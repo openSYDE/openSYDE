@@ -133,6 +133,9 @@ void C_CamMosDllWidget::m_InitUi(void)
    // initialize background color
    this->SetBackgroundColor(5);
 
+   // Activate drag and drop for path line edit
+   this->mpc_Ui->pc_LineEditCustomDllPath->SetDragAndDropActiveForFile("dll");
+
    // initialize title widget
    this->mpc_Ui->pc_WiHeader->SetTitle(C_GtGetText::h_GetText("PC CAN Interface Configuration"));
    this->mpc_Ui->pc_WiHeader->SetIcon("://images/IconConfig.svg");
@@ -185,6 +188,8 @@ void C_CamMosDllWidget::m_InitUi(void)
            this, &C_CamMosDllWidget::m_OtherDllClicked);
    connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::editingFinished, this,
            &C_CamMosDllWidget::m_OnCustomDllEdited);
+   connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::SigPathDropped, this,
+           &C_CamMosDllWidget::m_OnDroppedDllPath);
 
    // path actions
    connect(this->mpc_Ui->pc_PushButtonBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosDllWidget::m_OnBrowse);
@@ -390,14 +395,38 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
       c_Path = c_Dialog.selectedFiles().at(0);
-      c_Path = C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_Uti::h_GetExePath());
 
-      // if path contains invalid characters this returned empty
-      if (c_Path.isEmpty() == false)
+      if (c_Path != "")
       {
-         this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
-         this->m_UpdateCANDllPath();
+         this->m_SetCustomDllPath(c_Path);
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped dll path in line edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosDllWidget::m_OnDroppedDllPath(void)
+{
+   this->m_SetCustomDllPath(this->mpc_Ui->pc_LineEditCustomDllPath->GetPath());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for full create in path.
+
+   \param[in] orc_New New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosDllWidget::m_SetCustomDllPath(const QString & orc_New)
+{
+   const QString c_Path = C_CamUti::h_AskUserToSaveRelativePath(this, orc_New, C_Uti::h_GetExePath());
+
+   // if path contains invalid characters this returned empty
+   if (c_Path.isEmpty() == false)
+   {
+      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+      this->m_UpdateCANDllPath();
    }
 }
 

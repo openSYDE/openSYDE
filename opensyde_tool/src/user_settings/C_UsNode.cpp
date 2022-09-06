@@ -34,6 +34,10 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_UsNode::C_UsNode(void) :
+   mu8_CANopenManager(0),
+   mu8_DeviceInterfaceNumber(0),
+   mu32_CANopenDeviceUseCaseIndex(0),
+   mq_IsUseCaseIndexSelected(false),
    me_SelectedProtocol(stw_opensyde_core::C_OSCCanProtocol::eLAYER2),
    mu32_SelectedInterface(0)
 {
@@ -99,6 +103,128 @@ stw_opensyde_core::C_OSCCanProtocol::E_Type C_UsNode::GetSelectedProtocol(void) 
 stw_types::uint32 C_UsNode::GetSelectedInterface(void) const
 {
    return this->mu32_SelectedInterface;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen overview column width
+
+   \return
+   CANopen overview column width
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw_types::sint32> & C_UsNode::GetCANopenOverviewColumnWidth(void) const
+{
+   return this->mc_CANopenOverviewColumnWidth;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen PDO overview column width
+
+   \return
+   CANopen PDO overview column width
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw_types::sint32> & C_UsNode::GetCANopenPdoOverviewColumnWidth(void) const
+{
+   return this->mc_CANopenPdoOverviewColumnWidth;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen manager
+
+   \return
+   CANopen manager interface number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint8 C_UsNode::GetSelectedCANopenManager(void) const
+{
+   return this->mu8_CANopenManager;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen device interface number
+
+   \return
+   CANopen device interface number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint8 C_UsNode::GetSelectedCANopenDeviceInterfaceNumber(void) const
+{
+   return this->mu8_DeviceInterfaceNumber;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen device node name
+
+   \return
+   CANopen device node name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsNode::GetSelectedCANopenDeviceNodeName(void) const
+{
+   return this->mc_CANopenNodeName;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen device use case
+
+   \return
+   CANopen device use case index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+stw_types::uint32 C_UsNode::GetSelectedCANopenDeviceUseCaseIndex(void) const
+{
+   return this->mu32_CANopenDeviceUseCaseIndex;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get expanded CANopen manager
+
+   \return
+   CANopen expandend manager
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<stw_types::uint8, bool> C_UsNode::GetExpandedCANopenManager(void) const
+{
+   return this->mc_CANopenExpandedManager;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get expanded CANopen devices
+
+   \return
+   CANopen expanded devices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<stw_types::uint8, bool> C_UsNode::GetExpandedCANopenDevices(void) const
+{
+   return this->mc_CANopenExpandedDevices;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get expanded CANopen device
+
+   \return
+   CANopen expanded device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<std::pair<stw_types::uint8, std::pair<stw_types::uint8, stw_scl::C_SCLString> >,
+         bool> C_UsNode::GetExpandedCANopenDevice(void) const
+{
+   return this->mc_CANopenExpandedDevice;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get selected item
+
+   \return
+   true:    Use case is selected
+   false:   Interface is selected
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_UsNode::GetCANopenSelectedUseCaseOrInterface(void) const
+{
+   return this->mq_IsUseCaseIndexSelected;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -353,6 +479,109 @@ void C_UsNode::SetDatapoolListColumnSizes(const QString & orc_DatapoolName, cons
       c_Datapool.SetListColumnSizes(orc_ListName, orc_ColumnWidths);
       this->mc_Datapools.insert(orc_DatapoolName, c_Datapool);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set CANopen overview column width
+
+   \param[in]  orc_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetCANopenOverviewColumnWidth(const std::vector<stw_types::sint32> & orc_Value)
+{
+   this->mc_CANopenOverviewColumnWidth = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set CANopen PDO overview column width
+
+   \param[in]  orc_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetCANopenPdoOverviewColumnWidth(const std::vector<stw_types::sint32> & orc_Value)
+{
+   this->mc_CANopenPdoOverviewColumnWidth = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected CANopen manager
+
+   \param[in]  oru8_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedCANopenManager(const stw_types::uint8 & oru8_Value)
+{
+   this->mu8_CANopenManager = oru8_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected CANopen device
+
+   \param[in]  oru8_Number     Number
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedCANopenDevice(const stw_types::uint8 & oru8_Number, const QString & orc_Value)
+{
+   this->mu8_DeviceInterfaceNumber = oru8_Number;
+   this->mc_CANopenNodeName = orc_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected CANopen device use case
+
+   \param[in]  oru32_Value   Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetSelectedCANopenDeviceUseCaseIndex(const stw_types::uint32 & oru32_Value)
+{
+   this->mu32_CANopenDeviceUseCaseIndex = oru32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set expanded CANopen manager
+
+   \param[in]  orc_Interfaces   Interfaces
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetExpandedCANopenManager(const std::map<stw_types::uint8, bool> & orc_Interfaces)
+{
+   this->mc_CANopenExpandedManager = orc_Interfaces;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set expanded CANopen devices
+
+   \param[in]  orc_Devices   Devices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetExpandedCANopenDevices(const std::map<stw_types::uint8, bool> & orc_Devices)
+{
+   this->mc_CANopenExpandedDevices = orc_Devices;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set expanded CANopen device
+
+   \param[in]  orc_Device   Device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetExpandedCANopenDevice(const std::map<std::pair<stw_types::uint8, std::pair<stw_types::uint8,
+                                                                                             stw_scl::C_SCLString> >,
+                                                       bool> & orc_Device)
+{
+   this->mc_CANopenExpandedDevice = orc_Device;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set selected item
+
+   \param[in]  orq_IsUseCaseSelected   true or false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsNode::SetCANopenSelectedUseCaseOrInterface(const bool orq_IsUseCaseSelected)
+{
+   this->mq_IsUseCaseIndexSelected = orq_IsUseCaseSelected;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

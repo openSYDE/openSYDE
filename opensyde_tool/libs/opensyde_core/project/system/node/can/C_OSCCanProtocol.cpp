@@ -443,6 +443,64 @@ bool C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(const E_Type oe_Type)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get CAN message signals byte alignment required flag
+
+   \param[in]  oe_Type  Current protocol type
+
+   \retval   True    Byte alignment in a CAN message is required
+   \retval   False   Byte alignment in a CAN message is not required
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(const E_Type oe_Type)
+{
+   bool q_Retval;
+
+   switch (oe_Type)
+   {
+   case C_OSCCanProtocol::eCAN_OPEN:
+      q_Retval = true;
+      break;
+   case C_OSCCanProtocol::eLAYER2:
+   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OSCCanProtocol::eECES:
+   default:
+      q_Retval = false;
+      break;
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get CAN message signals required flag
+
+   \param[in]  oe_Type  Current protocol type
+
+   \retval   True    CAN message requires at least on signal
+   \retval   False   CAN message requires no signals
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanProtocol::h_GetCANMessageSignalsRequired(const E_Type oe_Type)
+{
+   bool q_Retval;
+
+   switch (oe_Type)
+   {
+   case C_OSCCanProtocol::eCAN_OPEN:
+      q_Retval = true;
+      break;
+   case C_OSCCanProtocol::eLAYER2:
+   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OSCCanProtocol::eECES:
+   default:
+      q_Retval = false;
+      break;
+   }
+
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all protocols
 
    \return

@@ -703,7 +703,7 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item row="2" column="2" colspan="3">
-        <widget class="stw_opensyde_gui_elements::C_OgeChxDefaultSmall" name="pc_CheckBoxCobIdWithNodeId">
+        <widget class="stw_opensyde_gui_elements::C_OgeChxPropertiesSmall" name="pc_CheckBoxCobIdWithNodeId">
          <property name="minimumSize">
           <size>
            <width>300</width>
@@ -744,7 +744,7 @@ p, li { white-space: pre-wrap; }
            <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxDlc">
             <property name="minimumSize">
              <size>
-              <width>100</width>
+              <width>210</width>
               <height>30</height>
              </size>
             </property>
@@ -995,11 +995,6 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
    <header>C_OgeLabGroupItem.h</header>
@@ -1015,11 +1010,6 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeCbxText.h</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.h</header>
@@ -1031,6 +1021,26 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeSpxNumber.h</header>
   </customwidget>
   <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeChxPropertiesSmall</class>
+   <extends>QCheckBox</extends>
+   <header>C_OgeChxPropertiesSmall.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLePropertiesName.h</header>
+  </customwidget>
+  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
    <extends>QCheckBox</extends>
    <header>C_OgeChxProperties.h</header>
@@ -1040,16 +1050,6 @@ p, li { white-space: pre-wrap; }
    <extends>QWidget</extends>
    <header>C_SdBueMessageRxList.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxDefaultSmall</class>
-   <extends>QCheckBox</extends>
-   <header>C_OgeChxDefaultSmall.h</header>
-  </customwidget>
-  <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

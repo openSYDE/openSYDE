@@ -45,15 +45,15 @@ public:
                                             stw_scl::C_SCLString & orc_ErrorMessage,
                                             const bool oq_SaveInCompatibilityFormat = false);
 
-   static stw_types::sint32 h_UnpackPackage(const stw_scl::C_SCLString & orc_PackagePath,
-                                            const stw_scl::C_SCLString & orc_TargetUnzipPath,
-                                            C_OSCSystemDefinition & orc_SystemDefinition,
-                                            stw_types::uint32 & oru32_ActiveBusIndex,
-                                            std::vector<stw_types::uint8> & orc_ActiveNodes,
-                                            std::vector<stw_types::uint32> & orc_NodesUpdateOrder,
-                                            std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-                                            stw_scl::C_SCLStringList & orc_WarningMessages,
-                                            stw_scl::C_SCLString & orc_ErrorMessage);
+   static stw_types::sint32 h_ProcessPackage(const stw_scl::C_SCLString & orc_PackagePath,
+                                             const stw_scl::C_SCLString & orc_TargetUnzipPath,
+                                             C_OSCSystemDefinition & orc_SystemDefinition,
+                                             stw_types::uint32 & oru32_ActiveBusIndex,
+                                             std::vector<stw_types::uint8> & orc_ActiveNodes,
+                                             std::vector<stw_types::uint32> & orc_NodesUpdateOrder,
+                                             std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+                                             stw_scl::C_SCLStringList & orc_WarningMessages,
+                                             stw_scl::C_SCLString & orc_ErrorMessage, const bool oq_IsZip);
 
    static stw_scl::C_SCLString h_GetPackageExtension();
 
@@ -91,6 +91,8 @@ protected:
                                                         // not available
    static stw_scl::C_SCLString mhc_ErrorMessage;        // description of error which caused the service update package
                                                         // to fail
+
+   static stw_types::sint32 mh_CheckSupFiles(const stw_scl::C_SCLString & orc_PackagePath);
 
    static stw_types::sint32 mh_CheckParamsToCreatePackage(const stw_scl::C_SCLString & orc_PackagePath,
                                                           const C_OSCSystemDefinition & orc_SystemDefinition,

@@ -301,7 +301,7 @@
                   </widget>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="pc_HorizontalLayout_10" stretch="0,0">
+                  <layout class="QHBoxLayout" name="pc_HorizontalLayout_10" stretch="0,0,0">
                    <property name="leftMargin">
                     <number>10</number>
                    </property>
@@ -310,6 +310,66 @@
                    </property>
                    <item>
                     <widget class="stw_opensyde_gui::C_SdBueMessageSelectorWidget" name="pc_MessageSelectorWidget" native="true"/>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="pc_CanOpenNoUsageWidget" native="true">
+                     <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,1">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
+                      <item>
+                       <spacer name="verticalSpacer_3">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeType">
+                         <enum>QSizePolicy::Fixed</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>26</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                      <item>
+                       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintNoUsageLabel">
+                        <property name="text">
+                         <string>TextLabel</string>
+                        </property>
+                        <property name="alignment">
+                         <set>Qt::AlignCenter</set>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <spacer name="verticalSpacer_4">
+                        <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                        </property>
+                        <property name="sizeHint" stdset="0">
+                         <size>
+                          <width>20</width>
+                          <height>282</height>
+                         </size>
+                        </property>
+                       </spacer>
+                      </item>
+                     </layout>
+                    </widget>
                    </item>
                    <item>
                     <widget class="QWidget" name="pc_LinkToBusWidget" native="true">
@@ -450,15 +510,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
-  </customwidget>
-  <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
    <header>C_OgeSpiStandard.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.h</header>
   </customwidget>
   <customwidget>
    <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>

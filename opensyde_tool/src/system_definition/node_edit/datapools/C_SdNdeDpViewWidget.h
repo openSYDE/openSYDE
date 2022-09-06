@@ -78,6 +78,7 @@ private:
    void m_UpdateUsageBarSize(void);
    void m_AutoStartAddressClicked(const bool oq_Enabled);
    void m_UpdateAutoStartAddressSvg(void) const;
+   void m_UpdateFollowingLists(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DataPoolType) const;
 
    Ui::C_SdNdeDpViewWidget * mpc_Ui;
    // array for more easy use of sub widgets

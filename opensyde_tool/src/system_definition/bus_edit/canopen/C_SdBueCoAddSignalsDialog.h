@@ -14,7 +14,7 @@
 #include "stwtypes.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OgeContextMenu.h"
-#include "C_SdBueCoAddSignalsResultEntry.h"
+#include "C_OSCCanOpenManagerMappableSignal.h"
 #include "C_PuiSvDbNodeDataPoolListElementId.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 
@@ -41,7 +41,7 @@ public:
    ~C_SdBueCoAddSignalsDialog(void);
 
    void InitStaticNames(void) const;
-   std::vector<stw_opensyde_gui_logic::C_SdBueCoAddSignalsResultEntry> GetSelectedSignals(void) const;
+   std::vector<stw_opensyde_core::C_OSCCanOpenManagerMappableSignal> GetSelectedSignals(void) const;
    void PrepareCleanUp(void);
 
 protected:

@@ -3084,15 +3084,19 @@ void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const 
       tgl_assert(pc_NodeData != NULL);
       if (pc_NodeData != NULL)
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+         std::vector<uint8> c_NodeActiveFlags;
+         const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+            ou32_ViewIndex,
+            c_NodeActiveFlags);
+
          //Name
          opc_TreeNode->c_Name = pc_NodeData->c_Properties.c_Name.c_str();
          //Icon
          opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_NODE);
          //State
-         if (pc_View != NULL)
+         if (s32_Retval == C_NO_ERR)
          {
-            opc_TreeNode->q_Enabled = static_cast<bool>(pc_View->GetNodeActiveFlags()[ou32_NodeIndex]);
+            opc_TreeNode->q_Enabled = static_cast<bool>(c_NodeActiveFlags[ou32_NodeIndex]);
             opc_TreeNode->q_Selectable = false;
 
             if (opc_TreeNode->q_Enabled == false)

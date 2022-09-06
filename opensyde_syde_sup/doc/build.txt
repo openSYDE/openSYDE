@@ -8,7 +8,7 @@ Used Compiler:
 Windows: 
    MinGW 8.1.0
    CMake 3.19.2
-   Ninja 1.7.2
+   Ninja 1.10.0
 Ubuntu 20.04: 
    GCC 9.3.0 (32-bit)
    CMake 3.16.3

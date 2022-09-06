@@ -113,7 +113,7 @@ private:
    void m_HandleUpdateFailure(void);
 
    void m_InitToolBox(void);
-   void m_CleanUpToolBox(void);
+   void m_CleanUpProgressLog(void);
    void m_AddProgressLogConnectEntry(const stw_types::uint32 ou32_NodeIndex);
 
    void m_ReplaceOriginalWithTempPaths(void);

@@ -107,6 +107,7 @@ void C_SdBueUnoSignalAddCommand::SetInitialData(const std::vector<C_OSCCanSignal
       // Adapt do safety protocol restrictions
       C_SdUtil::h_AdaptSignalToProtocolType(this->mc_Signal[u32_ItStep], orc_ProtocolType[u32_ItStep], NULL);
    }
+   tgl_assert(this->m_CheckSignalsSortedAscending());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

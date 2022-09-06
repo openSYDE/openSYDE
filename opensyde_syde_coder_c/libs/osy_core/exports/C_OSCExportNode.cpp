@@ -18,6 +18,8 @@
 #include "C_OSCExportNode.h"
 #include "C_OSCExportDataPool.h"
 #include "C_OSCExportCommunicationStack.h"
+#include "C_OSCExportCanOpenConfig.h"
+#include "C_OSCExportCanOpenInit.h"
 #include "C_OSCExportHalc.h"
 #include "C_OSCExportParamSet.h"
 #include "C_OSCExportOsyInit.h"
@@ -149,7 +151,8 @@ sint32 C_OSCExportNode::h_CreateSourceCode(const C_OSCNode & orc_Node, const stw
       // export COMM definition
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = mh_CreateCOMMStackCode(orc_Node, ou16_ApplicationIndex, orc_Path, orc_Files, c_ExportToolInfo);
+         s32_Retval = mh_CreateCOMMStackCode(orc_Node, ou16_ApplicationIndex, orc_Path, orc_Files,
+                                             c_ExportToolInfo);
       }
 
       // export HAL configuration
@@ -396,29 +399,69 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
       //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the application than create code
       if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
       {
+         std::vector<uint8> c_IFWithCanOpenManager;
          for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
               ++u32_ItInterface)
          {
-            const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
-            if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
-                (rc_ComMessageContainer.c_RxMessages.size() > 0))
+            //handle special case CANopen
+            //For CANopen we allow to have configuration with just the manager but no assigned devices
+            // (and therefore no messages). "c_ComMessages" lists all interfaces.
+            //So we create code for all of those interfaces where a manager is active:
+            if ((rc_Protocol.e_Type == C_OSCCanProtocol::eCAN_OPEN) &&
+                (orc_Node.c_CanOpenManagers.count(static_cast<uint8>(u32_ItInterface)) != 0))
             {
-               s32_Retval =
-                  C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
-                                                                    static_cast<uint8>(u32_ItInterface),
-                                                                    rc_Protocol.u32_DataPoolIndex,
-                                                                    rc_Protocol.e_Type, orc_ExportToolInfo);
-               //Handle file names
+               s32_Retval = C_OSCExportCanOpenConfig::h_CreateSourceCode(orc_Path, orc_Node,
+                                                                         ou16_ApplicationIndex,
+                                                                         static_cast<uint8>(u32_ItInterface),
+                                                                         rc_Protocol.u32_DataPoolIndex,
+                                                                         orc_ExportToolInfo);
+               //handle file names
                if (s32_Retval == C_NO_ERR)
                {
-                  C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
-                                                     C_OSCExportCommunicationStack::h_GetFileName(
-                                                        static_cast<uint8>(u32_ItInterface), rc_Protocol.e_Type), true);
+                  C_OSCExportUti::h_CollectFilePaths(
+                     orc_Files, orc_Path,
+                     C_OSCExportCanOpenConfig::h_GetFileName(static_cast<uint8>(u32_ItInterface)),
+                     true);
                }
-               else
+
+               c_IFWithCanOpenManager.push_back(static_cast<uint8>(u32_ItInterface));
+            }
+            //all other COMM protocol types remain as COMMStack export
+            else
+            {
+               //only if at least one message is defined:
+               const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
+               if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
+                   (rc_ComMessageContainer.c_RxMessages.size() > 0))
                {
-                  break;
+                  s32_Retval =
+                     C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
+                                                                       static_cast<uint8>(u32_ItInterface),
+                                                                       rc_Protocol.u32_DataPoolIndex,
+                                                                       rc_Protocol.e_Type, orc_ExportToolInfo);
+                  //Handle file names
+                  if (s32_Retval == C_NO_ERR)
+                  {
+                     C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
+                                                        C_OSCExportCommunicationStack::h_GetFileName(
+                                                           static_cast<uint8>(u32_ItInterface),
+                                                           rc_Protocol.e_Type), true);
+                  }
                }
+            }
+            if (s32_Retval != C_NO_ERR)
+            {
+               break;
+            }
+         }
+         if (c_IFWithCanOpenManager.size() > 0)
+         {
+            s32_Retval = C_OSCExportCanOpenInit::h_CreateSourceCode(orc_Path, orc_Node, c_IFWithCanOpenManager,
+                                                                    orc_ExportToolInfo);
+            //handle file names
+            if (s32_Retval == C_NO_ERR)
+            {
+               C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path, C_OSCExportCanOpenInit::h_GetFileName(), true);
             }
          }
          if (s32_Retval != C_NO_ERR)

@@ -54,10 +54,14 @@ C_SdNdeNodePropertiesTabContentWidget::C_SdNdeNodePropertiesTabContentWidget(QWi
 
    connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigChanged,
            this, &C_SdNdeNodePropertiesTabContentWidget::SigChanged);
+   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigErrorChange,
+           this, &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNameChanged,
            this, &C_SdNdeNodePropertiesTabContentWidget::SigNameChanged);
    connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigBusBitrateClicked,
            this, &C_SdNdeNodePropertiesTabContentWidget::SigBusBitrateClicked);
+   connect(this->mpc_Ui->pc_NodePropWidget, &C_SdNdeNodePropertiesWidget::SigNodePropChanged,
+           this, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigErrorChange, this,
            &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged, this,

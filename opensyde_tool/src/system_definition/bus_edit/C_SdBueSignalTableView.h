@@ -58,7 +58,10 @@ private:
    C_SdBueSignalTableView(const C_SdBueSignalTableView &);
    C_SdBueSignalTableView & operator =(const C_SdBueSignalTableView &);
 
+   const stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_SyncManager;
+
    void m_InitColumns(void);
+   void m_HandleColumnVisibility(void);
 
    QSortFilterProxyModel mc_SortProxyModel;
    stw_opensyde_gui_logic::C_SdBueSignalTableModel mc_Model;

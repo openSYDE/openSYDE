@@ -63,6 +63,7 @@ public:
    bool IsThereAnyHexFileInformation(void) const;
    bool IsDeviceInfoDiscarded(const stw_types::uint32 ou32_SubDeviceIndex) const;
    bool IsThereAnyHexFileInformationForDevice(const stw_types::uint32 ou32_SubDeviceIndex) const;
+   bool IsSubNodeActive(const stw_types::uint32 ou32_SubDeviceIndex) const;
 
    void DiscardInfo(void);
    bool CheckAlwaysUpdate(void) const;
@@ -90,6 +91,7 @@ private:
    bool mq_UpdateInProgress;
 
    std::vector<C_GiSvSubNodeData> mc_SubNodes;
+   std::vector<stw_types::uint8> mc_SubNodesActiveFlags;
 
    stw_types::uint32 m_GetCorrespondingSubNodeIndex(const stw_types::uint32 ou32_NodeIndex) const;
    static bool mh_IsPreconditionErrorSet(const std::vector<stw_types::uint32> & orc_ErrorIndexes,

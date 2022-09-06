@@ -331,39 +331,6 @@ bool C_GiSvNodeSyvUpdate::HasNoResponseAndIsActive(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get all not responding and active indices
-
-   \return
-   All not responding and active indices
-*/
-//----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_GiSvNodeSyvUpdate::GetAllNotRespondingAndActiveIndices() const
-{
-   std::vector<uint32> c_Retval;
-   if (this->ms32_Index >= 0)
-   {
-      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      if (pc_View != NULL)
-      {
-         const std::vector<uint32> c_NodeIndices =
-            C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
-               static_cast<uint32>(this->ms32_Index));
-         for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
-         {
-            if (pc_View->GetNodeActive(c_NodeIndices[u32_ItNode]))
-            {
-               if (this->mc_NodeData.GetInitialStateByNodeIndex(c_NodeIndices[u32_ItNode]) == C_SyvUtil::eI_ERROR)
-               {
-                  c_Retval.push_back(c_NodeIndices[u32_ItNode]);
-               }
-            }
-         }
-      }
-   }
-   return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all active STW device indices
 
    \return
@@ -375,15 +342,19 @@ std::vector<uint32> C_GiSvNodeSyvUpdate::GetAllActiveSTWDeviceIndices() const
    std::vector<uint32> c_Retval;
    if (this->ms32_Index >= 0)
    {
-      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-      if (pc_View != NULL)
+      std::vector<uint8> c_NodeActiveFlags;
+      const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+         this->mu32_ViewIndex,
+         c_NodeActiveFlags);
+
+      if (s32_Retval == C_NO_ERR)
       {
          const std::vector<uint32> c_NodeIndices =
             C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
                static_cast<uint32>(this->ms32_Index));
          for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
          {
-            if (pc_View->GetNodeActive(c_NodeIndices[u32_ItNode]))
+            if (c_NodeActiveFlags[c_NodeIndices[u32_ItNode]] == 1U)
             {
                if (this->mc_NodeData.GetSTWDeviceInfoByNodeIndex(c_NodeIndices[u32_ItNode]))
                {

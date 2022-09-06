@@ -32,6 +32,8 @@ public:
    C_SdNdeCoOverviewTableView(QWidget * const opc_Parent = NULL);
    virtual ~C_SdNdeCoOverviewTableView(void);
 
+   void LoadUserSettings(void);
+   void SaveUserSettings(void) const;
    void UpdateData(void);
    void SetNodeIndex(const stw_types::uint32 ou32_NodeIndex);
    stw_types::sintn GetCountRows(void) const;

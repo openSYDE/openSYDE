@@ -75,8 +75,8 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
                                                  const uint32 ou32_BusIndex,
                                                  const C_OSCCanProtocol::E_Type oe_ProtocolType,
                                                  const std::vector<C_CieImportDataAssignment> & orc_ImportDataAssigned,
-                                                 const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned,
-                                                 const stw_scl::C_SCLString * const opc_NodeNameReplacement) :
+                                                 const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned, const stw_scl::C_SCLString * const opc_NodeNameReplacement,
+                                                 const bool oq_IsCANopen) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieImportReportWidget),
    mrc_ParentDialog(orc_Parent),
@@ -109,7 +109,7 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
    mh_AdaptMessageNames(this->mc_SkippedImportedAssignedData);
    tgl_assert(m_ShowReport(c_FileInfo.
                            completeSuffix().
-                           toUpper()) == C_NO_ERR);
+                           toUpper(), oq_IsCANopen) == C_NO_ERR);
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_CieImportReportWidget::m_OkClicked);
@@ -387,7 +387,7 @@ void C_CieImportReportWidget::m_AdaptMessagesToProtocolType(
    C_CONFIG Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieImportReportWidget::m_ShowReport(const QString & orc_Suffix)
+sint32 C_CieImportReportWidget::m_ShowReport(const QString & orc_Suffix, const bool oq_IsCANopen)
 {
    sint32 s32_Retval;
    QString c_ImportTable = "";
@@ -429,7 +429,14 @@ sint32 C_CieImportReportWidget::m_ShowReport(const QString & orc_Suffix)
       QString c_ReadContent;
 
       //Sum up read content
-      c_ReadContent += C_GtGetText::h_GetText("Nodes: ");
+      if (oq_IsCANopen == true)
+      {
+         c_ReadContent += C_GtGetText::h_GetText("PDOs: ");
+      }
+      else
+      {
+         c_ReadContent += C_GtGetText::h_GetText("Nodes: ");
+      }
       for (uint32 u32_ItNodes = 0; u32_ItNodes < this->mc_ImportedAssignedData.size(); u32_ItNodes++)
       {
          C_CieImportDataAssignment & rc_CurData = this->mc_ImportedAssignedData[u32_ItNodes];
@@ -455,18 +462,21 @@ sint32 C_CieImportReportWidget::m_ShowReport(const QString & orc_Suffix)
       C_OSCLoggingHandler::h_Flush();
 
       //Info
-      c_CompleteLog += "<h3>";
-      c_CompleteLog += C_GtGetText::h_GetText("Import Preview");
-      c_CompleteLog += "</h3>";
-      c_CompleteLog += "<p>";
-      c_CompleteLog += C_GtGetText::h_GetText("Info: Message and signal names are adapted as follows:");
-      c_CompleteLog += "<br/>";
-      c_CompleteLog += "- ";
-      c_CompleteLog += C_GtGetText::h_GetText("Eliminate spaces");
-      c_CompleteLog += "<br/>";
-      c_CompleteLog += "- ";
-      c_CompleteLog += C_GtGetText::h_GetText("Cut to 31 characters");
-      c_CompleteLog += "</p>";
+      if (c_ImportTable.isEmpty() == false)
+      {
+         c_CompleteLog += "<h3>";
+         c_CompleteLog += C_GtGetText::h_GetText("Import Preview");
+         c_CompleteLog += "</h3>";
+         c_CompleteLog += "<p>";
+         c_CompleteLog += C_GtGetText::h_GetText("Info: Message and signal names are adapted as follows:");
+         c_CompleteLog += "<br/>";
+         c_CompleteLog += "- ";
+         c_CompleteLog += C_GtGetText::h_GetText("Eliminate spaces");
+         c_CompleteLog += "<br/>";
+         c_CompleteLog += "- ";
+         c_CompleteLog += C_GtGetText::h_GetText("Cut to 31 characters");
+         c_CompleteLog += "</p>";
+      }
 
       //Table
       if (c_ImportTable.isEmpty() == false)

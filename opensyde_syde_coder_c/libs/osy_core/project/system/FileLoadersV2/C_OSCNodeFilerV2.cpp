@@ -863,6 +863,7 @@ C_SCLString C_OSCNodeFilerV2::h_CommunicationProtocolToString(const C_OSCCanProt
    case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
       c_Retval = "can open safety";
       break;
+   case C_OSCCanProtocol::eCAN_OPEN:
    default:
       c_Retval = "invalid";
       break;
@@ -1957,6 +1958,8 @@ C_SCLString C_OSCNodeFilerV2::mh_NodeComMessageTxMethodToString(
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
       c_Retval = "on-application-event";
       break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
    default:
       c_Retval = "invalid";
       break;

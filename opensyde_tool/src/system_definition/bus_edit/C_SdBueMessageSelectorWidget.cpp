@@ -13,10 +13,12 @@
 #include <QAction>
 
 #include "C_GtGetText.h"
+#include "C_PuiSdHandler.h"
 #include "C_SdBueMessageSelectorWidget.h"
 #include "C_OgeWiCustomMessage.h"
 #include "ui_C_SdBueMessageSelectorWidget.h"
 
+#include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_Uti.h"
 
@@ -51,6 +53,11 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageSelectorWidget),
    mpc_ContextMenu(NULL),
+   mpc_MessageSyncManager(NULL),
+   mq_ModeSingleNode(false),
+   mu32_NodeIndex(0),
+   mu32_InterfaceIndex(0),
+   mu32_BusIndex(0),
    mq_MessagesActive(true),
    me_ProtocolType(C_OSCCanProtocol::eLAYER2),
    mpc_AddMessageAction(NULL),
@@ -132,9 +139,14 @@ C_SdBueMessageSelectorWidget::~C_SdBueMessageSelectorWidget()
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetNodeId(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                             const std::vector<uint32> & orc_DatapoolIndexes) const
+                                             const std::vector<uint32> & orc_DatapoolIndexes)
 {
+   this->mq_ModeSingleNode = true;
+   this->mu32_NodeIndex = ou32_NodeIndex;
+   this->mu32_InterfaceIndex = ou32_InterfaceIndex;
    this->mpc_Ui->pc_MessageTreeWidget->SetNodeId(ou32_NodeIndex, ou32_InterfaceIndex, orc_DatapoolIndexes);
+   this->RecheckProtocolError();
+   this->UpdateButtonText();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,9 +155,13 @@ void C_SdBueMessageSelectorWidget::SetNodeId(const uint32 ou32_NodeIndex, const 
    \param[in]  ou32_BusIndex  Bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSelectorWidget::SetBusId(const uint32 ou32_BusIndex) const
+void C_SdBueMessageSelectorWidget::SetBusId(const uint32 ou32_BusIndex)
 {
+   this->mq_ModeSingleNode = false;
+   this->mu32_BusIndex = ou32_BusIndex;
    this->mpc_Ui->pc_MessageTreeWidget->SetBusId(ou32_BusIndex);
+   this->RecheckProtocolError();
+   this->UpdateButtonText();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -163,18 +179,10 @@ void C_SdBueMessageSelectorWidget::SetProtocolType(const stw_opensyde_core::C_OS
    //Text
    if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
    {
-      this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
-         C_GtGetText::h_GetText("PDO Messages"),
-         C_GtGetText::h_GetText("Show overview of all PDO messages / mapped signals"));
-
       this->mpc_Ui->pc_PbAddMessage->setEnabled(false);
    }
    else
    {
-      this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(C_GtGetText::h_GetText("Messages"),
-                                                               C_GtGetText::h_GetText(
-                                                                  "Show overview of all messages / signals"));
-
       this->mpc_Ui->pc_PbAddMessage->setEnabled(true);
    }
 }
@@ -187,18 +195,27 @@ void C_SdBueMessageSelectorWidget::SetProtocolType(const stw_opensyde_core::C_OS
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::UpdateButtonText(void) const
 {
-   QString c_Text;
+   if (this->mpc_Ui->pc_PbTreeWidgetRoot->isVisible() == true)
+   {
+      QString c_Text;
 
-   //Text
-   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
-   {
-      c_Text = static_cast<QString>(C_GtGetText::h_GetText("PDO Messages (%1)"));
+      //Text
+      if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+      {
+         c_Text = static_cast<QString>(C_GtGetText::h_GetText("PDO Messages (%1)"));
+      }
+      else
+      {
+         c_Text = static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)"));
+      }
+
+      tgl_assert(this->mpc_MessageSyncManager != NULL);
+      if (this->mpc_MessageSyncManager != NULL)
+      {
+         const uint32 u32_MsgCount = this->mpc_MessageSyncManager->GetUniqueMessageCount(this->me_ProtocolType);
+         this->mpc_Ui->pc_PbTreeWidgetRoot->setText(c_Text.arg(u32_MsgCount));
+      }
    }
-   else
-   {
-      c_Text = static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)"));
-   }
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(c_Text.arg(this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -219,8 +236,9 @@ void C_SdBueMessageSelectorWidget::SetUndoManager(stw_opensyde_gui_logic::C_SdBu
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSelectorWidget::SetMessageSyncManager(
-   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
+   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
+   this->mpc_MessageSyncManager = opc_Value;
    this->mpc_Ui->pc_MessageTreeWidget->SetMessageSyncManager(opc_Value);
 }
 
@@ -342,6 +360,159 @@ void C_SdBueMessageSelectorWidget::RecheckErrorGlobal(void) const
 void C_SdBueMessageSelectorWidget::RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MessageTreeWidget->RecheckError(orc_MessageId);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks for protocol errors
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::RecheckProtocolError(void) const
+{
+   QString c_ErrorText;
+   QString c_ErrorNodes;
+   bool q_Valid = true;
+
+   bool q_CommRxSignalCountInvalid = false;
+   bool q_CommTxSignalCountInvalid = false;
+   bool q_CoRPdoCountInvalid = false;
+   bool q_CoTPdoCountInvalid = false;
+
+   if (this->mq_ModeSingleNode == true)
+   {
+      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+
+      if (pc_Node != NULL)
+      {
+         pc_Node->CheckErrorCANProtocol(this->mu32_InterfaceIndex, this->me_ProtocolType, false,
+                                        q_CommRxSignalCountInvalid, q_CommTxSignalCountInvalid,
+                                        q_CoRPdoCountInvalid, q_CoTPdoCountInvalid);
+      }
+   }
+   else
+   {
+      std::vector<uint32> c_NodeIndexes;
+      std::vector<uint32> c_InterfaceIndexes;
+      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
+                                                                                         c_NodeIndexes,
+                                                                                         c_InterfaceIndexes);
+
+      c_ErrorNodes = C_GtGetText::h_GetText("\nAffected nodes:");
+
+      for (uint32 u32_Counter = 0U; u32_Counter < c_NodeIndexes.size(); u32_Counter++)
+      {
+         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            c_NodeIndexes[u32_Counter]);
+         tgl_assert(pc_Node != NULL);
+
+         if (pc_Node != NULL)
+         {
+            bool q_TempCommRxSignalCountInvalid;
+            bool q_TempCommTxSignalCountInvalid;
+            bool q_TempCoRPdoCountInvalid;
+            bool q_TempCoTPdoCountInvalid;
+
+            pc_Node->CheckErrorCANProtocol(c_InterfaceIndexes[u32_Counter], this->me_ProtocolType, true,
+                                           q_TempCommRxSignalCountInvalid, q_TempCommTxSignalCountInvalid,
+                                           q_TempCoRPdoCountInvalid, q_TempCoTPdoCountInvalid);
+
+            // Do not overwrite already detected errors
+            if ((q_TempCommRxSignalCountInvalid == true) ||
+                (q_TempCommTxSignalCountInvalid == true) ||
+                (q_TempCoRPdoCountInvalid == true) ||
+                (q_TempCoTPdoCountInvalid == true))
+            {
+               c_ErrorNodes += "\n" + static_cast<QString>(pc_Node->c_Properties.c_Name.c_str());
+
+               if (q_TempCommRxSignalCountInvalid == true)
+               {
+                  q_CommRxSignalCountInvalid = true;
+               }
+               if (q_TempCommTxSignalCountInvalid == true)
+               {
+                  q_CommTxSignalCountInvalid = true;
+               }
+               if (q_TempCoRPdoCountInvalid == true)
+               {
+                  q_CoRPdoCountInvalid = true;
+               }
+               if (q_TempCoTPdoCountInvalid == true)
+               {
+                  q_CoTPdoCountInvalid = true;
+               }
+            }
+         }
+      }
+   }
+
+   if ((q_CommRxSignalCountInvalid == true) ||
+       (q_CommTxSignalCountInvalid == true) ||
+       (q_CoRPdoCountInvalid == true) ||
+       (q_CoTPdoCountInvalid == true))
+   {
+      q_Valid = false;
+      c_ErrorText = C_GtGetText::h_GetText("\n\nProtocol error detected:\n");
+
+      if (q_CommRxSignalCountInvalid == true)
+      {
+         c_ErrorText += C_GtGetText::h_GetText("The number of RX signals is too high. The maximum is 2048.");
+      }
+      if (q_CommTxSignalCountInvalid == true)
+      {
+         c_ErrorText += C_GtGetText::h_GetText("The number of TX signals is too high. The maximum is 2048.");
+      }
+      if (q_CoRPdoCountInvalid == true)
+      {
+         c_ErrorText += C_GtGetText::h_GetText("The number of active RPDOs is too high. The maximum is 512.");
+      }
+      if (q_CoTPdoCountInvalid == true)
+      {
+         c_ErrorText += C_GtGetText::h_GetText("The number of active TPDOs is too high. The maximum is 512.");
+      }
+
+      if (c_ErrorNodes != "")
+      {
+         c_ErrorText += c_ErrorNodes;
+      }
+   }
+
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PbTreeWidgetRoot, "Valid", q_Valid);
+
+   // Update the tooltip
+   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      const QString c_Text = C_GtGetText::h_GetText("Show overview of all PDO messages / mapped signals");
+
+      if (q_Valid == true)
+      {
+         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
+            C_GtGetText::h_GetText("PDO Messages"),
+            c_Text);
+      }
+      else
+      {
+         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
+            C_GtGetText::h_GetText("PDO Messages"),
+            c_Text + c_ErrorText,
+            C_NagToolTip::eERROR);
+      }
+   }
+   else
+   {
+      const QString c_Text = C_GtGetText::h_GetText("Show overview of all messages / mapped signals");
+
+      if (q_Valid == true)
+      {
+         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(C_GtGetText::h_GetText("Messages"),
+                                                                  c_Text);
+      }
+      else
+      {
+         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
+            C_GtGetText::h_GetText("Messages"),
+            c_Text + c_ErrorText,
+            C_NagToolTip::eERROR);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -782,6 +953,7 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
          {
             // no level and under
             this->mpc_AddMessageAction->setVisible(!q_ProtCoActive);
+            this->mpc_AddMessageAction->setEnabled(true);
             this->mpc_AddSignalAction->setVisible(false);
             this->mpc_AddSignalActionWithKey->setVisible(false);
 
@@ -839,11 +1011,7 @@ void C_SdBueMessageSelectorWidget::m_OnMessageCountChanged(void)
    Q_EMIT (this->SigMessageCountChanged());
 
    //Text
-   this->mpc_Ui->pc_PbTreeWidgetRoot->setText(static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)")).arg(this->
-                                                                                                                mpc_Ui->
-                                                                                                                pc_MessageTreeWidget
-                                                                                                                ->
-                                                                                                                topLevelItemCount()));
+   this->UpdateButtonText();
 
    //Handle visibility
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)

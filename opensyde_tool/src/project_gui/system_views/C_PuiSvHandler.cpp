@@ -239,6 +239,142 @@ bool C_PuiSvHandler::GetServiceModeActive(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Getting the node active flags with deactivated sub nodes of squad nodes when not connected
+
+   Special case for active squad nodes:
+   * When a sub node has no interface connected, the sub node will be deactivated
+   * When a sub node has an interface connected, check for an error on the route.
+      * If the route is valid, the sub node remains active
+      * If the route is invalid, the sub node will be deactivated
+
+   But at least one sub node of a squad must be active. If this is not the case, the sub nodes will remain as active
+
+   \param[in]       ou32_ViewIndex    View index
+   \param[out]      orc_ActiveFlags   Adapted node active flags if return value equals C_NO_ERR
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_ViewIndex,
+                                                            std::vector<uint8> & orc_ActiveFlags)
+{
+   sint32 s32_Return = C_RANGE;
+
+   orc_ActiveFlags.clear();
+
+   if (ou32_ViewIndex < this->mc_Views.size())
+   {
+      const uint32 u32_Hash = this->GetViewHash(ou32_ViewIndex);
+      const QMap<stw_types::uint32,
+                 std::vector<stw_types::uint8> >::const_iterator c_It =
+         this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.find(u32_Hash);
+
+      s32_Return = C_NO_ERR;
+
+      if (c_It == this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.end())
+      {
+         C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
+         const C_OSCNodeSquad * pc_Squad = NULL;
+         uint32 u32_SquadCounter = 0U;
+
+         // activate all where only one active
+         rc_View.ActivateAllRelevantSubDevices();
+
+         // Get the original user configured active flags
+         orc_ActiveFlags = rc_View.GetNodeActiveFlags();
+
+         // Search for squads
+         do
+         {
+            pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_SquadCounter);
+
+            if (pc_Squad != NULL)
+            {
+               uint32 u32_SubNodeCounter;
+               bool q_AtLeastOneSubNodeActive = false;
+               std::vector<uint8> c_SubNodeActiveFlags;
+
+               c_SubNodeActiveFlags.resize(pc_Squad->c_SubNodeIndexes.size(), 0U);
+
+               // Check each sub node
+               for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < pc_Squad->c_SubNodeIndexes.size();
+                    ++u32_SubNodeCounter)
+               {
+                  const uint32 u32_NodeIndex = pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter];
+
+                  // Check only necessary if node is active in the first place
+                  if (orc_ActiveFlags[u32_NodeIndex] != 0U)
+                  {
+                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+                     tgl_assert(pc_Node != NULL);
+                     if (pc_Node != NULL)
+                     {
+                        // Check for connected interfaces
+                        uint32 u32_IntfCounter;
+                        bool q_AtLeastOneInftConnected = false;
+
+                        for (u32_IntfCounter = 0U; u32_IntfCounter < pc_Node->c_Properties.c_ComInterfaces.size();
+                             ++u32_IntfCounter)
+                        {
+                           const C_OSCNodeComInterfaceSettings & rc_Intf =
+                              pc_Node->c_Properties.c_ComInterfaces[u32_IntfCounter];
+
+                           if (rc_Intf.GetBusConnected() == true)
+                           {
+                              q_AtLeastOneInftConnected = true;
+                              break;
+                           }
+                        }
+
+                        if (q_AtLeastOneInftConnected == true)
+                        {
+                           // Check for an existing valid route
+                           const C_SyvRoRouteCalculation c_RouteCalcCheck(
+                              ou32_ViewIndex, u32_NodeIndex,
+                              stw_opensyde_core::C_OSCRoutingCalculation::eROUTING_CHECK);
+
+                           if (c_RouteCalcCheck.GetState() == C_NO_ERR)
+                           {
+                              // Valid route found
+                              c_SubNodeActiveFlags[u32_SubNodeCounter] = 1U;
+                              q_AtLeastOneSubNodeActive = true;
+                           }
+                        }
+                     }
+                  }
+               }
+
+               // In case of no active sub node of the squad, do not change the original active flag configuration
+               // to let the normal error handling do its job
+               if (q_AtLeastOneSubNodeActive == true)
+               {
+                  // In the case of at least one active sub node, transfer the adapted active flags of the sub node
+                  // to the output parameter
+                  for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_SubNodeActiveFlags.size(); ++u32_SubNodeCounter)
+                  {
+                     const uint32 u32_NodeIndex = pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter];
+                     orc_ActiveFlags[u32_NodeIndex] = c_SubNodeActiveFlags[u32_SubNodeCounter];
+                  }
+               }
+               ++u32_SquadCounter;
+            }
+         }
+         while (pc_Squad != NULL);
+
+         //Store results
+         this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.insert(u32_Hash, orc_ActiveFlags);
+      }
+      else
+      {
+         orc_ActiveFlags = c_It.value();
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set service mode active
 
    \param[in]  oq_NewValue    New value
@@ -2330,6 +2466,7 @@ void C_PuiSvHandler::UpdateSystemDefintionErrors(void)
       }
       //Clear all previous view errors (might have changed with new SD)
       this->mc_PreviousErrorCheckResults.clear();
+      this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.clear();
    }
 }
 
@@ -2415,7 +2552,10 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          std::set<uint32> c_NodesWithDashboardRoutingError;
          std::set<uint32> c_NodesRelevantForDashboardRouting;
          QString c_SetupWarningMessage;
-         const std::vector<uint8> & rc_NodeActiveFlags = rc_CheckedData.GetNodeActiveFlags();
+         std::vector<uint8> c_NodeActiveFlags;
+
+         // Get the adapted node active flags in which the not reachable sub nodes of squads are deactivated
+         this->GetNodeActiveFlagsWithSquadAdaptions(ou32_Index, c_NodeActiveFlags);
          //Name check
          c_Details.q_NameInvalid = false;
          for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
@@ -2432,9 +2572,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Check PC connected
          c_Details.q_PCNotConnected = !rc_CheckedData.GetPcData().GetConnected();
          //Check all routing details
-         tgl_assert(this->m_CheckRoutingAndUpdateNodes(ou32_Index, c_SetupWarningMessage, c_ErrorMessages,
-                                                       c_NodesWithDashboardRoutingError,
-                                                       c_NodesRelevantForDashboardRouting) == C_NO_ERR);
+         tgl_assert(this->m_CheckRouting(ou32_Index, c_NodeActiveFlags, c_SetupWarningMessage, c_ErrorMessages,
+                                         c_NodesWithDashboardRoutingError,
+                                         c_NodesRelevantForDashboardRouting) == C_NO_ERR);
          c_Details.c_RoutingErrorMessages = c_ErrorMessages;
          c_Details.c_RoutingSetupWarningMessage = c_SetupWarningMessage;
          c_Details.c_ResultNodesWithDashboardRoutingError = c_NodesWithDashboardRoutingError;
@@ -2443,9 +2583,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Check system definition
          c_Details.q_SysDefInvalid = false;
          //Node error
-         for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
+         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
          {
-            if (rc_NodeActiveFlags[u32_ItNode] == true)
+            if (c_NodeActiveFlags[u32_ItNode] == true)
             {
                if (this->GetErrorNode(u32_ItNode) == true)
                {
@@ -2472,9 +2612,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Check any nodes active
          c_Details.q_NoNodesActive = true;
          //Node error
-         for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
+         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
          {
-            if (rc_NodeActiveFlags[u32_ItNode] == true)
+            if (c_NodeActiveFlags[u32_ItNode] == true)
             {
                c_Details.q_NoNodesActive = false;
                break;
@@ -4159,6 +4299,7 @@ void C_PuiSvHandler::m_HandleCompatibilityChart(void)
 /*! \brief   Check routing error
 
    \param[in]      ou32_ViewIndex                       View index
+   \param[in]      orc_CheckedNodeActiveFlags           Flags for active nodes
    \param[in,out]  orc_SetupWarningRoutingDetails       Warning details for setup case: generic routing,
                                                         update and dashboard routing
    \param[in,out]  orc_ErrorRoutingDetails              Error details for each case: generic routing,
@@ -4173,9 +4314,13 @@ void C_PuiSvHandler::m_HandleCompatibilityChart(void)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::m_CheckRoutingDetails(const uint32 ou32_ViewIndex, std::map<uint32,
-                                                                                   QString> & orc_SetupWarningRoutingDetails, std::vector<std::map<uint32,
-                                                                                                                                                   QString> > & orc_ErrorRoutingDetails, std::set<uint32> & orc_NodesWithDashboardRoutingError,
+sint32 C_PuiSvHandler::m_CheckRoutingDetails(const uint32 ou32_ViewIndex,
+                                             const std::vector<stw_types::uint8> & orc_CheckedNodeActiveFlags,
+                                             std::map<uint32,
+                                                      QString> & orc_SetupWarningRoutingDetails,
+                                             std::vector<std::map<uint32,
+                                                                  QString> > & orc_ErrorRoutingDetails,
+                                             std::set<uint32> & orc_NodesWithDashboardRoutingError,
                                              std::set<uint32> & orc_NodesRelevantForDashboardRouting)
 const
 {
@@ -4186,14 +4331,12 @@ const
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      const C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      const std::vector<uint8> & rc_ActiveNodes = rc_View.GetNodeActiveFlags();
       uint32 u32_Counter;
 
       // check connection state of all active nodes
-      for (u32_Counter = 0U; u32_Counter < rc_ActiveNodes.size(); ++u32_Counter)
+      for (u32_Counter = 0U; u32_Counter < orc_CheckedNodeActiveFlags.size(); ++u32_Counter)
       {
-         if (rc_ActiveNodes[u32_Counter] == true)
+         if (orc_CheckedNodeActiveFlags[u32_Counter] == true)
          {
             const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                u32_Counter);
@@ -4334,11 +4477,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check routing
 
-   \param[in]      ou32_ViewIndex            View index
-   \param[out]     orq_RoutingError          Routing error
-   \param[in,out]  orc_SetupWarningMessage   Setup specific warning message
-   \param[in,out]  orc_ErrorMessages         Error messages for each sub mode
-   \param[in,out]  orc_NodesWithDashboardRoutingError       All nodes with dashboard specific routing errors
+   \param[in]      ou32_ViewIndex                       View index
+   \param[in]      orc_CheckedNodeActiveFlags           Flags for active nodes
+   \param[out]     orq_RoutingError                     Routing error
+   \param[in,out]  orc_SetupWarningMessage              Setup specific warning message
+   \param[in,out]  orc_ErrorMessages                    Error messages for each sub mode
+   \param[in,out]  orc_NodesWithDashboardRoutingError   All nodes with dashboard specific routing errors
    \param[in,out]  orc_NodesRelevantForDashboardRouting All nodes which are capable for dashboard communication
                                                         or are involved in the route for dashboard communication
                                                         without detected errors
@@ -4348,14 +4492,16 @@ const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex, QString & orc_SetupWarningMessage,
-                                      std::vector<QString> & orc_ErrorMessages,
+sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex,
+                                      const std::vector<uint8> & orc_CheckedNodeActiveFlags,
+                                      QString & orc_SetupWarningMessage, std::vector<QString> & orc_ErrorMessages,
                                       std::set<uint32> & orc_NodesWithDashboardRoutingError,
                                       std::set<uint32> & orc_NodesRelevantForDashboardRouting) const
 {
    std::map<uint32, QString> c_SetupWarningDetails;
    std::vector<std::map<uint32, QString> > c_ErrorDetails;
-   const sint32 s32_Retval = this->m_CheckRoutingDetails(ou32_ViewIndex, c_SetupWarningDetails, c_ErrorDetails,
+   const sint32 s32_Retval = this->m_CheckRoutingDetails(ou32_ViewIndex, orc_CheckedNodeActiveFlags,
+                                                         c_SetupWarningDetails, c_ErrorDetails,
                                                          orc_NodesWithDashboardRoutingError,
                                                          orc_NodesRelevantForDashboardRouting);
    uintn un_ErrorCounter;
@@ -4435,42 +4581,6 @@ sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex, QString & orc
    }
 
    return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check routing and update nodes
-
-   \param[in]      ou32_ViewIndex                           View index
-   \param[out]     orc_SetupWarningMessage                  Setup specific warning message
-   \param[in,out]  orc_ErrorMessages                        Error messages for each sub mode
-   \param[in,out]  orc_NodesWithDashboardRoutingError       All nodes with dashboard specific routing errors
-   \param[in,out]  orc_NodesRelevantForDashboardRouting     All nodes which are capable for dashboard communication
-                                                            or are involved in the route for dashboard communication
-                                                            without detected errors
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::m_CheckRoutingAndUpdateNodes(const uint32 ou32_ViewIndex, QString & orc_SetupWarningMessage,
-                                                    std::vector<QString> & orc_ErrorMessages,
-                                                    std::set<uint32> & orc_NodesWithDashboardRoutingError,
-                                                    std::set<uint32> & orc_NodesRelevantForDashboardRouting)
-{
-   //Only necessary for multi cpu
-   if (C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_NodeSquads.size() > 0UL)
-   {
-      if (ou32_ViewIndex < this->mc_Views.size())
-      {
-         C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-         // activate all where only one active
-         rc_View.ActivateAllRelevantSubDevices();
-      }
-   }
-   return m_CheckRouting(ou32_ViewIndex, orc_SetupWarningMessage, orc_ErrorMessages,
-                         orc_NodesWithDashboardRoutingError,
-                         orc_NodesRelevantForDashboardRouting);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

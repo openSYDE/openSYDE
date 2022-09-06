@@ -27,11 +27,22 @@ public:
                                                                         const stw_types::uint8 ou8_InterfaceNumber)
    const;
    const stw_opensyde_core::C_OSCNode * GetCanOpenManagerNodeOnBus(const stw_types::uint32 ou32_BusIndex) const;
+   stw_types::sint32 GetCanOpenManagerNodeOnBus(const stw_types::uint32 ou32_BusIndex,
+                                                stw_types::uint32 & oru32_ManagerNodeIndex,
+                                                stw_types::uint8 * const opu8_ManagerIntfNumber) const;
    const stw_opensyde_core::C_OSCCanOpenManagerDeviceInfo * GetCanOpenManagerDevice(
       const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_InterfaceNumber,
       const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId) const;
    const stw_opensyde_core::C_OSCCanOpenManagerDeviceInfo * GetCanOpenManagerDevice(
       const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   stw_types::sint32 GetCanOpenManagerOfDeviceAndId(const stw_types::uint32 ou32_DeviceNodeIndex,
+                                                    stw_types::uint32 * const opu32_ManagerNodeIndex,
+                                                    stw_types::uint8 * const opu8_ManagerInterfaceNumber,
+                                                    stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceNodeId)
+   const;
+   const stw_opensyde_core::C_OSCCanOpenManagerDeviceInfo * GetCanOpenManagerDeviceForAnyManager(
+      const stw_types::uint32 ou32_ManagerNodeIndex,
+      const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId) const;
 
    //CANOpen setter
    stw_types::sint32 SetCanOpenManagerCommonProperties(const stw_types::uint32 ou32_NodeIndex,
@@ -41,23 +52,19 @@ public:
                                                        const stw_types::uint16 ou16_GlobalSDOTimeoutMs,
                                                        const bool oq_AutostartCanOpenManager,
                                                        const bool oq_StartDevices, const bool oq_NMTStartAll,
-                                                       const stw_opensyde_core::C_OSCCanOpenManagerInfo::E_NMTErrorBehaviourType oe_NMTErrorBehaviour, const bool oq_EnableHeartbeatProducing);
+                                                       const stw_opensyde_core::C_OSCCanOpenManagerInfo::E_NMTErrorBehaviourType oe_NMTErrorBehaviour);
    stw_types::sint32 SetCanOpenManagerProducerHeartbeat(const stw_types::uint32 ou32_NodeIndex,
                                                         const stw_types::uint8 ou8_InterfaceNumber,
-                                                        const stw_types::uint16 ou16_HeartbeatProducerTimeMs);
-   stw_types::sint32 SetCanOpenManagerDeviceProperties(const stw_types::uint32 ou32_NodeIndex,
-                                                       const stw_types::uint8 ou8_InterfaceNumber,
-                                                       const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId,
-                                                       const bool oq_DeviceOptional, const bool oq_NoInitialization,
-                                                       const bool oq_FactorySettingsActive,
-                                                       const stw_types::uint8 ou8_ResetNodeObjectDictionarySubIndex,
-                                                       const bool oq_EnableHeartbeatProducing,
-                                                       const stw_types::uint16 ou16_HeartbeatProducerTimeMs,
-                                                       const bool oq_UseOpenSYDENodeID,
-                                                       const stw_types::uint8 ou8_NodeIDValue,
-                                                       const bool oq_EnableHeartbeatConsuming,
-                                                       const stw_types::uint16 ou16_HeartbeatConsumerTimeMs,
-                                                       const bool oq_EnableHeartbeatConsumingAutoCalculation);
+                                                        const stw_types::uint16 ou16_HeartbeatProducerTimeMs,
+                                                        const bool oq_EnableHeartbeatProducing);
+   stw_types::sint32 SetCanOpenManagerDeviceCommonProperties(const stw_types::uint32 ou32_NodeIndex,
+                                                             const stw_types::uint8 ou8_InterfaceNumber,
+                                                             const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId, const bool oq_DeviceOptional, const bool oq_NoInitialization, const bool oq_FactorySettingsActive, const stw_types::uint8 ou8_ResetNodeObjectDictionarySubIndex, const bool oq_EnableHeartbeatProducing, const stw_types::uint16 ou16_HeartbeatProducerTimeMs, const bool oq_EnableHeartbeatConsuming, const stw_types::uint16 ou16_HeartbeatConsumerTimeMs, const bool oq_EnableHeartbeatConsumingAutoCalculation);
+   stw_types::sint32 SetCanOpenManagerDeviceNodeId(const stw_types::uint32 ou32_NodeIndex,
+                                                   const stw_types::uint8 ou8_InterfaceNumber,
+                                                   const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId,
+                                                   const bool oq_UseOpenSYDENodeID,
+                                                   const stw_types::uint8 ou8_NodeIDValue);
 
    //CANOpen add/delete
    stw_types::sint32 AddCanOpenManager(const stw_types::uint32 ou32_NodeIndex,
@@ -146,6 +153,20 @@ protected:
                                                           const C_PuiSdNodeConnectionId & orc_NewId);
    void m_HandleChangeCompleteConnectionForCanOpenDevice(const stw_types::uint32 ou32_NodeIndex,
                                                          const C_PuiSdNodeConnectionId & orc_PrevId);
+   virtual void m_SyncOsyNodeIdChange(const stw_types::uint32 ou32_NodeIndex,
+                                      const stw_types::uint32 ou32_InterfaceIndex,
+                                      const stw_types::uint8 ou8_NewNodeId) override;
+   void m_HandleOsyNodeIdChangeForCanOpenManager(const stw_types::uint32 ou32_NodeIndex,
+                                                 const stw_types::uint32 ou32_InterfaceIndex,
+                                                 const stw_types::uint8 ou8_NewNodeId);
+   void m_HandleOsyNodeIdChangeForCanOpenDevice(const stw_types::uint32 ou32_NodeIndex,
+                                                const stw_types::uint32 ou32_InterfaceIndex,
+                                                const stw_types::uint8 ou8_NewNodeId);
+   void m_HandleNodeIdChangeForCanOpenMessages(const stw_types::uint32 ou32_NodeIndex,
+                                               const stw_types::uint8 ou8_InterfaceNumber);
+   static void mh_HandleNodeIdChangeForCanOpenMessages(const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId,
+                                                       const stw_types::uint8 ou8_NewNodeId,
+                                                       std::vector<stw_opensyde_core::C_OSCCanMessage> & orc_Messages);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

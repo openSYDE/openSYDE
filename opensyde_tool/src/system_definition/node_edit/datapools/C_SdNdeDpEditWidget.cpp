@@ -201,7 +201,27 @@ void C_SdNdeDpEditWidget::m_OpenDataPoolContent(const uint32 ou32_DataPoolIndex)
       //Decide
       if (e_Type == C_OSCNodeDataPool::eCOM)
       {
-         Q_EMIT (this->SigSwitchToCommMessages(ou32_DataPoolIndex));
+         bool q_SwitchToCanOpenTab = false;
+         // Check for CANopen Datapool
+         C_OSCCanProtocol::E_Type e_ProtocolType;
+         if (C_PuiSdHandler::h_GetInstance()->GetCanProtocolType(this->mu32_NodeIndex, ou32_DataPoolIndex,
+                                                                 e_ProtocolType) == C_NO_ERR)
+         {
+            if (e_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+            {
+               q_SwitchToCanOpenTab = true;
+            }
+         }
+
+         if (q_SwitchToCanOpenTab == true)
+         {
+            Q_EMIT (this->SigSwitchToCanOpen());
+         }
+         else
+         {
+            Q_EMIT (this->SigSwitchToCommMessages(ou32_DataPoolIndex));
+         }
+
          q_ShowInternalWidget = false;
       }
       // Comment this else if block out, to get the HAL Datapool in the list edit widget

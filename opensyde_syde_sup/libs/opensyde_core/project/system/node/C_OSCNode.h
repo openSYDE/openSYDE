@@ -21,6 +21,7 @@
 #include "C_OSCCanProtocol.h"
 #include "C_OSCHalcConfig.h"
 #include "C_OSCCanMessageUniqueId.h"
+#include "C_OSCCanOpenManagerInfo.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -161,8 +162,10 @@ public:
    std::vector<C_OSCCanProtocol> c_ComProtocols;     ///< All node specific information
    ///< for related communication protocol.
    ///< Created if necessary.
-   ///< Maximum size equal to number of com protocols.
-   C_OSCHalcConfig c_HALCConfig; ///< Optional HALC configuration for this node
+   ///< Maximum size equal to number of possible com protocol types.
+   C_OSCHalcConfig c_HALCConfig;                                          ///< Optional HALC configuration for this node
+   std::map<stw_types::uint8, C_OSCCanOpenManagerInfo> c_CanOpenManagers; ///< CANopen managers grouped by their
+   ///< according CAN interface ID
 
    //constraints imposed by openSYDE protocol:
    static const stw_types::uint32 hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE = 32U;

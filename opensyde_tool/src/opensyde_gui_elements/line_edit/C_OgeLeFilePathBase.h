@@ -30,9 +30,19 @@ public:
    explicit C_OgeLeFilePathBase(QWidget * const opc_Parent = NULL);
 
    void SetPath(const QString & orc_New, const QString & orc_RelativeTo = "");
+   void SetDragAndDropActiveForFolder(const bool oq_Active);
+   void SetDragAndDropActiveForFile(const QString & orc_FileExtension);
+   void SetDragAndDropActiveForFile(const bool oq_Active, const QStringList * const opc_FileExtensions);
    QString GetPath(void) const;
    void InsertVariable(const QString & orc_Variable);
    void UpdateText(void);
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigPathDropped(void) const;
 
 protected:
    virtual void focusInEvent(QFocusEvent * const opc_Event) override;
@@ -40,12 +50,16 @@ protected:
    virtual void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
    virtual void showEvent(QShowEvent * const opc_Event) override;
    virtual void resizeEvent(QResizeEvent * const opc_Event) override;
+   virtual void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
+   virtual void dropEvent(QDropEvent * const opc_Event) override;
    virtual QString m_ResolveVariables(const QString & orc_Path);
 
 private:
    QString mc_Path;
    QString mc_RelativeTo;
    stw_types::sint32 ms32_LastKnownCursorPos;
+   bool mq_DragAndDropFolderActive;
+   QStringList mc_DragAndDropFileExtensions;
 
    void m_UpdateMinimizing(void);
 };

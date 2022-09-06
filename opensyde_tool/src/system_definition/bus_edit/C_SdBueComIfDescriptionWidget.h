@@ -49,6 +49,7 @@ public:
    void SetProtocolByDataPool(const stw_types::uint32 ou32_DataPoolIndexw);
    void SetBusId(const stw_types::uint32 ou32_BusIndex);
    void SetInitialFocus(void) const;
+   void SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol) const;
    void PartialReload(void);
    void SelectMessageSearch(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex,
                             const stw_types::uint32 ou32_ListIndex, const stw_types::uint32 ou32_MessageIndex) const;
@@ -83,7 +84,12 @@ Q_SIGNALS:
    void SigChanged(void);
    void SigErrorChange(void) const;
    // In case of node mode
+
    void SigSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName) const;
+   void SigSwitchToBusProtocol(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName,
+                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType) const;
+   void SigSwitchToCoManager(const stw_types::uint32 ou32_NodeIndex, const QString & orc_NodeName,
+                             const stw_types::uint8 ou8_InterfaceNumber) const;
    void SigCommDataPoolAdded(void) const;
 
 protected:
@@ -110,7 +116,6 @@ private:
                        const stw_types::uint32 & oru32_SignalIndex) const;
    void m_FillNodeDatapoolIndexes(const stw_opensyde_core::C_OSCNode * const opc_Node);
    static stw_types::sintn mh_GetIndexOfProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
-   void m_SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol) const;
    void m_SelectMessageProperties(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void m_SelectSignalProperties(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                  const stw_types::uint32 & oru32_SignalIndex) const;
@@ -162,6 +167,16 @@ private:
    std::vector<stw_types::uint32> mc_DatapoolIndexes; // For single node mode
    bool mq_ModeSingleNode;
    bool mq_LinkOnly;
+   bool mq_IsCoDevice;                                            // Special case CANopen: mq_LinkOnly == false,
+                                                                  // mq_ModeSingleNode == true and current node is a
+                                                                  // CANopen device
+   stw_types::uint32 mu32_CoDeviceIntfIndex;                      // Interface index of device which is connected to the
+                                                                  // Manager
+   stw_opensyde_core::C_OSCCanInterfaceId mc_CoDeviceInterfaceId; // Intf Id of device for CANopen Manager
+                                                                  // identification
+   stw_types::uint32 mu32_CoManagerNodeIndexOfCoDevice;           // Node id of manager the device is assigned to
+   stw_types::uint8 mu8_CoManagerNodeIndexIntfNumber;             // Interface number of manager the device is assigned
+                                                                  // to
    bool mq_IndexValid;
    stw_opensyde_gui_logic::C_SdBueUnoManager mc_UndoManager;
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager mc_MessageSyncManager;

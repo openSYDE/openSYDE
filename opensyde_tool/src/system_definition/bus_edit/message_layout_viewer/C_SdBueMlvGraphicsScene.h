@@ -188,10 +188,11 @@ private:
    static const stw_types::float64 mhf64_Z_ORDER_INTERACTION;
    static const stw_types::float64 mhf64_Z_ORDER_EMPTY_ITEM;
    static const stw_types::float64 mhf64_Z_ORDER_HINT_ITEM;
-   static const stw_types::uint8 mhu8_NUM_COLORS;
+   static const stw_types::uint8 mhu8_MAX_NUM_BITS;
 
    // Array for grid states. It saves the pointer to the signals on each bit
    std::set<C_SdBueMlvSignalManager *> mac_SetGridState[64];
+   stw_types::uint16 mu16_LastGridPosFilled;
 
    // Color configuration for the signals
    static const C_SdBueMlvSignalManager::C_SignalItemColors mhac_SIGNALS_COLORS[64];
@@ -202,6 +203,9 @@ private:
 
    // CANopen specific
    bool mq_CoFixedMapping;
+
+   bool mq_ResizingEnabled;
+   bool mq_ByteAligned;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

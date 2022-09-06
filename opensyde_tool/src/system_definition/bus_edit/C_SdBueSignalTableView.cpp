@@ -51,7 +51,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueSignalTableView::C_SdBueSignalTableView(QWidget * const opc_Parent) :
-   C_TblViewScroll(opc_Parent)
+   C_TblViewScroll(opc_Parent),
+   mpc_SyncManager(NULL)
 {
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
@@ -110,6 +111,7 @@ C_SdBueSignalTableView::C_SdBueSignalTableView(QWidget * const opc_Parent) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540} never took ownership of any item
 C_SdBueSignalTableView::~C_SdBueSignalTableView(void)
 {
 }
@@ -148,6 +150,7 @@ void C_SdBueSignalTableView::SaveUserSettings(std::vector<sint32> & orc_Values) 
 void C_SdBueSignalTableView::SetMessageSyncManager(
    stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
+   this->mpc_SyncManager = opc_Value;
    this->mc_Model.SetMessageSyncManager(opc_Value);
 }
 
@@ -158,6 +161,7 @@ void C_SdBueSignalTableView::SetMessageSyncManager(
 void C_SdBueSignalTableView::UpdateData(void)
 {
    this->mc_Model.UpdateData();
+   this->m_HandleColumnVisibility();
    this->sortByColumn(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eINDEX), Qt::AscendingOrder);
 }
 
@@ -254,6 +258,7 @@ void C_SdBueSignalTableView::m_InitColumns(void)
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eMESSAGE), 138);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eNAME), 148);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCOMMENT), 206);
+   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX), 81);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eSTART_BIT), 70);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eLENGTH), 81);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eBYTE_ORDER), 73);
@@ -265,4 +270,24 @@ void C_SdBueSignalTableView::m_InitColumns(void)
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eMINIMUM_VALUE), 75);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eMAXIMUM_VALUE), 72);
    this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eUNIT), 55);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle column visibility
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalTableView::m_HandleColumnVisibility()
+{
+   if (this->mpc_SyncManager != NULL)
+   {
+      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)
+      {
+         this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX),
+                               false);
+      }
+      else
+      {
+         this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX), true);
+      }
+   }
 }

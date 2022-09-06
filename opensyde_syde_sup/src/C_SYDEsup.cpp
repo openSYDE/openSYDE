@@ -333,29 +333,50 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void)
    C_SUPSuSequences c_Sequence;
    bool q_ResetSystem = false;
 
+   bool q_PackageIsZip = false;
+
    std::vector<uint8> c_ActiveNodes;
    std::vector<uint32> c_NodesUpdateOrder;
    std::vector<C_OSCSuSequences::C_DoFlash> c_ApplicationsToWrite;
 
-   // check file ending
-   if (TGL_ExtractFileExtension(this->mc_SUPFilePath) != ".syde_sup")
+   //if file extension is not empty we can assume it's a file and we further need to check whether the extension
+   //matches, otherwise it's mc_SUPFilePath is a directory
+   if ((TGL_ExtractFileExtension(this->mc_SUPFilePath) != "") &&
+       (TGL_ExtractFileExtension(this->mc_SUPFilePath) == ".syde_sup"))
+   {
+      q_PackageIsZip = true;
+   }
+   else if ((TGL_ExtractFileExtension(this->mc_SUPFilePath) != "") &&
+            (TGL_ExtractFileExtension(this->mc_SUPFilePath) != ".syde_sup"))
    {
       e_Result = eERR_PACKAGE_WRONG_EXTENSION;
    }
    else
    {
+      //no file extension -> plain directory -> nothing to here: q_PackageIsZip still false
+   }
+
+   if (e_Result == eOK)
+   {
       // unpack Service Update Package which was created with openSYDE (also checks if paths are valid)
-      s32_Return = C_OSCSuServiceUpdatePackage::h_UnpackPackage(mc_SUPFilePath, mc_UnzipPath,
-                                                                c_SystemDefinition, u32_ActiveBusIndex,
-                                                                c_ActiveNodes, c_NodesUpdateOrder,
-                                                                c_ApplicationsToWrite,
-                                                                c_WarningMessages, c_ErrorMessage);
+      s32_Return = C_OSCSuServiceUpdatePackage::h_ProcessPackage(mc_SUPFilePath, mc_UnzipPath,
+                                                                 c_SystemDefinition, u32_ActiveBusIndex,
+                                                                 c_ActiveNodes, c_NodesUpdateOrder,
+                                                                 c_ApplicationsToWrite,
+                                                                 c_WarningMessages, c_ErrorMessage, q_PackageIsZip);
 
       // report success or translate errors
       switch (s32_Return) // here s32_Return is result of h_UnpackPackage
       {
       case C_NO_ERR:
-         h_WriteLog("Unzip Package", "Service Update Package unzipped to \"" + mc_UnzipPath + "\".");
+         if (q_PackageIsZip)
+         {
+            h_WriteLog("Unzip Package", "Service Update Package unzipped to \"" + mc_UnzipPath + "\".");
+         }
+         else
+         {
+            h_WriteLog("Process Package", "Service Update Package was processed from \"" + mc_SUPFilePath + "\".");
+         }
          break;
       case C_BUSY:
          e_Result = eERR_PACKAGE_ERASE_TARG_PATH;
@@ -374,6 +395,9 @@ C_SYDEsup::E_Result C_SYDEsup::Update(void)
          break;
       case C_CONFIG:
          e_Result = eERR_PACKAGE_NOT_FOUND;
+         break;
+      case C_DEFAULT:
+         e_Result = eERR_PACKAGE_FILES_MISSING;
          break;
       default:
          e_Result = eERR_UNKNOWN;
@@ -794,11 +818,15 @@ void C_SYDEsup::m_PrintStringFromError(const E_Result & ore_Result) const
       break;
    case eERR_PACKAGE_NOT_FOUND: //C_CONFIG
       c_Activity = "Unzip Package";
-      c_Error = "Could not find Service Update Package.";
+      c_Error = "Either could not find Service Update Package or System Definition content is invalid or incomplete.";
       break;
    case eERR_PACKAGE_WRONG_EXTENSION:
       c_Activity = "Unzip Package";
       c_Error = "Service Update Package has wrong file extension. File extension must be *.syde_sup.";
+      break;
+   case eERR_PACKAGE_FILES_MISSING: //C_DEFAULT
+      c_Activity = "Unzip Package";
+      c_Error = "Service Update Package misses mandatory files. See manual to learn about mandatory files.";
       break;
 
    // result from check if driver exists

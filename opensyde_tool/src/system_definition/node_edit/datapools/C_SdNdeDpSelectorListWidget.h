@@ -19,8 +19,6 @@
 
 #include "stwtypes.h"
 
-//#include "C_SdNdeDpSelectorListDelegate.h"
-
 #include "C_SdNdeDpSelectorItemWidget.h"
 #include "C_OgeContextMenu.h"
 #include "C_OSCNodeDataPool.h"
@@ -48,6 +46,7 @@ public:
                        const stw_types::uint32 ou32_NodeIndex, const bool oq_UsageViewActive);
    void SetSelected(const bool oq_Selected);
    bool SetActualDataPoolConflict(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_Active) const;
+   void ReloadDataPools(void);
    void UpdateDataPools(void);
    void UpdateActualDataPool(void);
    void AddNewDatapool(void);
@@ -71,6 +70,7 @@ public:
 Q_SIGNALS:
    //lint -restore
    void SigListChanged(void);
+   void SigUpdateFollowingLists(stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DataPoolType);
    void SigWidgetFocused(void);
    void SigOpenDataPoolContent(const stw_types::sintn osn_DataPoolWidgetIndex);
    void SigDataPoolChanged(void);
@@ -140,9 +140,8 @@ private:
    void m_UpdateCounters(const bool oq_ForceRearrageItems = false);
    void m_RearrangeItems(void);
    void m_UpdateItemErrorToolTip(const stw_types::uint32 ou32_Index) const;
+   bool m_IsItemComCanOpenDatapool(const C_SdNdeDpSelectorItemWidget * const opc_Item) const;
 
-   // TODO BAY:
-   //stw_opensyde_gui_logic::C_SdNdeDpSelectorListDelegate mc_Delegate;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
    QAction * mpc_AddAction;
    QAction * mpc_EditAction;

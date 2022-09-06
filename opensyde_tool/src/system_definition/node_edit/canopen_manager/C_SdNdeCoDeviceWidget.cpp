@@ -22,9 +22,9 @@ using namespace stw_types;
 using namespace stw_opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_EDS_FILE = 0UL;
-const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_CONFIGURATION = 1UL;
-const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_PDOS = 2UL;
+const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_CONFIGURATION = 0UL;
+const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_PDOS = 1UL;
+const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_EDS_FILE = 2UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -53,6 +53,14 @@ C_SdNdeCoDeviceWidget::C_SdNdeCoDeviceWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_DevConfigWidget->setVisible(false);
    this->mpc_Ui->pc_DevPdoWidget->setVisible(false);
    this->mpc_Ui->pc_DevEdsWidget->setVisible(false);
+
+   connect(this->mpc_Ui->pc_DevConfigWidget, &C_SdNdeCoDeviceConfigWidget::SigErrorChange,
+           this, &C_SdNdeCoDeviceWidget::SigErrorChange);
+   // bus link
+   connect(this->mpc_Ui->pc_DevPdoWidget, &C_SdNdeCoPdoWidget::SigSwitchToBusProtocol, this,
+           &C_SdNdeCoDeviceWidget::SigSwitchToBusProtocol);
+   connect(this->mpc_Ui->pc_DevPdoWidget, &C_SdNdeCoPdoWidget::SigSwitchToBusProtocolMessage, this,
+           &C_SdNdeCoDeviceWidget::SigSwitchToBusProtocolMessage);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,14 +75,14 @@ C_SdNdeCoDeviceWidget::~C_SdNdeCoDeviceWidget()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set device use case
 
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  ou8_InterfaceId      Interface ID
-   \param[in]  orc_NodeId           Node ID
-   \param[in]  ou32_UseCaseIndex    Use case index
+   \param[in]  ou32_ManagerNodeIndex       Node index
+   \param[in]  ou8_ManagerInterfaceId      Interface ID
+   \param[in]  orc_DeviceNodeId            Node ID
+   \param[in]  ou32_UseCaseIndex           Use case index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoDeviceWidget::SetDeviceUseCase(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceId,
-                                             const stw_opensyde_core::C_OSCCanInterfaceId & orc_NodeId,
+void C_SdNdeCoDeviceWidget::SetDeviceUseCase(const uint32 ou32_ManagerNodeIndex, const uint8 ou8_ManagerInterfaceId,
+                                             const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId,
                                              const uint32 ou32_UseCaseIndex)
 {
    bool q_EdsWidgetVisibility = false;
@@ -85,13 +93,18 @@ void C_SdNdeCoDeviceWidget::SetDeviceUseCase(const uint32 ou32_NodeIndex, const 
    {
    case C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_EDS_FILE:
       q_EdsWidgetVisibility = true;
+      this->mpc_Ui->pc_DevEdsWidget->SetNodeIndexAndInterfaceId(ou32_ManagerNodeIndex, ou8_ManagerInterfaceId,
+                                                                orc_DeviceNodeId);
       break;
    case C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_CONFIGURATION:
       q_ConfigWidgetVisibility = true;
-      this->mpc_Ui->pc_DevConfigWidget->SetNodeIndexAndInterfaceId(ou32_NodeIndex, ou8_InterfaceId, orc_NodeId);
+      this->mpc_Ui->pc_DevConfigWidget->SetNodeIndexAndInterfaceId(ou32_ManagerNodeIndex, ou8_ManagerInterfaceId,
+                                                                   orc_DeviceNodeId);
       break;
    case C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_PDOS:
       q_PdoWidgetVisibility = true;
+      this->mpc_Ui->pc_DevPdoWidget->SetNodeIndexAndInterfaceId(ou32_ManagerNodeIndex, ou8_ManagerInterfaceId,
+                                                                orc_DeviceNodeId);
       break;
    default:
       //Should not happen
@@ -101,4 +114,35 @@ void C_SdNdeCoDeviceWidget::SetDeviceUseCase(const uint32 ou32_NodeIndex, const 
    this->mpc_Ui->pc_DevConfigWidget->setVisible(q_ConfigWidgetVisibility);
    this->mpc_Ui->pc_DevPdoWidget->setVisible(q_PdoWidgetVisibility);
    this->mpc_Ui->pc_DevEdsWidget->setVisible(q_EdsWidgetVisibility);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoDeviceWidget::LoadUserSettings() const
+{
+   this->mpc_Ui->pc_DevPdoWidget->LoadUserSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoDeviceWidget::SaveUserSettings() const
+{
+   this->mpc_Ui->pc_DevPdoWidget->SaveUserSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Refresh config page data
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoDeviceWidget::Refresh()
+{
+   if (this->mpc_Ui->pc_DevConfigWidget->isVisible() == true)
+   {
+      this->mpc_Ui->pc_DevConfigWidget->Refresh();
+   }
 }

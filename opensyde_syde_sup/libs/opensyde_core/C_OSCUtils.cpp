@@ -57,15 +57,17 @@ stw_scl::C_SCLResourceStrings C_OSCUtils::mhc_ResourceStrings;
    -> only alphanumeric characters + "_"
    -> should not be longer than "ou16_MaxLength" characters
 
-   \param[in]  orc_Name          symbol name to check
-   \param[in]  ou16_MaxLength    permitted maximum identifier length
+   \param[in]  orc_Name                         symbol name to check
+   \param[in]  oq_AutomaticCStringAdaptation    if automatic c string adaptation true or false
+   \param[in]  ou16_MaxLength                   permitted maximum identifier length
 
    \return
    true  -> OK
    false -> violation of rules
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const stw_types::uint16 ou16_MaxLength)
+bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const bool oq_AutomaticCStringAdaptation,
+                                   const stw_types::uint16 ou16_MaxLength)
 {
    uint32 u32_Index;
    charn cn_Char;
@@ -78,13 +80,36 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    else
    {
       // -> only alphanumeric characters + "_"
-      for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
+      if (oq_AutomaticCStringAdaptation == false)
       {
-         cn_Char = orc_Name.c_str()[u32_Index];
-         if ((std::isalnum(cn_Char) == 0) && (cn_Char != '_')) //ANSI compliant check
+         // no automatic c string adaptation
+         for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
          {
-            q_IsValid = false;
-            break;
+            // first char of name
+            cn_Char = orc_Name.c_str()[u32_Index];
+            // is alphanumeric and no underscore true or a number true -> invalid name
+            if (((std::isalnum(cn_Char) == 0) &&
+                 (cn_Char != '_')) || (std::isdigit(orc_Name.c_str()[0]) == 1)) //ANSI compliant check
+            {
+               q_IsValid = false;
+               break;
+            }
+         }
+      }
+      else
+      {
+         // automatic c string adaptation
+         for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
+         {
+            // fist char of name
+            cn_Char = orc_Name.c_str()[u32_Index];
+            // is alphanumeric true or no underscore and a number true -> invalid name
+            if ((std::isalnum(cn_Char) == 0) &&
+                ((cn_Char != '_') || (std::isdigit(orc_Name.c_str()[0]) == 1))) //ANSI compliant check
+            {
+               q_IsValid = false;
+               break;
+            }
          }
       }
 

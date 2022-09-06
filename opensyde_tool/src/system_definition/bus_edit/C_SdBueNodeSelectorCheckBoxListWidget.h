@@ -21,6 +21,7 @@
 
 #include "C_SdBueNodeSelectorCheckBoxItemWidget.h"
 #include "C_OSCCanProtocol.h"
+#include "C_OSCCanInterfaceId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -50,6 +51,12 @@ public:
                    const std::vector<stw_types::uint32> & orc_SubIndexes) const;
    void CheckSpecificNode(const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_SubIndex,
                           const bool oq_Checked) const;
+   void SetSpecificNodeAsManager(const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_SubIndex,
+                                 const bool oq_Manager) const;
+   void SetSpecificNodeAsDevice(const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_SubIndex,
+                                const bool oq_Device, const stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceId,
+                                const stw_types::uint32 ou32_ManagerNodeIndex = 0U,
+                                const stw_types::uint32 ou32_ManagerIntfIndex = 0U) const;
    void SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol) const;
    void Refresh(void) const;
 
@@ -60,6 +67,8 @@ Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                        const bool oq_Checked);
+   void SigSwitchToCoManager(const stw_types::uint32 ou32_NodeIndex, const QString & orc_NodeName,
+                             const stw_types::uint8 ou8_InterfaceNumber) const;
 
 private:
    //Avoid call
@@ -68,6 +77,8 @@ private:
 
    void m_AddNode(const QString & orc_Name, const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_SubIndex);
    void m_ScrollBarRangeChanged(const stw_types::sintn osn_Min, const stw_types::sintn osn_Max) const;
+   C_SdBueNodeSelectorCheckBoxItemWidget * m_GetItemWidget(const stw_types::uint32 ou32_Index,
+                                                           const stw_types::uint32 ou32_SubIndex) const;
 
    Ui::C_SdBueNodeSelectorCheckBoxListWidget * mpc_Ui;
 };

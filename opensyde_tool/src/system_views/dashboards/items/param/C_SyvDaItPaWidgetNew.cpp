@@ -684,16 +684,18 @@ void C_SyvDaItPaWidgetNew::m_ReadElements(void)
    if (this->mpc_ComDriver != NULL)
    {
       //Check all list IDs valid -> node active in view
-      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+      std::vector<uint8> c_NodeActiveFlags;
+      const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+         this->mu32_ViewIndex,
+         c_NodeActiveFlags);
 
-      if (pc_View != NULL)
+      if (s32_Retval == C_NO_ERR)
       {
          for (uint32 u32_ItList = 0UL; u32_ItList < this->mc_ListIds.size(); ++u32_ItList)
          {
             const C_OSCNodeDataPoolListElementId & rc_ID = this->mc_ListIds[u32_ItList];
-            const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
 
-            if ((rc_ID.u32_NodeIndex < rc_ActiveFlags.size()) && (rc_ActiveFlags[rc_ID.u32_NodeIndex] == 1U))
+            if ((rc_ID.u32_NodeIndex < c_NodeActiveFlags.size()) && (c_NodeActiveFlags[rc_ID.u32_NodeIndex] == 1U))
             {
                //Valid
                bool q_Error = false;

@@ -1251,8 +1251,15 @@ void C_GiSvDaRectBaseGroup::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
    if ((this->mq_EditModeActive == false) ||
        (this->mq_EditContentModeEnabled == true))
    {
+      //Start proxy widget interaction
+      this->mq_ProxyWidgetInteractionActive = true;
+
       this->mpc_ProxyWidget->TriggerMouseDoubleClickEvent(opc_Event);
       opc_Event->accept();
+   }
+   else
+   {
+      C_GiBiRectBaseGroup::mouseDoubleClickEvent(opc_Event);
    }
 }
 

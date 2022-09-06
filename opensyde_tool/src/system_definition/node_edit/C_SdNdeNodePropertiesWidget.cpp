@@ -424,7 +424,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    disconnect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
               &C_SdNdeNodePropertiesWidget::m_RegisterChange);
    disconnect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
-              &C_SdNdeNodePropertiesWidget::m_RegisterChange);
+              &C_SdNdeNodePropertiesWidget::m_RegisterErrorChange);
    disconnect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
               &C_SdNdeNodePropertiesWidget::m_CheckComInterface);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -895,7 +895,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
    connect(this->mpc_Ui->pc_TextEditComment, &QTextEdit::textChanged, this,
            &C_SdNdeNodePropertiesWidget::m_RegisterChange);
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
-           &C_SdNdeNodePropertiesWidget::m_RegisterChange);
+           &C_SdNdeNodePropertiesWidget::m_RegisterErrorChange);
    connect(this->mpc_Ui->pc_TableWidgetComIfSettings, &QTableWidget::cellChanged, this,
            &C_SdNdeNodePropertiesWidget::m_CheckComInterface);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
@@ -912,7 +912,7 @@ void C_SdNdeNodePropertiesWidget::m_LoadFromData(void)
       - on page change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesWidget::SaveToData(void) const
+void C_SdNdeNodePropertiesWidget::SaveToData(void)
 {
    const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
@@ -1086,6 +1086,9 @@ void C_SdNdeNodePropertiesWidget::SaveToData(void) const
                                                                           e_DiagnosticServer, e_FlashLoader, c_NodeIds,
                                                                           c_UpdateFlags, c_RoutingFlags,
                                                                           c_DiagnosisFlags);
+
+            //send signal SigNodePropChanged (trigger to adapt canopen config)
+            Q_EMIT (this->SigNodePropChanged());
          }
       }
    }
@@ -1236,6 +1239,19 @@ void C_SdNdeNodePropertiesWidget::m_RegisterChange(void)
    SaveToData();
    //signal
    Q_EMIT this->SigChanged();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Register error change
+
+   Function where ui elements register an error change. Change will be sent via a signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodePropertiesWidget::m_RegisterErrorChange()
+{
+   m_RegisterChange();
+   //signal
+   Q_EMIT this->SigErrorChange();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

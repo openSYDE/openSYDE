@@ -37,6 +37,14 @@ public:
    void InitStaticNames(void) const;
    void SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_InterfaceId);
    void SaveToData(void) const;
+   void Refresh();
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigErrorChange(void) const;
 
 private:
    Ui::C_SdNdeCoManagerIntfWidget * mpc_Ui;
@@ -49,8 +57,14 @@ private:
 
    void m_OnStartDevicesChanged(void) const;
    void m_OnHeartbeatEnableChanged(void) const;
+   void m_HandleHeartbeatEnableState(void) const;
    void m_OnSameAsOpensydeNodeIdChanged(void) const;
+   void m_HandleSameAsOpensydeNodeIdState(void) const;
+   void m_OnCoNodeIdChanged(void) const;
+   void m_CheckCoNodeId(void) const;
    void m_OnHeartbeatProducerTimeChanged(void) const;
+   void m_CheckHeartbeatProducerTime(void) const;
+
    void m_LoadFromData(void);
    void m_SaveChanges(void) const;
 };

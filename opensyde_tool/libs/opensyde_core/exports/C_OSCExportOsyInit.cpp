@@ -139,16 +139,10 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
 
       for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); u32_ItProtocol++)
       {
-         bool oq_Skip = false;
          const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
 
-         //skip ay CANopen protocol
-         if (rc_Protocol.e_Type == C_OSCCanProtocol::eCAN_OPEN)
-         {
-            oq_Skip = true;
-         }
-
-         if (oq_Skip == false)
+         //skip CANopen protocol
+         if (rc_Protocol.e_Type != C_OSCCanProtocol::eCAN_OPEN)
          {
             //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
             // C_OSCNodeApplication then create it
@@ -265,7 +259,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
 
    //prototypes for COMM utility functions; only place if there are COMM protocols to prevent external dependencies
    // (on type definitions)
-   if (u8_CommDefinitionsKnownInThisApplication > 0U) //TODO PTH min 1 config
+   if ((u8_CommDefinitionsKnownInThisApplication > 0) && (u32_CommProtocolCnt > 0))
    {
       c_Lines.Add("extern const T_osy_com_protocol_configuration * const * osy_com_get_protocol_configs(void);");
       c_Lines.Add("extern uint8 osy_com_get_num_protocol_configs(void);");

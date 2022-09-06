@@ -359,6 +359,15 @@ void C_SdBueSignalPropertiesWidget::SelectName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Recheck the message position of the signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::RecheckMessagePosition(void)
+{
+   this->m_CheckMessagePosition(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   In case of a disconnected node update of the unique message ids
 
    \param[in]  ou32_NodeIndex       Node index
@@ -441,10 +450,12 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
 
          if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
          {
-            this->mpc_Ui->pc_LabelObjectDictValue->setText(
-               QString::number(rc_OSCSignal.u16_CanOpenManagerObjectDictionaryIndex, 16) +
-               static_cast<QString>(C_GtGetText::h_GetText("sub")) +
-               QString::number(rc_OSCSignal.u8_CanOpenManagerObjectDictionarySubIndex));
+            this->mpc_Ui->pc_LabelObjectDictValue->setText(C_SdUtil::h_GetCanOpenSignalObjectIndex(static_cast<uint32>(
+                                                                                                      rc_OSCSignal.
+                                                                                                      u16_CanOpenManagerObjectDictionaryIndex),
+                                                                                                   static_cast<uint32>(
+                                                                                                      rc_OSCSignal.
+                                                                                                      u8_CanOpenManagerObjectDictionarySubIndex)));
          }
 
          //Update all fields
@@ -844,13 +855,15 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
       bool q_NameInvalid = false;
       bool q_NameConflict = false;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL,
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL, NULL,
                                            &q_NameConflict, &q_NameInvalid,
                                            NULL, NULL, NULL, NULL, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
                                                                                                   e_ComProtocol),
                                            C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(this->mc_MessageId.
-                                                                                            e_ComProtocol));
+                                                                                            e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                              this->mc_MessageId.e_ComProtocol));
 
       q_Combined = (q_NameInvalid == false) && (q_NameConflict == false);
       //set invalid text property
@@ -900,11 +913,13 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorC
    {
       bool q_MuxTypeInvalid;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL, NULL, NULL,
                                            NULL, NULL, NULL, NULL, &q_MuxTypeInvalid, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                               this->mc_MessageId.e_ComProtocol),
                                            C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                              this->mc_MessageId.e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxMuxType, "Valid", !q_MuxTypeInvalid);
@@ -947,11 +962,13 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalError
    {
       bool q_MuxValueInvalid;
 
-      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL,
+      pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL, NULL, NULL,
                                            NULL, NULL, NULL, NULL, NULL, &q_MuxValueInvalid,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                               this->mc_MessageId.e_ComProtocol),
                                            C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                              this->mc_MessageId.e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxMuxValue, "Valid", !q_MuxValueInvalid);
@@ -992,33 +1009,63 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
       bool q_LayoutConflict = false;
       bool q_BorderConflict = false;
       bool q_GapConflict = false;
+      bool q_ByteAlignmentLengthConflict = false;
+      bool q_ByteAlignmentStartbitConflict = false;
 
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex,
                                            &q_LayoutConflict, &q_BorderConflict, &q_GapConflict,
+                                           &q_ByteAlignmentLengthConflict, &q_ByteAlignmentStartbitConflict,
                                            NULL, NULL, NULL, NULL, NULL, NULL, NULL,
                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                               this->mc_MessageId.e_ComProtocol),
                                            C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                              this->mc_MessageId.e_ComProtocol),
+                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
       q_PositionValid = (q_LayoutConflict == false) && (q_BorderConflict == false);
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxStartBit, "Valid",
-                                             q_PositionValid && (q_GapConflict == false));
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxLength, "Valid", q_PositionValid);
+                                             (q_PositionValid == true) && (q_GapConflict == false) &&
+                                             (q_ByteAlignmentStartbitConflict == false));
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxLength, "Valid",
+                                             (q_PositionValid == true) && (q_ByteAlignmentLengthConflict == false));
       if (q_PositionValid == true)
       {
-         if (q_GapConflict == true)
+         if (q_ByteAlignmentStartbitConflict == true)
          {
-            // Special case: Gap error is only relevant for the start bit
+            const QString c_Content = C_GtGetText::h_GetText(
+               "The signal has a start bit which is not byte aligned and is not allowed for CANopen.");
+            this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+            this->mpc_Ui->pc_SpinBoxStartBit->ShowToolTipWhenDisabled(true);
+         }
+         else if (q_GapConflict == true)
+         {
+            // Special case CANopen: Gap error is only relevant for the start bit
             const QString c_Content = C_GtGetText::h_GetText(
                "A gap between signals is detected and is not allowed for CANopen.");
             this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+            this->mpc_Ui->pc_SpinBoxStartBit->ShowToolTipWhenDisabled(true);
          }
          else
          {
             this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+            this->mpc_Ui->pc_SpinBoxStartBit->ShowToolTipWhenDisabled(false);
          }
-         this->mpc_Ui->pc_SpinBoxLength->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+
+         if (q_ByteAlignmentLengthConflict == true)
+         {
+            const QString c_Content = C_GtGetText::h_GetText(
+               "The signal has a length which is not byte aligned and is not allowed for CANopen."
+               " Only 8, 16, 32 and 64 bit are supported.");
+            this->mpc_Ui->pc_SpinBoxLength->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+            // Special case CANopen: This can only happen with CANopen and the spin box is always disabled
+            this->mpc_Ui->pc_SpinBoxLength->ShowToolTipWhenDisabled(true);
+         }
+         else
+         {
+            this->mpc_Ui->pc_SpinBoxLength->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+            this->mpc_Ui->pc_SpinBoxLength->ShowToolTipWhenDisabled(false);
+         }
       }
       else
       {
@@ -1026,6 +1073,8 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
             "Either signal out of range of message DLC or intersecting signals detected.");
          this->mpc_Ui->pc_SpinBoxStartBit->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
          this->mpc_Ui->pc_SpinBoxLength->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+         this->mpc_Ui->pc_SpinBoxStartBit->ShowToolTipWhenDisabled(true);
+         this->mpc_Ui->pc_SpinBoxLength->ShowToolTipWhenDisabled(true);
       }
       if (orq_SignalErrorChange == true)
       {

@@ -454,6 +454,8 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
    \param[out]     opq_DataPoolsInvalid            true: error in data pool was detected
    \param[out]     opq_ApplicationsInvalid         true: error in application was detected
    \param[out]     opq_DomainsInvalid              true: error in HALC configuration was detected
+   \param[out]     opq_CoNodeIDInvalid             true: error with CANopen Node ID detected
+   \param[out]     opq_CoHearbeatTimeInvalid       true: error with hearbeat time of Manager detected
    \param[in]      orq_AllowComDataPoolException   true: allow exception to skip check for connected interface
    \param[in,out]  opc_InvalidInterfaceIndices     Optional storage for invalid interface indices
    \param[in,out]  opc_InvalidDataPoolIndices      Optional storage for invalid datapool indices
@@ -469,6 +471,7 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                                              bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                              bool * const opq_IpInvalid, bool * const opq_DataPoolsInvalid,
                                              bool * const opq_ApplicationsInvalid, bool * const opq_DomainsInvalid,
+                                             bool * const opq_CoNodeIDInvalid, bool * const opq_CoHearbeatTimeInvalid,
                                              const bool & orq_AllowComDataPoolException,
                                              std::vector<uint32> * const opc_InvalidInterfaceIndices,
                                              std::vector<uint32> * const opc_InvalidDataPoolIndices,
@@ -677,10 +680,15 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                                  rc_DataPool, u32_ItInterface, false);
                               if ((pc_TxList != NULL) && (pc_RxList != NULL))
                               {
-                                 if (rc_MessageContainer.CheckLocalError(*pc_TxList, *pc_RxList,
-                                                                         C_OSCCanProtocol::
-                                                                         h_GetCANMessageValidSignalsDLCOffset(
-                                                                            pc_Protocol->e_Type)) == true)
+                                 if (rc_MessageContainer.CheckLocalError(
+                                        *pc_TxList, *pc_RxList,
+                                        C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           pc_Protocol->e_Type),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                           pc_Protocol->e_Type),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                           pc_Protocol->e_Type),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalsRequired(pc_Protocol->e_Type)) == true)
                                  {
                                     q_ResultError = true;
                                     q_CurRes = true;
@@ -785,6 +793,63 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
       if (opq_DomainsInvalid != NULL)
       {
          rc_CheckedNode.CheckHalcConfigValid(opq_DomainsInvalid, opc_InvalidDomainIndices);
+      }
+
+      // CANopen specific check
+      if ((opq_CoNodeIDInvalid != NULL) || (opq_CoHearbeatTimeInvalid != NULL))
+      {
+         std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager;
+         bool q_TempCoNodeIdConflict;
+         bool * pq_TempCoNodeIdConflict = NULL;
+         bool q_TempCoManagerNodeIdInvalid;
+         bool * pq_TempCoManagerNodeIdInvalid = NULL;
+         bool q_TempCoDevicesNodeIdInvalid;
+         bool * pq_TempCoDevicesNodeIdInvalid = NULL;
+         bool q_TempCoHeartbeatInvalid;
+         bool * pq_TempCoHeartbeatInvalid = NULL;
+
+         // Temporary pointers needed for avoid overwriting previous results in the loop
+         // and avoid running error checks of not wanted checks
+         if (opq_CoNodeIDInvalid != NULL)
+         {
+            *opq_CoNodeIDInvalid = false;
+            pq_TempCoNodeIdConflict = &q_TempCoNodeIdConflict;
+
+            // Summing all CANopen Node ID conflicts into one flag
+            pq_TempCoManagerNodeIdInvalid = &q_TempCoManagerNodeIdInvalid;
+            pq_TempCoDevicesNodeIdInvalid = &q_TempCoDevicesNodeIdInvalid;
+         }
+
+         if (opq_CoHearbeatTimeInvalid != NULL)
+         {
+            *opq_CoHearbeatTimeInvalid = false;
+            pq_TempCoHeartbeatInvalid = &q_TempCoHeartbeatInvalid;
+         }
+
+         for (c_ItManager = rc_CheckedNode.c_CanOpenManagers.begin();
+              c_ItManager != rc_CheckedNode.c_CanOpenManagers.end(); ++c_ItManager)
+         {
+            c_ItManager->second.CheckErrorManager(pq_TempCoNodeIdConflict, pq_TempCoManagerNodeIdInvalid,
+                                                  pq_TempCoDevicesNodeIdInvalid,
+                                                  pq_TempCoHeartbeatInvalid, true);
+
+            if ((opq_CoNodeIDInvalid != NULL) &&
+                ((q_TempCoNodeIdConflict == true) ||
+                 (q_TempCoManagerNodeIdInvalid == true) ||
+                 (q_TempCoDevicesNodeIdInvalid == true)))
+            {
+               // Summing all CANopen Node ID conflicts into one flag
+               // Error for CANopen Node ID detected
+               *opq_CoNodeIDInvalid = true;
+            }
+
+            if ((opq_CoHearbeatTimeInvalid != NULL) &&
+                (q_TempCoHeartbeatInvalid == true))
+            {
+               // Error for CANopen Node ID detected
+               *opq_CoHearbeatTimeInvalid = true;
+            }
+         }
       }
    }
    else
@@ -924,10 +989,12 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
                                        false);
                                  if ((pc_TxList != NULL) && (pc_RxList != NULL))
                                  {
-                                    *opq_DataPoolsInvalid = rc_MessageContainer.CheckLocalError(*pc_TxList,
-                                                                                                *pc_RxList,
-                                                                                                C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                                                                   rc_Protocol.e_Type));
+                                    *opq_DataPoolsInvalid = rc_MessageContainer.CheckLocalError(
+                                       *pc_TxList, *pc_RxList,
+                                       C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(rc_Protocol.e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(rc_Protocol.e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(rc_Protocol.e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalsRequired(rc_Protocol.e_Type));
                                     //Check global error
                                     if (*opq_DataPoolsInvalid == false)
                                     {

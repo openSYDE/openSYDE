@@ -23,6 +23,7 @@
 #include "C_OSCNode.h"
 #include "C_OSCSystemBus.h"
 #include "C_PuiSdHandler.h"
+#include "TGLUtils.h"
 #include "C_GtGetText.h"
 #include "C_SdUtil.h"
 #include "C_CieUtil.h"
@@ -153,6 +154,8 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
 
    disconnect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled,
               this, &C_SdBueNodeSelectorWidget::m_NodeToggled);
+   disconnect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigSwitchToCoManager,
+              this, &C_SdBueNodeSelectorWidget::SigSwitchToCoManager);
 
    // save the protocol
    this->me_Protocol = oe_Protocol;
@@ -197,10 +200,94 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
    }
 
    this->mpc_Ui->pc_NodeSelectorListWidget->SetProtocol(oe_Protocol);
-   this->mpc_Ui->pc_NodeSelectorListWidget->CheckNodes(c_NodeIndexesWithInterfaceDuplicates, c_ReducedInterfaceIndexes);
+
+   if (oe_Protocol == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      // Special case CANopen: The CANopen Manager on this bus gets a link
+      uint32 u32_ManagerNodeIndex;
+      uint8 u8_ManagerIntfNumber;
+      if (C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerNodeOnBus(this->mu32_BusIndex, u32_ManagerNodeIndex,
+                                                                      &u8_ManagerIntfNumber) == C_NO_ERR)
+      {
+         const C_OSCNode * const pc_NodeManager =
+            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ManagerNodeIndex);
+
+         if (pc_NodeManager != NULL)
+         {
+            uint32 u32_IntfCounter;
+            uint32 u32_ManagerIntfIndex = 0U;
+            // The devices have to be added manually as checked due to not having own protocol information about
+            // CANopen. Only the manager has all information.
+            const std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManagerInfo =
+               pc_NodeManager->c_CanOpenManagers.find(u8_ManagerIntfNumber);
+
+            // Set the info for the manager
+            // Getting the interface index by the interface number
+            for (u32_IntfCounter = 0U; u32_IntfCounter < pc_NodeManager->c_Properties.c_ComInterfaces.size();
+                 ++u32_IntfCounter)
+            {
+               if (pc_NodeManager->c_Properties.c_ComInterfaces[u32_IntfCounter].u8_InterfaceNumber ==
+                   u8_ManagerIntfNumber)
+               {
+                  // Found
+                  this->mpc_Ui->pc_NodeSelectorListWidget->SetSpecificNodeAsManager(u32_ManagerNodeIndex,
+                                                                                    u32_IntfCounter,
+                                                                                    true);
+                  u32_ManagerIntfIndex = u32_IntfCounter;
+                  break;
+               }
+            }
+
+            tgl_assert(c_ItManagerInfo != pc_NodeManager->c_CanOpenManagers.end());
+            if (c_ItManagerInfo != pc_NodeManager->c_CanOpenManagers.end())
+            {
+               const C_OSCCanOpenManagerInfo & rc_ManagerInfo = c_ItManagerInfo->second;
+               std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice;
+
+               for (c_ItDevice = rc_ManagerInfo.c_CanOpenDevices.begin();
+                    c_ItDevice != rc_ManagerInfo.c_CanOpenDevices.end(); ++c_ItDevice)
+               {
+                  const C_OSCCanInterfaceId & rc_DeviceId = c_ItDevice->first;
+                  const C_OSCNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                     rc_DeviceId.u32_NodeIndex);
+
+                  if (pc_DeviceNode != NULL)
+                  {
+                     for (u32_IntfCounter = 0U;
+                          u32_IntfCounter < pc_DeviceNode->c_Properties.c_ComInterfaces.size();
+                          ++u32_IntfCounter)
+                     {
+                        if (pc_DeviceNode->c_Properties.c_ComInterfaces[u32_IntfCounter].u8_InterfaceNumber ==
+                            rc_DeviceId.u8_InterfaceNumber)
+                        {
+                           // Specific interface found
+                           this->mpc_Ui->pc_NodeSelectorListWidget->SetSpecificNodeAsDevice(rc_DeviceId.u32_NodeIndex,
+                                                                                            u32_IntfCounter,
+                                                                                            true,
+                                                                                            &rc_DeviceId,
+                                                                                            u32_ManagerNodeIndex,
+                                                                                            u32_ManagerIntfIndex);
+                           // Add the CANopen devices to the checked nodes
+                           c_NodeIndexesWithInterfaceDuplicates.push_back(rc_DeviceId.u32_NodeIndex);
+                           c_ReducedInterfaceIndexes.push_back(u32_IntfCounter);
+                           break;
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   // Set the checkbox state
+   this->mpc_Ui->pc_NodeSelectorListWidget->CheckNodes(c_NodeIndexesWithInterfaceDuplicates,
+                                                       c_ReducedInterfaceIndexes);
 
    connect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled,
            this, &C_SdBueNodeSelectorWidget::m_NodeToggled);
+   connect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigSwitchToCoManager,
+           this, &C_SdBueNodeSelectorWidget::SigSwitchToCoManager);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

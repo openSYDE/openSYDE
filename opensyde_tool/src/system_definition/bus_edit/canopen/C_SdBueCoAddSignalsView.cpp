@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include <QScrollBar>
+#include <QMouseEvent>
 
 #include "C_SdBueCoAddSignalsView.h"
 
@@ -46,12 +47,27 @@ using namespace stw_opensyde_gui_elements;
 C_SdBueCoAddSignalsView::C_SdBueCoAddSignalsView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent)
 {
-   this->C_SdBueCoAddSignalsView::setModel(&this->mc_Model);
+   QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
+
+   this->mc_SortModel.setSortRole(static_cast<sintn>(Qt::DisplayRole));
+   this->mc_SortModel.setSourceModel(&this->mc_Model);
+   this->C_SdBueCoAddSignalsView::setModel(&this->mc_SortModel);
+   //Delete last selection model, see Qt documentation for setModel
+   delete pc_LastSelectionModel;
 
    this->m_InitColumns();
 
+   //Configure sorting
+   this->setSortingEnabled(true);
+
+   //Configure filter
+   this->mc_SortModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+
    // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
-   this->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+   this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+   this->verticalScrollBar()->hide();
+   this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+   this->horizontalScrollBar()->hide();
 
    this->setDragEnabled(false);
    this->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -60,6 +76,11 @@ C_SdBueCoAddSignalsView::C_SdBueCoAddSignalsView(QWidget * const opc_Parent) :
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
    this->horizontalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
+
+   connect(this->verticalScrollBar(), &QScrollBar::rangeChanged, this,
+           &C_SdBueCoAddSignalsView::m_ShowHideVerticalScrollBar);
+   connect(this->horizontalScrollBar(), &QScrollBar::rangeChanged, this,
+           &C_SdBueCoAddSignalsView::m_ShowHideHorizontalScrollBar);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,6 +92,7 @@ C_SdBueCoAddSignalsView::C_SdBueCoAddSignalsView(QWidget * const opc_Parent) :
 void C_SdBueCoAddSignalsView::SetIndex(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
 {
    this->mc_Model.SetIndex(orc_MessageId);
+   this->sortByColumn(C_SdBueCoAddSignalsModel::h_EnumToColumn(C_SdBueCoAddSignalsModel::eINDEX), Qt::AscendingOrder);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -89,19 +111,20 @@ void C_SdBueCoAddSignalsView::PrepareCleanUp()
    Selected signals
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_SdBueCoAddSignalsResultEntry> C_SdBueCoAddSignalsView::GetSelectedSignals() const
+std::vector<C_OSCCanOpenManagerMappableSignal> C_SdBueCoAddSignalsView::GetSelectedSignals() const
 {
-   std::vector<C_SdBueCoAddSignalsResultEntry> c_Retval;
-   const std::map<uint32, std::vector<uint32> > c_UniqueSignals = C_SdBueCoAddSignalsModel::h_GetUniqueIndices(
-      this->selectedIndexes());
+   std::vector<C_OSCCanOpenManagerMappableSignal> c_Retval;
+   const std::map<uint32, std::vector<uint32> > c_UniqueSignals = C_SdBueCoAddSignalsModel::h_GetUniqueIndices(m_MapModelIndices(
+                                                                                                                  this->
+                                                                                                                  selectedIndexes()));
    for (std::map<uint32, std::vector<uint32> >::const_iterator c_ItTopLevel = c_UniqueSignals.cbegin();
         c_ItTopLevel != c_UniqueSignals.cend(); ++c_ItTopLevel)
    {
       for (std::vector<uint32>::const_iterator c_ItSignal = c_ItTopLevel->second.cbegin();
            c_ItSignal != c_ItTopLevel->second.cend(); ++c_ItSignal)
       {
-         const C_SdBueCoAddSignalsResultEntry * const pc_Entry = this->mc_Model.GetDataForIndex(c_ItTopLevel->first,
-                                                                                                *c_ItSignal);
+         const C_OSCCanOpenManagerMappableSignal * const pc_Entry = this->mc_Model.GetDataForIndex(c_ItTopLevel->first,
+                                                                                                   *c_ItSignal);
          if (pc_Entry != NULL)
          {
             c_Retval.push_back(*pc_Entry);
@@ -131,10 +154,31 @@ bool C_SdBueCoAddSignalsView::IsEmpty() const
    \param[in]  orc_Text    String
 */
 //----------------------------------------------------------------------------------------------------------------------
-//lint -e{9175} WIP
-void C_SdBueCoAddSignalsView::Search(const QString & orc_Text) const
+void C_SdBueCoAddSignalsView::Search(const QString & orc_Text)
 {
-   Q_UNUSED(orc_Text)
+   this->mc_SortModel.SetFilter(orc_Text);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overwritten mouse double click event slot
+
+   Here: Add dialog exit if valid selection
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueCoAddSignalsView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
+{
+   const QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(opc_Event->globalPos()));
+
+   QTreeView::mouseDoubleClickEvent(opc_Event);
+   if ((c_Index.isValid() == true) && (this->selectedIndexes().size() > 0))
+   {
+      if (C_SdBueCoAddSignalsView::mh_CountUnique(m_MapModelIndices(this->selectedIndexes())) == 1UL)
+      {
+         Q_EMIT this->SigAccept();
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,7 +194,7 @@ void C_SdBueCoAddSignalsView::selectionChanged(const QItemSelection & orc_Select
                                                const QItemSelection & orc_Deselected)
 {
    QTreeView::selectionChanged(orc_Selected, orc_Deselected);
-   Q_EMIT this->SigSelectionChanged(C_SdBueCoAddSignalsView::mh_CountUnique(this->selectedIndexes()));
+   Q_EMIT this->SigSelectionChanged(C_SdBueCoAddSignalsView::mh_CountUnique(m_MapModelIndices(this->selectedIndexes())));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -186,4 +230,66 @@ void C_SdBueCoAddSignalsView::m_InitColumns(void)
    this->setColumnWidth(C_SdBueCoAddSignalsModel::h_EnumToColumn(C_SdBueCoAddSignalsModel::eINDEX), 150);
    this->setColumnWidth(C_SdBueCoAddSignalsModel::h_EnumToColumn(C_SdBueCoAddSignalsModel::eNAME), 200);
    this->setColumnWidth(C_SdBueCoAddSignalsModel::h_EnumToColumn(C_SdBueCoAddSignalsModel::eLENGTH), 80);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Showing or hiding the vertical scrollbar for no resizing the parent widget
+
+   \param[in]  osn_Min  Min
+   \param[in]  osn_Max  Max
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueCoAddSignalsView::m_ShowHideVerticalScrollBar(const sintn osn_Min, const sintn osn_Max) const
+{
+   // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
+   if ((osn_Min == 0) && (osn_Max == 0))
+   {
+      this->verticalScrollBar()->hide();
+   }
+   else
+   {
+      this->verticalScrollBar()->show();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Show hide horizontal scroll bar
+
+   \param[in]  osn_Min  Min
+   \param[in]  osn_Max  Max
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueCoAddSignalsView::m_ShowHideHorizontalScrollBar(const sintn osn_Min, const sintn osn_Max) const
+{
+   // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
+   if ((osn_Min == 0) && (osn_Max == 0))
+   {
+      this->horizontalScrollBar()->hide();
+   }
+   else
+   {
+      this->horizontalScrollBar()->show();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map model indices
+
+   \param[in]  orc_SortModelIndices    Sort model indices
+
+   \return
+   Converted model indices
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QModelIndexList C_SdBueCoAddSignalsView::m_MapModelIndices(const QModelIndexList & orc_SortModelIndices) const
+{
+   QModelIndexList c_Retval;
+
+   c_Retval.reserve(orc_SortModelIndices.size());
+   for (QModelIndexList::ConstIterator c_ItSortModelIndex = orc_SortModelIndices.cbegin();
+        c_ItSortModelIndex != orc_SortModelIndices.cend(); ++c_ItSortModelIndex)
+   {
+      c_Retval.push_back(this->mc_SortModel.mapToSource(*c_ItSortModelIndex));
+   }
+   return c_Retval;
 }

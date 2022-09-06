@@ -400,6 +400,9 @@ protected:
                            const bool & orq_AllowDataAdaptation = false, const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_ComProtocolType =
                               stw_opensyde_core::C_OSCCanProtocol::eLAYER2);
    void m_CleanUpComDataPool(const stw_types::uint32 & oru32_NodeIndex, const stw_types::uint32 & oru32_DataPoolIndex);
+   virtual void m_SyncOsyNodeIdChange(const stw_types::uint32 ou32_NodeIndex,
+                                      const stw_types::uint32 ou32_InterfaceIndex,
+                                      const stw_types::uint8 ou8_NewNodeId) = 0;
 
 private:
    // NVM base Datapool helper functions
@@ -409,6 +412,9 @@ private:
                                              std::vector<C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas);
    static void mh_MergeNvmDataPoolAreas(const C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToAdd,
                                         C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToMerge);
+   void m_SetOSCNodeIds(const stw_types::uint32 ou32_NodeIndex, const std::vector<stw_types::uint8> & orc_NodeIds);
+   void m_SetOSCNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
+                       const stw_types::uint8 ou8_NodeId);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

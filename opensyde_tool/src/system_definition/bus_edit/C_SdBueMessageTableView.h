@@ -57,7 +57,10 @@ private:
    C_SdBueMessageTableView(const C_SdBueMessageTableView &);
    C_SdBueMessageTableView & operator =(const C_SdBueMessageTableView &);
 
+   const stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_SyncManager;
+
    void m_InitColumns(void);
+   void m_HandleColumnVisibility(void);
 
    QSortFilterProxyModel mc_SortProxyModel;
    stw_opensyde_gui_logic::C_SdBueMessageTableModel mc_Model;

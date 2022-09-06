@@ -44,9 +44,10 @@ public:
              const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes, const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues, const std::vector<stw_types::uint32> & orc_DatapoolIndexes, const std::vector<QString> & orc_DatapoolNames, const bool oq_NodeLayer, const bool oq_ReadOnly);
    void SetLastKnownCycleTimeValue(const stw_types::uint32 ou32_Value);
    void SetRxTimeoutPreconditions(const bool oq_TxMethodOnEvent, const bool oq_DisableOptionPossible);
-   void SetRxTimeoutConfigurationDisabled(const bool oq_DisableTimeoutConfiguration);
+   void SetRxTimeoutConfigurationReadOnly(const bool oq_TimeoutConfigurationReadOnly);
    void SetChecked(const stw_types::uint32 ou32_DatapoolIndex, const bool oq_Checked) const;
    void SetEnabled(const bool oq_Enabled) const;
+   void SetSpecificToolTip(const QString & orc_Tooltip);
 
    bool HasChildren(void) const;
 
@@ -100,7 +101,7 @@ private:
 
    bool mq_TxMethodOnEvent;
    bool mq_DisableOptionPossible;
-   bool mq_DisableTimeoutConfiguration;
+   bool mq_TimeoutConfigurationReadOnly;
 
    void m_OnCheckBoxStateChanged(const stw_types::sintn osn_CheckState);
    void m_ToggleSubItems(const bool oq_Checked);

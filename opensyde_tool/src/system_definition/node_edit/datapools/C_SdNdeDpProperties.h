@@ -77,7 +77,7 @@ private:
    void m_CheckDatapoolName(void) const;
    bool m_CheckDatapoolNameNotDuplicate(std::vector<stw_scl::C_SCLString> * const opc_ExistingDatapoolNames) const;
    void m_InitSpinBox(void) const;
-   void m_InitComboBoxProtocols(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComProtocolType =
+   void m_InitComboBoxProtocols(const bool oq_NewDatapool, const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ComProtocolType =
                                    stw_opensyde_core::C_OSCCanProtocol::eLAYER2) const;
    stw_opensyde_core::C_OSCCanProtocol::E_Type m_GetSelectedProtocol(void) const;
    void m_OnComTypeChange(void) const;

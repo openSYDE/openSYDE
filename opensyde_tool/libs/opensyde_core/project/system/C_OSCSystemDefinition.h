@@ -53,11 +53,14 @@ public:
                                     bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                     bool * const opq_IpInvalid, bool * const opq_DataPoolsInvalid,
                                     bool * const opq_ApplicationsInvalid, bool * const opq_DomainsInvalid,
+                                    bool * const opq_CommSignalCountInvalid, bool * const opq_CoPdoCountInvalid,
+                                    bool * const opq_CoNodeIDInvalid, bool * const opq_CoHearbeatTimeInvalid,
                                     const bool & orq_AllowComDataPoolException,
                                     std::vector<stw_types::uint32> * const opc_InvalidInterfaceIndices,
                                     std::vector<stw_types::uint32> * const opc_InvalidDataPoolIndices,
                                     std::vector<stw_types::uint32> * const opc_InvalidApplicationIndices,
-                                    std::vector<stw_types::uint32> * const opc_InvalidDomainIndices) const;
+                                    std::vector<stw_types::uint32> * const opc_InvalidDomainIndices,
+                                    std::vector<C_OSCCanProtocol::E_Type> * const opc_InvalidProtocolTypes) const;
    stw_types::sint32 CheckErrorBus(const stw_types::uint32 ou32_BusIndex, bool * const opq_NameConflict,
                                    bool * const opq_NameInvalid, bool * const opq_IdInvalid,
                                    bool * const opq_DataPoolsInvalid) const;

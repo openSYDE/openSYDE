@@ -82,9 +82,12 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
       // -> only alphanumeric characters + "_"
       if (oq_AutomaticCStringAdaptation == false)
       {
+         // no automatic c string adaptation
          for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
          {
+            // first char of name
             cn_Char = orc_Name.c_str()[u32_Index];
+            // is alphanumeric and no underscore true or a number true -> invalid name
             if (((std::isalnum(cn_Char) == 0) &&
                  (cn_Char != '_')) || (std::isdigit(orc_Name.c_str()[0]) == 1)) //ANSI compliant check
             {
@@ -95,9 +98,12 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
       }
       else
       {
+         // automatic c string adaptation
          for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
          {
+            // fist char of name
             cn_Char = orc_Name.c_str()[u32_Index];
+            // is alphanumeric true or no underscore and a number true -> invalid name
             if ((std::isalnum(cn_Char) == 0) &&
                 ((cn_Char != '_') || (std::isdigit(orc_Name.c_str()[0]) == 1))) //ANSI compliant check
             {

@@ -28,6 +28,7 @@
 #include "C_SdUtil.h"
 #include "stwerrors.h"
 #include "constants.h"
+#include "C_OgeWiUtil.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdBueSortHelper.h"
@@ -87,6 +88,10 @@ C_SdBueMessageSelectorTreeWidget::C_SdBueMessageSelectorTreeWidget(QWidget * con
    this->setDragDropMode(QAbstractItemView::DragDropMode::DragDrop);
    this->setDefaultDropAction(Qt::DropAction::MoveAction);
    this->setDragEnabled(true);
+
+   //Avoid styling widgets inside
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->verticalScrollBar(), "C_SdBueMessageSelectorTreeWidget", true);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->horizontalScrollBar(), "C_SdBueMessageSelectorTreeWidget", true);
 
    // Deactivate custom context menu of scroll bar
    this->verticalScrollBar()->setContextMenuPolicy(Qt::NoContextMenu);
@@ -468,7 +473,7 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
       {
          std::vector<C_OSCCanMessageIdentificationIndices> c_Groups;
          std::vector<std::vector<uint32> > c_GroupMessages;
-         std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > c_SortedDescendingMessageGroups;
+         std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > c_SortedAscendingMessageGroups;
          c_Groups.push_back(c_SelectedMessageIds[0]);
          c_GroupMessages.resize(1);
          //First element
@@ -509,20 +514,20 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
          {
             C_SdUtil::h_SortIndicesAscending(c_GroupMessages[u32_ItGroup]);
          }
-         //Delete messages per group (Descending)
+         //Delete messages per group (Ascending)
          tgl_assert(c_Groups.size() == c_GroupMessages.size());
-         c_SortedDescendingMessageGroups.reserve(c_Groups.size());
+         c_SortedAscendingMessageGroups.reserve(c_Groups.size());
          for (uint32 u32_ItGroup = 0; u32_ItGroup < c_Groups.size(); ++u32_ItGroup)
          {
             std::vector<C_OSCCanMessageIdentificationIndices> c_Tmp;
             const C_OSCCanMessageIdentificationIndices & rc_CurGroup = c_Groups[u32_ItGroup];
             c_Tmp.reserve(c_GroupMessages[u32_ItGroup].size());
-            for (uint32 u32_ItGroupMessage = c_GroupMessages[u32_ItGroup].size(); u32_ItGroupMessage > 0;
-                 --u32_ItGroupMessage)
+            for (uint32 u32_ItGroupMessage = 0UL; u32_ItGroupMessage < c_GroupMessages[u32_ItGroup].size();
+                 ++u32_ItGroupMessage)
             {
                const uint32 u32_GroupMessageIndex =
                   c_GroupMessages[u32_ItGroup][static_cast<std::vector< uint32>::size_type >
-                                               (u32_ItGroupMessage - 1UL)];
+                                               (u32_ItGroupMessage)];
                const C_OSCCanMessageIdentificationIndices c_MessageId(rc_CurGroup.u32_NodeIndex,
                                                                       rc_CurGroup.e_ComProtocol,
                                                                       rc_CurGroup.u32_InterfaceIndex,
@@ -531,16 +536,16 @@ void C_SdBueMessageSelectorTreeWidget::Delete(void)
                                                                       u32_GroupMessageIndex);
                c_Tmp.push_back(c_MessageId);
             }
-            c_SortedDescendingMessageGroups.push_back(c_Tmp);
+            c_SortedAscendingMessageGroups.push_back(c_Tmp);
          }
-         this->mpc_UndoManager->DoDeleteMessages(c_SortedDescendingMessageGroups, this->mpc_MessageSyncManager,
+         this->mpc_UndoManager->DoDeleteMessages(c_SortedAscendingMessageGroups, this->mpc_MessageSyncManager,
                                                  this);
       }
       //Sort signals
       c_Dummy.resize(c_SelectedSignals.size());
-      C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCCanMessageIdentificationIndices, uint32>(c_SelectedSignals,
-                                                                                             c_SelectedSignalMessageIds,
-                                                                                             c_Dummy);
+      C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCCanMessageIdentificationIndices, uint32>(c_SelectedSignals,
+                                                                                            c_SelectedSignalMessageIds,
+                                                                                            c_Dummy);
       //Delete signals
       this->mpc_UndoManager->DoDeleteSignals(c_SelectedSignalMessageIds,
                                              c_SelectedSignals, this->mpc_MessageSyncManager, this);
@@ -1390,6 +1395,7 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
             bool q_NameValid = true;
             bool q_HasTx = true;
             bool q_DelayInvalid;
+            bool q_NoSignalsInvalid;
             bool q_SignalsValid = true;
             this->mpc_MessageSyncManager->CheckMessageIdBus(C_OSCCanMessageUniqueId(pc_Message->u32_CanId,
                                                                                     pc_Message->q_IsExtended), q_IdValid,
@@ -1398,10 +1404,14 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
             this->mpc_MessageSyncManager->CheckMessageHasTx(q_HasTx, orc_MessageId);
             pc_MessageContainer->CheckMessageLocalError(NULL, orc_MessageId.u32_MessageIndex,
                                                         orc_MessageId.q_MessageIsTx, NULL, NULL, &q_DelayInvalid, NULL,
-                                                        NULL, NULL,
+                                                        NULL, NULL, &q_NoSignalsInvalid,
                                                         C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                                            orc_MessageId.e_ComProtocol),
                                                         C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                                           orc_MessageId.e_ComProtocol),
+                                                        C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                                           orc_MessageId.e_ComProtocol),
+                                                        C_OSCCanProtocol::h_GetCANMessageSignalsRequired(
                                                            orc_MessageId.e_ComProtocol));
             if (pc_Message->c_Signals.size() > 0)
             {
@@ -1421,11 +1431,12 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
                                                                                          u32_SignalInternalIndex));
                         if (pc_ChildItem != NULL)
                         {
-                           if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal,
-                                                            C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
-                                                               orc_MessageId.e_ComProtocol),
-                                                            C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
-                                                               orc_MessageId.e_ComProtocol)))
+                           if (pc_Message->CheckErrorSignal(
+                                  pc_List, u32_ItSignal,
+                                  C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(orc_MessageId.e_ComProtocol),
+                                  C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(orc_MessageId.e_ComProtocol),
+                                  C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                     orc_MessageId.e_ComProtocol)))
                            {
                               //Error
                               pc_ChildItem->SetError(true);
@@ -1442,8 +1453,9 @@ void C_SdBueMessageSelectorTreeWidget::RecheckError(const C_OSCCanMessageIdentif
                }
             }
             //Always active
-            if (((((q_IdValid == true) && (q_NameValid == true)) && (q_SignalsValid == true)) &&
-                 (q_DelayInvalid == false)) && (q_HasTx == true))
+            if ((q_IdValid == true) && (q_NameValid == true) && (q_SignalsValid == true) &&
+                (q_DelayInvalid == false) && (q_NoSignalsInvalid == false) &&
+                (q_HasTx == true))
             {
                //Valid
                pc_TopLevelItem->SetError(false);
@@ -2104,7 +2116,6 @@ void C_SdBueMessageSelectorTreeWidget::m_AddSignal(const uint32 ou32_MessageInde
 void C_SdBueMessageSelectorTreeWidget::m_AddCoSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                      const uint32 ou32_SignalIndex, const uint16 ou16_StartBit)
 {
-   // TODO SFI: Add CANopen signal
    QPointer<C_OgePopUpDialog> const c_PopUp = new C_OgePopUpDialog(this, this);
    C_SdBueCoAddSignalsDialog * const pc_AddDialog = new C_SdBueCoAddSignalsDialog(*c_PopUp,
                                                                                   orc_MessageId);
@@ -2116,7 +2127,7 @@ void C_SdBueMessageSelectorTreeWidget::m_AddCoSignal(const C_OSCCanMessageIdenti
 
    if (c_PopUp->exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      const std::vector<C_SdBueCoAddSignalsResultEntry> c_Signals = pc_AddDialog->GetSelectedSignals();
+      const std::vector<C_OSCCanOpenManagerMappableSignal> c_Signals = pc_AddDialog->GetSelectedSignals();
       if (c_Signals.size() > 0UL)
       {
          //Core
@@ -2212,8 +2223,35 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
          if ((this->mpc_MessageSyncManager != NULL) &&
              (this->mpc_MessageSyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN))
          {
-            // Special case: CANopen PDO messages can be activated/deactivated
-            pc_Message->setFlags(pc_Message->flags() | Qt::ItemIsUserCheckable);
+            // Adopt PDO settings (rw/ro and activated/deactivated) from EDS
+            // Hint: the case read-only as well as deactivated PDO at the same time is valid and accepted here,
+            //       even if it is probably not really useful for the user, but nevertheless this case would be
+            //       rather an EDS file user issue.
+
+            // first, check if PDO is read-only
+            const C_OSCCanOpenManagerDeviceInfo * const pc_Manager =
+               C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(rc_MessageId);
+
+            const uint16 u16_PdoIndex = pc_MessageData->u16_CanOpenManagerPdoIndex;
+            const bool q_MessageIsTx = !(rc_MessageId.q_MessageIsTx); // the message is from CANopen manager view and
+                                                                      // therefore this flag must be used inverse for
+                                                                      // IsPDOMappingRo method
+            bool q_IsPdoRo;
+            pc_Manager->c_EDSFileContent.IsPDOMappingRo(u16_PdoIndex, q_MessageIsTx, q_IsPdoRo);
+
+            if (q_IsPdoRo == true)
+            {
+               // PDO is read only
+               Qt::ItemFlags c_Flags = pc_Message->flags();
+               c_Flags.setFlag(Qt::ItemIsUserCheckable, false);
+               pc_Message->setFlags(c_Flags);
+            }
+            else
+            {
+               pc_Message->setFlags(pc_Message->flags() | Qt::ItemIsUserCheckable);
+            }
+
+            // second, special case: CANopen PDO messages can be activated/deactivated
             pc_Message->setCheckState(0, ((pc_MessageData->q_CanOpenManagerMessageActive == true) ?
                                           Qt::Checked : Qt::Unchecked));
             connect(pc_Message, &C_SdBusMessageSelectorTreeWidgetItem::SigCheckedStateChanged,
@@ -2419,7 +2457,10 @@ void C_SdBueMessageSelectorTreeWidget::m_CoMessageCheckedStateChanged(
                              rc_MessageId,
                              c_MessageData) == C_NO_ERR);
 
+               this->RecheckErrorGlobal(false);
+
                // Change can cause a changed error state
+               Q_EMIT (this->SigMessageCountChanged());
                Q_EMIT (this->SigErrorChanged());
                Q_EMIT (this->SigRefreshSelection());
             }

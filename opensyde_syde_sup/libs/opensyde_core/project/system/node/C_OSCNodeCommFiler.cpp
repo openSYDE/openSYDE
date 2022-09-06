@@ -39,9 +39,9 @@ using namespace stw_opensyde_core;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load comm definition file
 
-   \param[out]    orc_NodeComProtocol Data storage
-   \param[in]     orc_FilePath        File path
-   \param[in]     orc_NodeDataPools   Loaded datapools
+   \param[out]  orc_NodeComProtocol    Data storage
+   \param[in]   orc_FilePath           File path
+   \param[in]   orc_NodeDataPools      Loaded datapools
 
    \return
    C_NO_ERR   data read
@@ -120,9 +120,9 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComProtocolFile(C_OSCCanProtocol & orc_Node
    pre-condition: the passed XML parser has the active node set to "com-protocol"
    post-condition: the passed XML parser has the active node set to the same "com-protocol"
 
-   \param[out]    orc_NodeComProtocol data storage
-   \param[in,out] orc_XMLParser       XML with list active
-   \param[in]     orc_NodeDataPools   Loaded datapools
+   \param[out]     orc_NodeComProtocol    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in]      orc_NodeDataPools      Loaded datapools
 
    \return
    C_NO_ERR   data read
@@ -196,9 +196,9 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComProtocol(C_OSCCanProtocol & orc_NodeComP
 
    Save comm definition to XML file
 
-   \param[in] orc_NodeComProtocol data storage
-   \param[in] orc_FilePath        File path for xml
-   \param[in] orc_DatapoolName    Datapool name
+   \param[in]  orc_NodeComProtocol  data storage
+   \param[in]  orc_FilePath         File path for xml
+   \param[in]  orc_DatapoolName     Datapool name
 
    \return
    C_NO_ERR   data saved
@@ -242,9 +242,9 @@ sint32 C_OSCNodeCommFiler::h_SaveNodeComProtocolFile(const C_OSCCanProtocol & or
    pre-condition: the passed XML parser has the active node set to "com-protocol"
    post-condition: the passed XML parser has the active node set to the same "com-protocol"
 
-   \param[in]     orc_NodeComProtocol data storage
-   \param[in,out] orc_XMLParser       XML with list active
-   \param[in]     orc_DatapoolName    Datapool name
+   \param[in]      orc_NodeComProtocol    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in]      orc_DatapoolName       Datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComProtocol(const C_OSCCanProtocol & orc_NodeComProtocol,
@@ -267,8 +267,8 @@ void C_OSCNodeCommFiler::h_SaveNodeComProtocol(const C_OSCCanProtocol & orc_Node
    pre-condition: the passed XML parser has the active node set to "com-message-containers"
    post-condition: the passed XML parser has the active node set to the same "com-message-containers"
 
-   \param[out]    orc_NodeComMessageContainers data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[out]     orc_NodeComMessageContainers    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 
    \return
    C_NO_ERR   data read
@@ -336,8 +336,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComMessageContainers(
    pre-condition: the passed XML parser has the active node set to "com-message-containers"
    post-condition: the passed XML parser has the active node set to the same "com-message-containers"
 
-   \param[in]     orc_NodeComMessageContainers data storage
-   \param[in,out] orc_XMLParser                XML with list active
+   \param[in]      orc_NodeComMessageContainers    data storage
+   \param[in,out]  orc_XMLParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComMessageContainers(
@@ -361,8 +361,8 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessageContainers(
    pre-condition: the passed XML parser has the active node set to "com-message-container"
    post-condition: the passed XML parser has the active node set to the same "com-message-container"
 
-   \param[out]    orc_NodeComMessageContainer data storage
-   \param[in,out] orc_XMLParser               XML with list active
+   \param[out]     orc_NodeComMessageContainer  data storage
+   \param[in,out]  orc_XMLParser                XML with list active
 
    \return
    C_NO_ERR   data read
@@ -416,8 +416,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComMessageContainer(C_OSCCanMessageContaine
    pre-condition: the passed XML parser has the active node set to "com-message-container"
    post-condition: the passed XML parser has the active node set to the same "com-message-container"
 
-   \param[in]     orc_NodeComMessageContainer data storage
-   \param[in,out] orc_XMLParser               XML with list active
+   \param[in]      orc_NodeComMessageContainer  data storage
+   \param[in,out]  orc_XMLParser                XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComMessageContainer(const C_OSCCanMessageContainer & orc_NodeComMessageContainer,
@@ -444,8 +444,8 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessageContainer(const C_OSCCanMessageCont
    pre-condition: the passed XML parser has the active node set to unknown
    post-condition: the passed XML parser has the active node set to the same unknown
 
-   \param[out]    orc_NodeComMessages data storage
-   \param[in,out] orc_XMLParser       XML with list active
+   \param[out]     orc_NodeComMessages    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 
    \return
    C_NO_ERR   data read
@@ -514,8 +514,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & 
    pre-condition: the passed XML parser has the active node set to unknown
    post-condition: the passed XML parser has the active node set to the same unknown
 
-   \param[in]     orc_NodeComMessages data storage
-   \param[in,out] orc_XMLParser       XML with list active
+   \param[in]      orc_NodeComMessages    data storage
+   \param[in,out]  orc_XMLParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage> & orc_NodeComMessages,
@@ -538,8 +538,8 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage
    pre-condition: the passed XML parser has the active node set to "com-message"
    post-condition: the passed XML parser has the active node set to the same "com-message"
 
-   \param[out]    orc_NodeComMessage data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[out]     orc_NodeComMessage  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 
    \return
    C_NO_ERR   data read
@@ -612,6 +612,10 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMes
       osc_write_log_error("Loading node definition", "Could not find \"com-message\".\"com-signals\" node.");
       s32_Retval = C_CONFIG;
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_LoadMessageCANOpenPart(orc_NodeComMessage, orc_XMLParser);
+   }
    return s32_Retval;
 }
 
@@ -622,8 +626,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMes
    pre-condition: the passed XML parser has the active node set to "com-message"
    post-condition: the passed XML parser has the active node set to the same "com-message"
 
-   \param[in]     orc_NodeComMessage data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[in]      orc_NodeComMessage  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeComMessage,
@@ -642,6 +646,7 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeCo
    h_SaveNodeComSignals(orc_NodeComMessage.c_Signals, orc_XMLParser);
    //Return
    tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+   C_OSCNodeCommFiler::mh_SaveMessageCANOpenPart(orc_NodeComMessage, orc_XMLParser);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -651,8 +656,8 @@ void C_OSCNodeCommFiler::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeCo
    pre-condition: the passed XML parser has the active node set to "com-signals"
    post-condition: the passed XML parser has the active node set to the same "com-signals"
 
-   \param[out]    orc_NodeComSignals data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[out]     orc_NodeComSignals  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 
    \return
    C_NO_ERR   data read
@@ -721,8 +726,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & or
    pre-condition: the passed XML parser has the active node set to "com-signals"
    post-condition: the passed XML parser has the active node set to the same "com-signals"
 
-   \param[in]     orc_NodeComSignals data storage
-   \param[in,out] orc_XMLParser      XML with list active
+   \param[in]      orc_NodeComSignals  data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> & orc_NodeComSignals,
@@ -745,8 +750,8 @@ void C_OSCNodeCommFiler::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> 
    pre-condition: the passed XML parser has the active node set to "com-signal"
    post-condition: the passed XML parser has the active node set to the same "com-signal"
 
-   \param[out]    orc_NodeComSignal data storage
-   \param[in,out] orc_XMLParser     XML with list active
+   \param[out]     orc_NodeComSignal   data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 
    \return
    C_NO_ERR   data read
@@ -792,6 +797,10 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComSignal(C_OSCCanSignal & orc_NodeComSigna
    {
       orc_NodeComSignal.u16_MultiplexValue = 0;
    }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_LoadSignalCANOpenPart(orc_NodeComSignal, orc_XMLParser);
+   }
    return s32_Retval;
 }
 
@@ -802,8 +811,8 @@ sint32 C_OSCNodeCommFiler::h_LoadNodeComSignal(C_OSCCanSignal & orc_NodeComSigna
    pre-condition: the passed XML parser has the active node set to "com-signal"
    post-condition: the passed XML parser has the active node set to the same "com-signal"
 
-   \param[in]     orc_NodeComSignal data storage
-   \param[in,out] orc_XMLParser     XML with list active
+   \param[in]      orc_NodeComSignal   data storage
+   \param[in,out]  orc_XMLParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComSignal,
@@ -816,12 +825,15 @@ void C_OSCNodeCommFiler::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComS
    orc_XMLParser.CreateNodeChild("byte-order", mh_CommunicationByteOrderToString(orc_NodeComSignal.e_ComByteOrder));
    orc_XMLParser.CreateNodeChild("multiplexer-type", mh_CommunicationMuxTypeToString(
                                     orc_NodeComSignal.e_MultiplexerType));
+   orc_XMLParser.CreateAndSelectNodeChild("can-open-object-dictionary");
+   mh_SaveSignalCANOpenPart(orc_NodeComSignal, orc_XMLParser);
+   orc_XMLParser.SelectNodeParent();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform communication protocol type to string
 
-   \param[in] ore_CommunicationProtocol Communication protocol type
+   \param[in]  ore_CommunicationProtocol  Communication protocol type
 
    \return
    Stringified communication protocol type
@@ -843,6 +855,9 @@ C_SCLString C_OSCNodeCommFiler::h_CommunicationProtocolToString(
    case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
       c_Retval = "can open safety";
       break;
+   case C_OSCCanProtocol::eCAN_OPEN:
+      c_Retval = "can open";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -853,8 +868,8 @@ C_SCLString C_OSCNodeCommFiler::h_CommunicationProtocolToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to communication protocol type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Communication protocol type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Communication protocol type
 
    \return
    C_NO_ERR   no error
@@ -878,6 +893,10 @@ sint32 C_OSCNodeCommFiler::h_StringToCommunicationProtocol(const C_SCLString & o
    {
       ore_Type = C_OSCCanProtocol::eLAYER2;
    }
+   else if (orc_String == "can open")
+   {
+      ore_Type = C_OSCCanProtocol::eCAN_OPEN;
+   }
    else
    {
       osc_write_log_error("Loading node definition", "Invalid value for \"communication-protocol\":" + orc_String);
@@ -890,7 +909,7 @@ sint32 C_OSCNodeCommFiler::h_StringToCommunicationProtocol(const C_SCLString & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get automatically generated file name
 
-   \param[in] orc_DatapoolName Datapool name
+   \param[in]  orc_DatapoolName  Datapool name
 
    \return
    Automatically generated file name
@@ -902,9 +921,254 @@ C_SCLString C_OSCNodeCommFiler::h_GetFileName(const C_SCLString & orc_DatapoolNa
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save node owner index
+
+   \param[in]      orc_OwnerNodeIndex  Owner node index
+   \param[in,out]  orc_XMLParser       XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeCommFiler::h_SaveNodeOwnerIndex(const C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                              C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("node-owner-index");
+   orc_XMLParser.SetAttributeUint32("node-index", orc_OwnerNodeIndex.u32_NodeIndex);
+   orc_XMLParser.SetAttributeUint32("interface-id", orc_OwnerNodeIndex.u8_InterfaceNumber);
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "node-owner-indices");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load node owner index
+
+   \param[in,out]  orc_OwnerNodeIndex  Owner node index
+   \param[in,out]  orc_XMLParser       XML parser
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeCommFiler::h_LoadNodeOwnerIndex(C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                                const C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = orc_XMLParser.GetAttributeUint32Error("node-index", orc_OwnerNodeIndex.u32_NodeIndex);
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      uint32 u32_Value;
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("interface-id", u32_Value);
+      orc_OwnerNodeIndex.u8_InterfaceNumber = static_cast<uint8>(u32_Value);
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save message CAN open part
+
+   \param[in]      orc_NodeCommMessage    Node COMM message
+   \param[in,out]  orc_XMLParser          XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeCommFiler::mh_SaveMessageCANOpenPart(const C_OSCCanMessage & orc_NodeCommMessage,
+                                                   C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("can-open");
+   orc_XMLParser.SetAttributeBool("cob-id-includes-node-id", orc_NodeCommMessage.q_CanOpenManagerCobIdIncludesNodeID);
+   orc_XMLParser.SetAttributeUint32("cob-id-offset", orc_NodeCommMessage.u32_CanOpenManagerCobIdOffset);
+   orc_XMLParser.SetAttributeBool("message-active", orc_NodeCommMessage.q_CanOpenManagerMessageActive);
+   orc_XMLParser.SetAttributeUint32("pdo-index", orc_NodeCommMessage.u16_CanOpenManagerPdoIndex);
+   C_OSCNodeCommFiler::mh_SaveNodeOwnerIndices(orc_NodeCommMessage.c_CanOpenManagerOwnerNodeIndex, orc_XMLParser);
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load message CAN open part
+
+   \param[in,out]  orc_NodeCommMessage    Node comm message
+   \param[in,out]  orc_XMLParser          XML parser
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeCommFiler::mh_LoadMessageCANOpenPart(C_OSCCanMessage & orc_NodeCommMessage,
+                                                     C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_XMLParser.SelectNodeChild("can-open") == "can-open")
+   {
+      s32_Retval = orc_XMLParser.GetAttributeBoolError("cob-id-includes-node-id",
+                                                       orc_NodeCommMessage.q_CanOpenManagerCobIdIncludesNodeID);
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XMLParser.GetAttributeUint32Error("cob-id-offset",
+                                                            orc_NodeCommMessage.u32_CanOpenManagerCobIdOffset);
+      }
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = orc_XMLParser.GetAttributeBoolError("message-active",
+                                                          orc_NodeCommMessage.q_CanOpenManagerMessageActive);
+      }
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         uint32 u32_Value;
+         s32_Retval = orc_XMLParser.GetAttributeUint32Error("pdo-index", u32_Value);
+         if (s32_Retval == C_NO_ERR)
+         {
+            orc_NodeCommMessage.u16_CanOpenManagerPdoIndex = static_cast<uint16>(u32_Value);
+         }
+      }
+
+      if (s32_Retval == C_NO_ERR)
+      {
+         s32_Retval = mh_LoadNodeOwnerIndices(orc_NodeCommMessage.c_CanOpenManagerOwnerNodeIndex, orc_XMLParser);
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save node owner indices
+
+   \param[in]      orc_OwnerNodeIndex  Owner node index
+   \param[in,out]  orc_XMLParser       XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeCommFiler::mh_SaveNodeOwnerIndices(const C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                                 C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.CreateAndSelectNodeChild("node-owner-indices");
+   orc_XMLParser.SetAttributeUint32("length", 1UL);
+   C_OSCNodeCommFiler::h_SaveNodeOwnerIndex(orc_OwnerNodeIndex, orc_XMLParser);
+
+   //Return
+   tgl_assert(orc_XMLParser.SelectNodeParent() == "can-open");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load node owner indices
+
+   \param[in,out]  orc_OwnerNodeIndex  Owner node index
+   \param[in,out]  orc_XMLParser       XML parser
+
+   \return
+   C_NO_ERR   data read
+   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeCommFiler::mh_LoadNodeOwnerIndices(C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                                   C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("node-owner-indices");
+
+   if (s32_Retval == C_NO_ERR)
+   {
+      uint32 u32_ExpectedSize;
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("length", u32_ExpectedSize);
+      if (s32_Retval == C_NO_ERR)
+      {
+         stw_scl::C_SCLString c_NodeName = orc_XMLParser.SelectNodeChild("node-owner-index");
+         if (c_NodeName == "node-owner-index")
+         {
+            do
+            {
+               C_OSCCanInterfaceId c_OwnerNodeIndex;
+               s32_Retval = h_LoadNodeOwnerIndex(c_OwnerNodeIndex, orc_XMLParser);
+               if (s32_Retval == C_NO_ERR)
+               {
+                  orc_OwnerNodeIndex = c_OwnerNodeIndex;
+               }
+               c_NodeName = orc_XMLParser.SelectNodeNext("node-owner-index");
+            }
+            while ((c_NodeName == "node-owner-index") && (s32_Retval == C_NO_ERR));
+            //Return
+            tgl_assert(orc_XMLParser.SelectNodeParent() == "node-owner-indices");
+         }
+      }
+      if (s32_Retval == C_NO_ERR)
+      {
+         if (u32_ExpectedSize != 1)
+         {
+            C_SCLString c_Tmp;
+            c_Tmp.PrintFormatted("Unexpected node owner indices count, expected: %i, got %i", u32_ExpectedSize,
+                                 1);
+            osc_write_log_warning("Load file", c_Tmp.c_str());
+         }
+         //Return
+         tgl_assert(orc_XMLParser.SelectNodeParent() == "can-open");
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save signal CAN open part
+
+   \param[in]      orc_NodeCommSignal  Node COMM signal
+   \param[in,out]  orc_XMLParser       XML parser
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNodeCommFiler::mh_SaveSignalCANOpenPart(const C_OSCCanSignal & orc_NodeCommSignal,
+                                                  C_OSCXMLParserBase & orc_XMLParser)
+{
+   orc_XMLParser.SetAttributeUint32("index", orc_NodeCommSignal.u16_CanOpenManagerObjectDictionaryIndex);
+   orc_XMLParser.SetAttributeUint32("sub-index", orc_NodeCommSignal.u8_CanOpenManagerObjectDictionarySubIndex);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load signal CAN open part
+
+   \param[in,out]  orc_NodeCommSignal  Node COMM signal
+   \param[in,out]  orc_XMLParser       XML parser
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Detailed description
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeCommFiler::mh_LoadSignalCANOpenPart(C_OSCCanSignal & orc_NodeCommSignal,
+                                                    C_OSCXMLParserBase & orc_XMLParser)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_XMLParser.SelectNodeChild("can-open-object-dictionary") == "can-open-object-dictionary")
+   {
+      uint32 u32_Value;
+      s32_Retval = orc_XMLParser.GetAttributeUint32Error("index", u32_Value);
+      if (s32_Retval == C_NO_ERR)
+      {
+         orc_NodeCommSignal.u16_CanOpenManagerObjectDictionaryIndex = static_cast<uint16>(u32_Value);
+         s32_Retval = orc_XMLParser.GetAttributeUint32Error("sub-index", u32_Value);
+         if (s32_Retval == C_NO_ERR)
+         {
+            orc_NodeCommSignal.u8_CanOpenManagerObjectDictionarySubIndex = static_cast<uint8>(u32_Value);
+         }
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signal");
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool communication byte order type to string
 
-   \param[in] ore_CommunicationByteOrder Node data pool communication byte order type
+   \param[in]  ore_CommunicationByteOrder    Node data pool communication byte order type
 
    \return
    Stringified node data pool communication byte order type
@@ -932,8 +1196,8 @@ C_SCLString C_OSCNodeCommFiler::mh_CommunicationByteOrderToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool communication byte order type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool communication byte order type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool communication byte order type
 
    \return
    C_NO_ERR   no error
@@ -966,7 +1230,7 @@ sint32 C_OSCNodeCommFiler::mh_StringToCommunicationByteOrder(const C_SCLString &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool communication mux type to string
 
-   \param[in] ore_CommunicationByteOrder Node data pool communication mux type
+   \param[in]  ore_CommunicationByteOrder    Node data pool communication mux type
 
    \return
    Stringified node data pool communication mux type
@@ -997,8 +1261,8 @@ C_SCLString C_OSCNodeCommFiler::mh_CommunicationMuxTypeToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool communication mux type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool communication mux type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool communication mux type
 
    \return
    C_NO_ERR   no error
@@ -1035,7 +1299,7 @@ sint32 C_OSCNodeCommFiler::mh_StringToCommunicationMuxType(const C_SCLString & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform node data pool communication message transmission method type to string
 
-   \param[in] ore_NodeComMessageTxMethod Node data pool communication message transmission method type
+   \param[in]  ore_NodeComMessageTxMethod    Node data pool communication message transmission method type
 
    \return
    Stringified node data pool communication message transmission method type
@@ -1057,6 +1321,12 @@ C_SCLString C_OSCNodeCommFiler::mh_NodeComMessageTxMethodToString(
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
       c_Retval = "on-application-event";
       break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+      c_Retval = "on-can-open-type-254";
+      break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+      c_Retval = "on-can-open-type-255";
+      break;
    default:
       c_Retval = "invalid";
       break;
@@ -1067,8 +1337,8 @@ C_SCLString C_OSCNodeCommFiler::mh_NodeComMessageTxMethodToString(
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Transform string to node data pool communication message transmission method type
 
-   \param[in]  orc_String String to interpret
-   \param[out] ore_Type   Node data pool communication message transmission method type
+   \param[in]   orc_String    String to interpret
+   \param[out]  ore_Type      Node data pool communication message transmission method type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCNodeCommFiler::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,
@@ -1085,6 +1355,14 @@ void C_OSCNodeCommFiler::mh_StringToNodeComMessageTxMethod(const C_SCLString & o
    else if (orc_String == "on-application-event")
    {
       ore_Type = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+   }
+   else if (orc_String == "on-can-open-type-254")
+   {
+      ore_Type = C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254;
+   }
+   else if (orc_String == "on-can-open-type-255")
+   {
+      ore_Type = C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255;
    }
    else
    {

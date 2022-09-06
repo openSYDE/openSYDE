@@ -14,8 +14,8 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QTreeWidget>
 #include "C_UtiUndoStack.h"
-#include "C_SdBueCoAddSignalsResultEntry.h"
 #include "C_PuiSdNodeCanMessageSyncManager.h"
+#include "C_OSCCanOpenManagerMappableSignal.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -65,7 +65,7 @@ public:
                        QTreeWidget * const opc_MessageTreeWidget,
                        const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType);
    void DoDeleteMessages(
-      const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > & orc_SortedDescendingMessageGroups, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget);
+      const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > & orc_SortedAscendingMessageGroups, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget);
    void DoAddSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                     const stw_types::uint32 ou32_SignalIndex, const stw_types::uint16 ou16_StartBit,
                     const stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
@@ -74,7 +74,7 @@ public:
                     QTreeWidget * const opc_MessageTreeWidget);
    void DoAddCoSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                       const stw_types::uint32 ou32_SignalIndex, const stw_types::uint16 ou16_StartBit,
-                      const std::vector<C_SdBueCoAddSignalsResultEntry> & orc_NewSignalInfo,
+                      const std::vector<stw_opensyde_core::C_OSCCanOpenManagerMappableSignal> & orc_NewSignalInfo,
                       C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                       QTreeWidget * const opc_MessageTreeWidget);
    void DoDeleteSignals(const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_MessageId,

@@ -639,15 +639,29 @@ sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
 bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
 {
    bool q_Retval = false;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-   if (pc_View != NULL)
+   if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
    {
-      if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
+      std::vector<uint8> c_NodeActiveFlags;
+      const sint32 s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+         this->mu32_ViewIndex,
+         c_NodeActiveFlags);
+
+      if (s32_FuncRetval == C_NO_ERR)
       {
-         q_Retval = pc_View->GetNodeActive(orc_DataPoolElementId.u32_NodeIndex);
+         q_Retval = static_cast<bool>(c_NodeActiveFlags[orc_DataPoolElementId.u32_NodeIndex]);
       }
       else
+      {
+         //Failure
+         q_Retval = false;
+      }
+   }
+   else
+   {
+      const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+      if (pc_View != NULL)
       {
          C_OSCCanMessageIdentificationIndices c_MessageID;
          uint32 u32_SignalIndex;
@@ -690,6 +704,11 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
             //Failure
             q_Retval = false;
          }
+      }
+      else
+      {
+         //Failure
+         q_Retval = false;
       }
    }
    return q_Retval;

@@ -49,6 +49,10 @@ public:
    void SetChecked(const bool oq_Checked);
    bool IsChecked(void) const;
    void SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol);
+   void SetNodeAsManager(const bool oq_Manager);
+   void SetNodeAsDevice(const bool oq_Device, const stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceId,
+                        const stw_types::uint32 ou32_ManagerNodeIndex = 0U,
+                        const stw_types::uint32 ou32_ManagerIntfIndex = 0U);
    void UpdateToolTip(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -58,6 +62,8 @@ Q_SIGNALS:
    //lint -restore
    void SigNodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                        const bool oq_Checked);
+   void SigSwitchToCoManager(const stw_types::uint32 ou32_NodeIndex, const QString & orc_NodeName,
+                             const stw_types::uint8 ou8_InterfaceNumber) const;
 
 private:
    //Avoid call
@@ -67,6 +73,7 @@ private:
    void m_NodeToggled(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                       const bool oq_Checked);
    void m_AdaptIcon(const bool oq_Checked);
+   void m_OnLinkSwitchToManager(const QString & orc_Link) const;
 
    Ui::C_SdBueNodeSelectorCheckBoxItemWidget * mpc_Ui;
 
@@ -75,6 +82,14 @@ private:
    QIcon mc_IconActive;
    QIcon mc_IconInactive;
    stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
+
+   // CANopen specific
+   bool mq_IsManager;
+   bool mq_IsDevice;
+   // Only relevant if mq_IsDevice == true
+   stw_opensyde_core::C_OSCCanInterfaceId mc_DeviceId;
+   stw_types::uint32 mu32_ManagerNodeIndex;
+   stw_types::uint32 mu32_ManagerIntfIndex;
 };
 }
 #endif

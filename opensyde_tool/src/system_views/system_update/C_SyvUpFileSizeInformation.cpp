@@ -318,13 +318,18 @@ void C_SyvUpFileSizeInformation::LoadUserSettings(const uint32 ou32_ViewIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
+
    this->mc_BytesPerMsMapPerNode.clear();
    // restore configuration of the view
-   if (pc_View != NULL)
+   if ((pc_View != NULL) &&
+       (s32_Retval == C_NO_ERR))
    {
       const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
-      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-      for (uint32 u32_ItNode = 0UL; u32_ItNode < rc_ActiveNodes.size(); ++u32_ItNode)
+      for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
       {
          QString c_Name;
          if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(u32_ItNode, c_Name) == C_NO_ERR)
@@ -356,13 +361,18 @@ void C_SyvUpFileSizeInformation::SaveUserSettings(const uint32 ou32_ViewIndex) c
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
+
    // restore configuration of the view
-   if (pc_View != NULL)
+   if ((pc_View != NULL) &&
+       (s32_Retval == C_NO_ERR))
    {
-      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-      for (uint32 u32_ItNode = 0UL; u32_ItNode < rc_ActiveNodes.size(); ++u32_ItNode)
+      for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
       {
-         if (rc_ActiveNodes[u32_ItNode] == true)
+         if (c_NodeActiveFlags[u32_ItNode] == true)
          {
             const QMap<stw_types::uint32, stw_types::float64>::const_iterator c_It = this->mc_BytesPerMsMapPerNode.find(
                u32_ItNode);

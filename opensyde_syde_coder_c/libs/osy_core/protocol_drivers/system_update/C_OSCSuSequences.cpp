@@ -4205,7 +4205,7 @@ void C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceI
                          orc_Info.c_MoreInformation.au8_FlashloaderSoftwareVersion[2]);
    orc_Text.Add(c_Line);
    c_Line.PrintFormatted("Flashloader protocol version: V%d.%02dr%d",
-                         orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[1],
+                         orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[0],
                          orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[1],
                          orc_Info.c_MoreInformation.au8_FlashloaderProtocolVersion[2]);
    orc_Text.Add(c_Line);

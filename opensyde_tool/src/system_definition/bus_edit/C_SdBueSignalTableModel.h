@@ -35,6 +35,7 @@ public:
       eMESSAGE,
       eNAME,
       eCOMMENT,
+      eCAN_OPEN_INDEX,
       eMULTIPLEXING,
       eSTART_BIT,
       eLENGTH,
@@ -68,9 +69,44 @@ public:
                                         stw_types::uint32 & oru32_Signal) const;
 
 private:
-   std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mc_MessageIds;
+   struct C_SigTableData
+   {
+      QString c_MsgName;
+      QString c_CoIndex;
+      QString c_MultiplexingValue;
+      QString c_SigName;
+      QString c_Comment;
+      stw_types::uint16 u16_StartBit;
+      stw_types::uint16 u16_BitLength;
+      QString c_ByteOrder;
+      QString c_ValueType;
+      QVariant c_InitValue;
+      QVariant c_Factor;
+      QVariant c_Offset;
+      stw_types::sintn sn_AutoMinMax;
+      QVariant c_MinValue;
+      QVariant c_MaxValue;
+      QString c_Unit;
+      QVariant c_Icon;
+   };
+
+   struct C_SigTableConfig
+   {
+      stw_opensyde_core::C_OSCCanMessageIdentificationIndices c_MessageId;
+      stw_types::uint32 u32_SignalIndex;
+      C_SigTableData c_SignalData;
+   };
+
+   std::vector<C_SigTableConfig> mc_SigInfoAll;
+
    C_PuiSdNodeCanMessageSyncManager * mpc_SyncManager;
-   stw_types::uint32 mu32_SignalCount;
+
+   QString m_GetMultiplexingValue(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                  const stw_types::uint32 ou32_Signal) const;
+   QVariant m_GetDisplayAndEditValue(const QModelIndex & orc_Index, const E_Columns oe_Column) const;
+   QFont m_GetFontValue(const E_Columns oe_Column) const;
+
+   void m_FillSigInfo(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

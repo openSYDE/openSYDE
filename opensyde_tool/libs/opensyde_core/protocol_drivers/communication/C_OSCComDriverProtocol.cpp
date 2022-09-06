@@ -1106,39 +1106,24 @@ C_OSCProtocolDriverOsy * C_OSCComDriverProtocol::m_GetOsyProtocol(const C_OSCPro
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get node name
 
-   \param[in] ou32_NodeIndex Node index
+   \param[in] ou32_ActiveNodeIndex   Active node index
 
    \return
    Node name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_NodeIndex) const
+C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_ActiveNodeIndex) const
 {
    C_SCLString c_Retval = "Unknown";
-   uint32 u32_ItActiveNodeIndex = 0;
-   uint32 u32_ItNodeActiveFlag;
 
-   //Search index
-   for (u32_ItNodeActiveFlag = 0U; u32_ItNodeActiveFlag < this->mc_ActiveNodesSystem.size(); ++u32_ItNodeActiveFlag)
+   if (ou32_ActiveNodeIndex < this->mc_ActiveNodesIndexes.size())
    {
-      if (this->mc_ActiveNodesSystem[u32_ItNodeActiveFlag] == 1U)
+      const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
+      if ((this->mpc_SysDef != NULL) &&
+          (u32_NodeIndex < this->mpc_SysDef->c_Nodes.size()))
       {
-         if (u32_ItActiveNodeIndex == ou32_NodeIndex)
-         {
-            break;
-         }
-         else
-         {
-            ++u32_ItActiveNodeIndex;
-         }
+         c_Retval = this->mpc_SysDef->c_Nodes[u32_NodeIndex].c_Properties.c_Name;
       }
-   }
-
-   //Get node name
-   if ((this->mpc_SysDef != NULL) &&
-       (u32_ItNodeActiveFlag < this->mpc_SysDef->c_Nodes.size()))
-   {
-      c_Retval = this->mpc_SysDef->c_Nodes[u32_ItNodeActiveFlag].c_Properties.c_Name;
    }
 
    return c_Retval;

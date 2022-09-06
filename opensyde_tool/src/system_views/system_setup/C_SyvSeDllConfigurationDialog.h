@@ -62,6 +62,8 @@ private:
    void m_ConcretDllClicked(void) const;
    void m_OtherDllClicked(void) const;
    void m_OnBrowse(void) const;
+   void m_OnDroppedDllPath(void);
+   void m_SetCustomDllPath(const QString & orc_New) const;
 
    void m_ShowCustomDllPath(const bool oq_Active) const;
    bool m_CheckCustomDllPath(void) const;

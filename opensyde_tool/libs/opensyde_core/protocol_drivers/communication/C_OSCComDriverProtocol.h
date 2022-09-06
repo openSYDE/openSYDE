@@ -83,7 +83,8 @@ public:
 protected:
    ///Init state
    bool mq_Initialized;
-   ///Holds all indices of all relevant nodes for the current use case
+   ///Holds all indices of all relevant nodes for the current use case. This active nodes represent the initialized
+   /// active node (for example mc_OsyProtocols) indexes which are part of mc_ActiveNodesSystem.
    std::vector<stw_types::uint32> mc_ActiveNodesIndexes;
    ///Has pointer to created instances of generic openSYDE protocol if available. Lifetime is handled by child classes.
    ///Length matches number of active nodes.
@@ -116,7 +117,7 @@ protected:
    virtual bool m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_Mode) const = 0;
    virtual stw_types::uint8 m_GetRoutingSessionId(void) const = 0;
    C_OSCProtocolDriverOsy * m_GetOsyProtocol(const C_OSCProtocolDriverOsyNode & orc_ServerId) const;
-   stw_scl::C_SCLString m_GetActiveNodeName(const stw_types::uint32 ou32_NodeIndex) const;
+   stw_scl::C_SCLString m_GetActiveNodeName(const stw_types::uint32 ou32_ActiveNodeIndex) const;
 
    stw_types::sint32 m_SetNodeSessionId(const stw_types::uint32 ou32_ActiveNode, const stw_types::uint8 ou8_SessionId,
                                         const bool oq_CheckForSession, stw_types::uint8 * const opu8_NrCode) const;
@@ -199,7 +200,7 @@ private:
    static const stw_types::uint8 mhu8_NODE_ID_CLIENT = 126;
 
    C_OSCProtocolDriverOsyNode mc_ClientID; ///< Client/our own ID
-   stw_types::uint32 mu32_ActiveNodeCount; ///< Active node count
+   stw_types::uint32 mu32_ActiveNodeCount; ///< Active node count in mc_ActiveNodesIndexes, not in mc_ActiveNodesSystem
    C_OSCIpDispatcher * mpc_IpDispatcher;   ///< Holds created instance of IP dispatcher
 
    std::map<stw_types::uint32, stw_types::uint32> mc_ActiveNodeIp2IpDispatcher; ///< Mapping from active node index to
@@ -219,6 +220,8 @@ private:
                                                                                  // routing
 
    std::vector<stw_types::uint8> mc_ActiveNodesSystem; ///< List of flags for all nodes which are active in the system
+                                                       // definition set by Init call
+
    stw_types::uint32 mu32_ActiveBusIndex;
    C_OSCSecurityPemDatabase * mpc_SecurityPemDb;
 

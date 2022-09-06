@@ -40,6 +40,8 @@ protected:
    std::vector<stw_types::uint64> mc_UniqueId;
    C_PuiSdNodeCanMessageSyncManager * const mpc_MessageSyncManager;
    stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget * const mpc_MessageTreeWidget;
+
+   bool m_CheckMessagesSortedAscending(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

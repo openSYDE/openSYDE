@@ -98,7 +98,7 @@ protected:
                                           const stw_types::uint32 ou32_SignalListIndex, const bool oq_RemoveLastComma);
    static void mh_GroupSignalsByMuxValue(const C_OSCCanMessage & orc_Message,
                                          const stw_types::uint32 ou32_MultiplexerIndex, std::map<stw_types::sint32,
-                                                                                                 std::vector<C_OSCCanSignal> > & orc_SignalsPerValue);
+                                                                                                 std::vector<C_OSCCanSignal> > & orc_MuxedSignalsPerValue, std::vector<C_OSCCanSignal> & orc_NonMuxedSignals);
    static stw_scl::C_SCLString mh_GetProtocolNameByType(const C_OSCCanProtocol::E_Type & ore_Protocol);
    static stw_scl::C_SCLString mh_GetByteOrderNameByType(const C_OSCCanSignal::E_ByteOrderType & ore_ByteOrder);
    static stw_scl::C_SCLString mh_GetTransmissionTriggerNameByType(const C_OSCCanMessage::E_TxMethodType & ore_Trigger);

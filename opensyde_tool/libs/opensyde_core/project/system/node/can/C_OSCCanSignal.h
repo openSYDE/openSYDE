@@ -44,6 +44,7 @@ public:
 
    bool operator !=(const C_OSCCanSignal & orc_Cmp) const;
    bool operator ==(const C_OSCCanSignal & orc_Cmp) const;
+   bool operator <(const C_OSCCanSignal & orc_Cmp) const;
 
    void CalcHash(stw_types::uint32 & oru32_HashValue, const bool oq_R20Compatible = false) const;
    // Helper functions for byte order

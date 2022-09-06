@@ -65,6 +65,8 @@ public:
    static bool h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List);
    static stw_types::uint32 h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Type);
    static bool h_GetCANMessageSignalGapsValid(const E_Type oe_Type);
+   static bool h_GetCANMessageSignalByteAlignmentRequired(const E_Type oe_Type);
+   static bool h_GetCANMessageSignalsRequired(const E_Type oe_Type);
 
    E_Type e_Type;                                       ///< Communication protocol associated to this data pool
    stw_types::uint32 u32_DataPoolIndex;                 ///< Related data pool index

@@ -25,6 +25,7 @@
 #include "C_SyvDcWidget.h"
 #include "C_OgePopUpDialog.h"
 #include "C_OSCLoggingHandler.h"
+#include "C_OgeWiCustomMessage.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -276,33 +277,76 @@ bool C_SyvSeSetupWidget::GetEditMode(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
 {
-   QPointer<C_OgePopUpDialog> c_New;
-   C_SyvDcWidget * pc_Dialog;
+   bool q_DeviceConfigPossible = true;
 
-   //Confirm if necessary
-   if (this->GetEditMode() == true)
+   // Check for special case of a automatically deactivated sub node
+   std::vector<uint8> c_NodeActiveFlagsWithDeactivatedSubNodes;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      this->mu32_ViewIndex,
+      c_NodeActiveFlagsWithDeactivatedSubNodes);
+   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+
+   if ((pc_View != NULL) &&
+       (s32_Retval == C_NO_ERR))
    {
-      this->SetEditMode(false);
+      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
+      uint32 u32_Counter;
+
+      tgl_assert(rc_NodeActiveFlags.size() == c_NodeActiveFlagsWithDeactivatedSubNodes.size());
+      for (u32_Counter = 0U; u32_Counter < rc_NodeActiveFlags.size(); ++u32_Counter)
+      {
+         if (rc_NodeActiveFlags[u32_Counter] != c_NodeActiveFlagsWithDeactivatedSubNodes[u32_Counter])
+         {
+            C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
+            QString c_Message;
+
+            c_Message = C_GtGetText::h_GetText("At least one sub node is not connected or can not"
+                                               " reached on the local bus.\n"
+                                               "The device configuration is only possible when all sub nodes"
+                                               " of one device can be reached on one interface.");
+
+            c_MessageBox.SetCustomMinHeight(230, 230);
+            c_MessageBox.SetDescription(c_Message);
+            c_MessageBox.Execute();
+
+            // Difference detected
+            q_DeviceConfigPossible = false;
+
+            break;
+         }
+      }
    }
 
-   //Show dialog
-   c_New = new C_OgePopUpDialog(this, this);
-   pc_Dialog = new C_SyvDcWidget(*c_New, this->mu32_ViewIndex);
-
-   Q_UNUSED(pc_Dialog)
-
-   //Resize
-   c_New->SetSize(QSize(1100, 743));
-
-   c_New->exec();
-
-   if (c_New != NULL)
+   if (q_DeviceConfigPossible == true)
    {
-      pc_Dialog->CleanUp();
-      c_New->HideOverlay();
-      c_New->deleteLater();
-   }
-} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+      QPointer<C_OgePopUpDialog> c_New;
+      C_SyvDcWidget * pc_Dialog;
+
+      //Confirm if necessary
+      if (this->GetEditMode() == true)
+      {
+         this->SetEditMode(false);
+      }
+
+      //Show dialog
+      c_New = new C_OgePopUpDialog(this, this);
+      pc_Dialog = new C_SyvDcWidget(*c_New, this->mu32_ViewIndex);
+
+      Q_UNUSED(pc_Dialog)
+
+      //Resize
+      c_New->SetSize(QSize(1100, 743));
+
+      c_New->exec();
+
+      if (c_New != NULL)
+      {
+         pc_Dialog->CleanUp();
+         c_New->HideOverlay();
+         c_New->deleteLater();
+      }
+   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+}
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function to prepare closing the scene
@@ -411,6 +455,7 @@ void C_SyvSeSetupWidget::m_OnViewConnectionChange(void)
 
    if (pc_View != NULL)
    {
+      // Get original active flags
       const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
       bool q_AllActive = true;
       for (uint32 u32_ItActive = 0UL; u32_ItActive < rc_ActiveFlags.size(); ++u32_ItActive)

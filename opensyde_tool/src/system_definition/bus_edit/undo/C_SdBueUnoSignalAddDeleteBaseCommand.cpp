@@ -148,6 +148,65 @@ void C_SdBueUnoSignalAddDeleteBaseCommand::m_Delete(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check signals sorted
+
+   \return
+   Flags
+
+   \retval   True    Sorted
+   \retval   False   Not sorted
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueUnoSignalAddDeleteBaseCommand::m_CheckSignalsSortedAscending() const
+{
+   bool q_Sorted = this->m_CheckMessagesSortedAscending();
+
+   if (q_Sorted)
+   {
+      tgl_assert(this->mc_UniqueId.size() == this->mc_SignalIndex.size());
+      if (this->mc_UniqueId.size() == this->mc_SignalIndex.size())
+      {
+         tgl_assert(this->mpc_MessageSyncManager != NULL);
+         if (this->mpc_MessageSyncManager != NULL)
+         {
+            C_OSCCanMessageIdentificationIndices c_PrevId;
+            uint32 u32_PrevSignalIndex = 0UL;
+            bool q_PrevIdValid = false;
+            for (uint32 u32_It = 0UL; u32_It < this->mc_UniqueId.size(); ++u32_It)
+            {
+               const C_OSCCanMessageIdentificationIndices c_Id = this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
+                  this->mc_UniqueId[u32_It]);
+               if (q_PrevIdValid)
+               {
+                  if (((((c_Id.u32_NodeIndex == c_PrevId.u32_NodeIndex) &&
+                         (c_Id.e_ComProtocol == c_PrevId.e_ComProtocol)) &&
+                        (c_Id.u32_DatapoolIndex == c_PrevId.u32_DatapoolIndex)) &&
+                       (c_Id.u32_InterfaceIndex == c_PrevId.u32_InterfaceIndex)) &&
+                      (c_Id.u32_InterfaceIndex == c_PrevId.u32_InterfaceIndex))
+                  {
+                     if (this->mc_SignalIndex[u32_It] >= u32_PrevSignalIndex)
+                     {
+                        //pass
+                     }
+                     else
+                     {
+                        q_Sorted = false;
+                        break;
+                     }
+                  }
+               }
+               //prep next iteration
+               c_PrevId = c_Id;
+               u32_PrevSignalIndex = this->mc_SignalIndex[u32_It];
+               q_PrevIdValid = true;
+            }
+         }
+      }
+   }
+   return q_Sorted;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Store current values
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -228,6 +287,7 @@ void C_SdBueUnoSignalAddDeleteBaseCommand::m_Store(void)
             }
          }
       }
+      tgl_assert(this->m_CheckSignalsSortedAscending());
    }
 }
 
@@ -239,16 +299,27 @@ void C_SdBueUnoSignalAddDeleteBaseCommand::m_Remove(void)
 {
    if (this->mpc_MessageSyncManager != NULL)
    {
-      for (uint32 u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
+      for (uint32 u32_ItStep = this->mc_UniqueId.size(); u32_ItStep > 0UL; --u32_ItStep)
       {
          tgl_assert(this->mpc_MessageSyncManager->DeleteCanSignal(this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
-                                                                     this->mc_UniqueId[u32_ItStep]),
-                                                                  this->mc_SignalIndex[u32_ItStep]) == C_NO_ERR);
+                                                                     this->mc_UniqueId[static_cast<std::vector<uint64>::
+                                                                                                   size_type>(u32_ItStep
+                                                                                                              -
+                                                                                                              1UL)]),
+                                                                  this->mc_SignalIndex[static_cast<std::vector<uint32>::
+                                                                                                   size_type>(u32_ItStep
+                                                                                                              -
+                                                                                                              1UL)]) ==
+                    C_NO_ERR);
          if (this->mpc_MessageTreeWidget != NULL)
          {
             this->mpc_MessageTreeWidget->InternalDeleteSignal(this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
-                                                                 this->mc_UniqueId[u32_ItStep]),
-                                                              this->mc_SignalIndex[u32_ItStep]);
+                                                                 this->mc_UniqueId[static_cast<std::vector<uint64>::
+                                                                                               size_type>(u32_ItStep -
+                                                                                                          1UL)]),
+                                                              this->mc_SignalIndex[static_cast<std::vector<uint32>::
+                                                                                               size_type>(u32_ItStep -
+                                                                                                          1UL)]);
          }
       }
    }

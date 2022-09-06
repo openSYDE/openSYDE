@@ -47,7 +47,7 @@ const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT = 0.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_INTERACTION = 1.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_EMPTY_ITEM = 10000.0;
 const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_HINT_ITEM = 10001.0;
-const stw_types::uint8 C_SdBueMlvGraphicsScene::mhu8_NUM_COLORS = 64U;
+const stw_types::uint8 C_SdBueMlvGraphicsScene::mhu8_MAX_NUM_BITS = 64U;
 
 const C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[64] =
 {
@@ -151,7 +151,10 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    mc_LastMousePos(0.0, 0.0),
    ms32_LastGridIndex(-1),
    mq_SignalChanged(false),
-   mq_CoFixedMapping(false)
+   mu16_LastGridPosFilled(0U),
+   mq_CoFixedMapping(false),
+   mq_ResizingEnabled(false),
+   mq_ByteAligned(false)
 {
    //Initialize
    this->m_PrepareNextColorSection();
@@ -198,7 +201,11 @@ void C_SdBueMlvGraphicsScene::SetMessageSyncManager(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
 {
+   const bool q_CanOpen =  (ore_Value == C_OSCCanProtocol::eCAN_OPEN);
+
    this->me_Protocol = ore_Value;
+   this->mq_ResizingEnabled = !q_CanOpen;
+   this->mq_ByteAligned = q_CanOpen;
 
    this->Clear();
 }
@@ -220,6 +227,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
    tgl_assert(pc_Message != NULL);
    if (pc_Message != NULL)
    {
+      uint16 u16_Counter;
       uint32 u32_Counter;
       sint32 s32_Counter;
 
@@ -241,7 +249,16 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       }
       else
       {
-         this->mu16_MaximumCountBits = static_cast<uint16>(pc_Message->u16_Dlc * 8U);
+         if (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN)
+         {
+            // special case CANopen: Auto DLC functionality adapt the DLC depending of the current signal configuration
+            // In this case all 8 byte must be available always
+            this->mu16_MaximumCountBits = mhu8_MAX_NUM_BITS;
+         }
+         else
+         {
+            this->mu16_MaximumCountBits = static_cast<uint16>(pc_Message->u16_Dlc * 8U);
+         }
          this->mapc_ECeSHints[0]->setVisible(false);
          this->mapc_ECeSHints[1]->setVisible(false);
       }
@@ -263,7 +280,10 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       }
       for (s32_Counter = 0U; s32_Counter < mc_VecBorderItemsVertical.size(); ++s32_Counter)
       {
-         if (s32_Counter < pc_Message->u16_Dlc)
+         // special case CANopen: Auto DLC functionality adapt the DLC depending of the current signal configuration
+         // In this case all 8 byte must be available always
+         if ((s32_Counter < pc_Message->u16_Dlc) ||
+             (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN))
          {
             this->mc_VecBorderItemsVertical[s32_Counter]->SetActive(true);
          }
@@ -273,11 +293,14 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
          }
       }
 
-      // Deactivate the top header too if DLC is zero
-      this->mpc_BorderItemUpperLeft->SetActive(pc_Message->u16_Dlc != 0U);
-      for (s32_Counter = 0U; s32_Counter < mc_VecBorderItemsHorizontal.size(); ++s32_Counter)
+      // Deactivate the top header too if DLC is zero and not CANopen
       {
-         this->mc_VecBorderItemsHorizontal[s32_Counter]->SetActive(pc_Message->u16_Dlc != 0U);
+         const bool q_Active = (pc_Message->u16_Dlc != 0) || (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN);
+         this->mpc_BorderItemUpperLeft->SetActive(q_Active);
+         for (s32_Counter = 0U; s32_Counter < mc_VecBorderItemsHorizontal.size(); ++s32_Counter)
+         {
+            this->mc_VecBorderItemsHorizontal[s32_Counter]->SetActive(q_Active);
+         }
       }
 
       // add the signals
@@ -306,6 +329,16 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       }
 
       this->m_UpdateSignalManager();
+
+      // Special case: CANopen can have errors set on empty grid positions. Make sure no error of an previous
+      // CANopen message is left
+      for (u16_Counter = 0U; u16_Counter < mhu8_MAX_NUM_BITS; ++u16_Counter)
+      {
+         if (this->mac_SetGridState[u16_Counter].size() == 0)
+         {
+            this->m_CheckGridMappingPositionForError(u16_Counter);
+         }
+      }
    }
 }
 
@@ -351,6 +384,7 @@ void C_SdBueMlvGraphicsScene::Clear(void)
       pc_ItOldItem = this->mc_VecSignals.begin();
       this->m_RemoveSignal((*pc_ItOldItem)->GetSignalIndex());
    }
+   this->mu16_LastGridPosFilled = 0U;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -381,7 +415,7 @@ void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
       const sint32 s32_GridIndex = this->m_GetGridIndex(orc_ScenePos);
 
       // Check for multiple signals on one spot
-      if ((s32_GridIndex >= 0) && (s32_GridIndex < mhu8_NUM_COLORS) &&
+      if ((s32_GridIndex >= 0) && (s32_GridIndex < mhu8_MAX_NUM_BITS) &&
           (this->mac_SetGridState[s32_GridIndex].size() > 1))
       {
          // More than one signal on the position
@@ -510,9 +544,24 @@ void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const op
       if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_MOVE)
       {
          // move an item
-         const sint32 s32_IndexDif = s32_ActGridIndex - this->ms32_LastGridIndex;
+         sint32 s32_IndexDif = s32_ActGridIndex - this->ms32_LastGridIndex;
+         bool q_OffsetAdapted = false;
 
-         if (this->mpc_ActualSignal->MoveSignal(s32_IndexDif) == true)
+         if (this->mq_ByteAligned == true)
+         {
+            const uint16 u16_AlignmentOffset = u16_StartBit % 8U;
+            // Special case: auto fixing a not aligned start bit
+            if (u16_AlignmentOffset != 0)
+            {
+               s32_IndexDif -= static_cast<sint32>(u16_AlignmentOffset);
+
+               q_OffsetAdapted = true;
+            }
+         }
+
+         if (((this->mq_ByteAligned == false) || (q_OffsetAdapted == true) ||
+              (s32_IndexDif == 8) || (s32_IndexDif == -8)) &&
+             (this->mpc_ActualSignal->MoveSignal(s32_IndexDif) == true))
          {
             this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
          }
@@ -729,7 +778,7 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
    uint8 u8_Counter;
 
    // fill the vector
-   for (u8_Counter = 0U; u8_Counter < mhu8_NUM_COLORS; ++u8_Counter)
+   for (u8_Counter = 0U; u8_Counter < mhu8_MAX_NUM_BITS; ++u8_Counter)
    {
       C_SdBueMlvEmptyItem * const pc_Item = new C_SdBueMlvEmptyItem(u8_Counter);
       this->mc_VecEmptyItems.push_back(pc_Item);
@@ -840,7 +889,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
 
    // set the information only when the signals are connected
    // Special case: CANopen signals have a constant size
-   pc_Item->LoadSignal(ou32_SignalIndex, c_ColorConfig, this->me_Protocol != C_OSCCanProtocol::eCAN_OPEN);
+   pc_Item->LoadSignal(ou32_SignalIndex, c_ColorConfig, this->mq_ResizingEnabled);
 
    if (pc_SignalUiItem != NULL)
    {
@@ -1034,15 +1083,19 @@ void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager *
       if (u16_GridPos < this->mu16_MaximumCountBits)
       {
          this->mac_SetGridState[u16_GridPos].insert(opc_Item);
+
+         if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+             (this->mu16_LastGridPosFilled < u16_GridPos))
+         {
+            // Need to know on which bit the last grid has at least one signal
+            this->mu16_LastGridPosFilled = u16_GridPos;
+         }
+
          // a signal is on this spot, deactivate the background rectangle of the empty items and
          // show only the number of the bit
          this->mc_VecEmptyItems[u16_GridPos]->SetDrawRectangle(false);
 
          this->m_CheckGridMappingPositionForError(u16_GridPos);
-      }
-      else
-      {
-         // TODO Set error
       }
    }
 } //lint !e429  //no memory leak because of the parent of pc_Item by addItem and the Qt memory management
@@ -1058,8 +1111,10 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManage
    // get all grid positions for this signal. necessary for motorola byte order
    opc_Item->GetDataBytesBitPositionsOfSignal(c_SetGridPositions);
 
-   for (u16_Counter = 0U; u16_Counter < this->mu16_MaximumCountBits; ++u16_Counter)
+   u16_Counter = this->mu16_MaximumCountBits;
+   do
    {
+      --u16_Counter;
       c_ItSetGridPosition = c_SetGridPositions.find(u16_Counter);
 
       // is this position used?
@@ -1069,6 +1124,14 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManage
          c_SetGridPositions.erase(c_ItSetGridPosition);
 
          this->mac_SetGridState[u16_Counter].insert(opc_Item);
+
+         if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+             (this->mu16_LastGridPosFilled < u16_Counter))
+         {
+            // Need to know on which bit the last grid has at least one signal
+            this->mu16_LastGridPosFilled = u16_Counter;
+         }
+
          // a signal is on this spot, deactivate the background rectangle of the empty items and
          // show only the number of the bit
          this->mc_VecEmptyItems[u16_Counter]->SetDrawRectangle(false);
@@ -1081,22 +1144,17 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManage
          this->m_RemoveSignalFromGridMappingPosition(opc_Item, u16_Counter);
       }
    }
-
-   // set must be empty
-   if (c_SetGridPositions.size() > 0)
-   {
-      // TODO Set error. Must be a range error
-   }
+   while (u16_Counter > 0U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
-   uint16 u16_Counter;
+   sint16 s16_Counter;
 
-   for (u16_Counter = 0U; u16_Counter < mhu8_NUM_COLORS; ++u16_Counter)
+   for (s16_Counter = static_cast<sint16>(mhu8_MAX_NUM_BITS - 1U); s16_Counter >= 0; --s16_Counter)
    {
-      this->m_RemoveSignalFromGridMappingPosition(opc_Item, u16_Counter);
+      this->m_RemoveSignalFromGridMappingPosition(opc_Item, static_cast<uint16>(s16_Counter));
    }
 }
 
@@ -1104,22 +1162,52 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMapping(C_SdBueMlvSignalMana
 void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSignalManager * const opc_Item,
                                                                     const uint16 ou16_Pos)
 {
-   // search the item
-   const std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].find(opc_Item);
-
-   if (c_ItItem != this->mac_SetGridState[ou16_Pos].end())
+   tgl_assert(ou16_Pos < mhu8_MAX_NUM_BITS);
+   if (ou16_Pos < mhu8_MAX_NUM_BITS)
    {
-      // remove the pointer from the set
-      this->mac_SetGridState[ou16_Pos].erase(c_ItItem);
+      // search the item
+      const std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].find(opc_Item);
 
-      // are there any other items left?
-      if (this->mac_SetGridState[ou16_Pos].size() == 0)
+      if (c_ItItem != this->mac_SetGridState[ou16_Pos].end())
       {
-         // show the background of the empty item again
-         this->mc_VecEmptyItems[ou16_Pos]->SetDrawRectangle(true);
-      }
+         // remove the pointer from the set
+         this->mac_SetGridState[ou16_Pos].erase(c_ItItem);
 
-      this->m_CheckGridMappingPositionForError(ou16_Pos);
+         // are there any other items left?
+         if (this->mac_SetGridState[ou16_Pos].size() == 0)
+         {
+            if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+                (ou16_Pos == this->mu16_LastGridPosFilled) &&
+                (ou16_Pos > 0U))
+            {
+               // Need to know on which bit the last grid has at least one signal
+               // Only necessary when the already highest bit signal holder was removed
+               // and it is not already the first bit
+
+               uint16 u16_Counter;
+
+               // This position value is need for checking in case of CANopen for gaps
+               // In case of the first bit as last bit with signal it is not necessary for this check to
+               // differ between no signal and signals on the first bit
+               this->mu16_LastGridPosFilled = 0U;
+               u16_Counter = (ou16_Pos - 1U);
+               while (u16_Counter > 0)
+               {
+                  if (this->mac_SetGridState[u16_Counter].size() > 0)
+                  {
+                     this->mu16_LastGridPosFilled = u16_Counter;
+                     break;
+                  }
+                  --u16_Counter;
+               }
+            }
+
+            // show the background of the empty item again
+            this->mc_VecEmptyItems[ou16_Pos]->SetDrawRectangle(true);
+         }
+
+         this->m_CheckGridMappingPositionForError(ou16_Pos);
+      }
    }
 }
 
@@ -1133,17 +1221,28 @@ void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16 ou
    }
    else
    {
-      this->mc_VecEmptyItems[ou16_Pos]->SetError(false);
-
-      if (this->mac_SetGridState[ou16_Pos].size() > 0)
+      if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+          (this->mac_SetGridState[ou16_Pos].size() == 0) &&
+          (ou16_Pos < this->mu16_LastGridPosFilled))
       {
-         const std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].begin();
-         const C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConf = (*c_ItItem)->GetColorConfiguration();
-         this->mc_VecEmptyItems[ou16_Pos]->SetFontColor(c_ColorConf.c_FontColor);
+         // Special case CANopen: No gaps between signals are allowed
+         this->mc_VecEmptyItems[ou16_Pos]->SetError(true);
       }
       else
       {
-         this->mc_VecEmptyItems[ou16_Pos]->RestoreFontColor();
+         this->mc_VecEmptyItems[ou16_Pos]->SetError(false);
+
+         if (this->mac_SetGridState[ou16_Pos].size() > 0)
+         {
+            const std::set<C_SdBueMlvSignalManager *>::iterator c_ItItem = this->mac_SetGridState[ou16_Pos].begin();
+            const C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConf = (*c_ItItem)->GetColorConfiguration();
+
+            this->mc_VecEmptyItems[ou16_Pos]->SetFontColor(c_ColorConf.c_FontColor);
+         }
+         else
+         {
+            this->mc_VecEmptyItems[ou16_Pos]->RestoreFontColor();
+         }
       }
    }
 }
@@ -1188,7 +1287,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    // Use the oldest section, if a free color is available
    for (u32_SectionNumber = 0U; u32_SectionNumber < this->mc_SignalsColorsUsed.size(); ++u32_SectionNumber)
    {
-      for (u32_ItFree = 0UL; u32_ItFree < mhu8_NUM_COLORS; ++u32_ItFree)
+      for (u32_ItFree = 0UL; u32_ItFree < mhu8_MAX_NUM_BITS; ++u32_ItFree)
       {
          if (this->mc_SignalsColorsUsed[u32_SectionNumber][u32_ItFree] == false)
          {
@@ -1215,7 +1314,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    // search a not used color with a random number in a section with at least one free entry
    do
    {
-      sn_ColorCounter = rand() % static_cast<sintn>(mhu8_NUM_COLORS);
+      sn_ColorCounter = rand() % static_cast<sintn>(mhu8_MAX_NUM_BITS);
 
       if (this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] == false)
       {
@@ -1249,7 +1348,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
    // search the color to set the flag
-   for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_NUM_COLORS; ++u32_ColorCounter)
+   for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_MAX_NUM_BITS; ++u32_ColorCounter)
    {
       if (ou8_Index == C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter].u8_Index)
       {
@@ -1310,7 +1409,7 @@ void C_SdBueMlvGraphicsScene::m_SetColorsUnused(const C_SdBueMlvSignalManager::C
       bool q_ColorFound = false;
       bool q_OtherColorUsed = false;
 
-      for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_NUM_COLORS; ++u32_ColorCounter)
+      for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_MAX_NUM_BITS; ++u32_ColorCounter)
       {
          if ((C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter].u8_Index == orc_Colors.u8_Index) &&
              ((*c_ItSection)[u32_ColorCounter] == true))
@@ -1378,7 +1477,7 @@ void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
    this->mpc_ActualSignal = NULL;
    this->ms32_LastGridIndex = -1;
 
-   if ((s32_Counter >= 0) && (s32_Counter < mhu8_NUM_COLORS))
+   if ((s32_Counter >= 0) && (s32_Counter < mhu8_MAX_NUM_BITS))
    {
       if (this->mac_SetGridState[s32_Counter].size() > 0)
       {
@@ -1584,7 +1683,7 @@ void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
       s32_Counter = 0;
    }
 
-   if (this->mc_VecSignals.size() < mhu8_NUM_COLORS)
+   if (this->mc_VecSignals.size() < mhu8_MAX_NUM_BITS)
    {
       Q_EMIT (this->SigPasteSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter)));
    }

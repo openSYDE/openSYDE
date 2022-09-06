@@ -16,6 +16,7 @@
 #include "TGLUtils.h"
 #include "stwerrors.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSvHandler.h"
 #include "C_GiSvNodeData.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
@@ -81,13 +82,29 @@ void C_GiSvNodeData::Init(const uint32 ou32_ViewIndex, const uint32 ou32_NodeInd
          C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
       if (pc_NodeSquad != NULL)
       {
-         std::vector<stw_types::uint32>::const_iterator c_ItSubNodeIndices;
-         for (c_ItSubNodeIndices = pc_NodeSquad->c_SubNodeIndexes.begin();
-              c_ItSubNodeIndices != pc_NodeSquad->c_SubNodeIndexes.end();
-              ++c_ItSubNodeIndices)
+         std::vector<uint8> c_NodeActiveFlags;
+         // In case of node squads we need to know about deactivated sub nodes
+         const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+            ou32_ViewIndex,
+            c_NodeActiveFlags);
+
+         tgl_assert(s32_Retval == C_NO_ERR);
+         if (s32_Retval == C_NO_ERR)
          {
-            const C_GiSvSubNodeData c_SubNode(ou32_ViewIndex, *c_ItSubNodeIndices);
-            this->mc_SubNodes.push_back(c_SubNode);
+            std::vector<stw_types::uint32>::const_iterator c_ItSubNodeIndices;
+            for (c_ItSubNodeIndices = pc_NodeSquad->c_SubNodeIndexes.begin();
+                 c_ItSubNodeIndices != pc_NodeSquad->c_SubNodeIndexes.end();
+                 ++c_ItSubNodeIndices)
+            {
+               const uint32 u32_SubNodeIndex = *c_ItSubNodeIndices;
+               tgl_assert(u32_SubNodeIndex < c_NodeActiveFlags.size());
+               if (u32_SubNodeIndex < c_NodeActiveFlags.size())
+               {
+                  const C_GiSvSubNodeData c_SubNode(ou32_ViewIndex, u32_SubNodeIndex);
+                  this->mc_SubNodes.push_back(c_SubNode);
+                  this->mc_SubNodesActiveFlags.push_back(c_NodeActiveFlags[u32_SubNodeIndex]);
+               }
+            }
          }
       }
    }
@@ -96,6 +113,8 @@ void C_GiSvNodeData::Init(const uint32 ou32_ViewIndex, const uint32 ou32_NodeInd
       // normal node
       const C_GiSvSubNodeData c_SubNode(ou32_ViewIndex, ou32_NodeIndex);
       this->mc_SubNodes.push_back(c_SubNode);
+      // must be active
+      this->mc_SubNodesActiveFlags.push_back(1U);
    }
 }
 
@@ -467,6 +486,27 @@ bool C_GiSvNodeData::IsThereAnyHexFileInformationForDevice(const uint32 ou32_Sub
    if (ou32_SubDeviceIndex < this->mc_SubNodes.size())
    {
       q_Retval = this->mc_SubNodes[ou32_SubDeviceIndex].IsThereAnyHexFileInformation();
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is a specific sub node active
+
+   \param[in]  ou32_SubDeviceIndex  Sub device index
+
+   \return
+   true  Sub node is active
+   false Sub node is not active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvNodeData::IsSubNodeActive(const uint32 ou32_SubDeviceIndex) const
+{
+   bool q_Retval = false;
+
+   if (ou32_SubDeviceIndex < this->mc_SubNodesActiveFlags.size())
+   {
+      q_Retval = (this->mc_SubNodesActiveFlags[ou32_SubDeviceIndex] == 1U) ? true : false;
    }
    return q_Retval;
 }

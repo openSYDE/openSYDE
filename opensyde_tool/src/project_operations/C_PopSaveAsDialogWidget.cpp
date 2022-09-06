@@ -69,6 +69,8 @@ C_PopSaveAsDialogWidget::C_PopSaveAsDialogWidget(stw_opensyde_gui_elements::C_Og
    // init names
    InitStaticNames();
 
+   this->mpc_Ui->pc_LineEditPath->SetDragAndDropActiveForFolder(true);
+
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
 

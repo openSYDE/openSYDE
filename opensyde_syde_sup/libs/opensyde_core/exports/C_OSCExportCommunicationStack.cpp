@@ -912,20 +912,20 @@ void C_OSCExportCommunicationStack::mh_AddSignalDefinitions(C_SCLStringList & or
             uint32 u32_MultiplexerIndex;
             if (rc_Message.IsMultiplexed(&u32_MultiplexerIndex) == true)
             {
-               std::map< sint32, std::vector<C_OSCCanSignal> > c_SignalsPerValue;
+               std::map< sint32, std::vector<C_OSCCanSignal> > c_MuxedSignalsPerValue;
+               std::vector<C_OSCCanSignal> c_NonMuxedSignals;
 
                // get signals grouped by mux value
-               mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_SignalsPerValue);
+               mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_MuxedSignalsPerValue, c_NonMuxedSignals);
 
-               // Special case: one T_osy_com_signal_definition if the muxed messages does not contain any muxed signals
-               // If we only have one entry in the map, then we only have the "non-multiplexed" signal.
-               if ((c_SignalsPerValue.size() == 1) && (c_SignalsPerValue[-1].size() != 0))
+               // Special case: Multiplexed message without any multiplexed signals.
+               if (c_MuxedSignalsPerValue.size() == 0) //no muxed signals ...
                {
                   const C_OSCCanSignal & rc_MultiplexerSignal = rc_Message.c_Signals[u32_MultiplexerIndex];
                   std::vector<C_OSCCanSignal> c_Signals;
                   c_Signals.push_back(rc_MultiplexerSignal);
                   //add non-muxed signals:
-                  c_Signals.insert(c_Signals.end(), c_SignalsPerValue[-1].begin(), c_SignalsPerValue[-1].end());
+                  c_Signals.insert(c_Signals.end(), c_NonMuxedSignals.begin(), c_NonMuxedSignals.end());
 
                   orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name + "[" +
                                   C_SCLString::IntToStr(c_Signals.size()) + "] =");
@@ -940,24 +940,22 @@ void C_OSCExportCommunicationStack::mh_AddSignalDefinitions(C_SCLStringList & or
                   std::map< sint32, std::vector<C_OSCCanSignal> >::const_iterator c_ItValue;
 
                   // add signal definitions to data string list
-                  for (c_ItValue = c_SignalsPerValue.begin(); c_ItValue != c_SignalsPerValue.end(); ++c_ItValue)
+                  for (c_ItValue = c_MuxedSignalsPerValue.begin(); c_ItValue != c_MuxedSignalsPerValue.end();
+                       ++c_ItValue)
                   {
-                     // skip non-muxed signals
-                     if (c_ItValue->first != -1)
-                     {
-                        orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name + "Value" +
-                                        C_SCLString::IntToStr(c_ItValue->first) + "[" +
-                                        C_SCLString::IntToStr(c_ItValue->second.size() +
-                                                              c_SignalsPerValue[-1].size()) + "] =");
-                        orc_Data.Append("{");
-                        // add multiplexer+multiplexed signals
-                        mh_ConvertSignalsToStrings(orc_Data, c_SignalsPerValue[c_ItValue->first], ou32_SignalListIndex,
-                                                   (c_SignalsPerValue[-1].size() == 0));
-                        // add fixed signals
-                        mh_ConvertSignalsToStrings(orc_Data, c_SignalsPerValue[-1], ou32_SignalListIndex, true);
-                        orc_Data.Append("};");
-                        orc_Data.Append("");
-                     }
+                     orc_Data.Append("static const T_osy_com_signal_definition mat_" + rc_Message.c_Name + "Value" +
+                                     C_SCLString::IntToStr(c_ItValue->first) + "[" +
+                                     C_SCLString::IntToStr(c_ItValue->second.size() +
+                                                           c_NonMuxedSignals.size()) + "] =");
+                     orc_Data.Append("{");
+                     // add multiplexer+multiplexed signals
+                     mh_ConvertSignalsToStrings(orc_Data, c_MuxedSignalsPerValue[c_ItValue->first],
+                                                ou32_SignalListIndex,
+                                                (c_NonMuxedSignals.size() == 0));
+                     // add non-muxed signals
+                     mh_ConvertSignalsToStrings(orc_Data, c_NonMuxedSignals, ou32_SignalListIndex, true);
+                     orc_Data.Append("};");
+                     orc_Data.Append("");
                   }
                }
             }
@@ -1014,16 +1012,16 @@ void C_OSCExportCommunicationStack::mh_AddMessageMuxDefinitions(C_SCLStringList 
       if (rc_Message.IsMultiplexed(&u32_MultiplexerIndex) == true)
       {
          // mux message: add entry for every mux value
-         std::map< sint32, std::vector<C_OSCCanSignal> > c_SignalsPerValue;
+         std::map< sint32, std::vector<C_OSCCanSignal> > c_MuxedSignalsPerValue;
+         std::vector<C_OSCCanSignal> c_NonMuxedSignals;
 
          // get signals grouped by mux value
-         mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_SignalsPerValue);
+         mh_GroupSignalsByMuxValue(rc_Message, u32_MultiplexerIndex, c_MuxedSignalsPerValue, c_NonMuxedSignals);
 
-         // Special case: one T_osy_com_signal_definition if the muxed messages does not contain any muxed signals
-         // If we only have one entry in the map, then we only have the "non-multiplexed" signal.
-         if ((c_SignalsPerValue.size() == 1) && (c_SignalsPerValue[-1].size() != 0))
+         // Special case: Multiplexed message without any multiplexed signals. Add dummy-mux value "0".
+         if (c_MuxedSignalsPerValue.size() == 0) //no muxed signals ...
          {
-            c_Text = "   { 0U, " + C_SCLString::IntToStr(1U + c_SignalsPerValue[-1].size()) + "U, " +
+            c_Text = "   { 0U, " + C_SCLString::IntToStr(1U + c_NonMuxedSignals.size()) + "U, " +
                      "&mat_" + rc_Message.c_Name + "[0] }";
             if (u16_MessageIndex != (u16_MessageCount - 1U))
             {
@@ -1037,21 +1035,17 @@ void C_OSCExportCommunicationStack::mh_AddMessageMuxDefinitions(C_SCLStringList 
             std::map< sint32, std::vector<C_OSCCanSignal> >::const_iterator c_ItValue;
 
             // add signal definitions to data string list
-            for (c_ItValue = c_SignalsPerValue.begin(); c_ItValue != c_SignalsPerValue.end(); ++c_ItValue)
+            for (c_ItValue = c_MuxedSignalsPerValue.begin(); c_ItValue != c_MuxedSignalsPerValue.end(); ++c_ItValue)
             {
-               // skip non-muxed signals
-               if (c_ItValue->first != -1)
+               c_Text = "   { " + C_SCLString::IntToStr(c_ItValue->first) + "U, " +
+                        C_SCLString::IntToStr(c_ItValue->second.size() + c_NonMuxedSignals.size()) + "U, " +
+                        "&mat_" + rc_Message.c_Name + "Value" + C_SCLString::IntToStr(c_ItValue->first) + "[0] }";
+               if ((u16_MessageIndex != (u16_MessageCount - 1U)) ||
+                   (u16_MuxCount != static_cast<uint16>((c_MuxedSignalsPerValue.size() - 1))))
                {
-                  c_Text = "   { " + C_SCLString::IntToStr(c_ItValue->first) + "U, " +
-                           C_SCLString::IntToStr(c_ItValue->second.size() + c_SignalsPerValue[-1].size()) + "U, " +
-                           "&mat_" + rc_Message.c_Name + "Value" + C_SCLString::IntToStr(c_ItValue->first) + "[0] }";
-                  if ((u16_MessageIndex != (u16_MessageCount - 1U)) ||
-                      (u16_MuxCount != static_cast<uint16>((c_SignalsPerValue.size() - 1))))
-                  {
-                     c_Text += ",";
-                  }
-                  orc_Data.Append(c_Text);
+                  c_Text += ",";
                }
+               orc_Data.Append(c_Text);
                u16_MuxCount++;
             }
          }
@@ -1313,6 +1307,9 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetProtocolNameByType(const C_OSCC
    case C_OSCCanProtocol::eECES:
       c_Name = "eces";
       break;
+   case C_OSCCanProtocol::eCAN_OPEN:
+      c_Name = "can open";
+      break;
    default:
       tgl_assert(false);
       break;
@@ -1376,7 +1373,10 @@ C_SCLString C_OSCExportCommunicationStack::mh_GetTransmissionTriggerNameByType(
    case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
       c_Name = "OSY_COM_COMM_METHOD_ON_EVENT";
       break;
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
    default:
+      //not supported for COMM
       tgl_assert(false);
       break;
    }
@@ -1444,18 +1444,19 @@ void C_OSCExportCommunicationStack::mh_ConvertSignalsToStrings(C_SCLStringList &
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Group signals by multiplex value
 
-   Sort all signals of the given message into vectors. There is one vector for each multiplex value and besides
-   one vector to key -1, holding all non-mux signals. The first entry in mux case is always the multiplexer signal
-   itself.
+   Sort all signals of the given message into vectors. There is one vector for each multiplex value and one separate
+    vector holding all non-mux signals. The first entry in mux case is always the multiplexer signal itself.
 
-   \param[in]   orc_Message            CAN message data for signal information
-   \param[in]   ou32_MultiplexerIndex  Index of multiplexer signal in orc_Message
-   \param[out]  orc_SignalsPerValue    Signals sorted by multiplexer values (see description)
+   \param[in]   orc_Message              CAN message data for signal information
+   \param[in]   ou32_MultiplexerIndex    Index of multiplexer signal in orc_Message
+   \param[out]  orc_MuxedSignalsPerValue Signals sorted by multiplexer values (see description)
+   \param[out]  orc_NonMuxedSignals      Non-multiplexed signals in the message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMessage & orc_Message,
                                                               const uint32 ou32_MultiplexerIndex, std::map<sint32,
-                                                                                                           std::vector<C_OSCCanSignal> > & orc_SignalsPerValue)
+                                                                                                           std::vector<C_OSCCanSignal> > & orc_MuxedSignalsPerValue,
+                                                              std::vector<C_OSCCanSignal> & orc_NonMuxedSignals)
 {
    if (ou32_MultiplexerIndex < orc_Message.c_Signals.size())
    {
@@ -1467,7 +1468,7 @@ void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMess
       for (c_ItValue = c_MultiplexValues.begin(); c_ItValue != c_MultiplexValues.end(); ++c_ItValue)
       {
          // add multiplexer signal of every multiplexer-value-group; must be first entry!
-         orc_SignalsPerValue[*c_ItValue].push_back(rc_MultiplexerSignal);
+         orc_MuxedSignalsPerValue[*c_ItValue].push_back(rc_MultiplexerSignal);
       }
 
       for (uint8 u8_SignalIndex = 0U; u8_SignalIndex < static_cast<uint8>(orc_Message.c_Signals.size());
@@ -1477,15 +1478,15 @@ void C_OSCExportCommunicationStack::mh_GroupSignalsByMuxValue(const C_OSCCanMess
          switch (rc_Signal.e_MultiplexerType)
          {
          case C_OSCCanSignal::eMUX_DEFAULT:
-            orc_SignalsPerValue[-1].push_back(rc_Signal);
+            orc_NonMuxedSignals.push_back(rc_Signal);
             break;
          case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
             // signal was already added to every vector
             break;
          case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
             // if key does not already exist something went really wrong
-            tgl_assert(orc_SignalsPerValue.count(rc_Signal.u16_MultiplexValue) == 1);
-            orc_SignalsPerValue[rc_Signal.u16_MultiplexValue].push_back(rc_Signal);
+            tgl_assert(orc_MuxedSignalsPerValue.count(rc_Signal.u16_MultiplexValue) == 1);
+            orc_MuxedSignalsPerValue[rc_Signal.u16_MultiplexValue].push_back(rc_Signal);
             break;
          default:
             tgl_assert(false);

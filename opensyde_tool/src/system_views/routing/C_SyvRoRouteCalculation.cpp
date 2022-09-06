@@ -54,6 +54,8 @@ C_SyvRoRouteCalculation::C_SyvRoRouteCalculation(const uint32 ou32_ViewIndex, co
 
    this->mq_PcAvailable = rc_Pc.GetConnected();
 
+   // Use the original node active flags. The potential deactivated sub nodes has no impact for the usages as
+   // routing points
    this->mpc_Calculation = new C_OSCRoutingCalculation(rc_SystemDefintion.c_Nodes,
                                                        pc_View->GetNodeActiveFlags(),
                                                        rc_Pc.GetBusIndex(),

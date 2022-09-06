@@ -41,12 +41,13 @@ public:
    virtual bool setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
                         const stw_types::sintn osn_Role) override;
 
+   stw_types::uint32 GetNodeIndex(void) const;
    stw_types::sint32 GetInterfaceIdForModelIndex(const QModelIndex & orc_Index,
                                                  stw_types::uint8 & oru8_InterfaceNumber) const;
    stw_types::sint32 GetDeviceIndexForModelIndex(const QModelIndex & orc_Index, stw_types::uint8 & oru8_InterfaceNumber,
                                                  stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceInterfaceId) const;
    stw_types::sint32 GetDeviceAndUseCaseIndexForModelIndex(const QModelIndex & orc_Index,
-                                                           stw_types::uint8 & oru8_InterfaceNumber,
+                                                           stw_types::uint8 & oru8_ManagerInterfaceNumber,
                                                            stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceInterfaceId, stw_types::uint32 & oru32_UseCaseIndex)
    const;
 
@@ -61,6 +62,15 @@ public:
    QModelIndex GetDeviceUseCaseModelIndex(const stw_types::uint8 ou8_InterfaceNumber,
                                           const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId,
                                           const stw_types::uint32 ou32_UseCaseIndex);
+   QModelIndex GetDevicesModelIndex(const stw_types::uint8 ou8_InterfaceNumber) const;
+   QModelIndex GetDeviceModelIndex(const stw_types::uint8 ou8_InterfaceNumber,
+                                   const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId) const;
+
+   void CheckError(const QModelIndex & orc_InterfaceEntry);
+
+   static const stw_types::uint32 hu32_INDEX_DEVICE_USE_CASE_CONFIGURATION;
+   static const stw_types::uint32 hu32_INDEX_DEVICE_USE_CASE_PDOS;
+   static const stw_types::uint32 hu32_INDEX_DEVICE_USE_CASE_EDS_FILE;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -68,17 +78,20 @@ Q_SIGNALS:
    //lint -restore
    void SigCommDatapoolsChanged(void) const;
    void SigErrorChange(void) const;
+   void SigSelectManager(const QModelIndex & orc_ManagerIndex) const;
+   void SigManagerUnchecked(const QModelIndex & orc_ManagerIndex) const;
+   void SigDeviceRemoved(void) const;
 
 private:
    QWidget * const mpc_Parent;
    stw_types::uint32 mu32_NodeIndex;
    QIcon mc_IconInterface;
+   QIcon mc_IconInterfaceError;
    QIcon mc_IconNode;
+   QIcon mc_IconNodeError;
    QIcon mc_IconNodeItems;
+   QIcon mc_IconNodeItemsError;
    QMap<stw_types::uint8, QMap<stw_opensyde_core::C_OSCCanInterfaceId, stw_types::uint32> > mc_LookupTreeIndex;
-   static const stw_types::uint32 mhu32_INDEX_DEVICE_USE_CASE_EDS_FILE;
-   static const stw_types::uint32 mhu32_INDEX_DEVICE_USE_CASE_CONFIGURATION;
-   static const stw_types::uint32 mhu32_INDEX_DEVICE_USE_CASE_PDOS;
 
    void m_InitInterfaceNode(const stw_opensyde_core::C_OSCNodeComInterfaceSettings & orc_Interface,
                             const stw_opensyde_core::C_OSCNode & orc_Node,
@@ -114,14 +127,16 @@ private:
                                                        const stw_types::uint32 ou32_TreeNodeIndex,
                                                        stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceInterfaceId)
    const;
-   QModelIndex m_GetDevicesModelIndex(const stw_types::uint8 ou8_InterfaceNumber) const;
-   QModelIndex m_GetDeviceModelIndex(const stw_types::uint8 ou8_InterfaceNumber,
-                                     const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId);
-   C_TblTreeModelCheckableItem * m_GetInterfaceModelNode(const stw_types::uint8 ou8_InterfaceNumber);
-   C_TblTreeModelCheckableItem * m_GetDevicesModelNode(const stw_types::uint8 ou8_InterfaceNumber);
+   C_TblTreeModelCheckableItem * m_GetInterfaceModelNode(const stw_types::uint8 ou8_InterfaceNumber) const;
+   C_TblTreeModelCheckableItem * m_GetDevicesModelNode(const stw_types::uint8 ou8_InterfaceNumber) const;
    C_TblTreeModelCheckableItem * m_GetDeviceModelNode(const stw_types::uint8 ou8_InterfaceNumber,
                                                       const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId);
    void m_TriggerUpdateDeviceCount(const stw_types::uint8 ou8_InterfaceNumber);
+
+   void m_CheckError(C_TblTreeModelCheckableItem * const opc_InterfaceEntry);
+   void m_CheckError(const QModelIndex & orc_InterfaceIndex, C_TblTreeModelCheckableItem * const opc_InterfaceEntry);
+   bool m_CheckIfCoManagerCanBeActivated(const stw_types::uint32 ou32_NodeIndex,
+                                         const stw_types::uint32 ou32_InterfaceIndex) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

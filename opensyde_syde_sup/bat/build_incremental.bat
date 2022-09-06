@@ -10,7 +10,7 @@ SET PATH=C:\Qt\Qt5.15.2\Tools\mingw810_32\bin\;%PATH%
 rem set path to cmake
 SET PATH=C:\Qt\Qt5.15.2\Tools\CMake_64\bin;%PATH%
 rem set path to ninja
-SET PATH=%PATH%;%CWD%\
+SET PATH=C:\Qt\Qt5.15.2\Tools\ninja;%PATH%
 
 rem run cmake
 cmake.exe ..\pjt -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../pjt/toolchain_windows.cmake

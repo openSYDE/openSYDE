@@ -130,7 +130,8 @@ public:
                       bool * const opq_MessagesHaveNoTx, bool * const opq_DelayTimeInvalid,
                       bool * const opq_MessageSignalInvalid,
                       const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
-                      const bool oq_CANMessageSignalGapsValid) const;
+                      const bool oq_CANMessageSignalGapsValid, const bool oq_ByteAlignmentRequired,
+                      const bool oq_SignalsRequired) const;
    void CheckMessageIdBus(const stw_opensyde_core::C_OSCCanMessageUniqueId & orc_MessageId, bool & orq_Valid, const stw_opensyde_core::C_OSCCanMessageIdentificationIndices * const opc_SkipMessage =
                              NULL, bool * const opq_EcosRangeError = NULL, bool * const opq_EcosEvenError = NULL,
                           bool * const opq_DuplicateDetected = NULL) const;
@@ -188,7 +189,8 @@ private:
                        std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> * const opc_CriticalMessageMatches);
    std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> m_GetAllUniqueMessages(void) const;
    static std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> mh_GetUniqueMessages(
-      const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > & orc_Input);
+      const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > & orc_Input,
+      const bool oq_CheckForMessageActiveFlag = false);
    static void mh_Append(const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_Input,
                          std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> & orc_Output);
    static void mh_HandleMessageComparison(

@@ -53,6 +53,7 @@ public:
                                     bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                     bool * const opq_IpInvalid, bool * const opq_DataPoolsInvalid,
                                     bool * const opq_ApplicationsInvalid, bool * const opq_DomainsInvalid,
+                                    bool * const opq_CoNodeIDInvalid, bool * const opq_CoHearbeatTimeInvalid,
                                     const bool & orq_AllowComDataPoolException,
                                     std::vector<stw_types::uint32> * const opc_InvalidInterfaceIndices,
                                     std::vector<stw_types::uint32> * const opc_InvalidDataPoolIndices,

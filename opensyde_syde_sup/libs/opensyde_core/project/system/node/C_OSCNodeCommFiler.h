@@ -64,8 +64,22 @@ public:
    static stw_types::sint32 h_StringToCommunicationProtocol(const stw_scl::C_SCLString & orc_String,
                                                             C_OSCCanProtocol::E_Type & ore_Type);
    static stw_scl::C_SCLString h_GetFileName(const stw_scl::C_SCLString & orc_DatapoolName);
+   static void h_SaveNodeOwnerIndex(const C_OSCCanInterfaceId & orc_OwnerNodeIndex, C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 h_LoadNodeOwnerIndex(C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                                 const C_OSCXMLParserBase & orc_XMLParser);
 
 private:
+   static void mh_SaveMessageCANOpenPart(const C_OSCCanMessage & orc_NodeCommMessage,
+                                         C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadMessageCANOpenPart(C_OSCCanMessage & orc_NodeCommMessage,
+                                                      C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveNodeOwnerIndices(const C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                       C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadNodeOwnerIndices(C_OSCCanInterfaceId & orc_OwnerNodeIndex,
+                                                    C_OSCXMLParserBase & orc_XMLParser);
+   static void mh_SaveSignalCANOpenPart(const C_OSCCanSignal & orc_NodeCommSignal, C_OSCXMLParserBase & orc_XMLParser);
+   static stw_types::sint32 mh_LoadSignalCANOpenPart(C_OSCCanSignal & orc_NodeCommSignal,
+                                                     C_OSCXMLParserBase & orc_XMLParser);
    static stw_scl::C_SCLString mh_CommunicationByteOrderToString(
       const C_OSCCanSignal::E_ByteOrderType & ore_CommunicationByteOrder);
    static stw_types::sint32 mh_StringToCommunicationByteOrder(const stw_scl::C_SCLString & orc_String,

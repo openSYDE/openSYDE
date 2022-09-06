@@ -47,7 +47,7 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
    mu32_LastKnownCycleTimeValue(0),
    mq_TxMethodOnEvent(false),
    mq_DisableOptionPossible(false),
-   mq_DisableTimeoutConfiguration(false),
+   mq_TimeoutConfigurationReadOnly(false),
    mq_ModeSingleNode(false)
 {
    mpc_Ui->setupUi(this);
@@ -95,6 +95,7 @@ void C_SdBueMessageRxList::InitStaticNames(void) const
    \param[in] orc_ReceiveTimeoutModes        Receive timeout modes
    \param[in] orc_ReceiveTimeoutValues       Receive timeout values
    \param[in] oq_ReadOnly                    Flag if elements shall be read only
+   \param[in] orc_SpecificTooltip            Text for showing a specific tool tip (Empty string for no change)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
@@ -103,7 +104,8 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                                     const std::vector<uint32> & orc_InterfaceIndexes,
                                     const std::vector<uint32> & orc_DatapoolIndexes,
                                     const std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes,
-                                    const std::vector<uint32> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly)
+                                    const std::vector<uint32> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly,
+                                    const QString & orc_SpecificTooltip)
 {
    Clear();
    //Can happen at start up
@@ -147,7 +149,8 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                            c_NodeDatapoolNames, true, oq_ReadOnly);
             pc_Entry->SetLastKnownCycleTimeValue(this->mu32_LastKnownCycleTimeValue);
             pc_Entry->SetRxTimeoutPreconditions(this->mq_TxMethodOnEvent, this->mq_DisableOptionPossible);
-            pc_Entry->SetRxTimeoutConfigurationDisabled(this->mq_DisableTimeoutConfiguration);
+            pc_Entry->SetRxTimeoutConfigurationReadOnly(this->mq_TimeoutConfigurationReadOnly);
+            pc_Entry->SetSpecificToolTip(orc_SpecificTooltip);
             this->mpc_Ui->pc_VerticalLayout->insertWidget(this->mpc_Ui->pc_VerticalLayout->count() - 1, pc_Entry);
             this->mc_Entries.push_back(pc_Entry);
 
@@ -220,19 +223,19 @@ void C_SdBueMessageRxList::SetRxTimeoutPreconditions(const bool oq_TxMethodOnEve
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the timeout configuration enabled or disabled
 
-   \param[in] oq_DisableTimeoutConfiguration   Flag if timeout configuration is disabled
+   \param[in] oq_TimeoutConfigurationReadOnly   Flag if timeout configuration is disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxList::SetRxTimeoutConfigurationDisabled(const bool oq_DisableTimeoutConfiguration)
+void C_SdBueMessageRxList::SetRxTimeoutConfigurationReadOnly(const bool oq_TimeoutConfigurationReadOnly)
 {
-   this->mq_DisableTimeoutConfiguration = oq_DisableTimeoutConfiguration;
+   this->mq_TimeoutConfigurationReadOnly = oq_TimeoutConfigurationReadOnly;
 
    for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if (pc_Entry != NULL)
       {
-         pc_Entry->SetRxTimeoutConfigurationDisabled(oq_DisableTimeoutConfiguration);
+         pc_Entry->SetRxTimeoutConfigurationReadOnly(oq_TimeoutConfigurationReadOnly);
       }
    }
 }

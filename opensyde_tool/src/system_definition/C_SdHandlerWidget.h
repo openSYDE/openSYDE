@@ -64,7 +64,16 @@ private:
    void m_BusChanged(const stw_types::uint32 ou32_Index);
 
    void m_SwitchToBus(const stw_types::uint32 ou32_Index, const QString & orc_BusName);
+   void m_SwitchToBusProtocol(const stw_types::uint32 ou32_Index, const QString & orc_BusName,
+                              const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType);
+   void m_SwitchToBusProtocolMessage(const stw_types::uint32 ou32_Index, const QString & orc_BusName,
+                                     const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void m_SwitchToBusProperties(const stw_types::uint32 ou32_Index, const QString & orc_BusName);
+   void m_SwitchToCoManager(const stw_types::uint32 ou32_ManagerNodeIndex, const QString & orc_ManagerNodeName,
+                            const stw_types::uint8 ou8_InterfaceNumber);
+   void m_SwitchToDeviceNodeInCoManager(const stw_types::uint32 ou32_ManagerNodeIndex,
+                                        const QString & orc_ManagerNodeName,
+                                        const stw_types::uint32 ou32_DeviceNodeIndex);
    void m_SetFlag(const stw_types::uint32 ou32_Flag) const;
    void m_ErrorChange(void);
    void m_GenerateCode(void) const;

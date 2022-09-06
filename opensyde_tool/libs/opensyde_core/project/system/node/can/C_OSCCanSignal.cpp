@@ -92,6 +92,28 @@ bool C_OSCCanSignal::operator ==(const C_OSCCanSignal & orc_Cmp) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if current is less than orc_Cmp. Comparing by start bit
+
+   \param[in]  orc_Cmp  Compared instance
+
+   \return
+   Current less than orc_Cmp
+   Else false
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanSignal::operator <(const C_OSCCanSignal & orc_Cmp) const
+{
+   bool q_Return = false;
+
+   if (this->u16_ComBitStart < orc_Cmp.u16_ComBitStart)
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.

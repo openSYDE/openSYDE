@@ -404,9 +404,10 @@ const QMap<QString, C_CamDbOsyMessageId> & C_CamDbOsy::GetFoundMessages(void) co
 
    Requirement: this function can only return a valid index if the function FindMessage was at least called once
 
-   \param[in]  orc_Message    Message name to look for
-   \param[in]  oq_UseHash     Use hash
-   \param[in]  ou32_Hash      Hash
+   \param[in]   orc_Message         Message name to look for
+   \param[in]   oq_UseHash          Use hash
+   \param[in]   ou32_Hash           Hash
+   \param[out]  ope_ProtocolType    Protocol type
 
    \return
    NULL OSC CAN message not found
@@ -414,7 +415,9 @@ const QMap<QString, C_CamDbOsyMessageId> & C_CamDbOsy::GetFoundMessages(void) co
 */
 //----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QString & orc_Message, const bool oq_UseHash,
-                                                                     const uint32 ou32_Hash) const
+                                                                     const uint32 ou32_Hash,
+                                                                     C_OSCCanProtocol::E_Type * const ope_ProtocolType)
+const
 {
    const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
 
@@ -445,6 +448,10 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QStri
                      if (c_It->c_Id.u32_MessageIndex < rc_Messages.size())
                      {
                         pc_Retval = &rc_Messages[c_It->c_Id.u32_MessageIndex];
+                        if (ope_ProtocolType != NULL)
+                        {
+                           *ope_ProtocolType = c_It->c_Id.e_ComProtocol;
+                        }
                      }
                   }
                }

@@ -1,4 +1,4 @@
-//----------------------------------------------------------------------------------------------------------------------
+﻿//----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
    \brief       short description (implementation)
@@ -239,6 +239,7 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Store(void)
             this->mc_MatchingIds[u32_ItStep] = c_MatchingIds;
          }
       }
+      tgl_assert(this->m_CheckMessagesSortedAscending());
    }
 }
 
@@ -251,18 +252,22 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Remove(void)
    if (this->mpc_MessageSyncManager != NULL)
    {
       uint32 u32_InternalMessageIndex = 0UL;
-      for (uint32 u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
+      for (uint32 u32_ItStep = this->mc_UniqueId.size(); u32_ItStep > 0; --u32_ItStep)
       {
          tgl_assert(this->mpc_MessageSyncManager->DeleteCanMessage(this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
                                                                       this->
-                                                                      mc_UniqueId[u32_ItStep])) ==
+                                                                      mc_UniqueId[static_cast<std::vector<stw_types::uint64>
+                                                                                              ::size_type>(u32_ItStep -
+                                                                                                           1UL)])) ==
                     C_NO_ERR);
          if (this->mpc_MessageTreeWidget != NULL)
          {
             //At this point we can't get the message ID by unique ID because it was already deleted
             // but this should be no problem as we do always remember the message ID anyways
             u32_InternalMessageIndex =
-               this->mpc_MessageTreeWidget->InternalDeleteMessage(this->mc_LastMessageId[u32_ItStep]);
+               this->mpc_MessageTreeWidget->InternalDeleteMessage(this->mc_LastMessageId[static_cast<std::vector<stw_types::uint64>
+                                                                                                     ::size_type>(
+                                                                                            u32_ItStep - 1UL)]);
          }
       }
       if (this->mpc_MessageTreeWidget != NULL)

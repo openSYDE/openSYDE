@@ -38,7 +38,7 @@ public:
    void InitStaticNames(void) const;
    void SelectName(void) const;
    void SetNodeId(const stw_types::uint32 ou32_NodeIndex);
-   void SaveToData(void) const;
+   void SaveToData(void);
 
 private:
    //Avoid call
@@ -57,6 +57,7 @@ private:
    void m_CheckNodeName(void);
    void m_TrimNodeName(void) const;
    void m_RegisterChange(void);
+   void m_RegisterErrorChange(void);
    void m_RegisterNameChange(void);
    void m_CheckComInterface(const stw_types::uint32 ou32_Row, const stw_types::uint32 ou32_Column) const;
    void m_GetInterfaceStatus(const stw_types::uint32 ou32_NodeIndex, const stw_types::sintn osn_InterfaceIndex,
@@ -80,9 +81,11 @@ private:
 Q_SIGNALS:
    //lint -restore
    void SigChanged(void);
+   void SigErrorChange(void);
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
                        const bool oq_CombineItemAndSubSubName);
    void SigBusBitrateClicked(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
+   void SigNodePropChanged(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

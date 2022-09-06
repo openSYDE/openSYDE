@@ -65,6 +65,9 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
 {
    this->mpc_Ui->setupUi(this);
 
+   // Activate drag and drop for path line edit
+   this->mpc_Ui->pc_LeFolder->SetDragAndDropActiveForFolder(true);
+
    // initialize background color
    this->SetBackgroundColor(5);
 
@@ -126,6 +129,8 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
            this, &C_CamMosLoggingWidget::m_LoadConfig);
    connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::editingFinished,
            this, &C_CamMosLoggingWidget::m_OnFolderEdited);
+   connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::SigPathDropped,
+           this, &C_CamMosLoggingWidget::m_OnDroppedPath);
    connect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
    connect(this->mpc_Ui->pc_CbxOverwrite, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnOverwriteModeSelected);
@@ -358,15 +363,35 @@ void C_CamMosLoggingWidget::m_OnBrowse(void)
 
    if (c_Path != "")
    {
-      c_Path =
-         C_CamUti::h_AskUserToSaveRelativePath(this, c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+      this->m_SetLoggingPath(c_Path);
+   }
+}
 
-      // if path contains invalid characters this returned empty
-      if (c_Path.isEmpty() == false)
-      {
-         this->mpc_Ui->pc_LeFolder->SetPath(c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
-         this->m_OnFolderEdited();
-      }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped folder path in create in line edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosLoggingWidget::m_OnDroppedPath(void)
+{
+   this->m_SetLoggingPath(this->mpc_Ui->pc_LeFolder->GetPath());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for full create in path.
+
+   \param[in] orc_New New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosLoggingWidget::m_SetLoggingPath(const QString & orc_New)
+{
+   const QString c_Path =
+      C_CamUti::h_AskUserToSaveRelativePath(this, orc_New, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+
+   // if path contains invalid characters this returned empty
+   if (c_Path.isEmpty() == false)
+   {
+      this->mpc_Ui->pc_LeFolder->SetPath(c_Path, C_CamProHandler::h_GetInstance()->GetCurrentProjDir());
+      this->m_OnFolderEdited();
    }
 }
 

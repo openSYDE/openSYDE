@@ -36,15 +36,24 @@ public:
    ~C_SdNdeCoDeviceConfigWidget(void);
 
    void InitStaticNames(void) const;
-   void SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint8 ou8_InterfaceId,
-                                   const stw_opensyde_core::C_OSCCanInterfaceId & orc_NodeId);
+   void SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_ManagerNodeIndex,
+                                   const stw_types::uint8 ou8_ManagerInterfaceId,
+                                   const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId);
    void SaveToData(void);
+   void Refresh(void);
+
+   //The signals keyword is necessary for Qt signal slot functionality
+   //lint -save -e1736
+
+Q_SIGNALS:
+   //lint -restore
+   void SigErrorChange(void) const;
 
 private:
    Ui::C_SdNdeCoDeviceConfigWidget * mpc_Ui;
-   stw_types::uint32 mu32_NodeIndex;
-   stw_types::uint8 mu8_InterfaceId;
-   stw_opensyde_core::C_OSCCanInterfaceId mc_CanInterfaceId;
+   stw_types::uint32 mu32_ManagerNodeIndex;
+   stw_types::uint8 mu8_ManagerInterfaceId;
+   stw_opensyde_core::C_OSCCanInterfaceId mc_DeviceInterfaceId;
    std::map<stw_types::sintn, stw_types::uint8> mc_ComboboxIndexToFactorySettingsSub;
 
    //Avoid call
@@ -52,15 +61,25 @@ private:
    C_SdNdeCoDeviceConfigWidget & operator =(const C_SdNdeCoDeviceConfigWidget &);
 
    void m_OnHeartbeatProducingEnableChanged(void) const;
-   void m_OnHeartbeatConsumingEnableChanged(void) const;
+   void m_OnHeartbeatConsumingEnableChanged(void);
+   void m_HandleHeartbeatConsumingEnableState(void) const;
    void m_OnFactorySetingsChanged(void) const;
-   void m_OnSameAsOpensydeNodeIdChanged(void) const;
-   void m_OnConsumerTimeAutoChanged(void) const;
+   void m_OnSameAsOpensydeNodeIdChanged(void);
+   void m_HandleSameAsOpensydeNodeIdState(void) const;
+   void m_OnCoNodeIdChanged(void);
+   void m_CheckCoNodeId(void) const;
+   void m_OnConsumerTimeAutoChanged(void);
+   void m_HandleConsumerTimeAutoState(void);
+   void m_OnHeartbeatConsumerTimeChanged(void);
+   void m_CheckHeartbeatConsumerTime(void) const;
+
    void m_LoadFromData(void);
    void m_SaveChanges(void);
 
    bool m_GetIndexOfSub(const stw_types::uint8 ou8_Sub, stw_types::sintn & orsn_FoundIndex);
    bool m_GetSubOfIndex(const stw_types::sintn osn_Index, stw_types::uint8 & oru8_FoundSub);
+
+   void m_HideParametersOnConfiguration(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

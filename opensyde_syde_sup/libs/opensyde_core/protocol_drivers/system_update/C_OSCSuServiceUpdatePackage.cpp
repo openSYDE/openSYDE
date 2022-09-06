@@ -377,29 +377,33 @@ sint32 C_OSCSuServiceUpdatePackage::h_CreatePackage(const C_SCLString & orc_Pack
    \param[out] orc_ApplicationsToWrite   files for updating nodes
    \param[out] orc_WarningMessages       warning messages for imported package (empty list if no warnings)
    \param[out] orc_ErrorMessage          error message in case of failure (empty string if no error)
+   \param[in]  oq_IsZip                  true: given package is ".syde_sup" format
+                                         false: given package is just a plain directory
 
    \return
    C_NO_ERR    success
-   C_CONFIG    could not find update package archive
+   C_CONFIG    could not find update package archive or update package directory
    C_RD_WR     could not unzip update package from disk to target path
    C_BUSY      could not erase pre-existing target path (note: can result in partially erased target path)
    C_RANGE     error code of a called core function (should not occur for valid and compatible service update package)
    C_NOACT     error code of a called core function (should not occur for valid and compatible service update package)
    C_OVERFLOW  error code of a called core function (should not occur for valid and compatible service update package)
+   C_DEFAULT   error code of a called core function (should not occur for valid and compatible service update package)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_PackagePath,
-                                                    const C_SCLString & orc_TargetUnzipPath,
-                                                    C_OSCSystemDefinition & orc_SystemDefinition,
-                                                    uint32 & oru32_ActiveBusIndex, vector<uint8> & orc_ActiveNodes,
-                                                    vector<uint32> & orc_NodesUpdateOrder,
-                                                    vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-                                                    C_SCLStringList & orc_WarningMessages,
-                                                    C_SCLString & orc_ErrorMessage)
+sint32 C_OSCSuServiceUpdatePackage::h_ProcessPackage(const C_SCLString & orc_PackagePath,
+                                                     const C_SCLString & orc_TargetUnzipPath,
+                                                     C_OSCSystemDefinition & orc_SystemDefinition,
+                                                     uint32 & oru32_ActiveBusIndex, vector<uint8> & orc_ActiveNodes,
+                                                     vector<uint32> & orc_NodesUpdateOrder,
+                                                     vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+                                                     C_SCLStringList & orc_WarningMessages,
+                                                     C_SCLString & orc_ErrorMessage, const bool oq_IsZip)
 {
    sint32 s32_Return = C_NO_ERR;
 
    C_SCLString c_TargetUnzipPath;
+   C_SCLString c_PackagePath;
 
    mhc_WarningMessages.Clear(); // clear old warning messages
    mhc_ErrorMessage = "";       // clear old error message
@@ -419,50 +423,86 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
    orc_NodesUpdateOrder.clear();
    orc_ApplicationsToWrite.clear();
 
-   // check if zip archive exists
-   if (TGL_FileExists(orc_PackagePath) == false)
+   if (oq_IsZip)
    {
-      mhc_ErrorMessage = "Zip archive \"" + orc_PackagePath + "\" does not exist.";
-      osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
-      s32_Return = C_CONFIG;
-   }
-
-   //erase target path if it exists
-   if (s32_Return == C_NO_ERR)
-   {
-      if (TGL_DirectoryExists(c_TargetUnzipPath) == true)
+      // check if zip archive exists
+      if (TGL_FileExists(orc_PackagePath) == false)
       {
-         s32_Return = TGL_RemoveDirectory(c_TargetUnzipPath, false);
-         if (s32_Return != 0)
+         mhc_ErrorMessage = "Zip archive \"" + orc_PackagePath + "\" does not exist.";
+         osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
+         s32_Return = C_CONFIG;
+      }
+
+      //erase target path if it exists
+      if (s32_Return == C_NO_ERR)
+      {
+         if (TGL_DirectoryExists(c_TargetUnzipPath) == true)
          {
-            mhc_ErrorMessage = "Could not remove folder \"" + c_TargetUnzipPath +
-                               "\" to extract contents of zip archive.";
+            s32_Return = TGL_RemoveDirectory(c_TargetUnzipPath, false);
+            if (s32_Return != 0)
+            {
+               mhc_ErrorMessage = "Could not remove folder \"" + c_TargetUnzipPath +
+                                  "\" to extract contents of zip archive.";
+               osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
+               s32_Return = C_BUSY;
+            }
+         }
+      }
+
+      // create target unzip path
+      if (s32_Return == C_NO_ERR)
+      {
+         //create target folder (from bottom-up if required):
+         s32_Return = C_OSCUtils::h_CreateFolderRecursively(c_TargetUnzipPath);
+         if (s32_Return != C_NO_ERR)
+         {
+            mhc_ErrorMessage = "Could not create folder \"" + c_TargetUnzipPath + "\" for zip archive.";
             osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
-            s32_Return = C_BUSY;
+            s32_Return = C_RD_WR;
+         }
+      }
+
+      // open zip file and unpack contents to target folder
+      if (s32_Return == C_NO_ERR)
+      {
+         s32_Return = C_OSCZipFile::h_UnpackZipFile(orc_PackagePath, c_TargetUnzipPath, &mhc_ErrorMessage);
+         if (s32_Return != C_NO_ERR)
+         {
+            osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
+         }
+      }
+
+      //check if all files are present
+      if (s32_Return == C_NO_ERR)
+      {
+         s32_Return = C_OSCSuServiceUpdatePackage::mh_CheckSupFiles(c_TargetUnzipPath);
+         if (s32_Return != C_NO_ERR)
+         {
+            mhc_ErrorMessage = "Could not find necessary files within \"" + c_TargetUnzipPath +
+                               "\" for update package to be complete.";
+            osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
          }
       }
    }
-
-   // create target unzip path
-   if (s32_Return == C_NO_ERR)
+   else
    {
-      //create target folder (from bottom-up if required):
-      s32_Return = C_OSCUtils::h_CreateFolderRecursively(c_TargetUnzipPath);
-      if (s32_Return != C_NO_ERR)
+      //no zip -> we have a plain directory. Does it even exist?
+      if (TGL_DirectoryExists(orc_PackagePath) == true)
       {
-         mhc_ErrorMessage = "Could not create folder \"" + c_TargetUnzipPath + "\" for zip archive.";
-         osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
-         s32_Return = C_RD_WR;
+         //check if necessary files are present
+         s32_Return = C_OSCSuServiceUpdatePackage::mh_CheckSupFiles(orc_PackagePath);
+         if (s32_Return != C_NO_ERR)
+         {
+            mhc_ErrorMessage = "Could not find necessary files within \"" + orc_PackagePath +
+                               "\" for update package to be complete.";
+            osc_write_log_error("Processing Update Package", mhc_ErrorMessage);
+         }
       }
-   }
-
-   // open zip file and unpack contents to target folder
-   if (s32_Return == C_NO_ERR)
-   {
-      s32_Return = C_OSCZipFile::h_UnpackZipFile(orc_PackagePath, c_TargetUnzipPath, &mhc_ErrorMessage);
-      if (s32_Return != C_NO_ERR)
+      else
       {
-         osc_write_log_error("Unpacking Update Package", mhc_ErrorMessage);
+         mhc_ErrorMessage = "Directory \"" + orc_PackagePath + "\" does not exist.";
+         osc_write_log_error("Processing Update Package", mhc_ErrorMessage);
+         s32_Return = C_CONFIG;
       }
    }
 
@@ -471,7 +511,15 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
    {
       C_OSCXMLParser c_XMLParser;
 
-      c_XMLParser.LoadFromFile(c_TargetUnzipPath + mc_PACKAGE_UPDATE_DEF);
+      if (oq_IsZip)
+      {
+         c_XMLParser.LoadFromFile(c_TargetUnzipPath + mc_PACKAGE_UPDATE_DEF);
+      }
+      else
+      {
+         c_PackagePath = TGL_FileIncludeTrailingDelimiter(orc_PackagePath);
+         c_XMLParser.LoadFromFile(c_PackagePath + mc_PACKAGE_UPDATE_DEF);
+      }
 
       tgl_assert(c_XMLParser.SelectRoot() == mc_ROOT_NAME); // we shall have a valid and compatible update package
 
@@ -527,8 +575,18 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
       mh_SetNodesUpdateOrder(c_UpdateOrderByNodes, orc_NodesUpdateOrder);
 
       // load system definition (has constant name) for active nodes
-      const C_SCLString c_SysDefPath = c_TargetUnzipPath + mc_SUP_SYSDEF;
-      const C_SCLString c_DevIniPath = c_TargetUnzipPath + mc_INI_DEV;
+      C_SCLString c_SysDefPath;
+      C_SCLString c_DevIniPath;
+      if (oq_IsZip)
+      {
+         c_SysDefPath = c_TargetUnzipPath + mc_SUP_SYSDEF;
+         c_DevIniPath = c_TargetUnzipPath + mc_INI_DEV;
+      }
+      else
+      {
+         c_SysDefPath = c_PackagePath + mc_SUP_SYSDEF;
+         c_DevIniPath = c_PackagePath + mc_INI_DEV;
+      }
 
       s32_Return = C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(orc_SystemDefinition, c_SysDefPath,
                                                                           c_DevIniPath, true, NULL, &orc_ActiveNodes,
@@ -568,6 +626,74 @@ sint32 C_OSCSuServiceUpdatePackage::h_UnpackPackage(const C_SCLString & orc_Pack
 C_SCLString C_OSCSuServiceUpdatePackage::h_GetPackageExtension()
 {
    return mc_PACKAGE_EXT;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  This function shall check if certain files are existent in the update package. (internal function)
+
+   The update package can be a created directory after unpacking a ".syde_sup" file or a directory itself,
+   if there was no ".syde_sup" file.   In order to successfully perform the actual update we need to make sure that
+   whether the "syde_sup" nor the plain directory got "corrupted". There are some defensive checks for files which are
+   necessary to perform an update routine and if those are missing, we want to handle this gracefully.
+   Files we need to make sure are present:
+      * ".syde_sysdef" //the expected name MUST NOT be changed
+      * ".syde_defsup" //the expected name MUST NOT be changed
+      * devices.ini    //the expected name MUST NOT be changed
+   Those are the absolute basics we need. This is an all or nothing approach. If one file is missing -> fail.
+
+   This function does not claim to be 100% defensive. We surely could go more into detail regarding the checks for
+   certain files, but for now it looks like the existing engines handle everything gracefully.
+
+   \param[in]       orc_PackagePath     path to unzipped package folder or plain directory
+
+   \retval   C_NO_ERR   directory contains all necessary files
+   \retval   C_DEFAULT  at least one file is missing in given directory
+                        (due to lack of alternatives C_DEFAULT was chosen to have a unique error to redirect to
+                         SYDEsup specific error codes in C_SYDEsup::Update)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSuServiceUpdatePackage::mh_CheckSupFiles(const C_SCLString & orc_PackagePath)
+{
+   sint32 s32_Return = C_NO_ERR;
+
+   SCLDynamicArray<TGL_FileSearchRecord> c_Files; //storage for found files
+   std::vector<C_SCLString> c_NecessaryFiles;     //those are the files we look for
+
+   c_NecessaryFiles.push_back(mc_PACKAGE_UPDATE_DEF); //".syde_supdef"
+   c_NecessaryFiles.push_back(mc_SUP_SYSDEF);         //".syde_sysdef"
+   c_NecessaryFiles.push_back(mc_INI_DEV);            //"devices.ini"
+
+   for (uint32 u32_It = 0; u32_It < c_NecessaryFiles.size(); ++u32_It)
+   {
+      if (s32_Return == C_DEFAULT)
+      {
+         break;
+      }
+      const C_SCLString c_FileExt = TGL_ExtractFileExtension(c_NecessaryFiles[u32_It]);
+      //define search pattern for TGL_FileFind including the package path, otherwise function would search the whole
+      //system. This probably would slow us down. We first search for a certain extension and in second step for
+      //specific name.
+      const C_SCLString c_SearchPattern = TGL_FileIncludeTrailingDelimiter(orc_PackagePath) + "*" + c_FileExt;
+
+      TGL_FileFind(c_SearchPattern, c_Files);
+
+      //only one of the specified files is allowed
+      if (c_Files.GetLength() == 1)
+      {
+         //if the correct amount of files is present, we need to have a match on the exact name, otherwise -> fail.
+         if (c_Files[0].c_FileName != c_NecessaryFiles[u32_It])
+         {
+            s32_Return = C_DEFAULT;
+         }
+      }
+      else
+      {
+         //more than one file of the specified type, smells fishy -> abort
+         s32_Return = C_DEFAULT;
+      }
+   }
+
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

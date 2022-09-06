@@ -12,6 +12,8 @@
 #include <QWidget>
 
 #include "stwtypes.h"
+#include "C_OSCCanProtocol.h"
+#include "C_OSCCanMessageIdentificationIndices.h"
 #include "C_OSCCanInterfaceId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -39,6 +41,9 @@ public:
    void SaveUserSettings(void) const;
    void InitStaticNames(void) const;
    void SetNode(const stw_types::uint32 ou32_NodeIndex);
+   void Refresh();
+   void OpenManagerConfiguration(const stw_types::uint8 ou8_InterfaceNumber);
+   void OpenDeviceConfiguration(const stw_types::uint32 ou32_DeviceNodeIndex);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -47,6 +52,14 @@ Q_SIGNALS:
    //lint -restore
    void SigErrorChange(void);
    void SigCommDatapoolsChanged(void);
+   void SigSwitchToDeviceNodeInCoManager(const stw_types::uint32 ou32_ManagerNodeIndex,
+                                         const QString & orc_ManagerNodeName,
+                                         const stw_types::uint32 ou32_DeviceNodeIndex) const;
+   void SigSwitchToBusProtocol(const stw_types::uint32 ou32_Index, const QString & orc_BusName,
+                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType) const;
+   void SigSwitchToBusProtocolMessage(const stw_types::uint32 ou32_Index, const QString & orc_BusName,
+                                      const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId)
+   const;
 
 protected:
    virtual void showEvent(QShowEvent * const opc_Event) override;
@@ -61,9 +74,10 @@ private:
 
    void m_OnOverviewClicked(void) const;
    void m_OnInterfaceSelected(const stw_types::uint8 ou8_InterfaceNumber);
-   void m_OnDeviceSelected(const stw_types::uint8 ou8_InterfaceNumber,
-                           const stw_opensyde_core::C_OSCCanInterfaceId & orc_NodeId,
+   void m_OnDeviceSelected(const stw_types::uint8 ou8_ManagerInterfaceNumber,
+                           const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId,
                            const stw_types::uint32 ou32_UseCaseIndex);
+   void m_OnLinkSwitchToManager(const QString & orc_Link) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

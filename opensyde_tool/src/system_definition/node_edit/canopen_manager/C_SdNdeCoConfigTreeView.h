@@ -14,6 +14,7 @@
 #include "C_OgeContextMenu.h"
 #include "C_OgeTreeViewToolTipBase.h"
 #include "C_SdNdeCoConfigTreeModel.h"
+#include "C_UsNode.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui
@@ -49,20 +50,27 @@ public:
 
    void SetNodeId(const stw_types::uint32 ou32_NodeIndex);
 
+   void ResetDelegate(void);
+   void LoadUserSettings(void);
+   void SaveUserSettings(void) const;
    void SetInterfaceSelected(const stw_types::uint8 ou8_InterfaceNumber);
    void SetDeviceSelected(const stw_types::uint8 ou8_InterfaceNumber,
                           const stw_opensyde_core::C_OSCCanInterfaceId & orc_NodeId,
                           const stw_types::uint32 ou32_UseCaseIndex);
+   void OpenManagerConfiguration(const stw_types::uint8 ou8_InterfaceNumber);
+   void OpenDeviceConfiguration(const stw_types::uint32 ou32_DeviceNodeIndex);
+   void CheckError(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 Q_SIGNALS:
    //lint -restore
-   void SigInterfaceSelected(const stw_types::uint8 ou8_InterfaceNumber);
-   void SigDeviceSelected(const stw_types::uint8 ou8_InterfaceNumber,
-                          const stw_opensyde_core::C_OSCCanInterfaceId & orc_NodeId,
+   void SigInterfaceSelected(const stw_types::uint8 ou8_ManagerInterfaceNumber);
+   void SigDeviceSelected(const stw_types::uint8 ou8_ManagerInterfaceNumber,
+                          const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId,
                           const stw_types::uint32 ou32_UseCaseIndex);
    void SigCommDatapoolsChanged(void);
+   void SigOpenOverview(void) const;
    void SigErrorChange(void) const;
 
 protected:
@@ -72,6 +80,7 @@ protected:
 
 private:
    stw_types::uint32 mu32_NodeIndex;
+   bool mq_Initialized;
 
    stw_opensyde_gui_logic::C_SdNdeCoConfigTreeModel mc_Model;
    C_SdNdeCoConfigTreeDelegate mc_Delegate;
@@ -91,8 +100,19 @@ private:
                                     const stw_types::uint8 ou8_SelectedNodeInterfaceNumber,
                                     const stw_types::uint8 ou8_OriginalNodeInterfaceNumber,
                                     const QString & orc_EdsPath);
+   void m_SelectDevice(const stw_types::uint8 ou8_OriginalNodeInterfaceNumber,
+                       const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceId);
+   void m_DisplayDeviceAddFinishedMessage(void);
    void m_OnRemoveDevice(void);
    void m_OnItemSelected(void);
+   stw_opensyde_core::C_OSCCanOpenManagerDeviceInfo m_CreateNewDevice(const QString & orc_EdsPath);
+   static void mh_InitMappableSignals(
+      std::vector<stw_opensyde_core::C_OSCCanOpenManagerMappableSignal> & orc_MappableSignals,
+      const stw_opensyde_core::C_OSCCanOpenObjectDictionary & orc_EdsDictionary);
+   void m_SelectManager(const QModelIndex & orc_ManagerIndex);
+   void m_HandleManagerUnchecked(const QModelIndex & orc_ManagerIndex);
+   void m_HandleDeviceRemoved(void) const;
+   void m_OnExpanded(const QModelIndex & orc_ExpandedIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

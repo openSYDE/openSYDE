@@ -378,10 +378,12 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                   c_Retval = static_cast<QString>(C_GtGetText::h_GetText("On Event"));
                   break;
                case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
-                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("CANopen transmission type 254"));
+                  c_Retval =
+                     static_cast<QString>(C_GtGetText::h_GetText("Type 254 - asynchronous manufacturer specific"));
                   break;
                case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
-                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("CANopen transmission type 255"));
+                  c_Retval =
+                     static_cast<QString>(C_GtGetText::h_GetText("Type 255 - asynchronous device specific"));
                   break;
                case C_OSCCanMessage::eTX_METHOD_CYCLIC:
                   c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Cyclic (%1 ms)")).arg(

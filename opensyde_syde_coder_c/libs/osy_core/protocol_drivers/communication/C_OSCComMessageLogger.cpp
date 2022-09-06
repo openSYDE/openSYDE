@@ -982,6 +982,7 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
                   {
                      const std::vector<C_OSCCanMessage> & rc_CanMsgContainerTx =
                         rc_CanProt.c_ComMessages[u32_IntfCounter].c_TxMessages;
+                     bool q_SearchAlsoInRxMessages = true; // flag to improve performance
                      uint32 u32_CanMsgCounter;
 
                      for (u32_CanMsgCounter = 0U; u32_CanMsgCounter < rc_CanMsgContainerTx.size(); ++u32_CanMsgCounter)
@@ -994,6 +995,7 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
                         {
                            // Message matches
                            this->mpc_OsySysDefMessage = &rc_OscMsg;
+                           q_SearchAlsoInRxMessages = false; // found message, no need to search in Rx messages anymore
 
                            // Get the associated list
                            tgl_assert(rc_CanProt.u32_DataPoolIndex < rc_Node.c_DataPools.size());
@@ -1008,6 +1010,46 @@ bool C_OSCComMessageLogger::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
                            }
 
                            break;
+                        }
+                     }
+
+                     // Only in case of CANopen protocol we want to visualize TXPDO messages (sent from server to
+                     // client, RX messages from client view) and their signals in trace because this safes us a lot
+                     // of performance.
+                     // Trigger of this feature is: https://redmine.sensor-technik.de/issues/78633
+                     if ((rc_CanProt.e_Type == C_OSCCanProtocol::eCAN_OPEN) && (q_SearchAlsoInRxMessages == true))
+                     {
+                        const std::vector<C_OSCCanMessage> & rc_CanMsgContainerRx =
+                           rc_CanProt.c_ComMessages[u32_IntfCounter].c_RxMessages;
+                        uint32 u32_CanMsgCounterRx;
+
+                        for (u32_CanMsgCounterRx = 0U; u32_CanMsgCounterRx < rc_CanMsgContainerRx.size();
+                             ++u32_CanMsgCounterRx)
+                        {
+                           const C_OSCCanMessage & rc_OscMsg = rc_CanMsgContainerRx[u32_CanMsgCounterRx];
+
+                           // No check of dlc here, it will be checked for each signal
+                           if ((orc_Msg.u32_ID == rc_OscMsg.u32_CanId) &&
+                               ((orc_Msg.u8_XTD == 1U) == rc_OscMsg.q_IsExtended))
+                           {
+                              // Message matches
+                              this->mpc_OsySysDefMessage = &rc_OscMsg;
+
+                              // Get the associated list
+                              tgl_assert(rc_CanProt.u32_DataPoolIndex < rc_Node.c_DataPools.size());
+                              if (rc_CanProt.u32_DataPoolIndex < rc_Node.c_DataPools.size())
+                              {
+                                 this->mpc_OsySysDefDataPoolList =
+                                    C_OSCCanProtocol::h_GetComListConst(
+                                       rc_Node.c_DataPools[rc_CanProt.u32_DataPoolIndex],
+                                       u32_IntfCounter, false);
+                                 tgl_assert(this->mpc_OsySysDefDataPoolList != NULL);
+
+                                 q_Return = true;
+                              }
+
+                              break;
+                           }
                         }
                      }
                   }

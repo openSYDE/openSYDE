@@ -385,82 +385,125 @@ const
    if (this->mc_CoreDefinition.CheckErrorBus(ou32_BusIndex, opq_NameConflict, opq_NameEmpty, opq_IdInvalid,
                                              NULL) == C_NO_ERR)
    {
-      // Check current bitrate
-      if (opc_InvalidNodesForBitRate != NULL)
+      if ((opc_InvalidNodesForBitRate != NULL) ||
+          (opc_InvalidProtocols != NULL))
       {
-         const C_OSCSystemBus * const pc_CheckedBus = this->GetOSCBus(ou32_BusIndex);
+         std::vector<uint32> c_ConnectedNodes;
+         std::vector<uint32> c_ConnectedInterfaces;
+         uint32 u32_NodeCounter;
 
-         if ((pc_CheckedBus != NULL) &&
-             (pc_CheckedBus->e_Type == C_OSCSystemBus::eCAN)) // Only relevant for CAN
+         this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_ConnectedNodes, c_ConnectedInterfaces);
+
+         // Check current bitrate
+         if (opc_InvalidNodesForBitRate != NULL)
          {
-            const uint32 u32_CurrentBitrate = static_cast<uint32>(pc_CheckedBus->u64_BitRate / 1000ULL);
-            std::vector<uint32> c_ConnectedNodes;
-            std::vector<uint32> c_ConnectedInterfaces;
-            uint32 u32_NodeCounter;
+            const C_OSCSystemBus * const pc_CheckedBus = this->GetOSCBus(ou32_BusIndex);
 
-            this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_ConnectedNodes, c_ConnectedInterfaces);
-
-            // Every node must support the CAN bitrate
-            for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
+            if ((pc_CheckedBus != NULL) &&
+                (pc_CheckedBus->e_Type == C_OSCSystemBus::eCAN)) // Only relevant for CAN
             {
-               const C_OSCNode * const pc_Node = this->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
+               const uint32 u32_CurrentBitrate = static_cast<uint32>(pc_CheckedBus->u64_BitRate / 1000ULL);
 
-               if (pc_Node != NULL)
+               // Every node must support the CAN bitrate
+               for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
                {
-                  uint32 u32_BitrateCounter;
-                  bool q_BitrateFound = false;
-                  tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+                  const C_OSCNode * const pc_Node = this->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
 
-                  for (u32_BitrateCounter = 0U;
-                       u32_BitrateCounter < pc_Node->pc_DeviceDefinition->c_SupportedBitrates.size();
-                       ++u32_BitrateCounter)
+                  if (pc_Node != NULL)
                   {
-                     if (u32_CurrentBitrate == pc_Node->pc_DeviceDefinition->c_SupportedBitrates[u32_BitrateCounter])
+                     uint32 u32_BitrateCounter;
+                     bool q_BitrateFound = false;
+                     tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+
+                     for (u32_BitrateCounter = 0U;
+                          u32_BitrateCounter < pc_Node->pc_DeviceDefinition->c_SupportedBitrates.size();
+                          ++u32_BitrateCounter)
                      {
-                        q_BitrateFound = true;
-                        break;
+                        if (u32_CurrentBitrate == pc_Node->pc_DeviceDefinition->c_SupportedBitrates[u32_BitrateCounter])
+                        {
+                           q_BitrateFound = true;
+                           break;
+                        }
                      }
-                  }
 
-                  if (q_BitrateFound == false)
-                  {
-                     // Bitrate not supported
-                     opc_InvalidNodesForBitRate->push_back(pc_Node->c_Properties.c_Name.c_str());
+                     if (q_BitrateFound == false)
+                     {
+                        // Bitrate not supported
+                        opc_InvalidNodesForBitRate->push_back(pc_Node->c_Properties.c_Name.c_str());
+                     }
                   }
                }
             }
          }
-      }
 
-      //Check message errors
-      if (opc_InvalidProtocols != NULL)
-      {
-         for (uint8 u8_ItProt = 0; u8_ItProt < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size(); ++u8_ItProt)
+         if (opc_InvalidProtocols != NULL)
          {
-            bool q_MessageNameConflict;
-            bool q_MessageIdInvalid;
-            bool q_MessagesHaveNoTx;
-            bool q_DelayTimeInvalid;
-            bool q_MessageSignalInvalid;
-            const C_OSCCanProtocol::E_Type e_Type = C_OSCCanProtocol::hc_ALL_PROTOCOLS[u8_ItProt];
-            C_PuiSdNodeCanMessageSyncManager c_SyncMan;
-
-            c_SyncMan.Init(ou32_BusIndex, e_Type);
-
-            c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
-                                    &q_DelayTimeInvalid,
-                                    &q_MessageSignalInvalid,
-                                    C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(e_Type),
-                                    C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(e_Type));
-            if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
-                  (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
-                (q_MessagesHaveNoTx == false))
+            for (uint8 u8_ItProt = 0; u8_ItProt < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size(); ++u8_ItProt)
             {
-               //No error
-            }
-            else
-            {
-               opc_InvalidProtocols->push_back(e_Type);
+               //Check message errors
+               bool q_MessageNameConflict;
+               bool q_MessageIdInvalid;
+               bool q_MessagesHaveNoTx;
+               bool q_DelayTimeInvalid;
+               bool q_MessageSignalInvalid;
+               bool q_ErrorDetected = false;
+
+               const C_OSCCanProtocol::E_Type e_Type = C_OSCCanProtocol::hc_ALL_PROTOCOLS[u8_ItProt];
+               C_PuiSdNodeCanMessageSyncManager c_SyncMan;
+
+               c_SyncMan.Init(ou32_BusIndex, e_Type);
+
+               c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
+                                       &q_DelayTimeInvalid,
+                                       &q_MessageSignalInvalid,
+                                       C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalsRequired(e_Type));
+               if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
+                     (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
+                   (q_MessagesHaveNoTx == false))
+               {
+                  //No error
+               }
+               else
+               {
+                  opc_InvalidProtocols->push_back(e_Type);
+                  q_ErrorDetected = true;
+               }
+
+               if (q_ErrorDetected == false)
+               {
+                  //Check protocol errors of specific nodes
+                  for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
+                  {
+                     const C_OSCNode * const pc_Node = this->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
+
+                     if (pc_Node != NULL)
+                     {
+                        bool q_TempCommRxSignalCountInvalid;
+                        bool q_TempCommTxSignalCountInvalid;
+                        bool q_TempCoRPdoCountInvalid;
+                        bool q_TempCoTPdoCountInvalid;
+
+                        pc_Node->CheckErrorCANProtocol(c_ConnectedInterfaces[u32_NodeCounter],
+                                                       e_Type,
+                                                       true,
+                                                       q_TempCommRxSignalCountInvalid,
+                                                       q_TempCommTxSignalCountInvalid,
+                                                       q_TempCoRPdoCountInvalid,
+                                                       q_TempCoTPdoCountInvalid);
+
+                        if ((q_TempCommRxSignalCountInvalid == true) ||
+                            (q_TempCommTxSignalCountInvalid == true) ||
+                            (q_TempCoRPdoCountInvalid == true) ||
+                            (q_TempCoTPdoCountInvalid == true))
+                        {
+                           opc_InvalidProtocols->push_back(e_Type);
+                        }
+                     }
+                  }
+               }
             }
          }
       }
@@ -1994,6 +2037,7 @@ sint32 C_PuiSdHandlerBusLogic::AddCanSignal(const C_OSCCanMessageIdentificationI
 
    \return
    C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
@@ -2002,28 +2046,24 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
                                                const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
                                                const C_PuiSdNodeCanSignal & orc_UISignal)
 {
-   const sint32 s32_RETVAL = C_NO_ERR;
+   sint32 s32_Retval = C_NO_ERR;
 
    tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
-                                                                                  orc_MessageId.u32_DatapoolIndex);
-      C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
-                                                                              orc_MessageId.e_ComProtocol,
-                                                                              orc_MessageId.u32_DatapoolIndex);
       C_OSCNodeDataPoolListElement c_OSCAdaptedSignalCommon = orc_OSCSignalCommon;
       C_OSCNodeDataPoolListElementId c_Id;
 
       //Get unique name
       c_OSCAdaptedSignalCommon.c_Name = C_Uti::h_GetUniqueName(
          this->m_GetExistingSignalNames(orc_MessageId), orc_OSCSignalCommon.c_Name);
-      rc_OSCNode.InsertSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
-                              orc_MessageId.u32_DatapoolIndex,
-                              orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex, oru32_SignalIndex,
-                              orc_Signal,
-                              c_OSCAdaptedSignalCommon);
+      s32_Retval = rc_OSCNode.InsertSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+                                           orc_MessageId.u32_DatapoolIndex,
+                                           orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
+                                           oru32_SignalIndex,
+                                           orc_Signal,
+                                           c_OSCAdaptedSignalCommon);
 
       //Signal new signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
@@ -2031,67 +2071,123 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
          Q_EMIT (this->SigSyncNodeDataPoolListElementAdded(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
                                                            c_Id.u32_ListIndex, c_Id.u32_ElementIndex));
       }
-      //Ui part
-      if (pc_Protocol != NULL)
+      if (s32_Retval == C_NO_ERR)
       {
-         if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
+         const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+                                                                                     orc_MessageId.u32_DatapoolIndex);
+         C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
+                                                                                 orc_MessageId.e_ComProtocol,
+                                                                                 orc_MessageId.u32_DatapoolIndex);
+         //Ui part
+         if (pc_Protocol != NULL)
          {
-            const C_OSCCanMessageContainer & rc_MessageContainer =
-               pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
-               orc_MessageId.q_MessageIsTx,
-               orc_MessageId.u32_MessageIndex);
-            C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-            if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+            if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
             {
-               const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
-                  orc_MessageId.e_ComProtocol,
-                  orc_MessageId.u32_DatapoolIndex);
-
-               if (pc_OSCDataPool != NULL)
+               const C_OSCCanMessageContainer & rc_MessageContainer =
+                  pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
+               const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
+                  orc_MessageId.q_MessageIsTx,
+                  orc_MessageId.u32_MessageIndex);
+               C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
+               if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
                {
-                  uint32 u32_ListIndex;
-                  if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
-                                                          orc_MessageId.q_MessageIsTx,
-                                                          u32_ListIndex) == C_NO_ERR)
+                  const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
+                     orc_MessageId.e_ComProtocol,
+                     orc_MessageId.u32_DatapoolIndex);
+
+                  if (pc_OSCDataPool != NULL)
                   {
-                     C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                     if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                     uint32 u32_ListIndex;
+                     if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                                                             orc_MessageId.q_MessageIsTx,
+                                                             u32_ListIndex) == C_NO_ERR)
                      {
-                        C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
-                        if ((u32_SignalIndex + oru32_SignalIndex) <= rc_UiList.c_DataPoolListElements.size())
+                        C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
+                        if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
                         {
-                           rc_UiList.c_DataPoolListElements.insert(
-                              rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex,
-                              orc_UISignalCommon);
+                           C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                           if ((u32_SignalIndex + oru32_SignalIndex) <= rc_UiList.c_DataPoolListElements.size())
+                           {
+                              rc_UiList.c_DataPoolListElements.insert(
+                                 rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex,
+                                 orc_UISignalCommon);
+                           }
+                           else
+                           {
+                              s32_Retval = C_RANGE;
+                           }
+                        }
+                        else
+                        {
+                           s32_Retval = C_RANGE;
                         }
                      }
+                     else
+                     {
+                        s32_Retval = C_RANGE;
+                     }
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
                   }
                }
-            }
-         }
-      }
-      //Ui part
-      if (pc_UiProtocol != NULL)
-      {
-         if (orc_MessageId.u32_InterfaceIndex < pc_UiProtocol->c_ComMessages.size())
-         {
-            C_PuiSdNodeCanMessageContainer & rc_MessageContainer =
-               pc_UiProtocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            std::vector<C_PuiSdNodeCanMessage> & rc_Messages = rc_MessageContainer.GetMessages(
-               orc_MessageId.q_MessageIsTx);
-            if (orc_MessageId.u32_MessageIndex < rc_Messages.size())
-            {
-               C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
-               if (oru32_SignalIndex <= rc_Message.c_Signals.size())
+               else
                {
-                  rc_Message.c_Signals.insert(rc_Message.c_Signals.begin() + oru32_SignalIndex, orc_UISignal);
+                  s32_Retval = C_RANGE;
                }
             }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+         //Ui part
+         if (pc_UiProtocol != NULL)
+         {
+            if (orc_MessageId.u32_InterfaceIndex < pc_UiProtocol->c_ComMessages.size())
+            {
+               C_PuiSdNodeCanMessageContainer & rc_MessageContainer =
+                  pc_UiProtocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
+               std::vector<C_PuiSdNodeCanMessage> & rc_Messages = rc_MessageContainer.GetMessages(
+                  orc_MessageId.q_MessageIsTx);
+               if (orc_MessageId.u32_MessageIndex < rc_Messages.size())
+               {
+                  C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
+                  if (oru32_SignalIndex <= rc_Message.c_Signals.size())
+                  {
+                     rc_Message.c_Signals.insert(rc_Message.c_Signals.begin() + oru32_SignalIndex, orc_UISignal);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
          }
       }
    }
-   return s32_RETVAL;
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2102,22 +2198,18 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
 
    \return
    C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                                const uint32 & oru32_SignalIndex)
 {
-   const sint32 s32_RETVAL = C_NO_ERR;
+   sint32 s32_Retval = C_NO_ERR;
 
    tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
       C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
-                                                                                  orc_MessageId.u32_DatapoolIndex);
-      C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
-                                                                              orc_MessageId.e_ComProtocol,
-                                                                              orc_MessageId.u32_DatapoolIndex);
       C_OSCNodeDataPoolListElementId c_Id;
 
       //Signal deleted signal to the sync engine
@@ -2127,69 +2219,126 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificati
                                                                      c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
       }
 
-      rc_OSCNode.DeleteSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
-                              orc_MessageId.u32_DatapoolIndex,
-                              orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex, oru32_SignalIndex);
-      //Ui part
-      if (pc_Protocol != NULL)
+      s32_Retval = rc_OSCNode.DeleteSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+                                           orc_MessageId.u32_DatapoolIndex,
+                                           orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
+                                           oru32_SignalIndex);
+      if (s32_Retval == C_NO_ERR)
       {
-         if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
+         const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+                                                                                     orc_MessageId.u32_DatapoolIndex);
+         C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
+                                                                                 orc_MessageId.e_ComProtocol,
+                                                                                 orc_MessageId.u32_DatapoolIndex);
+         //Ui part
+         if (pc_Protocol != NULL)
          {
-            const C_OSCCanMessageContainer & rc_MessageContainer =
-               pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
-               orc_MessageId.q_MessageIsTx,
-               orc_MessageId.u32_MessageIndex);
-            C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-            if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+            if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
             {
-               const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
-                  orc_MessageId.e_ComProtocol,
-                  orc_MessageId.u32_DatapoolIndex);
-
-               if (pc_OSCDataPool != NULL)
+               const C_OSCCanMessageContainer & rc_MessageContainer =
+                  pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
+               const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
+                  orc_MessageId.q_MessageIsTx,
+                  orc_MessageId.u32_MessageIndex);
+               C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
+               if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
                {
-                  uint32 u32_ListIndex;
-                  if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
-                                                          orc_MessageId.q_MessageIsTx,
-                                                          u32_ListIndex) == C_NO_ERR)
+                  const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
+                     orc_MessageId.e_ComProtocol,
+                     orc_MessageId.u32_DatapoolIndex);
+
+                  if (pc_OSCDataPool != NULL)
                   {
-                     C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                     if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                     uint32 u32_ListIndex;
+                     if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                                                             orc_MessageId.q_MessageIsTx,
+                                                             u32_ListIndex) == C_NO_ERR)
                      {
-                        C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
-                        if ((u32_SignalIndex + oru32_SignalIndex) < rc_UiList.c_DataPoolListElements.size())
+                        C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
+                        if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
                         {
-                           rc_UiList.c_DataPoolListElements.erase(
-                              rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex);
+                           C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                           if ((u32_SignalIndex + oru32_SignalIndex) < rc_UiList.c_DataPoolListElements.size())
+                           {
+                              rc_UiList.c_DataPoolListElements.erase(
+                                 rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex);
+                           }
+                           else
+                           {
+                              s32_Retval = C_RANGE;
+                           }
+                        }
+                        else
+                        {
+                           s32_Retval = C_RANGE;
                         }
                      }
+                     else
+                     {
+                        s32_Retval = C_RANGE;
+                     }
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
                   }
                }
-            }
-         }
-      }
-      //Ui part
-      if (pc_UiProtocol != NULL)
-      {
-         if (orc_MessageId.u32_InterfaceIndex < pc_UiProtocol->c_ComMessages.size())
-         {
-            C_PuiSdNodeCanMessageContainer & rc_MessageContainer =
-               pc_UiProtocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            std::vector<C_PuiSdNodeCanMessage> & rc_Messages = rc_MessageContainer.GetMessages(
-               orc_MessageId.q_MessageIsTx);
-            if (orc_MessageId.u32_MessageIndex < rc_Messages.size())
-            {
-               C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
-               if (oru32_SignalIndex < rc_Message.c_Signals.size())
+               else
                {
-                  rc_Message.c_Signals.erase(rc_Message.c_Signals.begin() + oru32_SignalIndex);
+                  s32_Retval = C_RANGE;
                }
             }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+         //Ui part
+         if (pc_UiProtocol != NULL)
+         {
+            if (orc_MessageId.u32_InterfaceIndex < pc_UiProtocol->c_ComMessages.size())
+            {
+               C_PuiSdNodeCanMessageContainer & rc_MessageContainer =
+                  pc_UiProtocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
+               std::vector<C_PuiSdNodeCanMessage> & rc_Messages = rc_MessageContainer.GetMessages(
+                  orc_MessageId.q_MessageIsTx);
+               if (orc_MessageId.u32_MessageIndex < rc_Messages.size())
+               {
+                  C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
+                  if (oru32_SignalIndex < rc_Message.c_Signals.size())
+                  {
+                     rc_Message.c_Signals.erase(rc_Message.c_Signals.begin() + oru32_SignalIndex);
+                  }
+                  else
+                  {
+                     s32_Retval = C_RANGE;
+                  }
+               }
+               else
+               {
+                  s32_Retval = C_RANGE;
+               }
+            }
+            else
+            {
+               s32_Retval = C_RANGE;
+            }
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
          }
       }
    }
-   return s32_RETVAL;
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

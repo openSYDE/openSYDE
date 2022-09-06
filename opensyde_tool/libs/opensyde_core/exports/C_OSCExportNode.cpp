@@ -403,31 +403,36 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
          for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
               ++u32_ItInterface)
          {
-            const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
-            if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
-                (rc_ComMessageContainer.c_RxMessages.size() > 0))
+            //handle special case CANopen
+            //For CANopen we allow to have configuration with just the manager but no assigned devices
+            // (and therefore no messages). "c_ComMessages" lists all interfaces.
+            //So we create code for all of those interfaces where a manager is active:
+            if ((rc_Protocol.e_Type == C_OSCCanProtocol::eCAN_OPEN) &&
+                (orc_Node.c_CanOpenManagers.count(static_cast<uint8>(u32_ItInterface)) != 0))
             {
-               //handle special case CANopen
-               if (rc_Protocol.e_Type == C_OSCCanProtocol::eCAN_OPEN)
+               s32_Retval = C_OSCExportCanOpenConfig::h_CreateSourceCode(orc_Path, orc_Node,
+                                                                         ou16_ApplicationIndex,
+                                                                         static_cast<uint8>(u32_ItInterface),
+                                                                         rc_Protocol.u32_DataPoolIndex,
+                                                                         orc_ExportToolInfo);
+               //handle file names
+               if (s32_Retval == C_NO_ERR)
                {
-                  s32_Retval = C_OSCExportCanOpenConfig::h_CreateSourceCode(orc_Path, orc_Node,
-                                                                            ou16_ApplicationIndex,
-                                                                            static_cast<uint8>(u32_ItInterface),
-                                                                            rc_Protocol.u32_DataPoolIndex,
-                                                                            orc_ExportToolInfo);
-                  //handle file names
-                  if (s32_Retval == C_NO_ERR)
-                  {
-                     C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
-                                                        C_OSCExportCanOpenConfig::h_GetFileName(static_cast<uint8>(
-                                                                                                   u32_ItInterface)),
-                                                        true);
-                  }
-
-                  c_IFWithCanOpenManager.push_back(static_cast<uint8>(u32_ItInterface));
+                  C_OSCExportUti::h_CollectFilePaths(
+                     orc_Files, orc_Path,
+                     C_OSCExportCanOpenConfig::h_GetFileName(static_cast<uint8>(u32_ItInterface)),
+                     true);
                }
-               //all other COMM protocol types remain as COMMStack export
-               else
+
+               c_IFWithCanOpenManager.push_back(static_cast<uint8>(u32_ItInterface));
+            }
+            //all other COMM protocol types remain as COMMStack export
+            else
+            {
+               //only if at least one message is defined:
+               const C_OSCCanMessageContainer & rc_ComMessageContainer = rc_Protocol.c_ComMessages[u32_ItInterface];
+               if ((rc_ComMessageContainer.c_TxMessages.size() > 0) ||
+                   (rc_ComMessageContainer.c_RxMessages.size() > 0))
                {
                   s32_Retval =
                      C_OSCExportCommunicationStack::h_CreateSourceCode(orc_Path, orc_Node, ou16_ApplicationIndex,
@@ -443,10 +448,10 @@ sint32 C_OSCExportNode::mh_CreateCOMMStackCode(const C_OSCNode & orc_Node, const
                                                            rc_Protocol.e_Type), true);
                   }
                }
-               if (s32_Retval != C_NO_ERR)
-               {
-                  break;
-               }
+            }
+            if (s32_Retval != C_NO_ERR)
+            {
+               break;
             }
          }
          if (c_IFWithCanOpenManager.size() > 0)

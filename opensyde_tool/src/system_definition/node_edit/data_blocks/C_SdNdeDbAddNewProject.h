@@ -61,11 +61,14 @@ private:
    stw_opensyde_gui_elements::C_OgePopUpDialog & mrc_ParentDialog;
    static const QString mhc_START_TD;
    static const QString mhc_CONTINUE_TD;
+   static const QString mhc_SUFFIX;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_TSPButtonClicked(void);
    void m_CreateInButtonClicked(void);
+   void m_OnDroppedCreatinPath(void);
+   void m_SetCreateInPath(const QString & orc_New);
    void m_OnLoadTSP(void);
    void m_AddTopSection(QString & orc_Content) const;
    void m_AddTemplateSection(QString & orc_Content) const;

@@ -22,6 +22,7 @@
 #include "C_OSCNodeDataPoolFiler.h"
 #include "C_OSCLoggingHandler.h"
 #include "C_OSCHalcConfigFiler.h"
+#include "C_OSCCanOpenManagerFiler.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
@@ -123,11 +124,11 @@ sint32 C_OSCNodeFiler::h_LoadNodeFile(C_OSCNode & orc_Node, const C_SCLString & 
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[out]     orc_Node            data storage
-   \param[in,out]  orc_XMLParser       XML with node active
-   \param[in]      orc_BasePath        Base path
-   \param[in]      oq_SkipContent      (Optional parameter) skip content when not needed (datapools, halc etc.)
-                                       (default = false)
+   \param[out]     orc_Node         data storage
+   \param[in,out]  orc_XMLParser    XML with node active
+   \param[in]      orc_BasePath     Base path
+   \param[in]      oq_SkipContent   (Optional parameter) skip content when not needed (datapools, halc etc.)
+                                    (default = false)
 
    \return
    C_NO_ERR   data read
@@ -179,6 +180,7 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
                   {
                      //Return
                      tgl_assert(orc_XMLParser.SelectNodeParent() == "node"); //back up to node
+                     s32_Retval = mh_LoadCANOpenManagers(orc_Node.c_CanOpenManagers, orc_XMLParser, orc_BasePath);
                   }
                }
                else
@@ -198,9 +200,10 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
 
    Save node to XML file
 
-   \param[in]      orc_Node            data storage
-   \param[in,out]  orc_FilePath        File path for xml
-   \param[in,out]  opc_CreatedFiles    Optional storage for history of all created files
+   \param[in]      orc_Node                  data storage
+   \param[in,out]  orc_FilePath              File path for xml
+   \param[in,out]  opc_CreatedFiles          Optional storage for history of all created files
+   \param[in]      orc_NodeIndicesToNameMap  Node indices to name map
 
    \return
    C_NO_ERR   data saved
@@ -208,7 +211,8 @@ sint32 C_OSCNodeFiler::h_LoadNode(C_OSCNode & orc_Node, C_OSCXMLParserBase & orc
 */
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLString & orc_FilePath,
-                                      std::vector<C_SCLString> * const opc_CreatedFiles)
+                                      std::vector<C_SCLString> * const opc_CreatedFiles, const std::map<uint32,
+                                                                                                        C_SCLString> & orc_NodeIndicesToNameMap)
 {
    C_OSCXMLParser c_XMLParser;
    sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath,
@@ -220,7 +224,8 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
       c_XMLParser.CreateNodeChild("file-version", "1");
       tgl_assert(c_XMLParser.CreateAndSelectNodeChild("node") == "node");
       //node
-      s32_Retval = C_OSCNodeFiler::h_SaveNode(orc_Node, c_XMLParser, orc_FilePath, opc_CreatedFiles);
+      s32_Retval = C_OSCNodeFiler::h_SaveNode(orc_Node, c_XMLParser, orc_FilePath, opc_CreatedFiles,
+                                              orc_NodeIndicesToNameMap);
       //Don't forget to save!
       if (c_XMLParser.SaveToFile(orc_FilePath) != C_NO_ERR)
       {
@@ -243,10 +248,11 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
    pre-condition: the passed XML parser has the active node set to "node"
    post-condition: the passed XML parser has the active node set to the same "node"
 
-   \param[in]      orc_Node            data storage
-   \param[in,out]  orc_XMLParser       XML with node active
-   \param[in]      orc_BasePath        Base path
-   \param[in,out]  opc_CreatedFiles    Optional storage for history of all created files
+   \param[in]      orc_Node                  data storage
+   \param[in,out]  orc_XMLParser             XML with node active
+   \param[in]      orc_BasePath              Base path
+   \param[in,out]  opc_CreatedFiles          Optional storage for history of all created files
+   \param[in]      orc_NodeIndicesToNameMap  Node indices to name map
 
    \return
    C_NO_ERR   data saved
@@ -255,7 +261,8 @@ sint32 C_OSCNodeFiler::h_SaveNodeFile(const C_OSCNode & orc_Node, const C_SCLStr
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser,
                                   const stw_scl::C_SCLString & orc_BasePath,
-                                  std::vector<C_SCLString> * const opc_CreatedFiles)
+                                  std::vector<C_SCLString> * const opc_CreatedFiles, const std::map<uint32,
+                                                                                                    C_SCLString> & orc_NodeIndicesToNameMap)
 {
    sint32 s32_Retval;
 
@@ -276,6 +283,11 @@ sint32 C_OSCNodeFiler::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = mh_SaveHALC(orc_Node.c_HALCConfig, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      s32_Retval = mh_SaveCANOpenManagers(orc_Node.c_CanOpenManagers, orc_XMLParser, orc_BasePath, opc_CreatedFiles,
+                                          orc_NodeIndicesToNameMap);
    }
    return s32_Retval;
 }
@@ -1554,7 +1566,8 @@ sint32 C_OSCNodeFiler::mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLP
          const C_SCLString c_FileName = "halc.xml";
          const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
          //Save datapool file
-         s32_Retval = C_OSCHalcConfigFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath, opc_CreatedFiles);
+         s32_Retval = C_OSCHalcConfigFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath,
+                                                       opc_CreatedFiles);
          //Set file reference
          orc_XMLParser.SetNodeContent(c_FileName);
          //Store if necessary
@@ -1566,6 +1579,109 @@ sint32 C_OSCNodeFiler::mh_SaveHALC(const C_OSCHalcConfig & orc_Config, C_OSCXMLP
       //Return
       tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
    }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load CAN open managers
+
+   \param[in,out]  orc_Config       Config
+   \param[in,out]  orc_XMLParser    XML parser
+   \param[in]      orc_BasePath     Base path
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data read
+   \retval   C_CONFIG   content of file is invalid or incomplete
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeFiler::mh_LoadCANOpenManagers(std::map<uint8, C_OSCCanOpenManagerInfo> & orc_Config,
+                                              C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_BasePath)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   //Clear
+   orc_Config.clear();
+   if (orc_XMLParser.SelectNodeChild("can-open-managers-file") == "can-open-managers-file")
+   {
+      if (orc_BasePath.IsEmpty())
+      {
+         //From string
+         s32_Retval = C_OSCCanOpenManagerFiler::h_LoadData(orc_Config, orc_XMLParser, orc_BasePath);
+      }
+      else
+      {
+         s32_Retval =
+            C_OSCCanOpenManagerFiler::h_LoadFile(orc_Config,
+                                                 C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath,
+                                                                                      orc_XMLParser.
+                                                                                      GetNodeContent()), orc_BasePath);
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   }
+   else
+   {
+      //Ignore
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save CAN open managers
+
+   \param[in]      orc_Config                Config
+   \param[in,out]  orc_XMLParser             XML parser
+   \param[in]      orc_BasePath              Base path
+   \param[in,out]  opc_CreatedFiles          Created files
+   \param[in]      orc_NodeIndicesToNameMap  Node indices to name map
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_CONFIG   file could not be created
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCNodeFiler::mh_SaveCANOpenManagers(const std::map<uint8, C_OSCCanOpenManagerInfo> & orc_Config,
+                                              C_OSCXMLParserBase & orc_XMLParser, const C_SCLString & orc_BasePath,
+                                              std::vector<C_SCLString> * const opc_CreatedFiles, const std::map<uint32,
+                                                                                                                stw_scl::C_SCLString> & orc_NodeIndicesToNameMap)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (orc_Config.size() > 0)
+   {
+      orc_XMLParser.CreateAndSelectNodeChild("can-open-managers-file");
+      if (orc_BasePath.IsEmpty())
+      {
+         //To string
+         C_OSCCanOpenManagerFiler::h_SaveData(orc_Config, orc_XMLParser, orc_BasePath, opc_CreatedFiles,
+                                              orc_NodeIndicesToNameMap);
+      }
+      else
+      {
+         // const C_SCLString c_FileName = C_OSCNodeDataPoolFiler::h_GetFileName(rc_CurDatapool.c_Name);
+         //Fix
+         const C_SCLString c_FileName = "can_open_managers.xml";
+         const C_SCLString c_CombinedFileName = C_OSCSystemFilerUtil::h_CombinePaths(orc_BasePath, c_FileName);
+         //Save datapool file
+         s32_Retval = C_OSCCanOpenManagerFiler::h_SaveFile(orc_Config, c_CombinedFileName, orc_BasePath,
+                                                           opc_CreatedFiles, orc_NodeIndicesToNameMap);
+         //Set file reference
+         orc_XMLParser.SetNodeContent(c_FileName);
+         //Store if necessary
+         if (opc_CreatedFiles != NULL)
+         {
+            opc_CreatedFiles->push_back(c_FileName);
+         }
+      }
+      //Return
+      tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   }
+
    return s32_Retval;
 }
 

@@ -56,6 +56,8 @@ Q_SIGNALS:
                                            const stw_types::uint32 ou32_InterfaceIndex) const;
    void SigDisconnectNodeFromProt(const stw_types::uint32 ou32_NodeIndex,
                                   const stw_types::uint32 ou32_InterfaceIndex) const;
+   void SigSwitchToCoManager(const stw_types::uint32 ou32_NodeIndex, const QString & orc_NodeName,
+                             const stw_types::uint8 ou8_InterfaceNumber) const;
 
 private:
    //Avoid call

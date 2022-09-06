@@ -1216,12 +1216,15 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredNodesActive(void) const
       const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
       if (c_ElementId.GetIsValid() == true)
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
+         std::vector<uint8> c_ActiveNodes;
+         const sint32 s32_Retval =
+            C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(this->mu32_ViewIndex,
+                                                                                  c_ActiveNodes);
 
-         const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
          //Is corresponding view active
-         if ((c_ElementId.u32_NodeIndex < rc_ActiveNodes.size()) &&
-             (rc_ActiveNodes[c_ElementId.u32_NodeIndex] == 1U))
+         if ((s32_Retval == C_NO_ERR) &&
+             (c_ElementId.u32_NodeIndex < c_ActiveNodes.size()) &&
+             (c_ActiveNodes[c_ElementId.u32_NodeIndex] == 1U))
          {
             q_AtLeastOneValidElement = true;
             break;
@@ -1369,14 +1372,17 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) cons
 bool C_PuiSvDbDataElementHandler::m_CheckNodeActive(const uint32 ou32_NodeIndex) const
 {
    bool q_Retval = false;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-   if (pc_View != NULL)
+   std::vector<uint8> c_ActiveNodes;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      this->mu32_ViewIndex,
+      c_ActiveNodes);
+
+   if (s32_Retval == C_NO_ERR)
    {
-      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-      if (ou32_NodeIndex < rc_ActiveNodes.size())
+      if (ou32_NodeIndex < c_ActiveNodes.size())
       {
-         if (rc_ActiveNodes[ou32_NodeIndex] == true)
+         if (c_ActiveNodes[ou32_NodeIndex] == true)
          {
             q_Retval = true;
          }

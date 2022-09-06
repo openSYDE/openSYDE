@@ -37,12 +37,12 @@ public:
    explicit C_SdBueMessageSelectorWidget(QWidget * const opc_Parent = NULL);
    virtual ~C_SdBueMessageSelectorWidget();
    void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
-                  const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
-   void SetBusId(const stw_types::uint32 ou32_BusIndex) const;
+                  const std::vector<stw_types::uint32> & orc_DatapoolIndexes);
+   void SetBusId(const stw_types::uint32 ou32_BusIndex);
    void SetUndoManager(stw_opensyde_gui_logic::C_SdBueUnoManager * const opc_Value) const;
    void SetProtocolType(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value);
    void UpdateButtonText(void) const;
-   void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const;
+   void SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value);
    void InitFromData(void) const;
    void InitStaticNames(void) const;
    void OnMessageIdChange(void) const;
@@ -53,6 +53,7 @@ public:
    void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex) const;
    void RecheckErrorGlobal(void) const;
    void RecheckError(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
+   void RecheckProtocolError(void) const;
    void SetInitialFocus(void) const;
    void SelectMessagesWithoutSignal(void);
    void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
@@ -99,6 +100,11 @@ private:
 
    Ui::C_SdBueMessageSelectorWidget * mpc_Ui;
    stw_opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
+   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_MessageSyncManager;
+   bool mq_ModeSingleNode;
+   stw_types::uint32 mu32_NodeIndex;      // Used by node mode
+   stw_types::uint32 mu32_InterfaceIndex; // Used by node mode
+   stw_types::uint32 mu32_BusIndex;       // Used by bus mode
    bool mq_MessagesActive;
    stw_opensyde_core::C_OSCCanProtocol::E_Type me_ProtocolType;
    QAction * mpc_AddMessageAction;

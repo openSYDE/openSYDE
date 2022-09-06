@@ -1,9 +1,9 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       CANopen result entry for add signals tree
+   \brief       CANopen mapping entry for a signal
 
-   CANopen result entry for add signals tree
+   CANopen mapping entry for a signal
 
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -12,10 +12,10 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
-#include "C_SdBueCoAddSignalsResultEntry.h"
+#include "C_OSCCanOpenManagerMappableSignal.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,7 +33,7 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueCoAddSignalsResultEntry::C_SdBueCoAddSignalsResultEntry() :
+C_OSCCanOpenManagerMappableSignal::C_OSCCanOpenManagerMappableSignal() :
    q_AutoMinMaxUsed(true)
 {
 }

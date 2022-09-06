@@ -172,6 +172,28 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                             const QString & orc_NodeName, const C_UsNode & orc_Node)
 {
    const QString c_NodeIdName = static_cast<QString>("%1Name").arg(orc_NodeIdBase);
+   const QString c_CANopenOvColumnId = static_cast<QString>("%1CANopenOverview").arg(orc_NodeIdBase);
+   const QString c_CANopenPdoOvColumnId = static_cast<QString>("%1CANopenPdoOverview").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenManager = static_cast<QString>("%1CANopenManager").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenDeviceInterfaceNumber =
+      static_cast<QString>("%1CANopenDeviceInterfaceNumber").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenDeviceNodeName = static_cast<QString>("%1CANopenDeviceNodeName").arg(
+      orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenDeviceUseCaseIndex = static_cast<QString>("%1CANopenDeviceUseCase").arg(
+      orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenManager =
+      static_cast<QString>("%1CANopenManagerExpanded#").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenManagerCounter =
+      static_cast<QString>("%1CANopenManagerExpandedCounter").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDevices =
+      static_cast<QString>("%1CANopenDevicesExpanded#").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDevicesCounter =
+      static_cast<QString>("%1CANopenDevicesExpandedCounter").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDevice = static_cast<QString>("%1CANopenDeviceExpanded#").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDeviceCounter =
+      static_cast<QString>("%1CANopenDeviceExpandedCounter").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedUseCaseOrInterface =
+      static_cast<QString>("%1CANopenSelectedUseCaseOrInterface").arg(orc_NodeIdBase);
    const QString c_HALCOvColumnId = static_cast<QString>("%1HALCOverview").arg(orc_NodeIdBase);
    const QString c_HALCConfigColumnId = static_cast<QString>("%1HALCParamConfig").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedHALCDomain = static_cast<QString>("%1Selected_HALC_domain").arg(orc_NodeIdBase);
@@ -201,9 +223,96 @@ void C_UsFiler::mh_SaveNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                         c_NodeIdSelectedInterface.toStdString().c_str(),
                         static_cast<sintn>(orc_Node.GetSelectedInterface()));
 
+   //CANopen colums
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, c_CANopenOvColumnId, orc_Node.GetCANopenOverviewColumnWidth());
+   C_UsFiler::mh_SaveColumns(orc_Ini, orc_SectionName, c_CANopenPdoOvColumnId,
+                             orc_Node.GetCANopenPdoOverviewColumnWidth());
+
+   //CANopen
+   uint32 u32_InterfaceCounter = 0UL;
+   const std::map<stw_types::uint8, bool> c_Interfaces = orc_Node.GetExpandedCANopenManager();
+   for (std::map<stw_types::uint8, bool>::const_iterator c_ItInterface = c_Interfaces.begin();
+        c_ItInterface != c_Interfaces.end(); ++c_ItInterface)
+   {
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                           (c_CANopenExpandedCANopenManager + QString::number(
+                               u32_InterfaceCounter) + "InterfaceNumber").toStdString().c_str(),
+                           c_ItInterface->first);
+      orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                        (c_CANopenExpandedCANopenManager + QString::number(
+                            u32_InterfaceCounter)).toStdString().c_str(), c_ItInterface->second);
+      u32_InterfaceCounter++;
+   }
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_CANopenExpandedCANopenManagerCounter.toStdString().c_str(),
+                        c_Interfaces.size());
+   uint32 u32_DevicesCounter = 0UL;
+   std::map<stw_types::uint8, bool> c_Devices = orc_Node.GetExpandedCANopenDevices();
+   for (std::map<stw_types::uint8, bool>::const_iterator c_ItDevices = c_Devices.begin();
+        c_ItDevices != c_Devices.end(); ++c_ItDevices)
+   {
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                           (c_CANopenExpandedCANopenDevices + QString::number(
+                               u32_DevicesCounter) + "InterfaceNumber").toStdString().c_str(),
+                           c_ItDevices->first);
+      orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                        (c_CANopenExpandedCANopenDevices + QString::number(
+                            u32_DevicesCounter)).toStdString().c_str(), c_ItDevices->second);
+      u32_DevicesCounter++;
+   }
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_CANopenExpandedCANopenDevicesCounter.toStdString().c_str(),
+                        c_Devices.size());
+   uint32 u32_DeviceCounter = 0UL;
+   std::map<std::pair<stw_types::uint8, std::pair<stw_types::uint8, stw_scl::C_SCLString> >,
+            bool> c_Device = orc_Node.GetExpandedCANopenDevice();
+   for (std::map<std::pair<stw_types::uint8, std::pair<stw_types::uint8, stw_scl::C_SCLString> >,
+                 bool>::const_iterator c_ItDevice = c_Device.begin();
+        c_ItDevice != c_Device.end();
+        ++c_ItDevice)
+   {
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                           (c_CANopenExpandedCANopenDevice +
+                            QString::number(u32_DeviceCounter) + "InterfaceNumber").toStdString().c_str(),
+                           c_ItDevice->first.first);
+      orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                           (c_CANopenExpandedCANopenDevice +
+                            QString::number(u32_DeviceCounter) + "DeviceInterfaceNumber").toStdString().c_str(),
+                           c_ItDevice->first.second.first);
+      orc_Ini.WriteString(orc_SectionName.toStdString().c_str(),
+                          (c_CANopenExpandedCANopenDevice +
+                           QString::number(u32_DeviceCounter) + "DeviceNodeName").toStdString().c_str(),
+                          c_ItDevice->first.second.second.AsStdString()->c_str());
+      orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                        (c_CANopenExpandedCANopenDevice +
+                         QString::number(u32_DeviceCounter)).toStdString().c_str(),
+                        c_ItDevice->second);
+      u32_DeviceCounter++;
+   }
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_CANopenExpandedCANopenDeviceCounter.toStdString().c_str(),
+                        c_Device.size());
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_CANopenSelectedCANopenManager.toStdString().c_str(),
+                        static_cast<sintn>(orc_Node.GetSelectedCANopenManager()));
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_CANopenSelectedCANopenDeviceInterfaceNumber.toStdString().c_str(),
+                        static_cast<sintn>(orc_Node.GetSelectedCANopenDeviceInterfaceNumber()));
+   orc_Ini.WriteString(orc_SectionName.toStdString().c_str(),
+                       c_CANopenSelectedCANopenDeviceNodeName.toStdString().c_str(),
+                       orc_Node.GetSelectedCANopenDeviceNodeName().toStdString().c_str());
+   orc_Ini.WriteInteger(orc_SectionName.toStdString().c_str(),
+                        c_CANopenSelectedCANopenDeviceUseCaseIndex.toStdString().c_str(),
+                        static_cast<sintn>(orc_Node.GetSelectedCANopenDeviceUseCaseIndex()));
+
+   orc_Ini.WriteBool(orc_SectionName.toStdString().c_str(),
+                     c_CANopenSelectedUseCaseOrInterface.toStdString().c_str(),
+                     orc_Node.GetCANopenSelectedUseCaseOrInterface());
+
    //Selected HALC domain & channel
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedHALCDomain.toStdString().c_str(),
                        orc_Node.GetSelectedHalcDomainName().toStdString().c_str());
+
    orc_Ini.WriteString(orc_SectionName.toStdString().c_str(), c_NodeIdSelectedHALCChannel.toStdString().c_str(),
                        orc_Node.GetSelectedHalcChannel().toStdString().c_str());
 
@@ -1052,6 +1161,29 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
    uint32 u32_Tmp;
    std::vector<sint32> c_Columns;
 
+   const QString c_CANopenOvColumnId = static_cast<QString>("%1CANopenOverview").arg(orc_NodeIdBase);
+   const QString c_CANopenPdoOvColumnId = static_cast<QString>("%1CANopenPdoOverview").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenManager = static_cast<QString>("%1CANopenManager").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenDeviceInterfaceNumber =
+      static_cast<QString>("%1CANopenDeviceInterfaceNumber").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenDeviceNodeName = static_cast<QString>("%1CANopenDeviceNodeName").arg(
+      orc_NodeIdBase);
+   const QString c_CANopenSelectedCANopenDeviceUseCaseIndex = static_cast<QString>("%1CANopenDeviceUseCase").arg(
+      orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenManager =
+      static_cast<QString>("%1CANopenManagerExpanded#").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenManagerCounter =
+      static_cast<QString>("%1CANopenManagerExpandedCounter").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDevices =
+      static_cast<QString>("%1CANopenDevicesExpanded#").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDevicesCounter =
+      static_cast<QString>("%1CANopenDevicesExpandedCounter").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDevice =
+      static_cast<QString>("%1CANopenDeviceExpanded#").arg(orc_NodeIdBase);
+   const QString c_CANopenExpandedCANopenDeviceCounter =
+      static_cast<QString>("%1CANopenDeviceExpandedCounter").arg(orc_NodeIdBase);
+   const QString c_CANopenSelectedUseCaseOrInterface =
+      static_cast<QString>("%1CANopenSelectedUseCaseOrInterface").arg(orc_NodeIdBase);
    const QString c_HALCOvColumnId = static_cast<QString>("%1HALCOverview").arg(orc_NodeIdBase);
    const QString c_HALCConfigColumnId = static_cast<QString>("%1HALCParamConfig").arg(orc_NodeIdBase);
    const QString c_NodeIdSelectedHALCDomain = static_cast<QString>("%1Selected_HALC_domain").arg(orc_NodeIdBase);
@@ -1081,7 +1213,88 @@ void C_UsFiler::mh_LoadNode(C_SCLIniFile & orc_Ini, const QString & orc_SectionN
                               c_NodeIdSelectedHALCChannel.toStdString().c_str(), "").c_str();
    orc_UserSettings.SetProjSdNodeSelectedHalcChannel(orc_NodeName, c_Tmp);
 
-   //HALC Columns
+   //CANopen columns
+   c_Columns.clear();
+   C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_CANopenOvColumnId, c_Columns);
+   orc_UserSettings.SetProjSdNodeCANopenOverviewColumnWidth(orc_NodeName, c_Columns);
+   c_Columns.clear();
+   C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_CANopenPdoOvColumnId, c_Columns);
+   orc_UserSettings.SetProjSdNodeCANopenPdoOverviewColumnWidth(orc_NodeName, c_Columns);
+
+   //CANopen
+   std::map<stw_types::uint8, bool> c_LoadInterfaces;
+   std::map<stw_types::uint8, bool> c_LoadDevices;
+   std::map<std::pair<stw_types::uint8, std::pair<stw_types::uint8, stw_scl::C_SCLString> >, bool> c_LoadDevice;
+   u32_Tmp = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                 c_CANopenExpandedCANopenManagerCounter.toStdString().c_str(), 0);
+   for (uint32 u32_InterfaceCounter = 0UL; u32_InterfaceCounter < u32_Tmp; u32_InterfaceCounter++)
+   {
+      c_LoadInterfaces[static_cast<uint8>(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                              (c_CANopenExpandedCANopenManager +
+                                                               QString::number(u32_InterfaceCounter) +
+                                                               "InterfaceNumber").toStdString().c_str(), 0))] =
+         orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                          (c_CANopenExpandedCANopenManager +
+                           QString::number(u32_InterfaceCounter)).toStdString().c_str(), false);
+   }
+   const uint32 u32_TmpDevices = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                     c_CANopenExpandedCANopenDevicesCounter.toStdString().c_str(),
+                                                     0);
+   for (uint32 u32_DevicesCounter = 0UL; u32_DevicesCounter < u32_TmpDevices; u32_DevicesCounter++)
+   {
+      c_LoadDevices[static_cast<uint8>(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                           (c_CANopenExpandedCANopenDevices +
+                                                            QString::number(u32_DevicesCounter) +
+                                                            "InterfaceNumber").toStdString().c_str(), 0))] =
+         orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                          (c_CANopenExpandedCANopenDevices +
+                           QString::number(u32_DevicesCounter)).toStdString().c_str(), false);
+   }
+   const uint32 u32_TmpDevice = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                    c_CANopenExpandedCANopenDeviceCounter.toStdString().c_str(),
+                                                    0);
+   for (uint32 u32_DeviceCounter = 0UL; u32_DeviceCounter < u32_TmpDevice; u32_DeviceCounter++)
+   {
+      const std::pair<stw_types::uint8, stw_scl::C_SCLString> c_PairInterfaceId(static_cast<uint8>(orc_Ini.ReadInteger(
+                                                                                                      orc_SectionName.toStdString().c_str(),
+                                                                                                      (c_CANopenExpandedCANopenDevice + QString::number(
+                                                                                                          u32_DeviceCounter) +
+                                                                                                       "DeviceInterfaceNumber").toStdString().c_str(), 0)),
+                                                                                orc_Ini.ReadString(
+                                                                                   orc_SectionName.toStdString().c_str(),
+                                                                                   (c_CANopenExpandedCANopenDevice + QString::number(
+                                                                                       u32_DeviceCounter) +
+                                                                                    "DeviceNodeName").toStdString().c_str(),
+                                                                                   ""));
+      const std::pair<stw_types::uint8, std::pair<stw_types::uint8, stw_scl::C_SCLString> > c_Pair(
+         static_cast<uint8>(orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                                (c_CANopenExpandedCANopenManager +
+                                                 QString::number(u32_DeviceCounter) +
+                                                 "InterfaceNumber").toStdString().c_str(), 0)),
+         c_PairInterfaceId);
+      c_LoadDevice[c_Pair] = orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                                              (c_CANopenExpandedCANopenDevice +
+                                               QString::number(u32_DeviceCounter)).toStdString().c_str(), false);
+   }
+   orc_UserSettings.SetProjSdNodeExpandedCANopenTree(orc_NodeName, c_LoadInterfaces, c_LoadDevices, c_LoadDevice);
+   u32_Tmp = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                 c_CANopenSelectedCANopenManager.toStdString().c_str(), 0);
+   orc_UserSettings.SetProjSdNodeSelectedCANopenManager(orc_NodeName, static_cast<uint8>(u32_Tmp));
+   u32_Tmp = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                 c_CANopenSelectedCANopenDeviceInterfaceNumber.toStdString().c_str(), 0);
+   c_Tmp = orc_Ini.ReadString(orc_SectionName.toStdString().c_str(),
+                              c_CANopenSelectedCANopenDeviceNodeName.toStdString().c_str(), "").c_str();
+   orc_UserSettings.SetProjSdNodeSelectedCANopenDevice(orc_NodeName, static_cast<uint8>(u32_Tmp), c_Tmp);
+   u32_Tmp = orc_Ini.ReadInteger(orc_SectionName.toStdString().c_str(),
+                                 c_CANopenSelectedCANopenDeviceUseCaseIndex.toStdString().c_str(), 0);
+   orc_UserSettings.SetProjSdNodeSelectedCANopenDeviceUseCaseIndex(orc_NodeName, u32_Tmp);
+
+   orc_UserSettings.SetProjSdNodeCANopenSelectedUseCaseOrInterface(
+      orc_NodeName,
+      orc_Ini.ReadBool(orc_SectionName.toStdString().c_str(),
+                       c_CANopenSelectedUseCaseOrInterface.toStdString().c_str(), false));
+
+   //HALC columns
    c_Columns.clear();
    C_UsFiler::mh_LoadColumns(orc_Ini, orc_SectionName, c_HALCOvColumnId, c_Columns);
    orc_UserSettings.SetProjSdNodeHalcOverviewColumnWidth(orc_NodeName, c_Columns);

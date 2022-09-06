@@ -13,6 +13,8 @@
 #include "precomp_headers.h"
 #include "stwtypes.h"
 #include "stwerrors.h"
+#include "C_UsHandler.h"
+#include "C_PuiSdHandler.h"
 #include "C_SdNdeCoOverviewTableView.h"
 #include "C_SdNdeCoOverviewTableModel.h"
 #include "C_SdNdeSingleHeaderView.h"
@@ -21,6 +23,7 @@
 using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -102,6 +105,39 @@ C_SdNdeCoOverviewTableView::C_SdNdeCoOverviewTableView(QWidget * const opc_Paren
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeCoOverviewTableView::~C_SdNdeCoOverviewTableView(void)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Load user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoOverviewTableView::LoadUserSettings(void)
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+
+   if (pc_Node != NULL)
+   {
+      const C_UsNode c_Node = C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
+      if (this->m_SetColumnWidths(c_Node.GetCANopenOverviewColumnWidth()) == false)
+      {
+         m_InitColumns();
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save user settings
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoOverviewTableView::SaveUserSettings(void) const
+{
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+
+   if (pc_Node != NULL)
+   {
+      C_UsHandler::h_GetInstance()->SetProjSdNodeCANopenOverviewColumnWidth(
+         pc_Node->c_Properties.c_Name.c_str(), this->m_GetColumnWidths());
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -213,7 +249,7 @@ void C_SdNdeCoOverviewTableView::mouseDoubleClickEvent(QMouseEvent * const opc_E
             }
             else
             {
-               u32_UseCaseIndex = 1U; // for the config page
+               u32_UseCaseIndex = 0U; // for the config page
                Q_EMIT (this->SigDeviceSelected(u8_InterfaceNumber, c_CanInterfaceId, u32_UseCaseIndex));
             }
          }

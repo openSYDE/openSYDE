@@ -1431,6 +1431,132 @@ C_OSCCanProtocol * C_OSCNode::GetRelatedCANProtocol(const uint32 ou32_DataPoolIn
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a specific CAN protocol on all CAN interfaces for errors
+
+   For all protocol types:
+   Allowed signals for each protocol, Datapool and direction (TX/RX) is 2048.
+
+   For CANopen only:
+   Allowed active PDOS (Messages) for each direction (TPDO/RPDO) is 512
+
+   \param[in]  oe_ComProtocol                Communication protocol
+   \param[in]  oq_ComProtocolUsedByInterface Flag for communication protocol bus connection to check for
+                                             true: Check only protocol instances which are connected to a bus
+                                             false: Check only protocol instances which are not connected to a bus
+   \param[out] orq_InvalidRxSignalCount  The number of RX signals of this protocol with at least one Datapool is to high
+   \param[out] orq_InvalidTxSignalCount  The number of TX signals of this protocol with at least one Datapool is to high
+   \param[out] orq_InvalidCoRPDOCount    The number of active RPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out] orq_InvalidCoTPDOCount    The number of active TPDOs (CANopen Manager viewpoint) of CANopen is to high
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNode::CheckErrorCANProtocol(const C_OSCCanProtocol::E_Type oe_ComProtocol,
+                                      const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidRxSignalCount,
+                                      bool & orq_InvalidTxSignalCount, bool & orq_InvalidCoRPDOCount,
+                                      bool & orq_InvalidCoTPDOCount) const
+{
+   uint32 u32_InterfaceCounter;
+
+   orq_InvalidRxSignalCount = false;
+   orq_InvalidTxSignalCount = false;
+   orq_InvalidCoTPDOCount = false;
+   orq_InvalidCoRPDOCount = false;
+
+   // Check all interfaces
+   for (u32_InterfaceCounter = 0U;
+        u32_InterfaceCounter < this->c_Properties.c_ComInterfaces.size();
+        ++u32_InterfaceCounter)
+   {
+      if (this->c_Properties.c_ComInterfaces[u32_InterfaceCounter].e_InterfaceType ==
+          C_OSCSystemBus::eCAN)
+      {
+         bool q_TempCommRxSignalCountInvalid = false;
+         bool q_TempCommTxSignalCountInvalid = false;
+         bool q_TempCoRPdoCountInvalid = false;
+         bool q_TempCoTPdoCountInvalid = false;
+
+         this->CheckErrorCANProtocol(u32_InterfaceCounter, oe_ComProtocol,
+                                     oq_ComProtocolUsedByInterface,
+                                     q_TempCommRxSignalCountInvalid, q_TempCommTxSignalCountInvalid,
+                                     q_TempCoRPdoCountInvalid, q_TempCoTPdoCountInvalid);
+
+         // Do not overwrite already detected errors
+         if (q_TempCommRxSignalCountInvalid == true)
+         {
+            orq_InvalidRxSignalCount = true;
+         }
+         if (q_TempCommTxSignalCountInvalid == true)
+         {
+            orq_InvalidTxSignalCount = true;
+         }
+
+         if (q_TempCoRPdoCountInvalid == true)
+         {
+            orq_InvalidCoRPDOCount = true;
+         }
+         if (q_TempCoTPdoCountInvalid == true)
+         {
+            orq_InvalidCoTPDOCount = true;
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a specific CAN protocol for errors
+
+   For all protocol types:
+   Allowed signals for each protocol, Datapool and direction (TX/RX) is 2048.
+
+   For CANopen only:
+   Allowed active PDOS (Messages) for each direction (TPDO/RPDO) is 512
+
+   \param[in]  ou32_InterfaceIndex           Interface index
+   \param[in]  oe_ComProtocol                Communication protocol
+   \param[in]  oq_ComProtocolUsedByInterface Flag for communication protocol bus connection to check for
+                                             true: Check only protocol instances which are connected to a bus
+                                             false: Check only protocol instances which are not connected to a bus
+   \param[out] orq_InvalidRxSignalCount  The number of RX signals of this protocol with at least one Datapool is to high
+   \param[out] orq_InvalidTxSignalCount  The number of TX signals of this protocol with at least one Datapool is to high
+   \param[out] orq_InvalidCoRPDOCount    The number of active RPDOs (CANopen Manager viewpoint) of CANopen is to high
+   \param[out] orq_InvalidCoTPDOCount    The number of active TPDOs (CANopen Manager viewpoint) of CANopen is to high
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNode::CheckErrorCANProtocol(const uint32 ou32_InterfaceIndex, const C_OSCCanProtocol::E_Type oe_ComProtocol,
+                                      const bool oq_ComProtocolUsedByInterface, bool & orq_InvalidRxSignalCount,
+                                      bool & orq_InvalidTxSignalCount, bool & orq_InvalidCoRPDOCount,
+                                      bool & orq_InvalidCoTPDOCount) const
+{
+   const std::vector<const C_OSCCanProtocol *> c_Protocols = this->GetCANProtocolsConst(oe_ComProtocol);
+   uint32 u32_Counter;
+
+   orq_InvalidRxSignalCount = false;
+   orq_InvalidTxSignalCount = false;
+   orq_InvalidCoTPDOCount = false;
+   orq_InvalidCoRPDOCount = false;
+
+   for (u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
+   {
+      // Check all instances of the matching protocol instances
+      const C_OSCCanProtocol * const pc_Prot = c_Protocols[u32_Counter];
+      if ((pc_Prot != NULL) &&
+          (pc_Prot->e_Type == oe_ComProtocol) &&
+          (ou32_InterfaceIndex < pc_Prot->c_ComMessages.size()) &&
+          (oq_ComProtocolUsedByInterface == pc_Prot->c_ComMessages[ou32_InterfaceIndex].q_IsComProtocolUsedByInterface))
+      {
+         // Check Rx and RPDOs
+         mh_CheckErrorCANProtocolDirection(pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_RxMessages,
+                                           oe_ComProtocol,
+                                           orq_InvalidRxSignalCount, orq_InvalidCoRPDOCount);
+
+         // Check Tx and TPDOs
+         mh_CheckErrorCANProtocolDirection(pc_Prot->c_ComMessages[ou32_InterfaceIndex].c_TxMessages,
+                                           oe_ComProtocol,
+                                           orq_InvalidTxSignalCount, orq_InvalidCoTPDOCount);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check whether the number of lists and elements is within supported range
 
    Goes through the data pool lists and element and check whether the number are within the supported range.
@@ -1579,7 +1705,9 @@ void C_OSCNode::CheckErrorDataPool(const uint32 ou32_DataPoolIndex, bool * const
                               rc_CheckedDataPool.c_Lists[u32_TxListIndex],
                               rc_CheckedDataPool.c_Lists[u32_RxListIndex],
                               C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(pc_Protocol->e_Type),
-                              C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(pc_Protocol->e_Type));
+                              C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(pc_Protocol->e_Type),
+                              C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(pc_Protocol->e_Type),
+                              C_OSCCanProtocol::h_GetCANMessageSignalsRequired(pc_Protocol->e_Type));
                            if (q_Error == true)
                            {
                               *opq_IsErrorInListOrMessage = true;
@@ -2200,4 +2328,56 @@ uint32 C_OSCNode::m_GetContainerHash(const uint32 ou32_DataPoolIndex, const uint
       }
    }
    return u32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a specific CAN protocol direction message container for errors
+
+   For all protocol types:
+   Allowed signals for each protocol, Datapool and direction (TX/RX) is 2048.
+
+   For CANopen only:
+   Allowed active PDOS (Messages) for each direction (TPDO/RPDO) is 512
+
+   \param[in]  orc_Messages              All messages of one specific direction of one specific protocol
+   \param[in]  oe_ComProtocol            Communication protocol
+   \param[out] orq_InvalidSignalCount    The number of signals of this messages is to high
+   \param[out] orq_InvalidCoPDOCount     The number of active PDOs (CANopen Manager viewpoint) of CANopen is to high
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OSCNode::mh_CheckErrorCANProtocolDirection(const std::vector<C_OSCCanMessage> & orc_Messages,
+                                                  const C_OSCCanProtocol::E_Type oe_ComProtocol,
+                                                  bool & orq_InvalidSignalCount, bool & orq_InvalidCoPDOCount)
+{
+   uint32 u32_MessageCounter;
+   uint32 u32_SignalCount = 0U;
+   uint32 u32_ActivePdoCounter = 0U;
+
+   for (u32_MessageCounter = 0U;
+        u32_MessageCounter < orc_Messages.size();
+        ++u32_MessageCounter)
+   {
+      const C_OSCCanMessage & rc_Msg = orc_Messages[u32_MessageCounter];
+      // Check signal count, which is relevant for all protocol types
+      // For each direction and interface is a Datapool list associated. The maximum number of list entries
+      // is the limit for the count of signals
+      u32_SignalCount += rc_Msg.c_Signals.size();
+      if (u32_SignalCount > hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST)
+      {
+         orq_InvalidSignalCount = true;
+      }
+
+      // Check active PDO count, which is only relevant for CANopen
+      if (oe_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
+      {
+         if (rc_Msg.q_CanOpenManagerMessageActive == true)
+         {
+            ++u32_ActivePdoCounter;
+            if (u32_ActivePdoCounter > hu32_MAX_NUMBER_OF_ACTIVE_PDO_PER_DIRECTION)
+            {
+               orq_InvalidCoPDOCount = true;
+            }
+         }
+      }
+   }
 }

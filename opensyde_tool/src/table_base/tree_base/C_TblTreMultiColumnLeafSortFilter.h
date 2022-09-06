@@ -1,16 +1,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       CANopen result entry for add signals tree
+   \brief       Generic filter for a multi column model displaying leaf items as result
    \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SDBUECOADDSIGNALSRESULTENTRY_H
-#define C_SDBUECOADDSIGNALSRESULTENTRY_H
+#ifndef C_TBLTREMULTICOLUMNLEAFSORTFILTER_H
+#define C_TBLTREMULTICOLUMNLEAFSORTFILTER_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OSCCanSignal.h"
-#include "C_OSCNodeDataPoolListElement.h"
+#include "C_TblTreDataElementSortFilter.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_gui_logic
@@ -19,14 +18,15 @@ namespace stw_opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_SdBueCoAddSignalsResultEntry
+class C_TblTreMultiColumnLeafSortFilter :
+   public C_TblTreDataElementSortFilter
 {
 public:
-   C_SdBueCoAddSignalsResultEntry();
+   C_TblTreMultiColumnLeafSortFilter();
 
-   bool q_AutoMinMaxUsed;
-   stw_opensyde_core::C_OSCCanSignal c_SignalData;
-   stw_opensyde_core::C_OSCNodeDataPoolListElement c_DatapoolData;
+protected:
+   virtual bool m_Contains(const QModelIndex & orc_Index) const override;
+   virtual bool lessThan(const QModelIndex & orc_SourceLeft, const QModelIndex & orc_SourceRight) const override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

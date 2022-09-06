@@ -970,7 +970,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(const C_GiSvSub
                                                                  QString & orc_Content, const C_OSCNode & orc_Node,
                                                                  const bool oq_IsMultiDevice)
 {
-   QString c_NewContent;
+   QString c_NewContent = "";
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
 
    stw_scl::C_SCLStringList c_List;
@@ -989,6 +989,8 @@ void C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(const C_GiSvSub
    }
    if (c_List.Strings.GetLength() > 1)
    {
+      c_NewContent +=
+         static_cast<QString>(C_GtGetText::h_GetText("Note: Flashloader data is read during \"Enter Update Mode\""));
       c_NewContent += "<p>";
       for (sint32 s32_ItString = 0; s32_ItString < c_List.Strings.GetLength(); ++s32_ItString)
       {
@@ -1074,30 +1076,34 @@ QString C_SyvUpNodePropertiesDialog::m_GetProgressLogConnectStatesString(void) c
 
       for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < u32_SubNodeCount; ++u32_SubNodeCounter)
       {
-         const C_GiSvSubNodeData * const pc_SubNodeData =
-            this->mc_NodeData.GetSubNodeBySubNodeIndex(u32_SubNodeCounter);
-
-         tgl_assert(pc_SubNodeData != NULL);
-         if (pc_SubNodeData != NULL)
+         // Print only information about active sub nodes
+         if (this->mc_NodeData.IsSubNodeActive(u32_SubNodeCounter) == true)
          {
-            if (u32_SubNodeCount > 1)
-            {
-               // In case of a multiple CPU node, printing each name
-               const uint32 u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
-               const C_OSCNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-               if (opc_OscNode != NULL)
-               {
-                  c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node: ")) +
-                            static_cast<QString>(opc_OscNode->c_Properties.c_Name.c_str());
-               }
-            }
+            const C_GiSvSubNodeData * const pc_SubNodeData =
+               this->mc_NodeData.GetSubNodeBySubNodeIndex(u32_SubNodeCounter);
 
-            // Printing the states
-            c_Text += mh_GetProgressLogConnectStatesStringForSubNode(pc_SubNodeData) + "<br>";
-            if ((u32_SubNodeCounter + 1U) < u32_SubNodeCount)
+            tgl_assert(pc_SubNodeData != NULL);
+            if (pc_SubNodeData != NULL)
             {
-               // Not the last sub node, add an additional space between sub nodes for better readability
-               c_Text += "<br>";
+               if (u32_SubNodeCount > 1)
+               {
+                  // In case of a multiple CPU node, printing each name
+                  const uint32 u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
+                  const C_OSCNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+                  if (opc_OscNode != NULL)
+                  {
+                     c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node: ")) +
+                               static_cast<QString>(opc_OscNode->c_Properties.c_Name.c_str());
+                  }
+               }
+
+               // Printing the states
+               c_Text += mh_GetProgressLogConnectStatesStringForSubNode(pc_SubNodeData) + "<br>";
+               if ((u32_SubNodeCounter + 1U) < u32_SubNodeCount)
+               {
+                  // Not the last sub node, add an additional space between sub nodes for better readability
+                  c_Text += "<br>";
+               }
             }
          }
       }
@@ -1231,30 +1237,35 @@ QString C_SyvUpNodePropertiesDialog::m_GetProgressLogUpdateStatesString(void) co
 
          for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < u32_SubNodeCount; ++u32_SubNodeCounter)
          {
-            const C_GiSvSubNodeData * const pc_SubNodeData =
-               this->mc_NodeData.GetSubNodeBySubNodeIndex(u32_SubNodeCounter);
-
-            tgl_assert(pc_SubNodeData != NULL);
-            if (pc_SubNodeData != NULL)
+            // Print only information about active sub nodes
+            if (this->mc_NodeData.IsSubNodeActive(u32_SubNodeCounter) == true)
             {
-               if (u32_SubNodeCount > 1)
-               {
-                  // In case of a multiple CPU node, printing each name
-                  const uint32 u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
-                  const C_OSCNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-                  if (opc_OscNode != NULL)
-                  {
-                     c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node: ")) +
-                               static_cast<QString>(opc_OscNode->c_Properties.c_Name.c_str());
-                  }
-               }
+               const C_GiSvSubNodeData * const pc_SubNodeData =
+                  this->mc_NodeData.GetSubNodeBySubNodeIndex(u32_SubNodeCounter);
 
-               // Printing the states
-               c_Text += mh_GetProgressLogUpdateStatesStringForSubNode(pc_SubNodeData) + "<br>";
-               if ((u32_SubNodeCounter + 1U) < u32_SubNodeCount)
+               tgl_assert(pc_SubNodeData != NULL);
+               if (pc_SubNodeData != NULL)
                {
-                  // Not the last sub node, add an additional space between sub nodes for better readability
-                  c_Text += "<br>";
+                  if (u32_SubNodeCount > 1)
+                  {
+                     // In case of a multiple CPU node, printing each name
+                     const uint32 u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
+                     const C_OSCNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                        u32_NodeIndex);
+                     if (opc_OscNode != NULL)
+                     {
+                        c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node: ")) +
+                                  static_cast<QString>(opc_OscNode->c_Properties.c_Name.c_str());
+                     }
+                  }
+
+                  // Printing the states
+                  c_Text += mh_GetProgressLogUpdateStatesStringForSubNode(pc_SubNodeData) + "<br>";
+                  if ((u32_SubNodeCounter + 1U) < u32_SubNodeCount)
+                  {
+                     // Not the last sub node, add an additional space between sub nodes for better readability
+                     c_Text += "<br>";
+                  }
                }
             }
          }

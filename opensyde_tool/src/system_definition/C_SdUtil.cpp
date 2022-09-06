@@ -21,6 +21,7 @@
 #include "C_OSCUtils.h"
 #include "C_GtGetText.h"
 #include "C_PuiSdHandler.h"
+#include "C_PuiSdUtil.h"
 #include "C_OgeRabProperties.h"
 #include "C_PuiSdUtil.h"
 #include "C_Uti.h"
@@ -289,10 +290,10 @@ QString C_SdUtil::h_ConvertTxMethodToName(const C_OSCCanMessage::E_TxMethodType 
       c_Retval = C_GtGetText::h_GetText("Cyclic");
       break;
    case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
-      c_Retval = C_GtGetText::h_GetText("CANopen transmission type 254");
+      c_Retval = C_GtGetText::h_GetText("Type 254 - asynchronous manufacturer specific");
       break;
    case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
-      c_Retval = C_GtGetText::h_GetText("CANopen transmission type 255");
+      c_Retval = C_GtGetText::h_GetText("Type 255 - asynchronous device specific");
       break;
    case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
       c_Retval = C_GtGetText::h_GetText("On Change");
@@ -821,9 +822,9 @@ std::vector<uint32> C_SdUtil::h_GetUsedIpAddressesForBusUniqueAndSortedAscending
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Gets all IP Addresses used on the given bus. (Complete addresses, not just last bytes)
 
-   \param[in]  oru32_BusIndex            Bus index of bus to look at
-   \param[in]  oru32_SpecialNodeIndex    Special node index to skip
-   \param[in]  ors32_SpecialInterface    Special interface to skip
+   \param[in]  oru32_BusIndex          Bus index of bus to look at
+   \param[in]  oru32_SpecialNodeIndex  Special node index to skip
+   \param[in]  ors32_SpecialInterface  Special interface to skip
 
    \return
    Vector of IP addresses (each stored in a separate vector)
@@ -1069,10 +1070,10 @@ QString C_SdUtil::h_InitUsedIdsString(const std::vector<uint32> & orc_UsedIds, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Builds a string which contains all used IP addresses separated with new line.
 
-   \param[in]      orc_UsedIps    Used IP addresses
-   \param[in]      orc_ItemName   Item name (e.g. bus name)
-   \param[in]      orc_ItemType   Item type (e.g. "bus" or "node")
-   \param[in]      oq_SkiptItem   Flag to skip item (default = false)
+   \param[in]  orc_UsedIps    Used IP addresses
+   \param[in]  orc_ItemName   Item name (e.g. bus name)
+   \param[in]  orc_ItemType   Item type (e.g. "bus" or "node")
+   \param[in]  oq_SkiptItem   Flag to skip item (default = false)
 
    \return
    String with already used IP addresses
@@ -1112,7 +1113,7 @@ QString C_SdUtil::h_InitUsedIpsString(const std::vector<std::vector<uint8> > & o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Converts an IP address represented as a byte-vector to a string
 
-   \param[in]       orc_Ip     Vector with 4 bytes of an IP address
+   \param[in]  orc_Ip   Vector with 4 bytes of an IP address
 
    \return
    IP as string with point separators
@@ -1139,11 +1140,11 @@ QString C_SdUtil::h_IpAddressAsString(const std::vector<uint8> & orc_Ip)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function generates node id or last byte for IP address depending on oq_GenerateId
 
-   \param[in]  orc_Interfaces                 Node interfaces
-   \param[in]  orc_UsedNodeProperties         Already used node properties (id/ip: unique and sorted ascending)
-   \param[in]  ors32_SpecialInterface         Special interface to use as default
-   \param[in]  oq_GenerateId                  True: generate ID
-                                              False: generate last byte of IP
+   \param[in]  orc_Interfaces          Node interfaces
+   \param[in]  orc_UsedNodeProperties  Already used node properties (id/ip: unique and sorted ascending)
+   \param[in]  ors32_SpecialInterface  Special interface to use as default
+   \param[in]  oq_GenerateId           True: generate ID
+                                       False: generate last byte of IP
 
    \return
    Node ID or IP proposal (Always in range but may be invalid)
@@ -1379,22 +1380,30 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
       bool q_DataPoolsInvalid;
       bool q_ApplicationsInvalid;
       bool q_DomainsInvalid;
+      bool q_CommSignalCountInvalid;
+      bool q_CoPdoCountInvalid;
+      bool q_CoNodeIdInvalid;
+      bool q_CoHeartbeatInvalid;
 
       std::vector<uint32> c_InvalidInterfaceIndices;
       std::vector<uint32> c_InvalidDataPoolIndices;
       std::vector<uint32> c_InvalidApplicationIndices;
       std::vector<uint32> c_InvalidDomainIndices;
+      std::vector<C_OSCCanProtocol::E_Type> c_InvalidProtocolTypes;
       s32_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorNode(
          c_NodeIndices[u32_ItNode], &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid, &q_IpInvalid, &q_DataPoolsInvalid,
          &q_ApplicationsInvalid,
-         &q_DomainsInvalid, true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
-         &c_InvalidDomainIndices);
+         &q_DomainsInvalid, &q_CommSignalCountInvalid, &q_CoPdoCountInvalid, &q_CoNodeIdInvalid, &q_CoHeartbeatInvalid,
+         true, &c_InvalidInterfaceIndices, &c_InvalidDataPoolIndices, &c_InvalidApplicationIndices,
+         &c_InvalidDomainIndices, &c_InvalidProtocolTypes);
+
       if (s32_Retval == C_NO_ERR)
       {
-         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true)) ||
-                 (q_DataPoolsInvalid == true)) ||
-                (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_DataPoolNvmConflict == true)) ||
-             (q_NameEmpty == true))
+         if ((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true) ||
+             (q_DataPoolsInvalid == true) ||
+             (q_ApplicationsInvalid == true) || (q_DomainsInvalid == true) || (q_DataPoolNvmConflict == true) ||
+             (q_NameEmpty == true) || (q_CommSignalCountInvalid == true) || (q_CoPdoCountInvalid == true) ||
+             (q_CoNodeIdInvalid == true) || (q_CoHeartbeatInvalid == true))
          {
             if (q_IsMulti)
             {
@@ -1501,6 +1510,40 @@ sint32 C_SdUtil::h_GetErrorToolTipNode(const uint32 & oru32_NodeIndex, QString &
                                                        static_cast<sintn>(mu32_TOOL_TIP_MAXIMUM_ITEMS));
                }
                orc_Text += "\n";
+            }
+
+            if (q_CommSignalCountInvalid == true)
+            {
+               uint32 u32_InvalidProtCounter;
+               orc_Text += C_GtGetText::h_GetText("Invalid COMM protocol configuration with too many signals:\n");
+               for (u32_InvalidProtCounter = 0U; u32_InvalidProtCounter < c_InvalidProtocolTypes.size();
+                    ++u32_InvalidProtCounter)
+               {
+                  orc_Text +=
+                     C_PuiSdUtil::h_ConvertProtocolTypeToString(c_InvalidProtocolTypes[u32_InvalidProtCounter]);
+               }
+            }
+
+            if ((q_CoNodeIdInvalid == true) ||
+                (q_CoHeartbeatInvalid == true) ||
+                (q_CoPdoCountInvalid == true))
+            {
+               orc_Text += C_GtGetText::h_GetText("Invalid CANopen Manager configuration:\n");
+
+               if (q_CoNodeIdInvalid == true)
+               {
+                  orc_Text += C_GtGetText::h_GetText("Duplicate or invalid CANopen Node ID detected.\n");
+               }
+
+               if (q_CoHeartbeatInvalid == true)
+               {
+                  orc_Text += C_GtGetText::h_GetText("Invalid CANopen Device Heartbeat consumer time detected.\n");
+               }
+
+               if (q_CoPdoCountInvalid == true)
+               {
+                  orc_Text += C_GtGetText::h_GetText("Too many PDOs in a CANopen Manager configuration detected.\n");
+               }
             }
          }
       }
@@ -1948,7 +1991,7 @@ QString C_SdUtil::h_GetToolTipContentSignal(const C_OSCCanMessageIdentificationI
          c_AutoMinMaxInfo.append(C_GtGetText::h_GetText("Disabled"));
       }
       c_ToolTipContent = C_SdTooltipUtil::h_GetToolTipContentSignal(*pc_Signal, *pc_Message, *pc_DpListElement,
-                                                                    c_AutoMinMaxInfo,
+                                                                    orc_MessageId.e_ComProtocol, c_AutoMinMaxInfo,
                                                                     orc_AdditionalInformation);
    }
 
@@ -2084,6 +2127,10 @@ void C_SdUtil::h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & or
 //Explicit declaration of every type usage is necessary for templates to allow split of declaration and implementation
 //lint -esym(754,stw_opensyde_gui_logic::C_SdUtil::h_SortIndicesAscendingAndSync*)
 template
+void C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCCanMessageIdentificationIndices, uint32>(
+   std::vector<stw_types::uint32> & orc_IndicesTmp,
+   std::vector<C_OSCCanMessageIdentificationIndices> & orc_OSCContentTmp, std::vector<uint32> & orc_UIContentTmp);
+template
 void C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolList, C_PuiSdNodeDataPoolList>(
    std::vector<stw_types::uint32> & orc_IndicesTmp, std::vector<C_OSCNodeDataPoolList> & orc_OSCContentTmp,
    std::vector<C_PuiSdNodeDataPoolList> & orc_UIContentTmp);
@@ -2095,3 +2142,281 @@ template
 void C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
    std::vector<stw_types::uint32> & orc_IndicesTmp, std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContentTmp,
    std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContentTmp);
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get string of details from eds file
+
+  \param[in]  oc_CanOpenObjDictionary  CANOpen object dictionary
+
+   \return
+   content as string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdUtil::h_GetEdsFileDetails(const C_OSCCanOpenObjectDictionary oc_CanOpenObjDictionary)
+{
+   QString c_String;
+   QString c_TrueOrFalse;
+   C_OSCCanOpenEdsInfoBlock const c_InfoBlock = oc_CanOpenObjDictionary.c_InfoBlock;
+   C_OSCCanOpenEdsFileInfoBlock c_FileInfoBlock = c_InfoBlock.c_FileInfo;
+   C_OSCCanOpenEdsDeviceInfoBlock c_DeviceInfoBlock = c_InfoBlock.c_DeviceInfo;
+
+   c_String += "[FileInfo]";
+   c_String += "\nFileName=";
+   c_String += c_FileInfoBlock.c_FileName.AsStdString()->c_str();
+   c_String += "\nFileVersion=";
+   c_String += QString::number(c_FileInfoBlock.u8_FileVersion);
+   c_String += "\nFileRevision=";
+   c_String += QString::number(c_FileInfoBlock.u8_FileRevision);
+   if (c_FileInfoBlock.c_EDSVersion != "")
+   {
+      c_String += "\nEDSVersion=";
+      c_String += c_FileInfoBlock.c_EDSVersion.AsStdString()->c_str();
+   }
+   c_String += "\nDescription=";
+   c_String += c_FileInfoBlock.c_Description.AsStdString()->c_str();
+   c_String += "\nCreationTime=";
+   c_String += c_FileInfoBlock.c_CreationTime.AsStdString()->c_str();
+   c_String += "\nCreationDate=";
+   c_String += c_FileInfoBlock.c_CreationDate.AsStdString()->c_str();
+   c_String += "\nCreatedBy=";
+   c_String += c_FileInfoBlock.c_CreatedBy.AsStdString()->c_str();
+   c_String += "\nModificationDate=";
+   c_String += c_FileInfoBlock.c_ModificationDate.AsStdString()->c_str();
+   c_String += "\nModifiedBy=";
+   c_String += c_FileInfoBlock.c_ModifiedBy.AsStdString()->c_str();
+
+   c_String += "\n\n[DeviceInfo]";
+   c_String += "\nVendorName=";
+   c_String += c_DeviceInfoBlock.c_VendorName.AsStdString()->c_str();
+   c_String += "\nVendorNumber=";
+   c_String += c_DeviceInfoBlock.c_VendorNumber.AsStdString()->c_str();
+   c_String += "\nProductName=";
+   c_String += c_DeviceInfoBlock.c_ProductName.AsStdString()->c_str();
+   c_String += "\nProductNumber=";
+   c_String += c_DeviceInfoBlock.c_ProductNumber.AsStdString()->c_str();
+   if (c_DeviceInfoBlock.c_RevisionNumber != "")
+   {
+      c_String += "\nRevisionNumber=";
+      c_String += c_DeviceInfoBlock.c_RevisionNumber.AsStdString()->c_str();
+   }
+   c_String += "\nOrderCode=";
+   c_String += c_DeviceInfoBlock.c_OrderCode.AsStdString()->c_str();
+   c_String += "\nBaudRate_10=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate10 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_20=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate20 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_50=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate50 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_125=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate125 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_250=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate250 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_500=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate500 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_800=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate800 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nBaudRate_1000=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_BaudRate1000 ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nSimpleBootUpMaster=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_SimpleBootUpMaster ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nSimpleBootUpSlave=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_SimpleBootUpSlave ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nGranularity=";
+   c_String += QString::number(c_DeviceInfoBlock.u8_Granularity);
+   c_String += "\nDynamicChannelsSupported=";
+   c_String += c_DeviceInfoBlock.c_DynamicChannelsSupported.AsStdString()->c_str();
+   c_String += "\nGroupMessaging=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_GroupMessaging ? "1" : "0";
+   c_String += c_TrueOrFalse;
+   c_String += "\nNrOfRxPDO=";
+   c_String += QString::number(c_DeviceInfoBlock.u16_NrOfRxPDO);
+   c_String += "\nNrOfTxPDO=";
+   c_String += QString::number(c_DeviceInfoBlock.u16_NrOfTxPDO);
+   c_String += "\nSupported=";
+   c_TrueOrFalse = c_DeviceInfoBlock.q_LSSSupported ? "1" : "0";
+   c_String += c_TrueOrFalse + "\n";
+
+   return c_String;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Counting messages and signals of a specific node for a specific protocol
+
+   \param[in]       ou32_NodeIndex           Node index for counting the messages.
+                                             In case of CANopen it must be always the index of the CANopen Manager
+   \param[in]       ou32_InterfaceIndex      Used interface index
+   \param[in]       oe_Protocol              Current CAN protocol
+   \param[in]       opc_CoDeviceInterfaceId  Optional: In case of protocol CANopen if the count of messages of a
+                                             specific device is needed. ou32_NodeIndex must be the CANopen Manager
+                                             which the device is assigned
+   \param[out]      oru32_RxMessageCount     Counted Rx messages of the specific node
+   \param[out]      oru32_TxMessageCount     Counted Tx messages of the specific node
+   \param[out]      opu32_SignalCount        Optional: Signal count of all Rx and Tx messages
+
+
+   \return
+   C_NO_ERR Operation success
+   C_RANGE  Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_SdUtil::h_GetMessageCountOfNode(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                         const C_OSCCanProtocol::E_Type oe_Protocol,
+                                         const C_OSCCanInterfaceId * const opc_CoDeviceInterfaceId,
+                                         uint32 & oru32_RxMessageCount, uint32 & oru32_TxMessageCount,
+                                         uint32 * const opu32_SignalCount)
+{
+   sint32 s32_Return = C_RANGE;
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+
+   oru32_TxMessageCount = 0U;
+   oru32_RxMessageCount = 0U;
+   if (opu32_SignalCount != NULL)
+   {
+      *opu32_SignalCount = 0U;
+   }
+
+   if ((pc_Node != NULL) &&
+       (ou32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
+   {
+      const uint32 u32_ListIndex = ou32_InterfaceIndex * 2U;
+      uint32 u32_DatapoolCounter;
+
+      s32_Return = C_NO_ERR;
+
+      for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < pc_Node->c_DataPools.size(); ++u32_DatapoolCounter)
+      {
+         const C_OSCNodeDataPool * const pc_Datapool = &pc_Node->c_DataPools[u32_DatapoolCounter];
+
+         if ((pc_Datapool != NULL) &&
+             (pc_Datapool->e_Type == C_OSCNodeDataPool::eCOM))
+         {
+            const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetRelatedCANProtocolConst(u32_DatapoolCounter);
+            if ((pc_Protocol != NULL) &&
+                (ou32_InterfaceIndex < pc_Protocol->c_ComMessages.size()) &&
+                (pc_Protocol->e_Type == oe_Protocol))
+            {
+               const C_OSCNodeDataPoolList * const pc_DataPoolList1 =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+                     ou32_NodeIndex,
+                     u32_DatapoolCounter,
+                     u32_ListIndex);
+               const C_OSCNodeDataPoolList * const pc_DataPoolList2 =
+                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+                     ou32_NodeIndex,
+                     u32_DatapoolCounter,
+                     u32_ListIndex + 1);
+
+               if ((pc_DataPoolList1 != NULL) && (pc_DataPoolList2 != NULL))
+               {
+                  const C_OSCCanMessageContainer & rc_MessageContainer =
+                     pc_Protocol->c_ComMessages[ou32_InterfaceIndex];
+
+                  if (oe_Protocol != C_OSCCanProtocol::eCAN_OPEN)
+                  {
+                     const uint32 u32_SignalSize1 = pc_DataPoolList1->c_Elements.size();
+                     const uint32 u32_SignalSize2 = pc_DataPoolList2->c_Elements.size();
+
+                     oru32_RxMessageCount += static_cast<uint32>(rc_MessageContainer.c_RxMessages.size());
+                     oru32_TxMessageCount += static_cast<uint32>(rc_MessageContainer.c_TxMessages.size());
+                     if (opu32_SignalCount != NULL)
+                     {
+                        *opu32_SignalCount += u32_SignalSize1 + u32_SignalSize2;
+                     }
+                  }
+                  else
+                  {
+                     // In case of CANopen the active flag of each message must be checked
+                     uint32 u32_MessageCounter;
+                     // RX messages
+                     for (u32_MessageCounter = 0U; u32_MessageCounter < rc_MessageContainer.c_RxMessages.size();
+                          ++u32_MessageCounter)
+                     {
+                        const C_OSCCanMessage & rc_Msg = rc_MessageContainer.c_RxMessages[u32_MessageCounter];
+                        // The message must be active and in case of the device, the device must be the matching
+                        // communication partner for this PDO
+                        if ((rc_Msg.q_CanOpenManagerMessageActive == true) &&
+                            ((opc_CoDeviceInterfaceId == NULL) || // No CANopen device, or it must match
+                             (rc_Msg.c_CanOpenManagerOwnerNodeIndex == *opc_CoDeviceInterfaceId)))
+                        {
+                           if (opc_CoDeviceInterfaceId == NULL)
+                           {
+                              ++oru32_RxMessageCount;
+                           }
+                           else
+                           {
+                              // In case of a device, the direction is reversed
+                              ++oru32_TxMessageCount;
+                           }
+
+                           if (opu32_SignalCount != NULL)
+                           {
+                              *opu32_SignalCount += rc_Msg.c_Signals.size();
+                           }
+                        }
+                     }
+
+                     // TX messages
+                     for (u32_MessageCounter = 0U; u32_MessageCounter < rc_MessageContainer.c_TxMessages.size();
+                          ++u32_MessageCounter)
+                     {
+                        const C_OSCCanMessage & rc_Msg = rc_MessageContainer.c_TxMessages[u32_MessageCounter];
+                        // The message must be active and in case of the device, the device must be the matching
+                        // communication partner for this PDO
+                        if ((rc_Msg.q_CanOpenManagerMessageActive == true) &&
+                            ((opc_CoDeviceInterfaceId == NULL) || // No CANopen device, or it must match
+                             (rc_Msg.c_CanOpenManagerOwnerNodeIndex == *opc_CoDeviceInterfaceId)))
+                        {
+                           if (opc_CoDeviceInterfaceId == NULL)
+                           {
+                              ++oru32_TxMessageCount;
+                           }
+                           else
+                           {
+                              // In case of a device, the direction is reversed
+                              ++oru32_RxMessageCount;
+                           }
+
+                           if (opu32_SignalCount != NULL)
+                           {
+                              *opu32_SignalCount += rc_Msg.c_Signals.size();
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+
+   return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen signal object index
+
+   \param[in]  ou32_ObjectIndex     Object index
+   \param[in]  ou32_ObjectSubIndex  Object sub index
+
+   \return
+   CANopen signal object index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdUtil::h_GetCanOpenSignalObjectIndex(const uint32 ou32_ObjectIndex, const uint32 ou32_ObjectSubIndex)
+{
+   const QString c_ObjectIndexString = QString::number(ou32_ObjectIndex, 16).toUpper();
+   const QString c_ObjectSubIndexString = QString::number(ou32_ObjectSubIndex, 16).toUpper();
+   const QString c_Retval = static_cast<QString>("%1sub%2").arg(c_ObjectIndexString).arg(c_ObjectSubIndexString);
+
+   return c_Retval;
+}

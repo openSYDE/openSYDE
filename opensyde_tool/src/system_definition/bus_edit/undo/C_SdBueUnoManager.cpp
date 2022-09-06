@@ -311,13 +311,13 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do delete messages
 
-   \param[in]      orc_SortedDescendingMessageGroups  Sorted descending message groups
+   \param[in]      orc_SortedAscendingMessageGroups   Sorted ascending message groups
    \param[in,out]  opc_MessageSyncManager             Message sync manager to perform actions on
    \param[in,out]  opc_MessageTreeWidget              Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoDeleteMessages(
-   const std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > & orc_SortedDescendingMessageGroups,
+   const std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > & orc_SortedAscendingMessageGroups,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget)
 {
    QUndoCommand * const pc_Parent = this->m_GetDeleteCommand();
@@ -326,10 +326,10 @@ void C_SdBueUnoManager::DoDeleteMessages(
    {
       std::vector<C_OSCCanMessageIdentificationIndices> c_AllMessages;
       //Consolidate
-      for (uint32 u32_ItGroup = 0UL; u32_ItGroup < orc_SortedDescendingMessageGroups.size(); ++u32_ItGroup)
+      for (uint32 u32_ItGroup = 0UL; u32_ItGroup < orc_SortedAscendingMessageGroups.size(); ++u32_ItGroup)
       {
          const std::vector<C_OSCCanMessageIdentificationIndices> & rc_Messages =
-            orc_SortedDescendingMessageGroups[u32_ItGroup];
+            orc_SortedAscendingMessageGroups[u32_ItGroup];
          c_AllMessages.reserve(c_AllMessages.size() + rc_Messages.size());
          for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Messages.size(); ++u32_ItMessage)
          {
@@ -392,7 +392,7 @@ void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices &
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
                                       const uint32 ou32_SignalIndex, const uint16 ou16_StartBit,
-                                      const std::vector<C_SdBueCoAddSignalsResultEntry> & orc_NewSignalInfo,
+                                      const std::vector<C_OSCCanOpenManagerMappableSignal> & orc_NewSignalInfo,
                                       C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                       QTreeWidget * const opc_MessageTreeWidget)
 {
@@ -429,14 +429,17 @@ void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices
 
    for (uint32 u32_SignalCounter = 0; u32_SignalCounter < orc_NewSignalInfo.size(); ++u32_SignalCounter)
    {
-      const C_SdBueCoAddSignalsResultEntry & rc_Result = orc_NewSignalInfo[u32_SignalCounter];
+      const C_OSCCanOpenManagerMappableSignal & rc_Result = orc_NewSignalInfo[u32_SignalCounter];
       C_OSCCanSignal c_SignalData = rc_Result.c_SignalData;
       C_OSCNodeDataPoolListElement c_SignalCommonData = rc_Result.c_DatapoolData;
       C_PuiSdNodeDataPoolListElement c_UISignalCommonData;
 
-      // Bring to default values
-      c_SignalCommonData.c_DataSetValues.resize(1);
-      c_SignalCommonData.c_DataSetValues[0] = c_SignalCommonData.c_MinValue;
+      if (c_SignalCommonData.c_DataSetValues.size() != 1)
+      {
+         // Bring to default values if no init value is set already
+         c_SignalCommonData.c_DataSetValues.resize(1);
+         c_SignalCommonData.c_DataSetValues[0] = c_SignalCommonData.c_MinValue;
+      }
 
       // Change the default values
       c_SignalData.u16_ComBitStart = u16_StartBit;

@@ -203,7 +203,7 @@ C_SyvUpUpdateWidget::~C_SyvUpUpdateWidget()
       C_UsHandler::h_GetInstance()->SetProjSvUpdateViewPos(
          pc_View->GetName(), this->mpc_Ui->pc_GraphicsView->GetViewPos());
    }
-   m_CleanUpToolBox();
+   m_CleanUpProgressLog();
    delete mpc_Ui;
    mpc_Ui = NULL;
 
@@ -390,7 +390,7 @@ void C_SyvUpUpdateWidget::showEvent(QShowEvent * const opc_Event)
 void C_SyvUpUpdateWidget::hideEvent(QHideEvent * const opc_Event)
 {
    QWidget::hideEvent(opc_Event);
-   m_CleanUpToolBox();
+   m_CleanUpProgressLog();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1304,8 +1304,15 @@ void C_SyvUpUpdateWidget::m_Connect(void)
          this->mpc_Scene->StartConnectionAnimation();
       }
 
-      // And Update package
+      // And Update package. After this call the timer will be disabled
       this->mpc_Ui->pc_WiUpdateInformation->SetConnected();
+
+      // Due to the timer of the update package and the signal used, timing could be a problem.
+      // Let the update package timer and its signal finish in any case and deactivate the buttons again just in case
+      QApplication::processEvents();
+      this->mpc_Ui->pc_PbConnect->setEnabled(false);
+      this->mpc_Ui->pc_PbUpdate->setEnabled(false);
+
       // When connected, no drag and drop is allowed on top level
       Q_EMIT (this->SigBlockDragAndDrop(true));
 
@@ -2454,10 +2461,10 @@ void C_SyvUpUpdateWidget::m_InitToolBox(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clean up toolbox
+/*! \brief   Clean up progress log
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_CleanUpToolBox(void)
+void C_SyvUpUpdateWidget::m_CleanUpProgressLog(void)
 {
    if (this->mpc_ProgressLog != NULL)
    {
@@ -2472,8 +2479,6 @@ void C_SyvUpUpdateWidget::m_CleanUpToolBox(void)
                                                                   this->mpc_ProgressLog->pos(), c_Size,
                                                                   this->mpc_ProgressLog->GetMaximized());
       }
-      this->mpc_ProgressLog->hide();
-      this->mpc_FixMinimizedProgressLog->hide();
    }
 }
 
@@ -2601,13 +2606,16 @@ void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32 ou32_NodeIndex)
 std::vector<bool> C_SyvUpUpdateWidget::m_GetIsFileBasedFlagForEach(void) const
 {
    std::vector<bool> c_Retval;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   if (pc_View != NULL)
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      this->mu32_ViewIndex,
+      c_NodeActiveFlags);
+
+   if (s32_FuncRetval == C_NO_ERR)
    {
-      const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-      for (uint32 u32_ItActiveNode = 0UL; u32_ItActiveNode < rc_ActiveNodes.size(); ++u32_ItActiveNode)
+      for (uint32 u32_ItActiveNode = 0UL; u32_ItActiveNode < c_NodeActiveFlags.size(); ++u32_ItActiveNode)
       {
-         if (rc_ActiveNodes[u32_ItActiveNode] == true)
+         if (c_NodeActiveFlags[u32_ItActiveNode] == true)
          {
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItActiveNode);
             if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&

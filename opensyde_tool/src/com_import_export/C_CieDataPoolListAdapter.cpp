@@ -331,7 +331,9 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
       // Adaption of Ui specific timeout mode
       if (c_MessageIter->u32_TimeoutMs == 0U)
       {
-         if (c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT)
+         if ((c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_EVENT) ||
+             (c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254) ||
+             (c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255))
          {
             // Special case: 0 means disabled timeout check for on event
             c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED;
@@ -377,6 +379,23 @@ void C_CieDataPoolListAdapter::mh_FillUpUiStructure(C_CieDataPoolListStructure &
    {
       C_PuiSdNodeCanMessage c_UiMessage;
       c_UiMessage.c_Signals.resize(c_MessageIter->c_Signals.size());
+
+      // Adaption of Ui specific timeout mode
+      if ((c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254) ||
+          (c_MessageIter->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255))
+      {
+         if (c_MessageIter->u32_TimeoutMs == 0U)
+         {
+            // Special case CANopen: 0 means disabled timeout check for on event and the Tx message has the information
+            // about receiving timeout too
+            c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED;
+         }
+         else
+         {
+            // Second special case CANopen:
+            c_UiMessage.e_ReceiveTimeoutMode = C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_CUSTOM;
+         }
+      }
 
       if (opc_TxSignalDefaultMinMaxValuesUsed != NULL)
       {

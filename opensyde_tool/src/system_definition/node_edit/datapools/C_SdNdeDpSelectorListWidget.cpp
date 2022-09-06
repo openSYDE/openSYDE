@@ -90,9 +90,6 @@ C_SdNdeDpSelectorListWidget::C_SdNdeDpSelectorListWidget(QWidget * const opc_Par
    msn_ItemHeight(141),
    msn_HeightHint(141)
 {
-   // TODO BAY:
-   //this->setItemDelegate(&this->mc_Delegate);
-
    //Custom context menu
    m_SetupContextMenu();
 }
@@ -276,6 +273,15 @@ bool C_SdNdeDpSelectorListWidget::SetActualDataPoolConflict(const stw_types::sin
    }
 
    return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload all Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorListWidget::ReloadDataPools(void)
+{
+   this->m_InitFromData(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1041,8 +1047,17 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
          switch (opc_Event->key())
          {
          case Qt::Key_Delete:
-            m_Delete(true);
-            break;
+            {
+               // CANopen Datapool shall not be removed by used manually
+               C_SdNdeDpSelectorItemWidget * const pc_SelectedWidgetItem =
+                  this->mc_DpItems.at(sn_CurrentItemIndex);
+               const bool q_ComCanOpenDatapool = this->m_IsItemComCanOpenDatapool(pc_SelectedWidgetItem);
+               if (q_ComCanOpenDatapool == false)
+               {
+                  m_Delete(true);
+               }
+               break;
+            }
          case Qt::Key_Left:
             if (sn_CurrentItemIndex > 0)
             {
@@ -1395,6 +1410,7 @@ void C_SdNdeDpSelectorListWidget::m_AddNewDataPool(const C_OSCNodeDataPool & orc
       this->ScrollToItem(sn_Row);
 
       Q_EMIT (this->SigListChanged());
+      Q_EMIT (this->SigUpdateFollowingLists(this->me_DataPoolType));
    }
    QApplication::restoreOverrideCursor();
 }
@@ -1441,6 +1457,7 @@ void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos
    // add action shall be shown only if no item concrete was clicked
    if (opc_Item != NULL)
    {
+      bool q_ComCanOpenDatapool;
       this->mpc_AddAction->setVisible(false);
 
       this->mpc_EditAction->setVisible(true);
@@ -1502,6 +1519,13 @@ void C_SdNdeDpSelectorListWidget::m_OpenCustomContextMenu(const QPoint & orc_Pos
       else
       {
          this->mpc_DeleteAction->setEnabled(true);
+      }
+
+      // actions depend on COMM Datapool protocol type
+      q_ComCanOpenDatapool = this->m_IsItemComCanOpenDatapool(opc_Item);
+      if (q_ComCanOpenDatapool == true)
+      {
+         this->mpc_DeleteAction->setEnabled(false);
       }
    }
    else
@@ -1818,6 +1842,7 @@ void C_SdNdeDpSelectorListWidget::m_Delete(const bool oq_AskUser)
             }
             Q_EMIT (this->SigListChanged());
             Q_EMIT (this->SigDataPoolChanged());
+            Q_EMIT (this->SigUpdateFollowingLists(this->me_DataPoolType));
             //Check
             Q_EMIT (this->SigErrorCheck());
          }
@@ -2291,4 +2316,34 @@ void C_SdNdeDpSelectorListWidget::m_UpdateItemErrorToolTip(const uint32 ou32_Ind
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Checks a specific item for a CANopen COMM Datapool
+
+   \param[in]       opc_Item     Specific Datapool item for checking
+
+   \retval   true    Datapool is a CANopen COMM Datapool
+   \retval   false   Datapool is not a CANopen COMM Datapool
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDpSelectorListWidget::m_IsItemComCanOpenDatapool(const C_SdNdeDpSelectorItemWidget * const opc_Item) const
+{
+   bool q_Return = false;
+
+   if ((this->me_DataPoolType == C_OSCNodeDataPool::eCOM) &&
+       (opc_Item != NULL))
+   {
+      C_OSCCanProtocol::E_Type e_ProtocolType;
+      const C_OSCNodeDataPoolId c_DpId = opc_Item->GetDatapoolId();
+      if (C_PuiSdHandler::h_GetInstance()->GetCanProtocolType(c_DpId.u32_NodeIndex, c_DpId.u32_DataPoolIndex,
+                                                              e_ProtocolType) == C_NO_ERR)
+      {
+         if (e_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+         {
+            q_Return = true;
+         }
+      }
+   }
+   return q_Return;
 }

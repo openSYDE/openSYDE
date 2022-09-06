@@ -13,8 +13,8 @@
 
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 #define PROJECT_VERSION_MAJOR 1
-#define PROJECT_VERSION_MINOR 8
-#define PROJECT_VERSION_RELEASE 1
+#define PROJECT_VERSION_MINOR 9
+#define PROJECT_VERSION_RELEASE 0
 #define PROJECT_VERSION_BUILD 0
 
 #endif // VERSION_CONFIG_H

@@ -305,6 +305,8 @@ void C_SdManTopologyCopyPasteManager::CopyFromSceneToManager(const QList<QGraphi
          --u32_ItBusTextElement;
       }
    }
+   //Handle CANopen
+   C_SdManTopologyCopyPasteManager::mh_RemoveCanOpenInformation(c_Snapshot);
    //Handle position of copied items
    this->m_CalcOriginalPosition(&c_Snapshot);
    //reset paste counter
@@ -509,5 +511,53 @@ void C_SdManTopologyCopyPasteManager::mh_RemoveConnection(C_SdTopologyDataSnapsh
       C_PuiSdNode & rc_UINode = orc_Data.c_UINodes[oru32_NodeIndex];
 
       rc_UINode.DeleteConnection(orc_ConnectionId);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Remove CANopen information
+
+   \param[in,out]  orc_Data   Data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdManTopologyCopyPasteManager::mh_RemoveCanOpenInformation(C_SdTopologyDataSnapshot & orc_Data)
+{
+   tgl_assert(orc_Data.c_OSCNodes.size() == orc_Data.c_UINodes.size());
+   if (orc_Data.c_OSCNodes.size() == orc_Data.c_UINodes.size())
+   {
+      for (uint32 u32_ItNode = 0UL; u32_ItNode < orc_Data.c_OSCNodes.size(); ++u32_ItNode)
+      {
+         C_OSCNode & rc_OSCNode = orc_Data.c_OSCNodes[u32_ItNode];
+         C_PuiSdNode & rc_UiNode = orc_Data.c_UINodes[u32_ItNode];
+
+         //CANopen
+         rc_OSCNode.c_CanOpenManagers.clear();
+
+         tgl_assert(rc_OSCNode.c_ComProtocols.size() == rc_UiNode.c_UICanProtocols.size());
+         if (rc_OSCNode.c_ComProtocols.size() == rc_UiNode.c_UICanProtocols.size())
+         {
+            for (uint32 u32_ItProt = 0UL; u32_ItProt < rc_OSCNode.c_ComProtocols.size();)
+            {
+               C_OSCCanProtocol & rc_OSCProtocol = rc_OSCNode.c_ComProtocols[u32_ItProt];
+               if (rc_OSCProtocol.e_Type == C_OSCCanProtocol::eCAN_OPEN)
+               {
+                  //DP
+                  tgl_assert(rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size());
+                  if (rc_OSCNode.c_DataPools.size() == rc_UiNode.c_UIDataPools.size())
+                  {
+                     rc_OSCNode.c_DataPools.erase(rc_OSCNode.c_DataPools.begin() + rc_OSCProtocol.u32_DataPoolIndex);
+                     rc_UiNode.c_UIDataPools.erase(rc_UiNode.c_UIDataPools.begin() + rc_OSCProtocol.u32_DataPoolIndex);
+                  }
+                  //Protocol
+                  rc_OSCNode.c_ComProtocols.erase(rc_OSCNode.c_ComProtocols.begin() + u32_ItProt);
+                  rc_UiNode.c_UICanProtocols.erase(rc_UiNode.c_UICanProtocols.begin() + u32_ItProt);
+               }
+               else
+               {
+                  ++u32_ItProt;
+               }
+            }
+         }
+      }
    }
 }

@@ -14,6 +14,7 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 
+#include "TGLUtils.h"
 #include "C_SdBueNodeSelectorCheckBoxListWidget.h"
 
 #include "ui_C_SdBueNodeSelectorCheckBoxListWidget.h"
@@ -103,6 +104,8 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
          // delete the widget
          disconnect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigNodeToggled,
                     this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
+         disconnect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigSwitchToCoManager,
+                    this, &C_SdBueNodeSelectorCheckBoxListWidget::SigSwitchToCoManager);
          delete pc_SelectorItem;
       }
 
@@ -183,33 +186,59 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32>
 void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32 ou32_Index, const uint32 ou32_SubIndex,
                                                               const bool oq_Checked) const
 {
-   sintn sn_Counter;
+   C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem = this->m_GetItemWidget(ou32_Index, ou32_SubIndex);
 
-   // check all checkboxes which have these indexes and uncheck all other checkboxes
-   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++sn_Counter)
+   tgl_assert(pc_SelectorItem != NULL);
+   if ((pc_SelectorItem != NULL) &&
+       (pc_SelectorItem->IsChecked() != oq_Checked))
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
+      pc_SelectorItem->SetChecked(oq_Checked);
+   }
+}
 
-      C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
-         dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a specific node in the checkbox list as CANopen Manager
 
-      if (pc_SelectorItem != NULL)
-      {
-         uint32 u32_Index;
-         uint32 u32_SubIndex;
+   \param[in]     ou32_Index        Index of Node
+   \param[in]     ou32_SubIndex     Subindex of Node
+   \param[in]     oq_Manager        Flag if node is a CANopen Manager
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsManager(const uint32 ou32_Index,
+                                                                     const uint32 ou32_SubIndex,
+                                                                     const bool oq_Manager) const
+{
+   C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem = this->m_GetItemWidget(ou32_Index, ou32_SubIndex);
 
-         pc_SelectorItem->GetIndexes(u32_Index, u32_SubIndex);
+   if (pc_SelectorItem != NULL)
+   {
+      pc_SelectorItem->SetNodeAsManager(oq_Manager);
+   }
+}
 
-         if ((u32_Index == ou32_Index) &&
-             (u32_SubIndex == ou32_SubIndex))
-         {
-            if (pc_SelectorItem->IsChecked() != oq_Checked)
-            {
-               pc_SelectorItem->SetChecked(oq_Checked);
-            }
-            break;
-         }
-      }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a specific node in the checkbox list as CANopen Device
+
+   \param[in]     ou32_Index              Index of Device Node
+   \param[in]     ou32_SubIndex           Subindex of Device Node
+   \param[in]     oq_Device               Flag if node is a CANopen Device
+   \param[in]     opc_DeviceId            Device Id (NULL if not a device)
+   \param[in]     ou32_ManagerNodeIndex   Index of Manager Node which the Device is assigned to (if oq_Device == true)
+   \param[in]     ou32_ManagerIntfIndex   Interface index of Manager Node which the Device is
+                                          assigned to (if oq_Device == true)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsDevice(const uint32 ou32_Index, const uint32 ou32_SubIndex,
+                                                                    const bool oq_Device,
+                                                                    const stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceId, const uint32 ou32_ManagerNodeIndex,
+                                                                    const uint32 ou32_ManagerIntfIndex)
+const
+{
+   C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem = this->m_GetItemWidget(ou32_Index, ou32_SubIndex);
+
+   if (pc_SelectorItem != NULL)
+   {
+      pc_SelectorItem->SetNodeAsDevice(oq_Device, opc_DeviceId, ou32_ManagerNodeIndex, ou32_ManagerIntfIndex);
    }
 }
 
@@ -275,6 +304,8 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, 
 
    connect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigNodeToggled,
            this, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled);
+   connect(pc_SelectorItem, &C_SdBueNodeSelectorCheckBoxItemWidget::SigSwitchToCoManager,
+           this, &C_SdBueNodeSelectorCheckBoxListWidget::SigSwitchToCoManager);
 
    this->mpc_Ui->pc_CbxVerticalLayout->addWidget(pc_SelectorItem);
 } //lint !e429  //no memory leak because of the parent of pc_SelectorItem by addWidget and the Qt memory management
@@ -291,4 +322,48 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged(const sintn 
    {
       this->mpc_Ui->pc_ScrollArea->verticalScrollBar()->show();
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets a specific node in the checkbox list
+
+   \param[in]     ou32_Index        Index of Node
+   \param[in]     ou32_SubIndex     Subindex of Node
+
+   \retval   Valid pointer   Item found
+   \retval   NULL            No item with matching parameters found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SdBueNodeSelectorCheckBoxItemWidget * C_SdBueNodeSelectorCheckBoxListWidget::m_GetItemWidget(const uint32 ou32_Index,
+                                                                                               const uint32 ou32_SubIndex)
+const
+{
+   sintn sn_Counter;
+   C_SdBueNodeSelectorCheckBoxItemWidget * pc_Return = NULL;
+
+   // check all checkboxes which have these indexes and uncheck all other checkboxes
+   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++sn_Counter)
+   {
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
+
+      C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
+         dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
+
+      if (pc_SelectorItem != NULL)
+      {
+         uint32 u32_Index;
+         uint32 u32_SubIndex;
+
+         pc_SelectorItem->GetIndexes(u32_Index, u32_SubIndex);
+
+         if ((u32_Index == ou32_Index) &&
+             (u32_SubIndex == ou32_SubIndex))
+         {
+            pc_Return = pc_SelectorItem;
+            break;
+         }
+      }
+   }
+
+   return pc_Return;
 }

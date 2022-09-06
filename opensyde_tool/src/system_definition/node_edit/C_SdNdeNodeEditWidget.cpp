@@ -84,11 +84,6 @@ C_SdNdeNodeEditWidget::C_SdNdeNodeEditWidget(const uint32 ou32_NodeIndex, const 
 
    // show the initial tab
    this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(osn_TabIndex);
-   //lint -e{506,774,948} Temporrary handling of non visible feature
-   if (mq_ENABLE_CAN_OPEN_FEATURE == false)
-   {
-      this->mpc_Ui->pc_TabWidgetPageNavi->setTabVisible(hsn_TAB_INDEX_CO_MANAGER, false);
-   }
    m_CurrentTabChanged(osn_TabIndex);
 }
 
@@ -171,6 +166,36 @@ void C_SdNdeNodeEditWidget::SetFlag(const uint32 ou32_Flag) const
             this->mpc_PropertiesWidget->SelectName();
          }
       }
+   }
+   else if ((ou32_Flag & mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER) ==
+            mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER)
+   {
+      // open the CANopen Manager with navigation to one of its manager interface configurations
+      // Special case: the interface number of the manager to navigate to in the tree of the manager is part of the flag
+      const uint8 u8_InterfaceNumber = static_cast<uint8>(ou32_Flag & (~mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER));
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_CO_MANAGER);
+      tgl_assert(this->mpc_CoManagerWidget != NULL);
+      if (this->mpc_CoManagerWidget != NULL)
+      {
+         this->mpc_CoManagerWidget->OpenManagerConfiguration(u8_InterfaceNumber);
+      }
+   }
+   else if ((ou32_Flag & mu32_FLAG_OPEN_SYSDEF_DEVICENODE_IN_CANOPENMANAGER) ==
+            mu32_FLAG_OPEN_SYSDEF_DEVICENODE_IN_CANOPENMANAGER)
+   {
+      // open the CANopen Manager with navigation to one of its device configurations
+      // Special case: the node id of the device to navigate to in the tree of the manager is part of the flag
+      const uint32 u32_DeviceNodeIndex = ou32_Flag & (~mu32_FLAG_OPEN_SYSDEF_DEVICENODE_IN_CANOPENMANAGER);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_CO_MANAGER);
+      tgl_assert(this->mpc_CoManagerWidget != NULL);
+      if (this->mpc_CoManagerWidget != NULL)
+      {
+         this->mpc_CoManagerWidget->OpenDeviceConfiguration(u32_DeviceNodeIndex);
+      }
+   }
+   else
+   {
+      // Nothing to do
    }
 }
 
@@ -306,7 +331,7 @@ sintn C_SdNdeNodeEditWidget::GetTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodeEditWidget::showEvent(QShowEvent * const opc_Event)
 {
-   this->mq_SkipLoadUserSettings = true;
+   this->mq_SkipLoadUserSettings = false;
    this->m_LoadUserSettings();
    QWidget::showEvent(opc_Event);
 }
@@ -335,23 +360,8 @@ void C_SdNdeNodeEditWidget::m_LoadUserSettings() const
    {
       this->mpc_PropertiesWidget->LoadUserSettings();
    }
-   //lint -e{506,774,948} Temporrary handling of non visible feature
-   if (mq_ENABLE_CAN_OPEN_FEATURE == false)
-   {
-      if (this->mpc_Ui->pc_TabWidgetPageNavi->isTabVisible(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex()))
-      {
-         this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(
-            C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
-      }
-      else
-      {
-         this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(0);
-      }
-   }
-   else
-   {
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
-   }
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex());
+
    if (this->mpc_HalWidget != NULL)
    {
       this->mpc_HalWidget->LoadUserSettings();
@@ -433,6 +443,15 @@ void C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages(const uint32 ou32_DataPoolI
    {
       this->mpc_ComIfDescriptionWidget->SetProtocolByDataPool(ou32_DataPoolIndex);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open the CANopen Manager tab
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_OnSwitchToCanOpenManager(void)
+{
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_CO_MANAGER);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -567,6 +586,18 @@ void C_SdNdeNodeEditWidget::m_ReloadDataPools(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Trigger reload of CANopen Manager tab
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeNodeEditWidget::m_ReloadCanOpenConfig(void) const
+{
+   if (this->mpc_CoManagerWidget != NULL)
+   {
+      this->mpc_CoManagerWidget->Refresh();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Trigger entire reload of COMM messages
 
    Necessary if Datapool order or existence has changed
@@ -639,6 +670,8 @@ void C_SdNdeNodeEditWidget::m_CreatePropertiesTab(const bool oq_AdaptCursor)
               this, &C_SdNdeNodeEditWidget::SigNameChanged);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigBusBitrateClicked,
               this, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties);
+      connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigNodePropChanged, this,
+              &C_SdNdeNodeEditWidget::m_ReloadCanOpenConfig);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange, this,
               &C_SdNdeNodeEditWidget::SigErrorChange);
       connect(this->mpc_PropertiesWidget, &C_SdNdeNodePropertiesTabContentWidget::SigOwnedDataPoolsChanged, this,
@@ -682,6 +715,8 @@ void C_SdNdeNodeEditWidget::m_CreateDpTab(const bool oq_AdaptCursor)
               this, &C_SdNdeNodeEditWidget::m_ReloadCommMessages);
       connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToHalc,
               this, &C_SdNdeNodeEditWidget::m_OnSwitchToHalc);
+      connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToCanOpen,
+              this, &C_SdNdeNodeEditWidget::m_OnSwitchToCanOpenManager);
       connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSwitchToCommMessages,
               this, &C_SdNdeNodeEditWidget::m_OnSwitchToCommMessages);
       connect(this->mpc_DataPoolEditWidget, &C_SdNdeDpEditWidget::SigSave,
@@ -728,10 +763,8 @@ void C_SdNdeNodeEditWidget::m_CreateCommTab(const bool oq_AdaptCursor)
               &C_SdNdeNodeEditWidget::m_ReloadDataPools);
 
       this->mpc_Ui->pc_TabCommMessagesLayout->addWidget(this->mpc_ComIfDescriptionWidget);
-      if (this->mq_SkipLoadUserSettings == false)
-      {
-         this->mpc_ComIfDescriptionWidget->LoadUserSettings();
-      }
+      // Not loading the user settings here due to loading it in the showEvent of mpc_ComIfDescriptionWidget itself
+      // Problems were occured when loading the user settings for this widget two times
       if (oq_AdaptCursor)
       {
          C_SdNdeNodeEditWidget::mh_EndWaitingCursor();
@@ -774,7 +807,7 @@ void C_SdNdeNodeEditWidget::m_CreateHalTab(const bool oq_AdaptCursor)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Create hal tab content
+/*! \brief  Create CANopen manager tab content
 
    \param[in]  oq_AdaptCursor    Adapt cursor
 */
@@ -794,6 +827,12 @@ void C_SdNdeNodeEditWidget::m_CreateCoManagerTab(const bool oq_AdaptCursor)
               &C_SdNdeNodeEditWidget::SigErrorChange);
       connect(mpc_CoManagerWidget, &C_SdNdeCoWidget::SigCommDatapoolsChanged, this,
               &C_SdNdeNodeEditWidget::m_ReloadCommDatapools);
+      connect(this->mpc_CoManagerWidget, &C_SdNdeCoWidget::SigSwitchToDeviceNodeInCoManager,
+              this, &C_SdNdeNodeEditWidget::SigSwitchToDeviceNodeInCoManager);
+      connect(this->mpc_CoManagerWidget, &C_SdNdeCoWidget::SigSwitchToBusProtocol, this,
+              &C_SdNdeNodeEditWidget::SigSwitchToBusProtocol);
+      connect(this->mpc_CoManagerWidget, &C_SdNdeCoWidget::SigSwitchToBusProtocolMessage, this,
+              &C_SdNdeNodeEditWidget::SigSwitchToBusProtocolMessage);
 
       this->mpc_Ui->pc_TabCoManagerLayout->addWidget(this->mpc_CoManagerWidget);
       if (this->mq_SkipLoadUserSettings == false)

@@ -213,6 +213,26 @@ void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentific
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Partial select signal
+
+   For avoiding problems with event handling of some spin boxes, the signal properties widget should not be
+   reloaded when not necessary.
+   Only refreshing the MLV and the PDO disabled info
+
+   \param[in]  orc_MessageId        Message identification indices
+   \param[in]  oru32_SignalIndex    Signal index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSignalEditWidget::PartialSelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                                                         const uint32 & oru32_SignalIndex) const
+{
+   this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
+   this->m_HandleDisabledPdoInfo(orc_MessageId);
+   // In case of a changed DLC, check the message position again
+   this->mpc_Ui->pc_SigPropertiesWidget->RecheckMessagePosition();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Hide
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -367,7 +387,7 @@ void C_SdBueMessageSignalEditWidget::RefreshSelection(void)
 
    if (q_SignalSelected == true)
    {
-      this->SelectSignal(c_MessageId, u32_SignalIndex);
+      this->PartialSelectSignal(c_MessageId, u32_SignalIndex);
    }
    else if (q_MessageSelected == true)
    {

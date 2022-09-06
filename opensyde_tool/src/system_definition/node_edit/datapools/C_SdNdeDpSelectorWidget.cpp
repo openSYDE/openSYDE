@@ -106,6 +106,8 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
            this, &C_SdNdeDpSelectorWidget::m_ButtonRightClicked);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigListChanged,
            this, &C_SdNdeDpSelectorWidget::m_UpdateWidget);
+   connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigUpdateFollowingLists,
+           this, &C_SdNdeDpSelectorWidget::SigUpdateFollowingLists);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigWidgetFocused,
            this, &C_SdNdeDpSelectorWidget::m_ListFocused);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigOpenDataPoolContent,
@@ -293,6 +295,15 @@ void C_SdNdeDpSelectorWidget::SetCurrentDataPoolConflict(const sintn osn_DataPoo
       // nothing to paint
       this->mpc_LabelStateImg->setVisible(false);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Reload all Datapools
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpSelectorWidget::ReloadDataPools(void) const
+{
+   this->mpc_Ui->pc_ListWidget->ReloadDataPools();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

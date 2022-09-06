@@ -27,6 +27,7 @@ using namespace stw_types;
 using namespace stw_errors;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
+using namespace stw_opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const stw_types::sintn C_SdBueBusEditWidget::hsn_TAB_INDEX_PROPERTIES = 0;
@@ -130,7 +131,8 @@ sintn C_SdBueBusEditWidget::GetTabIndex(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditWidget::ImportMessages(void)
 {
-   m_CreateCommTab(true);
+   // Change to COMM tab
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
    tgl_assert(this->mpc_WidgetComIfDescr != NULL);
    if (this->mpc_WidgetComIfDescr != NULL)
    {
@@ -202,6 +204,20 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
    {
       // open the COM interface description
       this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+   }
+   else if ((ou32_Flag & mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL) ==
+            mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL)
+   {
+      // open the COM interface description with a specific protocol
+      // Special case: the protocol type to navigate to in the tabs of the COMM messages is part of the flag
+      const C_OSCCanProtocol::E_Type e_ProtocolType =
+         static_cast<C_OSCCanProtocol::E_Type>(ou32_Flag & (~mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL));
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+      tgl_assert(this->mpc_WidgetComIfDescr != NULL);
+      if (this->mpc_WidgetComIfDescr != NULL)
+      {
+         this->mpc_WidgetComIfDescr->SetProtocol(e_ProtocolType);
+      }
    }
    else
    {
@@ -384,6 +400,8 @@ void C_SdBueBusEditWidget::m_CreateCommTab(const bool oq_AdaptCursor)
               this, &C_SdBueBusEditWidget::m_DataChanged);
       connect(this->mpc_WidgetComIfDescr, &C_SdBueComIfDescriptionWidget::SigErrorChange,
               this, &C_SdBueBusEditWidget::SigErrorChange);
+      connect(this->mpc_WidgetComIfDescr, &C_SdBueComIfDescriptionWidget::SigSwitchToCoManager,
+              this, &C_SdBueBusEditWidget::SigSwitchToCoManager);
 
       this->mpc_Ui->pc_TabCommMessagesLayout->addWidget(this->mpc_WidgetComIfDescr);
       if (this->mq_SkipLoadUserSettings == false)

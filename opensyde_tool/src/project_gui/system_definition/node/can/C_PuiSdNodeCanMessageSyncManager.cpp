@@ -191,6 +191,7 @@ uint32 C_PuiSdNodeCanMessageSyncManager::GetUniqueMessageCount(const C_OSCCanPro
                                                                stw_types::uint32 * const opu32_SignalCount) const
 {
    uint32 u32_Count = 0U;
+   const bool oq_CanOpenActive = (oe_ComProtocol == C_OSCCanProtocol::eCAN_OPEN);
 
    const std::vector<std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> > * pc_UniqueMessages;
 
@@ -215,11 +216,12 @@ uint32 C_PuiSdNodeCanMessageSyncManager::GetUniqueMessageCount(const C_OSCCanPro
 
    if (opu32_SignalCount == NULL)
    {
-      u32_Count = mh_GetUniqueMessages(*pc_UniqueMessages).size();
+      u32_Count = mh_GetUniqueMessages(*pc_UniqueMessages, oq_CanOpenActive).size();
    }
    else
    {
-      std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMsgIds = mh_GetUniqueMessages(*pc_UniqueMessages);
+      std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMsgIds = mh_GetUniqueMessages(*pc_UniqueMessages,
+                                                                                              oq_CanOpenActive);
       uint32 u32_MsgCounter;
 
       // Message count
@@ -1227,6 +1229,9 @@ const
    \param[out]  opq_MessageSignalInvalid              An error type, found for a bus
    \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
    \param[in]   oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
+   \param[in]   oq_ByteAlignmentRequired              Flag if byte alignment is required and if the signal does not
+                                                      fit into byte alignment it will be handled as error
+   \param[in]   oq_SignalsRequired                    Flag if signals are required for a message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNameInvalid,
@@ -1235,7 +1240,9 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
                                                      bool * const opq_DelayTimeInvalid,
                                                      bool * const opq_MessageSignalInvalid,
                                                      const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
-                                                     const bool oq_CANMessageSignalGapsValid) const
+                                                     const bool oq_CANMessageSignalGapsValid,
+                                                     const bool oq_ByteAlignmentRequired,
+                                                     const bool oq_SignalsRequired) const
 {
    std::vector<C_OSCCanMessageIdentificationIndices> c_UniqueMessageIds;
 
@@ -1295,9 +1302,19 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
          }
       }
    }
-   if (opq_DelayTimeInvalid != NULL)
+   if ((opq_DelayTimeInvalid != NULL) ||
+       (opq_MessageSignalInvalid != NULL))
    {
-      *opq_DelayTimeInvalid = false;
+      if (opq_DelayTimeInvalid != NULL)
+      {
+         *opq_DelayTimeInvalid = false;
+      }
+      if (opq_MessageSignalInvalid != NULL)
+      {
+         *opq_MessageSignalInvalid = false;
+      }
+
+      // This part is relevant for opq_DelayTimeInvalid and opq_MessageSignalInvalid
       for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size(); ++u32_ItUniqueMessageId)
       {
          const C_OSCCanMessageIdentificationIndices & rc_MessageId = c_UniqueMessageIds[u32_ItUniqueMessageId];
@@ -1309,37 +1326,49 @@ void C_PuiSdNodeCanMessageSyncManager::CheckErrorBus(bool * const opq_MessageNam
          if (pc_MessageContainer != NULL)
          {
             bool q_DelayTimeInvalid;
-            //Don't use opq_DelayTimeInvalid directly as this might then reset a previous error
+            bool q_NoSignalsInvalid;
+            //Don't use opq_DelayTimeInvalid or opq_MessageSignalInvalid directly as this might then reset a previous
+            // error
             pc_MessageContainer->CheckMessageLocalError(NULL, rc_MessageId.u32_MessageIndex, rc_MessageId.q_MessageIsTx,
                                                         NULL, NULL, &q_DelayTimeInvalid, NULL, NULL, NULL,
+                                                        &q_NoSignalsInvalid,
                                                         ou32_CANMessageValidSignalsDLCOffset,
-                                                        oq_CANMessageSignalGapsValid);
-            if (q_DelayTimeInvalid == true)
+                                                        oq_CANMessageSignalGapsValid, oq_ByteAlignmentRequired,
+                                                        oq_SignalsRequired);
+            if ((opq_DelayTimeInvalid != NULL) &&
+                (q_DelayTimeInvalid == true))
             {
                *opq_DelayTimeInvalid = true;
             }
+            if ((opq_MessageSignalInvalid != NULL) &&
+                (q_NoSignalsInvalid == true))
+            {
+               *opq_MessageSignalInvalid = true;
+            }
          }
       }
-   }
-   if (opq_MessageSignalInvalid != NULL)
-   {
-      *opq_MessageSignalInvalid = false;
-      for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size(); ++u32_ItUniqueMessageId)
+
+      if (opq_MessageSignalInvalid != NULL)
       {
-         const C_OSCCanMessageIdentificationIndices & rc_MessageId = c_UniqueMessageIds[u32_ItUniqueMessageId];
-         const C_OSCCanMessage * const pc_Message =
-            C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MessageId);
-         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
-            rc_MessageId.u32_NodeIndex, rc_MessageId.e_ComProtocol, rc_MessageId.u32_InterfaceIndex,
-            rc_MessageId.u32_DatapoolIndex, rc_MessageId.q_MessageIsTx);
-         if ((pc_Message != NULL) && (pc_List != NULL))
+         // This part is only relevant for opq_MessageSignalInvalid
+         for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size();
+              ++u32_ItUniqueMessageId)
          {
-            for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
+            const C_OSCCanMessageIdentificationIndices & rc_MessageId = c_UniqueMessageIds[u32_ItUniqueMessageId];
+            const C_OSCCanMessage * const pc_Message =
+               C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_MessageId);
+            const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+               rc_MessageId.u32_NodeIndex, rc_MessageId.e_ComProtocol, rc_MessageId.u32_InterfaceIndex,
+               rc_MessageId.u32_DatapoolIndex, rc_MessageId.q_MessageIsTx);
+            if ((pc_Message != NULL) && (pc_List != NULL))
             {
-               if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset,
-                                                oq_CANMessageSignalGapsValid))
+               for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                {
-                  *opq_MessageSignalInvalid = true;
+                  if (pc_Message->CheckErrorSignal(pc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset,
+                                                   oq_CANMessageSignalGapsValid, oq_ByteAlignmentRequired))
+                  {
+                     *opq_MessageSignalInvalid = true;
+                  }
                }
             }
          }
@@ -1369,6 +1398,7 @@ const
       this->m_GetAllUniqueMessages();
    bool q_TestSkip = false;
    bool q_Found = false;
+   bool q_MessageActive = true;
    uint32 u32_SkipIndex = 0;
 
    orq_Valid = true;
@@ -1382,62 +1412,87 @@ const
    }
    if (opc_SkipMessage != NULL)
    {
-      u32_SkipIndex = this->m_GetMatchingMessageVectorIndex(*opc_SkipMessage);
-      q_TestSkip = true;
-      //Check ECoS
-      if (opc_SkipMessage->e_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
+      if (opc_SkipMessage->e_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
       {
-         if ((orc_MessageId.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
-             (orc_MessageId.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
+         const C_OSCCanMessage * const pc_SkipMessage =
+            C_PuiSdHandler::h_GetInstance()->GetCanMessage(*opc_SkipMessage);
+
+         if (pc_SkipMessage != NULL)
          {
-            orq_Valid = false;
-            if (opq_EcosRangeError != NULL)
-            {
-               *opq_EcosRangeError = true;
-            }
+            // Special case CANopen: Message can be deactivated. In this scenario, this message is not relevant
+            // for further CAN-ID checks
+            q_MessageActive = pc_SkipMessage->q_CanOpenManagerMessageActive;
          }
-         if ((orc_MessageId.u32_CanId % 2) == 0)
+      }
+
+      if (q_MessageActive == true)
+      {
+         u32_SkipIndex = this->m_GetMatchingMessageVectorIndex(*opc_SkipMessage);
+         q_TestSkip = true;
+
+         //Check ECoS
+         if (opc_SkipMessage->e_ComProtocol == C_OSCCanProtocol::eCAN_OPEN_SAFETY)
          {
-            orq_Valid = false;
-            if (opq_EcosEvenError != NULL)
+            if ((orc_MessageId.u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN) ||
+                (orc_MessageId.u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX))
             {
-               *opq_EcosEvenError = true;
+               orq_Valid = false;
+               if (opq_EcosRangeError != NULL)
+               {
+                  *opq_EcosRangeError = true;
+               }
+            }
+            if ((orc_MessageId.u32_CanId % 2) == 0)
+            {
+               orq_Valid = false;
+               if (opq_EcosEvenError != NULL)
+               {
+                  *opq_EcosEvenError = true;
+               }
             }
          }
       }
    }
 
-   for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size(); ++u32_ItUniqueMessageId)
+   // Check is only relevant if the message is active
+   if (q_MessageActive == true)
    {
-      bool q_Skip = false;
-      //Check which index to skip
-      if (q_TestSkip == true)
+      for (uint32 u32_ItUniqueMessageId = 0; u32_ItUniqueMessageId < c_UniqueMessageIds.size(); ++u32_ItUniqueMessageId)
       {
-         if (u32_SkipIndex == u32_ItUniqueMessageId)
+         bool q_Skip = false;
+         //Check which index to skip
+         if (q_TestSkip == true)
          {
-            q_Skip = true;
-         }
-      }
-      if (q_Skip == false)
-      {
-         //Compare
-         const C_OSCCanMessage * const pc_CurrentMessage =
-            C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_UniqueMessageIds[u32_ItUniqueMessageId]);
-         if (pc_CurrentMessage != NULL)
-         {
-            if ((pc_CurrentMessage->u32_CanId == orc_MessageId.u32_CanId) &&
-                (pc_CurrentMessage->q_IsExtended == orc_MessageId.q_IsExtended))
+            if (u32_SkipIndex == u32_ItUniqueMessageId)
             {
-               q_Found = true;
-               break;
+               q_Skip = true;
+            }
+         }
+         if (q_Skip == false)
+         {
+            //Compare
+            const C_OSCCanMessage * const pc_CurrentMessage =
+               C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_UniqueMessageIds[u32_ItUniqueMessageId]);
+            if (pc_CurrentMessage != NULL)
+            {
+               // Check if the compared message is a CANopen message and deactivated too
+               if (((c_UniqueMessageIds[u32_ItUniqueMessageId].e_ComProtocol != C_OSCCanProtocol::eCAN_OPEN) ||
+                    (pc_CurrentMessage->q_CanOpenManagerMessageActive == true)) &&
+                   (pc_CurrentMessage->u32_CanId == orc_MessageId.u32_CanId) &&
+                   (pc_CurrentMessage->q_IsExtended == orc_MessageId.q_IsExtended))
+               {
+                  q_Found = true;
+                  break;
+               }
             }
          }
       }
+      if (q_Found == true)
+      {
+         orq_Valid = false;
+      }
    }
-   if (q_Found == true)
-   {
-      orq_Valid = false;
-   }
+
    if (opq_DuplicateDetected != NULL)
    {
       *opq_DuplicateDetected = q_Found;
@@ -2533,14 +2588,16 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get vector of different, unique message ids
 
-   \param[in]  orc_Input   Message vector to check
+   \param[in]  orc_Input                      Message vector to check
+   \param[in]  oq_CheckForMessageActiveFlag   Flag to check the message if it is active before returning
 
    \return
    Different, unique message ids
 */
 //----------------------------------------------------------------------------------------------------------------------
 std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManager::mh_GetUniqueMessages(
-   const std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > & orc_Input)
+   const std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > & orc_Input,
+   const bool oq_CheckForMessageActiveFlag)
 {
    std::vector<C_OSCCanMessageIdentificationIndices> c_Retval;
    c_Retval.reserve(orc_Input.size());
@@ -2551,7 +2608,20 @@ std::vector<C_OSCCanMessageIdentificationIndices> C_PuiSdNodeCanMessageSyncManag
          orc_Input[u32_ItDifferentMessage];
       if (orc_MatchingMessageIds.size() > 0)
       {
-         c_Retval.push_back(orc_MatchingMessageIds[0]);
+         if (oq_CheckForMessageActiveFlag == false)
+         {
+            c_Retval.push_back(orc_MatchingMessageIds[0]);
+         }
+         else
+         {
+            const C_OSCCanMessage * const pc_Message =
+               C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MatchingMessageIds[0]);
+
+            if ((pc_Message != NULL) && (pc_Message->q_CanOpenManagerMessageActive == true))
+            {
+               c_Retval.push_back(orc_MatchingMessageIds[0]);
+            }
+         }
       }
    }
    return c_Retval;

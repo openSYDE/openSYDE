@@ -76,8 +76,7 @@ C_SdNdeCoOverviewWidget::~C_SdNdeCoOverviewWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewWidget::LoadUserSettings() const
 {
-   // todo
-   std::cout << "Implementation will be done in R22" << std::endl;
+   this->mpc_Ui->pc_TableView->LoadUserSettings();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,8 +85,7 @@ void C_SdNdeCoOverviewWidget::LoadUserSettings() const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewWidget::SaveUserSettings() const
 {
-   // todo
-   std::cout << "Implementation will be done in R22" << std::endl;
+   this->mpc_Ui->pc_TableView->SaveUserSettings();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,7 +116,7 @@ void C_SdNdeCoOverviewWidget::UpdateData(void)
 void C_SdNdeCoOverviewWidget::SetNodeIndex(const uint32 ou32_NodeIndex)
 {
    this->mpc_Ui->pc_TableView->SetNodeIndex(ou32_NodeIndex);
-   this->m_UpdateUi();
+   this->UpdateData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -13,6 +13,8 @@
 #include "precomp_headers.h"
 
 #include <QScrollBar>
+
+#include "stwerrors.h"
 #include "TGLUtils.h"
 #include "C_OgeWiUtil.h"
 #include "C_PuiSvHandler.h"
@@ -21,8 +23,9 @@
 #include "C_SyvDaPeUpdateModeTreeWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
 using namespace stw_types;
+using namespace stw_errors;
+using namespace stw_tgl;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_gui_logic;
 using namespace stw_opensyde_core;
@@ -65,6 +68,7 @@ C_SyvDaPeUpdateModeTreeWidget::C_SyvDaPeUpdateModeTreeWidget(QWidget * const opc
    this->setHeaderHidden(true);
    this->setAcceptDrops(false);
    this->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+   this->setAutoScroll(false);
 
    // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -104,14 +108,17 @@ C_SyvDaPeUpdateModeTreeWidget::~C_SyvDaPeUpdateModeTreeWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeUpdateModeTreeWidget::Init(const uint32 ou32_ViewIndex)
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
 
    m_Clear();
-   if (pc_View != NULL)
+   if (s32_Retval == C_NO_ERR)
    {
       //Step 1: Initialize all necessary models
-      this->mc_Models.reserve(pc_View->GetNodeActiveFlags().size());
-      for (uint32 u32_ItNode = 0; u32_ItNode < pc_View->GetNodeActiveFlags().size(); ++u32_ItNode)
+      this->mc_Models.reserve(c_NodeActiveFlags.size());
+      for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
       {
          C_SyvDaPeUpdateModeTableModel * const pc_Tmp = new C_SyvDaPeUpdateModeTableModel(ou32_ViewIndex, u32_ItNode);
          //Only store if relevant
@@ -198,6 +205,7 @@ void C_SyvDaPeUpdateModeTreeWidget::Select(const C_PuiSvDbNodeDataPoolListElemen
                   if (pc_TopLevelItem != NULL)
                   {
                      QTreeWidgetItem * const pc_ViewItem = pc_TopLevelItem->child(0);
+
                      if (pc_ViewItem != NULL)
                      {
                         C_SyvDaPeUpdateModeTableView * const pc_Table =
@@ -213,8 +221,30 @@ void C_SyvDaPeUpdateModeTreeWidget::Select(const C_PuiSvDbNodeDataPoolListElemen
                               {
                                  if (orc_Id == *pc_CurElementId)
                                  {
+                                    const QModelIndex c_TopLevelIndex = this->model()->index(u32_It, 0);
                                     //Match row
                                     pc_Table->selectRow(s32_ItRow);
+
+                                    // Manual scrolling on the top level layer necessary
+                                    this->scrollTo(c_TopLevelIndex);
+
+                                    if (u32_It == static_cast<uint32>(this->mc_Models.size() - 1))
+                                    {
+                                       // Last table view. It has no own scroll bar.
+                                       // The main scroll bar must handle this. The problem: The normal scroll functions
+                                       // does not work here. The position must be set manually
+                                       QScrollBar * const pc_ScrollBar = this->verticalScrollBar();
+                                       if (pc_ScrollBar != NULL)
+                                       {
+                                          const sintn sn_SliderPos = pc_ScrollBar->sliderPosition();
+                                          const sintn sn_SliderMax = pc_ScrollBar->maximum();
+                                          const sintn sn_ItemRelPos = (s32_ItRow * 100) / pc_Model->rowCount();
+                                          const sintn sn_SliderOffset =
+                                             ((sn_SliderMax - sn_SliderPos) * sn_ItemRelPos) / 100;
+                                          pc_ScrollBar->setSliderPosition(sn_SliderPos + sn_SliderOffset);
+                                       }
+                                    }
+                                    break;
                                  }
                               }
                            }

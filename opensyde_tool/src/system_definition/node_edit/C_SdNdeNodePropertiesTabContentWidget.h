@@ -54,6 +54,7 @@ Q_SIGNALS:
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
                        const bool oq_CombineItemAndSubSubName);
    void SigBusBitrateClicked(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
+   void SigNodePropChanged(void);
 
 private:
    Ui::C_SdNdeNodePropertiesTabContentWidget * mpc_Ui;

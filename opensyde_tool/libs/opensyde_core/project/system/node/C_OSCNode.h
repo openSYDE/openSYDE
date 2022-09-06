@@ -116,6 +116,13 @@ public:
    std::vector<C_OSCCanProtocol *> GetCANProtocols(const C_OSCCanProtocol::E_Type oe_ComProtocol);
    const C_OSCCanProtocol * GetRelatedCANProtocolConst(const stw_types::uint32 ou32_DataPoolIndex) const;
    C_OSCCanProtocol * GetRelatedCANProtocol(const stw_types::uint32 ou32_DataPoolIndex);
+   void CheckErrorCANProtocol(const C_OSCCanProtocol::E_Type oe_ComProtocol, const bool oq_ComProtocolUsedByInterface,
+                              bool & orq_InvalidRxSignalCount, bool & orq_InvalidTxSignalCount,
+                              bool & orq_InvalidCoRPDOCount, bool & orq_InvalidCoTPDOCount) const;
+   void CheckErrorCANProtocol(const stw_types::uint32 ou32_InterfaceIndex,
+                              const C_OSCCanProtocol::E_Type oe_ComProtocol, const bool oq_ComProtocolUsedByInterface,
+                              bool & orq_InvalidRxSignalCount, bool & orq_InvalidTxSignalCount,
+                              bool & orq_InvalidCoRPDOCount, bool & orq_InvalidCoTPDOCount) const;
 
    void CheckErrorDataPoolNumListsAndElements(const stw_types::uint32 ou32_DataPoolIndex,
                                               bool & orq_InvalidNumberOfListsOrElements) const;
@@ -162,7 +169,7 @@ public:
    std::vector<C_OSCCanProtocol> c_ComProtocols;     ///< All node specific information
    ///< for related communication protocol.
    ///< Created if necessary.
-   ///< Maximum size equal to number of com protocols.
+   ///< Maximum size equal to number of possible com protocol types.
    C_OSCHalcConfig c_HALCConfig;                                          ///< Optional HALC configuration for this node
    std::map<stw_types::uint8, C_OSCCanOpenManagerInfo> c_CanOpenManagers; ///< CANopen managers grouped by their
    ///< according CAN interface ID
@@ -171,6 +178,9 @@ public:
    static const stw_types::uint32 hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE = 32U;
    static const stw_types::uint32 hu32_MAX_NUMBER_OF_LISTS_PER_DATA_POOL = 128U;
    static const stw_types::uint32 hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST   = 2048U;
+
+   //constraints imposed by CANopen protocol:
+   static const stw_types::uint32 hu32_MAX_NUMBER_OF_ACTIVE_PDO_PER_DIRECTION   = 512U;
 
 private:
    void m_GetAllMessages(const stw_types::uint32 ou32_InterfaceIndex,
@@ -190,6 +200,9 @@ private:
                                    const stw_types::uint32 ou32_ListIndex) const;
    stw_types::uint32 m_GetContainerHash(const stw_types::uint32 ou32_DataPoolIndex,
                                         const stw_types::uint32 ou32_ContainerIndex) const;
+   static void mh_CheckErrorCANProtocolDirection(const std::vector<C_OSCCanMessage> & orc_Messages,
+                                                 const C_OSCCanProtocol::E_Type oe_ComProtocol,
+                                                 bool & orq_InvalidSignalCount, bool & orq_InvalidCoPDOCount);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

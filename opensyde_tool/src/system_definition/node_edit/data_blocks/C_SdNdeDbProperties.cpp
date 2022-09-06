@@ -76,6 +76,8 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    me_Type(C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION),
    mrc_ParentDialog(orc_Parent)
 {
+   QStringList c_CodeGeneratorSupportedFiles;
+
    this->mpc_Ui->setupUi(this);
 
    //Configure
@@ -116,6 +118,17 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    this->mpc_Ui->pc_LabelSafeFileValue->setText("");
    this->mpc_Ui->pc_LabelNonSafeFile->setText("");
    this->mpc_Ui->pc_LabelNonSafeFileValue->setText("");
+
+   // Activate drag and drop for path/file line edits
+   this->mpc_Ui->pc_LineEditProject->SetDragAndDropActiveForFolder(true);
+   this->mpc_Ui->pc_LineEditOutputFile->SetDragAndDropActiveForFile("hex");
+
+   c_CodeGeneratorSupportedFiles.push_back("exe");
+   c_CodeGeneratorSupportedFiles.push_back("bat");
+   this->mpc_Ui->pc_LineEditCodeGenerator->SetDragAndDropActiveForFile(true, &c_CodeGeneratorSupportedFiles);
+
+   this->mpc_Ui->pc_LineEditCodeGenerate->SetDragAndDropActiveForFolder(true);
+   this->mpc_Ui->pc_LineEditFileGenerate->SetDragAndDropActiveForFolder(true);
 
    // Init non empty names
    InitStaticNames();
@@ -175,6 +188,18 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
            this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToProject);
    connect(this->mpc_Ui->pc_LineEditFileGenerate, &C_OgeLeFilePath::editingFinished,
            this, &C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir);
+
+   // connect for drag and drop path handling
+   connect(this->mpc_Ui->pc_LineEditProject, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SdNdeDbProperties::m_OnDroppedProject);
+   connect(this->mpc_Ui->pc_LineEditOutputFile, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SdNdeDbProperties::m_OnDroppedOutput);
+   connect(this->mpc_Ui->pc_LineEditCodeGenerator, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SdNdeDbProperties::m_OnDroppedGenerator);
+   connect(this->mpc_Ui->pc_LineEditCodeGenerate, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SdNdeDbProperties::m_OnDroppedCodeGeneration);
+   connect(this->mpc_Ui->pc_LineEditFileGenerate, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SdNdeDbProperties::m_OnDroppedFileGeneration);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1270,22 +1295,32 @@ void C_SdNdeDbProperties::m_OnClickProject(void)
    const QString c_FolderName =
       this->m_GetDialogPath(C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath()));
 
-   QString c_Path =
+   const QString c_Path =
       QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Target Project Location"),
                                         c_FolderName, QFileDialog::ShowDirsOnly);
 
-   if (c_Path != "")
+   this->m_AskUserToSaveRelativePath(c_Path,
+                                     C_PuiProject::h_GetInstance()->GetFolderPath(), this->mpc_Ui->pc_LineEditProject);
+
+   if (this->mpc_Ui->pc_LineEditProject->GetPath() != "")
    {
-      // check if relative path is possible and appreciated
-      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+      // update tooltips of line edits with paths relative to project
+      this->m_UpdatePathsRelativeToProject();
+   }
+}
 
-      if (c_Path != "")
-      {
-         this->mpc_Ui->pc_LineEditProject->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
-
-         // update tooltips of line edits with paths relative to project
-         this->m_UpdatePathsRelativeToProject();
-      }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped url on "Project Path" section
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnDroppedProject(void)
+{
+   this->m_AskUserToSaveRelativePath(this->mpc_Ui->pc_LineEditProject->GetPath(),
+                                     C_PuiProject::h_GetInstance()->GetFolderPath(), this->mpc_Ui->pc_LineEditProject);
+   if (this->mpc_Ui->pc_LineEditProject->GetPath() != "")
+   {
+      // update tooltips of line edits with paths relative to project
+      this->m_UpdatePathsRelativeToProject();
    }
 }
 
@@ -1311,14 +1346,23 @@ void C_SdNdeDbProperties::m_OnClickOutput(void)
    {
       QString c_FilePath;
       c_FilePath = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
-      // check if relative path is possible and appreciated
-      c_FilePath = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_FilePath, c_ProjectPath);
 
-      if (c_FilePath != "")
-      {
-         this->mpc_Ui->pc_LineEditOutputFile->SetPath(c_FilePath, c_ProjectPath);
-      }
+      // check if relative path is possible and appreciated
+      this->m_AskUserToSaveRelativePath(c_FilePath, c_ProjectPath, this->mpc_Ui->pc_LineEditOutputFile);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped url on "Output File" section
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnDroppedOutput(void)
+{
+   const QString c_ProjectPath =
+      C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
+
+   this->m_AskUserToSaveRelativePath(this->mpc_Ui->pc_LineEditOutputFile->GetPath(),
+                                     c_ProjectPath, this->mpc_Ui->pc_LineEditOutputFile);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1336,19 +1380,20 @@ void C_SdNdeDbProperties::m_OnClickGenerator(void)
    const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Executable (*.exe *.bat);;Others (*.*)"));
 
    // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
-   QString c_FilePath = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select Generator"),
-                                                     c_FolderName, c_FilterName, NULL);
+   const QString c_FilePath = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select Generator"),
+                                                           c_FolderName, c_FilterName, NULL);
 
-   if (c_FilePath != "")
-   {
-      // check if relative path is possible and appreciated
-      c_FilePath = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_FilePath, C_Uti::h_GetExePath());
+   this->m_AskUserToSaveRelativePath(c_FilePath, C_Uti::h_GetExePath(), this->mpc_Ui->pc_LineEditCodeGenerator);
+}
 
-      if (c_FilePath != "")
-      {
-         this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(c_FilePath, C_Uti::h_GetExePath());
-      }
-   }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped url on "Generator" section
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnDroppedGenerator(void)
+{
+   this->m_AskUserToSaveRelativePath(this->mpc_Ui->pc_LineEditCodeGenerator->GetPath(),
+                                     C_Uti::h_GetExePath(), this->mpc_Ui->pc_LineEditCodeGenerator);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1362,20 +1407,24 @@ void C_SdNdeDbProperties::m_OnClickCodeGeneration(void)
    const QString c_FolderName = this->m_GetDialogPath(
       C_PuiUtil::h_GetResolvedAbsPathFromDbProject(c_ProjectPath, this->mpc_Ui->pc_LineEditCodeGenerate->GetPath()));
 
-   QString c_Path =
+   const QString c_Path =
       QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Directory for Generated Files"),
                                         c_FolderName, QFileDialog::ShowDirsOnly);
 
-   if (c_Path != "")
-   {
-      // check if relative path is possible and appreciated
-      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, c_ProjectPath);
+   this->m_AskUserToSaveRelativePath(c_Path, c_ProjectPath, this->mpc_Ui->pc_LineEditCodeGenerate);
+}
 
-      if (c_Path != "")
-      {
-         this->mpc_Ui->pc_LineEditCodeGenerate->SetPath(c_Path, c_ProjectPath);
-      }
-   }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped url on "Generation Directory" section
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnDroppedCodeGeneration(void)
+{
+   const QString c_ProjectPath =
+      C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
+
+   this->m_AskUserToSaveRelativePath(this->mpc_Ui->pc_LineEditCodeGenerate->GetPath(),
+                                     c_ProjectPath, this->mpc_Ui->pc_LineEditCodeGenerate);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1387,22 +1436,34 @@ void C_SdNdeDbProperties::m_OnClickFileGeneration(void)
    const QString c_FolderName = this->m_GetDialogPath(
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditFileGenerate->GetPath()));
 
-   QString c_Path =
+   const QString c_Path =
       QFileDialog::getExistingDirectory(this, C_GtGetText::h_GetText("Select Directory for Generated Files"),
                                         c_FolderName, QFileDialog::ShowDirsOnly);
 
-   if (c_Path != "")
+   this->m_AskUserToSaveRelativePath(c_Path,
+                                     C_PuiProject::h_GetInstance()->GetFolderPath(),
+                                     this->mpc_Ui->pc_LineEditFileGenerate);
+
+   if (this->mpc_Ui->pc_LineEditFileGenerate->GetPath() != "")
    {
-      // check if relative path is possible and appreciated
-      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+      // update tooltips of line edits with paths relative to project
+      this->m_UpdatePathsRelativeToGeneratedDir();
+   }
+}
 
-      if (c_Path != "")
-      {
-         this->mpc_Ui->pc_LineEditFileGenerate->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
-
-         // update tooltips of line edits with paths relative to generation directory
-         this->m_UpdatePathsRelativeToGeneratedDir();
-      }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped url on "file generator output directory" section
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_OnDroppedFileGeneration(void)
+{
+   this->m_AskUserToSaveRelativePath(this->mpc_Ui->pc_LineEditFileGenerate->GetPath(),
+                                     C_PuiProject::h_GetInstance()->GetFolderPath(),
+                                     this->mpc_Ui->pc_LineEditFileGenerate);
+   if (this->mpc_Ui->pc_LineEditFileGenerate->GetPath() != "")
+   {
+      // update tooltips of line edits with paths relative to project
+      this->m_UpdatePathsRelativeToGeneratedDir();
    }
 }
 
@@ -1703,4 +1764,41 @@ void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const 
 
    //update owned dp count
    this->m_UpdateOwnedDpsCount();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Short function description
+
+   Detailed function description (optional). The function shall be described detailed if it is not described completely
+   by short function description and parameter description.
+
+   \param[in]       ou8_Aa     Detailed input parameter description
+   \param[out]      opu32_Bb   Detailed output parameter description
+   \param[in,out]   opu16_Cc   Detailed input/output parameter description
+
+   \return
+   Type of return values, e.g. STW error codes
+
+   \retval   Return value 1   Detailed description of 1st return value
+   \retval   Return value 2   Detailed description of 2nd return value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbProperties::m_AskUserToSaveRelativePath(const QString & orc_Path,
+                                                      const QString & orc_AbsoluteReferenceDir,
+                                                      stw_opensyde_gui_elements::C_OgeLeFilePath * const opc_PathLineEdit)
+{
+   if (orc_Path != "")
+   {
+      // check if relative path is possible and appreciated
+      const QString c_AdaptedPath = C_ImpUtil::h_AskUserToSaveRelativePath(this, orc_Path, orc_AbsoluteReferenceDir);
+
+      if (c_AdaptedPath != "")
+      {
+         tgl_assert(opc_PathLineEdit != NULL);
+         if (opc_PathLineEdit != NULL)
+         {
+            opc_PathLineEdit->SetPath(c_AdaptedPath, orc_AbsoluteReferenceDir);
+         }
+      }
+   }
 }

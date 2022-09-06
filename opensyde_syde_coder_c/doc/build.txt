@@ -3,9 +3,11 @@ File:      build.txt
 Content:   How to build this project
 ---------------------------------------------------------------------
 
-Used Compiler:
-==============
+Used build tools:
+=================
 MinGW: 8.1.0
+CMake 3.19.2
+Ninja 1.10.0
 
 Editor:
 =======

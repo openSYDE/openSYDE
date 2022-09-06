@@ -38,15 +38,19 @@ public:
                                bool * const opq_NameConflict, bool * const opq_NameInvalid,
                                bool * const opq_DelayTimeInvalid, bool * const opq_IdConflict,
                                bool * const opq_IdInvalid, bool * const opq_SignalInvalid,
+                               bool * const opq_NoSignalsInvalid,
                                const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
-                               const bool oq_CANMessageSignalGapsValid) const;
+                               const bool oq_CANMessageSignalGapsValid, const bool oq_ByteAlignmentRequired,
+                               const bool oq_SignalsRequired) const;
    bool CheckLocalError(const C_OSCNodeDataPoolList & orc_ListTx, const C_OSCNodeDataPoolList & orc_ListRx,
                         const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
-                        const bool oq_CANMessageSignalGapsValid,
+                        const bool oq_CANMessageSignalGapsValid, const bool oq_ByteAlignmentRequired,
+                        const bool oq_SignalsRequired,
                         std::vector<stw_types::uint32> * const opc_InvalidTxMessages = NULL,
                         std::vector<stw_types::uint32> * const opc_InvalidRxMessages = NULL) const;
 
    bool ContainsAtLeastOneMessage(void) const;
+   bool ContainsAtLeastOneActiveMessage(void) const;
 
    std::vector<C_OSCCanMessage> c_TxMessages; ///< Transmitted message types
    std::vector<C_OSCCanMessage> c_RxMessages; ///< Received message types

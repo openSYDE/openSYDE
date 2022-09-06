@@ -97,8 +97,10 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
       // So we do limit the timeout to (cycle-time * 100);
       // Even the 100 is way over what makes sense in a real application.
       // To keep complexity low we also apply this to non-ECeS.
+      // In case of CANopen 0 could be possible, but does not make any sens as maximum value.
       sintn sn_MaxCycleTime = static_cast<sintn>(ou32_LastKnownCycleTimeValue * 100);
-      if (sn_MaxCycleTime > 65535)
+      if ((sn_MaxCycleTime > 65535) ||
+          (sn_MaxCycleTime == 0))
       {
          //limit to 16 bit
          sn_MaxCycleTime = 65535;

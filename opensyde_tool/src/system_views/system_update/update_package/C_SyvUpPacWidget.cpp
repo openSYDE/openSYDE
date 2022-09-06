@@ -366,7 +366,42 @@ void C_SyvUpPacWidget::m_ButtonExport(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacWidget::m_ButtonCreatePackage(void) const
 {
-   this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage();
+   bool q_SaveAsFile = true;
+   bool q_Continue = true;
+
+   C_OgeWiCustomMessage c_Message(this->mpc_Ui->pc_ListWidget, C_OgeWiCustomMessage::E_Type::eQUESTION);
+
+   c_Message.SetHeading(C_GtGetText::h_GetText("Save Service Update Package"));
+   c_Message.SetDescription(C_GtGetText::h_GetText(
+                               "Do you want to save your Service Update Package as .syde_sup archive file or un-zipped to a directory?"));
+   c_Message.SetOKButtonText(C_GtGetText::h_GetText("Archive"));
+   c_Message.SetNOButtonText(C_GtGetText::h_GetText("Directory"));
+   c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
+   c_Message.SetDetails(
+      "Saving to a directory means, that all files which are part of the Service Update Package are not zipped into a .syde_sup file.");
+   c_Message.SetCustomMinHeight(200, 250);
+
+   switch (c_Message.Execute())
+   {
+   case C_OgeWiCustomMessage::eOK:
+      q_SaveAsFile = true;
+      q_Continue = true;
+      break;
+   case C_OgeWiCustomMessage::eNO:
+      q_SaveAsFile = false;
+      q_Continue = true;
+      break;
+   case C_OgeWiCustomMessage::eCANCEL:
+      q_Continue = false;
+      break;
+   default:
+      break;
+   }
+
+   if (q_Continue)
+   {
+      this->mpc_Ui->pc_ListWidget->CreateServiceUpdatePackage(q_SaveAsFile);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

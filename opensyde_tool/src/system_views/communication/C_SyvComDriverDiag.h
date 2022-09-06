@@ -199,8 +199,9 @@ private:
 
    void m_HandlePollingFinished(void);
 
-   static QString mh_GetNodeNameForActiveNodeIndex(const stw_types::uint32 ou32_ViewIndex,
-                                                   const stw_types::uint32 ou32_ActiveNodeIndex);
+   void m_GetRoutingErrorDetails(QString & orc_ErrorDetails, std::set<stw_types::uint32> & orc_ErrorActiveNodes,
+                                 const stw_types::uint32 ou32_ActiveNode,
+                                 const stw_types::uint32 ou32_ErrorActiveNodeIndex) const;
 
    //Avoid call
    C_SyvComDriverDiag(const C_SyvComDriverDiag &);

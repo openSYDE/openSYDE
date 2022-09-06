@@ -60,7 +60,8 @@ public:
                                     const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType,
                                     const std::vector<C_CieImportDataAssignment > & orc_ImportDataAssigned,
                                     const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned,
-                                    const stw_scl::C_SCLString * const opc_NodeNameReplacement);
+                                    const stw_scl::C_SCLString * const opc_NodeNameReplacement,
+                                    const bool oq_IsCANopen = false);
    ~C_CieImportReportWidget(void);
 
    void InitStaticNames(void) const;
@@ -86,7 +87,7 @@ private:
    void m_CancelClicked(void);
    static void mh_AdaptMessageNames(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment);
    void m_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment);
-   stw_types::sint32 m_ShowReport(const QString & orc_Suffix);
+   stw_types::sint32 m_ShowReport(const QString & orc_Suffix, const bool oq_IsCANopen);
    stw_types::sint32 m_CheckMessages(std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment) const;
    stw_types::sint32 m_CheckMessageMatches(const QString & orc_Suffix,
                                            std::vector<C_CieImportDataAssignment>  & orc_ImportDataAssignment);

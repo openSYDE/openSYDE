@@ -83,6 +83,8 @@ C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elem
 {
    mpc_Ui->setupUi(this);
 
+   this->mpc_Ui->pc_LineEditPath->SetDragAndDropActiveForFile("syde_psi");
+
    // register the widget for showing
    this->mpc_ParentDialog->SetWidget(this);
    this->mpc_Ui->pc_LabelRead->setEnabled(false);

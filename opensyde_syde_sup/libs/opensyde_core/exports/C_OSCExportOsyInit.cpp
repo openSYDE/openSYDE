@@ -87,6 +87,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
    uint8 u8_NumCanChannels = 0U;
    uint8 u8_NumEthChannels = 0U;
    uint32 u32_BufferSize;
+   uint32 u32_CommProtocolCnt = 0U;
 
    //header file: quite simple (constant only as long as we always create DPD and DPH structures):
    c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
@@ -121,29 +122,44 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
          u8_DataPoolsKnownInThisApplication++;
       }
    }
+   //count how many node protocols are NOT CANopen and how many ARE CANopen
+   for (uint32 u32_ProtIt = 0U; u32_ProtIt < orc_Node.c_ComProtocols.size(); ++u32_ProtIt)
+   {
+      if (orc_Node.c_ComProtocols[u32_ProtIt].e_Type != C_OSCCanProtocol::eCAN_OPEN)
+      {
+         u32_CommProtocolCnt++;
+      }
+   }
    //includes for comm stack configuration
    //these are not needed by this module at all; they are only provided for application convenience
-   if (orc_Node.c_ComProtocols.size() > 0)
+   //only add includes if there is at least one COMM Protocol which is NOT CANopen
+   if ((orc_Node.c_ComProtocols.size() > 0U) && (u32_CommProtocolCnt > 0U))
    {
       c_Lines.Add("//Header files exporting comm stack configuration and status:");
+
       for (uint32 u32_ItProtocol = 0U; u32_ItProtocol < orc_Node.c_ComProtocols.size(); u32_ItProtocol++)
       {
          const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_ItProtocol];
-         //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
-         // C_OSCNodeApplication then create it
-         if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
+
+         //skip CANopen protocol
+         if (rc_Protocol.e_Type != C_OSCCanProtocol::eCAN_OPEN)
          {
-            for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
-                 u32_ItInterface++)
+            //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
+            // C_OSCNodeApplication then create it
+            if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
             {
-               //at least one message defined ?
-               if (rc_Protocol.c_ComMessages[u32_ItInterface].ContainsAtLeastOneMessage() == true)
+               for (uint32 u32_ItInterface = 0U; u32_ItInterface < rc_Protocol.c_ComMessages.size();
+                    u32_ItInterface++)
                {
-                  const C_SCLString c_HeaderName =
-                     C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
-                                                                  rc_Protocol.e_Type);
-                  c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
-                  u8_CommDefinitionsKnownInThisApplication++;
+                  //at least one message defined ?
+                  if (rc_Protocol.c_ComMessages[u32_ItInterface].ContainsAtLeastOneMessage() == true)
+                  {
+                     const C_SCLString c_HeaderName =
+                        C_OSCExportCommunicationStack::h_GetFileName(static_cast<uint8>(u32_ItInterface),
+                                                                     rc_Protocol.e_Type);
+                     c_Lines.Add("#include \"" + c_HeaderName + ".h\"");
+                     u8_CommDefinitionsKnownInThisApplication++;
+                  }
                }
             }
          }
@@ -243,7 +259,7 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
 
    //prototypes for COMM utility functions; only place if there are COMM protocols to prevent external dependencies
    // (on type definitions)
-   if (u8_CommDefinitionsKnownInThisApplication > 0U)
+   if ((u8_CommDefinitionsKnownInThisApplication > 0) && (u32_CommProtocolCnt > 0))
    {
       c_Lines.Add("extern const T_osy_com_protocol_configuration * const * osy_com_get_protocol_configs(void);");
       c_Lines.Add("extern uint8 osy_com_get_num_protocol_configs(void);");
@@ -492,7 +508,8 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
       c_Lines.Add("   return OSY_INIT_DPH_NUM_DATA_POOLS;");
       c_Lines.Add("}");
 
-      if (u8_CommDefinitionsKnownInThisApplication > 0)
+      //only add function implementations if there is at least one COMM Protocol which is NOT CANopen
+      if ((u8_CommDefinitionsKnownInThisApplication > 0) && (u32_CommProtocolCnt > 0))
       {
          c_Lines.Add("");
          c_Lines.Add(C_OSCExportUti::h_GetHeaderSeparator());
@@ -512,21 +529,33 @@ sint32 C_OSCExportOsyInit::h_CreateSourceCode(const C_SCLString & orc_FilePath, 
 
          for (uint32 u32_Protocol = 0U; u32_Protocol < orc_Node.c_ComProtocols.size(); u32_Protocol++)
          {
+            bool oq_Skip = false;
             const C_OSCCanProtocol & rc_Protocol = orc_Node.c_ComProtocols[u32_Protocol];
-            //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
-            // C_OSCNodeApplication then this node knows about the protocol
-            if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex == ou16_ApplicationIndex)
-            {
-               for (uint8 u8_Interface = 0U; u8_Interface < rc_Protocol.c_ComMessages.size(); u8_Interface++)
-               {
-                  //at least one message defined ?
-                  if (rc_Protocol.c_ComMessages[u8_Interface].ContainsAtLeastOneMessage() == true)
-                  {
-                     //finally we have a winner ...
-                     const C_SCLString c_Text = "      &" + C_OSCExportCommunicationStack::h_GetConfigurationName(
-                        u8_Interface, rc_Protocol.e_Type) + ",";
 
-                     c_Lines.Add(c_Text);
+            //skip any CANopen protocol
+            if (rc_Protocol.e_Type == C_OSCCanProtocol::eCAN_OPEN)
+            {
+               oq_Skip = true;
+            }
+
+            if (oq_Skip == false)
+            {
+               //logic: C_OSCCanProtocol refers to a Datapool; if that Datapool is owned by the
+               // C_OSCNodeApplication then this node knows about the protocol
+               if (orc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex].s32_RelatedDataBlockIndex ==
+                   ou16_ApplicationIndex)
+               {
+                  for (uint8 u8_Interface = 0U; u8_Interface < rc_Protocol.c_ComMessages.size(); u8_Interface++)
+                  {
+                     //at least one message defined ?
+                     if (rc_Protocol.c_ComMessages[u8_Interface].ContainsAtLeastOneMessage() == true)
+                     {
+                        //finally we have a winner ...
+                        const C_SCLString c_Text = "      &" + C_OSCExportCommunicationStack::h_GetConfigurationName(
+                           u8_Interface, rc_Protocol.e_Type) + ",";
+
+                        c_Lines.Add(c_Text);
+                     }
                   }
                }
             }

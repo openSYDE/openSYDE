@@ -120,7 +120,7 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
    this->mpc_Ui->pc_GroupBoxUsage->setTitle("");
 
    //Spin box
-   this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(10);
+   this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(1);
    this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(std::numeric_limits<sintn>::max());
 
    //Timer

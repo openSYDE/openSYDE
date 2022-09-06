@@ -444,14 +444,17 @@ void C_SyvDaChaPlotHandlerWidget::SetData(const C_PuiSvDbTabChart & orc_Data, co
       }
       else
       {
-         const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
-         tgl_assert(pc_View != NULL);
-         if (pc_View != NULL)
+         std::vector<uint8> c_NodeActiveFlags;
+         const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+            ou32_ViewIndex,
+            c_NodeActiveFlags);
+
+         tgl_assert(s32_Retval == C_NO_ERR);
+         if (s32_Retval == C_NO_ERR)
          {
-            const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
-            if (rc_Config.c_ElementId.u32_NodeIndex < rc_ActiveFlags.size())
+            if (rc_Config.c_ElementId.u32_NodeIndex < c_NodeActiveFlags.size())
             {
-               if (rc_ActiveFlags[rc_Config.c_ElementId.u32_NodeIndex] == 0U)
+               if (c_NodeActiveFlags[rc_Config.c_ElementId.u32_NodeIndex] == 0U)
                {
                   // Node with data element is not active in current view
                   q_Warning = true;

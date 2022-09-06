@@ -623,7 +623,9 @@ void C_GiNode::GenerateHint(void)
             //Translation: 1 = bus name
             //tooltip title
             c_Title = this->GetText();
-            c_Title.append(static_cast<QString>(" (Type: %1)").arg(pc_Node->pc_DeviceDefinition->c_DeviceName.c_str()));
+            c_Title.append(static_cast<QString>(" (Type: %1)").arg(
+                              pc_Node->pc_DeviceDefinition->GetDisplayName().c_str()));
+
             this->SetDefaultToolTipHeading(c_Title);
 
             //comment
@@ -1131,7 +1133,11 @@ void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnector
 
    if (pc_ConnId != NULL)
    {
-      C_PuiSdHandler::h_GetInstance()->RemoveConnection(static_cast<uint32>(this->ms32_Index), *pc_ConnId);
+      // We need a copy due to multi CPU nodes. RemoveConnection removes the connection and the first
+      // sub node remove can cause a change the value pc_ConnId points at. All following deletions of the other sub
+      // nodes in RemoveConnection could have wrong values where pc_ConnId is pointing at
+      const C_PuiSdNodeConnectionId c_ConnIdCopy = *pc_ConnId;
+      C_PuiSdHandler::h_GetInstance()->RemoveConnection(static_cast<uint32>(this->ms32_Index), c_ConnIdCopy);
    }
 
    for (s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)

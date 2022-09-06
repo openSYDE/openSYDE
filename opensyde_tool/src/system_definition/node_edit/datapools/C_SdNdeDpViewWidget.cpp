@@ -154,6 +154,8 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
               this, &C_SdNdeDpViewWidget::m_EmitActualDataPool);
       connect(this->mapc_Selectors[s32_Counter], &C_SdNdeDpSelectorWidget::SigUpdateLists,
               this, &C_SdNdeDpViewWidget::SigUpdateLists);
+      connect(this->mapc_Selectors[s32_Counter], &C_SdNdeDpSelectorWidget::SigUpdateFollowingLists,
+              this, &C_SdNdeDpViewWidget::m_UpdateFollowingLists);
       connect(this->mapc_Selectors[s32_Counter], &C_SdNdeDpSelectorWidget::SigNoDataPoolSelected,
               this, &C_SdNdeDpViewWidget::m_NoDataPoolSelected);
    }
@@ -730,4 +732,22 @@ void C_SdNdeDpViewWidget::m_UpdateAutoStartAddressSvg(void) const
       this->mpc_Ui->pc_PushButtonAutoStartAddress->SetSvg("://images/system_views/IconDisconnected.svg");
    }
    this->mpc_Ui->pc_PushButtonAutoStartAddress->update();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates all lists after the list with the specified Datapool type
+
+   \param[in]       oe_DataPoolType     List with Datapool type which sent the update request
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpViewWidget::m_UpdateFollowingLists(const C_OSCNodeDataPool::E_Type oe_DataPoolType) const
+{
+   sint32 s32_Counter;
+
+   for (s32_Counter = static_cast<sint32>(oe_DataPoolType) + 1;
+        s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+        ++s32_Counter)
+   {
+      this->mapc_Selectors[s32_Counter]->ReloadDataPools();
+   }
 }

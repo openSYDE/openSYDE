@@ -419,12 +419,20 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
                     &C_SdHandlerWidget::m_ErrorChange);
          disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBus, this,
                     &C_SdHandlerWidget::m_SwitchToBus);
+         disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProtocol, this,
+                    &C_SdHandlerWidget::m_SwitchToBusProtocol);
+         disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProtocolMessage, this,
+                    &C_SdHandlerWidget::m_SwitchToBusProtocolMessage);
+         disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToDeviceNodeInCoManager, this,
+                    &C_SdHandlerWidget::m_SwitchToDeviceNodeInCoManager);
          disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigNameChanged, this,
                     &C_SdHandlerWidget::SigNameChanged);
          disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSave, this,
                     &C_SdHandlerWidget::Save);
          disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSaveAs, this,
                     &C_SdHandlerWidget::SaveAs);
+         disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProperties, this,
+                    &C_SdHandlerWidget::m_SwitchToBusProperties);
          delete this->mpc_ActNodeEdit;
          this->mpc_ActNodeEdit = NULL;
       }
@@ -457,6 +465,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
                     &C_SdHandlerWidget::m_ErrorChange);
          disconnect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigNameChanged, this,
                     &C_SdHandlerWidget::SigNameChanged);
+         disconnect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigSwitchToCoManager, this,
+                    &C_SdHandlerWidget::m_SwitchToCoManager);
 
          delete this->mpc_ActBusEdit;
          this->mpc_ActBusEdit = NULL;
@@ -503,6 +513,12 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
                  &C_SdHandlerWidget::m_ErrorChange);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBus, this,
                  &C_SdHandlerWidget::m_SwitchToBus);
+         connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProtocol, this,
+                 &C_SdHandlerWidget::m_SwitchToBusProtocol);
+         connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToBusProtocolMessage, this,
+                 &C_SdHandlerWidget::m_SwitchToBusProtocolMessage);
+         connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSwitchToDeviceNodeInCoManager, this,
+                 &C_SdHandlerWidget::m_SwitchToDeviceNodeInCoManager);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigNameChanged, this,
                  &C_SdHandlerWidget::SigNameChanged);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigSave, this,
@@ -541,6 +557,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigErrorChange, this, &C_SdHandlerWidget::m_ErrorChange);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigNameChanged, this, &C_SdHandlerWidget::SigNameChanged);
+         connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigSwitchToCoManager, this,
+                 &C_SdHandlerWidget::m_SwitchToCoManager);
 
          //Buttons
          Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_GENERATE_CODE, true));
@@ -648,6 +666,50 @@ void C_SdHandlerWidget::m_SwitchToBus(const uint32 ou32_Index, const QString & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch to bus edit widget with a specific protocol type
+
+   \param[in]  ou32_Index         Bus index
+   \param[in]  orc_BusName        Bus name
+   \param[in]  oe_ProtocolType    Protocol type to switch to
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_SwitchToBusProtocol(const uint32 ou32_Index, const QString & orc_BusName,
+                                              const C_OSCCanProtocol::E_Type oe_ProtocolType)
+{
+   Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
+                              mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL + static_cast<uint32>(oe_ProtocolType));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch to bus edit widget with a specific message
+
+   \param[in]  ou32_Index         Bus index
+   \param[in]  orc_BusName        Bus name
+   \param[in]  orc_MessageId      Message id to jump to
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_SwitchToBusProtocolMessage(const uint32 ou32_Index, const QString & orc_BusName,
+                                                     const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+{
+   Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
+                               mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR));
+
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
+   if ((pc_Node != NULL) &&
+       (orc_MessageId.u32_DatapoolIndex < pc_Node->c_DataPools.size()))
+   {
+      uint32 u32_ListIndex;
+      if (C_OSCCanProtocol::h_GetComListIndex(pc_Node->c_DataPools[orc_MessageId.u32_DatapoolIndex],
+                                              orc_MessageId.u32_InterfaceIndex, orc_MessageId.q_MessageIsTx,
+                                              u32_ListIndex) == C_NO_ERR)
+      {
+         Q_EMIT (this->OpenDetail(orc_MessageId.u32_NodeIndex, orc_MessageId.u32_DatapoolIndex,
+                                  u32_ListIndex, orc_MessageId.u32_MessageIndex, 2));
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Switch to bus edit widget, properties tab
 
    \param[in]  ou32_Index     Bus index
@@ -658,6 +720,39 @@ void C_SdHandlerWidget::m_SwitchToBusProperties(const uint32 ou32_Index, const Q
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
                               mu32_FLAG_OPEN_PROPERTIES);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch to node edit widget in CANopen Manager tab with navigation to the device in the tree
+
+   \param[in]  ou32_ManagerNodeIndex     Manager Node index
+   \param[in]  orc_ManagerNodeName       Manager Node name
+   \param[in]  ou8_InterfaceNumber       Manager Node interface number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_SwitchToCoManager(const uint32 ou32_ManagerNodeIndex, const QString & orc_ManagerNodeName,
+                                            const uint8 ou8_InterfaceNumber)
+{
+   Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, ou32_ManagerNodeIndex,
+                               orc_ManagerNodeName, "",
+                               mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER + static_cast<uint32>(ou8_InterfaceNumber)));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Switch to node edit widget in CANopen Manager tab with navigation to the device in the tree
+
+   \param[in]  ou32_ManagerNodeIndex     Manager Node index
+   \param[in]  orc_ManagerNodeName       Manager Node name
+   \param[in]  ou32_DeviceNodeIndex      Device Node index
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdHandlerWidget::m_SwitchToDeviceNodeInCoManager(const uint32 ou32_ManagerNodeIndex,
+                                                        const QString & orc_ManagerNodeName,
+                                                        const uint32 ou32_DeviceNodeIndex)
+{
+   Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, ou32_ManagerNodeIndex,
+                               orc_ManagerNodeName, "",
+                               mu32_FLAG_OPEN_SYSDEF_DEVICENODE_IN_CANOPENMANAGER + ou32_DeviceNodeIndex));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

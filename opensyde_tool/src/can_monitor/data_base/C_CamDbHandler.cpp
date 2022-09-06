@@ -19,6 +19,7 @@
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw_types;
 using namespace stw_errors;
+using namespace stw_opensyde_core;
 using namespace stw_opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -247,10 +248,11 @@ sint32 C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & 
 
    Requirement: this function can only return a valid index if the function FindOsyMessage was at least called once
 
-   \param[in]  orc_File       File name to look in
-   \param[in]  orc_Message    Message name to look for
-   \param[in]  oq_UseHash     Use hash
-   \param[in]  ou32_Hash      Hash
+   \param[in]   orc_File            File name to look in
+   \param[in]   orc_Message         Message name to look for
+   \param[in]   oq_UseHash          Use hash
+   \param[in]   ou32_Hash           Hash
+   \param[out]  ope_ProtocolType    Protocol type
 
    \return
    NULL OSC CAN message not found
@@ -259,15 +261,16 @@ sint32 C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & 
 //----------------------------------------------------------------------------------------------------------------------
 const stw_opensyde_core::C_OSCCanMessage * C_CamDbHandler::GetOSCMessage(const QString & orc_File,
                                                                          const QString & orc_Message,
-                                                                         const bool oq_UseHash,
-                                                                         const uint32 ou32_Hash) const
+                                                                         const bool oq_UseHash, const uint32 ou32_Hash,
+                                                                         C_OSCCanProtocol::E_Type * const ope_ProtocolType)
+const
 {
    const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
    const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.find(orc_File);
 
    if (c_It != this->mc_OSYFiles.end())
    {
-      pc_Retval = c_It->GetOSCMessage(orc_Message, oq_UseHash, ou32_Hash);
+      pc_Retval = c_It->GetOSCMessage(orc_Message, oq_UseHash, ou32_Hash, ope_ProtocolType);
    }
    return pc_Retval;
 }

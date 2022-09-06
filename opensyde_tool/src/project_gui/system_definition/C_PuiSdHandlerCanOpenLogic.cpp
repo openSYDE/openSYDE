@@ -81,9 +81,36 @@ const C_OSCCanOpenManagerInfo * C_PuiSdHandlerCanOpenLogic::GetCanOpenManager(co
 const C_OSCNode * C_PuiSdHandlerCanOpenLogic::GetCanOpenManagerNodeOnBus(const uint32 ou32_BusIndex) const
 {
    const C_OSCNode * pc_Retval = NULL;
+   uint32 u32_NodeIndex;
+
+   if (this->GetCanOpenManagerNodeOnBus(ou32_BusIndex, u32_NodeIndex, NULL) == C_NO_ERR)
+   {
+      pc_Retval = &this->mc_CoreDefinition.c_Nodes[u32_NodeIndex];
+   }
+
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get node index which has the CANopen manager on a specific bus
+
+   \param[in]  ou32_BusIndex           Index of CAN bus
+   \param[out] oru32_ManagerNodeIndex  Found index of CANopen Manager node
+   \param[out] opu8_ManagerIntfNumber  Optional parameter for used interface number of CANopen Manager
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid or no manager available
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerCanOpenLogic::GetCanOpenManagerNodeOnBus(const stw_types::uint32 ou32_BusIndex,
+                                                              stw_types::uint32 & oru32_ManagerNodeIndex,
+                                                              stw_types::uint8 * const opu8_ManagerIntfNumber) const
+{
+   sint32 s32_Return = C_RANGE;
+
    uint32 u32_NodeCounter;
 
-   // Search all ndes
+   // Search all nodes
    for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_CoreDefinition.c_Nodes.size(); ++u32_NodeCounter)
    {
       const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_NodeCounter];
@@ -105,20 +132,25 @@ const C_OSCNode * C_PuiSdHandlerCanOpenLogic::GetCanOpenManagerNodeOnBus(const u
                if (rc_Node.c_CanOpenManagers.find(rc_Intf.u8_InterfaceNumber) != rc_Node.c_CanOpenManagers.end())
                {
                   // CANopen manager on this bus found
-                  pc_Retval = &rc_Node;
+                  oru32_ManagerNodeIndex = u32_NodeCounter;
+                  if (opu8_ManagerIntfNumber != NULL)
+                  {
+                     *opu8_ManagerIntfNumber = rc_Intf.u8_InterfaceNumber;
+                  }
+                  s32_Return = C_NO_ERR;
                   break;
                }
             }
          }
 
-         if (pc_Retval != NULL)
+         if (s32_Return == C_NO_ERR)
          {
             break;
          }
       }
    }
 
-   return pc_Retval;
+   return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -208,6 +240,110 @@ const C_OSCCanOpenManagerDeviceInfo * C_PuiSdHandlerCanOpenLogic::GetCanOpenMana
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the node index of the CANopen Manager which has the device assigned
+
+   Output parameter are only valid if return value is C_NO_ERR
+
+   \param[in]       ou32_DeviceNodeIndex          Node index of the device for checking
+   \param[out]      opu32_ManagerNodeIndex        Node index of the found CANopen Manager.
+   \param[out]      opu8_ManagerInterfaceNumber   CANopen Manager interface number on which the device is assigned to
+   \param[out]      opc_DeviceNodeId              Device node id which is assigned to the manager on this interface
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+   \retval   C_CONFIG   Device is no device and is not assigned to a CANopen Manager
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerCanOpenLogic::GetCanOpenManagerOfDeviceAndId(const stw_types::uint32 ou32_DeviceNodeIndex,
+                                                                  stw_types::uint32 * const opu32_ManagerNodeIndex,
+                                                                  stw_types::uint8 * const opu8_ManagerInterfaceNumber,
+                                                                  stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceNodeId)
+const
+{
+   sint32 s32_Retval = C_RANGE;
+
+   if (ou32_DeviceNodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      uint32 u32_NodeCounter;
+
+      s32_Retval = C_CONFIG;
+
+      // Searching in all node CANopen Managers for the searched node as device
+      for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_CoreDefinition.c_Nodes.size(); ++u32_NodeCounter)
+      {
+         const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_NodeCounter];
+
+         std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager;
+         for (c_ItManager = rc_Node.c_CanOpenManagers.begin(); c_ItManager != rc_Node.c_CanOpenManagers.end();
+              ++c_ItManager)
+         {
+            const C_OSCCanOpenManagerInfo & rc_Manager = c_ItManager->second;
+            std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice;
+
+            for (c_ItDevice = rc_Manager.c_CanOpenDevices.begin(); c_ItDevice != rc_Manager.c_CanOpenDevices.end();
+                 ++c_ItDevice)
+            {
+               if (c_ItDevice->first.u32_NodeIndex == ou32_DeviceNodeIndex)
+               {
+                  if (opu32_ManagerNodeIndex != NULL)
+                  {
+                     *opu32_ManagerNodeIndex = u32_NodeCounter;
+                  }
+                  if (opc_DeviceNodeId != NULL)
+                  {
+                     *opc_DeviceNodeId = c_ItDevice->first;
+                  }
+                  if (opu8_ManagerInterfaceNumber != NULL)
+                  {
+                     *opu8_ManagerInterfaceNumber = c_ItManager->first;
+                  }
+                  s32_Retval = C_NO_ERR;
+                  break;
+               }
+            }
+         }
+      }
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen manager device for any manager
+
+   \param[in]  ou32_ManagerNodeIndex   Manager node index
+   \param[in]  orc_DeviceId            Device id
+
+   \return
+   CANopen manager device for any manager
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCCanOpenManagerDeviceInfo * C_PuiSdHandlerCanOpenLogic::GetCanOpenManagerDeviceForAnyManager(
+   const uint32 ou32_ManagerNodeIndex, const C_OSCCanInterfaceId & orc_DeviceId) const
+{
+   const C_OSCCanOpenManagerDeviceInfo * pc_Retval = NULL;
+   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(ou32_ManagerNodeIndex);
+
+   if (pc_Node != NULL)
+   {
+      for (std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager =
+              pc_Node->c_CanOpenManagers.cbegin();
+           (c_ItManager != pc_Node->c_CanOpenManagers.cend()) && (pc_Retval == NULL); ++c_ItManager)
+      {
+         const std::map<C_OSCCanInterfaceId,
+                        C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+            c_ItManager->second.c_CanOpenDevices.find(
+               orc_DeviceId);
+         if (c_ItDevice != c_ItManager->second.c_CanOpenDevices.cend())
+         {
+            pc_Retval = &c_ItDevice->second;
+         }
+      }
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set CANopen manager common properties
 
    \param[in]  ou32_NodeIndex                Node index
@@ -219,7 +355,6 @@ const C_OSCCanOpenManagerDeviceInfo * C_PuiSdHandlerCanOpenLogic::GetCanOpenMana
    \param[in]  oq_StartDevices               Start devices
    \param[in]  oq_NMTStartAll                NMT start all
    \param[in]  oe_NMTErrorBehaviour          NMT error behaviour
-   \param[in]  oq_EnableHeartbeatProducing   Enable heartbeat producing
 
    \return
    STW error codes
@@ -236,8 +371,7 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerCommonProperties(const uint3
                                                                      const bool oq_AutostartCanOpenManager,
                                                                      const bool oq_StartDevices,
                                                                      const bool oq_NMTStartAll,
-                                                                     const C_OSCCanOpenManagerInfo::E_NMTErrorBehaviourType oe_NMTErrorBehaviour,
-                                                                     const bool oq_EnableHeartbeatProducing)
+                                                                     const C_OSCCanOpenManagerInfo::E_NMTErrorBehaviourType oe_NMTErrorBehaviour)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -256,7 +390,6 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerCommonProperties(const uint3
          c_ItManager->second.q_StartDevices = oq_StartDevices;
          c_ItManager->second.q_NMTStartAll = oq_NMTStartAll;
          c_ItManager->second.e_NMTErrorBehaviour = oe_NMTErrorBehaviour;
-         c_ItManager->second.q_EnableHeartbeatProducing = oq_EnableHeartbeatProducing;
       }
       else
       {
@@ -277,6 +410,7 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerCommonProperties(const uint3
    \param[in]  ou32_NodeIndex                Node index
    \param[in]  ou8_InterfaceNumber           Interface number
    \param[in]  ou16_HeartbeatProducerTimeMs  Heartbeat producer time ms
+   \param[in]  oq_EnableHeartbeatProducing   Heartbeat producing enabled flag
 
    \return
    STW error codes
@@ -287,7 +421,8 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerCommonProperties(const uint3
 //----------------------------------------------------------------------------------------------------------------------
 sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerProducerHeartbeat(const uint32 ou32_NodeIndex,
                                                                       const uint8 ou8_InterfaceNumber,
-                                                                      const uint16 ou16_HeartbeatProducerTimeMs)
+                                                                      const uint16 ou16_HeartbeatProducerTimeMs,
+                                                                      const bool oq_EnableHeartbeatProducing)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -300,6 +435,7 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerProducerHeartbeat(const uint
       if (c_ItManager != rc_Node.c_CanOpenManagers.end())
       {
          c_ItManager->second.u16_HeartbeatProducerTimeMs = ou16_HeartbeatProducerTimeMs;
+         c_ItManager->second.q_EnableHeartbeatProducing = oq_EnableHeartbeatProducing;
 
          //update consumer time of devices
          for (std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::iterator c_ItDevice =
@@ -314,6 +450,13 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerProducerHeartbeat(const uint
                const uint16 u16_Result = static_cast<uint16>(f32_Result);
 
                c_ItDevice->second.u16_HeartbeatConsumerTimeMs = u16_Result;
+
+               //disable device HB consuming if manager HB producing is disabled
+               if ((c_ItManager->second.q_EnableHeartbeatProducing == false) &&
+                   (c_ItDevice->second.q_EnableHeartbeatConsuming == true))
+               {
+                  c_ItDevice->second.q_EnableHeartbeatConsuming = false;
+               }
             }
          }
       }
@@ -331,7 +474,7 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerProducerHeartbeat(const uint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set CANopen manager device properties
+/*! \brief  Set CANopen manager device common properties
 
    \param[in]  ou32_NodeIndex                               Node index
    \param[in]  ou8_InterfaceNumber                          Interface number
@@ -342,8 +485,6 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerProducerHeartbeat(const uint
    \param[in]  ou8_ResetNodeObjectDictionarySubIndex        Reset node object dictionary sub index
    \param[in]  oq_EnableHeartbeatProducing                  Enable heartbeat producing
    \param[in]  ou16_HeartbeatProducerTimeMs                 Heartbeat producer time ms
-   \param[in]  oq_UseOpenSYDENodeID                         Use open SYDE node ID
-   \param[in]  ou8_NodeIDValue                              Node ID value
    \param[in]  oq_EnableHeartbeatConsuming                  Enable heartbeat consuming
    \param[in]  ou16_HeartbeatConsumerTimeMs                 Heartbeat consumer time ms
    \param[in]  oq_EnableHeartbeatConsumingAutoCalculation   Enable heartbeat consuming autocalculation
@@ -355,20 +496,14 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerProducerHeartbeat(const uint
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerDeviceProperties(const uint32 ou32_NodeIndex,
-                                                                     const uint8 ou8_InterfaceNumber,
-                                                                     const C_OSCCanInterfaceId & orc_DeviceId,
-                                                                     const bool oq_DeviceOptional,
-                                                                     const bool oq_NoInitialization,
-                                                                     const bool oq_FactorySettingsActive,
-                                                                     const uint8 ou8_ResetNodeObjectDictionarySubIndex,
-                                                                     const bool oq_EnableHeartbeatProducing,
-                                                                     const uint16 ou16_HeartbeatProducerTimeMs,
-                                                                     const bool oq_UseOpenSYDENodeID,
-                                                                     const uint8 ou8_NodeIDValue,
-                                                                     const bool oq_EnableHeartbeatConsuming,
-                                                                     const stw_types::uint16 ou16_HeartbeatConsumerTimeMs,
-                                                                     const bool oq_EnableHeartbeatConsumingAutoCalculation)
+sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerDeviceCommonProperties(const uint32 ou32_NodeIndex,
+                                                                           const uint8 ou8_InterfaceNumber,
+                                                                           const C_OSCCanInterfaceId & orc_DeviceId,
+                                                                           const bool oq_DeviceOptional,
+                                                                           const bool oq_NoInitialization,
+                                                                           const bool oq_FactorySettingsActive,
+                                                                           const uint8 ou8_ResetNodeObjectDictionarySubIndex, const bool oq_EnableHeartbeatProducing, const uint16 ou16_HeartbeatProducerTimeMs, const bool oq_EnableHeartbeatConsuming, const stw_types::uint16 ou16_HeartbeatConsumerTimeMs,
+                                                                           const bool oq_EnableHeartbeatConsumingAutoCalculation)
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -391,12 +526,69 @@ sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerDeviceProperties(const uint3
             c_ItSubDevice->second.u8_ResetNodeObjectDictionarySubIndex = ou8_ResetNodeObjectDictionarySubIndex;
             c_ItSubDevice->second.q_EnableHeartbeatProducing = oq_EnableHeartbeatProducing;
             c_ItSubDevice->second.u16_HeartbeatProducerTimeMs = ou16_HeartbeatProducerTimeMs;
-            c_ItSubDevice->second.q_UseOpenSYDENodeID = oq_UseOpenSYDENodeID;
-            c_ItSubDevice->second.u8_NodeIDValue = ou8_NodeIDValue;
             c_ItSubDevice->second.q_EnableHeartbeatConsuming = oq_EnableHeartbeatConsuming;
             c_ItSubDevice->second.u16_HeartbeatConsumerTimeMs = ou16_HeartbeatConsumerTimeMs;
             c_ItSubDevice->second.q_EnableHeartbeatConsumingAutoCalculation =
                oq_EnableHeartbeatConsumingAutoCalculation;
+         }
+         else
+         {
+            s32_Retval = C_RANGE;
+         }
+      }
+      else
+      {
+         s32_Retval = C_RANGE;
+      }
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set CANopen manager device node id properties
+
+   \param[in]  ou32_NodeIndex          Node index
+   \param[in]  ou8_InterfaceNumber     Interface number
+   \param[in]  orc_DeviceId            Device id
+   \param[in]  oq_UseOpenSYDENodeID    Use open SYDE node ID
+   \param[in]  ou8_NodeIDValue         Node ID value
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Operation success
+   \retval   C_RANGE    Operation failure: parameter invalid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_PuiSdHandlerCanOpenLogic::SetCanOpenManagerDeviceNodeId(const uint32 ou32_NodeIndex,
+                                                                 const uint8 ou8_InterfaceNumber,
+                                                                 const C_OSCCanInterfaceId & orc_DeviceId,
+                                                                 const bool oq_UseOpenSYDENodeID,
+                                                                 const uint8 ou8_NodeIDValue)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      const std::map<stw_types::uint8,
+                     C_OSCCanOpenManagerInfo>::iterator c_ItManager = rc_Node.c_CanOpenManagers.find(
+         ou8_InterfaceNumber);
+      if (c_ItManager != rc_Node.c_CanOpenManagers.end())
+      {
+         const std::map<C_OSCCanInterfaceId,
+                        C_OSCCanOpenManagerDeviceInfo>::iterator c_ItSubDevice = c_ItManager->second.c_CanOpenDevices.
+                                                                                 find(orc_DeviceId);
+         if (c_ItSubDevice != c_ItManager->second.c_CanOpenDevices.end())
+         {
+            c_ItSubDevice->second.q_UseOpenSYDENodeID = oq_UseOpenSYDENodeID;
+            c_ItSubDevice->second.u8_NodeIDValue = ou8_NodeIDValue;
+            m_HandleNodeIdChangeForCanOpenMessages(orc_DeviceId.u32_NodeIndex, orc_DeviceId.u8_InterfaceNumber);
          }
          else
          {
@@ -498,6 +690,7 @@ sint32 C_PuiSdHandlerCanOpenLogic::DeleteCanOpenManager(const uint32 ou32_NodeIn
          ou8_InterfaceNumber);
       if (c_ItManager != rc_Node.c_CanOpenManagers.end())
       {
+         uint32 u32_InterfaceIndex = 0UL;
          tgl_assert(this->DeleteAllCanOpenManagerDevices(ou32_NodeIndex, ou8_InterfaceNumber) == C_NO_ERR);
          //Delete manager
          rc_Node.c_CanOpenManagers.erase(c_ItManager);
@@ -509,6 +702,14 @@ sint32 C_PuiSdHandlerCanOpenLogic::DeleteCanOpenManager(const uint32 ou32_NodeIn
          else
          {
             orq_DatapoolChanged = false;
+         }
+         if (this->TranslateCanInterfaceNumberToIndex(ou32_NodeIndex, ou8_InterfaceNumber,
+                                                      u32_InterfaceIndex) == C_NO_ERR)
+         {
+            this->SetCanProtocolMessageContainerConnected(ou32_NodeIndex,
+                                                          C_OSCCanProtocol::eCAN_OPEN,
+                                                          u32_InterfaceIndex,
+                                                          false);
          }
       }
       else
@@ -1745,6 +1946,183 @@ void C_PuiSdHandlerCanOpenLogic::m_HandleChangeCompleteConnectionForCanOpenDevic
               c_ItManager != rc_Node.c_CanOpenManagers.end(); ++c_ItManager)
          {
             this->DeleteCanOpenManagerDevice(u32_ItNode, c_ItManager->first, c_Id);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Synchronise openSYDE node id change
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou8_NewNodeId        New node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerCanOpenLogic::m_SyncOsyNodeIdChange(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                                       const uint8 ou8_NewNodeId)
+{
+   tgl_assert(ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+
+      tgl_assert(ou32_InterfaceIndex < rc_OSCNode.c_Properties.c_ComInterfaces.size());
+      if (ou32_InterfaceIndex < rc_OSCNode.c_Properties.c_ComInterfaces.size())
+      {
+         if (rc_OSCNode.c_Properties.c_ComInterfaces[ou32_InterfaceIndex].e_InterfaceType == C_OSCSystemBus::eCAN)
+         {
+            uint8 u8_InterfaceNumber;
+
+            m_HandleOsyNodeIdChangeForCanOpenManager(ou32_NodeIndex, ou32_InterfaceIndex, ou8_NewNodeId);
+            m_HandleOsyNodeIdChangeForCanOpenDevice(ou32_NodeIndex, ou32_InterfaceIndex, ou8_NewNodeId);
+
+            if (this->TranslateCanInterfaceIndexToId(ou32_NodeIndex, ou32_InterfaceIndex,
+                                                     u8_InterfaceNumber) == C_NO_ERR)
+            {
+               m_HandleNodeIdChangeForCanOpenMessages(ou32_NodeIndex, u8_InterfaceNumber);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle openSYDE node id change to CANopen manager
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou8_NewNodeId        New node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerCanOpenLogic::m_HandleOsyNodeIdChangeForCanOpenManager(const uint32 ou32_NodeIndex,
+                                                                          const uint32 ou32_InterfaceIndex,
+                                                                          const uint8 ou8_NewNodeId)
+{
+   uint8 u8_InterfaceNumber;
+
+   if (this->TranslateCanInterfaceIndexToId(ou32_NodeIndex, ou32_InterfaceIndex, u8_InterfaceNumber) == C_NO_ERR)
+   {
+      tgl_assert(ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size());
+      if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+      {
+         C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+         const std::map<stw_types::uint8,
+                        C_OSCCanOpenManagerInfo>::iterator c_ItCanOpenManager = rc_OSCNode.c_CanOpenManagers.find(
+            u8_InterfaceNumber);
+         if (c_ItCanOpenManager != rc_OSCNode.c_CanOpenManagers.end())
+         {
+            //TODO SSI check
+            if (c_ItCanOpenManager->second.q_UseOpenSYDENodeID == true)
+            {
+               c_ItCanOpenManager->second.u8_NodeIDValue = ou8_NewNodeId;
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle openSYDE node id change for CANopen device
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou8_NewNodeId        New node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerCanOpenLogic::m_HandleOsyNodeIdChangeForCanOpenDevice(const uint32 ou32_NodeIndex,
+                                                                         const uint32 ou32_InterfaceIndex,
+                                                                         const uint8 ou8_NewNodeId)
+{
+   uint8 u8_InterfaceNumber;
+
+   if (this->TranslateCanInterfaceIndexToId(ou32_NodeIndex, ou32_InterfaceIndex, u8_InterfaceNumber) == C_NO_ERR)
+   {
+      const C_OSCCanInterfaceId c_DeviceId(ou32_NodeIndex, u8_InterfaceNumber);
+      for (uint32 u32_ItNode = 0UL; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
+      {
+         C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+         for (std::map<stw_types::uint8,
+                       C_OSCCanOpenManagerInfo>::iterator c_ItCanOpenManager = rc_OSCNode.c_CanOpenManagers.begin();
+              c_ItCanOpenManager != rc_OSCNode.c_CanOpenManagers.end(); ++c_ItCanOpenManager)
+         {
+            const std::map<C_OSCCanInterfaceId,
+                           C_OSCCanOpenManagerDeviceInfo>::iterator c_ItCanOpenDevice =
+               c_ItCanOpenManager->second.c_CanOpenDevices.find(c_DeviceId);
+            if (c_ItCanOpenDevice != c_ItCanOpenManager->second.c_CanOpenDevices.end())
+            {
+               //TODO SSI check
+               if (c_ItCanOpenDevice->second.q_UseOpenSYDENodeID == true)
+               {
+                  c_ItCanOpenDevice->second.u8_NodeIDValue = ou8_NewNodeId;
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle node id change to CANopen message
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou8_InterfaceNumber  Interface number
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerCanOpenLogic::m_HandleNodeIdChangeForCanOpenMessages(const uint32 ou32_NodeIndex,
+                                                                        const uint8 ou8_InterfaceNumber)
+{
+   for (uint32 u32_ItNode = 0UL; u32_ItNode < this->mc_CoreDefinition.c_Nodes.size(); ++u32_ItNode)
+   {
+      const C_OSCCanInterfaceId c_DeviceId(ou32_NodeIndex, ou8_InterfaceNumber);
+      const C_OSCCanOpenManagerDeviceInfo * const pc_FoundDevice = this->GetCanOpenManagerDeviceForAnyManager(
+         u32_ItNode,
+         c_DeviceId);
+      if (pc_FoundDevice != NULL)
+      {
+         C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_ItNode];
+         for (uint32 u32_ItProt = 0UL; u32_ItProt < rc_Node.c_ComProtocols.size(); ++u32_ItProt)
+         {
+            C_OSCCanProtocol & rc_Prot = rc_Node.c_ComProtocols[u32_ItProt];
+            if (rc_Prot.e_Type == C_OSCCanProtocol::eCAN_OPEN)
+            {
+               for (uint32 u32_ItContainer = 0UL; u32_ItContainer < rc_Prot.c_ComMessages.size(); ++u32_ItContainer)
+               {
+                  C_OSCCanMessageContainer & rc_PrevInterfaceMessages =
+                     rc_Prot.c_ComMessages[u32_ItContainer];
+                  C_PuiSdHandlerCanOpenLogic::mh_HandleNodeIdChangeForCanOpenMessages(c_DeviceId,
+                                                                                      pc_FoundDevice->u8_NodeIDValue,
+                                                                                      rc_PrevInterfaceMessages.c_RxMessages);
+                  C_PuiSdHandlerCanOpenLogic::mh_HandleNodeIdChangeForCanOpenMessages(c_DeviceId,
+                                                                                      pc_FoundDevice->u8_NodeIDValue,
+                                                                                      rc_PrevInterfaceMessages.c_TxMessages);
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle node id change for CANopen messages
+
+   \param[in]      orc_DeviceId     Device id
+   \param[in]      ou8_NewNodeId    New node id
+   \param[in,out]  orc_Messages     Messages
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerCanOpenLogic::mh_HandleNodeIdChangeForCanOpenMessages(const C_OSCCanInterfaceId & orc_DeviceId,
+                                                                         const uint8 ou8_NewNodeId,
+                                                                         std::vector<C_OSCCanMessage> & orc_Messages)
+{
+   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
+   {
+      C_OSCCanMessage & rc_Message = orc_Messages[u32_ItMessage];
+      if (rc_Message.c_CanOpenManagerOwnerNodeIndex == orc_DeviceId)
+      {
+         if (rc_Message.q_CanOpenManagerCobIdIncludesNodeID)
+         {
+            rc_Message.u32_CanId = rc_Message.u32_CanOpenManagerCobIdOffset + ou8_NewNodeId;
          }
       }
    }

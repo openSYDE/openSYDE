@@ -90,14 +90,6 @@ static const C_TextAndSize mac_TextAndSizeTable[mu8_NUM_DATA_TYPES] =
    { "IDENTITY",        0,             false, false, false, false }  //23
 };
 
-const stw_types::uint16 C_OSCCanOpenObjectDictionary::hu16_OBJECT_DICTIONARY_START_INDEX_RPDO = 0x1400U;
-const stw_types::uint16 C_OSCCanOpenObjectDictionary::hu16_OBJECT_DICTIONARY_START_INDEX_TPDO = 0x1800U;
-const stw_types::uint8 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_COB_ID_SUB_INDEX = 0x1U;
-const stw_types::uint8 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_TRANSMISSION_TYPE_SUB_INDEX = 0x2U;
-const stw_types::uint8 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_INHIBIT_TIME_SUB_INDEX = 0x3U;
-const stw_types::uint8 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_EVENT_TIMER_SUB_INDEX = 0x5U;
-const stw_types::uint16 C_OSCCanOpenObjectDictionary::hu16_OBJECT_DICTIONARY_PDO_MAPPING_OFFSET = 0x200U;
-
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
@@ -283,7 +275,7 @@ sint32 C_OSCCanOpenObjectDictionary::m_AppendEDSBlock(const C_SCLString & orc_Bl
             C_SCLString c_SubSection = c_Section + "sub0";
 
             u8_HighestSupportedSubIndex = orc_IniFile.ReadUint8(c_SubSection, "DefaultValue", 0);
-            if (u8_HighestSupportedSubIndex > u8_NumSubs)
+            if (u8_HighestSupportedSubIndex >= u8_NumSubs)
             {
                u8_NumSubs = static_cast<uint8>(u8_HighestSupportedSubIndex + 1);
             }
@@ -443,7 +435,7 @@ sint32 C_OSCCanOpenObjectDictionary::m_GetObjectDescription(const uint16 ou16_In
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is section read-only
 
-   \param[in]   ou32_PdoIndex    PDO index
+   \param[in]   ou16_PdoIndex    PDO index (0 = first PDO)
    \param[in]   oq_MessageIsTx   Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[in]   ou8_OdSubIndex   Object dictionary sub index
    \param[out]  orq_IsRo         Is read-only
@@ -455,13 +447,13 @@ sint32 C_OSCCanOpenObjectDictionary::m_GetObjectDescription(const uint16 ou16_In
    \retval   C_RANGE    Value missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenObjectDictionary::m_IsSectionRo(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+sint32 C_OSCCanOpenObjectDictionary::m_IsSectionRo(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                    const uint8 ou8_OdSubIndex, bool & orq_IsRo) const
 {
    sint32 s32_Retval = C_NO_ERR;
-   const uint32 u32_ObjectIndex = C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(ou32_PdoIndex,
+   const uint16 u16_ObjectIndex = C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(ou16_PdoIndex,
                                                                                                         oq_MessageIsTx);
-   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(u32_ObjectIndex, ou8_OdSubIndex);
+   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(u16_ObjectIndex, ou8_OdSubIndex);
 
    if (pc_Object != NULL)
    {
@@ -477,7 +469,7 @@ sint32 C_OSCCanOpenObjectDictionary::m_IsSectionRo(const uint32 ou32_PdoIndex, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Does section exist
 
-   \param[in]  ou32_PdoIndex     PDO index
+   \param[in]  ou16_PdoIndex     PDO index (0 = first PDO)
    \param[in]  oq_MessageIsTx    Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[in]  ou8_OdSubIndex    Object dictionary sub index
 
@@ -488,13 +480,13 @@ sint32 C_OSCCanOpenObjectDictionary::m_IsSectionRo(const uint32 ou32_PdoIndex, c
    \retval   False   Section does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanOpenObjectDictionary::m_DoesSectionExist(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+bool C_OSCCanOpenObjectDictionary::m_DoesSectionExist(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                       const uint8 ou8_OdSubIndex) const
 {
    bool q_Retval;
-   const uint32 u32_ObjectIndex = C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(ou32_PdoIndex,
+   const uint16 u16_ObjectIndex = C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(ou16_PdoIndex,
                                                                                                         oq_MessageIsTx);
-   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(u32_ObjectIndex, ou8_OdSubIndex);
+   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(u16_ObjectIndex, ou8_OdSubIndex);
 
    if (pc_Object != NULL)
    {
@@ -647,6 +639,41 @@ bool C_OSCCanOpenObject::IsMappableIntoPDO() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if object is mappable into a TPDO
+
+   \return
+   Flags
+
+   \retval   True    Object is mappable
+   \retval   False   Object is not mappable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanOpenObject::IsMappableIntoTPDO() const
+{
+   const C_SCLString c_Help = c_Access.UpperCase();
+
+   return this->IsMappableIntoPDO() &&
+          ((c_Help == "RO") || (c_Help == "RW") || (c_Help == "RWR") || (c_Help == "CONST"));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if object is mappable into a RPDO
+
+   \return
+   Flags
+
+   \retval   True    Object is mappable
+   \retval   False   Object is not mappable
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanOpenObject::IsMappableIntoRPDO() const
+{
+   const C_SCLString c_Help = c_Access.UpperCase();
+
+   return this->IsMappableIntoPDO() && ((c_Help == "WO") || (c_Help == "RW") || (c_Help == "RWW"));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check whether object is of signed integer type
 
    \return
@@ -757,7 +784,7 @@ void C_OSCCanOpenObjectDictionary::CalcHash(uint32 & oru32_HashValue) const
 uint8 C_OSCCanOpenObjectDictionary::GetNumHeartbeatConsumers() const
 {
    uint8 u8_Retval = 0;
-   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenObject(0x1016UL);
+   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenObject(hu16_OD_INDEX_HEARTBEAT_CONSUMER);
 
    if (pc_Object != NULL)
    {
@@ -772,6 +799,36 @@ uint8 C_OSCCanOpenObjectDictionary::GetNumHeartbeatConsumers() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is heartbeat consumer read-only
+
+   \param[out]  orq_IsRo         Is read-only
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Value found
+   \retval   C_RANGE    Value missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCCanOpenObjectDictionary::IsHeartbeatConsumerRo(bool & orq_IsRo) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+   // Checking the first consumer for read only because this is the entry which will be used for the user specified
+   // value when it is not read-only
+   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(hu16_OD_INDEX_HEARTBEAT_CONSUMER, 1U);
+
+   if (pc_Object != NULL)
+   {
+      orq_IsRo = pc_Object->IsWriteable() == false;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is heartbeat producer supported
 
    \return
@@ -783,7 +840,50 @@ uint8 C_OSCCanOpenObjectDictionary::GetNumHeartbeatConsumers() const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OSCCanOpenObjectDictionary::IsHeartbeatProducerSupported() const
 {
-   return CheckObjectPresentByIndex(0x1017UL, 0);
+   return CheckObjectPresentByIndex(hu16_OD_INDEX_HEARTBEAT_PRODUCER, 0);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Is heartbeat producer read-only
+
+   \param[out]  orq_IsRo         Is read-only
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   Value found
+   \retval   C_RANGE    Value missing
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCCanOpenObjectDictionary::IsHeartbeatProducerRo(bool & orq_IsRo) const
+{
+   sint32 s32_Retval = C_NO_ERR;
+   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenObject(hu16_OD_INDEX_HEARTBEAT_PRODUCER);
+
+   if (pc_Object != NULL)
+   {
+      orq_IsRo = pc_Object->IsWriteable() == false;
+   }
+   else
+   {
+      s32_Retval = C_RANGE;
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Does device support EMCY
+
+  \return
+  Flags
+
+   \retval   True    EMCY object present
+   \retval   False   EMCY object not present
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanOpenObjectDictionary::IsEMCYSupported() const
+{
+   return CheckObjectPresentByIndex(hu16_OD_INDEX_EMCY, 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -807,7 +907,7 @@ uint8 C_OSCCanOpenObjectDictionary::GetGranularity() const
 //----------------------------------------------------------------------------------------------------------------------
 std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableFactorySettingsSubIndices() const
 {
-   const std::set<uint8> c_Retval = this->GetAllAvailableSubIndices(0x1011UL);
+   const std::set<uint8> c_Retval = this->GetAllAvailableSubIndices(0x1011U);
 
    return c_Retval;
 }
@@ -815,13 +915,13 @@ std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableFactorySettingsSubI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all available sub indices
 
-   \param[in]  ou32_Index  Index
+   \param[in]  ou16_OdIndex  Index
 
    \return
    All available sub indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableSubIndices(const uint32 ou32_Index) const
+std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableSubIndices(const uint16 ou16_OdIndex) const
 {
    std::set<uint8> c_Retval;
 
@@ -829,9 +929,9 @@ std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableSubIndices(const ui
    {
       const C_OSCCanOpenObject & rc_Object = this->c_Objects[s32_It];
       //Matching index
-      if (rc_Object.u16_Index == ou32_Index)
+      if (rc_Object.u16_Index == ou16_OdIndex)
       {
-         if (rc_Object.u8_NumSubs == 255)
+         if (rc_Object.u8_NumSubs == C_OSCCanOpenObject::hu8_NUM_SUBS_WE_ARE_A_SUB)
          {
             c_Retval.insert(rc_Object.u8_SubIndex);
          }
@@ -843,7 +943,7 @@ std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableSubIndices(const ui
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Does inhibit time section exist
 
-   \param[in]  ou32_PdoIndex     PDO index
+   \param[in]  ou16_PdoIndex     PDO index (0 = first PDO)
    \param[in]  oq_MessageIsTx    Flag if message is TX (for CANopen manager usage this flag is inverse)
 
    \return
@@ -853,17 +953,17 @@ std::set<uint8> C_OSCCanOpenObjectDictionary::GetAllAvailableSubIndices(const ui
    \retval   False   Section does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanOpenObjectDictionary::DoesInhibitTimeSectionExist(const uint32 ou32_PdoIndex,
+bool C_OSCCanOpenObjectDictionary::DoesInhibitTimeSectionExist(const uint16 ou16_PdoIndex,
                                                                const bool oq_MessageIsTx) const
 {
-   return this->m_DoesSectionExist(ou32_PdoIndex, oq_MessageIsTx,
-                                   C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_INHIBIT_TIME_SUB_INDEX);
+   return this->m_DoesSectionExist(ou16_PdoIndex, oq_MessageIsTx,
+                                   C_OSCCanOpenObjectDictionary::hu8_OD_SUB_INDEX_INHIBIT_TIME);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Does event timer section exist
 
-   \param[in]  ou32_PdoIndex     PDO index
+   \param[in]  ou16_PdoIndex     PDO index (0 = first PDO)
    \param[in]  oq_MessageIsTx    Flag if message is TX (for CANopen manager usage this flag is inverse)
 
    \return
@@ -873,17 +973,17 @@ bool C_OSCCanOpenObjectDictionary::DoesInhibitTimeSectionExist(const uint32 ou32
    \retval   False   Section does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanOpenObjectDictionary::DoesEventTimerSectionExist(const uint32 ou32_PdoIndex,
+bool C_OSCCanOpenObjectDictionary::DoesEventTimerSectionExist(const uint16 ou16_PdoIndex,
                                                               const bool oq_MessageIsTx) const
 {
-   return this->m_DoesSectionExist(ou32_PdoIndex, oq_MessageIsTx,
-                                   C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_EVENT_TIMER_SUB_INDEX);
+   return this->m_DoesSectionExist(ou16_PdoIndex, oq_MessageIsTx,
+                                   C_OSCCanOpenObjectDictionary::hu8_OD_SUB_INDEX_EVENT_TIMER);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is COB-ID read-only
 
-   \param[in]   ou32_PdoIndex    PDO index
+   \param[in]   ou16_PdoIndex    PDO index (0 = first PDO)
    \param[in]   oq_MessageIsTx   Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[out]  orq_IsRo         Is read-only
 
@@ -894,11 +994,11 @@ bool C_OSCCanOpenObjectDictionary::DoesEventTimerSectionExist(const uint32 ou32_
    \retval   C_RANGE    Value missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenObjectDictionary::IsCobIdRo(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+sint32 C_OSCCanOpenObjectDictionary::IsCobIdRo(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                bool & orq_IsRo) const
 {
-   const sint32 s32_Retval = this->m_IsSectionRo(ou32_PdoIndex, oq_MessageIsTx,
-                                                 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_COB_ID_SUB_INDEX,
+   const sint32 s32_Retval = this->m_IsSectionRo(ou16_PdoIndex, oq_MessageIsTx,
+                                                 C_OSCCanOpenObjectDictionary::hu8_OD_SUB_INDEX_COB_ID,
                                                  orq_IsRo);
 
    return s32_Retval;
@@ -907,7 +1007,7 @@ sint32 C_OSCCanOpenObjectDictionary::IsCobIdRo(const uint32 ou32_PdoIndex, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is inhibit time read-only
 
-   \param[in]   ou32_PdoIndex    PDO index
+   \param[in]   ou16_PdoIndex    PDO index (0 = first PDO)
    \param[in]   oq_MessageIsTx   Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[out]  orq_IsRo         Is read-only
 
@@ -918,12 +1018,13 @@ sint32 C_OSCCanOpenObjectDictionary::IsCobIdRo(const uint32 ou32_PdoIndex, const
    \retval   C_RANGE    Value missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenObjectDictionary::IsInhibitTimeRo(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+sint32 C_OSCCanOpenObjectDictionary::IsInhibitTimeRo(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                      bool & orq_IsRo) const
 {
-   const sint32 s32_Retval = this->m_IsSectionRo(ou32_PdoIndex, oq_MessageIsTx,
-                                                 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_INHIBIT_TIME_SUB_INDEX,
-                                                 orq_IsRo);
+   const sint32 s32_Retval = this->m_IsSectionRo(
+      ou16_PdoIndex, oq_MessageIsTx,
+      C_OSCCanOpenObjectDictionary::hu8_OD_SUB_INDEX_INHIBIT_TIME,
+      orq_IsRo);
 
    return s32_Retval;
 }
@@ -931,7 +1032,7 @@ sint32 C_OSCCanOpenObjectDictionary::IsInhibitTimeRo(const uint32 ou32_PdoIndex,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is event timer read-only
 
-   \param[in]   ou32_PdoIndex    PDO index
+   \param[in]   ou16_PdoIndex    PDO index (0 = first PDO)
    \param[in]   oq_MessageIsTx   Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[out]  orq_IsRo         Is read-only
 
@@ -942,12 +1043,13 @@ sint32 C_OSCCanOpenObjectDictionary::IsInhibitTimeRo(const uint32 ou32_PdoIndex,
    \retval   C_RANGE    Value missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenObjectDictionary::IsEventTimerRo(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+sint32 C_OSCCanOpenObjectDictionary::IsEventTimerRo(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                     bool & orq_IsRo) const
 {
-   const sint32 s32_Retval = this->m_IsSectionRo(ou32_PdoIndex, oq_MessageIsTx,
-                                                 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_EVENT_TIMER_SUB_INDEX,
-                                                 orq_IsRo);
+   const sint32 s32_Retval = this->m_IsSectionRo(
+      ou16_PdoIndex, oq_MessageIsTx,
+      C_OSCCanOpenObjectDictionary::hu8_OD_SUB_INDEX_EVENT_TIMER,
+      orq_IsRo);
 
    return s32_Retval;
 }
@@ -955,7 +1057,7 @@ sint32 C_OSCCanOpenObjectDictionary::IsEventTimerRo(const uint32 ou32_PdoIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is transmission type read-only
 
-   \param[in]   ou32_PdoIndex    PDO index
+   \param[in]   ou16_PdoIndex    PDO index (0 = first PDO)
    \param[in]   oq_MessageIsTx   Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[out]  orq_IsRo         Is read-only
 
@@ -966,11 +1068,11 @@ sint32 C_OSCCanOpenObjectDictionary::IsEventTimerRo(const uint32 ou32_PdoIndex, 
    \retval   C_RANGE    Value missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenObjectDictionary::IsTransmissionTypeRo(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+sint32 C_OSCCanOpenObjectDictionary::IsTransmissionTypeRo(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                           bool & orq_IsRo) const
 {
-   const sint32 s32_Retval = this->m_IsSectionRo(ou32_PdoIndex, oq_MessageIsTx,
-                                                 C_OSCCanOpenObjectDictionary::hu8_OBJECT_DICTIONARY_TRANSMISSION_TYPE_SUB_INDEX,
+   const sint32 s32_Retval = this->m_IsSectionRo(ou16_PdoIndex, oq_MessageIsTx,
+                                                 C_OSCCanOpenObjectDictionary::hu8_OD_SUB_INDEX_TRANSMISSION_TYPE,
                                                  orq_IsRo);
 
    return s32_Retval;
@@ -979,7 +1081,7 @@ sint32 C_OSCCanOpenObjectDictionary::IsTransmissionTypeRo(const uint32 ou32_PdoI
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Is PDO mapping read-only
 
-   \param[in]   ou32_PdoIndex    PDO index
+   \param[in]   ou16_PdoIndex    PDO index (0 = first PDO)
    \param[in]   oq_MessageIsTx   Flag if message is TX (for CANopen manager usage this flag is inverse)
    \param[out]  orq_IsRo         Is read-only
 
@@ -990,15 +1092,14 @@ sint32 C_OSCCanOpenObjectDictionary::IsTransmissionTypeRo(const uint32 ou32_PdoI
    \retval   C_RANGE    Value missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenObjectDictionary::IsPDOMappingRo(const uint32 ou32_PdoIndex, const bool oq_MessageIsTx,
+sint32 C_OSCCanOpenObjectDictionary::IsPDOMappingRo(const uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
                                                     bool & orq_IsRo) const
 {
    sint32 s32_Retval = C_NO_ERR;
-   const uint32 u32_ObjectIndex = C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(ou32_PdoIndex,
-                                                                                                        oq_MessageIsTx)
-                                  +
-                                  C_OSCCanOpenObjectDictionary::hu16_OBJECT_DICTIONARY_PDO_MAPPING_OFFSET;
-   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(u32_ObjectIndex, 0U);
+   const uint16 u16_ObjectIndex =
+      C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(ou16_PdoIndex, oq_MessageIsTx) +
+      C_OSCCanOpenObjectDictionary::hu16_OD_PDO_MAPPING_OFFSET;
+   const C_OSCCanOpenObject * const pc_Object = this->GetCanOpenSubIndexObject(u16_ObjectIndex, 0U);
 
    if (pc_Object != NULL)
    {
@@ -1014,14 +1115,17 @@ sint32 C_OSCCanOpenObjectDictionary::IsPDOMappingRo(const uint32 ou32_PdoIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get CANopen object
 
-   \param[in]  ou32_OdIndex   Object dictionary index
+   Goes through the list of known object dictionary entries and returns a pointer to the object with the specified
+    index.
+
+   \param[in]  ou16_OdIndex   Object dictionary index
 
    \return
    NULL CANopen object not found
    Else Valid CANopen object
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenObject(const uint32 ou32_OdIndex) const
+const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenObject(const uint16 ou16_OdIndex) const
 {
    const C_OSCCanOpenObject * pc_Retval = NULL;
 
@@ -1029,9 +1133,9 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenObject(const 
    {
       const C_OSCCanOpenObject & rc_Object = this->c_Objects[s32_It];
       //Matching index
-      if (rc_Object.u16_Index == ou32_OdIndex)
+      if (rc_Object.u16_Index == ou16_OdIndex)
       {
-         if (rc_Object.u8_NumSubs != 255)
+         if (rc_Object.u8_NumSubs != C_OSCCanOpenObject::hu8_NUM_SUBS_WE_ARE_A_SUB)
          {
             pc_Retval = &this->c_Objects[s32_It];
             break;
@@ -1045,7 +1149,7 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenObject(const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get CANopen sub index object
 
-   \param[in]  ou32_OdIndex      Object dictionary index
+   \param[in]  ou16_OdIndex      Object dictionary index
    \param[in]  ou8_OdSubIndex    Object dictionary sub index
 
    \return
@@ -1053,7 +1157,7 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenObject(const 
    Else Valid CANopen sub index object
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenSubIndexObject(const uint32 ou32_OdIndex,
+const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenSubIndexObject(const uint16 ou16_OdIndex,
                                                                                   const uint8 ou8_OdSubIndex) const
 {
    const C_OSCCanOpenObject * pc_Retval = NULL;
@@ -1062,7 +1166,7 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenSubIndexObjec
    {
       const C_OSCCanOpenObject & rc_Object = this->c_Objects[s32_It];
       //Matching index
-      if (rc_Object.u16_Index == ou32_OdIndex)
+      if (rc_Object.u16_Index == ou16_OdIndex)
       {
          //Matching sub index
          if (rc_Object.u8_SubIndex == ou8_OdSubIndex)
@@ -1071,7 +1175,7 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenSubIndexObjec
             // 1. search for sub index directly, if sub index entry in file
             // or
             // 2. search for object entry directly, if no sub index entries in file
-            if (rc_Object.u8_NumSubs == 255)
+            if (rc_Object.u8_NumSubs == C_OSCCanOpenObject::hu8_NUM_SUBS_WE_ARE_A_SUB)
             {
                pc_Retval = &this->c_Objects[s32_It];
                break;
@@ -1086,7 +1190,7 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenSubIndexObjec
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check object present by index
 
-   \param[in]  ou32_OdIndex      Object dictionary index
+   \param[in]  ou16_OdIndex      Object dictionary index
    \param[in]  ou8_OdSubIndex    Object dictionary sub index (0 means search for object directly)
 
    \return
@@ -1096,7 +1200,7 @@ const C_OSCCanOpenObject * C_OSCCanOpenObjectDictionary::GetCanOpenSubIndexObjec
    \retval   False   Object not present
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanOpenObjectDictionary::CheckObjectPresentByIndex(const uint32 ou32_OdIndex,
+bool C_OSCCanOpenObjectDictionary::CheckObjectPresentByIndex(const uint16 ou16_OdIndex,
                                                              const uint8 ou8_OdSubIndex) const
 {
    bool q_Retval = false;
@@ -1105,7 +1209,7 @@ bool C_OSCCanOpenObjectDictionary::CheckObjectPresentByIndex(const uint32 ou32_O
    {
       const C_OSCCanOpenObject & rc_Object = this->c_Objects[s32_It];
       //Matching index
-      if (rc_Object.u16_Index == ou32_OdIndex)
+      if (rc_Object.u16_Index == ou16_OdIndex)
       {
          //Matching sub index
          if (rc_Object.u8_SubIndex == ou8_OdSubIndex)
@@ -1114,7 +1218,7 @@ bool C_OSCCanOpenObjectDictionary::CheckObjectPresentByIndex(const uint32 ou32_O
             // 1. search for sub index directly, if sub index entry in file
             // or
             // 2. search for object entry directly, if no sub index entries in file
-            if ((rc_Object.u8_NumSubs == 255) || (rc_Object.u8_NumSubs == 0))
+            if ((rc_Object.u8_NumSubs == C_OSCCanOpenObject::hu8_NUM_SUBS_WE_ARE_A_SUB) || (rc_Object.u8_NumSubs == 0))
             {
                q_Retval = true;
                break;
@@ -1141,9 +1245,13 @@ const
       if (rc_Object.IsMappableIntoPDO())
       {
          //Matching sub index
-         if (rc_Object.u8_NumSubs == 255)
+         if (rc_Object.u8_NumSubs == C_OSCCanOpenObject::hu8_NUM_SUBS_WE_ARE_A_SUB)
          {
             orc_SubIndices[rc_Object.u16_Index].push_back(rc_Object.u8_SubIndex);
+         }
+         else
+         {
+            orc_SubIndices[rc_Object.u16_Index].push_back(0U);
          }
       }
    }
@@ -1152,27 +1260,27 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get CANopen object dictionary index for PDO
 
-   \param[in]  ou32_PdoIndex     PDO index
+   \param[in]  ou16_PdoIndex     PDO index (0 = first PDO)
    \param[in]  oq_MessageIsTx    Flag if message is TX (for CANopen manager usage this flag is inverse)
 
    \return
    Object dictionary index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(const uint32 ou32_PdoIndex,
+uint16 C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(const uint16 ou16_PdoIndex,
                                                                              const bool oq_MessageIsTx)
 {
-   uint32 u32_Retval;
+   uint16 u16_Retval;
 
    if (oq_MessageIsTx)
    {
-      u32_Retval = C_OSCCanOpenObjectDictionary::hu16_OBJECT_DICTIONARY_START_INDEX_RPDO + ou32_PdoIndex;
+      u16_Retval = C_OSCCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_TX_PDO + ou16_PdoIndex;
    }
    else
    {
-      u32_Retval = C_OSCCanOpenObjectDictionary::hu16_OBJECT_DICTIONARY_START_INDEX_TPDO + ou32_PdoIndex;
+      u16_Retval = C_OSCCanOpenObjectDictionary::hu16_OD_INDEX_FIRST_RX_PDO + ou16_PdoIndex;
    }
-   return u32_Retval;
+   return u16_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

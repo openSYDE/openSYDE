@@ -54,7 +54,6 @@ public:
    void UpdateInitialPackageStatus(const stw_opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos,
                                    const stw_types::uint32 ou32_NodeIndex);
    bool HasNoResponseAndIsActive(void) const;
-   std::vector<stw_types::uint32> GetAllNotRespondingAndActiveIndices(void) const;
    std::vector<stw_types::uint32> GetAllActiveSTWDeviceIndices(void) const;
    bool IsActiveInView(void) const;
    bool HasNodeAnAvailableFlashloader(void) const;

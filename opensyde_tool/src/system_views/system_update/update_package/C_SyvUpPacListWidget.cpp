@@ -123,11 +123,16 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
+
    this->clear();
 
-   if (pc_View != NULL)
+   if ((pc_View != NULL) &&
+       (s32_Retval == C_NO_ERR))
    {
-      std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
       const std::vector<C_PuiSvNodeUpdate> & rc_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
       uint32 u32_CurrentPosition = 0U;
       uint32 u32_FoundNodes = 0U;
@@ -135,7 +140,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
 
       this->mu32_ViewIndex = ou32_ViewIndex;
 
-      tgl_assert(rc_NodeUpdate.size() == c_ActiveNodes.size());
+      tgl_assert(rc_NodeUpdate.size() == c_NodeActiveFlags.size());
 
       do
       {
@@ -146,7 +151,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
             // same position after the previous one too
             if (rc_NodeUpdate[u32_NodeUpdateCounter].u32_NodeUpdatePosition == u32_CurrentPosition)
             {
-               if (c_ActiveNodes[u32_NodeUpdateCounter] == true)
+               if (c_NodeActiveFlags[u32_NodeUpdateCounter] == true)
                {
                   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
                      u32_NodeUpdateCounter);
@@ -173,7 +178,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
          ++u32_CurrentPosition;
          // Run till all nodes were found, but not all must be added to the list
       }
-      while (u32_FoundNodes < c_ActiveNodes.size());
+      while (u32_FoundNodes < c_NodeActiveFlags.size());
 
       // Maximum 3 nodes shall be visible in the list at the same time
       if (this->count() == 2)
@@ -679,27 +684,42 @@ void C_SyvUpPacListWidget::ImportConfig(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Creates the service update package
+
+   \param[in]  oq_SaveAsFile  true: SUP shall be saved as .syde_sup
+                              false: SUP shall be saved in a simple directory
+
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::CreateServiceUpdatePackage(void)
+void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
 {
    const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    tgl_assert(pc_ViewData != NULL);
 
+   QString c_FilterName;
    QString c_DefaultFilename;
    if (pc_ViewData != NULL)
    {
       c_DefaultFilename = pc_ViewData->GetName();
    }
 
-   c_DefaultFilename += "_ServiceUpdatePackage" +
-                        static_cast<QString>(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().c_str());
-   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
-                                " (*" +
-                                static_cast<QString>(C_GtGetText::h_GetText(C_OSCSuServiceUpdatePackage::
-                                                                            h_GetPackageExtension().
-                                                                            c_str())) + ")";
+   if (oq_SaveAsFile)
+   {
+      c_FilterName =
+         static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
+         " (*" +
+         static_cast<QString>(C_GtGetText::h_GetText(C_OSCSuServiceUpdatePackage::
+                                                     h_GetPackageExtension().
+                                                     c_str())) + ")";
+      c_DefaultFilename += "_ServiceUpdatePackage" +
+                           static_cast<QString>(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().c_str());
+   }
+   else
+   {
+      c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Directories only")) + " *.";
+      c_DefaultFilename += "_ServiceUpdatePackage";
+   }
+
    const QString c_Folder = this->m_GetDialogPath();
    const QString c_FullPackagePath =
       C_OgeWiUtil::h_GetSaveFileName(this, C_GtGetText::h_GetText("Select Directory for Service Update Package"),
@@ -741,7 +761,12 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(void)
          const stw_types::uint32 u32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
 
          // active nodes
-         std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
+         std::vector<uint8> c_NodeActiveFlags;
+         const sint32 s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+            this->mu32_ViewIndex,
+            c_NodeActiveFlags);
+
+         tgl_assert(s32_FuncRetval == C_NO_ERR);
 
          // update applications of nodes, update position of nodes,
          std::vector<C_OSCSuSequences::C_DoFlash> c_ApplicationsToWrite;
@@ -757,25 +782,25 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(void)
             // In case of skipped files, check if some nodes does not need to be active for the package anymore
             uint32 u32_NodeCounter;
 
-            tgl_assert(c_ActiveNodes.size() == c_ApplicationsToWrite.size());
+            tgl_assert(c_NodeActiveFlags.size() == c_ApplicationsToWrite.size());
             for (u32_NodeCounter = 0; u32_NodeCounter < c_ApplicationsToWrite.size(); ++u32_NodeCounter)
             {
                if ((c_ApplicationsToWrite[u32_NodeCounter].c_FilesToFlash.size() == 0) &&
                    (c_ApplicationsToWrite[u32_NodeCounter].c_FilesToWriteToNvm.size() == 0) &&
                    (c_ApplicationsToWrite[u32_NodeCounter].c_PemFile == ""))
                {
-                  c_ActiveNodes[u32_NodeCounter] = 0U;
+                  c_NodeActiveFlags[u32_NodeCounter] = 0U;
                }
             }
 
             s32_Return = C_OSCSuServiceUpdatePackage::h_CreatePackage(c_FullPackagePath.toStdString().c_str(),
                                                                       rc_SystemDefinition,
                                                                       u32_ActiveBusIndex,
-                                                                      c_ActiveNodes,
+                                                                      c_NodeActiveFlags,
                                                                       c_NodesUpdateOrder,
                                                                       c_ApplicationsToWrite,
                                                                       c_Warnings,
-                                                                      c_Error);
+                                                                      c_Error, false, oq_SaveAsFile);
          }
 
          if (s32_Return == C_NO_ERR)

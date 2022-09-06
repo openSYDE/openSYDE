@@ -54,6 +54,7 @@ Q_SIGNALS:
    void SigErrorChange(void) const;
    void SigSwitchToHalc(void) const;
    void SigSwitchToCommMessages(const stw_types::uint32 ou32_DataPoolIndex) const;
+   void SigSwitchToCanOpen(void) const;
    void SigSave(void);
    void SigSaveAs(void);
 

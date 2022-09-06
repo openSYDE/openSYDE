@@ -46,16 +46,18 @@ public:
    void CalcHash(stw_types::uint32 & oru32_HashValue, const bool oq_R20Compatible = false) const;
    bool CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const stw_types::uint32 & oru32_SignalIndex,
                          const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
-                         const bool oq_CANMessageSignalGapsValid) const;
+                         const bool oq_CANMessageSignalGapsValid, const bool oq_ByteAlignmentRequired) const;
    void CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * const opc_List,
                                  const stw_types::uint32 & oru32_SignalIndex, bool * const opq_LayoutConflict,
                                  bool * const opq_BorderConflict, bool * const opq_GapConflict,
-                                 bool * const opq_NameConflict, bool * const opq_NameInvalid,
-                                 bool * const opq_MinOverMax, bool * const opq_ValueBelowMin,
-                                 bool * const opq_ValueOverMax, bool * const opq_NoMultiplexerButMultiplexed,
+                                 bool * const opq_ByteAlignmentLengthConflict,
+                                 bool * const opq_ByteAlignmentStartbitConflict, bool * const opq_NameConflict,
+                                 bool * const opq_NameInvalid, bool * const opq_MinOverMax,
+                                 bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
+                                 bool * const opq_NoMultiplexerButMultiplexed,
                                  bool * const opq_MultiplexedValueOutOfRange,
                                  const stw_types::uint32 ou32_CANMessageValidSignalsDLCOffset,
-                                 const bool oq_CANMessageSignalGapsValid) const;
+                                 const bool oq_CANMessageSignalGapsValid, const bool oq_ByteAlignmentRequired) const;
 
    bool IsTransmissionTypeACyclicType(void) const;
    static bool h_IsTransmissionTypeACyclicType(const E_TxMethodType oe_Type);

@@ -405,8 +405,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
             }
             else
             {
-               e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), orc_OutputPath,
-                                                  c_CreatedFiles);
+               e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application),
+                                                  orc_OutputPath, c_CreatedFiles);
 
                this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application,
                                                     e_Return == eRESULT_OK, c_CreatedFiles);
@@ -443,7 +443,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
                   TGL_FileIncludeTrailingDelimiter(orc_OutputPath) +
                   C_OSCUtils::h_NiceifyStringForFileName(rc_Application.c_Name);
                e_Return =
-                  m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), c_Path, c_CreatedFiles);
+                  m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), c_Path,
+                                          c_CreatedFiles);
                if (e_Return == eRESULT_OK)
                {
                   this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, true,
@@ -652,7 +653,6 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
          for (uint32 u32_Node = 0U; u32_Node < mc_SystemDefinition.c_Nodes.size(); u32_Node++)
          {
             const C_OSCNode & rc_Node = mc_SystemDefinition.c_Nodes[u32_Node];
-
             if ((rc_Node.c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
             {
                const C_SCLString c_Path = TGL_FileIncludeTrailingDelimiter(mc_OutputPath) +

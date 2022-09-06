@@ -172,6 +172,23 @@ public:
    void SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                              const QString & orc_ListName,
                                              const std::vector<stw_types::sint32> & orc_ColumnWidths);
+   void SetProjSdNodeCANopenOverviewColumnWidth(const QString & orc_NodeName,
+                                                const std::vector<stw_types::sint32> & orc_Value);
+   void SetProjSdNodeCANopenPdoOverviewColumnWidth(const QString & orc_NodeName,
+                                                   const std::vector<stw_types::sint32> & orc_Value);
+   void SetProjSdNodeSelectedCANopenManager(const QString & orc_NodeName, const stw_types::uint8 & oru8_Value);
+   void SetProjSdNodeSelectedCANopenDevice(const QString & orc_NodeName, const stw_types::uint8 & oru8_Number,
+                                           const QString & orc_Value);
+   void SetProjSdNodeSelectedCANopenDeviceUseCaseIndex(const QString & orc_NodeName,
+                                                       const stw_types::uint32 & oru32_Value);
+   void SetProjSdNodeExpandedCANopenTree(const QString & orc_NodeName, const std::map<stw_types::uint8,
+                                                                                      bool> & orc_Interfaces,
+                                         const std::map<stw_types::uint8, bool> & orc_Devices,
+                                         const std::map<std::pair<stw_types::uint8, std::pair<stw_types::uint8,
+                                                                                              stw_scl::C_SCLString> >,
+                                                        bool> & orc_Device);
+   void SetProjSdNodeCANopenSelectedUseCaseOrInterface(const QString & orc_NodeName,
+                                                       const bool & orq_IsUseCaseSelected);
    void SetProjSdNodeHalcOverviewColumnWidth(const QString & orc_NodeName,
                                              const std::vector<stw_types::sint32> & orc_Value);
    void SetProjSdNodeHalcConfigColumnWidth(const QString & orc_NodeName,

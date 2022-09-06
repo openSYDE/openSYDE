@@ -42,10 +42,10 @@ public:
                  const std::vector<stw_types::uint32> & orc_NodeIndexes,
                  const std::vector<stw_types::uint32> & orc_InterfaceIndexes,
                  const std::vector<stw_types::uint32> & orc_DatapoolIndexes,
-                 const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes, const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly);
+                 const std::vector<stw_opensyde_gui_logic::C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes, const std::vector<stw_types::uint32> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly, const QString & orc_SpecificTooltip);
    void SetLastKnownCycleTimeValue(const stw_types::uint32 ou32_Value);
    void SetRxTimeoutPreconditions(const bool oq_TxMethodOnEvent, const bool oq_DisableOptionPossible);
-   void SetRxTimeoutConfigurationDisabled(const bool oq_DisableTimeoutConfiguration);
+   void SetRxTimeoutConfigurationReadOnly(const bool oq_TimeoutConfigurationReadOnly);
    void CheckNodes(const std::vector<stw_types::uint32> & orc_NodeIndexes,
                    const std::vector<stw_types::uint32> & orc_InterfaceIndexes,
                    const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;
@@ -74,7 +74,7 @@ private:
    stw_types::uint32 mu32_LastKnownCycleTimeValue;
    bool mq_TxMethodOnEvent;
    bool mq_DisableOptionPossible;
-   bool mq_DisableTimeoutConfiguration;
+   bool mq_TimeoutConfigurationReadOnly;
    bool mq_ModeSingleNode;
 
    //Avoid call

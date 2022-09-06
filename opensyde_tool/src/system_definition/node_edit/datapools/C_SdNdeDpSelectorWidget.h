@@ -52,6 +52,7 @@ public:
                        const bool oq_AddBtnVisible);
    void SetSelectedDataPool(const stw_types::uint32 ou32_Index) const;
    void SetCurrentDataPoolConflict(const stw_types::sintn osn_DataPoolWidgetIndex, const bool oq_Active);
+   void ReloadDataPools(void) const;
    void UpdateDataPools(void);
    void UpdateActualDataPool(void) const;
    void ErrorCheck(void);
@@ -66,6 +67,7 @@ Q_SIGNALS:
                                const stw_types::sintn osn_DataPoolWidgetIndex);
    void SigDataPoolChanged(void);
    void SigErrorCheck(void);
+   void SigUpdateFollowingLists(stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_DataPoolType);
    void SigUpdateLists(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex);
    void SigNoDataPoolSelected(void);
    void SigDataPoolHoverStateChanged(const stw_types::uint32 ou32_DataPoolIndex, const bool oq_Hovered);

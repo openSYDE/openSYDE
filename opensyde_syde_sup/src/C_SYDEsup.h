@@ -43,6 +43,7 @@ public:
       eERR_PACKAGE_CORE_C_NOACT        = 24,
       eERR_PACKAGE_NOT_FOUND           = 25,
       eERR_PACKAGE_WRONG_EXTENSION     = 26,
+      eERR_PACKAGE_FILES_MISSING       = 27,
 
       eERR_CAN_IF_NOT_FOUND            = 30,
       eERR_CAN_IF_LOAD_FAILED          = 31,

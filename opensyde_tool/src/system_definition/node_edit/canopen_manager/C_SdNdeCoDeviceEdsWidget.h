@@ -10,6 +10,10 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
+#include <QFileInfo>
+
+#include "stwtypes.h"
+#include "C_OSCCanInterfaceId.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -32,12 +36,24 @@ public:
    explicit C_SdNdeCoDeviceEdsWidget(QWidget * const opc_Parent = NULL);
    ~C_SdNdeCoDeviceEdsWidget(void);
 
+   void InitStaticNames(void) const;
+   void SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_ManagerNodeIndex,
+                                   const stw_types::uint8 ou8_ManagerInterfaceId,
+                                   const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId);
+
 private:
    Ui::C_SdNdeCoDeviceEdsWidget * mpc_Ui;
+   stw_types::uint32 mu32_ManagerNodeIndex;
+   stw_types::uint8 mu8_ManagerInterfaceId;
+   stw_opensyde_core::C_OSCCanInterfaceId mc_DeviceInterfaceId;
 
    //Avoid call
    C_SdNdeCoDeviceEdsWidget(const C_SdNdeCoDeviceEdsWidget &);
    C_SdNdeCoDeviceEdsWidget & operator =(const C_SdNdeCoDeviceEdsWidget &);
+
+   void m_OnUpdateClicked(void) const;
+   void m_LoadPicture(const QFileInfo oc_FileInfo);
+   void m_SetDetails(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

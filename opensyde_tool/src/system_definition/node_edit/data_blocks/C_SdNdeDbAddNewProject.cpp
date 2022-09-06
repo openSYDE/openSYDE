@@ -45,6 +45,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SdNdeDbAddNewProject::mhc_START_TD = "<td style=\"padding: 0 9px 0 0;\">";
 const QString C_SdNdeDbAddNewProject::mhc_CONTINUE_TD = "<td style=\"padding: 0 9px 0 9px;\">";
+const QString C_SdNdeDbAddNewProject::mhc_SUFFIX = "syde_tsp";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -75,6 +76,10 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
 {
    this->mpc_Ui->setupUi(this);
 
+   //lint -e{1938}  static const is guaranteed preinitialized before main
+   this->mpc_Ui->pc_LineEditTSP->SetDragAndDropActiveForFile(mhc_SUFFIX);
+   this->mpc_Ui->pc_LineEditCreateIn->SetDragAndDropActiveForFolder(true);
+
    InitStaticNames();
    m_Init(ou32_NodeIndex);
    this->mpc_Ui->pc_TextEditTSPDescription->setReadOnly(true);
@@ -94,6 +99,8 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
            &C_SdNdeDbAddNewProject::m_CreateInButtonClicked);
    connect(this->mpc_Ui->pc_LineEditTSP, &C_OgeLeFilePath::editingFinished,
            this, &C_SdNdeDbAddNewProject::m_OnLoadTSP);
+   connect(this->mpc_Ui->pc_LineEditCreateIn, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SdNdeDbAddNewProject::m_OnDroppedCreatinPath);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -568,10 +575,9 @@ void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
 {
    QString c_FolderName; // for default folder
    QString c_FilePath = "";
-   const QString c_Suffix = "syde_tsp";
    const QFileInfo c_File(C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()));
    const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("openSYDE Target Support Package file")) +
-                                " (*." + c_Suffix + ")";
+                                " (*." + mhc_SUFFIX + ")";
 
    if (c_File.exists() == true)
    {
@@ -584,7 +590,7 @@ void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
 
    c_FilePath =
       C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Select openSYDE Target Support Package File"),
-                                     c_FolderName, c_FilterName, c_Suffix);
+                                     c_FolderName, c_FilterName, mhc_SUFFIX);
    if (c_FilePath != "")
    {
       this->SetTSPPath(c_FilePath);
@@ -610,19 +616,41 @@ void C_SdNdeDbAddNewProject::m_CreateInButtonClicked(void)
       c_FolderName = C_PuiProject::h_GetInstance()->GetFolderPath();
    }
 
-   QString c_Path = QFileDialog::getExistingDirectory(this,
-                                                      C_GtGetText::h_GetText("Select Directory for Target Project"),
-                                                      c_FolderName, QFileDialog::ShowDirsOnly);
+   const QString c_Path = QFileDialog::getExistingDirectory(
+      this,
+      C_GtGetText::h_GetText("Select Directory for Target Project"),
+      c_FolderName, QFileDialog::ShowDirsOnly);
 
    if (c_Path != "")
    {
-      // check if relative path is possible and appreciated
-      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
+      this->m_SetCreateInPath(c_Path);
+   }
+}
 
-      if (c_Path != "")
-      {
-         this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
-      }
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped folder path in create in line edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbAddNewProject::m_OnDroppedCreatinPath(void)
+{
+   this->m_SetCreateInPath(this->mpc_Ui->pc_LineEditCreateIn->GetPath());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for full create in path.
+
+   \param[in] orc_New New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDbAddNewProject::m_SetCreateInPath(const QString & orc_New)
+{
+   // check if relative path is possible and appreciated
+   const QString c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this, orc_New,
+                                                                 C_PuiProject::h_GetInstance()->GetFolderPath());
+
+   if (c_Path != "")
+   {
+      this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_Path, C_PuiProject::h_GetInstance()->GetFolderPath());
    }
 }
 

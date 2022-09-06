@@ -464,6 +464,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                {
                   if (e_Col == eNAME)
                   {
+                     C_OSCCanProtocol::E_Type e_ProtocolType = C_OSCCanProtocol::eCAN_OPEN;
                      C_OSCCanSignal c_OsySignal;
                      C_OSCCanMessage c_OsyMessage;
                      C_OSCNodeDataPoolListElement c_OsySignalCommon;
@@ -472,7 +473,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                      const C_OSCNodeDataPoolListElement * pc_OsySignalCommon;
 
                      //Signal
-                     pc_OsySignal = m_GetSignalInterpretedOsy(u32_Index);
+                     pc_OsySignal = m_GetSignalInterpretedOsy(u32_Index, &e_ProtocolType);
                      if (pc_OsySignal != NULL)
                      {
                         c_OsySignal = *pc_OsySignal;
@@ -485,6 +486,8 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                         {
                            c_OsySignal = C_CamGenSigUtil::h_ConvertDBCToOSY(*pc_DbcSignal);
                         }
+                        //Use layer 2 for DBC
+                        e_ProtocolType = C_OSCCanProtocol::eLAYER2;
                      }
                      //Signal common
                      pc_OsySignalCommon = m_GetSignalInterpretedOsyCommon(u32_Index);
@@ -517,6 +520,7 @@ QVariant C_CamGenSigTableModel::data(const QModelIndex & orc_Index, const sintn 
                      }
                      //Tool tip
                      c_Retval = C_SdTooltipUtil::h_GetToolTipContentSignal(c_OsySignal, c_OsyMessage, c_OsySignalCommon,
+                                                                           e_ProtocolType,
                                                                            "", "");
                   }
                   else
@@ -1009,11 +1013,14 @@ bool C_CamGenSigTableModel::m_CheckInterpretedMode(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get  interpreted OSY message
 
+   \param[out]  ope_ProtocolType    Protocol type
+
    \return
    Interpreted OSY message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageInterpretedOsy(void) const
+const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageInterpretedOsy(
+   C_OSCCanProtocol::E_Type * const ope_ProtocolType) const
 {
    const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
    const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(
@@ -1024,7 +1031,8 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageIn
       pc_Retval = C_CamDbHandler::h_GetInstance()->GetOSCMessage(pc_Message->c_DataBaseFilePath.c_str(),
                                                                  pc_Message->c_Name.c_str(),
                                                                  pc_Message->q_ContainsValidHash,
-                                                                 pc_Message->u32_Hash);
+                                                                 pc_Message->u32_Hash,
+                                                                 ope_ProtocolType);
    }
    return pc_Retval;
 }
@@ -1032,17 +1040,19 @@ const stw_opensyde_core::C_OSCCanMessage * C_CamGenSigTableModel::m_GetMessageIn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get interpreted OSY signal
 
-   \param[in]  ou32_Index  Signal index
+   \param[in]   ou32_Index          Signal index
+   \param[out]  ope_ProtocolType    Protocol type
 
    \return
    Interpreted OSY signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_core::C_OSCCanSignal * C_CamGenSigTableModel::m_GetSignalInterpretedOsy(const uint32 ou32_Index)
+const stw_opensyde_core::C_OSCCanSignal * C_CamGenSigTableModel::m_GetSignalInterpretedOsy(const uint32 ou32_Index,
+                                                                                           C_OSCCanProtocol::E_Type * const ope_ProtocolType)
 const
 {
    const C_OSCCanSignal * pc_Retval = NULL;
-   const C_OSCCanMessage * const pc_Message = m_GetMessageInterpretedOsy();
+   const C_OSCCanMessage * const pc_Message = m_GetMessageInterpretedOsy(ope_ProtocolType);
 
    if ((pc_Message != NULL) && (ou32_Index < pc_Message->c_Signals.size()))
    {

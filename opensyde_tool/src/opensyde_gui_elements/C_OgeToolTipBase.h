@@ -31,6 +31,7 @@ public:
 
    void SetToolTipInformation(const QString & orc_Heading, const QString & orc_Content, const stw_opensyde_gui::C_NagToolTip::E_Type oe_Type =
                                  stw_opensyde_gui::C_NagToolTip::eDEFAULT);
+   void ShowToolTipWhenDisabled(const bool oq_ShowToolTip);
 
 protected:
    virtual void m_HideToolTip(void);
@@ -40,6 +41,7 @@ protected:
    QString mc_ToolTipContent;
    stw_opensyde_gui::C_NagToolTip::E_Type me_ToolTipType;
    bool mq_ToolTipActive;
+   bool mq_ShowToolTipWhenDisabled;
 
 private:
    stw_opensyde_gui::C_NagToolTip * mpc_ToolTip;

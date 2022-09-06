@@ -296,51 +296,69 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    const C_OSCNode * const pc_Node = &this->mrc_AllNodes[this->mu32_TargetNodeIndex];
    uint32 u32_Counter;
 
-   for (u32_Counter = 0U; u32_Counter < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_Counter)
+   tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
+   if (pc_Node->pc_DeviceDefinition != NULL)
    {
-      // Bus is connected and for the routing and check relevant
-      if ((this->me_Mode == C_OSCRoutingCalculation::eDIAGNOSTIC) &&
-          (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsDiagnosisEnabled == true))
+      tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
+      if (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size())
       {
-         q_AtLeastOneFunctionActive = true;
+         const C_OSCSubDeviceDefinition & rc_SubDevDef =
+            pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex];
 
-         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
+         // But with one exception: A node without any functionality like a third party device. This must be handled
+         // without functionality and without error. All other nodes must be checked
+         if ((rc_SubDevDef.q_FlashloaderOpenSydeEthernet == true) ||
+             (rc_SubDevDef.q_FlashloaderOpenSydeCan == true) ||
+             (rc_SubDevDef.q_FlashloaderStwCan == true))
          {
-            // Minimum one com interface is relevant
-            q_UsableBusFound = true;
-         }
-      }
-      else if ((this->me_Mode == C_OSCRoutingCalculation::eUPDATE) &&
-               (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsUpdateEnabled == true))
-      {
-         q_AtLeastOneFunctionActive = true;
+            for (u32_Counter = 0U; u32_Counter < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_Counter)
+            {
+               // Bus is connected and for the routing and check relevant
+               if ((this->me_Mode == C_OSCRoutingCalculation::eDIAGNOSTIC) &&
+                   (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsDiagnosisEnabled == true))
+               {
+                  q_AtLeastOneFunctionActive = true;
 
-         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
-         {
-            // Minimum one com interface is relevant
-            q_UsableBusFound = true;
-         }
-      }
-      else if (this->me_Mode == eROUTING_CHECK)
-      {
-         // Independent of any update or diagnostic functionality of the interface, but the error must be detected,
-         // so handle it as interface with active functionality
-         q_AtLeastOneFunctionActive = true;
+                  if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
+                  {
+                     // Minimum one com interface is relevant
+                     q_UsableBusFound = true;
+                  }
+               }
+               else if ((this->me_Mode == C_OSCRoutingCalculation::eUPDATE) &&
+                        (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsUpdateEnabled == true))
+               {
+                  q_AtLeastOneFunctionActive = true;
 
-         if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
-         {
-            // Minimum one com interface is relevant
-            q_UsableBusFound = true;
-         }
-      }
-      else
-      {
-         // Nothing to do
-      }
+                  if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
+                  {
+                     // Minimum one com interface is relevant
+                     q_UsableBusFound = true;
+                  }
+               }
+               else if (this->me_Mode == eROUTING_CHECK)
+               {
+                  // Independent of any update or diagnostic functionality of the interface, but the error must be
+                  // detected, so handle it as interface with active functionality
+                  q_AtLeastOneFunctionActive = true;
 
-      if (q_UsableBusFound == true)
-      {
-         break;
+                  if (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].GetBusConnected() == true)
+                  {
+                     // Minimum one com interface is relevant
+                     q_UsableBusFound = true;
+                  }
+               }
+               else
+               {
+                  // Nothing to do
+               }
+
+               if (q_UsableBusFound == true)
+               {
+                  break;
+               }
+            }
+         }
       }
    }
 

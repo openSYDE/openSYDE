@@ -107,6 +107,9 @@ private:
    void m_OnNameChanged(void);
    void m_OnIdChanged(void);
    void m_OnCobIdChanged(void);
+   stw_types::uint8 m_GetCoNodeId(const stw_opensyde_core::C_OSCCanMessage & orc_MessageData);
+   void m_UpdateCobIdText(const stw_opensyde_core::C_OSCCanMessage & orc_MessageData,
+                          const stw_types::uint8 ou8_CoDeviceNodeId);
    void m_OnExtendedChanged(void);
    void m_OnDlcChanged(void);
    void m_OnCycleTimeChanged(void);

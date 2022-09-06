@@ -38,6 +38,7 @@ public:
                                   const bool oq_SourceCode);
 
    static stw_scl::C_SCLString h_GetTypePrefix(const C_OSCNodeDataPoolContent::E_Type oe_Type, const bool oq_IsArray);
+   static stw_scl::C_SCLString h_GetElementTypeAsString(const C_OSCNodeDataPoolContent::E_Type oe_Type);
    static stw_scl::C_SCLString h_GetElementCName(const stw_scl::C_SCLString & orc_Name, const bool oq_IsArray,
                                                  const C_OSCNodeDataPoolContent::E_Type oe_Type,
                                                  const stw_scl::C_SCLString & orc_ArrayPos = "0");

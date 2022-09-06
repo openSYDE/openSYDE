@@ -80,6 +80,8 @@ C_PopCreateServiceProjDialogWidget::C_PopCreateServiceProjDialogWidget(
    InitStaticNames();
    this->m_InitPwdLineEdit();
 
+   this->mpc_Ui->pc_LineEditPath->SetDragAndDropActiveForFile("syde_sp");
+
    // set default path if nothing in user settings
    QString c_DefaultPath;
    if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)

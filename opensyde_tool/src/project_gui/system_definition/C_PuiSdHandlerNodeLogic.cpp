@@ -465,12 +465,12 @@ void C_PuiSdHandlerNodeLogic::SetOSCNodePropertiesDetailed(const uint32 ou32_Nod
               ++u32_ItInt)
          {
             C_OSCNodeComInterfaceSettings & rc_Interface = rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItInt];
-            rc_Interface.u8_NodeID = orc_NodeIds[u32_ItInt];
             rc_Interface.q_IsUpdateEnabled = orc_UpdateFlags[u32_ItInt];
             rc_Interface.q_IsRoutingEnabled = orc_RoutingFlags[u32_ItInt];
             rc_Interface.q_IsDiagnosisEnabled = orc_DiagnosisFlags[u32_ItInt];
          }
       }
+      m_SetOSCNodeIds(ou32_NodeIndex, orc_NodeIds);
       //Signal new name!
       Q_EMIT (this->SigNodeChanged(ou32_NodeIndex));
    }
@@ -682,17 +682,27 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
       bool q_DataPoolsInvalid;
       bool q_ApplicationsInvalid;
       bool q_DomainsInvalid;
+      bool q_CommSignalCountInvalid;
+      bool q_CoPdoCountInvalid;
+      bool q_CoNodeIdInvalid;
+      bool q_CoHeartbeatInvalid;
 
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, &q_NameEmpty, &q_NodeIdInvalid,
                                                  &q_IpInvalid,
                                                  &q_DataPoolsInvalid, &q_ApplicationsInvalid, &q_DomainsInvalid,
-                                                 true, NULL, NULL, NULL, NULL) == C_NO_ERR)
+                                                 &q_CommSignalCountInvalid, &q_CoPdoCountInvalid,
+                                                 &q_CoNodeIdInvalid, &q_CoHeartbeatInvalid,
+                                                 true, NULL, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
          const bool q_NvmSizeConflict = this->CheckNodeNvmDataPoolsSizeConflict(oru32_NodeIndex);
-         if (((((((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true)) ||
-                 (q_DataPoolsInvalid == true)) ||
-                (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true)) || (q_NameEmpty == true)) ||
-             (q_NvmSizeConflict == true))
+         if ((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true) ||
+             (q_DataPoolsInvalid == true) ||
+             (q_ApplicationsInvalid == true) || (q_DomainsInvalid == true) || (q_NameEmpty == true) ||
+             (q_NvmSizeConflict == true) ||
+             (q_CommSignalCountInvalid == true) ||
+             (q_CoPdoCountInvalid == true) ||
+             (q_CoNodeIdInvalid == true) ||
+             (q_CoHeartbeatInvalid == true))
          {
             q_Retval = true;
          }
@@ -701,8 +711,10 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
             q_Retval = false;
          }
          //Store for future reference
-         if ((((q_DataPoolsInvalid == true) || (q_ApplicationsInvalid == true)) || (q_DomainsInvalid == true) ||
-              (q_NameEmpty == true)) || (q_NvmSizeConflict == true))
+         if ((q_DataPoolsInvalid == true) || (q_ApplicationsInvalid == true) || (q_DomainsInvalid == true) ||
+             (q_NameEmpty == true) || (q_NvmSizeConflict == true) ||
+             (q_CoNodeIdInvalid == true) || (q_CommSignalCountInvalid == true) || (q_CoPdoCountInvalid == true) ||
+             (q_CoHeartbeatInvalid == true))
          {
             hc_PreviousResult.insert(u32_Hash, true);
          }
@@ -724,8 +736,8 @@ bool C_PuiSdHandlerNodeLogic::CheckNodeConflict(const uint32 & oru32_NodeIndex) 
       bool q_IpInvalid;
 
       if (this->mc_CoreDefinition.CheckErrorNode(oru32_NodeIndex, &q_NameConflict, NULL, &q_NodeIdInvalid, &q_IpInvalid,
-                                                 NULL, NULL,
-                                                 NULL, true, NULL, NULL, NULL, NULL) == C_NO_ERR)
+                                                 NULL, NULL, NULL, NULL, NULL, NULL,
+                                                 NULL, true, NULL, NULL, NULL, NULL, NULL) == C_NO_ERR)
       {
          if ((q_NameConflict == true) || (q_NodeIdInvalid == true) || (q_IpInvalid == true))
          {
@@ -6344,5 +6356,52 @@ void C_PuiSdHandlerNodeLogic::mh_MergeNvmDataPoolAreas(
    for (u32_Counter = 0; u32_Counter < orc_AreaToAdd.c_DataPoolIndexes.size(); ++u32_Counter)
    {
       orc_AreaToMerge.c_DataPoolIndexes.push_back(orc_AreaToAdd.c_DataPoolIndexes[u32_Counter]);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node ids
+
+   \param[in]  ou32_NodeIndex    Node index
+   \param[in]  orc_NodeIds       Node ids
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::m_SetOSCNodeIds(const uint32 ou32_NodeIndex, const std::vector<uint8> & orc_NodeIds)
+{
+   tgl_assert(ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      for (uint32 u32_ItInt = 0UL;
+           (u32_ItInt < rc_OSCNode.c_Properties.c_ComInterfaces.size()) && (u32_ItInt < orc_NodeIds.size());
+           ++u32_ItInt)
+      {
+         m_SetOSCNodeId(ou32_NodeIndex, u32_ItInt, orc_NodeIds[u32_ItInt]);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set node id
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou8_NodeId           Node id
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::m_SetOSCNodeId(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
+                                             const uint8 ou8_NodeId)
+{
+   tgl_assert(ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size());
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      tgl_assert(ou32_InterfaceIndex < rc_OSCNode.c_Properties.c_ComInterfaces.size());
+      if (ou32_InterfaceIndex < rc_OSCNode.c_Properties.c_ComInterfaces.size())
+      {
+         C_OSCNodeComInterfaceSettings & rc_Interface = rc_OSCNode.c_Properties.c_ComInterfaces[ou32_InterfaceIndex];
+         rc_Interface.u8_NodeID = ou8_NodeId;
+         m_SyncOsyNodeIdChange(ou32_NodeIndex, ou32_InterfaceIndex, ou8_NodeId);
+      }
    }
 }

@@ -73,8 +73,11 @@ private:
    stw_types::uint32 mu32_MessageIndex;
 
    bool m_CheckInterpretedMode(void) const;
-   const stw_opensyde_core::C_OSCCanMessage * m_GetMessageInterpretedOsy(void) const;
-   const stw_opensyde_core::C_OSCCanSignal * m_GetSignalInterpretedOsy(const stw_types::uint32 ou32_Index) const;
+   const stw_opensyde_core::C_OSCCanMessage * m_GetMessageInterpretedOsy(
+      stw_opensyde_core::C_OSCCanProtocol::E_Type * const ope_ProtocolType = NULL) const;
+   const stw_opensyde_core::C_OSCCanSignal * m_GetSignalInterpretedOsy(const stw_types::uint32 ou32_Index,
+                                                                       stw_opensyde_core::C_OSCCanProtocol::E_Type * const ope_ProtocolType = NULL)
+   const;
    const stw_opensyde_core::C_OSCNodeDataPoolList * m_GetMessageListInterpreted(void) const;
    const stw_opensyde_core::C_OSCNodeDataPoolListElement * m_GetSignalInterpretedOsyCommon(
       const stw_types::uint32 ou32_Index) const;

@@ -49,7 +49,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.cpp \
-    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsResultEntry.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.cpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.cpp \
@@ -57,6 +56,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeModel.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeView.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.cpp \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.cpp \
@@ -92,6 +92,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.cpp \
+    ../src/table_base/tree_base/C_TblTreMultiColumnLeafSortFilter.cpp \
     ../src/user_settings/C_UsHandler.cpp \
     ../src/user_settings/C_UsFiler.cpp \
     ../src/project_operations/C_PopListItem.cpp \
@@ -212,7 +213,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpViewWidget.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.cpp \
-    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListDelegate.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.cpp \
     ../src/opensyde_gui_elements/frame/C_OgeFraSeparator.cpp \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddCommand.cpp \
@@ -922,7 +922,6 @@ HEADERS  += \
     ../src/system_definition/C_SdTopologyWidget.h \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.h \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.h \
-    ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsResultEntry.h \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.h \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.h \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.h \
@@ -930,6 +929,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeModel.h \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoConfigTreeView.h \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewDelegate.h \
+    ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableDelegate.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpEditWidget.h \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoWidget.h \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoDeviceConfigWidget.h \
@@ -965,6 +965,7 @@ HEADERS  += \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeFilesWidget.h \
     ../src/system_views/system_update/update_package/C_SyvUpPacSectionNodeWidget.h \
     ../src/system_views/system_update/update_package/C_SyvUpPacWidget.h \
+    ../src/table_base/tree_base/C_TblTreMultiColumnLeafSortFilter.h \
     ../src/user_settings/C_UsHandler.h \
     ../src/constants.h \
     ../src/user_settings/C_UsFiler.h \
@@ -1087,7 +1088,6 @@ HEADERS  += \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpViewWidget.h \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorItemWidget.h \
-    ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorListDelegate.h \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesWidget.h \
     ../src/opensyde_gui_elements/frame/C_OgeFraSeparator.h \
     ../src/system_definition/node_edit/undo/list_element/C_SdNdeUnoLeDataPoolListElementAddCommand.h \

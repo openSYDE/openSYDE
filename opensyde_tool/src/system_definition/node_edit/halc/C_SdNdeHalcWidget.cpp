@@ -256,7 +256,7 @@ void C_SdNdeHalcWidget::ShowChannel(const stw_types::uint32 ou32_DomainIndex,
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Overridden show event
+/*! \brief   Overwritten show event
 
    Here: Set splitter size.
 

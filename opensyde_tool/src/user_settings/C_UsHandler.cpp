@@ -1552,6 +1552,179 @@ void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeN
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node CANopen overview column width
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeCANopenOverviewColumnWidth(const QString & orc_NodeName,
+                                                          const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetCANopenOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetCANopenOverviewColumnWidth(orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node CANopen PDO overview column width
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  orc_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeCANopenPdoOverviewColumnWidth(const QString & orc_NodeName,
+                                                             const std::vector<sint32> & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetCANopenPdoOverviewColumnWidth(orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetCANopenPdoOverviewColumnWidth(orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node selected CANopen manager
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  oru8_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedCANopenManager(const QString & orc_NodeName, const stw_types::uint8 & oru8_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCANopenManager(oru8_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedCANopenManager(oru8_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node selected CANopen device
+
+   \param[in]  orc_NodeName      Node name
+   \param[in]  oru8_Number       Interface number
+   \param[in]  orc_Value         Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedCANopenDevice(const QString & orc_NodeName, const stw_types::uint8 & oru8_Number,
+                                                     const QString & orc_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCANopenDevice(oru8_Number, orc_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedCANopenDevice(oru8_Number, orc_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node selected CANopen device use case
+
+   \param[in]  orc_NodeName   Node name
+   \param[in]  oru32_Value      Value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeSelectedCANopenDeviceUseCaseIndex(const QString & orc_NodeName,
+                                                                 const uint32 & oru32_Value)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCANopenDeviceUseCaseIndex(oru32_Value);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetSelectedCANopenDeviceUseCaseIndex(oru32_Value);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node selected CANopen device use case
+
+   \param[in]  orc_NodeName      Node name
+   \param[in]  orc_Interfaces    Expanded interfaces
+   \param[in]  orc_Devices       Expanded devices
+   \param[in]  orc_Device        Expanded device
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeExpandedCANopenTree(const QString & orc_NodeName, const std::map<stw_types::uint8,
+                                                                                                bool> & orc_Interfaces,
+                                                   const std::map<stw_types::uint8,
+                                                                  bool> & orc_Devices,
+                                                   const std::map<std::pair<stw_types::uint8,
+                                                                            std::pair<stw_types::uint8,
+                                                                                      stw_scl::C_SCLString> >,
+                                                                  bool> & orc_Device)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCANopenManager(orc_Interfaces);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCANopenDevices(orc_Devices);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCANopenDevice(orc_Device);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetExpandedCANopenManager(orc_Interfaces);
+      c_Node.SetExpandedCANopenDevices(orc_Devices);
+      c_Node.SetExpandedCANopenDevice(orc_Device);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set project system definition node is use case or interface selected
+
+   \param[in]  orc_NodeName               Node name
+   \param[in]  orq_IsUseCaseSelected      Selected or not
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetProjSdNodeCANopenSelectedUseCaseOrInterface(const QString & orc_NodeName,
+                                                                 const bool & orq_IsUseCaseSelected)
+{
+   if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
+   {
+      //Do not insert as this will replace all currently known user settings for this item
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetCANopenSelectedUseCaseOrInterface(orq_IsUseCaseSelected);
+   }
+   else
+   {
+      C_UsNode c_Node;
+      c_Node.SetCANopenSelectedUseCaseOrInterface(orq_IsUseCaseSelected);
+      this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set project system definition node halc overview column width
 
    \param[in]  orc_NodeName   Node name

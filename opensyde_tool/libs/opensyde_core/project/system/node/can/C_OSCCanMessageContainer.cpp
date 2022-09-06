@@ -183,8 +183,12 @@ std::vector<C_OSCCanMessage> & C_OSCCanMessageContainer::GetMessages(const bool 
    \param[out]  opq_IdConflict                        Id conflict
    \param[out]  opq_IdInvalid                         Id out of 11 bit / 29 bit range
    \param[out]  opq_SignalInvalid                     An error found for a signal
+   \param[out]  opq_NoSignalsInvalid                  An error found for having no signals
    \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
    \param[in]   oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
+   \param[in]   oq_ByteAlignmentRequired              Flag if byte alignment is required and if the signal does not
+                                                      fit into byte alignment it will be handled as error
+   \param[in]   oq_SignalsRequired                    Flag if signals are required for a message
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolList * const opc_List,
@@ -192,8 +196,11 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
                                                       bool * const opq_NameConflict, bool * const opq_NameInvalid,
                                                       bool * const opq_DelayTimeInvalid, bool * const opq_IdConflict,
                                                       bool * const opq_IdInvalid, bool * const opq_SignalInvalid,
+                                                      bool * const opq_NoSignalsInvalid,
                                                       const uint32 ou32_CANMessageValidSignalsDLCOffset,
-                                                      const bool oq_CANMessageSignalGapsValid) const
+                                                      const bool oq_CANMessageSignalGapsValid,
+                                                      const bool oq_ByteAlignmentRequired,
+                                                      const bool oq_SignalsRequired) const
 {
    const std::vector<C_OSCCanMessage> & rc_Messages = this->GetMessagesConst(orq_IsTx);
 
@@ -204,7 +211,8 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       //Check variable name
       if (opq_NameInvalid != NULL)
       {
-         if (C_OSCUtils::h_CheckValidCName(rc_Message.c_Name) == false)
+         if ((rc_Message.q_CanOpenManagerMessageActive == true) &&
+             (C_OSCUtils::h_CheckValidCName(rc_Message.c_Name) == false))
          {
             *opq_NameInvalid = true;
          }
@@ -217,47 +225,52 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       if (opq_NameConflict != NULL)
       {
          *opq_NameConflict = false;
-         //Tx
-         for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_TxMessages.size()) && (*opq_NameConflict == false);
-              ++u32_ItMessage)
-         {
-            bool q_Skip = false;
 
-            if (orq_IsTx == true)
-            {
-               if (u32_ItMessage == oru32_MessageIndex)
-               {
-                  q_Skip = true;
-               }
-            }
-            if (q_Skip == false)
-            {
-               const C_OSCCanMessage & rc_CurrentMessage = this->c_TxMessages[u32_ItMessage];
-               if (rc_Message.c_Name.LowerCase() == rc_CurrentMessage.c_Name.LowerCase())
-               {
-                  *opq_NameConflict = true;
-               }
-            }
-         }
-         //Rx
-         for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_RxMessages.size()) && (*opq_NameConflict == false);
-              ++u32_ItMessage)
+         if (rc_Message.q_CanOpenManagerMessageActive == true)
          {
-            bool q_Skip = false;
-
-            if (orq_IsTx == false)
+            //Tx
+            for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_TxMessages.size()) && (*opq_NameConflict == false);
+                 ++u32_ItMessage)
             {
-               if (u32_ItMessage == oru32_MessageIndex)
+               bool q_Skip = false;
+
+               if (orq_IsTx == true)
                {
-                  q_Skip = true;
+                  if (u32_ItMessage == oru32_MessageIndex)
+                  {
+                     q_Skip = true;
+                  }
+               }
+               if (q_Skip == false)
+               {
+                  const C_OSCCanMessage & rc_CurrentMessage = this->c_TxMessages[u32_ItMessage];
+                  if (rc_Message.c_Name.LowerCase() == rc_CurrentMessage.c_Name.LowerCase())
+                  {
+                     *opq_NameConflict = true;
+                  }
                }
             }
-            if (q_Skip == false)
+
+            //Rx
+            for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_RxMessages.size()) && (*opq_NameConflict == false);
+                 ++u32_ItMessage)
             {
-               const C_OSCCanMessage & rc_CurrentMessage = this->c_RxMessages[u32_ItMessage];
-               if (rc_Message.c_Name.LowerCase() == rc_CurrentMessage.c_Name.LowerCase())
+               bool q_Skip = false;
+
+               if (orq_IsTx == false)
                {
-                  *opq_NameConflict = true;
+                  if (u32_ItMessage == oru32_MessageIndex)
+                  {
+                     q_Skip = true;
+                  }
+               }
+               if (q_Skip == false)
+               {
+                  const C_OSCCanMessage & rc_CurrentMessage = this->c_RxMessages[u32_ItMessage];
+                  if (rc_Message.c_Name.LowerCase() == rc_CurrentMessage.c_Name.LowerCase())
+                  {
+                     *opq_NameConflict = true;
+                  }
                }
             }
          }
@@ -267,26 +280,23 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       //Check valid id
       if (opq_IdInvalid != NULL)
       {
-         if (rc_Message.q_IsExtended == true)
+         *opq_IdInvalid = false;
+
+         if (rc_Message.q_CanOpenManagerMessageActive == true)
          {
-            if (rc_Message.u32_CanId <= 0x1FFFFFFFUL)
+            if (rc_Message.q_IsExtended == true)
             {
-               *opq_IdInvalid = false;
+               if (rc_Message.u32_CanId > 0x1FFFFFFFUL)
+               {
+                  *opq_IdInvalid = true;
+               }
             }
             else
             {
-               *opq_IdInvalid = true;
-            }
-         }
-         else
-         {
-            if (rc_Message.u32_CanId <= 0x7FFUL)
-            {
-               *opq_IdInvalid = false;
-            }
-            else
-            {
-               *opq_IdInvalid = true;
+               if (rc_Message.u32_CanId > 0x7FFUL)
+               {
+                  *opq_IdInvalid = true;
+               }
             }
          }
       }
@@ -294,49 +304,54 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       if (opq_IdConflict != NULL)
       {
          *opq_IdConflict = false;
-         //Tx
-         for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_TxMessages.size()) && (*opq_IdConflict == false);
-              ++u32_ItMessage)
-         {
-            bool q_Skip = false;
 
-            if (orq_IsTx == true)
-            {
-               if (u32_ItMessage == oru32_MessageIndex)
-               {
-                  q_Skip = true;
-               }
-            }
-            if (q_Skip == false)
-            {
-               const C_OSCCanMessage & rc_CurrentMessage = this->c_TxMessages[u32_ItMessage];
-               if ((rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId) &&
-                   (rc_Message.q_IsExtended == rc_CurrentMessage.q_IsExtended))
-               {
-                  *opq_IdConflict = true;
-               }
-            }
-         }
-         //Rx
-         for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_RxMessages.size()) && (*opq_IdConflict == false);
-              ++u32_ItMessage)
+         if (rc_Message.q_CanOpenManagerMessageActive == true)
          {
-            bool q_Skip = false;
-
-            if (orq_IsTx == false)
+            //Tx
+            for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_TxMessages.size()) && (*opq_IdConflict == false);
+                 ++u32_ItMessage)
             {
-               if (u32_ItMessage == oru32_MessageIndex)
+               bool q_Skip = false;
+
+               if (orq_IsTx == true)
                {
-                  q_Skip = true;
+                  if (u32_ItMessage == oru32_MessageIndex)
+                  {
+                     q_Skip = true;
+                  }
+               }
+               if (q_Skip == false)
+               {
+                  const C_OSCCanMessage & rc_CurrentMessage = this->c_TxMessages[u32_ItMessage];
+                  if ((rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId) &&
+                      (rc_Message.q_IsExtended == rc_CurrentMessage.q_IsExtended))
+                  {
+                     *opq_IdConflict = true;
+                  }
                }
             }
-            if (q_Skip == false)
+
+            //Rx
+            for (uint32 u32_ItMessage = 0; (u32_ItMessage < this->c_RxMessages.size()) && (*opq_IdConflict == false);
+                 ++u32_ItMessage)
             {
-               const C_OSCCanMessage & rc_CurrentMessage = this->c_RxMessages[u32_ItMessage];
-               if ((rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId) &&
-                   (rc_Message.q_IsExtended == rc_CurrentMessage.q_IsExtended))
+               bool q_Skip = false;
+
+               if (orq_IsTx == false)
                {
-                  *opq_IdConflict = true;
+                  if (u32_ItMessage == oru32_MessageIndex)
+                  {
+                     q_Skip = true;
+                  }
+               }
+               if (q_Skip == false)
+               {
+                  const C_OSCCanMessage & rc_CurrentMessage = this->c_RxMessages[u32_ItMessage];
+                  if ((rc_Message.u32_CanId == rc_CurrentMessage.u32_CanId) &&
+                      (rc_Message.q_IsExtended == rc_CurrentMessage.q_IsExtended))
+                  {
+                     *opq_IdConflict = true;
+                  }
                }
             }
          }
@@ -345,13 +360,17 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       if (opq_DelayTimeInvalid != NULL)
       {
          *opq_DelayTimeInvalid = false;
-         if ((rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE) ||
-             (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254) ||
-             (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255))
+
+         if (rc_Message.q_CanOpenManagerMessageActive == true)
          {
-            if (static_cast<uint32>(rc_Message.u16_DelayTimeMs) > rc_Message.u32_CycleTimeMs)
+            if ((rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE) ||
+                (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254) ||
+                (rc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255))
             {
-               *opq_DelayTimeInvalid = true;
+               if (static_cast<uint32>(rc_Message.u16_DelayTimeMs) > rc_Message.u32_CycleTimeMs)
+               {
+                  *opq_DelayTimeInvalid = true;
+               }
             }
          }
       }
@@ -360,14 +379,32 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
       if (opq_SignalInvalid != NULL)
       {
          *opq_SignalInvalid = false;
-         for (uint32 u32_ItSignal = 0; (u32_ItSignal < rc_Message.c_Signals.size()) && (*opq_SignalInvalid == false);
-              ++u32_ItSignal)
+
+         if (rc_Message.q_CanOpenManagerMessageActive == true)
          {
-            if (rc_Message.CheckErrorSignal(opc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset,
-                                            oq_CANMessageSignalGapsValid))
+            for (uint32 u32_ItSignal = 0; (u32_ItSignal < rc_Message.c_Signals.size()) && (*opq_SignalInvalid == false);
+                 ++u32_ItSignal)
             {
-               *opq_SignalInvalid = true;
+               if (rc_Message.CheckErrorSignal(opc_List, u32_ItSignal, ou32_CANMessageValidSignalsDLCOffset,
+                                               oq_CANMessageSignalGapsValid, oq_ByteAlignmentRequired))
+               {
+                  *opq_SignalInvalid = true;
+               }
             }
+         }
+      }
+
+      //Signal count
+      if (opq_NoSignalsInvalid != NULL)
+      {
+         *opq_NoSignalsInvalid = false;
+
+         // Only relevant if the message is active
+         if ((oq_SignalsRequired == true) &&
+             (rc_Message.q_CanOpenManagerMessageActive == true) &&
+             (rc_Message.c_Signals.size() == 0))
+         {
+            *opq_NoSignalsInvalid = true;
          }
       }
    }
@@ -382,6 +419,9 @@ void C_OSCCanMessageContainer::CheckMessageLocalError(const C_OSCNodeDataPoolLis
    \param[in]      orc_ListRx                            Node data pool list containing rx signal data
    \param[in]      ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
    \param[in]      oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
+   \param[in]      oq_ByteAlignmentRequired              Flag if byte alignment is required and if the signal does not
+                                                         fit into byte alignment it will be handled as error
+   \param[in]      oq_SignalsRequired                    Flag if signals are required for a message
    \param[in,out]  opc_InvalidTxMessages                 Optional vector of invalid Tx CAN message names
    \param[in,out]  opc_InvalidRxMessages                 Optional vector of invalid Rx CAN message names
 
@@ -394,6 +434,7 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
                                                const C_OSCNodeDataPoolList & orc_ListRx,
                                                const uint32 ou32_CANMessageValidSignalsDLCOffset,
                                                const bool oq_CANMessageSignalGapsValid,
+                                               const bool oq_ByteAlignmentRequired, const bool oq_SignalsRequired,
                                                std::vector<uint32> * const opc_InvalidTxMessages,
                                                std::vector<uint32> * const opc_InvalidRxMessages) const
 {
@@ -409,11 +450,13 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
       bool q_IdConflict = false;
       bool q_IdInvalid = false;
       bool q_SignalInvalid = false;
+      bool q_NoSignalsInvalid = false;
       this->CheckMessageLocalError(&orc_ListTx, u32_ItMessage, true, &q_NameConflict, &q_NameInvalid, &q_DelayInvalid,
-                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, ou32_CANMessageValidSignalsDLCOffset,
-                                   oq_CANMessageSignalGapsValid);
-      if ((((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_DelayInvalid == true)) ||
-            (q_IdConflict == true)) || (q_IdInvalid == true)) || (q_SignalInvalid == true))
+                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, &q_NoSignalsInvalid,
+                                   ou32_CANMessageValidSignalsDLCOffset,
+                                   oq_CANMessageSignalGapsValid, oq_ByteAlignmentRequired, oq_SignalsRequired);
+      if ((q_NameConflict == true) || (q_NameInvalid == true) || (q_DelayInvalid == true) ||
+          (q_IdConflict == true) || (q_IdInvalid == true) || (q_SignalInvalid == true)  || (q_NoSignalsInvalid == true))
       {
          q_Error = true;
          if (opc_InvalidTxMessages != NULL)
@@ -432,11 +475,13 @@ bool C_OSCCanMessageContainer::CheckLocalError(const C_OSCNodeDataPoolList & orc
       bool q_IdConflict = false;
       bool q_IdInvalid = false;
       bool q_SignalInvalid = false;
+      bool q_NoSignalsInvalid = false;
       this->CheckMessageLocalError(&orc_ListRx, u32_ItMessage, false, &q_NameConflict, &q_NameInvalid, &q_DelayInvalid,
-                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, ou32_CANMessageValidSignalsDLCOffset,
-                                   oq_CANMessageSignalGapsValid);
-      if ((((((q_NameConflict == true) || (q_NameInvalid == true)) || (q_DelayInvalid == true)) ||
-            (q_IdConflict == true)) || (q_IdInvalid == true)) || (q_SignalInvalid == true))
+                                   &q_IdConflict, &q_IdInvalid, &q_SignalInvalid, &q_NoSignalsInvalid,
+                                   ou32_CANMessageValidSignalsDLCOffset,
+                                   oq_CANMessageSignalGapsValid, oq_ByteAlignmentRequired, oq_SignalsRequired);
+      if ((q_NameConflict == true) || (q_NameInvalid == true) || (q_DelayInvalid == true) ||
+          (q_IdConflict == true) || (q_IdInvalid == true) || (q_SignalInvalid == true) || (q_NoSignalsInvalid == true))
       {
          q_Error = true;
          if (opc_InvalidRxMessages != NULL)
@@ -463,6 +508,44 @@ bool C_OSCCanMessageContainer::ContainsAtLeastOneMessage(void) const
    if ((this->c_TxMessages.size() > 0) || (this->c_RxMessages.size() > 0))
    {
       q_Result = true;
+   }
+   return q_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check whether container contains at least one Tx or Rx message with "q_Active" flag set
+
+   \return
+   true   at least one active Tx or Rx message is defined
+   false  else
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OSCCanMessageContainer::ContainsAtLeastOneActiveMessage(void) const
+{
+   uint32 u32_ItMessage;
+   bool q_Result = false;
+
+   //check if there are any active TX messages:
+   for (u32_ItMessage = 0U; u32_ItMessage < this->c_TxMessages.size(); ++u32_ItMessage)
+   {
+      if (this->c_TxMessages[u32_ItMessage].q_CanOpenManagerMessageActive == true)
+      {
+         q_Result = true;
+         break;
+      }
+   }
+
+   if (q_Result == false)
+   {
+      //check if there are any active RX PDO(s) with signals
+      for (u32_ItMessage = 0; u32_ItMessage < this->c_RxMessages.size(); ++u32_ItMessage)
+      {
+         if (this->c_RxMessages[u32_ItMessage].q_CanOpenManagerMessageActive == true)
+         {
+            q_Result = true;
+            break;
+         }
+      }
    }
    return q_Result;
 }

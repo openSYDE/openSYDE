@@ -80,7 +80,8 @@ border-style: solid;
 border-width: 1px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView
+stw_opensyde_gui--C_SdNdeHalcChannelTreeView,
+stw_opensyde_gui--C_SdNdeCoConfigTreeView
 {
 border-style: solid;
 border-width: 1px;
@@ -233,4 +234,19 @@ stw_opensyde_gui--C_SyvDaItPaListTreeWidget
 {
 padding-left: 48px;
 }
+
+/* --------------------------------------------------------------------- */
+/* Sort indicator */
+stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::down-arrow {
+width: 20px;
+height: 20px;
+image: url(://images/system_definition/NodeEdit/lists/IconSortDown.svg) 0 0 0 0 stretch stretch;
+}
+
+stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::up-arrow {
+width: 20px;
+height: 20px;
+image: url(://images/system_definition/NodeEdit/lists/IconSortUp.svg) 0 0 0 0 stretch stretch;
+}
+
 /* --------------------------------------------------------------------- */

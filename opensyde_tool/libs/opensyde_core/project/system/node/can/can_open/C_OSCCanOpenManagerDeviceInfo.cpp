@@ -37,7 +37,7 @@ using namespace stw_opensyde_core;
 C_OSCCanOpenManagerDeviceInfo::C_OSCCanOpenManagerDeviceInfo() :
    q_DeviceOptional(false),
    q_NoInitialization(false),
-   q_FactorySettingsActive(true),
+   q_FactorySettingsActive(false),
    u8_ResetNodeObjectDictionarySubIndex(0),
    q_EnableHeartbeatProducing(true),
    u16_HeartbeatProducerTimeMs(100),

@@ -41,6 +41,8 @@ public:
    void SelectMessage(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const;
    void SelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
                      const stw_types::uint32 & oru32_SignalIndex) const;
+   void PartialSelectSignal(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
+                            const stw_types::uint32 & oru32_SignalIndex) const;
    void Hide(void);
    void SetNodeId(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
                   const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const;

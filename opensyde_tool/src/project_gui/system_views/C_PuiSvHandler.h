@@ -41,6 +41,8 @@ public:
    stw_types::uint32 GetViewCount(void) const;
    const std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> & GetLastKnownHalcCrcs(void) const;
    bool GetServiceModeActive(void) const;
+   stw_types::sint32 GetNodeActiveFlagsWithSquadAdaptions(const stw_types::uint32 ou32_ViewIndex,
+                                                          std::vector<stw_types::uint8> & orc_ActiveFlags);
 
    //Set
    void SetServiceModeActive(const bool oq_NewValue);
@@ -378,19 +380,20 @@ private:
    stw_types::uint32 m_CalcHashSystemViews(void) const;
    void m_FixInvalidRailConfig(void);
    void m_HandleCompatibilityChart(void);
-   stw_types::sint32 m_CheckRoutingDetails(const stw_types::uint32 ou32_ViewIndex, std::map<stw_types::uint32,
-                                                                                            QString> & orc_SetupWarningRoutingDetails, std::vector< std::map<stw_types::uint32,
-                                                                                                                                                             QString> > & orc_ErrorRoutingDetails, std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError, std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting)
+   stw_types::sint32 m_CheckRoutingDetails(const stw_types::uint32 ou32_ViewIndex,
+                                           const std::vector<stw_types::uint8> & orc_CheckedNodeActiveFlags,
+                                           std::map<stw_types::uint32,
+                                                    QString> & orc_SetupWarningRoutingDetails,
+                                           std::vector< std::map<stw_types::uint32,
+                                                                 QString> > & orc_ErrorRoutingDetails,
+                                           std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError,
+                                           std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting)
    const;
-   stw_types::sint32 m_CheckRouting(const stw_types::uint32 ou32_ViewIndex, QString & orc_SetupWarningMessage,
-                                    std::vector<QString> & orc_ErrorMessages,
+   stw_types::sint32 m_CheckRouting(const stw_types::uint32 ou32_ViewIndex,
+                                    const std::vector<stw_types::uint8> & orc_CheckedNodeActiveFlags,
+                                    QString & orc_SetupWarningMessage, std::vector<QString> & orc_ErrorMessages,
                                     std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError,
                                     std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting) const;
-   stw_types::sint32 m_CheckRoutingAndUpdateNodes(const stw_types::uint32 ou32_ViewIndex,
-                                                  QString & orc_SetupWarningMessage,
-                                                  std::vector<QString> & orc_ErrorMessages,
-                                                  std::set<stw_types::uint32> & orc_NodesWithDashboardRoutingError,
-                                                  std::set<stw_types::uint32> & orc_NodesRelevantForDashboardRouting);
    std::map<stw_scl::C_SCLString, bool> m_GetExistingViewNames(void) const;
 
    static C_PuiSvHandler * mhpc_Singleton;
@@ -425,6 +428,7 @@ private:
    };
 
    QMap<stw_types::uint32, C_PuiSvViewErrorDetails> mc_PreviousErrorCheckResults;
+   QMap<stw_types::uint32, std::vector<stw_types::uint8> > mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

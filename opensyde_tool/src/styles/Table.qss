@@ -25,6 +25,7 @@ stw_opensyde_gui--C_SdNdeDpListTableView,
 stw_opensyde_gui--C_SdBueMessageTableView,
 stw_opensyde_gui--C_SdNdeHalcOvTableView,
 stw_opensyde_gui--C_SdNdeCoOverviewTableView,
+stw_opensyde_gui--C_SdNdeCoPdoTableView,
 stw_opensyde_gui--C_SdBueSignalTableView,
 stw_opensyde_gui--C_SyvDaItPaArView,
 stw_opensyde_gui--C_SyvDaItPaTableView,
@@ -63,6 +64,7 @@ stw_opensyde_gui_logic--C_PopFileTableView::item,
 stw_opensyde_gui--C_SdBueMessageTableView::item,
 stw_opensyde_gui--C_SdNdeHalcOvTableView::item,
 stw_opensyde_gui--C_SdNdeCoOverviewTableView::item,
+stw_opensyde_gui--C_SdNdeCoPdoTableView::item,
 stw_opensyde_gui--C_SdBueSignalTableView::item,
 stw_opensyde_gui--C_SyvDaItPaArView::item,
 stw_opensyde_gui--C_SyvDaPeUpdateModeTableView::item,
@@ -175,6 +177,7 @@ border-left-style: solid;
 stw_opensyde_gui--C_SdBueMessageTableView QHeaderView::down-arrow,
 stw_opensyde_gui--C_SdNdeHalcOvTableView QHeaderView::down-arrow,
 stw_opensyde_gui--C_SdNdeCoOverviewTableView QHeaderView::down-arrow,
+stw_opensyde_gui--C_SdNdeCoPdoTableView QHeaderView::down-arrow,
 stw_opensyde_gui--C_SdBueSignalTableView QHeaderView::down-arrow {
 width: 20px;
 height: 20px;
@@ -184,6 +187,7 @@ image: url(://images/system_definition/NodeEdit/lists/IconSortDown.svg) 0 0 0 0 
 stw_opensyde_gui--C_SdBueMessageTableView QHeaderView::up-arrow,
 stw_opensyde_gui--C_SdNdeHalcOvTableView QHeaderView::up-arrow,
 stw_opensyde_gui--C_SdNdeCoOverviewTableView QHeaderView::up-arrow,
+stw_opensyde_gui--C_SdNdeCoPdoTableView QHeaderView::up-arrow,
 stw_opensyde_gui--C_SdBueSignalTableView QHeaderView::up-arrow {
 width: 20px;
 height: 20px;

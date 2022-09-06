@@ -27,7 +27,9 @@ namespace stw_opensyde_core
 class C_OSCUtils
 {
 public:
-   static bool h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const stw_types::uint16 ou16_MaxLength = 31U);
+   static bool h_CheckValidCName(const stw_scl::C_SCLString & orc_Name,
+                                 const bool oq_AutomaticCStringAdaptation = false,
+                                 const stw_types::uint16 ou16_MaxLength = 31U);
    static bool h_IsFloat64NearlyEqual(const stw_types::float64 & orf64_Float1, const stw_types::float64 & orf64_Float2);
    static bool h_IsFloat32NearlyEqual(const stw_types::float32 & orf32_Float1, const stw_types::float32 & orf32_Float2);
    static stw_types::sint32 h_CreateFolderRecursively(const stw_scl::C_SCLString & orc_Folder);

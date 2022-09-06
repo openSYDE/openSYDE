@@ -6,36 +6,288 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>874</width>
+    <height>626</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>C_SdNdeCoDeviceEdsWidget</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
+   <property name="spacing">
+    <number>6</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>EDS File</string>
-     </property>
+    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBox">
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiEDSFilePanel" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <property name="spacing">
+            <number>12</number>
+           </property>
+           <property name="leftMargin">
+            <number>20</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>11</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileTitle">
+             <property name="text">
+              <string>EDS File:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileCurrent">
+             <property name="text">
+              <string>my_eds_file.eds</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubUpdate">
+             <property name="text">
+              <string>Update</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <spacer name="verticalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="groupBox">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelDetails">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>30</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Details</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>1</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>6</width>
+             <height>6</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="stw_opensyde_gui_elements::C_OgeTedPropertiesComment" name="pc_TedHtmlReport"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>260</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgePubHalcPanel</class>
+   <extends>QPushButton</extends>
+   <header>C_OgePubHalcPanel.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <extends>QFrame</extends>
+   <header>C_OgeFraSeparator.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabHeadingGroupBold.h</header>
+  </customwidget>
+  <customwidget>
+   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <extends>QGroupBox</extends>
+   <header>C_OgeGbxTransparent.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

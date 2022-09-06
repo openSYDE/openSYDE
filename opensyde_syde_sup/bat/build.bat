@@ -8,3 +8,4 @@ rem clean folder ...
 del /s /f /q ..\temp\*.* > nul
 
 call build_incremental.bat
+if errorlevel 1 exit /B

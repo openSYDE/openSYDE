@@ -63,6 +63,9 @@ private:
    void m_UpdateCANDllPath(void) const;
    void m_OnExpand(const bool oq_Expand) const;
    void m_OnBrowse(void);
+   void m_OnDroppedDllPath(void);
+   void m_SetCustomDllPath(const QString & orc_New);
+
    void m_InsertPathVar(const QString & orc_Variable);
    void m_OnCustomDllEdited(void);
 };

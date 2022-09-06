@@ -12,10 +12,12 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.h"
 
+#include "TGLUtils.h"
 #include "C_PuiSdHandler.h"
 #include "C_SdBueUnoMessageAddCommand.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
+using namespace stw_tgl;
 using namespace stw_types;
 using namespace stw_opensyde_gui;
 using namespace stw_opensyde_core;
@@ -164,6 +166,7 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OSCCanMessa
          }
       }
    }
+   tgl_assert(this->m_CheckMessagesSortedAscending());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -88,12 +88,12 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
    case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") +
-                              C_GtGetText::h_GetText("Tx-Method: CANopen transmission type 254\n"));
+                              C_GtGetText::h_GetText("Tx-Method: Type 254 - asynchronous manufacturer specific\n"));
       break;
    case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") +
-                              C_GtGetText::h_GetText("Tx-Method: CANopen transmission type 255\n"));
+                              C_GtGetText::h_GetText("Tx-Method: Type 255 - asynchronous device specific\n"));
       break;
    case C_OSCCanMessage::eTX_METHOD_CYCLIC:
       c_ToolTipContent +=
@@ -122,13 +122,14 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get string for tooltip content for signal.
 
-   \param[in]     orc_Signal                   Signal information for which the tooltip is requested
-   \param[in]     orc_Message                  Message information
-   \param[in]     orc_DpListElement            Signal information datapool part
-   \param[in]     orc_AutoMinMaxInformation    Optional auto min max information string which will get inserted
-                                               after the signal properties heading (no "\n" at end necessary)
-   \param[in]     orc_AdditionalInformation    Optional additional information string which will get inserted after comment
-                                               (no "\n" at end necessary)
+   \param[in]  orc_Signal                 Signal information for which the tooltip is requested
+   \param[in]  orc_Message                Message information
+   \param[in]  orc_DpListElement          Signal information datapool part
+   \param[in]  oe_ProtocolType            Protocol type
+   \param[in]  orc_AutoMinMaxInformation  Optional auto min max information string which will get inserted
+                                          after the signal properties heading (no "\n" at end necessary)
+   \param[in]  orc_AdditionalInformation  Optional additional information string which will get inserted after comment
+                                          (no "\n" at end necessary)
 
    \return
       content as string
@@ -137,16 +138,27 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
 QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Signal,
                                                    const C_OSCCanMessage & orc_Message,
                                                    const C_OSCNodeDataPoolListElement & orc_DpListElement,
+                                                   const C_OSCCanProtocol::E_Type oe_ProtocolType,
                                                    const QString & orc_AutoMinMaxInformation,
                                                    const QString & orc_AdditionalInformation)
 {
    QString c_ToolTipContent = "";
    float64 f64_Value = 0.0;
 
+   // Object Dictionary (only CANopen Protocol)
+   if (oe_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   {
+      c_ToolTipContent.append(C_GtGetText::h_GetText("Object Dictionary: "));
+      c_ToolTipContent.append(QString::number(orc_Signal.u16_CanOpenManagerObjectDictionaryIndex, 16) +
+                              static_cast<QString>(C_GtGetText::h_GetText("sub")) +
+                              QString::number(orc_Signal.u8_CanOpenManagerObjectDictionarySubIndex));
+      c_ToolTipContent.append("\n\n");
+   }
+
    // Comment
    if (orc_DpListElement.c_Comment.IsEmpty() == false)
    {
-      c_ToolTipContent = orc_DpListElement.c_Comment.c_str();
+      c_ToolTipContent.append(orc_DpListElement.c_Comment.c_str());
       c_ToolTipContent.append("\n\n");
    }
 

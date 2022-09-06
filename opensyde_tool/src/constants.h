@@ -34,7 +34,15 @@ const stw_types::sint32 ms32_SUBMODE_SYSVIEW_DASHBOARD = 2;
 const stw_types::uint32 mu32_FLAG_DEFAULT = 0U;
 const stw_types::uint32 mu32_FLAG_EDIT_NAME = 1U;
 const stw_types::uint32 mu32_FLAG_OPEN_PROPERTIES = 2U;
+//Flags for specific functions of bus modes
 const stw_types::uint32 mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR = 3U;
+//The COMM messages flag gets the protocol type as offset.
+const stw_types::uint32 mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL = 0x80000000U;
+//Flags for specific functions of node modes
+//The CANopen Manager flag gets the interface number as offset.
+const stw_types::uint32 mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER = 0x40000000U;
+//The CANopen Manager flag gets the device as offset.
+const stw_types::uint32 mu32_FLAG_OPEN_SYSDEF_DEVICENODE_IN_CANOPENMANAGER = 0x80000000U;
 
 //CANopen Manager
 const stw_types::float32 mf32_HEARTBEAT_CONSUMER_TIME_FACTOR = 1.5f;
@@ -215,9 +223,6 @@ const QString mc_REPORT_HEADLINE_HTML_TAG_START = "<h3>";
 const QString mc_REPORT_HEADLINE_HTML_TAG_END = "</h3>";
 const QString mc_REPORT_HIGHLIGHT_TAG_START = "<span style=\" font-weight: bold;\">";
 const QString mc_REPORT_HIGHLIGHT_TAG_END = "</span>";
-
-// Features
-const bool mq_ENABLE_CAN_OPEN_FEATURE = false;
 
 //User roles
 //----------------------------------------------------------------------------------------------------------------------

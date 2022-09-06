@@ -456,6 +456,8 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
                                                std::vector<C_SCLString> * const opc_CreatedFiles)
 {
    sint32 s32_Retval = C_NO_ERR;
+   const std::map<uint32,
+                  C_SCLString> c_NodeIndicesToNameMap = C_OSCSystemDefinitionFiler::mh_MapNodeIndicesToName(orc_Nodes);
 
    orc_XMLParser.SetAttributeUint32("length", orc_Nodes.size());
    for (uint32 u32_Index = 0U; (u32_Index < orc_Nodes.size()) && (s32_Retval == C_NO_ERR); u32_Index++)
@@ -465,7 +467,8 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
       if (orc_BasePath.IsEmpty())
       {
          //To string
-         s32_Retval = C_OSCNodeFiler::h_SaveNode(rc_Node, orc_XMLParser, orc_BasePath, opc_CreatedFiles);
+         s32_Retval = C_OSCNodeFiler::h_SaveNode(rc_Node, orc_XMLParser, orc_BasePath, opc_CreatedFiles,
+                                                 c_NodeIndicesToNameMap);
       }
       else
       {
@@ -482,7 +485,8 @@ sint32 C_OSCSystemDefinitionFiler::h_SaveNodes(const std::vector<C_OSCNode> & or
          }
          //Save node file
          s32_Retval = C_OSCNodeFiler::h_SaveNodeFile(rc_Node, c_CombinedFileName,
-                                                     (opc_CreatedFiles != NULL) ? &c_CreatedFiles : NULL);
+                                                     (opc_CreatedFiles != NULL) ? &c_CreatedFiles : NULL,
+                                                     c_NodeIndicesToNameMap);
          //Store if necessary
          if (opc_CreatedFiles != NULL)
          {
@@ -775,4 +779,25 @@ void C_OSCSystemDefinitionFiler::h_SplitDeviceType(const C_SCLString & orc_Compl
       orc_MainType = "";
       orc_SubType = orc_CompleteType;
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Map node indices to name
+
+   \param[in]  orc_Nodes   Nodes
+
+   \return
+   Mapping of node indices to name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<uint32, C_SCLString> C_OSCSystemDefinitionFiler::mh_MapNodeIndicesToName(
+   const std::vector<C_OSCNode> & orc_Nodes)
+{
+   std::map<uint32, C_SCLString> c_Retval;
+   for (uint32 u32_It = 0UL; u32_It < orc_Nodes.size(); ++u32_It)
+   {
+      const C_OSCNode & rc_Node = orc_Nodes[u32_It];
+      c_Retval[u32_It] = rc_Node.c_Properties.c_Name;
+   }
+   return c_Retval;
 }

@@ -59,7 +59,7 @@ public:
    void ExportConfig(void);
    void ImportConfig(void);
 
-   void CreateServiceUpdatePackage(void);
+   void CreateServiceUpdatePackage(const bool oq_SaveAsFile);
 
    stw_types::sint32 CheckAllPaths(stw_types::uint32 & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
                                    QStringList * const opc_MissingDataBlocks, QStringList * const opc_MissingParamFiles,

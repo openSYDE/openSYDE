@@ -15,6 +15,7 @@
 #include <QWidget>
 #include "stwtypes.h"
 #include "C_OgePopUpDialog.h"
+#include "C_OgeLeFilePath.h"
 #include "C_OSCNodeApplication.h"
 #include "C_SdNdeDbDataPoolEntry.h"
 
@@ -80,10 +81,15 @@ private:
 
    void m_OnFileGenerationChanged(const stw_types::sintn osn_State);
    void m_OnClickProject(void);
+   void m_OnDroppedProject(void);
    void m_OnClickOutput(void);
+   void m_OnDroppedOutput(void);
    void m_OnClickGenerator(void);
+   void m_OnDroppedGenerator(void);
    void m_OnClickCodeGeneration(void);
+   void m_OnDroppedCodeGeneration(void);
    void m_OnClickFileGeneration(void);
+   void m_OnDroppedFileGeneration(void);
    void m_OnClickIDE(void);
 
    void m_OnNameEdited(void) const;
@@ -98,6 +104,9 @@ private:
 
    void m_UpdatePathsRelativeToProject(void) const;
    void m_UpdatePathsRelativeToGeneratedDir(void) const;
+
+   void m_AskUserToSaveRelativePath(const QString & orc_Path, const QString & orc_AbsoluteReferenceDir,
+                                    stw_opensyde_gui_elements::C_OgeLeFilePath * const opc_PathLineEdit);
 
    //Avoid call
    C_SdNdeDbProperties(const C_SdNdeDbProperties &);

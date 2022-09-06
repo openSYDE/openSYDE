@@ -50,6 +50,7 @@ public:
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices GetMessageId(void) const;
    stw_types::uint32 GetSignalIndex(void) const;
    void SelectName(void) const;
+   void RecheckMessagePosition(void);
 
    void OnNodeDisconnected(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex);
 

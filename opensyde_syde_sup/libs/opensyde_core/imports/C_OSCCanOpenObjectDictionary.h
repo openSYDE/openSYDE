@@ -12,10 +12,13 @@
 #define C_OSCCANOPENEDSDCFH
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
+#include <set>
+#include <map>
 
 #include "stwtypes.h"
 #include "CSCLString.h"
 #include "CSCLIniFile.h"
+#include "C_OSCCanOpenEdsInfoBlock.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw_opensyde_core
@@ -63,6 +66,8 @@ public:
    static const stw_types::uint8 hu8_DATA_TYPE_SDO_PARAMETER    = 0x22U;
    static const stw_types::uint8 hu8_DATA_TYPE_IDENTITY         = 0x23U;
 
+   static const stw_types::uint8 hu8_NUM_SUBS_WE_ARE_A_SUB      = 0xFFU;
+
    stw_scl::C_SCLString c_Name;   //object name
    stw_types::uint16 u16_Index;   //object index
    stw_types::uint8 u8_SubIndex;  //object subindex
@@ -71,10 +76,16 @@ public:
    stw_types::uint8 u8_NumSubs;   //number of sub-indexes (0xFF: we are a sub)
    stw_scl::C_SCLString c_DefaultValue;
    stw_scl::C_SCLString c_ParameterValue;
+   stw_scl::C_SCLString c_LowLimit;
+   stw_scl::C_SCLString c_HighLimit;
    stw_scl::C_SCLString c_Denotation;
+   bool q_IsMappableIntoPDO;
+
+   C_OSCCanOpenObject();
 
    bool IsReadable(void) const;  //do the access rights permit reading ?
    bool IsWriteable(void) const; //do the access rights permit writing ?
+   bool IsMappableIntoPDO(void) const;
 
    bool IsIntegerDataType(void) const;  //INTEGER (signed)
    bool IsUnsignedDataType(void) const; //BOOLEAN, UNSIGNED
@@ -85,6 +96,7 @@ public:
 
    void SetSize(const stw_types::uint16 ou16_Size);
    stw_types::uint16 GetSize(void) const;
+   void CalcHash(stw_types::uint32 & oru32_HashValue) const;
 
    //less than operator for sorting:
    bool operator < (const C_OSCCanOpenObject & orc_Object) const;
@@ -104,11 +116,63 @@ private:
 
    stw_scl::C_SCLString mc_LastError;
 
+   stw_types::sint32 m_IsSectionRo(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
+                                   const stw_types::uint8 ou8_OdSubIndex, bool & orq_IsRo) const;
+   bool m_DoesSectionExist(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
+                           const stw_types::uint8 ou8_OdSubIndex) const;
+
 public:
+   static const stw_types::uint16 hu16_OD_INDEX_EMCY = 0x1014U;
+   static const stw_types::uint16 hu16_OD_INDEX_HEARTBEAT_CONSUMER = 0x1016U;
+   static const stw_types::uint16 hu16_OD_INDEX_HEARTBEAT_PRODUCER = 0x1017U;
+   static const stw_types::uint16 hu16_OD_INDEX_FIRST_RX_PDO = 0x1400U;
+   static const stw_types::uint16 hu16_OD_INDEX_FIRST_TX_PDO = 0x1800U;
+   static const stw_types::uint8 hu8_OD_SUB_INDEX_COB_ID = 0x1U;
+   static const stw_types::uint8 hu8_OD_SUB_INDEX_TRANSMISSION_TYPE = 0x2U;
+   static const stw_types::uint8 hu8_OD_SUB_INDEX_INHIBIT_TIME = 0x3U;
+   static const stw_types::uint8 hu8_OD_SUB_INDEX_EVENT_TIMER = 0x5U;
+   static const stw_types::uint16 hu16_OD_INDEX_FIRST_RX_PDO_MAPPING = 0x1600U;
+   static const stw_types::uint16 hu16_OD_INDEX_FIRST_TX_PDO_MAPPING = 0x1A00U;
+   static const stw_types::uint16 hu16_OD_PDO_MAPPING_OFFSET = 0x200U;
+
+   C_OSCCanOpenEdsInfoBlock c_InfoBlock;
    stw_scl::SCLDynamicArray<C_OSCCanOpenObject> c_Objects;
 
    stw_types::sint32 LoadFromFile(const stw_scl::C_SCLString & orc_File);
    stw_scl::C_SCLString GetLastErrorText(void) const;
+   void CalcHash(stw_types::uint32 & oru32_HashValue) const;
+
+   //General
+   stw_types::uint8 GetNumHeartbeatConsumers(void) const;
+   bool IsHeartbeatProducerSupported(void) const;
+   bool IsEMCYSupported(void) const;
+   stw_types::uint8 GetGranularity(void) const;
+   std::set<stw_types::uint8> GetAllAvailableFactorySettingsSubIndices(void) const;
+   std::set<stw_types::uint8> GetAllAvailableSubIndices(const stw_types::uint16 ou16_OdIndex) const;
+
+   //Message
+   bool DoesInhibitTimeSectionExist(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx) const;
+   bool DoesEventTimerSectionExist(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx) const;
+   stw_types::sint32 IsCobIdRo(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx, bool & orq_IsRo) const;
+   stw_types::sint32 IsInhibitTimeRo(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
+                                     bool & orq_IsRo) const;
+   stw_types::sint32 IsEventTimerRo(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
+                                    bool & orq_IsRo) const;
+   stw_types::sint32 IsTransmissionTypeRo(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
+                                          bool & orq_IsRo) const;
+   stw_types::sint32 IsPDOMappingRo(const stw_types::uint16 ou16_PdoIndex, const bool oq_MessageIsTx,
+                                    bool & orq_IsRo) const;
+
+   //Util
+   const C_OSCCanOpenObject * GetCanOpenObject(const stw_types::uint16 ou16_OdIndex) const;
+   const C_OSCCanOpenObject * GetCanOpenSubIndexObject(const stw_types::uint16 ou16_OdIndex,
+                                                       const stw_types::uint8 ou8_OdSubIndex) const;
+   bool CheckObjectPresentByIndex(const stw_types::uint16 ou16_OdIndex, const stw_types::uint8 ou8_OdSubIndex) const;
+   void GetMappableObjects(std::map<stw_types::uint32, std::vector<stw_types::uint32> > & orc_SubIndices)
+   const;
+
+   static stw_types::uint16 h_GetCanOpenObjectDictionaryIndexForPdo(const stw_types::uint16 ou16_PdoIndex,
+                                                                    const bool oq_MessageIsTx);
 };
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */

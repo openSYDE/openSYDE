@@ -96,52 +96,61 @@ sint32 C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(const uint32 ou32_View
             //No check for connected because error check passed
             oru32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
             orc_ActiveNodes.clear();
-            orc_ActiveNodes = pc_View->GetNodeActiveFlags();
 
-            if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+            if (C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+                   ou32_ViewIndex,
+                   orc_ActiveNodes) == C_NO_ERR)
             {
-               QFile c_File;
-               QString c_FilePath;
-               //No ethernet
-               *oppc_IpDispatcher = NULL;
-
-               c_FilePath = pc_View->GetPcData().GetCANDllAbsolute();
-
-               c_File.setFileName(c_FilePath);
-
-               if (c_File.exists() == true)
+               if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
                {
-                  *oppc_CanDispatcher = new stw_can::C_CAN();
+                  QFile c_File;
+                  QString c_FilePath;
+                  //No ethernet
+                  *oppc_IpDispatcher = NULL;
 
-                  s32_Retval = (*oppc_CanDispatcher)->DLL_Open(c_FilePath.toStdString().c_str());
-                  if ((s32_Retval == C_NO_ERR) &&
-                      (oq_InitCan == true))
+                  c_FilePath = pc_View->GetPcData().GetCANDllAbsolute();
+
+                  c_File.setFileName(c_FilePath);
+
+                  if (c_File.exists() == true)
                   {
-                     s32_Retval = (*oppc_CanDispatcher)->CAN_Init(static_cast<sint32>(pc_Bus->u64_BitRate / 1000ULL));
+                     *oppc_CanDispatcher = new stw_can::C_CAN();
+
+                     s32_Retval = (*oppc_CanDispatcher)->DLL_Open(c_FilePath.toStdString().c_str());
+                     if ((s32_Retval == C_NO_ERR) &&
+                         (oq_InitCan == true))
+                     {
+                        s32_Retval =
+                           (*oppc_CanDispatcher)->CAN_Init(static_cast<sint32>(pc_Bus->u64_BitRate / 1000ULL));
+                     }
+
+                     if (s32_Retval != C_NO_ERR)
+                     {
+                        s32_Retval = C_COM;
+                     }
                   }
-
-                  if (s32_Retval != C_NO_ERR)
+                  else
                   {
-                     s32_Retval = C_COM;
+                     s32_Retval = C_RD_WR;
                   }
                }
                else
                {
-                  s32_Retval = C_RD_WR;
+                  //No CAN
+
+                  // Set optional Ethernet configuration file path
+                  const QString c_EthFilePath = stw_opensyde_gui_logic::C_Uti::h_GetAbsolutePathFromExe(
+                     "User/eth_config.ini");
+
+                  *oppc_CanDispatcher = NULL;
+                  *oppc_IpDispatcher = new C_OSCIpDispatcherWinSock();
+
+                  (*oppc_IpDispatcher)->LoadConfigFile(c_EthFilePath.toStdString().c_str());
                }
             }
             else
             {
-               //No CAN
-
-               // Set optional Ethernet configuration file path
-               const QString c_EthFilePath = stw_opensyde_gui_logic::C_Uti::h_GetAbsolutePathFromExe(
-                  "User/eth_config.ini");
-
-               *oppc_CanDispatcher = NULL;
-               *oppc_IpDispatcher = new C_OSCIpDispatcherWinSock();
-
-               (*oppc_IpDispatcher)->LoadConfigFile(c_EthFilePath.toStdString().c_str());
+               s32_Retval = C_CONFIG;
             }
          }
          else

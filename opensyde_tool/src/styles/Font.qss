@@ -209,7 +209,8 @@ stw_opensyde_gui_elements--C_OgeLabListHeaderHighlighted,
 stw_opensyde_gui_elements--C_OgeLabComListHeader,
 stw_opensyde_gui_elements--C_OgeSpxEditProperties,
 stw_opensyde_gui_elements--C_OgeLabDescriptionMessage,
-stw_opensyde_gui--C_SdNdeCoOverviewTableView
+stw_opensyde_gui--C_SdNdeCoOverviewTableView,
+stw_opensyde_gui--C_SdNdeCoPdoTableView
 {
 font-family: "Segoe UI";
 font-size: 14px;

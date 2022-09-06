@@ -102,15 +102,10 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_imports) {
 } else {
    message("opensyde_core_skip_imports not detected ... dragging in package")
 
-   INCLUDEPATH += \
-               $${PWD}/imports
-
    SOURCES += \
-    $${PWD}/imports/C_OSCCanOpenObjectDictionary.cpp \
     $${PWD}/imports/C_OSCImportEdsDcf.cpp
 
    HEADERS += \
-    $${PWD}/imports/C_OSCCanOpenObjectDictionary.h \
     $${PWD}/imports/C_OSCImportEdsDcf.h
 }
 
@@ -124,6 +119,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_code_generation) {
                $${PWD}/exports
 
    SOURCES += \
+    $${PWD}/exports/C_OSCExportCanOpenConfig.cpp \
+    $${PWD}/exports/C_OSCExportCanOpenInit.cpp \
     $${PWD}/exports/C_OSCExportCommunicationStack.cpp \
     $${PWD}/exports/C_OSCExportDataPool.cpp \
     $${PWD}/exports/C_OSCExportHalc.cpp \
@@ -133,6 +130,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_code_generation) {
     $${PWD}/exports/C_OSCExportUti.cpp
 
    HEADERS += \
+    $${PWD}/exports/C_OSCExportCanOpenConfig.h \
+    $${PWD}/exports/C_OSCExportCanOpenInit.h \
     $${PWD}/exports/C_OSCExportCommunicationStack.h \
     $${PWD}/exports/C_OSCExportDataPool.h \
     $${PWD}/exports/C_OSCExportHalc.h \
@@ -155,10 +154,12 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
                   $${PWD}/halc/definition/base \
                   $${PWD}/halc/magician \
                   $${PWD}/project \
+                  $${PWD}/imports \
                   $${PWD}/project/system \
                   $${PWD}/project/system/FileLoadersV2 \
                   $${PWD}/project/system/node \
-                  $${PWD}/project/system/node/can
+                  $${PWD}/project/system/node/can \
+                  $${PWD}/project/system/node/can/can_open
 
    SOURCES += \
        $${PWD}/halc/configuration/C_OSCHalcConfig.cpp \
@@ -234,7 +235,16 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/C_OSCNodeProperties.cpp \
        $${PWD}/project/system/node/C_OSCNodeStwFlashloaderSettings.cpp \
        $${PWD}/project/system/node/C_OSCNodeCommFiler.cpp \
-       $${PWD}/project/system/node/C_OSCNodeDataPoolId.cpp
+       $${PWD}/project/system/node/C_OSCNodeDataPoolId.cpp \
+       $${PWD}/project/system/node/can/C_OSCCanInterfaceId.cpp \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerMappableSignal.cpp \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerDeviceInfo.cpp \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerInfo.cpp \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerFiler.cpp \
+       $${PWD}/imports/C_OSCCanOpenObjectDictionary.cpp \
+       $${PWD}/imports/C_OSCCanOpenEdsInfoBlock.cpp \
+       $${PWD}/imports/C_OSCCanOpenEdsDeviceInfoBlock.cpp \
+       $${PWD}/imports/C_OSCCanOpenEdsFileInfoBlock.cpp
 
    HEADERS += \
        $${PWD}/halc/configuration/C_OSCHalcConfig.h \
@@ -310,7 +320,16 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/C_OSCCanMessageIdentificationIndices.h \
        $${PWD}/project/system/node/can/C_OSCCanProtocol.h \
        $${PWD}/project/system/node/can/C_OSCCanSignal.h \
-       $${PWD}/project/system/node/can/C_OSCCanUtil.h
+       $${PWD}/project/system/node/can/C_OSCCanUtil.h \
+       $${PWD}/project/system/node/can/C_OSCCanInterfaceId.h \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerMappableSignal.h \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerDeviceInfo.h \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerInfo.h \
+       $${PWD}/project/system/node/can/can_open/C_OSCCanOpenManagerFiler.h \
+       $${PWD}/imports/C_OSCCanOpenObjectDictionary.h \
+       $${PWD}/imports/C_OSCCanOpenEdsInfoBlock.h \
+       $${PWD}/imports/C_OSCCanOpenEdsDeviceInfoBlock.h \
+       $${PWD}/imports/C_OSCCanOpenEdsFileInfoBlock.h
 }
 
 # optional: parameter set handling (reading and writing syde_psi files)

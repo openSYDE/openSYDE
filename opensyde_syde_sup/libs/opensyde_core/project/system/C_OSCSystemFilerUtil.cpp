@@ -43,7 +43,7 @@ using namespace stw_errors;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert bus type enum to string
 
-   \param[in]   oe_Type   Bus type
+   \param[in]  oe_Type  Bus type
 
    \return  string representation of oe_Type
 */
@@ -66,8 +66,8 @@ C_SCLString C_OSCSystemFilerUtil::h_BusTypeEnumToString(const C_OSCSystemBus::E_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert bus type string to enum
 
-   \param[in]  orc_Type   type string
-   \param[out] ore_Type   Enum corresponding to type
+   \param[in]   orc_Type   type string
+   \param[out]  ore_Type   Enum corresponding to type
 
    \return
    C_NO_ERR   no error
@@ -100,9 +100,9 @@ sint32 C_OSCSystemFilerUtil::h_BusTypeStringToEnum(const stw_scl::C_SCLString & 
 
    Warning: includes error logging
 
-   \param[in,out] orc_FileXMLParser XML parser
-   \param[in]     orc_Path          File path
-   \param[in]     orc_RootNode      Root node name
+   \param[in,out]  orc_FileXMLParser   XML parser
+   \param[in]      orc_Path            File path
+   \param[in]      orc_RootNode        Root node name
 
    \return
    C_NO_ERR   data was read from file
@@ -145,9 +145,9 @@ sint32 C_OSCSystemFilerUtil::h_GetParserForExistingFile(C_OSCXMLParser & orc_Fil
 
    Warning: includes error logging
 
-   \param[in,out] orc_FileXMLParser XML parser
-   \param[in]     orc_Path          File path
-   \param[in]     orc_RootNode      Root node name
+   \param[in,out]  orc_FileXMLParser   XML parser
+   \param[in]      orc_Path            File path
+   \param[in]      orc_RootNode        Root node name
 
    \return
    C_NO_ERR   XML handle was created
@@ -180,7 +180,7 @@ sint32 C_OSCSystemFilerUtil::h_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLP
 
    Warning: includes error logging
 
-   \param[in] orc_Path Folder path
+   \param[in]  orc_Path    Folder path
 
    \return
    C_NO_ERR   XML handle was created
@@ -214,7 +214,7 @@ sint32 C_OSCSystemFilerUtil::h_CreateFolder(const C_SCLString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt item name for file name usage
 
-   \param[in] orc_ItemName Item name
+   \param[in]  orc_ItemName   Item name
 
    \return
    Item name ready for file name usage
@@ -228,8 +228,8 @@ C_SCLString C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(const C_SCLString
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Combine the base path and a relative sub folder path
 
-   \param[in] orc_BasePathName      Base path name
-   \param[in] orc_SubFolderFileName Sub folder directory and file name
+   \param[in]  orc_BasePathName        Base path name
+   \param[in]  orc_SubFolderFileName   Sub folder directory and file name
 
    \return
    Full, combined path
@@ -244,9 +244,71 @@ C_SCLString C_OSCSystemFilerUtil::h_CombinePaths(const C_SCLString & orc_BasePat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Save string to file
+
+   Will overwrite the file if it already exists.
+
+   \param[in]  orc_CompleteFileAsString   Complete file as string
+   \param[in]  orc_CompleteFilePath       Complete file path
+   \param[in]  orc_LogHeading             Log heading
+
+   \return
+   STW error codes
+
+   \retval   C_NO_ERR   data saved
+   \retval   C_RD_WR    could not erase pre-existing file before saving
+   \retval   C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+sint32 C_OSCSystemFilerUtil::h_SaveStringToFile(const C_SCLString & orc_CompleteFileAsString,
+                                                const C_SCLString & orc_CompleteFilePath,
+                                                const C_SCLString & orc_LogHeading)
+{
+   sint32 s32_Retval = C_NO_ERR;
+
+   if (TGL_FileExists(orc_CompleteFilePath) == true)
+   {
+      //erase it:
+      sintn sn_Return;
+      sn_Return = std::remove(orc_CompleteFilePath.c_str());
+      if (sn_Return != 0)
+      {
+         osc_write_log_error(orc_LogHeading,
+                             "Could not erase pre-existing file \"" + orc_CompleteFilePath + "\".");
+         s32_Retval = C_RD_WR;
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      const C_SCLString c_Folder = TGL_ExtractFilePath(orc_CompleteFilePath);
+      if (TGL_DirectoryExists(c_Folder) == false)
+      {
+         if (TGL_CreateDirectory(c_Folder) != 0)
+         {
+            osc_write_log_error(orc_LogHeading, "Could not create folder \"" + c_Folder + "\".");
+            s32_Retval = C_RD_WR;
+         }
+      }
+   }
+   if (s32_Retval == C_NO_ERR)
+   {
+      //Write
+      std::ofstream c_File;
+
+      c_File.open(orc_CompleteFilePath.c_str(), std::ofstream::out);
+      if (c_File.is_open())
+      {
+         c_File.write(orc_CompleteFileAsString.c_str(), orc_CompleteFileAsString.Length());
+         c_File.close();
+      }
+   }
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Transform export scaling support type to string
 
-   \param[in]  ore_Scaling   Flash loader type
+   \param[in]  ore_Scaling    Flash loader type
 
    \return
    Stringified export scaling support type

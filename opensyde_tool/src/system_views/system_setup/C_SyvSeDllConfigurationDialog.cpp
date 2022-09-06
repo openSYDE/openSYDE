@@ -64,6 +64,8 @@ C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_el
 {
    mpc_Ui->setupUi(this);
 
+   this->mpc_Ui->pc_LineEditCustomDllPath->SetDragAndDropActiveForFile("dll");
+
    this->mrc_ParentDialog.SetWidget(this);
 
    this->InitText();
@@ -93,6 +95,8 @@ C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_el
            this, &C_SyvSeDllConfigurationDialog::m_OnBrowse);
    connect(this->mpc_Ui->pc_PushButtonVariables, &C_OgePubPathVariables::SigVariableSelected,
            this->mpc_Ui->pc_LineEditCustomDllPath, &C_OgeLeFilePath::InsertVariable);
+   connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_OgeLeFilePath::SigPathDropped,
+           this, &C_SyvSeDllConfigurationDialog::m_OnDroppedDllPath);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -410,14 +414,38 @@ void C_SyvSeDllConfigurationDialog::m_OnBrowse(void) const
 
    if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
    {
-      QString c_Path = c_Dialog.selectedFiles().at(0);
-      // check if relative path is possible and appreciated
-      c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this->parentWidget(), c_Path, C_Uti::h_GetExePath());
+      const QString c_Path = c_Dialog.selectedFiles().at(0);
 
       if (c_Path != "")
       {
-         this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
+         this->m_SetCustomDllPath(c_Path);
       }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle a dropped folder path in line edit
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvSeDllConfigurationDialog::m_OnDroppedDllPath(void)
+{
+   this->m_SetCustomDllPath(this->mpc_Ui->pc_LineEditCustomDllPath->GetPath());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Setter for full create in path.
+
+   \param[in] orc_New New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvSeDllConfigurationDialog::m_SetCustomDllPath(const QString & orc_New) const
+{
+   // check if relative path is possible and appreciated
+   const QString c_Path = C_ImpUtil::h_AskUserToSaveRelativePath(this->parentWidget(), orc_New, C_Uti::h_GetExePath());
+
+   if (c_Path != "")
+   {
+      this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
    }
 }
 

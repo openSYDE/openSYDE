@@ -1965,6 +1965,14 @@ private:
 	private:
 		XMLDocument * _document;
 	};
+
+   //Modification by STW:
+   //To make sure that with strict C++98 or C++03 compilers DepthTracker can access "PushDepth" and "PopDepth"
+   // we need to give it access to those functions that are private in the parent class.
+   //See https://stackoverflow.com/questions/2421492/visibility-of-privately-inherited-typedefs-to-nested-classes
+   // for detailled explanation or the C++ Standard defect 45 "CWG 45" for details.
+   friend class XMLDocument::DepthTracker;
+
 	void PushDepth();
 	void PopDepth();
 

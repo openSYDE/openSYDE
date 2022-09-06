@@ -783,11 +783,13 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
                                                       const bool oq_Show64BitValues,
                                                       const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
 
-   if (pc_View != NULL)
+   if (s32_Retval == C_NO_ERR)
    {
-      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
       bool q_NodeValid;
       bool q_DataPoolDiagValid;
       bool q_DataPoolNvmValid;
@@ -799,10 +801,10 @@ void C_TblTreDataElementModel::m_InitDatapoolElements(const uint32 ou32_ViewInde
 
       //Nodes
       this->mpc_InvisibleRootItem->ReserveChildrenSpace(u32_NodeSize);
-      tgl_assert(rc_NodeActiveFlags.size() == u32_NodeSize);
+      tgl_assert(c_NodeActiveFlags.size() == u32_NodeSize);
       for (uint32 u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
-         if ((rc_NodeActiveFlags[u32_ItNode] == true) && (mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
+         if ((c_NodeActiveFlags[u32_ItNode] == true) && (mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
          {
             C_TblTreItem * const pc_NodeItem = new C_TblTreItem();
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
@@ -2008,9 +2010,14 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
-   if (pc_View != NULL)
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
+
+   if ((pc_View != NULL) &&
+       (s32_Retval == C_NO_ERR))
    {
-      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
       bool q_NodeValid;
       bool q_DataPoolDiagValid;
       bool q_DataPoolNvmValid;
@@ -2021,10 +2028,10 @@ void C_TblTreDataElementModel::m_InitNvmList(const uint32 ou32_ViewIndex)
 
       //Nodes
       this->mpc_InvisibleRootItem->ReserveChildrenSpace(u32_NodeSize);
-      tgl_assert(rc_NodeActiveFlags.size() == u32_NodeSize);
+      tgl_assert(c_NodeActiveFlags.size() == u32_NodeSize);
       for (uint32 u32_ItNode = 0; u32_ItNode < u32_NodeSize; ++u32_ItNode)
       {
-         if ((rc_NodeActiveFlags[u32_ItNode] == true) && (mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
+         if ((c_NodeActiveFlags[u32_ItNode] == true) && (mh_CheckNodeDiagnostic(ou32_ViewIndex, u32_ItNode) == true))
          {
             C_TblTreItem * const pc_NodeItem = new C_TblTreItem();
             const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
@@ -2462,19 +2469,24 @@ std::vector<uint32> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32 ou32
    std::vector<uint32> c_Retval;
    uint32 u32_Hash;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
-   if (pc_View != NULL)
+   std::vector<uint8> c_NodeActiveFlags;
+   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      ou32_ViewIndex,
+      c_NodeActiveFlags);
+
+   if ((pc_View != NULL) &&
+       (s32_Retval == C_NO_ERR))
    {
       bool q_Data;
       uint32 u32_Data;
       uint32 u32_DashboardCounter;
       const std::vector<C_PuiSvDashboard> & rc_Dashboards = pc_View->GetDashboards();
 
-      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
       u32_Hash = 0xFFFFFFFFUL;
       //Active flags
-      for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
+      for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
       {
-         q_Data = static_cast<bool>(rc_NodeActiveFlags[u32_ItNode]);
+         q_Data = static_cast<bool>(c_NodeActiveFlags[u32_ItNode]);
          stw_scl::C_SCLChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Hash);
       }
       //Relevant PC data

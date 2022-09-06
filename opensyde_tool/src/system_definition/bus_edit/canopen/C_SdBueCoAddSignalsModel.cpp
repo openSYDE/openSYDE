@@ -13,6 +13,7 @@
 #include "precomp_headers.h"
 
 #include "C_Uti.h"
+#include "C_SdUtil.h"
 #include "TGLUtils.h"
 #include "constants.h"
 #include "stwerrors.h"
@@ -84,11 +85,13 @@ void C_SdBueCoAddSignalsModel::SetIndex(const C_OSCCanMessageIdentificationIndic
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueCoAddSignalsModel::PrepareCleanUp()
 {
+   this->beginResetModel();
    if (this->mpc_InvisibleRootItem != NULL)
    {
       delete (this->mpc_InvisibleRootItem);
       this->mpc_InvisibleRootItem = NULL;
    }
+   this->endResetModel();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -101,19 +104,26 @@ void C_SdBueCoAddSignalsModel::PrepareCleanUp()
    Data for index
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_SdBueCoAddSignalsResultEntry * C_SdBueCoAddSignalsModel::GetDataForIndex(const uint32 ou32_ObjectIndex,
-                                                                                 const uint32 ou32_SignalIndex) const
+const C_OSCCanOpenManagerMappableSignal * C_SdBueCoAddSignalsModel::GetDataForIndex(const uint32 ou32_ObjectIndex,
+                                                                                    const uint32 ou32_SignalIndex) const
 {
-   const C_SdBueCoAddSignalsResultEntry * pc_Retval = NULL;
+   const C_OSCCanOpenManagerMappableSignal * pc_Retval = NULL;
    const std::map<stw_types::uint32,
-                  std::vector<C_SdBueCoAddSignalsResultEntry> >::const_iterator c_ItMappableObjectContent =
-      this->mc_MappableObjectContent.find(ou32_ObjectIndex);
+                  std::map<stw_types::uint32, stw_types::uint32> >::const_iterator c_ItObject =
+      this->mc_MapObjectIndexToVectorIndex.find(ou32_ObjectIndex);
 
-   if (c_ItMappableObjectContent != this->mc_MappableObjectContent.cend())
+   if (c_ItObject != this->mc_MapObjectIndexToVectorIndex.cend())
    {
-      if (ou32_SignalIndex < c_ItMappableObjectContent->second.size())
+      const std::map<stw_types::uint32, stw_types::uint32>::const_iterator c_ItItem =
+         c_ItObject->second.find(ou32_SignalIndex);
+
+      if (c_ItItem != c_ItObject->second.cend())
       {
-         pc_Retval = &c_ItMappableObjectContent->second[ou32_SignalIndex];
+         const std::vector<C_OSCCanOpenManagerMappableSignal> * const pc_MappableSignals = this->m_GetMappableSignals();
+         if ((pc_MappableSignals != NULL) && (c_ItItem->second < pc_MappableSignals->size()))
+         {
+            pc_Retval = &(*pc_MappableSignals)[c_ItItem->second];
+         }
       }
    }
 
@@ -354,8 +364,7 @@ void C_SdBueCoAddSignalsModel::m_Init(void)
 
       tgl_assert(this->mpc_InvisibleRootItem == NULL);
       this->beginResetModel();
-      pc_EdsDictionary->GetMappableObjects(this->mc_MappableObjects);
-      this->m_InitResult(*pc_EdsDictionary);
+      this->m_InitObjectMap();
       this->mpc_InvisibleRootItem = pc_RootItem;
       this->m_InitTopLevel(*pc_RootItem);
       this->endResetModel();
@@ -363,32 +372,53 @@ void C_SdBueCoAddSignalsModel::m_Init(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Init result
-
-   \param[in]  orc_EdsDictionary    EDS dictionary
+/*! \brief  Init object map
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueCoAddSignalsModel::m_InitResult(const C_OSCCanOpenObjectDictionary & orc_EdsDictionary)
+void C_SdBueCoAddSignalsModel::m_InitObjectMap()
 {
-   for (std::map<uint32, std::vector<uint32> >::const_iterator c_It = this->mc_MappableObjects.begin();
-        c_It != this->mc_MappableObjects.end(); ++c_It)
+   const std::vector<C_OSCCanOpenManagerMappableSignal> * const pc_MappableSignals = this->m_GetMappableSignals();
+   const C_OSCCanOpenObjectDictionary * const pc_EdsDictionary = this->m_GetEdsDictionary();
+
+   this->mc_MapObjectIndexToVectorIndex.clear();
+   if ((pc_MappableSignals != NULL) && (pc_EdsDictionary != NULL))
    {
-      std::vector<C_SdBueCoAddSignalsResultEntry> c_Entries;
-      c_Entries.reserve(c_It->second.size());
-      for (uint32 u32_ItSig = 0UL; u32_ItSig < c_It->second.size(); ++u32_ItSig)
+      for (uint32 u32_It = 0UL; u32_It < pc_MappableSignals->size(); ++u32_It)
       {
-         C_SdBueCoAddSignalsResultEntry c_Entry;
-         tgl_assert(C_OSCImportEdsDcf::h_ParseSignalContent(orc_EdsDictionary.c_Objects, c_It->first,
-                                                            c_It->second[u32_ItSig], 0UL,
-                                                            true, c_Entry.c_SignalData,
-                                                            c_Entry.c_DatapoolData,
-                                                            c_Entry.q_AutoMinMaxUsed) == C_NO_ERR);
-         C_CieUtil::h_AdaptName(c_Entry.c_DatapoolData.c_Name, c_Entry.c_DatapoolData.c_Comment);
-         c_Entries.push_back(c_Entry);
+         const C_OSCCanOpenManagerMappableSignal & rc_Signal = (*pc_MappableSignals)[u32_It];
+         if (this->m_CheckSignalRelevant(rc_Signal, *pc_EdsDictionary))
+         {
+            const std::map<stw_types::uint32,
+                           std::map<stw_types::uint32, stw_types::uint32> >::iterator c_ItObject =
+               this->mc_MapObjectIndexToVectorIndex.find(rc_Signal.c_SignalData.u16_CanOpenManagerObjectDictionaryIndex);
+
+            if (c_ItObject != this->mc_MapObjectIndexToVectorIndex.cend())
+            {
+               const std::map<stw_types::uint32, stw_types::uint32>::iterator c_ItItem =
+                  c_ItObject->second.find(rc_Signal.c_SignalData.u8_CanOpenManagerObjectDictionarySubIndex);
+
+               if (c_ItItem != c_ItObject->second.cend())
+               {
+                  //Should not happen
+                  tgl_assert(false);
+               }
+               else
+               {
+                  //Add to existing
+                  c_ItObject->second[rc_Signal.c_SignalData.u8_CanOpenManagerObjectDictionarySubIndex] = u32_It;
+               }
+            }
+            else
+            {
+               std::map<stw_types::uint32, stw_types::uint32> c_FreshMap;
+               c_FreshMap[rc_Signal.c_SignalData.u8_CanOpenManagerObjectDictionarySubIndex] = u32_It;
+               //New
+               this->mc_MapObjectIndexToVectorIndex[rc_Signal.c_SignalData.u16_CanOpenManagerObjectDictionaryIndex] =
+                  c_FreshMap;
+            }
+         }
       }
-      this->mc_MappableObjectContent[c_It->first] = c_Entries;
    }
-   tgl_assert(this->mc_MappableObjects.size() == this->mc_MappableObjectContent.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -399,8 +429,10 @@ void C_SdBueCoAddSignalsModel::m_InitResult(const C_OSCCanOpenObjectDictionary &
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueCoAddSignalsModel::m_InitTopLevel(C_TblTreItem & orc_RootNode)
 {
-   for (std::map<uint32, std::vector<uint32> >::const_iterator c_It = this->mc_MappableObjects.begin();
-        c_It != this->mc_MappableObjects.end(); ++c_It)
+   for (std::map<stw_types::uint32,
+                 std::map<stw_types::uint32,
+                          stw_types::uint32> >::const_iterator c_It = this->mc_MapObjectIndexToVectorIndex.begin();
+        c_It != this->mc_MapObjectIndexToVectorIndex.end(); ++c_It)
    {
       C_TblTreItem * const pc_ObjectItem = new C_TblTreItem();
       m_InitObjectNode(*pc_ObjectItem, c_It->first);
@@ -430,7 +462,7 @@ void C_SdBueCoAddSignalsModel::m_InitObjectNode(C_TblTreItem & orc_ObjectNode, c
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueCoAddSignalsModel::m_InitObjectNodeContent(C_TblTreItem & orc_ObjectNode, const uint32 ou32_ObjectIndex)
 {
-   orc_ObjectNode.c_Name = QString::number(ou32_ObjectIndex, 16);
+   orc_ObjectNode.c_Name = QString::number(ou32_ObjectIndex, 16).toUpper();
    orc_ObjectNode.q_Enabled = true;
    orc_ObjectNode.q_Selectable = false;
 
@@ -447,27 +479,20 @@ void C_SdBueCoAddSignalsModel::m_InitObjectNodeContent(C_TblTreItem & orc_Object
 void C_SdBueCoAddSignalsModel::m_InitObjectNodeChildren(C_TblTreItem & orc_ObjectNode, const uint32 ou32_ObjectIndex)
 {
    const std::map<stw_types::uint32,
-                  std::vector<stw_types::uint32> >::const_iterator c_ItMappableObjects =
-      this->mc_MappableObjects.find(ou32_ObjectIndex);
-   const std::map<stw_types::uint32,
-                  std::vector<C_SdBueCoAddSignalsResultEntry> >::const_iterator c_ItMappableObjectContent =
-      this->mc_MappableObjectContent.find(ou32_ObjectIndex);
+                  std::map<stw_types::uint32,
+                           stw_types::uint32> >::const_iterator c_ItMappableObjects =
+      this->mc_MapObjectIndexToVectorIndex.find(ou32_ObjectIndex);
 
-   tgl_assert(c_ItMappableObjects != this->mc_MappableObjects.end());
-   tgl_assert(c_ItMappableObjectContent != this->mc_MappableObjectContent.end());
-   if ((c_ItMappableObjects != this->mc_MappableObjects.end()) &&
-       (c_ItMappableObjectContent != this->mc_MappableObjectContent.end()))
+   tgl_assert(c_ItMappableObjects != this->mc_MapObjectIndexToVectorIndex.end());
+   if (c_ItMappableObjects != this->mc_MapObjectIndexToVectorIndex.end())
    {
-      tgl_assert(c_ItMappableObjects->second.size() == c_ItMappableObjectContent->second.size());
-      if (c_ItMappableObjects->second.size() == c_ItMappableObjectContent->second.size())
+      for (std::map<stw_types::uint32,
+                    stw_types::uint32>::const_iterator c_ItEntry = c_ItMappableObjects->second.cbegin();
+           c_ItEntry != c_ItMappableObjects->second.cend(); ++c_ItEntry)
       {
-         for (uint32 u32_ItEntry = 0UL; u32_ItEntry < c_ItMappableObjects->second.size(); ++u32_ItEntry)
-         {
-            C_TblTreItem * const pc_SignalItem = new C_TblTreItem();
-            m_InitSignalNodeContent(*pc_SignalItem, ou32_ObjectIndex, c_ItMappableObjects->second[u32_ItEntry],
-                                    u32_ItEntry);
-            orc_ObjectNode.AddChild(pc_SignalItem);
-         }
+         C_TblTreItem * const pc_SignalItem = new C_TblTreItem();
+         m_InitSignalNodeContent(*pc_SignalItem, ou32_ObjectIndex, c_ItEntry->first);
+         orc_ObjectNode.AddChild(pc_SignalItem);
       }
    }
 }
@@ -478,36 +503,18 @@ void C_SdBueCoAddSignalsModel::m_InitObjectNodeChildren(C_TblTreItem & orc_Objec
    \param[in,out]  orc_SignalNode         Signal node
    \param[in]      ou32_ObjectIndex       Object index
    \param[in]      ou32_ObjectSubIndex    Object sub index
-   \param[in]      ou32_SignalIndex       Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueCoAddSignalsModel::m_InitSignalNodeContent(C_TblTreItem & orc_SignalNode, const uint32 ou32_ObjectIndex,
-                                                       const uint32 ou32_ObjectSubIndex, const uint32 ou32_SignalIndex)
+                                                       const uint32 ou32_ObjectSubIndex)
 {
-   orc_SignalNode.c_Name = C_SdBueCoAddSignalsModel::mh_GetSignalNodeIndex(ou32_ObjectIndex, ou32_ObjectSubIndex);
+   orc_SignalNode.c_Name = C_SdUtil::h_GetCanOpenSignalObjectIndex(ou32_ObjectIndex, ou32_ObjectSubIndex);
    orc_SignalNode.c_Icon = this->mc_IconSignal;
 
    orc_SignalNode.q_Enabled = true;
    orc_SignalNode.q_Selectable = true;
 
-   orc_SignalNode.u32_Index = ou32_SignalIndex;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get signal node index
-
-   \param[in]  ou32_ObjectIndex     Object index
-   \param[in]  ou32_ObjectSubIndex  Object sub index
-
-   \return
-   Signal node index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueCoAddSignalsModel::mh_GetSignalNodeIndex(const uint32 ou32_ObjectIndex, const uint32 ou32_ObjectSubIndex)
-{
-   const QString c_Retval = static_cast<QString>("%1sub%2").arg(ou32_ObjectIndex, 0, 16).arg(ou32_ObjectSubIndex);
-
-   return c_Retval;
+   orc_SignalNode.u32_Index = ou32_ObjectSubIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -580,48 +587,56 @@ void C_SdBueCoAddSignalsModel::m_GetData(const E_Columns oe_Column, const uint32
       if (oq_IsSignal)
       {
          const std::map<stw_types::uint32,
-                        std::vector<stw_types::uint32> >::const_iterator c_ItMappableObjects =
-            this->mc_MappableObjects.find(ou32_ObjectIndex);
-         const std::map<stw_types::uint32,
-                        std::vector<C_SdBueCoAddSignalsResultEntry> >::const_iterator c_ItMappableObjectContent =
-            this->mc_MappableObjectContent.find(ou32_ObjectIndex);
+                        std::map<stw_types::uint32, stw_types::uint32> >::const_iterator c_ItObject =
+            this->mc_MapObjectIndexToVectorIndex.find(ou32_ObjectIndex);
 
-         tgl_assert(c_ItMappableObjects != this->mc_MappableObjects.end());
-         tgl_assert(c_ItMappableObjectContent != this->mc_MappableObjectContent.end());
-         if ((c_ItMappableObjects != this->mc_MappableObjects.end()) &&
-             (c_ItMappableObjectContent != this->mc_MappableObjectContent.end()))
+         tgl_assert(c_ItObject != this->mc_MapObjectIndexToVectorIndex.cend());
+         if (c_ItObject != this->mc_MapObjectIndexToVectorIndex.cend())
          {
-            tgl_assert(c_ItMappableObjects->second.size() == c_ItMappableObjectContent->second.size());
-            tgl_assert(ou32_SignalIndex < c_ItMappableObjectContent->second.size());
-            if ((c_ItMappableObjects->second.size() == c_ItMappableObjectContent->second.size()) &&
-                (ou32_SignalIndex < c_ItMappableObjectContent->second.size()))
+            const std::map<stw_types::uint32, stw_types::uint32>::const_iterator c_ItItem =
+               c_ItObject->second.find(ou32_SignalIndex);
+
+            tgl_assert(c_ItItem != c_ItObject->second.cend());
+            if (c_ItItem != c_ItObject->second.cend())
             {
-               const C_SdBueCoAddSignalsResultEntry & rc_ResultEntry =
-                  c_ItMappableObjectContent->second[ou32_SignalIndex];
-               // show data for column
-               switch (oe_Column)
+               const std::vector<C_OSCCanOpenManagerMappableSignal> * const pc_MappableSignals =
+                  this->m_GetMappableSignals();
+
+               tgl_assert(pc_MappableSignals != NULL);
+               if (pc_MappableSignals != NULL)
                {
-               case eINDEX:
-                  // name is handled by tree item name
-                  break;
-               case eNAME:
-                  pc_EdsDictionary = this->m_GetEdsDictionary();
-                  if (pc_EdsDictionary != NULL)
+                  tgl_assert(c_ItItem->second < pc_MappableSignals->size());
+                  if (c_ItItem->second < pc_MappableSignals->size())
                   {
-                     const C_OSCCanOpenObject * const pc_Object = pc_EdsDictionary->GetCanOpenSubIndexObject(
-                        ou32_ObjectIndex, static_cast<uint8>(c_ItMappableObjects->second[ou32_SignalIndex]));
-                     if (pc_Object != NULL)
+                     const C_OSCCanOpenManagerMappableSignal & rc_ResultEntry = (*pc_MappableSignals)[c_ItItem->second];
+                     // show data for column
+                     switch (oe_Column)
                      {
-                        orc_Output = C_OSCImportEdsDcf::h_GetObjectName(*pc_Object).c_str();
+                     case eINDEX:
+                        // name is handled by tree item name
+                        break;
+                     case eNAME:
+                        pc_EdsDictionary = this->m_GetEdsDictionary();
+                        if (pc_EdsDictionary != NULL)
+                        {
+                           const C_OSCCanOpenObject * const pc_Object = C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
+                              *pc_EdsDictionary,
+                              ou32_ObjectIndex,
+                              ou32_SignalIndex);
+                           if (pc_Object != NULL)
+                           {
+                              orc_Output = C_OSCImportEdsDcf::h_GetObjectName(*pc_Object).c_str();
+                           }
+                        }
+                        break;
+                     case eLENGTH:
+                        orc_Output = rc_ResultEntry.c_SignalData.u16_ComBitLength;
+                        break;
+                     default:
+                        tgl_assert(false);
+                        break;
                      }
                   }
-                  break;
-               case eLENGTH:
-                  orc_Output = rc_ResultEntry.c_SignalData.u16_ComBitLength;
-                  break;
-               default:
-                  tgl_assert(false);
-                  break;
                }
             }
          }
@@ -638,7 +653,8 @@ void C_SdBueCoAddSignalsModel::m_GetData(const E_Columns oe_Column, const uint32
             pc_EdsDictionary = this->m_GetEdsDictionary();
             if (pc_EdsDictionary != NULL)
             {
-               const C_OSCCanOpenObject * const pc_Object = pc_EdsDictionary->GetCanOpenObject(ou32_ObjectIndex);
+               const C_OSCCanOpenObject * const pc_Object =
+                  pc_EdsDictionary->GetCanOpenObject(static_cast<uint16>(ou32_ObjectIndex));
                if (pc_Object != NULL)
                {
                   orc_Output = C_OSCImportEdsDcf::h_GetObjectName(*pc_Object).c_str();
@@ -670,8 +686,51 @@ void C_SdBueCoAddSignalsModel::m_GetData(const E_Columns oe_Column, const uint32
 //----------------------------------------------------------------------------------------------------------------------
 const C_OSCCanOpenObjectDictionary * C_SdBueCoAddSignalsModel::m_GetEdsDictionary() const
 {
-   uint8 u8_InterfaceNumber;
    const C_OSCCanOpenObjectDictionary * pc_Retval = NULL;
+   const C_OSCCanOpenManagerDeviceInfo * const pc_Device = this->m_GetDeviceInfo();
+
+   if (pc_Device != NULL)
+   {
+      pc_Retval = &pc_Device->c_EDSFileContent;
+   }
+
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get mappable signals
+
+   \return
+   NULL Not found
+   Else Mappable signals
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<C_OSCCanOpenManagerMappableSignal> * C_SdBueCoAddSignalsModel::m_GetMappableSignals() const
+{
+   const std::vector<C_OSCCanOpenManagerMappableSignal> * pc_Retval = NULL;
+
+   const C_OSCCanOpenManagerDeviceInfo * const pc_Device = this->m_GetDeviceInfo();
+
+   if (pc_Device != NULL)
+   {
+      pc_Retval = &pc_Device->c_EDSFileMappableSignals;
+   }
+
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get device info
+
+   \return
+   NULL Not found
+   Else Device info
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCCanOpenManagerDeviceInfo * C_SdBueCoAddSignalsModel::m_GetDeviceInfo() const
+{
+   uint8 u8_InterfaceNumber;
+   const C_OSCCanOpenManagerDeviceInfo * pc_Retval = NULL;
 
    if (C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(this->mc_MessageId.u32_NodeIndex,
                                                                        this->mc_MessageId.u32_InterfaceIndex,
@@ -680,15 +739,74 @@ const C_OSCCanOpenObjectDictionary * C_SdBueCoAddSignalsModel::m_GetEdsDictionar
       const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
       if (pc_Message != NULL)
       {
-         const C_OSCCanOpenManagerDeviceInfo * const pc_Device =
+         pc_Retval =
             C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(this->mc_MessageId.u32_NodeIndex,
                                                                      u8_InterfaceNumber,
                                                                      pc_Message->c_CanOpenManagerOwnerNodeIndex);
-         if (pc_Device != NULL)
-         {
-            pc_Retval = &pc_Device->c_EDSFileContent;
-         }
       }
    }
    return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get CANopen object
+
+   \param[in]  orc_Dictionary    Dictionary
+   \param[in]  ou32_ObjectIndex  Object index
+   \param[in]  ou32_SignalIndex  Signal index
+
+   \return
+   CANopen object
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_OSCCanOpenObject * C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
+   const C_OSCCanOpenObjectDictionary & orc_Dictionary, const uint32 ou32_ObjectIndex, const uint32 ou32_SignalIndex)
+{
+   const C_OSCCanOpenObject * pc_Object;
+
+   if (ou32_SignalIndex == 0U)
+   {
+      //Object
+      pc_Object = orc_Dictionary.GetCanOpenObject(static_cast<uint16>(ou32_ObjectIndex));
+   }
+   else
+   {
+      //Object with sub index
+      pc_Object = orc_Dictionary.GetCanOpenSubIndexObject(
+         static_cast<uint16>(ou32_ObjectIndex), static_cast<uint8>(ou32_SignalIndex));
+   }
+   return pc_Object;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check signal relevant
+
+   \param[in]  orc_Signal        Signal
+   \param[in]  orc_Dictionary    Dictionary
+
+   \return
+   Flags
+
+   \retval   True    Signal relevant
+   \retval   False   Signal not relevant
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdBueCoAddSignalsModel::m_CheckSignalRelevant(const C_OSCCanOpenManagerMappableSignal & orc_Signal,
+                                                     const C_OSCCanOpenObjectDictionary & orc_Dictionary) const
+{
+   bool q_Retval = false;
+   const C_OSCCanOpenObject * const pc_Object = C_SdBueCoAddSignalsModel::mh_GetCanOpenObject(
+      orc_Dictionary,
+      static_cast<uint32>(orc_Signal.c_SignalData.u16_CanOpenManagerObjectDictionaryIndex),
+      static_cast<uint32>(orc_Signal.c_SignalData.u8_CanOpenManagerObjectDictionarySubIndex));
+
+   if (pc_Object != NULL)
+   {
+      if (((this->mc_MessageId.q_MessageIsTx) && (pc_Object->IsMappableIntoRPDO())) ||
+          ((!this->mc_MessageId.q_MessageIsTx) && (pc_Object->IsMappableIntoTPDO())))
+      {
+         q_Retval = true;
+      }
+   }
+   return q_Retval;
 }

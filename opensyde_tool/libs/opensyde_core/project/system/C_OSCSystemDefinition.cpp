@@ -171,7 +171,7 @@ sint32 C_OSCSystemDefinition::DeleteBus(const uint32 ou32_BusIndex)
               ++u32_ItInterface)
          {
             C_OSCNodeComInterfaceSettings & rc_ComInterface = rc_Node.c_Properties.c_ComInterfaces[u32_ItInterface];
-            if (rc_ComInterface.GetBusConnected() == true)
+            if (rc_ComInterface.GetBusConnectedRawValue() == true)
             {
                if (rc_ComInterface.u32_BusIndex == ou32_BusIndex)
                {
@@ -454,11 +454,16 @@ sint32 C_OSCSystemDefinition::GetNextFreeBusId(uint8 & oru8_BusId) const
    \param[out]     opq_DataPoolsInvalid            true: error in data pool was detected
    \param[out]     opq_ApplicationsInvalid         true: error in application was detected
    \param[out]     opq_DomainsInvalid              true: error in HALC configuration was detected
+   \param[out]     opq_CommSignalCountInvalid      true: error in COMM protocol with invalid signal count was detected
+   \param[out]     opq_CoPdoCountInvalid           true: error in CANopen protocol with invalid PDO count was detected
+   \param[out]     opq_CoNodeIDInvalid             true: error with CANopen Node ID detected
+   \param[out]     opq_CoHearbeatTimeInvalid       true: error with hearbeat time of Manager detected
    \param[in]      orq_AllowComDataPoolException   true: allow exception to skip check for connected interface
    \param[in,out]  opc_InvalidInterfaceIndices     Optional storage for invalid interface indices
    \param[in,out]  opc_InvalidDataPoolIndices      Optional storage for invalid datapool indices
    \param[in,out]  opc_InvalidApplicationIndices   Optional storage for invalid application indices
    \param[in,out]  opc_InvalidDomainIndices        Optional storage for invalid application indices
+   \param[in,out]  opc_InvalidProtocolTypes        Optional storage for invalid COMM protocol types
 
    \return
    C_NO_ERR Operation success
@@ -469,11 +474,16 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                                              bool * const opq_NameInvalid, bool * const opq_NodeIdInvalid,
                                              bool * const opq_IpInvalid, bool * const opq_DataPoolsInvalid,
                                              bool * const opq_ApplicationsInvalid, bool * const opq_DomainsInvalid,
+                                             bool * const opq_CommSignalCountInvalid,
+                                             bool * const opq_CoPdoCountInvalid, bool * const opq_CoNodeIDInvalid,
+                                             bool * const opq_CoHearbeatTimeInvalid,
                                              const bool & orq_AllowComDataPoolException,
                                              std::vector<uint32> * const opc_InvalidInterfaceIndices,
                                              std::vector<uint32> * const opc_InvalidDataPoolIndices,
                                              std::vector<uint32> * const opc_InvalidApplicationIndices,
-                                             std::vector<uint32> * const opc_InvalidDomainIndices) const
+                                             std::vector<uint32> * const opc_InvalidDomainIndices,
+                                             std::vector<C_OSCCanProtocol::E_Type> * const opc_InvalidProtocolTypes)
+const
 {
    sint32 s32_Retval = C_NO_ERR;
 
@@ -682,7 +692,10 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
                                         C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                            pc_Protocol->e_Type),
                                         C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
-                                           pc_Protocol->e_Type)) == true)
+                                           pc_Protocol->e_Type),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                           pc_Protocol->e_Type),
+                                        C_OSCCanProtocol::h_GetCANMessageSignalsRequired(pc_Protocol->e_Type)) == true)
                                  {
                                     q_ResultError = true;
                                     q_CurRes = true;
@@ -787,6 +800,114 @@ sint32 C_OSCSystemDefinition::CheckErrorNode(const uint32 ou32_NodeIndex, bool *
       if (opq_DomainsInvalid != NULL)
       {
          rc_CheckedNode.CheckHalcConfigValid(opq_DomainsInvalid, opc_InvalidDomainIndices);
+      }
+
+      // COMM protocol check
+      if ((opq_CommSignalCountInvalid != NULL) || (opq_CoPdoCountInvalid != NULL))
+      {
+         bool q_TempCommRxSignalCountInvalid = false;
+         bool q_TempCommTxSignalCountInvalid = false;
+         bool q_TempCoRPdoCountInvalid = false;
+         bool q_TempCoTPdoCountInvalid = false;
+         uint32 u32_ProtCounter;
+
+         if (opq_CommSignalCountInvalid != NULL)
+         {
+            *opq_CommSignalCountInvalid = false;
+         }
+         if (opq_CoPdoCountInvalid != NULL)
+         {
+            *opq_CoPdoCountInvalid = false;
+         }
+
+         // And all protocols which are not connected to a bus
+         for (u32_ProtCounter = 0U; u32_ProtCounter < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size();
+              ++u32_ProtCounter)
+         {
+            rc_CheckedNode.CheckErrorCANProtocol(C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtCounter],
+                                                 false,
+                                                 q_TempCommRxSignalCountInvalid,
+                                                 q_TempCommTxSignalCountInvalid,
+                                                 q_TempCoRPdoCountInvalid,
+                                                 q_TempCoTPdoCountInvalid);
+
+            if ((opq_CommSignalCountInvalid != NULL) &&
+                ((q_TempCommRxSignalCountInvalid == true) ||
+                 (q_TempCommTxSignalCountInvalid == true)))
+            {
+               // Merge TX and RX error
+               *opq_CommSignalCountInvalid = true;
+
+               if (opc_InvalidProtocolTypes != NULL)
+               {
+                  opc_InvalidProtocolTypes->push_back(C_OSCCanProtocol::hc_ALL_PROTOCOLS[u32_ProtCounter]);
+               }
+            }
+            if ((opq_CoPdoCountInvalid != NULL) &&
+                ((q_TempCoRPdoCountInvalid == true) ||
+                 (q_TempCoTPdoCountInvalid == true)))
+            {
+               // Merge TPDO and RPDO error
+               *opq_CoPdoCountInvalid = true;
+            }
+         }
+      }
+
+      // CANopen specific check
+      if ((opq_CoNodeIDInvalid != NULL) || (opq_CoHearbeatTimeInvalid != NULL))
+      {
+         std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManager;
+         bool q_TempCoNodeIdConflict;
+         bool * pq_TempCoNodeIdConflict = NULL;
+         bool q_TempCoManagerNodeIdInvalid;
+         bool * pq_TempCoManagerNodeIdInvalid = NULL;
+         bool q_TempCoDevicesNodeIdInvalid;
+         bool * pq_TempCoDevicesNodeIdInvalid = NULL;
+         bool q_TempCoHeartbeatInvalid;
+         bool * pq_TempCoHeartbeatInvalid = NULL;
+
+         // Temporary pointers needed for avoid overwriting previous results in the loop
+         // and avoid running error checks of not wanted checks
+         if (opq_CoNodeIDInvalid != NULL)
+         {
+            *opq_CoNodeIDInvalid = false;
+            pq_TempCoNodeIdConflict = &q_TempCoNodeIdConflict;
+
+            // Summing all CANopen Node ID conflicts into one flag
+            pq_TempCoManagerNodeIdInvalid = &q_TempCoManagerNodeIdInvalid;
+            pq_TempCoDevicesNodeIdInvalid = &q_TempCoDevicesNodeIdInvalid;
+         }
+
+         if (opq_CoHearbeatTimeInvalid != NULL)
+         {
+            *opq_CoHearbeatTimeInvalid = false;
+            pq_TempCoHeartbeatInvalid = &q_TempCoHeartbeatInvalid;
+         }
+
+         for (c_ItManager = rc_CheckedNode.c_CanOpenManagers.begin();
+              c_ItManager != rc_CheckedNode.c_CanOpenManagers.end(); ++c_ItManager)
+         {
+            c_ItManager->second.CheckErrorManager(pq_TempCoNodeIdConflict, pq_TempCoManagerNodeIdInvalid,
+                                                  pq_TempCoDevicesNodeIdInvalid,
+                                                  pq_TempCoHeartbeatInvalid, true);
+
+            if ((opq_CoNodeIDInvalid != NULL) &&
+                ((q_TempCoNodeIdConflict == true) ||
+                 (q_TempCoManagerNodeIdInvalid == true) ||
+                 (q_TempCoDevicesNodeIdInvalid == true)))
+            {
+               // Summing all CANopen Node ID conflicts into one flag
+               // Error for CANopen Node ID detected
+               *opq_CoNodeIDInvalid = true;
+            }
+
+            if ((opq_CoHearbeatTimeInvalid != NULL) &&
+                (q_TempCoHeartbeatInvalid == true))
+            {
+               // Error for CANopen Node ID detected
+               *opq_CoHearbeatTimeInvalid = true;
+            }
+         }
       }
    }
    else
@@ -929,7 +1050,9 @@ sint32 C_OSCSystemDefinition::CheckErrorBus(const uint32 ou32_BusIndex, bool * c
                                     *opq_DataPoolsInvalid = rc_MessageContainer.CheckLocalError(
                                        *pc_TxList, *pc_RxList,
                                        C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(rc_Protocol.e_Type),
-                                       C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(rc_Protocol.e_Type));
+                                       C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(rc_Protocol.e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(rc_Protocol.e_Type),
+                                       C_OSCCanProtocol::h_GetCANMessageSignalsRequired(rc_Protocol.e_Type));
                                     //Check global error
                                     if (*opq_DataPoolsInvalid == false)
                                     {

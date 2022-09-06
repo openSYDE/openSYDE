@@ -69,6 +69,15 @@ Q_SIGNALS:
    void SigSwitchToDataPool(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
    void SigSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
    void SigSwitchToBusProperties(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
+   void SigSwitchToBusProtocol(const stw_types::uint32 ou32_Index, const QString & orc_BusName,
+                               const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_ProtocolType) const;
+   void SigSwitchToBusProtocolMessage(const stw_types::uint32 ou32_Index, const QString & orc_BusName,
+                                      const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId)
+   const;
+
+   void SigSwitchToDeviceNodeInCoManager(const stw_types::uint32 ou32_ManagerNodeIndex,
+                                         const QString & orc_ManagerNodeName,
+                                         const stw_types::uint32 ou32_DeviceNodeIndex) const;
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName,
                        const bool oq_CombineItemAndSubSubName);
    void SigSave(void);
@@ -89,10 +98,12 @@ private:
    void m_OnSwitchToBus(const stw_types::uint32 & oru32_BusIndex, const QString & orc_BusName);
    void m_OnSwitchToHalc(void);
    void m_OnSwitchToCommMessages(const stw_types::uint32 ou32_DataPoolIndex);
+   void m_OnSwitchToCanOpenManager(void);
    void m_CurrentTabChanged(const stw_types::sintn osn_Index);
    void m_TabClicked(const stw_types::sintn osn_Index) const;
    void m_CreateTabWidgetsAlways(const stw_types::sintn osn_Index, const bool oq_AdaptCursor);
    void m_ReloadDataPools(void) const;
+   void m_ReloadCanOpenConfig(void) const;
    void m_ReloadCommMessages(void) const;
    void m_ReloadCommDatapools(void) const;
    void m_HalcLoadedFromTSP(void) const;

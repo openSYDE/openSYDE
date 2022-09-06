@@ -145,7 +145,8 @@ bool C_OgeSpxAllBase::m_HandleEvent(QEvent * const opc_Event)
 
             if (pc_HelpEvent != NULL)
             {
-               if (this->m_IsEnabled() == true)
+               if ((this->mq_ShowToolTipWhenDisabled == true) ||
+                   (this->m_IsEnabled() == true))
                {
                   this->m_SetMouseTracking(true);
 

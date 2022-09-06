@@ -56,6 +56,8 @@ private:
    std::vector<stw_types::uint32> mc_NodeIndexes;
    std::vector<stw_types::uint32> mc_InterfaceIndexes;
 
+   static const QString mhc_SUFFIX;
+
    void m_OkClicked(void);
    void m_CancelClicked(void);
    void m_EDSPathButtonClicked(void);
@@ -63,6 +65,7 @@ private:
    void m_LoadPicture(const QFileInfo oc_FileInfo);
 
    void m_FillUpComboBox(const stw_types::uint32 ou32_BusIndex, const QString oc_NodeName);
+   bool m_CheckIfNodeHasCANopenManager(const stw_types::uint32 ou32_NodeIndex);
    void m_OnLoadEDS(void);
 
    //Avoid call

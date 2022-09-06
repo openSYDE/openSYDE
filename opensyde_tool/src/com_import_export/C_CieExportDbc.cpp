@@ -599,7 +599,8 @@ sint32 C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CIEDataPoolEle
 
    float64 f64_Value;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_DataSetValues.at(0), f64_Value, 0UL); // raw value
-   f64_Value = orc_DbcSignal.rawToPhysicalValue(f64_Value);                                      // phy value
+
+   //raw value shall be used for export
    if ((e_CurrentType == C_OSCNodeDataPoolContent::eFLOAT32) || (e_CurrentType == C_OSCNodeDataPoolContent::eFLOAT64))
    {
       c_Attribute.floatValue = f64_Value;

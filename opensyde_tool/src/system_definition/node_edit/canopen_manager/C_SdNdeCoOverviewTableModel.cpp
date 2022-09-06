@@ -59,6 +59,7 @@ C_SdNdeCoOverviewTableModel::C_SdNdeCoOverviewTableModel(QObject * const opc_Par
 void C_SdNdeCoOverviewTableModel::UpdateData()
 {
    this->beginResetModel();
+   this->m_FillCoInfo();
    this->endResetModel();
 }
 
@@ -105,55 +106,14 @@ sint32 C_SdNdeCoOverviewTableModel::MapRowToNodeConfig(const sint32 os32_RowInde
                                                        C_OSCCanInterfaceId & orc_CanInterfaceId)
 {
    sint32 s32_Error = C_NO_ERR;
-   bool q_DeviceFound = false;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
 
-   if ((pc_Node->c_CanOpenManagers.empty() == false) &&
-       (os32_RowIndex >= 0))
+   if ((os32_RowIndex >= 0) && (static_cast<uintn>(os32_RowIndex) < this->mc_CoInfoAll.size()))
    {
-      // we have a CANopen Manager node
-      sint32 s32_CurrentDeviceIndex = 0;
-      std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_IterManagers;
-      for (c_IterManagers = pc_Node->c_CanOpenManagers.begin();
-           (c_IterManagers != pc_Node->c_CanOpenManagers.end()) && (q_DeviceFound == false);
-           ++c_IterManagers)
-      {
-         if (s32_CurrentDeviceIndex == os32_RowIndex)
-         {
-            ore_NodeType = E_NodeType::eMANAGER;
-            oru8_InterfaceNumber = c_IterManagers->first;
-            q_DeviceFound = true;
-         }
-         else
-         {
-            s32_CurrentDeviceIndex++;
-            // current device is a normal server device
-            std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
-            for (c_IterDevices = c_IterManagers->second.c_CanOpenDevices.begin();
-                 (c_IterDevices != c_IterManagers->second.c_CanOpenDevices.end()) && (q_DeviceFound == false);
-                 ++c_IterDevices)
-            {
-               if (s32_CurrentDeviceIndex == os32_RowIndex)
-               {
-                  // found normal server device --> check if active otherwise take next
-                  if (c_IterDevices->second.q_DeviceOptional == false)
-                  {
-                     ore_NodeType = E_NodeType::eDEVICE;
-                     oru8_InterfaceNumber = c_IterManagers->first; // we take the interface from manager
-                     orc_CanInterfaceId = c_IterDevices->first;
-                     q_DeviceFound = true;
-                  }
-               }
-               else
-               {
-                  s32_CurrentDeviceIndex++;
-               }
-            }
-         }
-      }
+      ore_NodeType = this->mc_CoInfoAll.at(os32_RowIndex).c_CoNodeConfig.e_NodeType;
+      oru8_InterfaceNumber = this->mc_CoInfoAll.at(os32_RowIndex).c_CoNodeConfig.u8_InterfaceNumber;
+      orc_CanInterfaceId = this->mc_CoInfoAll.at(os32_RowIndex).c_CoNodeConfig.c_CanInterfaceId;
    }
-
-   if (q_DeviceFound == false)
+   else
    {
       s32_Error = C_NOACT;
    }
@@ -310,11 +270,8 @@ sintn C_SdNdeCoOverviewTableModel::rowCount(const QModelIndex & orc_Parent) cons
               c_IterDevices != c_IterManagers->second.c_CanOpenDevices.end();
               ++c_IterDevices)
          {
-            // found normal server device --> check if active otherwise take next
-            if (c_IterDevices->second.q_DeviceOptional == false)
-            {
-               sn_Retval++;
-            }
+            // found normal server device
+            sn_Retval++;
          }
       }
    }
@@ -361,57 +318,34 @@ QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const 
       const E_Columns e_Col = static_cast<E_Columns>(orc_Index.column());
       if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
       {
-         sint32 s32_Error;
-         C_CoTableData c_Data;
-         switch (e_Col)
+         if ((static_cast<uintn>(orc_Index.row()) < this->mc_CoInfoAll.size()) && (orc_Index.row() >= 0))
          {
-         case eINDEX:
-            c_Retval = orc_Index.row() + 1;
-            break;
-         case eINTERFACE:
-            s32_Error = m_MapRowToCoData(orc_Index.row(), c_Data);
-            if (s32_Error == C_NO_ERR)
+            switch (e_Col)
             {
-               c_Retval = c_Data.c_Interface;
+            case eINDEX:
+               c_Retval = orc_Index.row() + 1;
+               break;
+            case eINTERFACE:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_Interface;
+               break;
+            case eNODE:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_Node;
+               break;
+            case eROLE:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_Role;
+               break;
+            case eCANOPENNODEID:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_CANopenId;
+               break;
+            case eTPDOS:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_TPDOs;
+               break;
+            case eRPDOS:
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_RPDOs;
+               break;
+            default:
+               break;
             }
-            break;
-         case eNODE:
-            s32_Error = m_MapRowToCoData(orc_Index.row(), c_Data);
-            if (s32_Error == C_NO_ERR)
-            {
-               c_Retval = c_Data.c_Node;
-            }
-            break;
-         case eROLE:
-            s32_Error = m_MapRowToCoData(orc_Index.row(), c_Data);
-            if (s32_Error == C_NO_ERR)
-            {
-               c_Retval = c_Data.c_Role;
-            }
-            break;
-         case eCANOPENNODEID:
-            s32_Error = m_MapRowToCoData(orc_Index.row(), c_Data);
-            if (s32_Error == C_NO_ERR)
-            {
-               c_Retval = c_Data.c_CANopenId;
-            }
-            break;
-         case eTPDOS:
-            s32_Error = m_MapRowToCoData(orc_Index.row(), c_Data);
-            if (s32_Error == C_NO_ERR)
-            {
-               c_Retval = c_Data.c_TPDOs;
-            }
-            break;
-         case eRPDOS:
-            s32_Error = m_MapRowToCoData(orc_Index.row(), c_Data);
-            if (s32_Error == C_NO_ERR)
-            {
-               c_Retval = c_Data.c_RPDOs;
-            }
-            break;
-         default:
-            break;
          }
       }
       else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
@@ -424,98 +358,6 @@ QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const 
       }
    }
    return c_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Map row to data
-
-   \param[in]  os32_RowIndex  Index
-   \param[out] orc_Data       data structure to be filled
-
-   \return
-   C_NO_ACT node not available
-   C_NO_ERR Valid data
-*/
-//----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeCoOverviewTableModel::m_MapRowToCoData(const sint32 os32_RowIndex, C_CoTableData & orc_Data) const
-{
-   sint32 s32_Error = C_NO_ERR;
-   bool q_DeviceFound = false;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   static C_PdoCount hc_PdoManagerCnt;
-   static std::map<uint32, C_PdoCount> hc_PdoDeviceMap;
-
-   if ((pc_Node->c_CanOpenManagers.empty() == false) &&
-       (os32_RowIndex >= 0))
-   {
-      // we have a CANopen Manager node
-      uint8 u8_InterfaceIndex;
-      sint32 s32_CurrentDeviceIndex = 0;
-      std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_IterManagers;
-      for (c_IterManagers = pc_Node->c_CanOpenManagers.begin();
-           (c_IterManagers != pc_Node->c_CanOpenManagers.end()) && (q_DeviceFound == false);
-           ++c_IterManagers)
-      {
-         if (s32_CurrentDeviceIndex == os32_RowIndex)
-         {
-            u8_InterfaceIndex = c_IterManagers->first;
-            // current device is a CANopen Manager
-            orc_Data.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN, u8_InterfaceIndex);
-            //lint -e{1946} // use of functional-style cast is fine here
-            orc_Data.c_Node = QString(pc_Node->c_Properties.c_Name.c_str());
-            orc_Data.c_Role = "Manager";
-            orc_Data.c_CANopenId = QString::number(c_IterManagers->second.u8_NodeIDValue);
-            // get TPDOs and RPDOs via message container
-            this->m_GetPdoCountsByManager(pc_Node, u8_InterfaceIndex, &hc_PdoManagerCnt, &hc_PdoDeviceMap);
-            this->m_GetResultStringsOfPdos(&hc_PdoManagerCnt, orc_Data.c_TPDOs, orc_Data.c_RPDOs);
-
-            q_DeviceFound = true;
-         }
-         else
-         {
-            s32_CurrentDeviceIndex++;
-            // current device is a normal server device
-            std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
-            for (c_IterDevices = c_IterManagers->second.c_CanOpenDevices.begin();
-                 (c_IterDevices != c_IterManagers->second.c_CanOpenDevices.end()) && (q_DeviceFound == false);
-                 ++c_IterDevices)
-            {
-               if (s32_CurrentDeviceIndex == os32_RowIndex)
-               {
-                  // found normal server device --> check if active otherwise take next
-                  if (c_IterDevices->second.q_DeviceOptional == false)
-                  {
-                     const C_OSCNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                        c_IterDevices->first.u32_NodeIndex);
-                     u8_InterfaceIndex = c_IterManagers->first; // we display the CAN interface from Manager
-                     orc_Data.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN, u8_InterfaceIndex);
-                     //lint -e{1946} // use of functional-style cast is fine here
-                     orc_Data.c_Node = QString(pc_DeviceNode->c_Properties.c_Name.c_str());
-                     orc_Data.c_Role = "Device";
-                     orc_Data.c_CANopenId = QString::number(c_IterManagers->second.u8_NodeIDValue);
-                     // get TPDOs and RPDOs via message container
-                     const C_PdoCount * const pc_PdoCount =
-                        &((hc_PdoDeviceMap.find(c_IterDevices->first.u32_NodeIndex))->second);
-                     this->m_GetResultStringsOfPdos(pc_PdoCount, orc_Data.c_TPDOs, orc_Data.c_RPDOs);
-
-                     q_DeviceFound = true;
-                  }
-               }
-               else
-               {
-                  s32_CurrentDeviceIndex++;
-               }
-            }
-         }
-      }
-   }
-
-   if (q_DeviceFound == false)
-   {
-      s32_Error = C_NOACT;
-   }
-
-   return s32_Error;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -688,5 +530,81 @@ const
       }
       opc_PdoDeviceMap->insert({ou32_NodeId, c_PdoCnt}
                                );
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Collects all CANopen data for overview table and double click event.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
+{
+   this->mc_CoInfoAll.clear();
+
+   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   C_PdoCount c_PdoManagerCnt;
+   std::map<uint32, C_PdoCount> c_PdoDeviceMap;
+
+   if (pc_Node->c_CanOpenManagers.empty() == false)
+   {
+      // we have a CANopen Manager node
+      uint8 u8_InterfaceIndex;
+      std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_IterManagers;
+      for (c_IterManagers = pc_Node->c_CanOpenManagers.begin();
+           c_IterManagers != pc_Node->c_CanOpenManagers.end();
+           ++c_IterManagers)
+      {
+         // current device is a CANopen Manager
+         C_CoInfo c_CoInfoManager;
+
+         c_CoInfoManager.c_CoNodeConfig.e_NodeType = E_NodeType::eMANAGER;
+         u8_InterfaceIndex = c_IterManagers->first;
+         c_CoInfoManager.c_CoNodeConfig.u8_InterfaceNumber = u8_InterfaceIndex;
+         c_CoInfoManager.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+                                                                                     u8_InterfaceIndex);
+         //lint -e{1946} // use of functional-style cast is fine here
+         c_CoInfoManager.c_CoTableData.c_Node = QString(pc_Node->c_Properties.c_Name.c_str());
+         c_CoInfoManager.c_CoTableData.c_Role = "Manager";
+         c_CoInfoManager.c_CoTableData.c_CANopenId = QString::number(c_IterManagers->second.u8_NodeIDValue);
+         // get TPDOs and RPDOs via message container
+         this->m_GetPdoCountsByManager(pc_Node, u8_InterfaceIndex, &c_PdoManagerCnt, &c_PdoDeviceMap);
+         this->m_GetResultStringsOfPdos(&c_PdoManagerCnt, c_CoInfoManager.c_CoTableData.c_TPDOs,
+                                        c_CoInfoManager.c_CoTableData.c_RPDOs);
+
+         this->mc_CoInfoAll.push_back(c_CoInfoManager);
+
+         // iterate throuch normal server devices
+         std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
+         for (c_IterDevices = c_IterManagers->second.c_CanOpenDevices.begin();
+              c_IterDevices != c_IterManagers->second.c_CanOpenDevices.end();
+              ++c_IterDevices)
+         {
+            // found normal server device
+            C_CoInfo c_CoInfoDevice;
+
+            const C_OSCNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+               c_IterDevices->first.u32_NodeIndex);
+            c_CoInfoDevice.c_CoNodeConfig.e_NodeType = E_NodeType::eDEVICE;
+            u8_InterfaceIndex = c_IterManagers->first; // we display the CAN interface from Manager
+            c_CoInfoDevice.c_CoNodeConfig.u8_InterfaceNumber = u8_InterfaceIndex;
+            c_CoInfoDevice.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+                                                                                       u8_InterfaceIndex);
+            c_CoInfoDevice.c_CoNodeConfig.c_CanInterfaceId = c_IterDevices->first;
+            //lint -e{1946} // use of functional-style cast is fine here
+            c_CoInfoDevice.c_CoTableData.c_Node = QString(pc_DeviceNode->c_Properties.c_Name.c_str());
+            c_CoInfoDevice.c_CoTableData.c_Role = "Device";
+            c_CoInfoDevice.c_CoTableData.c_CANopenId = QString::number(c_IterDevices->second.u8_NodeIDValue);
+            // get TPDOs and RPDOs via message container
+            C_PdoCount c_PdoCount = {0U, 0U, 0U, 0U};
+            if (c_PdoDeviceMap.find(c_IterDevices->first.u32_NodeIndex) != c_PdoDeviceMap.end())
+            {
+               c_PdoCount = (c_PdoDeviceMap.find(c_IterDevices->first.u32_NodeIndex))->second;
+            }
+            this->m_GetResultStringsOfPdos(&c_PdoCount, c_CoInfoDevice.c_CoTableData.c_TPDOs,
+                                           c_CoInfoDevice.c_CoTableData.c_RPDOs);
+
+            this->mc_CoInfoAll.push_back(c_CoInfoDevice);
+         }
+      }
    }
 }

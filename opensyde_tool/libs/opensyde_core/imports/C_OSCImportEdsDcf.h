@@ -140,9 +140,10 @@ private:
                                  const stw_scl::C_SCLString & orc_ErrorMessage,
                                  const stw_types::sint32 os32_COSubSectionId, const bool oq_IsError,
                                  std::vector<stw_scl::C_SCLString> * const opc_ImportMessages = NULL);
-   static stw_types::sint32 mh_CalcMinMax(const C_OSCCanOpenObject * const opc_COSignalObject,
-                                          C_OSCNodeDataPoolListElement & orc_Element,
-                                          const stw_types::uint16 ou16_NumberBits, bool & orq_DefaultMinMax);
+   static stw_scl::C_SCLString mh_GetNumberAsHex(const stw_types::uint32 ou32_Number);
+   static stw_types::sint32 mh_CalcMinMaxInit(const C_OSCCanOpenObject * const opc_COSignalObject,
+                                              C_OSCNodeDataPoolListElement & orc_Element,
+                                              const stw_types::uint16 ou16_NumberBits, bool & orq_DefaultMinMax);
    static void mh_LoadDummies(const stw_scl::C_SCLString & orc_FilePath, std::vector<stw_types::uint32> & orc_Dummies);
 };
 

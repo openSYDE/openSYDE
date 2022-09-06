@@ -170,12 +170,12 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OSCNod
                }
             }
 
-            this->m_InitComboBoxProtocols(*this->mpe_ComProtocolType);
+            this->m_InitComboBoxProtocols(false, *this->mpe_ComProtocolType);
          }
          else
          {
             // New Datapool
-            this->m_InitComboBoxProtocols(C_OSCCanProtocol::eLAYER2);
+            this->m_InitComboBoxProtocols(true, C_OSCCanProtocol::eLAYER2);
 
             //Initial name generation
             m_OnComTypeChange();
@@ -987,25 +987,36 @@ void C_SdNdeDpProperties::m_InitSpinBox(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialization of the combo box with the different protocol types
 
+   \param[in]  oq_NewDatapool       Flag if COMM Datapool is a new Datapool
    \param[in]  oe_ComProtocolType   Protocol type to set initially
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpProperties::m_InitComboBoxProtocols(const C_OSCCanProtocol::E_Type oe_ComProtocolType) const
+void C_SdNdeDpProperties::m_InitComboBoxProtocols(const bool oq_NewDatapool,
+                                                  const C_OSCCanProtocol::E_Type oe_ComProtocolType) const
 {
+   const sint32 s32_PROTOCOL_CANOPEN_INDEX = 3;
+
    this->mpc_Ui->pc_ComboBoxProtocol->clear();
 
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eLAYER2));
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::eECES));
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::
                                                                                          eCAN_OPEN_SAFETY));
-   //lint -e{506,774} Temporrary handling of non visible feature
-   if (mq_ENABLE_CAN_OPEN_FEATURE)
-   {
-      this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::
-                                                                                            eCAN_OPEN));
-   }
+   this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OSCCanProtocol::
+                                                                                         eCAN_OPEN));
 
    this->mpc_Ui->pc_ComboBoxProtocol->setCurrentText(C_PuiSdUtil::h_ConvertProtocolTypeToString(oe_ComProtocolType));
+
+   if (oq_NewDatapool == false)
+   {
+      // No change of the protocol is allowed on existing COMM Datapools
+      this->mpc_Ui->pc_ComboBoxProtocol->setEnabled(false);
+   }
+   else
+   {
+      // New COMM Datapool. CANopen shall not be added manually, must be disabled
+      this->mpc_Ui->pc_ComboBoxProtocol->SetItemState(s32_PROTOCOL_CANOPEN_INDEX, false);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

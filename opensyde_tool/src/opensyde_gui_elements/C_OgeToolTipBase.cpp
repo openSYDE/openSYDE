@@ -36,6 +36,7 @@ C_OgeToolTipBase::C_OgeToolTipBase() :
    mc_ToolTipContent(""),
    me_ToolTipType(stw_opensyde_gui::C_NagToolTip::eDEFAULT),
    mq_ToolTipActive(false),
+   mq_ShowToolTipWhenDisabled(false),
    mpc_ToolTip(NULL)
 {
 }
@@ -83,6 +84,17 @@ void C_OgeToolTipBase::SetToolTipInformation(const QString & orc_Heading, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the flag for showing the tooltip even when the element is disabled
+
+   \param[in]       oq_ShowToolTip     Flag for showing tooltip
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeToolTipBase::ShowToolTipWhenDisabled(const bool oq_ShowToolTip)
+{
+   this->mq_ShowToolTipWhenDisabled = oq_ShowToolTip;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Hides the tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,10 +107,10 @@ void C_OgeToolTipBase::m_HideToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get the current tooltip
+/*! \brief   Get the current tool tip
 
    \return
-   Current tooltip
+   Current tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
 stw_opensyde_gui::C_NagToolTip * C_OgeToolTipBase::m_GetToolTip(void)

@@ -126,6 +126,14 @@ public:
    template <typename T, typename U>
    static void h_SortIndicesAscendingAndSync(std::vector<stw_types::uint32> & orc_IndicesTmp,
                                              std::vector<T> & orc_OSCContentTmp, std::vector<U> & orc_UIContentTmp);
+   static QString h_GetEdsFileDetails(const stw_opensyde_core::C_OSCCanOpenObjectDictionary oc_CanOpenObjDictionary);
+
+   static stw_types::sint32 h_GetMessageCountOfNode(const stw_types::uint32 ou32_NodeIndex,
+                                                    const stw_types::uint32 ou32_InterfaceIndex,
+                                                    const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol,
+                                                    const stw_opensyde_core::C_OSCCanInterfaceId * const opc_CoDeviceInterfaceId, stw_types::uint32 & oru32_RxMessageCount, stw_types::uint32 & oru32_TxMessageCount, stw_types::uint32 * const opu32_SignalCount);
+   static QString h_GetCanOpenSignalObjectIndex(const stw_types::uint32 ou32_ObjectIndex,
+                                                const stw_types::uint32 ou32_ObjectSubIndex);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

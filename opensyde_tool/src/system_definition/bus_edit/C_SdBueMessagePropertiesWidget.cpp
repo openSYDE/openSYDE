@@ -229,15 +229,23 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this message."));
 
-   this->mpc_Ui->pc_CheckBoxExtendedType->SetToolTipInformation(C_GtGetText::h_GetText("Extended Type"),
-                                                                C_GtGetText::h_GetText("CAN ID Type. "
-                                                                                       "\nStandard Type: 11Bit "
-                                                                                       "\nExtended Type: 29Bit"));
    this->mpc_Ui->pc_LabelID->SetToolTipInformation(C_GtGetText::h_GetText("CAN ID"),
                                                    C_GtGetText::h_GetText("CAN Identifier (Hex).\n"
                                                                           "Unique within a bus."));
+   this->mpc_Ui->pc_LabelCobId->SetToolTipInformation(C_GtGetText::h_GetText("COB-ID"),
+                                                      C_GtGetText::h_GetText("Communication Object Identifier (Hex).\n"
+                                                                             "Unique within a bus."));
+   this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->SetToolTipInformation(
+      C_GtGetText::h_GetText("COB-ID CANopen Node ID Offset"),
+      C_GtGetText::h_GetText("Communication Object Identifier (Hex) with CANopen Node ID as offset. "));
    this->mpc_Ui->pc_LabelDlc->SetToolTipInformation(C_GtGetText::h_GetText("DLC"),
                                                     C_GtGetText::h_GetText("Data Length Code. Number of data bytes."));
+   this->mpc_Ui->pc_LabelCoDlc->SetToolTipInformation(
+      C_GtGetText::h_GetText("DLC"),
+      C_GtGetText::h_GetText("Data Length Code. Number of data bytes. Will be set automatically for CANopen."));
+   this->mpc_Ui->pc_LabelCoDlcAuto->SetToolTipInformation(
+      C_GtGetText::h_GetText("DLC"),
+      C_GtGetText::h_GetText("Data Length Code. Number of data bytes. Will be set automatically for CANopen."));
    this->mpc_Ui->pc_LabelCycleTime->SetToolTipInformation(C_GtGetText::h_GetText("Cycle Time"),
                                                           C_GtGetText::h_GetText(
                                                              "Cyclic method property. Message is transmitted every time"
@@ -248,6 +256,12 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
                              "\nCyclic: Message is transmitted cyclically."
                              "\nOn Change: Message is transmitted if any signal value is changed."
                              "\nOn Event: Message transmission is handled by application (spontaneous)."));
+   this->mpc_Ui->pc_LabelTxMethodCo->SetToolTipInformation(
+      C_GtGetText::h_GetText("Tx Method"),
+      C_GtGetText::h_GetText(
+         "Message transmission method. "
+         "\nType 254 - asynchronous manufacturer specific: Message is transmitted cyclically."
+         "\nType 255 - asynchronous device specific:  Message is transmitted cyclically."));
    this->mpc_Ui->pc_LabelDirection->SetToolTipInformation(
       C_GtGetText::h_GetText("Direction"),
       C_GtGetText::h_GetText("Message is either transmitted or received."));
@@ -322,13 +336,14 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
 
          if (q_CanOpenActive == true)
          {
+            const uint8 u8_CoDeviceNodeId = this->m_GetCoNodeId(*pc_Message);
+
             // CANopen specific part
             this->mpc_Ui->pc_SpinBoxCobId->setValue(pc_Message->u32_CanOpenManagerCobIdOffset);
             this->mpc_Ui->pc_SpinBoxCobId->textFromValue(this->mpc_Ui->pc_SpinBoxCobId->value());
 
             this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setChecked(pc_Message->q_CanOpenManagerCobIdIncludesNodeID);
-            this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setText(" + $NodeID = 0x" +
-                                                              QString::number(pc_Message->u32_CanId, 16).toUpper());
+            this->m_UpdateCobIdText(*pc_Message, u8_CoDeviceNodeId);
          }
 
          //Dlc
@@ -342,23 +357,10 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
             this->mpc_Ui->pc_WidgetReceiver->SetRxTimeoutPreconditions(true, true);
             // No configurable cycle time
             u32_UsedCylceTime = 0U;
-
-            this->mq_CoEventTimerDisabled = false;
          }
          else
          {
             u32_UsedCylceTime = pc_Message->u32_CycleTimeMs;
-
-            if ((q_CanOpenActive == true) && (u32_UsedCylceTime == 0U))
-            {
-               // Special case: CANopen and value 0 equals read only for event timer too
-               this->mq_CoEventTimerDisabled = true;
-            }
-            else
-            {
-               this->mq_CoEventTimerDisabled = false;
-            }
-
             this->mpc_Ui->pc_WidgetReceiver->SetRxTimeoutPreconditions(false, q_CanOpenActive);
          }
          this->mpc_Ui->pc_ComboBoxTxMethod->SetItemState(ms32_TX_TYPE_INDEX_ON_CHANGE,
@@ -366,18 +368,17 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
                                                          (pc_Message->IsMultiplexed() == false));
 
          //Cycle time
-         if (this->mq_CoEventTimerDisabled == true)
+         this->mq_CoEventTimerDisabled = false;
+
+         if (q_CanOpenActive == true)
          {
-            // Adaption necessary to hold the 0 as placeholder for read only
-            this->mpc_Ui->pc_SpinBoxLater->SetMinimumCustom(0);
-            this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(0);
+            // In case of CANopen it is possible to have an adapted maximum value
+            // see m_CoLoadEdsRestricitions
+            this->mpc_Ui->pc_SpinBoxLater->SetMaximumCustom(0xFFFF);
+            this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(0xFFFF);
          }
-         else
-         {
-            this->mpc_Ui->pc_SpinBoxLater->SetMinimumCustom(1);
-            this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(1);
-         }
-         this->mpc_Ui->pc_SpinBoxLater->setEnabled(!this->mq_CoEventTimerDisabled);
+
+         this->mpc_Ui->pc_SpinBoxLater->setEnabled(true);
          this->mpc_Ui->pc_SpinBoxCycleTime->setValue(u32_UsedCylceTime);
          this->mpc_Ui->pc_SpinBoxLater->setValue(u32_UsedCylceTime);
 
@@ -431,7 +432,7 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
                this->m_CoLoadEdsRestricitions(pc_Message);
 
                // Special case: CANopen with event timer read only and device as receiver
-               this->mpc_Ui->pc_WidgetReceiver->SetRxTimeoutConfigurationDisabled(
+               this->mpc_Ui->pc_WidgetReceiver->SetRxTimeoutConfigurationReadOnly(
                   ((q_CanOpenActive == true) &&
                    (this->mq_CoEventTimerDisabled == true) &&
                    (this->mq_CoDeviceIsTransmitter == false)));
@@ -479,6 +480,7 @@ void C_SdBueMessagePropertiesWidget::m_CoLoadEdsRestricitions(const C_OSCCanMess
             pc_Manager->c_EDSFileContent.IsCobIdRo(opc_Message->u16_CanOpenManagerPdoIndex,
                                                    this->mq_CoDeviceIsTransmitter, q_RoFlag);
 
+            this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(!q_RoFlag);
             this->mpc_Ui->pc_SpinBoxCobId->setEnabled(!q_RoFlag);
             this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setEnabled(!q_RoFlag);
 
@@ -496,19 +498,41 @@ void C_SdBueMessagePropertiesWidget::m_CoLoadEdsRestricitions(const C_OSCCanMess
 
             // Event time
             // Special case: If the value is 0, the event time is already marked as read only
-            if (this->mq_CoEventTimerDisabled == false)
-            {
-               pc_Manager->c_EDSFileContent.IsEventTimerRo(opc_Message->u16_CanOpenManagerPdoIndex,
-                                                           this->mq_CoDeviceIsTransmitter, q_RoFlag);
 
+            pc_Manager->c_EDSFileContent.IsEventTimerRo(opc_Message->u16_CanOpenManagerPdoIndex,
+                                                        this->mq_CoDeviceIsTransmitter, q_RoFlag);
+
+            if (this->mq_CoDeviceIsTransmitter == true)
+            {
+               // In case of device as receiver, the manager can handle the
                this->mpc_Ui->pc_SpinBoxLater->setEnabled(!q_RoFlag);
-               this->mq_CoEventTimerDisabled = q_RoFlag;
             }
+            else if (q_RoFlag == true)
+            {
+               const C_PuiSdNodeCanMessage * const pc_UiMessage =
+                  C_PuiSdHandler::h_GetInstance()->GetUiCanMessage(this->mc_MessageId);
+
+               tgl_assert(pc_UiMessage != NULL);
+               if ((pc_UiMessage != NULL) &&
+                   (pc_UiMessage->e_ReceiveTimeoutMode != C_PuiSdNodeCanMessage::eRX_TIMEOUT_MODE_DISABLED))
+               {
+                  // The manager is the transmitter and the timeout time of the device is read only and because of this
+                  // restriction it is the new maximum for the manager event time if it is not disabled
+                  this->mpc_Ui->pc_SpinBoxLater->SetMaximumCustom(opc_Message->u32_TimeoutMs);
+                  this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(opc_Message->u32_TimeoutMs);
+               }
+            }
+            else
+            {
+               // Nothing to do
+            }
+            this->mq_CoEventTimerDisabled = q_RoFlag;
          }
       }
       else
       {
          // This item is relevant for the other protocols, but is only en-/disabled here. Activate it again
+         this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(true);
          this->mpc_Ui->pc_SpinBoxEarly->setEnabled(true);
       }
    }
@@ -711,6 +735,77 @@ void C_SdBueMessagePropertiesWidget::m_OnCobIdChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the CANopen Node id of the Device associated to the PDO
+
+   \param[in]       orc_MessageData     Message data to get the Node id of its device
+
+   \return
+   CANopen Node id of device of PDO
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint8 C_SdBueMessagePropertiesWidget::m_GetCoNodeId(const C_OSCCanMessage & orc_MessageData)
+{
+   uint8 u8_CoNodeId = 0U;
+
+   // Get the CANopen node id of the device
+   // The manager must be the node referenced by the message
+   const C_OSCNode * const pc_Manager = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+      this->mc_MessageId.u32_NodeIndex);
+
+   tgl_assert(pc_Manager != NULL);
+   if (pc_Manager != NULL)
+   {
+      tgl_assert(this->mc_MessageId.u32_InterfaceIndex <
+                 pc_Manager->c_Properties.c_ComInterfaces.size());
+      if (this->mc_MessageId.u32_InterfaceIndex < pc_Manager->c_Properties.c_ComInterfaces.size())
+      {
+         const std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManagerInfo =
+            pc_Manager->c_CanOpenManagers.find(
+               pc_Manager->c_Properties.c_ComInterfaces[
+                  this->mc_MessageId.u32_InterfaceIndex].u8_InterfaceNumber);
+
+         tgl_assert(c_ItManagerInfo != pc_Manager->c_CanOpenManagers.end());
+         if (c_ItManagerInfo != pc_Manager->c_CanOpenManagers.end())
+         {
+            const C_OSCCanOpenManagerInfo & rc_ManagerInfo = c_ItManagerInfo->second;
+
+            // Get the device info
+            const std::map<C_OSCCanInterfaceId,
+                           C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+               rc_ManagerInfo.c_CanOpenDevices.find(orc_MessageData.c_CanOpenManagerOwnerNodeIndex);
+
+            tgl_assert(c_ItDevice != rc_ManagerInfo.c_CanOpenDevices.end());
+            if (c_ItDevice != rc_ManagerInfo.c_CanOpenDevices.end())
+            {
+               // Adding the CANopen node id of the device
+               u8_CoNodeId = c_ItDevice->second.u8_NodeIDValue;
+            }
+         }
+      }
+   }
+
+   return u8_CoNodeId;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the Cob Id Text
+
+   \param[in]       orc_MessageData     Message data to get the Node id of its device
+   \param[in]       ou8_CoDeviceNodeId  CANopen Node id of device of PDO
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::m_UpdateCobIdText(const C_OSCCanMessage & orc_MessageData,
+                                                       const uint8 ou8_CoDeviceNodeId)
+{
+   this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setText(
+      " + $CANopenNodeID (0x" +
+      QString::number(ou8_CoDeviceNodeId, 16).toUpper() +
+      ") = 0x" +
+      QString::number(orc_MessageData.u32_CanId, 16).toUpper());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle extended flag change
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -812,6 +907,7 @@ void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
             // COB-ID for CANopen
             if (q_CanOpenActive == true)
             {
+               uint8 u8_CoDeviceNodeId;
                uint32 u32_ResultingCanId;
                c_MessageData.u32_CanOpenManagerCobIdOffset =
                   static_cast<uint32>(this->mpc_Ui->pc_SpinBoxCobId->value());
@@ -820,38 +916,22 @@ void C_SdBueMessagePropertiesWidget::m_OnPropertiesChanged(void)
 
                // Write the resulting CAN-ID into the original spinbox for later usage
                u32_ResultingCanId = c_MessageData.u32_CanOpenManagerCobIdOffset;
+               u8_CoDeviceNodeId = this->m_GetCoNodeId(c_MessageData);
                if (c_MessageData.q_CanOpenManagerCobIdIncludesNodeID == true)
                {
-                  // Get the node id of the device
-                  const C_OSCNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
-                     c_MessageData.c_CanOpenManagerOwnerNodeIndex.u32_NodeIndex);
-                  tgl_assert(pc_DeviceNode != NULL);
-                  if (pc_DeviceNode != NULL)
-                  {
-                     uint32 u32_IntfIndex;
-                     tgl_assert(C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceNumberToIndex(
-                                   c_MessageData.c_CanOpenManagerOwnerNodeIndex.u32_NodeIndex,
-                                   c_MessageData.c_CanOpenManagerOwnerNodeIndex.u8_InterfaceNumber,
-                                   u32_IntfIndex) == C_NO_ERR);
-
-                     tgl_assert(u32_IntfIndex < pc_DeviceNode->c_Properties.c_ComInterfaces.size());
-                     if (u32_IntfIndex < pc_DeviceNode->c_Properties.c_ComInterfaces.size())
-                     {
-                        // Add the node id of the device on this interface
-                        u32_ResultingCanId += pc_DeviceNode->c_Properties.c_ComInterfaces[u32_IntfIndex].u8_NodeID;
-                     }
-                  }
+                  u32_ResultingCanId += u8_CoDeviceNodeId;
                }
-
-               this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setText(" + $NodeID = 0x" +
-                                                                 QString::number(u32_ResultingCanId, 16).toUpper());
 
                this->mpc_Ui->pc_SpinBoxId->setValue(u32_ResultingCanId);
                this->mpc_Ui->pc_SpinBoxId->textFromValue(this->mpc_Ui->pc_SpinBoxCobId->value());
+               c_MessageData.u32_CanId = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxId->value());
+               this->m_UpdateCobIdText(c_MessageData, u8_CoDeviceNodeId);
             }
-
-            //Id
-            c_MessageData.u32_CanId = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxId->value());
+            else
+            {
+               //Id
+               c_MessageData.u32_CanId = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxId->value());
+            }
 
             //Dlc
             c_MessageData.u16_Dlc = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxDlc->value());
@@ -1665,6 +1745,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
    if (C_SdUtil::h_GetNames(this->mc_BusNodeIndexes, this->mc_BusInterfaceIndexes, c_NodeNames, false,
                             &this->mc_BusDatapoolIndexes, &c_DatapoolNames) == C_NO_ERR)
    {
+      QString c_TooltipText;
       std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
       std::vector<uint32> c_ReceiveTimeoutValues;
       const sint32 s32_CurrentNodeIndex = this->mpc_Ui->pc_ComboBoxTransmitterNode->currentIndex();
@@ -1791,7 +1872,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
                                                    c_RxInterfaceIndexes,
                                                    c_RxDatapoolIndexes,
                                                    c_RxReceiveTimeoutModes, c_RxReceiveTimeoutValues,
-                                                   q_CanOpenActive);
+                                                   q_CanOpenActive, c_TooltipText);
 
          q_TxSelected = true;
       }
@@ -1800,6 +1881,11 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
          // no restrictions by Tx in case of CANopen
          if (q_CanOpenActive == true)
          {
+            c_TooltipText =
+               C_GtGetText::h_GetText("This property is relevant for source code file generation. "
+                                      "\nThe CANopen Event Timer Reception Time."
+                                      "\nWithin this interval a PDO should be received. "
+                                      "\nOtherwise the CANopen stack will report an error.");
             // Special case CANopen
             if (this->mq_CoDeviceIsTransmitter == false)
             {
@@ -1841,7 +1927,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
                                                    this->mc_BusInterfaceIndexes,
                                                    this->mc_BusDatapoolIndexes,
                                                    c_ReceiveTimeoutModes, c_ReceiveTimeoutValues,
-                                                   q_CanOpenActive);
+                                                   q_CanOpenActive, c_TooltipText);
       }
    }
 
@@ -2162,7 +2248,8 @@ void C_SdBueMessagePropertiesWidget::m_NodeModeDirectionChanged(const bool oq_Di
                this->mpc_Ui->pc_WidgetReceiver->AddNodes(c_NodeNames, c_DatapoolNames, c_NodeIndexes,
                                                          c_InterfaceIndexes,
                                                          this->mc_NodeDatapoolIndexes,
-                                                         c_ReceiveTimeoutModes, c_ReceiveTimeoutValues, false);
+                                                         c_ReceiveTimeoutModes, c_ReceiveTimeoutValues, false,
+                                                         QString());
 
                this->mpc_Ui->pc_WidgetReceiver->SetModeSingleNode(true);
 
@@ -2412,6 +2499,20 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
       this->mpc_Ui->pc_WidgetDlcSpinBox->layout()->addWidget(this->mpc_Ui->pc_SpinBoxDlc);
       this->mpc_Ui->pc_WidgetTxMethod->layout()->addWidget(this->mpc_Ui->pc_ComboBoxTxMethod);
 
+      //Restrict delay time to 16 bit unsigned
+      //Restrict cycle time to 50000 (CANdb++ limit)
+      this->mpc_Ui->pc_SpinBoxLater->SetMinimumCustom(1);
+      this->mpc_Ui->pc_SpinBoxLater->SetMaximumCustom(50000);
+      this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(1);
+      this->mpc_Ui->pc_SpinBoxEarly->SetMaximumCustom(50000);
+      this->mpc_Ui->pc_SpinBoxCycleTime->SetMinimumCustom(1);
+      this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(50000);
+
+      this->mpc_Ui->pc_CheckBoxExtendedType->SetToolTipInformation(C_GtGetText::h_GetText("Extended Type"),
+                                                                   C_GtGetText::h_GetText("CAN ID Type. "
+                                                                                          "\nStandard Type: 11Bit "
+                                                                                          "\nExtended Type: 29Bit"));
+
       this->mpc_Ui->pc_LabelEarly->setText(C_GtGetText::h_GetText("Not earlier than"));
       this->mpc_Ui->pc_LabelLater->setText(C_GtGetText::h_GetText("But no later than"));
       this->mpc_Ui->pc_LabelEarly->SetToolTipInformation(
@@ -2428,6 +2529,21 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
    {
       this->mpc_Ui->pc_WidgetIdAndCoDlcSpinBox->layout()->addWidget(this->mpc_Ui->pc_SpinBoxDlc);
       this->mpc_Ui->pc_WidgetTxMethodCo->layout()->addWidget(this->mpc_Ui->pc_ComboBoxTxMethod);
+
+      // No minimum restriction for CANopen. 16 bit unsigned is the possible range
+      this->mpc_Ui->pc_SpinBoxLater->SetMinimumCustom(0);
+      this->mpc_Ui->pc_SpinBoxLater->SetMaximumCustom(0xFFFF);
+      this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(0);
+      // Resolution of inhibit time is 100us (event time has 1ms)
+      this->mpc_Ui->pc_SpinBoxEarly->SetMaximumCustom(6553U);
+      // Adapt cycle time limits here too due to the synchronization with the spinboxlater
+      this->mpc_Ui->pc_SpinBoxCycleTime->SetMinimumCustom(0);
+      this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(0xFFFF);
+
+      this->mpc_Ui->pc_CheckBoxExtendedType->SetToolTipInformation(C_GtGetText::h_GetText("Extended Type"),
+                                                                   C_GtGetText::h_GetText("COB-ID Type. "
+                                                                                          "\nStandard Type: 11Bit "
+                                                                                          "\nExtended Type: 29Bit"));
 
       this->mpc_Ui->pc_LabelEarly->setText(C_GtGetText::h_GetText("Inhibit Time"));
       this->mpc_Ui->pc_LabelLater->setText(C_GtGetText::h_GetText("Event Time"));
@@ -2499,14 +2615,6 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Ty
    }
    //Min max handling (initially extended type is always set to false)
    m_OnExtendedChangeWithoutDataAccess(false);
-   //Restrict delay time to 16 bit unsigned
-   this->mpc_Ui->pc_SpinBoxEarly->SetMinimumCustom(1);
-   this->mpc_Ui->pc_SpinBoxEarly->SetMaximumCustom(50000);
-   //Restrict cycle time to 50000 (CANdb++ limit)
-   this->mpc_Ui->pc_SpinBoxCycleTime->SetMinimumCustom(1);
-   this->mpc_Ui->pc_SpinBoxCycleTime->SetMaximumCustom(50000);
-   this->mpc_Ui->pc_SpinBoxLater->SetMinimumCustom(1);
-   this->mpc_Ui->pc_SpinBoxLater->SetMaximumCustom(50000);
 
    ConnectAllChanges();
 }
@@ -2693,6 +2801,8 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
    {
       const uint32 u32_Id = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxId->value());
       const bool q_Id = this->mpc_Ui->pc_CheckBoxExtendedType->isChecked();
+      C_OgeSpxNumber * const pc_VisibleSpinBox = (this->me_ComProtocol != C_OSCCanProtocol::eCAN_OPEN) ?
+                                                 this->mpc_Ui->pc_SpinBoxId : this->mpc_Ui->pc_SpinBoxCobId;
 
       //check
       bool q_NameIsValid = false;
@@ -2708,10 +2818,10 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
       }
 
       //set invalid text property
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxId, "Valid", q_NameIsValid);
+      C_OgeWiUtil::h_ApplyStylesheetProperty(pc_VisibleSpinBox, "Valid", q_NameIsValid);
       if (q_NameIsValid == true)
       {
-         this->mpc_Ui->pc_SpinBoxId->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+         pc_VisibleSpinBox->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
       }
       else
       {
@@ -2728,7 +2838,8 @@ void C_SdBueMessagePropertiesWidget::m_CheckMessageId(void) const
          {
             c_Content += C_GtGetText::h_GetText("Message ID already in use\n");
          }
-         this->mpc_Ui->pc_SpinBoxId->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+
+         pc_VisibleSpinBox->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
       }
    }
 }
@@ -2757,9 +2868,14 @@ void C_SdBueMessagePropertiesWidget::m_CheckEarlyTime(void) const
                                                      this->mc_MessageId.q_MessageIsTx, NULL, NULL, &q_Invalid, NULL,
                                                      NULL,
                                                      NULL,
+                                                     NULL,
                                                      C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
                                                         this->mc_MessageId.e_ComProtocol),
                                                      C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                                        this->mc_MessageId.e_ComProtocol),
+                                                     C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                                        this->mc_MessageId.e_ComProtocol),
+                                                     C_OSCCanProtocol::h_GetCANMessageSignalsRequired(
                                                         this->mc_MessageId.e_ComProtocol));
          q_Valid = !q_Invalid;
       }
@@ -2775,8 +2891,20 @@ void C_SdBueMessagePropertiesWidget::m_CheckEarlyTime(void) const
       }
       else
       {
-         const QString c_Heading1 = C_GtGetText::h_GetText("Not earlier than");
-         const QString c_Heading2 = C_GtGetText::h_GetText("But not later than");
+         QString c_Heading1;
+         QString c_Heading2;
+
+         if (this->me_ComProtocol != C_OSCCanProtocol::eCAN_OPEN)
+         {
+            c_Heading1 = C_GtGetText::h_GetText("Not earlier than");
+            c_Heading2 = C_GtGetText::h_GetText("But not later than");
+         }
+         else
+         {
+            c_Heading1 = C_GtGetText::h_GetText("Inhibit Time");
+            c_Heading2 = C_GtGetText::h_GetText("Event Time");
+         }
+
          const QString c_Content1 =
             static_cast<QString>(C_GtGetText::h_GetText("Value may not be greater than the value for \"%1\"")).arg(
                c_Heading2);

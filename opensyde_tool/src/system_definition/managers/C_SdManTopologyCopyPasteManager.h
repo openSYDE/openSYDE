@@ -55,6 +55,7 @@ private:
                                                         const QGraphicsItem * const opc_NodeItemOrigin);
    static void mh_RemoveConnection(C_SdTopologyDataSnapshot & orc_Data, const stw_types::uint32 & oru32_NodeIndex,
                                    const C_PuiSdNodeConnectionId & orc_ConnectionId);
+   static void mh_RemoveCanOpenInformation(C_SdTopologyDataSnapshot & orc_Data);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -12,7 +12,8 @@
 #include "C_TblTreItem.h"
 #include "C_TblTreModel.h"
 #include "C_OSCCanOpenObjectDictionary.h"
-#include "C_SdBueCoAddSignalsResultEntry.h"
+#include "C_OSCCanOpenManagerDeviceInfo.h"
+#include "C_OSCCanOpenManagerMappableSignal.h"
 #include "C_OSCCanMessageIdentificationIndices.h"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -37,8 +38,8 @@ public:
    ~C_SdBueCoAddSignalsModel(void);
    void SetIndex(const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId);
    void PrepareCleanUp(void);
-   const C_SdBueCoAddSignalsResultEntry * GetDataForIndex(const stw_types::uint32 ou32_ObjectIndex,
-                                                          const stw_types::uint32 ou32_SignalIndex) const;
+   const stw_opensyde_core::C_OSCCanOpenManagerMappableSignal * GetDataForIndex(
+      const stw_types::uint32 ou32_ObjectIndex, const stw_types::uint32 ou32_SignalIndex) const;
    static std::map<stw_types::uint32, std::vector<stw_types::uint32> > h_GetUniqueIndices(
       const QModelIndexList & orc_ModelIndices);
 
@@ -54,25 +55,29 @@ public:
 private:
    const QIcon mc_IconSignal;
    stw_opensyde_core::C_OSCCanMessageIdentificationIndices mc_MessageId;
-   std::map<stw_types::uint32, std::vector<stw_types::uint32> > mc_MappableObjects;
-   std::map<stw_types::uint32, std::vector<C_SdBueCoAddSignalsResultEntry> > mc_MappableObjectContent;
+   std::map<stw_types::uint32,  std::map<stw_types::uint32, stw_types::uint32> > mc_MapObjectIndexToVectorIndex;
 
    void m_Init(void);
-   void m_InitResult(const stw_opensyde_core::C_OSCCanOpenObjectDictionary & orc_EdsDictionary);
+   void m_InitObjectMap(void);
    void m_InitTopLevel(C_TblTreItem & orc_RootNode);
    void m_InitObjectNode(C_TblTreItem & orc_ObjectNode, const stw_types::uint32 ou32_ObjectIndex);
    void m_InitObjectNodeContent(C_TblTreItem & orc_ObjectNode, const stw_types::uint32 ou32_ObjectIndex);
    void m_InitObjectNodeChildren(C_TblTreItem & orc_ObjectNode, const stw_types::uint32 ou32_ObjectIndex);
    void m_InitSignalNodeContent(C_TblTreItem & orc_SignalNode, const stw_types::uint32 ou32_ObjectIndex,
-                                const stw_types::uint32 ou32_ObjectSubIndex, const stw_types::uint32 ou32_SignalIndex);
-   static QString mh_GetSignalNodeIndex(const stw_types::uint32 ou32_ObjectIndex,
-                                        const stw_types::uint32 ou32_ObjectSubIndex);
+                                const stw_types::uint32 ou32_ObjectSubIndex);
    static void mh_DecodeIndex(const QModelIndex & orc_ModelIndex, stw_types::uint32 & oru32_ObjectIndex,
                               stw_types::uint32 & oru32_SignalIndex, bool & orq_IsSignal);
    void m_GetData(const C_SdBueCoAddSignalsModel::E_Columns oe_Column, const stw_types::uint32 ou32_ObjectIndex,
                   const stw_types::uint32 ou32_SignalIndex, const bool oq_IsSignal, const stw_types::sintn osn_Role,
                   QVariant & orc_Output) const;
    const stw_opensyde_core::C_OSCCanOpenObjectDictionary * m_GetEdsDictionary(void) const;
+   const std::vector<stw_opensyde_core::C_OSCCanOpenManagerMappableSignal> * m_GetMappableSignals(void) const;
+   const stw_opensyde_core::C_OSCCanOpenManagerDeviceInfo * m_GetDeviceInfo(void) const;
+   static const stw_opensyde_core::C_OSCCanOpenObject * mh_GetCanOpenObject(
+      const stw_opensyde_core::C_OSCCanOpenObjectDictionary & orc_Dictionary,
+      const stw_types::uint32 ou32_ObjectIndex, const stw_types::uint32 ou32_SignalIndex);
+   bool m_CheckSignalRelevant(const stw_opensyde_core::C_OSCCanOpenManagerMappableSignal & orc_Signal,
+                              const stw_opensyde_core::C_OSCCanOpenObjectDictionary & orc_Dictionary) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

@@ -73,6 +73,19 @@ private:
       QString c_RPDOs;
    };
 
+   struct C_CoNodeConfig
+   {
+      E_NodeType e_NodeType;
+      stw_types::uint8 u8_InterfaceNumber;
+      stw_opensyde_core::C_OSCCanInterfaceId c_CanInterfaceId;
+   };
+
+   struct C_CoInfo
+   {
+      C_CoTableData c_CoTableData;
+      C_CoNodeConfig c_CoNodeConfig;
+   };
+
    enum E_PdoType
    {
       eTX,
@@ -87,7 +100,6 @@ private:
       stw_types::uint16 u16_RxActive;
    };
 
-   stw_types::sint32 m_MapRowToCoData(const stw_types::sint32 os32_RowIndex, C_CoTableData & orc_Data) const;
    void m_GetPdoCountsByManager(const stw_opensyde_core::C_OSCNode * const opc_Node,
                                 const stw_types::uint8 ou8_InterfaceIndex, C_PdoCount * const opc_PdoManagerCnt,
                                 std::map<stw_types::uint32,
@@ -100,7 +112,10 @@ private:
                                                                        C_PdoCount> * const opc_PdoDeviceMap)
    const;
 
+   void m_FillCoInfo(void);
+
    stw_types::uint32 mu32_NodeIndex;
+   std::vector<C_CoInfo> mc_CoInfoAll;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

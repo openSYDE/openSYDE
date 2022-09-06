@@ -65,6 +65,8 @@ Q_SIGNALS:
    void SigErrorChange(void);
    void SigNameChanged(const QString & orc_Name, const QString & orc_SubItemName = "",
                        const bool oq_CombineItemAndSubSubName = false);
+   void SigSwitchToCoManager(const stw_types::uint32 ou32_NodeIndex, const QString & orc_NodeName,
+                             const stw_types::uint8 ou8_InterfaceNumber) const;
 
 protected:
    virtual void showEvent(QShowEvent * const opc_Event) override;

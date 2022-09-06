@@ -307,9 +307,7 @@ sint32 C_SyvComDriverDiag::SetDiagnosticMode(QString & orc_ErrorDetails)
          for (c_ItDefectNode = this->mc_DefectNodeIndices.begin(); c_ItDefectNode != this->mc_DefectNodeIndices.end();
               ++c_ItDefectNode)
          {
-            orc_ErrorDetails += "- " +
-                                mh_GetNodeNameForActiveNodeIndex(this->mu32_ViewIndex,
-                                                                 *c_ItDefectNode) + "\n";
+            orc_ErrorDetails += "- " + static_cast<QString>(this->m_GetActiveNodeName(*c_ItDefectNode).c_str()) + "\n";
          }
       }
    }
@@ -1964,17 +1962,9 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
 
       if (s32_Return != C_NO_ERR)
       {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[u32_ActiveNode]);
+         m_GetRoutingErrorDetails(orc_ErrorDetails, orc_ErrorActiveNodes,
+                                  u32_ActiveNode, u32_ErrorActiveNodeIndex);
 
-         orc_ErrorActiveNodes.insert(u32_ActiveNode);
-         orc_ErrorActiveNodes.insert(u32_ErrorActiveNodeIndex);
-
-         tgl_assert(pc_Node != NULL);
-         if (pc_Node != NULL)
-         {
-            orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
-         }
          break;
       }
    }
@@ -2006,10 +1996,8 @@ sint32 C_SyvComDriverDiag::m_StartRoutingDiag(QString & orc_ErrorDetails, std::s
 
             if (s32_Return != C_NO_ERR)
             {
-               orc_ErrorActiveNodes.insert(u32_ActiveNode);
-               orc_ErrorActiveNodes.insert(u32_ErrorActiveNodeIndex);
-
-               orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
+               m_GetRoutingErrorDetails(orc_ErrorDetails, orc_ErrorActiveNodes,
+                                        u32_ActiveNode, u32_ErrorActiveNodeIndex);
                break;
             }
          }
@@ -2651,41 +2639,45 @@ void C_SyvComDriverDiag::m_HandlePollingFinished(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node name for active node index
+/*! \brief   Reports error details in case of an routing error with check for duplicate entries
 
-   \param[in]  ou32_ViewIndex          View index (identifier)
-   \param[in]  ou32_ActiveNodeIndex    Active node index (depending on number of active nodes)
+   \param[in,out]   orc_ErrorDetails          Details for current error
+   \param[out]      orc_ErrorActiveNodes      All active node indexes of nodes which can not be reached
+   \param[in]     ou32_ActiveNode             active node index of vector mc_ActiveNodesIndexes which was the target
+   \param[in]     ou32_ErrorActiveNodeIndex   active node index which caused the error on starting routing
 
-   \return
-   Node name if any found
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvComDriverDiag::mh_GetNodeNameForActiveNodeIndex(const uint32 ou32_ViewIndex,
-                                                             const uint32 ou32_ActiveNodeIndex)
+void C_SyvComDriverDiag::m_GetRoutingErrorDetails(QString & orc_ErrorDetails, std::set<uint32> & orc_ErrorActiveNodes,
+                                                  const uint32 ou32_ActiveNode,
+                                                  const uint32 ou32_ErrorActiveNodeIndex) const
 {
-   QString c_Retval;
-   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
-
-   if (pc_View != NULL)
+   // Check if both nodes are already marked as error to avoid duplicates in the orc_ErrorDetails string
+   // Duplicates could occur dependent of the routing order
+   if (orc_ErrorActiveNodes.find(ou32_ActiveNode) == orc_ErrorActiveNodes.end())
    {
-      uint32 u32_ActiveCounter = 0;
-      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
-      for (uint32 u32_It = 0; u32_It < rc_NodeActiveFlags.size(); ++u32_It)
+      // Add the "target" node as error target
+      const C_OSCNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[ou32_ActiveNode]);
+
+      orc_ErrorActiveNodes.insert(ou32_ActiveNode);
+      tgl_assert(pc_Node != NULL);
+      if (pc_Node != NULL)
       {
-         if (rc_NodeActiveFlags[u32_It] == true)
-         {
-            if (u32_ActiveCounter == ou32_ActiveNodeIndex)
-            {
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_It);
-               if (pc_Node != NULL)
-               {
-                  c_Retval = pc_Node->c_Properties.c_Name.c_str();
-               }
-            }
-            //Important iterator step
-            ++u32_ActiveCounter;
-         }
+         orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
       }
    }
-   return c_Retval;
+   if (orc_ErrorActiveNodes.find(ou32_ErrorActiveNodeIndex) == orc_ErrorActiveNodes.end())
+   {
+      // Add the "routing" node as error target
+      const C_OSCNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_ActiveNodesIndexes[ou32_ErrorActiveNodeIndex]);
+
+      orc_ErrorActiveNodes.insert(ou32_ErrorActiveNodeIndex);
+      tgl_assert(pc_Node != NULL);
+      if (pc_Node != NULL)
+      {
+         orc_ErrorDetails += static_cast<QString>("\"") + pc_Node->c_Properties.c_Name.c_str() + "\"\n";
+      }
+   }
 }

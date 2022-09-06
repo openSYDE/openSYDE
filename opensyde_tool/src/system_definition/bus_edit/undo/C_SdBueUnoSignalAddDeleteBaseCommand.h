@@ -44,6 +44,8 @@ protected:
    void m_Add(void);
    void m_Delete(void);
 
+   bool m_CheckSignalsSortedAscending(void) const;
+
 private:
    void m_Store(void);
    void m_Remove(void);
