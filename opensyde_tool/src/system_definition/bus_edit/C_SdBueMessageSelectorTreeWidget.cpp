@@ -2235,9 +2235,9 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32 & oru32_Mess
             const uint16 u16_PdoIndex = pc_MessageData->u16_CanOpenManagerPdoIndex;
             const bool q_MessageIsTx = !(rc_MessageId.q_MessageIsTx); // the message is from CANopen manager view and
                                                                       // therefore this flag must be used inverse for
-                                                                      // IsPDOMappingRo method
+                                                                      // IsCobIdRo method
             bool q_IsPdoRo;
-            pc_Manager->c_EDSFileContent.IsPDOMappingRo(u16_PdoIndex, q_MessageIsTx, q_IsPdoRo);
+            pc_Manager->c_EDSFileContent.IsCobIdRo(u16_PdoIndex, q_MessageIsTx, q_IsPdoRo);
 
             if (q_IsPdoRo == true)
             {

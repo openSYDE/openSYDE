@@ -99,7 +99,7 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    this->mpc_Ui->pc_ErrorLabelTitle->SetFontPixel(14, false, true);
    this->mpc_Ui->pc_ErrorLabelIcon->SetSvg("://images/Error_iconV2.svg");
 
-   this->m_InitToolBox();
+   this->m_InitProgressLog();
 
    // Initialize the update summary screen and update package
    this->mpc_Ui->pc_WiUpdateInformation->SetViewIndex(this->mu32_ViewIndex);
@@ -204,13 +204,21 @@ C_SyvUpUpdateWidget::~C_SyvUpUpdateWidget()
          pc_View->GetName(), this->mpc_Ui->pc_GraphicsView->GetViewPos());
    }
    m_CleanUpProgressLog();
-   delete mpc_Ui;
-   mpc_Ui = NULL;
+
+   if (this->mpc_ProgressLog != NULL)
+   {
+      this->mpc_ProgressLog->hide();
+   }
+
+   if (this->mpc_FixMinimizedProgressLog != NULL)
+   {
+      this->mpc_FixMinimizedProgressLog->hide();
+   }
 
    this->m_CleanUpSequence();
 
-   mpc_ProgressLog = NULL;
-   mpc_FixMinimizedProgressLog = NULL;
+   delete mpc_Ui;
+   mpc_Ui = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2384,10 +2392,10 @@ void C_SyvUpUpdateWidget::m_HandleUpdateFailure(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Init toolbox widget
+/*! \brief   Init progress log widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_InitToolBox(void)
+void C_SyvUpUpdateWidget::m_InitProgressLog(void)
 {
    QString c_ViewName = "";
 

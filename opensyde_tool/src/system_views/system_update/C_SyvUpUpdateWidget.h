@@ -112,7 +112,7 @@ private:
    void m_HandleConnectionFailure(const bool oq_SuppressMessageBox = false);
    void m_HandleUpdateFailure(void);
 
-   void m_InitToolBox(void);
+   void m_InitProgressLog(void);
    void m_CleanUpProgressLog(void);
    void m_AddProgressLogConnectEntry(const stw_types::uint32 ou32_NodeIndex);
 
