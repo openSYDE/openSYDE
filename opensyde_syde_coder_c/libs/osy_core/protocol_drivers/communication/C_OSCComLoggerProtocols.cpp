@@ -8,18 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_OSCComLoggerProtocols.h"
+#include "C_OscComLoggerProtocols.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_can;
-using namespace stw_opensyde_core;
-using namespace stw_cmon_protocol;
+
+using namespace stw::scl;
+using namespace stw::can;
+using namespace stw::opensyde_core;
+using namespace stw::cmon_protocol;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,11 +37,11 @@ using namespace stw_cmon_protocol;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
-   C_CMONProtocols()
+C_OscComLoggerProtocols::C_OscComLoggerProtocols(void) :
+   C_CanMonProtocols()
 {
    // Reassign the openSYDE protocol with the derived variant with system definition interpretation
-   this->mapc_Protocols[CMONL7ProtocolOpenSYDE] = &mc_ProtocolOpenSYDEExtended;
+   this->mapc_Protocols[CMONL7ProtocolOpenSYDE] = &mc_ProtocolOpenSydeExtended;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -57,11 +57,11 @@ C_OSCComLoggerProtocols::C_OSCComLoggerProtocols(void) :
    Empty string in case of no matching message to the configured protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_Msg_RX & orc_Msg) const
+C_SclString C_OscComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_Msg_RX & orc_Msg) const
 {
-   C_SCLString c_Text = "";
+   C_SclString c_Text = "";
 
-   if (static_cast<sint32>(me_ActiveProtocol) < gs32_KFX_CMON_NUM_PROTOCOLS)
+   if (static_cast<int32_t>(me_ActiveProtocol) < gs32_KFX_CMON_NUM_PROTOCOLS)
    {
       c_Text = mapc_Protocols[me_ActiveProtocol]->MessageToString(orc_Msg);
    }
@@ -75,9 +75,9 @@ C_SCLString C_OSCComLoggerProtocols::MessageToStringProtocolOnly(const T_STWCAN_
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComLoggerProtocols::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
+void C_OscComLoggerProtocols::AddOsySysDef(const C_OscComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
-   this->mc_ProtocolOpenSYDEExtended.AddOsySysDef(opc_SysDefConfig);
+   this->mc_ProtocolOpenSydeExtended.AddOsySysDef(opc_SysDefConfig);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -86,7 +86,7 @@ void C_OSCComLoggerProtocols::AddOsySysDef(const C_OSCComMessageLoggerOsySysDefC
    \param[in]     opc_SysDefConfig               Pointer to openSYDE system definition configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComLoggerProtocols::RemoveOsySysDef(const C_OSCComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
+void C_OscComLoggerProtocols::RemoveOsySysDef(const C_OscComMessageLoggerOsySysDefConfig * const opc_SysDefConfig)
 {
-   this->mc_ProtocolOpenSYDEExtended.RemoveOsySysDef(opc_SysDefConfig);
+   this->mc_ProtocolOpenSydeExtended.RemoveOsySysDef(opc_SysDefConfig);
 }

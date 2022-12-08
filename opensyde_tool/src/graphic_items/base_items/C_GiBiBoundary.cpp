@@ -10,31 +10,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 #include <QGraphicsView>
 
-#include "stwtypes.h"
-#include "C_GiBiBoundary.h"
-#include "C_OgePopUpDialog.h"
-#include "C_GtGetText.h"
-#include "C_GiSyBaseWidget.h"
-#include "C_GiSyBoundaryWidget.h"
-#include "C_PuiSdDataElement.h"
-#include "gitypes.h"
+#include "stwtypes.hpp"
+#include "C_GiBiBoundary.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSyBaseWidget.hpp"
+#include "C_GiSyBoundaryWidget.hpp"
+#include "C_PuiSdDataElement.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 mf64_ACTION_POINT_OFFSET_BOUNDARY = 8.0;
+const float64_t mf64_ACTION_POINT_OFFSET_BOUNDARY = 8.0;
 
-const float64 C_GiBiBoundary::mhf64_MIN_WIDTH_BOUNDARY = 50.0;
-const float64 C_GiBiBoundary::mhf64_MIN_HEIGHT_BOUNDARY = 50.0;
+const float64_t C_GiBiBoundary::mhf64_MIN_WIDTH_BOUNDARY = 50.0;
+const float64_t C_GiBiBoundary::mhf64_MIN_HEIGHT_BOUNDARY = 50.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -51,16 +50,16 @@ const float64 C_GiBiBoundary::mhf64_MIN_HEIGHT_BOUNDARY = 50.0;
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID    Unique ID
+   \param[in]     oru64_Id    Unique ID
    \param[in]     of64_Width  Width of node
    \param[in]     of64_Height Height of node
    \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiBoundary::C_GiBiBoundary(const uint64 & oru64_ID, const float64 of64_Width, const float64 of64_Height,
+C_GiBiBoundary::C_GiBiBoundary(const uint64_t & oru64_Id, const float64_t of64_Width, const float64_t of64_Height,
                                QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID,
+   C_GiBiRectBaseGroup(oru64_Id,
                        mhf64_MIN_WIDTH_BOUNDARY, mhf64_MIN_HEIGHT_BOUNDARY, mf64_ACTION_POINT_OFFSET_BOUNDARY, false,
                        opc_Parent)
 {
@@ -112,9 +111,9 @@ C_GiBiBoundary::~C_GiBiBoundary()
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiBiBoundary::type(void) const
+int32_t C_GiBiBoundary::type(void) const
 {
-   return msn_GRAPHICS_ITEM_BOUNDARY;
+   return ms32_GRAPHICS_ITEM_BOUNDARY;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,7 +130,7 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    bool q_Retval;
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
    C_GiSyBaseWidget * const pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Boundary"), oq_DarkMode);
    C_GiSyBoundaryWidget * const pc_SettingsWidget = new C_GiSyBoundaryWidget(*pc_Dialog);
 
@@ -139,7 +138,7 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    pc_SettingsWidget->SetBackgroundColor(this->GetBackgroundColor());
    pc_SettingsWidget->SetBorderWidth(this->GetBorderWidth());
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       this->SetBorderColor(pc_SettingsWidget->GetBorderColor());
       this->SetBackgroundColor(pc_SettingsWidget->GetBackgroundColor());
@@ -184,7 +183,7 @@ void C_GiBiBoundary::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
    \param[in] ors32_Width New line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiBoundary::SetBorderWidth(const stw_types::sint32 & ors32_Width)
+void C_GiBiBoundary::SetBorderWidth(const int32_t & ors32_Width)
 {
    //Update pen
    QPen c_Pen = this->mpc_Rectangle->pen();
@@ -234,7 +233,7 @@ void C_GiBiBoundary::SetBackgroundColor(const QColor & orc_Color)
    border width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiBiBoundary::GetBorderWidth() const
+int32_t C_GiBiBoundary::GetBorderWidth() const
 {
    return this->mpc_Rectangle->pen().width();
 }
@@ -264,7 +263,7 @@ QColor C_GiBiBoundary::GetBackgroundColor() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiBoundary::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+void C_GiBiBoundary::m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
    Q_UNUSED(of64_DiffHeight)
@@ -284,15 +283,15 @@ void C_GiBiBoundary::m_LoadFromData(const C_PuiBsBoundary & orc_Data, const bool
    this->LoadBasicData(orc_Data);
    if (oq_DarkMode == true)
    {
-      this->SetBackgroundColor(orc_Data.c_UIBackgroundColorDark);
-      this->SetBorderColor(orc_Data.c_UIBorderColorDark);
+      this->SetBackgroundColor(orc_Data.c_UiBackgroundColorDark);
+      this->SetBorderColor(orc_Data.c_UiBorderColorDark);
    }
    else
    {
-      this->SetBackgroundColor(orc_Data.c_UIBackgroundColorBright);
-      this->SetBorderColor(orc_Data.c_UIBorderColorBright);
+      this->SetBackgroundColor(orc_Data.c_UiBackgroundColorBright);
+      this->SetBorderColor(orc_Data.c_UiBorderColorBright);
    }
-   this->SetBorderWidth(orc_Data.s32_UIBorderWidth);
+   this->SetBorderWidth(orc_Data.s32_UiBorderWidth);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -308,13 +307,13 @@ void C_GiBiBoundary::m_UpdateData(C_PuiBsBoundary & orc_Data, const bool oq_Dark
 
    if (oq_DarkMode == true)
    {
-      orc_Data.c_UIBorderColorDark = this->GetBorderColor();
-      orc_Data.c_UIBackgroundColorDark = this->GetBackgroundColor();
+      orc_Data.c_UiBorderColorDark = this->GetBorderColor();
+      orc_Data.c_UiBackgroundColorDark = this->GetBackgroundColor();
    }
    else
    {
-      orc_Data.c_UIBorderColorBright = this->GetBorderColor();
-      orc_Data.c_UIBackgroundColorBright = this->GetBackgroundColor();
+      orc_Data.c_UiBorderColorBright = this->GetBorderColor();
+      orc_Data.c_UiBackgroundColorBright = this->GetBackgroundColor();
    }
-   orc_Data.s32_UIBorderWidth = this->GetBorderWidth();
+   orc_Data.s32_UiBorderWidth = this->GetBorderWidth();
 }

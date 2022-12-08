@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SebUnoTopBusConnectorMoveCommand.h"
-#include "C_GiLiBusConnectorBase.h"
+#include "stwtypes.hpp"
+#include "C_SebUnoTopBusConnectorMoveCommand.hpp"
+#include "C_GiLiBusConnectorBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 using namespace std;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -38,18 +37,18 @@ using namespace std;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene         Pointer to currently active scene
-   \param[in]     orc_IDs           Affected unique IDs
+   \param[in]     orc_Ids           Affected unique IDs
    \param[in]     orc_InitialPoints Point state before move
    \param[in]     orc_FinalPoints   Point state after move
    \param[in,out] opc_Parent        Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoTopBusConnectorMoveCommand::C_SebUnoTopBusConnectorMoveCommand(QGraphicsScene * const opc_Scene,
-                                                                       const vector<uint64> & orc_IDs,
+                                                                       const vector<uint64_t> & orc_Ids,
                                                                        const vector<QPointF> & orc_InitialPoints,
                                                                        const vector<QPointF> & orc_FinalPoints,
                                                                        QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Bus connector position change", opc_Parent),
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, "Bus connector position change", opc_Parent),
    mc_Initial(orc_InitialPoints),
    mc_Final(orc_FinalPoints)
 {

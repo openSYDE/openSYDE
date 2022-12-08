@@ -10,28 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <fstream>
 
-#include "TGLFile.h"
-#include "TGLUtils.h"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
 #include "AES.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "C_OSCAesFile.h"
-#include "CSCLString.h"
-#include "CMD5Checksum.h"
-#include "C_OSCZipFile.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscAesFile.hpp"
+#include "C_SclString.hpp"
+#include "C_Md5Checksum.hpp"
+#include "C_OscZipFile.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
 using namespace std;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -73,30 +73,30 @@ using namespace std;
    C_NOACT     output could not be written
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCAesFile::h_EncryptFile(const C_SCLString & orc_Key, const C_SCLString & orc_InFilePath,
-                                   const C_SCLString & orc_OutFilePath)
+int32_t C_OscAesFile::h_EncryptFile(const C_SclString & orc_Key, const C_SclString & orc_InFilePath,
+                                    const C_SclString & orc_OutFilePath)
 
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?& anyway
-   const C_SCLString c_AesKey = stw_md5::CMD5Checksum::GetMD5(
-      reinterpret_cast<const uint8 *>(orc_Key.c_str()), orc_Key.Length());
+   const C_SclString c_AesKey = stw::md5::C_Md5Checksum::GetMD5(
+      reinterpret_cast<const uint8_t *>(orc_Key.c_str()), orc_Key.Length());
 
    tgl_assert(c_AesKey.Length() == 32); //really should be 16 bytes, resp. 32 hex characters
 
    //check whether input file exists:
-   if (TGL_FileExists(orc_InFilePath) == false)
+   if (TglFileExists(orc_InFilePath) == false)
    {
       s32_Return = C_RD_WR;
    }
    else
    {
       //load data from input file:
-      vector<uint8> c_InputData;
+      vector<uint8_t> c_InputData;
       std::ifstream c_InputFileStream;
-      const uint32 u32_InputFileSize = static_cast<uint32>(TGL_FileSize(orc_InFilePath));
-      const uint8 u8_Pkcs7Size = static_cast<uint8>(16U - (u32_InputFileSize % 16U));
+      const uint32_t u32_InputFileSize = static_cast<uint32_t>(TglFileSize(orc_InFilePath));
+      const uint8_t u8_Pkcs7Size = static_cast<uint8_t>(16U - (u32_InputFileSize % 16U));
 
       c_InputData.resize(static_cast<size_t>(u32_InputFileSize) + u8_Pkcs7Size);
 
@@ -111,7 +111,7 @@ sint32 C_OSCAesFile::h_EncryptFile(const C_SCLString & orc_Key, const C_SCLStrin
          //read file content
          bool q_HasFailed;
          //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?& anyway
-         c_InputFileStream.read(reinterpret_cast<charn *>(&c_InputData[0]), u32_InputFileSize);
+         c_InputFileStream.read(reinterpret_cast<char_t *>(&c_InputData[0]), u32_InputFileSize);
          //check for error
          q_HasFailed = c_InputFileStream.fail();
          //close file
@@ -124,28 +124,32 @@ sint32 C_OSCAesFile::h_EncryptFile(const C_SCLString & orc_Key, const C_SCLStrin
          else
          {
             //do the encryption:
-            uint8 au8_Key[16];
-            uint8 * pu8_EncryptedData;
-            uintn un_EncryptedSize;
+            uint8_t au8_Key[16];
+            uint8_t * pu8_EncryptedData;
+            unsigned int x_EncryptedSize; //lint !e8080 !e970  //using type to match library interface
             std::ofstream c_OutputFileStream;
             AES c_Aes(128);
 
             //add PKCS#7 values:
-            for (uint8 u8_ByteIndex = 0U; u8_ByteIndex < u8_Pkcs7Size; u8_ByteIndex++)
+            for (uint8_t u8_ByteIndex = 0U; u8_ByteIndex < u8_Pkcs7Size; u8_ByteIndex++)
             {
                c_InputData[static_cast<size_t>(u32_InputFileSize) + u8_ByteIndex] = u8_Pkcs7Size;
             }
 
             //convert key from string to array:
-            for (uint8 u8_Index = 0U; u8_Index < 16U; u8_Index++)
+            for (uint8_t u8_Index = 0U; u8_Index < 16U; u8_Index++)
             {
-               const C_SCLString c_Text = "0x" + c_AesKey.SubString((static_cast<uint32>(u8_Index) * 2U) + 1U, 2U);
-               au8_Key[u8_Index] = static_cast<uint8>(c_Text.ToInt());
+               const C_SclString c_Text = "0x" + c_AesKey.SubString((static_cast<uint32_t>(u8_Index) * 2U) + 1U, 2U);
+               au8_Key[u8_Index] = static_cast<uint8_t>(c_Text.ToInt());
             }
 
-            pu8_EncryptedData = c_Aes.EncryptECB(&c_InputData[0], c_InputData.size(), &au8_Key[0], un_EncryptedSize);
+            pu8_EncryptedData = c_Aes.EncryptECB(
+               &c_InputData[0],
+               static_cast<unsigned int>(c_InputData.size()), //lint !e970  //using type to match library interface
+               &au8_Key[0],
+               x_EncryptedSize);
             //we added the padding manually: no magic expected here ...
-            tgl_assert(un_EncryptedSize == c_InputData.size());
+            tgl_assert(x_EncryptedSize == c_InputData.size());
 
             //save to output file:
             c_OutputFileStream.open(orc_OutFilePath.c_str(), std::ofstream::binary | std::ofstream::trunc);
@@ -153,7 +157,7 @@ sint32 C_OSCAesFile::h_EncryptFile(const C_SCLString & orc_Key, const C_SCLStrin
             {
                //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?&
                // anyway
-               c_OutputFileStream.write(reinterpret_cast<const charn *>(pu8_EncryptedData), un_EncryptedSize);
+               c_OutputFileStream.write(reinterpret_cast<const char_t *>(pu8_EncryptedData), x_EncryptedSize);
                q_HasFailed = c_OutputFileStream.fail();
                c_OutputFileStream.close();
                if (q_HasFailed == true)
@@ -203,29 +207,29 @@ sint32 C_OSCAesFile::h_EncryptFile(const C_SCLString & orc_Key, const C_SCLStrin
    C_NOACT     output file could not be written
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCAesFile::h_DecryptFile(const C_SCLString & orc_Key, const C_SCLString & orc_InFilePath,
-                                   const C_SCLString & orc_OutFilePath)
+int32_t C_OscAesFile::h_DecryptFile(const C_SclString & orc_Key, const C_SclString & orc_InFilePath,
+                                    const C_SclString & orc_OutFilePath)
 
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?& anyway
-   const C_SCLString c_AesKey = stw_md5::CMD5Checksum::GetMD5(
-      reinterpret_cast<const uint8 *>(orc_Key.c_str()), orc_Key.Length());
+   const C_SclString c_AesKey = stw::md5::C_Md5Checksum::GetMD5(
+      reinterpret_cast<const uint8_t *>(orc_Key.c_str()), orc_Key.Length());
 
    tgl_assert(c_AesKey.Length() == 32); //really should be 16 bytes, resp. 32 hex characters
 
    //check whether input file exists:
-   if (TGL_FileExists(orc_InFilePath) == false)
+   if (TglFileExists(orc_InFilePath) == false)
    {
       s32_Return = C_RD_WR;
    }
    else
    {
       //load data from input file:
-      vector<uint8> c_InputData;
+      vector<uint8_t> c_InputData;
       std::ifstream c_InputFileStream;
-      const uint32 u32_InputFileSize = TGL_FileSize(orc_InFilePath);
+      const uint32_t u32_InputFileSize = TglFileSize(orc_InFilePath);
 
       //is the file correctly padded ?
       if ((u32_InputFileSize % 16U) != 0U)
@@ -234,7 +238,7 @@ sint32 C_OSCAesFile::h_DecryptFile(const C_SCLString & orc_Key, const C_SCLStrin
       }
       else
       {
-         c_InputData.resize(TGL_FileSize(orc_InFilePath));
+         c_InputData.resize(TglFileSize(orc_InFilePath));
 
          c_InputFileStream.open(orc_InFilePath.c_str(), std::ifstream::binary);
 
@@ -248,7 +252,7 @@ sint32 C_OSCAesFile::h_DecryptFile(const C_SCLString & orc_Key, const C_SCLStrin
             bool q_HasFailed;
             //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?&
             // anyway
-            c_InputFileStream.read(reinterpret_cast<charn *>(&c_InputData[0]), c_InputData.size());
+            c_InputFileStream.read(reinterpret_cast<char_t *>(&c_InputData[0]), c_InputData.size());
             //check for error
             q_HasFailed = c_InputFileStream.fail();
             //close file
@@ -261,20 +265,22 @@ sint32 C_OSCAesFile::h_DecryptFile(const C_SCLString & orc_Key, const C_SCLStrin
             else
             {
                //do the decryption:
-               uint8 au8_Key[16];
-               uint8 * pu8_DecryptedData;
+               uint8_t au8_Key[16];
+               uint8_t * pu8_DecryptedData;
                std::ofstream c_OutputFileStream;
-               uint8 u8_Pkcs7Value;
+               uint8_t u8_Pkcs7Value;
                AES c_Aes(128);
+               //using type to match library interface
+               const unsigned int x_InputSize = static_cast<unsigned int>(c_InputData.size()); //lint  !e8080 !e970
 
                //convert key from string to array:
-               for (uint8 u8_Index = 0U; u8_Index < 16U; u8_Index++)
+               for (uint8_t u8_Index = 0U; u8_Index < 16U; u8_Index++)
                {
-                  const C_SCLString c_Text = "0x" + c_AesKey.SubString((static_cast<uint32>(u8_Index) * 2U) + 1U, 2U);
-                  au8_Key[u8_Index] = static_cast<uint8>(c_Text.ToInt());
+                  const C_SclString c_Text = "0x" + c_AesKey.SubString((static_cast<uint32_t>(u8_Index) * 2U) + 1U, 2U);
+                  au8_Key[u8_Index] = static_cast<uint8_t>(c_Text.ToInt());
                }
 
-               pu8_DecryptedData = c_Aes.DecryptECB(&c_InputData[0], c_InputData.size(), &au8_Key[0]);
+               pu8_DecryptedData = c_Aes.DecryptECB(&c_InputData[0], x_InputSize, &au8_Key[0]);
                //remove padding:
                u8_Pkcs7Value = pu8_DecryptedData[c_InputData.size() - 1];
                if ((u8_Pkcs7Value > 16) || (u8_Pkcs7Value > c_InputData.size()))
@@ -291,8 +297,8 @@ sint32 C_OSCAesFile::h_DecryptFile(const C_SCLString & orc_Key, const C_SCLStrin
                      //write without the PKCS#7 bytes:
                      //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep
                      // !"=?& anyway
-                     c_OutputFileStream.write(reinterpret_cast<const charn *>(pu8_DecryptedData),
-                                              static_cast<sintn>(c_InputData.size()) - u8_Pkcs7Value);
+                     c_OutputFileStream.write(reinterpret_cast<const char_t *>(pu8_DecryptedData),
+                                              static_cast<streamsize>(c_InputData.size()) - u8_Pkcs7Value);
                      q_HasFailed = c_OutputFileStream.fail();
                      c_OutputFileStream.close();
                      if (q_HasFailed == true)
@@ -334,33 +340,33 @@ sint32 C_OSCAesFile::h_DecryptFile(const C_SCLString & orc_Key, const C_SCLStrin
    C_BUSY      Problems with deleting the temporary file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCAesFile::h_CreateEncryptedZipFile(const C_SCLString & orc_FolderPathToZip,
-                                              const std::vector<C_SCLString> & orc_FilesToZip,
-                                              const C_SCLString & orc_PathForZipFile, const C_SCLString & orc_Key,
-                                              C_SCLString * const opc_ErrorMessage)
+int32_t C_OscAesFile::h_CreateEncryptedZipFile(const C_SclString & orc_FolderPathToZip,
+                                               const std::vector<C_SclString> & orc_FilesToZip,
+                                               const C_SclString & orc_PathForZipFile, const C_SclString & orc_Key,
+                                               C_SclString * const opc_ErrorMessage)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   std::set<C_SCLString> c_SupFiles;
-   const C_SCLString c_ZipFileTmp = orc_PathForZipFile + static_cast<C_SCLString>("_tmp");
-   C_SCLString c_ErrorText;
+   std::set<C_SclString> c_SupFiles;
+   const C_SclString c_ZipFileTmp = orc_PathForZipFile + static_cast<C_SclString>("_tmp");
+   C_SclString c_ErrorText;
 
-   C_OSCZipFile::h_AppendFilesRelative(c_SupFiles, orc_FilesToZip, orc_FolderPathToZip);
+   C_OscZipFile::h_AppendFilesRelative(c_SupFiles, orc_FilesToZip, orc_FolderPathToZip);
 
-   s32_Return = C_OSCZipFile::h_CreateZipFile(orc_FolderPathToZip, c_SupFiles, c_ZipFileTmp, &c_ErrorText);
+   s32_Return = C_OscZipFile::h_CreateZipFile(orc_FolderPathToZip, c_SupFiles, c_ZipFileTmp, &c_ErrorText);
 
    if (s32_Return == C_NO_ERR)
    {
       if (orc_Key != "")
       {
-         s32_Return = C_OSCAesFile::h_EncryptFile(orc_Key, c_ZipFileTmp, orc_PathForZipFile);
+         s32_Return = C_OscAesFile::h_EncryptFile(orc_Key, c_ZipFileTmp, orc_PathForZipFile);
       }
       else
       {
          // No key, just copy the original zip file as result
          osc_write_log_info("Creating Encrypted Zip File", "No key defined. Encryption not necessary.");
 
-         s32_Return = C_OSCUtils::h_CopyFile(c_ZipFileTmp, orc_PathForZipFile, NULL, &c_ErrorText);
+         s32_Return = C_OscUtils::h_CopyFile(c_ZipFileTmp, orc_PathForZipFile, NULL, &c_ErrorText);
       }
 
       // Remove the non encrypted temporary file
@@ -376,7 +382,7 @@ sint32 C_OSCAesFile::h_CreateEncryptedZipFile(const C_SCLString & orc_FolderPath
       if (s32_Return != C_NO_ERR)
       {
          osc_write_log_error("Creating Encrypted Zip File", "Encrypting zip file failed with error: " +
-                             C_OSCLoggingHandler::h_StwError(s32_Return));
+                             C_OscLoggingHandler::h_StwError(s32_Return));
       }
       else
       {
@@ -386,7 +392,7 @@ sint32 C_OSCAesFile::h_CreateEncryptedZipFile(const C_SCLString & orc_FolderPath
    else
    {
       osc_write_log_error("Creating Encrypted Zip File", "Creating zip file failed with error: " +
-                          C_OSCLoggingHandler::h_StwError(s32_Return) +
+                          C_OscLoggingHandler::h_StwError(s32_Return) +
                           " and error text: " + c_ErrorText.c_str());
 
       if (opc_ErrorMessage != NULL)
@@ -421,17 +427,17 @@ sint32 C_OSCAesFile::h_CreateEncryptedZipFile(const C_SCLString & orc_FolderPath
    C_NOACT     output file already exists or could not be written
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCAesFile::h_UnpackEncryptedZipFile(const C_SCLString & orc_PathOfZipFile,
-                                              const C_SCLString & orc_FolderPathToUnzip, const C_SCLString & orc_Key,
-                                              C_SCLString * const opc_ErrorMessage)
+int32_t C_OscAesFile::h_UnpackEncryptedZipFile(const C_SclString & orc_PathOfZipFile,
+                                               const C_SclString & orc_FolderPathToUnzip, const C_SclString & orc_Key,
+                                               C_SclString * const opc_ErrorMessage)
 {
-   sint32 s32_Return;
-   C_SCLString c_ZipFileTmp = orc_PathOfZipFile + static_cast<C_SCLString>("_tmp");
+   int32_t s32_Return;
+   C_SclString c_ZipFileTmp = orc_PathOfZipFile + static_cast<C_SclString>("_tmp");
    bool q_TemporaryFileUsed = true;
 
    if (orc_Key != "")
    {
-      s32_Return = C_OSCAesFile::h_DecryptFile(orc_Key, orc_PathOfZipFile, c_ZipFileTmp);
+      s32_Return = C_OscAesFile::h_DecryptFile(orc_Key, orc_PathOfZipFile, c_ZipFileTmp);
    }
    else
    {
@@ -443,8 +449,8 @@ sint32 C_OSCAesFile::h_UnpackEncryptedZipFile(const C_SCLString & orc_PathOfZipF
 
    if (s32_Return == C_NO_ERR)
    {
-      C_SCLString c_ErrorText;
-      s32_Return = C_OSCZipFile::h_UnpackZipFile(c_ZipFileTmp, orc_FolderPathToUnzip, &c_ErrorText);
+      C_SclString c_ErrorText;
+      s32_Return = C_OscZipFile::h_UnpackZipFile(c_ZipFileTmp, orc_FolderPathToUnzip, &c_ErrorText);
 
       if (q_TemporaryFileUsed == true)
       {
@@ -462,7 +468,7 @@ sint32 C_OSCAesFile::h_UnpackEncryptedZipFile(const C_SCLString & orc_PathOfZipF
       if (s32_Return != C_NO_ERR)
       {
          osc_write_log_error("Unpacking Encrypted Zip File", "Unpacking decrypted zip file failed with error: " +
-                             C_OSCLoggingHandler::h_StwError(s32_Return) +
+                             C_OscLoggingHandler::h_StwError(s32_Return) +
                              " and error text: " + c_ErrorText.c_str());
 
          if (opc_ErrorMessage != NULL)
@@ -474,7 +480,7 @@ sint32 C_OSCAesFile::h_UnpackEncryptedZipFile(const C_SCLString & orc_PathOfZipF
    else
    {
       osc_write_log_error("Unpacking Encrypted Zip File", "Decrypting zip file failed with error: " +
-                          C_OSCLoggingHandler::h_StwError(s32_Return));
+                          C_OscLoggingHandler::h_StwError(s32_Return));
    }
 
    return s32_Return;

@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeLabFrameError.h"
-#include "C_GtGetText.h"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeLabFrameError.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,12 +49,12 @@ C_OgeLabFrameError::C_OgeLabFrameError(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set foreground color (stylesheet color index)
 
-   \param[in]  osn_Value   Value
+   \param[in]  os32_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeLabFrameError::SetForegroundColor(const stw_types::sintn osn_Value)
+void C_OgeLabFrameError::SetForegroundColor(const int32_t os32_Value)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Foreground", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Foreground", os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,11 +66,11 @@ void C_OgeLabFrameError::SetForegroundColor(const stw_types::sintn osn_Value)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabFrameError::SetCompleteText(const QString & orc_Text, const QString & orc_Tooltip,
-                                         const stw_opensyde_gui::C_NagToolTip::E_Type oe_TooltipType)
+                                         const stw::opensyde_gui::C_NagToolTip::E_Type oe_TooltipType)
 {
    QString c_ToolTipHeading;
 
-   if (oe_TooltipType == stw_opensyde_gui::C_NagToolTip::eERROR)
+   if (oe_TooltipType == stw::opensyde_gui::C_NagToolTip::eERROR)
    {
       c_ToolTipHeading = C_GtGetText::h_GetText("Invalid");
    }
@@ -156,12 +156,12 @@ void C_OgeLabFrameError::m_OnSizeChange(const QSize * const opc_SizeToUse)
    if (opc_SizeToUse != NULL)
    {
       c_DisplayedString =
-         C_Uti::h_AdaptStringToSize(this->mc_Text, c_Metrics, static_cast<stw_types::float64>(opc_SizeToUse->width()));
+         C_Uti::h_AdaptStringToSize(this->mc_Text, c_Metrics, static_cast<float64_t>(opc_SizeToUse->width()));
    }
    else
    {
       c_DisplayedString =
-         C_Uti::h_AdaptStringToSize(this->mc_Text, c_Metrics, static_cast<stw_types::float64>(this->width()));
+         C_Uti::h_AdaptStringToSize(this->mc_Text, c_Metrics, static_cast<float64_t>(this->width()));
    }
 
    this->setText(c_DisplayedString);

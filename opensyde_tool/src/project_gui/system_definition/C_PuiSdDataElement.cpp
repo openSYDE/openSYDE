@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdDataElement.h"
-#include "C_PuiSdHandler.h"
+#include "C_PuiSdDataElement.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in]  ore_Type       Type of data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSdDataElement::C_PuiSdDataElement(const stw_types::sint32 & ors32_Index, const E_Type & ore_Type) :
+C_PuiSdDataElement::C_PuiSdDataElement(const int32_t & ors32_Index, const E_Type & ore_Type) :
    C_PuiBsDataElement(ors32_Index),
    me_Type(ore_Type)
 {
@@ -60,8 +60,7 @@ C_PuiSdDataElement::~C_PuiSdDataElement()
    \param[in]  ore_Action     Type of change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdDataElement::SyncIndex(const E_Type & ore_Type, const stw_types::sint32 & ors32_Index,
-                                   const E_Action & ore_Action)
+void C_PuiSdDataElement::SyncIndex(const E_Type & ore_Type, const int32_t & ors32_Index, const E_Action & ore_Action)
 {
    if (ore_Type == me_Type)
    {

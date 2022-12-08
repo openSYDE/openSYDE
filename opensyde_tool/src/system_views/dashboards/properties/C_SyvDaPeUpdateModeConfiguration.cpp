@@ -8,18 +8,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_SyvDaDashboardSettings.h"
-#include "C_SyvDaPeUpdateModeConfiguration.h"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaDashboardSettings.hpp"
+#include "C_SyvDaPeUpdateModeConfiguration.hpp"
 #include "ui_C_SyvDaPeUpdateModeConfiguration.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +42,7 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaPeUpdateModeConfiguration::C_SyvDaPeUpdateModeConfiguration(C_OgePopUpDialog & orc_Parent,
-                                                                   const stw_types::uint32 ou32_ViewIndex) :
+                                                                   const uint32_t ou32_ViewIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeUpdateModeConfiguration),
    mu32_ViewIndex(ou32_ViewIndex),
@@ -137,8 +136,8 @@ void C_SyvDaPeUpdateModeConfiguration::keyPressEvent(QKeyEvent * const opc_KeyEv
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -190,7 +189,7 @@ void C_SyvDaPeUpdateModeConfiguration::m_ConfigureClicked(void) const
    //Resize
    c_New->SetSize(QSize(600, 430));
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       pc_Dialog->Save();
    }

@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QHeaderView>
 
-#include "C_CamMosFilterTableView.h"
+#include "C_CamMosFilterTableView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -72,7 +71,7 @@ C_CamMosFilterTableView::C_CamMosFilterTableView(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosFilterTableView::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Delete))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Delete))
    {
       Q_EMIT (this->SigDeleteKeyPressed());
    }

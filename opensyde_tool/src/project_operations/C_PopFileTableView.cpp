@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QHeaderView>
 #include <QMouseEvent>
 #include <QScrollBar>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_PopFileTableView.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_PopFileTableView.hpp"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -105,7 +104,7 @@ C_PopFileTableView::C_PopFileTableView(QWidget * const opc_Parent) :
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::UpdateData(const std::vector<QString> & orc_RecentFilePaths,
-                                    const std::vector<stw_opensyde_core::C_OSCProject> & orc_RecentProjects)
+                                    const std::vector<stw::opensyde_core::C_OscProject> & orc_RecentProjects)
 {
    this->mc_Model.UpdateData(orc_RecentFilePaths, orc_RecentProjects);
 }
@@ -121,7 +120,7 @@ void C_PopFileTableView::UpdateData(const std::vector<QString> & orc_RecentFileP
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopFileTableView::ConvertRowToFile(const sint32 & ors32_Row, QString & orc_FilePath) const
+int32_t C_PopFileTableView::ConvertRowToFile(const int32_t & ors32_Row, QString & orc_FilePath) const
 {
    return this->mc_Model.ConvertRowToFile(ors32_Row, orc_FilePath);
 }
@@ -136,7 +135,7 @@ sint32 C_PopFileTableView::ConvertRowToFile(const sint32 & ors32_Row, QString & 
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_HoveredRow = -1;
+   int32_t s32_HoveredRow = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
    C_TblViewToolTipBase::mouseMoveEvent(opc_Event);
@@ -161,11 +160,11 @@ void C_PopFileTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableView::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_ClickedRow = -1;
    const QModelIndex c_ClickedIndex = this->indexAt(opc_Event->pos());
 
    if (opc_Event->button() == Qt::LeftButton)
    {
+      int32_t s32_ClickedRow = -1;
       if (c_ClickedIndex.isValid() == true)
       {
          s32_ClickedRow = c_ClickedIndex.row();

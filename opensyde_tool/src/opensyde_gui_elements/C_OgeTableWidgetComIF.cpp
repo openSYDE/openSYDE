@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QScrollBar>
@@ -18,13 +18,12 @@
 #include <QHoverEvent>
 #include <QHeaderView>
 #include <QLabel>
-#include "constants.h"
-#include "C_OgeTableWidgetComIF.h"
+#include "constants.hpp"
+#include "C_OgeTableWidgetComIf.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,7 +45,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeTableWidgetComIF::C_OgeTableWidgetComIF(QWidget * const opc_Parent) :
+C_OgeTableWidgetComIf::C_OgeTableWidgetComIf(QWidget * const opc_Parent) :
    QTableWidget(opc_Parent),
    mpc_ToolTip(NULL)
 {
@@ -79,14 +78,14 @@ C_OgeTableWidgetComIF::C_OgeTableWidgetComIF(QWidget * const opc_Parent) :
 
    //Connects
    connect(this->verticalScrollBar(), &QScrollBar::rangeChanged, this,
-           &C_OgeTableWidgetComIF::m_ScrollBarRangeChangedVer);
+           &C_OgeTableWidgetComIf::m_ScrollBarRangeChangedVer);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeTableWidgetComIF::~C_OgeTableWidgetComIF(void)
+C_OgeTableWidgetComIf::~C_OgeTableWidgetComIf(void)
 {
    delete mpc_ToolTip;
    mpc_ToolTip = NULL;
@@ -102,16 +101,16 @@ C_OgeTableWidgetComIF::~C_OgeTableWidgetComIF(void)
    \param[in]  oe_Type        Tool tip error type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::SetToolTipAt(const uint32 ou32_Row, const uint32 ou32_Col, const QString & orc_Heading,
+void C_OgeTableWidgetComIf::SetToolTipAt(const uint32_t ou32_Row, const uint32_t ou32_Col, const QString & orc_Heading,
                                          const QString & orc_Content, const C_NagToolTip::E_Type oe_Type)
 {
-   C_ItemID c_Id;
+   C_ItemId c_Id;
 
-   c_Id.s32_Row = static_cast<sint32>(ou32_Row);
-   c_Id.s32_Col = static_cast<sint32>(ou32_Col);
+   c_Id.s32_Row = static_cast<int32_t>(ou32_Row);
+   c_Id.s32_Col = static_cast<int32_t>(ou32_Col);
    if ((orc_Heading.compare("") == 0) && (orc_Content.compare("") == 0))
    {
-      const std::map<C_ItemID, C_ToolTipContent>::iterator c_ItPos = this->mc_ToolTips.find(c_Id);
+      const std::map<C_ItemId, C_ToolTipContent>::iterator c_ItPos = this->mc_ToolTips.find(c_Id);
       if (c_ItPos != this->mc_ToolTips.end())
       {
          this->mc_ToolTips.erase(c_ItPos);
@@ -137,13 +136,13 @@ void C_OgeTableWidgetComIF::SetToolTipAt(const uint32 ou32_Row, const uint32 ou3
    \param[in]  orc_Content       Tool tip content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::SetToolTipHeadingAt(const uint32 ou32_Section, const Qt::Orientation oe_Orientation,
+void C_OgeTableWidgetComIf::SetToolTipHeadingAt(const uint32_t ou32_Section, const Qt::Orientation oe_Orientation,
                                                 const QString & orc_Heading, const QString & orc_Content) const
 {
-   this->model()->setHeaderData(static_cast<sint32>(ou32_Section), oe_Orientation, orc_Heading,
-                                msn_USER_ROLE_TOOL_TIP_HEADING);
-   this->model()->setHeaderData(static_cast<sint32>(ou32_Section), oe_Orientation, orc_Content,
-                                msn_USER_ROLE_TOOL_TIP_CONTENT);
+   this->model()->setHeaderData(static_cast<int32_t>(ou32_Section), oe_Orientation, orc_Heading,
+                                ms32_USER_ROLE_TOOL_TIP_HEADING);
+   this->model()->setHeaderData(static_cast<int32_t>(ou32_Section), oe_Orientation, orc_Content,
+                                ms32_USER_ROLE_TOOL_TIP_CONTENT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,7 +153,7 @@ void C_OgeTableWidgetComIF::SetToolTipHeadingAt(const uint32 ou32_Section, const
    \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::mouseMoveEvent(QMouseEvent * const opc_Event)
+void C_OgeTableWidgetComIf::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QTableWidget::mouseMoveEvent(opc_Event);
    m_HandleMouseMoveToolTip(opc_Event->globalPos());
@@ -172,7 +171,7 @@ void C_OgeTableWidgetComIF::mouseMoveEvent(QMouseEvent * const opc_Event)
    False Event ignored
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
+bool C_OgeTableWidgetComIf::event(QEvent * const opc_Event)
 {
    bool q_Return;
 
@@ -181,7 +180,7 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
       //show tool-tip
       if (mpc_ToolTip == NULL)
       {
-         mpc_ToolTip = new stw_opensyde_gui::C_NagToolTip();
+         mpc_ToolTip = new stw::opensyde_gui::C_NagToolTip();
       }
 
       if (this->mpc_ToolTip->isVisible() == false)
@@ -195,16 +194,16 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
                 (this->verticalHeader()->geometry().contains(
                     this->verticalHeader()->mapFromGlobal(pc_HelpEvent->globalPos())) == true))
             {
-               const sint32 s32_LogicalIndex =
+               const int32_t s32_LogicalIndex =
                   this->verticalHeader()->logicalIndexAt(this->verticalHeader()->mapFromGlobal(
                                                             pc_HelpEvent->globalPos()));
-               const sint32 s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
+               const int32_t s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
                if (s32_VisualIndex >= 0)
                {
                   const QString c_Heading = this->model()->headerData(s32_VisualIndex, Qt::Vertical,
-                                                                      msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
                   const QString c_Content = this->model()->headerData(s32_VisualIndex, Qt::Vertical,
-                                                                      msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
 
                   if ((c_Heading.compare("") != 0) && (c_Content.compare("") != 0))
                   {
@@ -224,16 +223,16 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
                      (this->horizontalHeader()->geometry().contains(
                          this->horizontalHeader()->mapFromGlobal(pc_HelpEvent->globalPos())) == true))
             {
-               const sint32 s32_LogicalIndex =
+               const int32_t s32_LogicalIndex =
                   this->horizontalHeader()->logicalIndexAt(this->horizontalHeader()->mapFromGlobal(
                                                               pc_HelpEvent->globalPos()));
-               const sint32 s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
+               const int32_t s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
                if (s32_VisualIndex >= 0)
                {
                   const QString c_Heading = this->model()->headerData(s32_VisualIndex, Qt::Horizontal,
-                                                                      msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
                   const QString c_Content = this->model()->headerData(s32_VisualIndex, Qt::Horizontal,
-                                                                      msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
 
                   if ((c_Heading.compare("") != 0) && (c_Content.compare("") != 0))
                   {
@@ -254,12 +253,12 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
                const QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(pc_HelpEvent->globalPos()));
                if (c_Index.isValid() == true)
                {
-                  const sint32 s32_ToolTipRow = c_Index.row();
-                  const sint32 s32_ToolTipCol = c_Index.column();
+                  const int32_t s32_ToolTipRow = c_Index.row();
+                  const int32_t s32_ToolTipCol = c_Index.column();
                   if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
                   {
-                     std::map<C_ItemID, C_ToolTipContent>::const_iterator c_ItToolTip;
-                     C_ItemID c_Id;
+                     std::map<C_ItemId, C_ToolTipContent>::const_iterator c_ItToolTip;
+                     C_ItemId c_Id;
                      c_Id.s32_Row = s32_ToolTipRow;
                      c_Id.s32_Col = s32_ToolTipCol;
                      c_ItToolTip = this->mc_ToolTips.find(c_Id);
@@ -357,7 +356,7 @@ bool C_OgeTableWidgetComIF::event(QEvent * const opc_Event)
    False This is bigger or equal
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OgeTableWidgetComIF::C_ItemID::operator <(const C_OgeTableWidgetComIF::C_ItemID & orc_Item) const
+bool C_OgeTableWidgetComIf::C_ItemId::operator <(const C_OgeTableWidgetComIf::C_ItemId & orc_Item) const
 {
    return (this->s32_Row < orc_Item.s32_Row) ||
           ((this->s32_Row == orc_Item.s32_Row) && (this->s32_Col < orc_Item.s32_Col));
@@ -367,7 +366,7 @@ bool C_OgeTableWidgetComIF::C_ItemID::operator <(const C_OgeTableWidgetComIF::C_
 /*! \brief   Hide tool-tip
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::m_HideToolTip(void)
+void C_OgeTableWidgetComIf::m_HideToolTip(void)
 {
    if (this->mpc_ToolTip != NULL)
    {
@@ -387,7 +386,7 @@ void C_OgeTableWidgetComIF::m_HideToolTip(void)
    \param[in]  orc_GlobalPos  Global mouse position
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
+void C_OgeTableWidgetComIf::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
 {
    if ((this->mc_HoveredRow.s32_Row >= 0) && (this->mc_HoveredRow.s32_Col >= 0))
    {
@@ -408,9 +407,9 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
    }
    if ((this->verticalHeader()->isVisible() == true) && (this->ms32_HoveredVertHeader >= 0))
    {
-      const sint32 s32_LogicalIndex =
+      const int32_t s32_LogicalIndex =
          this->verticalHeader()->logicalIndexAt(this->verticalHeader()->mapFromGlobal(orc_GlobalPos));
-      const sint32 s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
+      const int32_t s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
       if (s32_VisualIndex != this->ms32_HoveredVertHeader)
       {
          //Hide Tooltip
@@ -428,9 +427,9 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
    }
    if ((this->horizontalHeader()->isVisible() == true) && (this->ms32_HoveredHorzHeader >= 0))
    {
-      const sint32 s32_LogicalIndex =
+      const int32_t s32_LogicalIndex =
          this->horizontalHeader()->logicalIndexAt(this->horizontalHeader()->mapFromGlobal(orc_GlobalPos));
-      const sint32 s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
+      const int32_t s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
       if (s32_VisualIndex != this->ms32_HoveredHorzHeader)
       {
          //Hide Tooltip
@@ -449,10 +448,10 @@ void C_OgeTableWidgetComIF::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTableWidgetComIF::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
+void C_OgeTableWidgetComIf::m_ScrollBarRangeChangedVer(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->verticalScrollBar()->hide();
    }

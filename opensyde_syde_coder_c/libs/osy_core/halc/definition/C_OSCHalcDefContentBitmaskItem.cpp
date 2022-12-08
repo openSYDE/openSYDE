@@ -10,18 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <sstream>
 
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_OSCHalcDefContentBitmaskItem.h"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscHalcDefContentBitmaskItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +39,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefContentBitmaskItem::C_OSCHalcDefContentBitmaskItem(void) :
+C_OscHalcDefContentBitmaskItem::C_OscHalcDefContentBitmaskItem(void) :
    q_ApplyValueSetting(false),
    u64_Value(0ULL)
 {
@@ -49,7 +49,7 @@ C_OSCHalcDefContentBitmaskItem::C_OSCHalcDefContentBitmaskItem(void) :
 /*! \brief  Denstructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefContentBitmaskItem::~C_OSCHalcDefContentBitmaskItem()
+C_OscHalcDefContentBitmaskItem::~C_OscHalcDefContentBitmaskItem()
 {
 }
 
@@ -63,9 +63,9 @@ C_OSCHalcDefContentBitmaskItem::~C_OSCHalcDefContentBitmaskItem()
    C_RANGE  String invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContentBitmaskItem::SetValueByString(const stw_scl::C_SCLString & orc_Item)
+int32_t C_OscHalcDefContentBitmaskItem::SetValueByString(const stw::scl::C_SclString & orc_Item)
 {
-   return C_OSCHalcDefContentBitmaskItem::mh_ParseUintFromString(orc_Item, this->u64_Value);
+   return C_OscHalcDefContentBitmaskItem::mh_ParseUintFromString(orc_Item, this->u64_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -76,12 +76,12 @@ sint32 C_OSCHalcDefContentBitmaskItem::SetValueByString(const stw_scl::C_SCLStri
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContentBitmaskItem::CalcHash(uint32 & oru32_HashValue) const
+void C_OscHalcDefContentBitmaskItem::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_ApplyValueSetting, sizeof(this->q_ApplyValueSetting), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u64_Value, sizeof(this->u64_Value), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_ApplyValueSetting, sizeof(this->q_ApplyValueSetting), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u64_Value, sizeof(this->u64_Value), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -92,11 +92,11 @@ void C_OSCHalcDefContentBitmaskItem::CalcHash(uint32 & oru32_HashValue) const
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContentBitmaskItem::CalcHashStructure(uint32 & oru32_HashValue) const
+void C_OscHalcDefContentBitmaskItem::CalcHashStructure(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u64_Value, sizeof(this->u64_Value), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u64_Value, sizeof(this->u64_Value), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,10 +110,10 @@ void C_OSCHalcDefContentBitmaskItem::CalcHashStructure(uint32 & oru32_HashValue)
    C_RANGE  String invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContentBitmaskItem::mh_ParseUintFromString(const stw_scl::C_SCLString & orc_Item,
-                                                              uint64 & oru64_Value)
+int32_t C_OscHalcDefContentBitmaskItem::mh_ParseUintFromString(const stw::scl::C_SclString & orc_Item,
+                                                               uint64_t & oru64_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_Item.LowerCase() == "true")
    {
@@ -127,7 +127,7 @@ sint32 C_OSCHalcDefContentBitmaskItem::mh_ParseUintFromString(const stw_scl::C_S
    {
       if (((orc_Item.Length() > 2UL) && (orc_Item[1] == '0')) && (orc_Item[2] == 'x'))
       {
-         const stw_scl::C_SCLString c_Hex = orc_Item.SubString(3UL, orc_Item.Length() - 2UL);
+         const stw::scl::C_SclString c_Hex = orc_Item.SubString(3UL, orc_Item.Length() - 2UL);
          std::stringstream c_Stream(c_Hex.c_str());
          (c_Stream >> &std::hex) >> oru64_Value;
          if (c_Stream.fail())

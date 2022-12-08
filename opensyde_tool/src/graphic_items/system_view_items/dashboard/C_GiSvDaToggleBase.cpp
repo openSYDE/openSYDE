@@ -10,32 +10,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsView>
 
-#include "gitypes.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvDaToggleBase.h"
-#include "C_PuiSvDbTable.h"
-#include "C_OgePopUpDialog.h"
-#include "C_SyvDaPeBase.h"
-#include "C_SyvDaPeToggle.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "gitypes.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvDaToggleBase.hpp"
+#include "C_PuiSvDbTable.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SyvDaPeBase.hpp"
+#include "C_SyvDaPeToggle.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,15 +54,15 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     oru32_ViewIndex        Index of system view
    \param[in]     oru32_DashboardIndex   Index of dashboard in system view
    \param[in]     ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]     oru64_ID               Unique ID
+   \param[in]     oru64_Id               Unique ID
    \param[in,out] opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaToggleBase::C_GiSvDaToggleBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                       const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaToggleBase::C_GiSvDaToggleBase(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                       const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                        QGraphicsItem * const opc_Parent) :
    C_GiSvDaRectBaseGroup(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eTOGGLE, 1,
-                         oru64_ID, 36.5, 22.0, 83.0, 50.0, true, false, opc_Parent)
+                         oru64_Id, 36.5, 22.0, 83.0, 50.0, true, false, opc_Parent)
 {
    mpc_CheckBoxWidget = new C_OgePubDashboard();
    this->mpc_CheckBoxWidget->setText("");
@@ -88,9 +87,9 @@ C_GiSvDaToggleBase::~C_GiSvDaToggleBase(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvDaToggleBase::type(void) const
+int32_t C_GiSvDaToggleBase::type(void) const
 {
-   return msn_GRAPHICS_ITEM_DB_TOGGLE;
+   return ms32_GRAPHICS_ITEM_DB_TOGGLE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,7 +110,7 @@ void C_GiSvDaToggleBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
       if (pc_Dashboard != NULL)
       {
          const C_PuiSvDbToggle * const pc_Box =
-            pc_Dashboard->GetToggle(static_cast<uint32>(this->ms32_Index));
+            pc_Dashboard->GetToggle(static_cast<uint32_t>(this->ms32_Index));
          tgl_assert(pc_Box != NULL);
          if (pc_Box != NULL)
          {
@@ -140,7 +139,7 @@ void C_GiSvDaToggleBase::LoadData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -164,7 +163,7 @@ void C_GiSvDaToggleBase::UpdateData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -176,7 +175,7 @@ void C_GiSvDaToggleBase::UpdateData(void)
          }
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         &c_Box, this->me_Type) == C_NO_ERR);
       }
    }
@@ -192,7 +191,7 @@ void C_GiSvDaToggleBase::DeleteData(void)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->DeleteDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         this->me_Type) ==
                  C_NO_ERR);
    }
@@ -207,7 +206,7 @@ void C_GiSvDaToggleBase::SendCurrentValue(void)
    if (this->mpc_CheckBoxWidget != NULL)
    {
       // Prepare the value
-      this->mf64_WriteValue = static_cast<float64>(this->mpc_CheckBoxWidget->isChecked());
+      this->mf64_WriteValue = static_cast<float64_t>(this->mpc_CheckBoxWidget->isChecked());
 
       // Send the value
       C_GiSvDaRectBaseGroup::SendCurrentValue();
@@ -226,13 +225,14 @@ bool C_GiSvDaToggleBase::CallProperties(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
-         sint32 s32_Return = C_NO_ERR;
+         int32_t s32_Return = C_NO_ERR;
          C_PuiSvDbNodeDataPoolListElementId c_ElementId;
          C_PuiSvDbDataElementScaling c_Scaling;
+         C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig;
 
          // Fill the existing data
          if (this->GetWidgetDataPoolElementCount() > 0)
@@ -242,6 +242,11 @@ bool C_GiSvDaToggleBase::CallProperties(void)
             if (s32_Return == C_NO_ERR)
             {
                s32_Return = this->GetDataPoolElementScaling(0U, c_Scaling);
+
+               if (s32_Return == C_NO_ERR)
+               {
+                  s32_Return = GetDataPoolElementFormatter(0, c_FormatterConfig);
+               }
             }
          }
          else
@@ -255,12 +260,12 @@ bool C_GiSvDaToggleBase::CallProperties(void)
          if (s32_Return == C_NO_ERR)
          {
             QGraphicsView * const pc_View = this->scene()->views().at(0);
-            QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+            const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
             C_SyvDaPeBase * pc_Dialog;
             C_SyvDaPeToggle * pc_PropertiesWidget;
 
             pc_Dialog = new C_SyvDaPeBase(*c_New, this->mu32_ViewIndex, this->mu32_DashboardIndex, "Toggle",
-                                          c_ElementId, c_Scaling, false, this->mq_DarkMode);
+                                          c_ElementId, c_Scaling, false, c_FormatterConfig, false, this->mq_DarkMode);
             pc_PropertiesWidget = new C_SyvDaPeToggle(*pc_Dialog, this->mq_DarkMode);
 
             pc_Dialog->SetWidget(pc_PropertiesWidget);
@@ -272,7 +277,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
             pc_PropertiesWidget->SetType(pc_Box->e_Type);
             pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);
 
-            if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+            if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
             {
                C_PuiSvDbToggle c_Box = *pc_Box;
                C_PuiSvDbNodeDataElementConfig c_Tmp;
@@ -283,6 +288,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
 
                c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
                c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
+               c_Tmp.c_DisplayFormatter = pc_Dialog->GetFormatterInformation();
                c_Box.c_DataPoolElementsConfig.clear();
                if (c_Tmp.c_ElementId.GetIsValid())
                {
@@ -299,13 +305,14 @@ bool C_GiSvDaToggleBase::CallProperties(void)
                this->ClearDataPoolElements();
                if (c_Tmp.c_ElementId.GetIsValid())
                {
-                  this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+                  this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation(),
+                                                pc_Dialog->GetFormatterInformation());
                }
 
                tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
                tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                               this->mu32_DashboardIndex,
-                                                                              static_cast<uint32>(this->ms32_Index),
+                                                                              static_cast<uint32_t>(this->ms32_Index),
                                                                               &c_Box, this->me_Type) == C_NO_ERR);
             }
             Q_EMIT this->SigTriggerUpdateTransmissionConfiguration();
@@ -333,7 +340,7 @@ void C_GiSvDaToggleBase::ConnectionActiveChanged(const bool oq_Active)
    C_GiSvDaRectBaseGroup::ConnectionActiveChanged(oq_Active);
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbToggle * const pc_Box = pc_Dashboard->GetToggle(static_cast<uint32_t>(this->ms32_Index));
       if ((pc_Box != NULL) && (pc_Box->e_ElementWriteMode == C_PuiSvDbToggle::eWM_ON_CHANGE))
       {
          if (oq_Active == true)
@@ -541,9 +548,9 @@ bool C_GiSvDaToggleBase::m_CheckHasValidElements(QString & orc_FirstInvalidEleme
 
    if (q_Retval == true)
    {
-      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
+      const QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t> & rc_Elements = this->m_GetMappingDpElementToDataSerie();
 
-      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32>::const_iterator c_ItElement = rc_Elements.begin();
+      for (QMap<C_PuiSvDbNodeDataPoolListElementId, uint32_t>::const_iterator c_ItElement = rc_Elements.begin();
            c_ItElement != rc_Elements.end(); ++c_ItElement)
       {
          const C_PuiSvDbNodeDataPoolListElementId c_ElementId = c_ItElement.key();
@@ -551,27 +558,27 @@ bool C_GiSvDaToggleBase::m_CheckHasValidElements(QString & orc_FirstInvalidEleme
          // Is the data element valid?
          if (c_ElementId.GetIsValid() == true)
          {
-            uint32 u32_Index;
+            uint32_t u32_Index;
             if (this->GetWidgetDataPoolElementIndex(c_ElementId, u32_Index) == C_NO_ERR)
             {
                C_PuiSvDbDataElementScaling c_Scaling;
-               const C_OSCNodeDataPoolListElement * const pc_Element =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_ElementId.u32_NodeIndex,
+               const C_OscNodeDataPoolListElement * const pc_Element =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_ElementId.u32_NodeIndex,
                                                                              c_ElementId.u32_DataPoolIndex,
                                                                              c_ElementId.u32_ListIndex,
                                                                              c_ElementId.u32_ElementIndex);
                if ((pc_Element != NULL) && (this->GetDataPoolElementScaling(u32_Index, c_Scaling) == C_NO_ERR))
                {
-                  std::vector<float64> c_Min;
-                  std::vector<float64> c_Max;
+                  std::vector<float64_t> c_Min;
+                  std::vector<float64_t> c_Max;
                   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_Element->c_MinValue, c_Min);
                   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_Element->c_MaxValue, c_Max);
                   if ((c_Min.size() == c_Max.size()) && (c_Min.size() == 1UL))
                   {
-                     const float64 f64_MinScaled = C_OSCUtils::h_GetValueScaled(c_Min[0], c_Scaling.f64_Factor,
-                                                                                c_Scaling.f64_Offset);
-                     const float64 f64_MaxScaled = C_OSCUtils::h_GetValueScaled(c_Max[0], c_Scaling.f64_Factor,
-                                                                                c_Scaling.f64_Offset);
+                     const float64_t f64_MinScaled = C_OscUtils::h_GetValueScaled(c_Min[0], c_Scaling.f64_Factor,
+                                                                                  c_Scaling.f64_Offset);
+                     const float64_t f64_MaxScaled = C_OscUtils::h_GetValueScaled(c_Max[0], c_Scaling.f64_Factor,
+                                                                                  c_Scaling.f64_Offset);
                      //Check if out of range
                      if ((f64_MinScaled > 0.0) || (f64_MaxScaled < 1.0))
                      {

@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QClipboard>
 #include <QApplication>
 #include <QDesktopServices>
 
-#include "stwtypes.h"
-#include "C_OgeTebContextMenuBase.h"
-#include "C_GtGetText.h"
+#include "stwtypes.hpp"
+#include "C_OgeTebContextMenuBase.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -85,7 +84,7 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy"),
                                     this,
                                     &C_OgeTebContextMenuBase::copy,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_C));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy Link Location"),
                                     this,
@@ -96,7 +95,7 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select All"),
                                     this,
                                     &C_OgeTebContextMenuBase::selectAll,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
 
    // store link text for copying
    mc_LinkText = this->anchorAt(orc_Pos);

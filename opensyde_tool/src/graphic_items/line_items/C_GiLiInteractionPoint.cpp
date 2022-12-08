@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 
-#include "C_GiLiInteractionPoint.h"
-#include "gitypes.h"
+#include "C_GiLiInteractionPoint.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +42,7 @@ using namespace stw_types;
    \param[in,out] opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiInteractionPoint::C_GiLiInteractionPoint(const sint32 & ors32_PointIndex, QGraphicsItem * const opc_Parent) :
+C_GiLiInteractionPoint::C_GiLiInteractionPoint(const int32_t & ors32_PointIndex, QGraphicsItem * const opc_Parent) :
    C_GiPointInteraction(opc_Parent),
    ms32_PointIndex(ors32_PointIndex)
 {
@@ -70,9 +69,9 @@ C_GiLiInteractionPoint::~C_GiLiInteractionPoint()
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiLiInteractionPoint::type() const
+int32_t C_GiLiInteractionPoint::type() const
 {
-   return msn_GRAPHICS_ITEM_LINEINTERACTION;
+   return ms32_GRAPHICS_ITEM_LINEINTERACTION;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -81,7 +80,7 @@ sintn C_GiLiInteractionPoint::type() const
    \param[in] ors32_PointIndex Index of the corresponding point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiInteractionPoint::SetPointIndex(const stw_types::sint32 & ors32_PointIndex)
+void C_GiLiInteractionPoint::SetPointIndex(const int32_t & ors32_PointIndex)
 {
    this->ms32_PointIndex = ors32_PointIndex;
 }
@@ -92,7 +91,7 @@ void C_GiLiInteractionPoint::SetPointIndex(const stw_types::sint32 & ors32_Point
    \return   Index of the corresponding point
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiInteractionPoint::GetPointIndex(void) const
+int32_t C_GiLiInteractionPoint::GetPointIndex(void) const
 {
    return this->ms32_PointIndex;
 }

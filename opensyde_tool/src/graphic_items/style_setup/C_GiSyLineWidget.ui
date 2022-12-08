@@ -52,7 +52,7 @@
         <enum>QLayout::SetDefaultConstraint</enum>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelWidth">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelWidth">
          <property name="text">
           <string>Width</string>
          </property>
@@ -72,7 +72,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxWidth">
+        <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxWidth">
          <property name="minimumSize">
           <size>
            <width>90</width>
@@ -98,7 +98,7 @@
      <item>
       <layout class="QHBoxLayout" name="pc_HorizontalLayout2" stretch="0,1,0">
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelColor">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelColor">
          <property name="text">
           <string>Color</string>
          </property>
@@ -118,7 +118,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubColorOnly" name="pc_BushButtonColor">
+        <widget class="stw::opensyde_gui_elements::C_OgePubColorOnly" name="pc_BushButtonColor">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -147,7 +147,7 @@
      <item>
       <layout class="QHBoxLayout" name="pc_HorizontalLayoutColorInner" stretch="0,1,0">
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelColorInner">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelColorInner">
          <property name="text">
           <string>Innerline Color</string>
          </property>
@@ -167,7 +167,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubColorOnly" name="pc_BushButtonColorInner">
+        <widget class="stw::opensyde_gui_elements::C_OgePubColorOnly" name="pc_BushButtonColorInner">
          <property name="minimumSize">
           <size>
            <width>90</width>
@@ -190,7 +190,7 @@
      <item>
       <layout class="QHBoxLayout" name="pc_HorizontalLayout4" stretch="0,1,0">
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLineStyle">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLineStyle">
          <property name="text">
           <string>Line Style</string>
          </property>
@@ -210,7 +210,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxLine" name="pc_ComboBoxLineStyle">
+        <widget class="stw::opensyde_gui_elements::C_OgeCbxLine" name="pc_ComboBoxLineStyle">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -287,7 +287,7 @@
      <item>
       <layout class="QHBoxLayout" name="pc_HorizontalLayout5">
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLineStartArrow">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLineStartArrow">
          <property name="text">
           <string>Start Arrow</string>
          </property>
@@ -307,7 +307,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxArrow" name="pc_ComboBoxStartArrow">
+        <widget class="stw::opensyde_gui_elements::C_OgeCbxArrow" name="pc_ComboBoxStartArrow">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -399,7 +399,7 @@
      <item>
       <layout class="QHBoxLayout" name="pc_HorizontalLayout6">
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLineEndArrow">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLineEndArrow">
          <property name="text">
           <string>End Arrow</string>
          </property>
@@ -419,7 +419,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeCbxArrow" name="pc_ComboBoxEndArrow">
+        <widget class="stw::opensyde_gui_elements::C_OgeCbxArrow" name="pc_ComboBoxEndArrow">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -527,29 +527,29 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxNumber</class>
    <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.h</header>
+   <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubColorOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubColorOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubColorOnly.h</header>
+   <header>C_OgePubColorOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxLine</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxLine</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxLine.h</header>
+   <header>C_OgeCbxLine.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxArrow</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxArrow</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxArrow.h</header>
+   <header>C_OgeCbxArrow.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

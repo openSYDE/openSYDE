@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCHalcConfigParameterStruct.h"
+#include "C_OscHalcConfigParameterStruct.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,8 +34,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigParameterStruct::C_OSCHalcConfigParameterStruct(void) :
-   C_OSCHalcConfigParameter()
+C_OscHalcConfigParameterStruct::C_OscHalcConfigParameterStruct(void) :
+   C_OscHalcConfigParameter()
 {
 }
 
@@ -48,11 +48,11 @@ C_OSCHalcConfigParameterStruct::C_OSCHalcConfigParameterStruct(void) :
    \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigParameterStruct::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_OscHalcConfigParameterStruct::CalcHash(uint32_t & oru32_HashValue) const
 {
-   C_OSCHalcConfigParameter::CalcHash(oru32_HashValue);
+   C_OscHalcConfigParameter::CalcHash(oru32_HashValue);
 
-   for (uint32 u32_It = 0UL; u32_It < this->c_ParameterElements.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_ParameterElements.size(); ++u32_It)
    {
       this->c_ParameterElements[u32_It].CalcHash(oru32_HashValue);
    }

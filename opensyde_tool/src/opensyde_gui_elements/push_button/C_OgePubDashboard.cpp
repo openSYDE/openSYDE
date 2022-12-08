@@ -13,16 +13,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "C_OgePubDashboard.h"
+#include "stwtypes.hpp"
+#include "C_OgePubDashboard.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -135,10 +134,11 @@ void C_OgePubDashboard::paintEvent(QPaintEvent * const opc_Event)
 QRectF C_OgePubDashboard::mh_AdaptToAspcetRatio(const QRect & orc_Target, const QRect & orc_Rect)
 {
    QRectF c_Retval = orc_Rect;
-   const float64 f64_IdealAspectRatio = static_cast<float64>(orc_Target.height()) /
-                                        static_cast<float64>(orc_Target.width());
-   const float64 f64_IdealHeight =
-      std::min(static_cast<float64>(orc_Rect.height()), static_cast<float64>(orc_Rect.width()) * f64_IdealAspectRatio);
+   const float64_t f64_IdealAspectRatio = static_cast<float64_t>(orc_Target.height()) /
+                                          static_cast<float64_t>(orc_Target.width());
+   const float64_t f64_IdealHeight =
+      std::min(static_cast<float64_t>(orc_Rect.height()),
+               static_cast<float64_t>(orc_Rect.width()) * f64_IdealAspectRatio);
 
    c_Retval.setHeight(f64_IdealHeight);
    c_Retval.setWidth(f64_IdealHeight / f64_IdealAspectRatio);

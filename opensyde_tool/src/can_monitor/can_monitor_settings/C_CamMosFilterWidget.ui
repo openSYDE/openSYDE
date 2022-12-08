@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeWiSettingSubSection" name="pc_WiHeader" native="true"/>
+    <widget class="stw::opensyde_gui_elements::C_CamOgeWiSettingSubSection" name="pc_WiHeader" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="pc_WiContent" native="true">
@@ -84,7 +84,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_BtnAdd">
+         <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_BtnAdd">
           <property name="text">
            <string>Add filter btn</string>
           </property>
@@ -93,7 +93,7 @@
        </layout>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameTop">
+       <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameTop">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -115,7 +115,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoElements">
+       <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoElements">
         <property name="title">
          <string/>
         </property>
@@ -149,7 +149,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabNoFilter">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabNoFilter">
              <property name="text">
               <string>Nothing to show!</string>
              </property>
@@ -192,11 +192,11 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
+         <widget class="stw::opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaContents">
+          <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaContents">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -245,7 +245,7 @@
        </layout>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameBottom">
+       <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameBottom">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -273,43 +273,43 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubSettingsAdd.h</header>
+   <header>C_CamOgePubSettingsAdd.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeWiSettingSubSection</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeWiSettingSubSection</class>
    <extends>QWidget</extends>
-   <header>C_CamOgeWiSettingSubSection.h</header>
+   <header>C_CamOgeWiSettingSubSection.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTransparentScrollArea</class>
+   <class>stw::opensyde_gui_elements::C_OgeTransparentScrollArea</class>
    <extends>QScrollArea</extends>
-   <header>C_OgeTransparentScrollArea.h</header>
+   <header>C_OgeTransparentScrollArea.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -8,29 +8,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFontDialog>
 
-#include "C_GiSyTextElementWidget.h"
+#include "C_GiSyTextElementWidget.hpp"
 #include "ui_C_GiSyTextElementWidget.h"
 
-#include "C_GtGetText.h"
-#include "C_OgePubColorOnly.h"
-#include "C_UtiStyleSheets.h"
-#include "C_GiBiTextElement.h"
-#include "C_SdTopologyScene.h"
-#include "C_UtiStyleSheets.h"
-#include "C_GiCustomFunctions.h"
-#include "C_Uti.h"
-#include "C_GiSyColorSelectWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_OgePubColorOnly.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_GiBiTextElement.hpp"
+#include "C_SdTopologyScene.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_GiCustomFunctions.hpp"
+#include "C_Uti.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBackground.png";
@@ -190,7 +189,7 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
    QSizeF c_ItemSize;
    bool q_SizeInvalid = true;
    QFont c_Tmp = this->mc_FontStyle;
-   sint32 s32_CurPixelSize = this->mc_FontStyle.pixelSize();
+   int32_t s32_CurPixelSize = this->mc_FontStyle.pixelSize();
 
    if (s32_CurPixelSize <= 0)
    {
@@ -200,7 +199,7 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
    //Apply color
    pc_Item->SetFontColor(this->mc_FontColor);
    //dynamic adaptation of point size as there are a wide variety of font families with vast differences in text length
-   for (sint32 s32_PixelSize = s32_CurPixelSize; (s32_PixelSize > 1) && (q_SizeInvalid == true);
+   for (int32_t s32_PixelSize = s32_CurPixelSize; (s32_PixelSize > 1) && (q_SizeInvalid == true);
         --s32_PixelSize)
    {
       //Apply current point size
@@ -213,11 +212,11 @@ void C_GiSyTextElementWidget::m_UpdatePreview(void)
       c_ItemSize = pc_Item->GetSize();
 
       //Set centered position
-      pc_Item->setPos((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0,
-                      (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
+      pc_Item->setPos((static_cast<float64_t>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0,
+                      (static_cast<float64_t>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
       //Check item size valid
-      if ((static_cast<float64>(pc_Item->boundingRect().width()) +
-           (2.0 * C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE)) > static_cast<float64>(c_ViewSize.width()))
+      if ((static_cast<float64_t>(pc_Item->boundingRect().width()) +
+           (2.0 * C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE)) > static_cast<float64_t>(c_ViewSize.width()))
       {
          q_SizeInvalid = true;
       }
@@ -247,13 +246,13 @@ void C_GiSyTextElementWidget::m_FontColorClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Color = pc_ColorWidget->ChooseSelectedColor();
 

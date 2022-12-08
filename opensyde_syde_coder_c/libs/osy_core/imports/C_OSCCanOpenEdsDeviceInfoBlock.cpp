@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_OSCCanOpenEdsDeviceInfoBlock.h"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscCanOpenEdsDeviceInfoBlock.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanOpenEdsDeviceInfoBlock::C_OSCCanOpenEdsDeviceInfoBlock() :
+C_OscCanOpenEdsDeviceInfoBlock::C_OscCanOpenEdsDeviceInfoBlock() :
    q_BaudRate10(false),
    q_BaudRate20(false),
    q_BaudRate50(false),
@@ -50,9 +50,9 @@ C_OSCCanOpenEdsDeviceInfoBlock::C_OSCCanOpenEdsDeviceInfoBlock() :
    q_SimpleBootUpSlave(false),
    u8_Granularity(0),
    q_GroupMessaging(false),
-   u16_NrOfRxPDO(0),
-   u16_NrOfTxPDO(0),
-   q_LSSSupported(false)
+   u16_NrOfRxPdo(0),
+   u16_NrOfTxPdo(0),
+   q_LssSupported(false)
 {
 }
 
@@ -64,46 +64,47 @@ C_OSCCanOpenEdsDeviceInfoBlock::C_OSCCanOpenEdsDeviceInfoBlock() :
    \param[in,out]  oru32_HashValue  Hash value with unit [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenEdsDeviceInfoBlock::CalcHash(uint32 & oru32_HashValue) const
+void C_OscCanOpenEdsDeviceInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_VendorName.c_str(), this->c_VendorName.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_VendorNumber.c_str(), this->c_VendorNumber.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ProductName.c_str(), this->c_ProductName.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ProductNumber.c_str(), this->c_ProductNumber.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_RevisionNumber.c_str(), this->c_RevisionNumber.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_OrderCode.c_str(), this->c_OrderCode.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate10, sizeof(this->q_BaudRate10),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate20, sizeof(this->q_BaudRate20),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate50, sizeof(this->q_BaudRate50),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate125, sizeof(this->q_BaudRate125),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate250, sizeof(this->q_BaudRate250),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate500, sizeof(this->q_BaudRate500),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate800, sizeof(this->q_BaudRate800),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_BaudRate1000, sizeof(this->q_BaudRate1000),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_SimpleBootUpMaster, sizeof(this->q_SimpleBootUpMaster),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_SimpleBootUpSlave, sizeof(this->q_SimpleBootUpSlave),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_Granularity, sizeof(this->u8_Granularity),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_DynamicChannelsSupported.c_str(),
-                                      this->c_DynamicChannelsSupported.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_GroupMessaging, sizeof(this->q_GroupMessaging),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_NrOfRxPDO, sizeof(this->u16_NrOfRxPDO),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_NrOfTxPDO, sizeof(this->u16_NrOfTxPDO),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_LSSSupported, sizeof(this->q_LSSSupported),
-                                      oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_VendorName.c_str(), this->c_VendorName.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_VendorNumber.c_str(), this->c_VendorNumber.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_ProductName.c_str(), this->c_ProductName.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_ProductNumber.c_str(), this->c_ProductNumber.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_RevisionNumber.c_str(), this->c_RevisionNumber.Length(),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_OrderCode.c_str(), this->c_OrderCode.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate10, sizeof(this->q_BaudRate10),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate20, sizeof(this->q_BaudRate20),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate50, sizeof(this->q_BaudRate50),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate125, sizeof(this->q_BaudRate125),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate250, sizeof(this->q_BaudRate250),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate500, sizeof(this->q_BaudRate500),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate800, sizeof(this->q_BaudRate800),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_BaudRate1000, sizeof(this->q_BaudRate1000),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_SimpleBootUpMaster, sizeof(this->q_SimpleBootUpMaster),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_SimpleBootUpSlave, sizeof(this->q_SimpleBootUpSlave),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_Granularity, sizeof(this->u8_Granularity),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_DynamicChannelsSupported.c_str(),
+                                       this->c_DynamicChannelsSupported.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_GroupMessaging, sizeof(this->q_GroupMessaging),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_NrOfRxPdo, sizeof(this->u16_NrOfRxPdo),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_NrOfTxPdo, sizeof(this->u16_NrOfTxPdo),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_LssSupported, sizeof(this->q_LssSupported),
+                                       oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,12 +120,12 @@ void C_OSCCanOpenEdsDeviceInfoBlock::CalcHash(uint32 & oru32_HashValue) const
    \retval   C_CONFIG   At least one value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsDeviceInfoBlock::LoadFromIni(stw_scl::C_SCLIniFile & orc_File,
-                                                   stw_scl::C_SCLString & orc_LastError)
+int32_t C_OscCanOpenEdsDeviceInfoBlock::LoadFromIni(stw::scl::C_SclIniFile & orc_File,
+                                                    stw::scl::C_SclString & orc_LastError)
 {
    //lint -e{8062} Kept for later error reporting
-   const sint32 s32_Retval = C_NO_ERR;
-   const stw_scl::C_SCLString c_SectionName = "DeviceInfo";
+   const int32_t s32_Retval = C_NO_ERR;
+   const stw::scl::C_SclString c_SectionName = "DeviceInfo";
 
    orc_LastError = "";
 
@@ -149,9 +150,9 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::LoadFromIni(stw_scl::C_SCLIniFile & orc_F
       //Optional
       this->c_RevisionNumber = orc_File.ReadString(c_SectionName, "RevisionNumber", "");
       this->q_GroupMessaging = orc_File.ReadBool(c_SectionName, "GroupMessaging", false);
-      this->u16_NrOfRxPDO = orc_File.ReadUint16(c_SectionName, "NrOfRxPDO", 0);
-      this->u16_NrOfTxPDO = orc_File.ReadUint16(c_SectionName, "NrOfTxPDO", 0);
-      this->q_LSSSupported = orc_File.ReadBool(c_SectionName, "LSS_Supported", false);
+      this->u16_NrOfRxPdo = orc_File.ReadUint16(c_SectionName, "NrOfRxPDO", 0);
+      this->u16_NrOfTxPdo = orc_File.ReadUint16(c_SectionName, "NrOfTxPDO", 0);
+      this->q_LssSupported = orc_File.ReadBool(c_SectionName, "LSS_Supported", false);
       this->c_VendorNumber = orc_File.ReadString(c_SectionName, "VendorNumber", "");
       this->c_ProductNumber = orc_File.ReadString(c_SectionName, "ProductNumber", "");
       this->c_OrderCode = orc_File.ReadString(c_SectionName, "OrderCode", "");
@@ -167,7 +168,7 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::LoadFromIni(stw_scl::C_SCLIniFile & orc_F
    Granularity
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_OSCCanOpenEdsDeviceInfoBlock::GetGranularity() const
+uint8_t C_OscCanOpenEdsDeviceInfoBlock::GetGranularity() const
 {
    return this->u8_Granularity;
 }
@@ -189,14 +190,14 @@ uint8 C_OSCCanOpenEdsDeviceInfoBlock::GetGranularity() const
    \retval   C_CONFIG   Value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadStringValueFromIniFile(stw_scl::C_SCLIniFile & orc_File,
-                                                                    const stw_scl::C_SCLString & orc_SectionName,
-                                                                    const stw_scl::C_SCLString & orc_KeyName,
-                                                                    stw_scl::C_SCLString & orc_OutputValue,
-                                                                    stw_scl::C_SCLString & orc_ErrorMessage,
-                                                                    const stw_scl::C_SCLString & orc_DefaultValue)
+int32_t C_OscCanOpenEdsDeviceInfoBlock::h_LoadStringValueFromIniFile(stw::scl::C_SclIniFile & orc_File,
+                                                                     const stw::scl::C_SclString & orc_SectionName,
+                                                                     const stw::scl::C_SclString & orc_KeyName,
+                                                                     stw::scl::C_SclString & orc_OutputValue,
+                                                                     stw::scl::C_SclString & orc_ErrorMessage,
+                                                                     const stw::scl::C_SclString & orc_DefaultValue)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_File.ValueExists(orc_SectionName, orc_KeyName))
    {
@@ -206,7 +207,7 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadStringValueFromIniFile(stw_scl::C_S
    {
       orc_OutputValue = orc_DefaultValue;
       s32_Retval = C_CONFIG;
-      C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
+      C_OscCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
    }
    return s32_Retval;
 }
@@ -228,14 +229,14 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadStringValueFromIniFile(stw_scl::C_S
    \retval   C_CONFIG   Value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadU8ValueFromIniFile(stw_scl::C_SCLIniFile & orc_File,
-                                                                const stw_scl::C_SCLString & orc_SectionName,
-                                                                const stw_scl::C_SCLString & orc_KeyName,
-                                                                uint8 & oru8_OutputValue,
-                                                                stw_scl::C_SCLString & orc_ErrorMessage,
-                                                                const uint8 ou8_DefaultValue)
+int32_t C_OscCanOpenEdsDeviceInfoBlock::h_LoadU8ValueFromIniFile(stw::scl::C_SclIniFile & orc_File,
+                                                                 const stw::scl::C_SclString & orc_SectionName,
+                                                                 const stw::scl::C_SclString & orc_KeyName,
+                                                                 uint8_t & oru8_OutputValue,
+                                                                 stw::scl::C_SclString & orc_ErrorMessage,
+                                                                 const uint8_t ou8_DefaultValue)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_File.ValueExists(orc_SectionName, orc_KeyName))
    {
@@ -245,7 +246,7 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadU8ValueFromIniFile(stw_scl::C_SCLIn
    {
       oru8_OutputValue = ou8_DefaultValue;
       s32_Retval = C_CONFIG;
-      C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
+      C_OscCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
    }
    return s32_Retval;
 }
@@ -267,14 +268,14 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadU8ValueFromIniFile(stw_scl::C_SCLIn
    \retval   C_CONFIG   Value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadU16ValueFromIniFile(stw_scl::C_SCLIniFile & orc_File,
-                                                                 const stw_scl::C_SCLString & orc_SectionName,
-                                                                 const stw_scl::C_SCLString & orc_KeyName,
-                                                                 uint16 & oru16_OutputValue,
-                                                                 stw_scl::C_SCLString & orc_ErrorMessage,
-                                                                 const uint16 ou16_DefaultValue)
+int32_t C_OscCanOpenEdsDeviceInfoBlock::h_LoadU16ValueFromIniFile(stw::scl::C_SclIniFile & orc_File,
+                                                                  const stw::scl::C_SclString & orc_SectionName,
+                                                                  const stw::scl::C_SclString & orc_KeyName,
+                                                                  uint16_t & oru16_OutputValue,
+                                                                  stw::scl::C_SclString & orc_ErrorMessage,
+                                                                  const uint16_t ou16_DefaultValue)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_File.ValueExists(orc_SectionName, orc_KeyName))
    {
@@ -284,7 +285,7 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadU16ValueFromIniFile(stw_scl::C_SCLI
    {
       oru16_OutputValue = ou16_DefaultValue;
       s32_Retval = C_CONFIG;
-      C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
+      C_OscCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
    }
    return s32_Retval;
 }
@@ -306,14 +307,14 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadU16ValueFromIniFile(stw_scl::C_SCLI
    \retval   C_CONFIG   Value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadBoolValueFromIniFile(stw_scl::C_SCLIniFile & orc_File,
-                                                                  const stw_scl::C_SCLString & orc_SectionName,
-                                                                  const stw_scl::C_SCLString & orc_KeyName,
-                                                                  bool & orq_OutputValue,
-                                                                  stw_scl::C_SCLString & orc_ErrorMessage,
-                                                                  const bool oq_DefaultValue)
+int32_t C_OscCanOpenEdsDeviceInfoBlock::h_LoadBoolValueFromIniFile(stw::scl::C_SclIniFile & orc_File,
+                                                                   const stw::scl::C_SclString & orc_SectionName,
+                                                                   const stw::scl::C_SclString & orc_KeyName,
+                                                                   bool & orq_OutputValue,
+                                                                   stw::scl::C_SclString & orc_ErrorMessage,
+                                                                   const bool oq_DefaultValue)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_File.ValueExists(orc_SectionName, orc_KeyName))
    {
@@ -323,7 +324,7 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadBoolValueFromIniFile(stw_scl::C_SCL
    {
       orq_OutputValue = oq_DefaultValue;
       s32_Retval = C_CONFIG;
-      C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
+      C_OscCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(orc_SectionName, orc_KeyName, orc_ErrorMessage);
    }
    return s32_Retval;
 }
@@ -335,8 +336,8 @@ sint32 C_OSCCanOpenEdsDeviceInfoBlock::h_LoadBoolValueFromIniFile(stw_scl::C_SCL
    \param[in,out]  orc_ErrorMessage    Error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingSectionError(const stw_scl::C_SCLString & orc_SectionName,
-                                                                 stw_scl::C_SCLString & orc_ErrorMessage)
+void C_OscCanOpenEdsDeviceInfoBlock::h_ReportMissingSectionError(const stw::scl::C_SclString & orc_SectionName,
+                                                                 stw::scl::C_SclString & orc_ErrorMessage)
 {
    orc_ErrorMessage = "Error: Could not find section \"" + orc_SectionName + "\".";
 }
@@ -349,9 +350,9 @@ void C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingSectionError(const stw_scl::
    \param[in,out]  orc_ErrorMessage    Error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(const stw_scl::C_SCLString & orc_SectionName,
-                                                             const stw_scl::C_SCLString & orc_KeyName,
-                                                             stw_scl::C_SCLString & orc_ErrorMessage)
+void C_OscCanOpenEdsDeviceInfoBlock::h_ReportMissingKeyError(const stw::scl::C_SclString & orc_SectionName,
+                                                             const stw::scl::C_SclString & orc_KeyName,
+                                                             stw::scl::C_SclString & orc_ErrorMessage)
 {
    orc_ErrorMessage = "Error: Could not find key \"" + orc_KeyName + "\" in section \"" + orc_SectionName + "\".";
 }

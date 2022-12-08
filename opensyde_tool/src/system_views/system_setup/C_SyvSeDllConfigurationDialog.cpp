@@ -6,35 +6,34 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFile>
 #include <QFileInfo>
 #include <QFileDialog>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_SyvSeDllConfigurationDialog.h"
+#include "C_SyvSeDllConfigurationDialog.hpp"
 #include "ui_C_SyvSeDllConfigurationDialog.h"
 
-#include "C_OSCUtils.h"
-#include "C_Uti.h"
-#include "C_GtGetText.h"
-#include "CCAN.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_ImpUtil.h"
-#include "C_PuiUtil.h"
-#include "C_OgeWiUtil.h"
+#include "C_OscUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Can.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
-using namespace stw_can;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::can;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,7 +55,8 @@ using namespace stw_can;
    \param[in,out] orc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent)
+   :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvSeDllConfigurationDialog),
    mrc_ParentDialog(orc_Parent),
@@ -85,11 +85,11 @@ C_SyvSeDllConfigurationDialog::C_SyvSeDllConfigurationDialog(stw_opensyde_gui_el
            this, &C_SyvSeDllConfigurationDialog::m_TestConnectionClicked);
    connect(this->mpc_Ui->pc_BushButtonConfigureDll, &QPushButton::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked);
-   connect(this->mpc_Ui->pc_RadioButtonPeak, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
+   connect(this->mpc_Ui->pc_RadioButtonPeak, &stw::opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_ConcretDllClicked);
-   connect(this->mpc_Ui->pc_RadioButtonVector, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
+   connect(this->mpc_Ui->pc_RadioButtonVector, &stw::opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_ConcretDllClicked);
-   connect(this->mpc_Ui->pc_RadioButtonOther, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
+   connect(this->mpc_Ui->pc_RadioButtonOther, &stw::opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_OtherDllClicked);
    connect(this->mpc_Ui->pc_PushButtonBrowse, &C_OgePubOpen::clicked,
            this, &C_SyvSeDllConfigurationDialog::m_OnBrowse);
@@ -140,7 +140,7 @@ void C_SyvSeDllConfigurationDialog::InitText(void) const
    \param[in]     oe_Type       CAN DLL type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvSeDllConfigurationDialog::SetDllType(const C_PuiSvPc::E_CANDllType oe_Type) const
+void C_SyvSeDllConfigurationDialog::SetDllType(const C_PuiSvPc::E_CanDllType oe_Type) const
 {
    // toggle radio button depending on type
    switch (oe_Type)
@@ -186,7 +186,7 @@ void C_SyvSeDllConfigurationDialog::SetCustomDllPath(const QString & orc_Path) c
    \param[in]     ou64_Bitrate     Bitrate for test connection
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvSeDllConfigurationDialog::SetBitrate(const uint64 ou64_Bitrate)
+void C_SyvSeDllConfigurationDialog::SetBitrate(const uint64_t ou64_Bitrate)
 {
    this->mu64_Bitrate = ou64_Bitrate;
 }
@@ -197,21 +197,21 @@ void C_SyvSeDllConfigurationDialog::SetBitrate(const uint64 ou64_Bitrate)
    \return     CAN DLL type (PEAK/VECTOR/Other)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvPc::E_CANDllType C_SyvSeDllConfigurationDialog::GetDllType(void) const
+C_PuiSvPc::E_CanDllType C_SyvSeDllConfigurationDialog::GetDllType(void) const
 {
-   C_PuiSvPc::E_CANDllType e_Type;
+   C_PuiSvPc::E_CanDllType e_Type;
 
    if (this->mpc_Ui->pc_RadioButtonVector->isChecked() == true)
    {
-      e_Type = C_PuiSvPc::E_CANDllType::eVECTOR;
+      e_Type = C_PuiSvPc::E_CanDllType::eVECTOR;
    }
    else if (this->mpc_Ui->pc_RadioButtonOther->isChecked() == true)
    {
-      e_Type = C_PuiSvPc::E_CANDllType::eOTHER;
+      e_Type = C_PuiSvPc::E_CanDllType::eOTHER;
    }
    else
    {
-      e_Type = C_PuiSvPc::E_CANDllType::ePEAK;
+      e_Type = C_PuiSvPc::E_CanDllType::ePEAK;
    }
 
    return e_Type;
@@ -245,8 +245,8 @@ void C_SyvSeDllConfigurationDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -296,8 +296,8 @@ void C_SyvSeDllConfigurationDialog::m_ConfigureDllClicked(void) const
 
       if (QFile::exists(c_Path) == true)
       {
-         C_CAN c_Can;
-         const sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
+         C_Can c_Can;
+         const int32_t s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
 
          if (s32_Return == C_NO_ERR)
          {
@@ -339,15 +339,15 @@ void C_SyvSeDllConfigurationDialog::m_TestConnectionClicked(void) const
 
       if (QFile::exists(c_Path) == true)
       {
-         C_CAN c_Can;
-         sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
+         C_Can c_Can;
+         int32_t s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
          if (s32_Return == C_NO_ERR)
          {
             // Test the CAN
             if (this->mu64_Bitrate > 0U)
             {
-               const uint64 u64_BitrateKbit = this->mu64_Bitrate / 1000U;
-               s32_Return = c_Can.CAN_Init(static_cast<sint32>(u64_BitrateKbit));
+               const uint64_t u64_BitrateKbit = this->mu64_Bitrate / 1000U;
+               s32_Return = c_Can.CAN_Init(static_cast<int32_t>(u64_BitrateKbit));
             }
             else
             {
@@ -412,7 +412,7 @@ void C_SyvSeDllConfigurationDialog::m_OnBrowse(void) const
 
    c_Dialog.setDefaultSuffix(".dll");
 
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Dialog.exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       const QString c_Path = c_Dialog.selectedFiles().at(0);
 
@@ -480,7 +480,7 @@ bool C_SyvSeDllConfigurationDialog::m_CheckCustomDllPath(void) const
       }
       else
       {
-         if (C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
+         if (C_OscUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
          {
             C_OgeWiUtil::h_ShowPathInvalidError(this->parentWidget(), c_ResolvedPath);
             q_Return = false;
@@ -505,16 +505,16 @@ QString C_SyvSeDllConfigurationDialog::m_GetAbsoluteDllPath(void) const
    switch (this->GetDllType())
    {
    case C_PuiSvPc::ePEAK:
-      c_Return = stw_opensyde_gui::mc_DLL_PATH_PEAK;
+      c_Return = stw::opensyde_gui::mc_DLL_PATH_PEAK;
       break;
    case C_PuiSvPc::eVECTOR:
-      c_Return = stw_opensyde_gui::mc_DLL_PATH_VECTOR;
+      c_Return = stw::opensyde_gui::mc_DLL_PATH_VECTOR;
       break;
    case C_PuiSvPc::eOTHER:
       c_Return = this->GetCustomDllPath();
       break;
    default:
-      c_Return = stw_opensyde_gui::mc_DLL_PATH_PEAK;
+      c_Return = stw::opensyde_gui::mc_DLL_PATH_PEAK;
       break;
    }
 

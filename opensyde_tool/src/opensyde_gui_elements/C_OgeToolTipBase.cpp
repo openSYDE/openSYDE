@@ -8,12 +8,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeToolTipBase.h"
+#include "C_OgeToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_elements;
 C_OgeToolTipBase::C_OgeToolTipBase() :
    mc_ToolTipHeading(""),
    mc_ToolTipContent(""),
-   me_ToolTipType(stw_opensyde_gui::C_NagToolTip::eDEFAULT),
+   me_ToolTipType(stw::opensyde_gui::C_NagToolTip::eDEFAULT),
    mq_ToolTipActive(false),
    mq_ShowToolTipWhenDisabled(false),
    mpc_ToolTip(NULL)
@@ -62,7 +62,7 @@ C_OgeToolTipBase::~C_OgeToolTipBase()
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeToolTipBase::SetToolTipInformation(const QString & orc_Heading, const QString & orc_Content,
-                                             const stw_opensyde_gui::C_NagToolTip::E_Type oe_Type)
+                                             const stw::opensyde_gui::C_NagToolTip::E_Type oe_Type)
 {
    this->mc_ToolTipHeading = orc_Heading;
    this->mc_ToolTipContent = orc_Content;
@@ -113,7 +113,7 @@ void C_OgeToolTipBase::m_HideToolTip(void)
    Current tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui::C_NagToolTip * C_OgeToolTipBase::m_GetToolTip(void)
+stw::opensyde_gui::C_NagToolTip * C_OgeToolTipBase::m_GetToolTip(void)
 {
    m_CreateToolTip();
    return this->mpc_ToolTip;
@@ -127,6 +127,6 @@ void C_OgeToolTipBase::m_CreateToolTip(void)
 {
    if (mpc_ToolTip == NULL)
    {
-      mpc_ToolTip = new stw_opensyde_gui::C_NagToolTip();
+      mpc_ToolTip = new stw::opensyde_gui::C_NagToolTip();
    }
 }

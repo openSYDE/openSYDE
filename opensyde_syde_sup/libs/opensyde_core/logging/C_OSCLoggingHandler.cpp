@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-#include "TGLFile.h"
-#include "C_OSCLoggingHandler.h"
-#include "stwerrors.h"
+#include "TglFile.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "stwerrors.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,14 +32,14 @@ using namespace stw_opensyde_core;
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-bool C_OSCLoggingHandler::mhq_WriteToFile = false;
-bool C_OSCLoggingHandler::mhq_WriteToConsole = true;
-bool C_OSCLoggingHandler::mhq_MeasureTime = false;
-std::map<uint16, uint32> C_OSCLoggingHandler::mhc_StartTimes = std::map<uint16, uint32>();
-C_SCLString C_OSCLoggingHandler::mhc_FileName = "";
-C_TGLCriticalSection C_OSCLoggingHandler::mhc_ConsoleCriticalSection;
-C_TGLCriticalSection C_OSCLoggingHandler::mhc_FileCriticalSection;
-std::ofstream C_OSCLoggingHandler::mhc_File;
+bool C_OscLoggingHandler::mhq_WriteToFile = false;
+bool C_OscLoggingHandler::mhq_WriteToConsole = true;
+bool C_OscLoggingHandler::mhq_MeasureTime = false;
+std::map<uint16_t, uint32_t> C_OscLoggingHandler::mhc_StartTimes = std::map<uint16_t, uint32_t>();
+C_SclString C_OscLoggingHandler::mhc_FileName = "";
+C_TglCriticalSection C_OscLoggingHandler::mhc_ConsoleCriticalSection;
+C_TglCriticalSection C_OscLoggingHandler::mhc_FileCriticalSection;
+std::ofstream C_OscLoggingHandler::mhc_File;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -52,13 +51,13 @@ std::ofstream C_OSCLoggingHandler::mhc_File;
    \param[in] oq_Active New write to file active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
+void C_OscLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
 {
-   if (C_OSCLoggingHandler::mhc_File.is_open() == true)
+   if (C_OscLoggingHandler::mhc_File.is_open() == true)
    {
-      C_OSCLoggingHandler::mhc_File.close();
+      C_OscLoggingHandler::mhc_File.close();
    }
-   C_OSCLoggingHandler::mhq_WriteToFile = oq_Active;
+   C_OscLoggingHandler::mhq_WriteToFile = oq_Active;
    mh_OpenFile();
 }
 
@@ -68,9 +67,9 @@ void C_OSCLoggingHandler::h_SetWriteToFileActive(const bool oq_Active)
    \param[in] oq_Active New write to console active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
+void C_OscLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
 {
-   C_OSCLoggingHandler::mhq_WriteToConsole = oq_Active;
+   C_OscLoggingHandler::mhq_WriteToConsole = oq_Active;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -79,9 +78,9 @@ void C_OSCLoggingHandler::h_SetWriteToConsoleActive(const bool oq_Active)
    \param[in] oq_Active New measure time active flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_SetMeasurePerformanceActive(const bool oq_Active)
+void C_OscLoggingHandler::h_SetMeasurePerformanceActive(const bool oq_Active)
 {
-   C_OSCLoggingHandler::mhq_MeasureTime = oq_Active;
+   C_OscLoggingHandler::mhq_MeasureTime = oq_Active;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,13 +89,13 @@ void C_OSCLoggingHandler::h_SetMeasurePerformanceActive(const bool oq_Active)
    \param[in] orc_CompleteLogFileLocation Log file location path and file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_SetCompleteLogFileLocation(const C_SCLString & orc_CompleteLogFileLocation)
+void C_OscLoggingHandler::h_SetCompleteLogFileLocation(const C_SclString & orc_CompleteLogFileLocation)
 {
-   if (C_OSCLoggingHandler::mhc_File.is_open() == true)
+   if (C_OscLoggingHandler::mhc_File.is_open() == true)
    {
-      C_OSCLoggingHandler::mhc_File.close();
+      C_OscLoggingHandler::mhc_File.close();
    }
-   C_OSCLoggingHandler::mhc_FileName = orc_CompleteLogFileLocation;
+   C_OscLoggingHandler::mhc_FileName = orc_CompleteLogFileLocation;
    mh_OpenFile();
 }
 
@@ -107,9 +106,9 @@ void C_OSCLoggingHandler::h_SetCompleteLogFileLocation(const C_SCLString & orc_C
    Current complete log file location
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_SCLString & C_OSCLoggingHandler::h_GetCompleteLogFileLocation(void)
+const C_SclString & C_OscLoggingHandler::h_GetCompleteLogFileLocation(void)
 {
-   return C_OSCLoggingHandler::mhc_FileName;
+   return C_OscLoggingHandler::mhc_FileName;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -121,11 +120,10 @@ const C_SCLString & C_OSCLoggingHandler::h_GetCompleteLogFileLocation(void)
    \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
-                                         const stw_types::charn * const opcn_Class,
-                                         const stw_types::charn * const opcn_Function)
+void C_OscLoggingHandler::h_WriteLogInfo(const C_SclString & orc_Activity, const C_SclString & orc_Message,
+                                         const char_t * const opcn_Class, const char_t * const opcn_Function)
 {
-   C_OSCLoggingHandler::mh_WriteLog("INFO", orc_Activity, orc_Message, opcn_Class, opcn_Function);
+   C_OscLoggingHandler::mh_WriteLog("INFO", orc_Activity, orc_Message, opcn_Class, opcn_Function);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -137,11 +135,10 @@ void C_OSCLoggingHandler::h_WriteLogInfo(const C_SCLString & orc_Activity, const
    \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
-                                            const stw_types::charn * const opcn_Class,
-                                            const stw_types::charn * const opcn_Function)
+void C_OscLoggingHandler::h_WriteLogWarning(const C_SclString & orc_Activity, const C_SclString & orc_Message,
+                                            const char_t * const opcn_Class, const char_t * const opcn_Function)
 {
-   C_OSCLoggingHandler::mh_WriteLog("WARNING", orc_Activity, orc_Message, opcn_Class, opcn_Function);
+   C_OscLoggingHandler::mh_WriteLog("WARNING", orc_Activity, orc_Message, opcn_Class, opcn_Function);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,39 +150,38 @@ void C_OSCLoggingHandler::h_WriteLogWarning(const C_SCLString & orc_Activity, co
    \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_WriteLogError(const C_SCLString & orc_Activity, const C_SCLString & orc_Message,
-                                          const stw_types::charn * const opcn_Class,
-                                          const stw_types::charn * const opcn_Function)
+void C_OscLoggingHandler::h_WriteLogError(const C_SclString & orc_Activity, const C_SclString & orc_Message,
+                                          const char_t * const opcn_Class, const char_t * const opcn_Function)
 {
-   C_OSCLoggingHandler::mh_WriteLog("ERROR", orc_Activity, orc_Message, opcn_Class, opcn_Function);
+   C_OscLoggingHandler::mh_WriteLog("ERROR", orc_Activity, orc_Message, opcn_Class, opcn_Function);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write time measurement message to log
 
-   Previous call of C_OSCLoggingHandler::h_StartPerformanceTimer() is mandatory ("tik and tok").
+   Previous call of C_OscLoggingHandler::h_StartPerformanceTimer() is mandatory ("tik and tok").
 
-   \param[in] ou16_TimerId  Timer ID returned by previous call of C_OSCLoggingHandler::h_StartPerformanceTimer()
+   \param[in] ou16_TimerId  Timer ID returned by previous call of C_OscLoggingHandler::h_StartPerformanceTimer()
    \param[in] orc_Message   Message to write (No '\n' necessary)
    \param[in] opcn_Class    Current class
    \param[in] opcn_Function Current function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_WriteLogPerformance(const uint16 ou16_TimerId, const C_SCLString & orc_Message,
-                                                const charn * const opcn_Class, const charn * const opcn_Function)
+void C_OscLoggingHandler::h_WriteLogPerformance(const uint16_t ou16_TimerId, const C_SclString & orc_Message,
+                                                const char_t * const opcn_Class, const char_t * const opcn_Function)
 {
    if (mhq_MeasureTime == true)
    {
-      const std::map<uint16, uint32>::iterator c_StartTime = mhc_StartTimes.find(ou16_TimerId);
+      const std::map<uint16_t, uint32_t>::iterator c_StartTime = mhc_StartTimes.find(ou16_TimerId);
       if (c_StartTime != mhc_StartTimes.end())
       {
-         C_OSCLoggingHandler::mh_WriteLog(
+         C_OscLoggingHandler::mh_WriteLog(
             "INFO", "Performance measurement",
-            orc_Message + " time: " + C_SCLString::IntToStr(stw_tgl::TGL_GetTickCount() - c_StartTime->second) + " ms",
+            orc_Message + " time: " + C_SclString::IntToStr(stw::tgl::TglGetTickCount() - c_StartTime->second) + " ms",
             opcn_Class, opcn_Function);
 
          // update log file
-         C_OSCLoggingHandler::h_Flush();
+         C_OscLoggingHandler::h_Flush();
 
          // remove ID from map
          mhc_StartTimes.erase(c_StartTime);
@@ -197,14 +193,14 @@ void C_OSCLoggingHandler::h_WriteLogPerformance(const uint16 ou16_TimerId, const
 /*! \brief  Start performance timer
 
    \return
-   ID for getting elapsed time with C_OSCLoggingHandler::h_WriteLogPerformance
+   ID for getting elapsed time with C_OscLoggingHandler::h_WriteLogPerformance
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_OSCLoggingHandler::h_StartPerformanceTimer(void)
+uint16_t C_OscLoggingHandler::h_StartPerformanceTimer(void)
 {
-   const uint16 u16_Id = static_cast<uint16>(rand());
+   const uint16_t u16_Id = static_cast<uint16_t>(rand());
 
-   mhc_StartTimes[u16_Id] = stw_tgl::TGL_GetTickCount();
+   mhc_StartTimes[u16_Id] = stw::tgl::TglGetTickCount();
 
    return u16_Id;
 }
@@ -218,9 +214,9 @@ uint16 C_OSCLoggingHandler::h_StartPerformanceTimer(void)
    STW error string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCLoggingHandler::h_StwError(const sint32 os32_Error)
+C_SclString C_OscLoggingHandler::h_StwError(const int32_t os32_Error)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (os32_Error)
    {
@@ -273,25 +269,25 @@ C_SCLString C_OSCLoggingHandler::h_StwError(const sint32 os32_Error)
 /*! \brief   Utility to flush current log entries (No manual call necessary)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::h_Flush(void)
+void C_OscLoggingHandler::h_Flush(void)
 {
-   if (C_OSCLoggingHandler::mhq_WriteToConsole == true)
+   if (C_OscLoggingHandler::mhq_WriteToConsole == true)
    {
       //Critical section
-      C_OSCLoggingHandler::mhc_ConsoleCriticalSection.Acquire();
+      C_OscLoggingHandler::mhc_ConsoleCriticalSection.Acquire();
       std::cout << &std::flush;
       //Critical section
-      C_OSCLoggingHandler::mhc_ConsoleCriticalSection.Release();
+      C_OscLoggingHandler::mhc_ConsoleCriticalSection.Release();
    }
 
    //File
-   if ((C_OSCLoggingHandler::mhq_WriteToFile == true) && (C_OSCLoggingHandler::mhc_File.is_open() == true))
+   if ((C_OscLoggingHandler::mhq_WriteToFile == true) && (C_OscLoggingHandler::mhc_File.is_open() == true))
    {
       //Critical section
-      C_OSCLoggingHandler::mhc_FileCriticalSection.Acquire();
-      C_OSCLoggingHandler::mhc_File.flush();
+      C_OscLoggingHandler::mhc_FileCriticalSection.Acquire();
+      C_OscLoggingHandler::mhc_File.flush();
       //Critical section
-      C_OSCLoggingHandler::mhc_FileCriticalSection.Release();
+      C_OscLoggingHandler::mhc_FileCriticalSection.Release();
    }
 }
 
@@ -306,16 +302,18 @@ void C_OSCLoggingHandler::h_Flush(void)
    Formatted string
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTime & orc_DateTime)
+std::string C_OscLoggingHandler::h_UtilConvertDateTimeToString(const C_TglDateTime & orc_DateTime)
 {
    std::stringstream c_Stream;
 
    c_Stream << &std::right << std::setw(4) << std::setfill('0') << orc_DateTime.mu16_Year << "-";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16>(orc_DateTime.mu8_Month) << "-";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16>(orc_DateTime.mu8_Day) << " ";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16>(orc_DateTime.mu8_Hour) << ":";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16>(orc_DateTime.mu8_Minute) << ":";
-   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16>(orc_DateTime.mu8_Second) << ".";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Month) << "-";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Day) << " ";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Hour) << ":";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Minute) <<
+      ":";
+   c_Stream << &std::right << std::setw(2) << std::setfill('0') << static_cast<uint16_t>(orc_DateTime.mu8_Second) <<
+      ".";
    c_Stream << &std::right << std::setw(3) << std::setfill('0') << orc_DateTime.mu16_MilliSeconds;
    return c_Stream.str();
 }
@@ -331,19 +329,19 @@ std::string C_OSCLoggingHandler::h_UtilConvertDateTimeToString(const C_TGLDateTi
    \param[in] opcn_Function Current function (combined with function: maximum 50 characters)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLString & orc_Activity,
-                                      const C_SCLString & orc_Message, const stw_types::charn * const opcn_Class,
-                                      const stw_types::charn * const opcn_Function)
+void C_OscLoggingHandler::mh_WriteLog(const C_SclString & orc_Type, const C_SclString & orc_Activity,
+                                      const C_SclString & orc_Message, const char_t * const opcn_Class,
+                                      const char_t * const opcn_Function)
 {
    std::string c_DateTimeFormatted;
-   C_TGLDateTime c_DateTime;
+   C_TglDateTime c_DateTime;
    std::stringstream c_LogEntryStream;
-   C_SCLString c_Class;
-   C_SCLString c_Function;
-   C_SCLString c_CombinedClassAndFunction;
+   C_SclString c_Class;
+   C_SclString c_Function;
+   C_SclString c_CombinedClassAndFunction;
    if (opcn_Class != NULL)
    {
-      c_Class = TGL_ChangeFileExtension(TGL_ExtractFileName(opcn_Class), "");
+      c_Class = TglChangeFileExtension(TglExtractFileName(opcn_Class), "");
    }
    else
    {
@@ -359,8 +357,8 @@ void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLS
    }
    c_CombinedClassAndFunction = c_Class + "::" + c_Function;
 
-   TGL_GetDateTimeNow(c_DateTime);
-   c_DateTimeFormatted = C_OSCLoggingHandler::h_UtilConvertDateTimeToString(c_DateTime);
+   TglGetDateTimeNow(c_DateTime);
+   c_DateTimeFormatted = C_OscLoggingHandler::h_UtilConvertDateTimeToString(c_DateTime);
 
    //Format:
    //[DATE/TIME] [TYPE_OF_REPORT (Info, Warning, Error)] [ACTIVITY] [CLASS::FUNCTION] [MESSAGE]
@@ -375,27 +373,27 @@ void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLS
    c_LogEntryStream << &std::left << orc_Message.c_str() << &std::endl;
 
    //Console
-   if (C_OSCLoggingHandler::mhq_WriteToConsole == true)
+   if (C_OscLoggingHandler::mhq_WriteToConsole == true)
    {
       //Critical section
-      C_OSCLoggingHandler::mhc_ConsoleCriticalSection.Acquire();
+      C_OscLoggingHandler::mhc_ConsoleCriticalSection.Acquire();
       std::cout << c_LogEntryStream.str();
       //Critical section
-      C_OSCLoggingHandler::mhc_ConsoleCriticalSection.Release();
+      C_OscLoggingHandler::mhc_ConsoleCriticalSection.Release();
    }
 
    //File
-   if ((C_OSCLoggingHandler::mhq_WriteToFile == true) && (C_OSCLoggingHandler::mhc_File.is_open() == true))
+   if ((C_OscLoggingHandler::mhq_WriteToFile == true) && (C_OscLoggingHandler::mhc_File.is_open() == true))
    {
       const std::string c_Message = c_LogEntryStream.str();
       //Critical section
-      C_OSCLoggingHandler::mhc_FileCriticalSection.Acquire();
+      C_OscLoggingHandler::mhc_FileCriticalSection.Acquire();
 
       //TGL critical section -> file
-      C_OSCLoggingHandler::mhc_File.write(c_Message.c_str(), c_Message.size());
+      C_OscLoggingHandler::mhc_File.write(c_Message.c_str(), c_Message.size());
 
       //Critical section
-      C_OSCLoggingHandler::mhc_FileCriticalSection.Release();
+      C_OscLoggingHandler::mhc_FileCriticalSection.Release();
    }
 }
 
@@ -403,18 +401,18 @@ void C_OSCLoggingHandler::mh_WriteLog(const C_SCLString & orc_Type, const C_SCLS
 /*! \brief   Open file if necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCLoggingHandler::mh_OpenFile(void)
+void C_OscLoggingHandler::mh_OpenFile(void)
 {
-   if (((C_OSCLoggingHandler::mhc_FileName != "") && (C_OSCLoggingHandler::mhq_WriteToFile == true)) &&
-       (C_OSCLoggingHandler::mhc_File.is_open() == false))
+   if (((C_OscLoggingHandler::mhc_FileName != "") && (C_OscLoggingHandler::mhq_WriteToFile == true)) &&
+       (C_OscLoggingHandler::mhc_File.is_open() == false))
    {
-      const C_SCLString c_FilePath = TGL_ExtractFilePath(C_OSCLoggingHandler::mhc_FileName);
+      const C_SclString c_FilePath = TglExtractFilePath(C_OscLoggingHandler::mhc_FileName);
       //Folder
-      if (TGL_DirectoryExists(c_FilePath) == false)
+      if (TglDirectoryExists(c_FilePath) == false)
       {
-         TGL_CreateDirectory(c_FilePath);
+         TglCreateDirectory(c_FilePath);
       }
-      C_OSCLoggingHandler::mhc_File.open(C_OSCLoggingHandler::mhc_FileName.c_str(), std::ios::app);
+      C_OscLoggingHandler::mhc_File.open(C_OscLoggingHandler::mhc_FileName.c_str(), std::ios::app);
    }
 }
 
@@ -422,7 +420,7 @@ void C_OSCLoggingHandler::mh_OpenFile(void)
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCLoggingHandler::C_OSCLoggingHandler(void)
+C_OscLoggingHandler::C_OscLoggingHandler(void)
 {
 }
 
@@ -432,10 +430,10 @@ C_OSCLoggingHandler::C_OSCLoggingHandler(void)
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCLoggingHandler::~C_OSCLoggingHandler(void)
+C_OscLoggingHandler::~C_OscLoggingHandler(void)
 {
-   if (C_OSCLoggingHandler::mhc_File.is_open() == true)
+   if (C_OscLoggingHandler::mhc_File.is_open() == true)
    {
-      C_OSCLoggingHandler::mhc_File.close();
+      C_OscLoggingHandler::mhc_File.close();
    }
 }

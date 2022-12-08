@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
-#include "C_OgeTreeWidgetToolTipBase.h"
+#include "C_OgeTreeWidgetToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

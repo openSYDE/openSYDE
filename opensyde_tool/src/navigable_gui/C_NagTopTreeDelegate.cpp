@@ -8,18 +8,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "C_Uti.h"
-#include "C_NagTopTreeDelegate.h"
+#include "stwtypes.hpp"
+#include "C_Uti.hpp"
+#include "C_NagTopTreeDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
+#include "C_GtGetText.hpp"
 
-#include "C_SdBueMessageRxTimeoutConfig.h"
+#include "C_SdBueMessageRxTimeoutConfig.hpp"
 #include "ui_C_SdBueMessageRxTimeoutConfig.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO = 0;
-const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_CUSTOM = 1;
-const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED = 2;
+const int32_t C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO = 0;
+const int32_t C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_CUSTOM = 1;
+const int32_t C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -43,18 +42,18 @@ const stw_types::sint32 C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED = 2;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent                Reference to parent
-   \param[in] oe_ReceiveTimeoutMode         Receive timeout mode
-   \param[in] oq_TxMethodOnEvent            Flag if Tx method is on event
-   \param[in] oq_DisablePossible            Flag if the timeout configuration can be disabled
-   \param[in] ou32_ReceiveTimeoutValue      Receive timeout value
-   \param[in] u32_LastKnownCycleTimeValue   Last known cycle time value
-   \param[in] ou32_AutoReceiveTimeoutValue  Calculated default timeout value
-   \param[in] orc_NameForTitle              Dialog title name
+   \param[in,out]  orc_Parent                      Reference to parent
+   \param[in]      oe_ReceiveTimeoutMode           Receive timeout mode
+   \param[in]      oq_TxMethodOnEvent              Flag if Tx method is on event
+   \param[in]      oq_DisablePossible              Flag if the timeout configuration can be disabled
+   \param[in]      ou32_ReceiveTimeoutValue        Receive timeout value
+   \param[in]      ou32_LastKnownCycleTimeValue    Last known cycle time value
+   \param[in]      ou32_AutoReceiveTimeoutValue    Calculated default timeout value
+   \param[in]      orc_NameForTitle                Dialog title name
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & orc_Parent,
-                                                             const C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const bool oq_DisablePossible, const uint32 ou32_ReceiveTimeoutValue, const uint32 ou32_LastKnownCycleTimeValue, const uint32 ou32_AutoReceiveTimeoutValue,
+                                                             const C_PuiSdNodeCanMessage::E_RxTimeoutMode oe_ReceiveTimeoutMode, const bool oq_TxMethodOnEvent, const bool oq_DisablePossible, const uint32_t ou32_ReceiveTimeoutValue, const uint32_t ou32_LastKnownCycleTimeValue, const uint32_t ou32_AutoReceiveTimeoutValue,
                                                              const QString & orc_NameForTitle) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageRxTimeoutConfig),
@@ -98,14 +97,14 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
       // Even the 100 is way over what makes sense in a real application.
       // To keep complexity low we also apply this to non-ECeS.
       // In case of CANopen 0 could be possible, but does not make any sens as maximum value.
-      sintn sn_MaxCycleTime = static_cast<sintn>(ou32_LastKnownCycleTimeValue * 100);
-      if ((sn_MaxCycleTime > 65535) ||
-          (sn_MaxCycleTime == 0))
+      int32_t s32_MaxCycleTime = static_cast<int32_t>(ou32_LastKnownCycleTimeValue * 100);
+      if ((s32_MaxCycleTime > 65535) ||
+          (s32_MaxCycleTime == 0))
       {
          //limit to 16 bit
-         sn_MaxCycleTime = 65535;
+         s32_MaxCycleTime = 65535;
       }
-      this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(sn_MaxCycleTime);
+      this->mpc_Ui->pc_SpinBoxTimeout->SetMaximumCustom(s32_MaxCycleTime);
    }
 
    //Title
@@ -142,7 +141,7 @@ C_SdBueMessageRxTimeoutConfig::C_SdBueMessageRxTimeoutConfig(C_OgePopUpDialog & 
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxTimeoutActive,
-           static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdBueMessageRxTimeoutConfig::m_OnReceiveTimeoutModeChanged);
 }
 
@@ -220,13 +219,13 @@ C_PuiSdNodeCanMessage::E_RxTimeoutMode C_SdBueMessageRxTimeoutConfig::GetReceive
    Receive timeout value
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_SdBueMessageRxTimeoutConfig::GetReceiveTimeoutValue(void) const
+uint32_t C_SdBueMessageRxTimeoutConfig::GetReceiveTimeoutValue(void) const
 {
-   uint32 u32_Return;
+   uint32_t u32_Return;
 
    if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() != C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_DISABLED)
    {
-      u32_Return = static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTimeout->value());
+      u32_Return = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxTimeout->value());
    }
    else
    {
@@ -242,7 +241,7 @@ stw_types::uint32 C_SdBueMessageRxTimeoutConfig::GetReceiveTimeoutValue(void) co
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxTimeoutConfig::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -250,8 +249,8 @@ void C_SdBueMessageRxTimeoutConfig::keyPressEvent(QKeyEvent * const opc_KeyEvent
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -321,6 +320,6 @@ void C_SdBueMessageRxTimeoutConfig::m_UpdateAutoReceiveTimeoutValue(void) const
 {
    if (this->mpc_Ui->pc_ComboBoxTimeoutActive->currentIndex() == C_SdBueMessageRxTimeoutConfig::mhs32_INDEX_AUTO)
    {
-      this->mpc_Ui->pc_SpinBoxTimeout->setValue(static_cast<sintn>(this->mu32_AutoReceiveTimeoutValue));
+      this->mpc_Ui->pc_SpinBoxTimeout->setValue(static_cast<int32_t>(this->mu32_AutoReceiveTimeoutValue));
    }
 }

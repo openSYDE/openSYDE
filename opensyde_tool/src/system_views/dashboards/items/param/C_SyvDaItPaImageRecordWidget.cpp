@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 
@@ -16,31 +16,30 @@
 #include <QFileDialog>
 #include <QDateTime>
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SyvDaItPaImageRecordWidget.h"
+#include "C_SyvDaItPaImageRecordWidget.hpp"
 #include "ui_C_SyvDaItPaImageRecordWidget.h"
 
-#include "constants.h"
-#include "C_Uti.h"
-#include "C_OSCUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_UsHandler.h"
-#include "C_GtGetText.h"
-#include "C_SyvDaItUtil.h"
-#include "C_OSCSystemFilerUtil.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "constants.hpp"
+#include "C_Uti.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaItUtil.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION = ".syde_psi";
@@ -66,9 +65,9 @@ const QString C_SyvDaItPaImageRecordWidget::mhc_FILE_EXTENSION = ".syde_psi";
    \param[in]      orc_ViewName     View name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+C_SyvDaItPaImageRecordWidget::C_SyvDaItPaImageRecordWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                            C_SyvComDriverDiag & orc_ComDriver,
-                                                           const std::vector<C_OSCNodeDataPoolListElementId > & orc_ListItemIds,
+                                                           const std::vector<C_OscNodeDataPoolListElementId > & orc_ListItemIds,
                                                            const QString & orc_ViewName) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaItPaImageRecordWidget),
@@ -208,9 +207,9 @@ void C_SyvDaItPaImageRecordWidget::SaveUserSettings(void) const
    File info
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::h_GetFileInfoData(const QString & orc_Comment)
+C_OscParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::h_GetFileInfoData(const QString & orc_Comment)
 {
-   C_OSCParamSetInterpretedFileInfoData c_Retval;
+   C_OscParamSetInterpretedFileInfoData c_Retval;
    QString c_Name = qgetenv("USER");
 
    if (c_Name.isEmpty())
@@ -237,7 +236,7 @@ C_OSCParamSetInterpretedFileInfoData C_SyvDaItPaImageRecordWidget::h_GetFileInfo
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       m_OnCancel();
    }
@@ -312,7 +311,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
       //Check conflicted files with automated file creation
       if (this->mc_AllNodeIndexes.size() > 1UL)
       {
-         for (uint32 u32_ItNodes = 0UL; u32_ItNodes < this->mc_AllNodeIndexes.size(); ++u32_ItNodes)
+         for (uint32_t u32_ItNodes = 0UL; u32_ItNodes < this->mc_AllNodeIndexes.size(); ++u32_ItNodes)
          {
             const QString c_FullPath = this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNodes],
                                                               this->mc_FilePath);
@@ -327,7 +326,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
       {
          if (("." + c_BaseInfo.completeSuffix()) == mhc_FILE_EXTENSION)
          {
-            if (C_OSCUtils::h_CheckValidFilePath(c_BaseInfo.absoluteFilePath().toStdString().c_str()) == true)
+            if (C_OscUtils::h_CheckValidFilePath(c_BaseInfo.absoluteFilePath().toStdString().c_str()) == true)
             {
                // Check if file exists already
                QFile c_File;
@@ -348,7 +347,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                   //Append conflicted files as details
                   if (c_ConflictedFiles.size() > 0UL)
                   {
-                     for (uint32 u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
+                     for (uint32_t u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
                      {
                         c_Details += c_ConflictedFiles[u32_ItFile];
                         c_Details += "\n";
@@ -359,8 +358,8 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                      c_Details += this->mc_FilePath;
                   }
                   c_MessageBox.SetDetails(c_Details);
-                  c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
-                  c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
+                  c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Overwrite"));
+                  c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Back"));
                   c_MessageBox.SetCustomMinHeight(180, 300);
                   c_MessageBox.SetCustomMinWidth(700);
                   e_ReturnMessageBox = c_MessageBox.Execute();
@@ -376,7 +375,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadClicked(void)
                      else
                      {
                         //Delete automatically generated files
-                        for (uint32 u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
+                        for (uint32_t u32_ItFile = 0UL; u32_ItFile < c_ConflictedFiles.size(); ++u32_ItFile)
                         {
                            QFile c_CurFile;
 
@@ -488,7 +487,7 @@ void C_SyvDaItPaImageRecordWidget::m_StartReadElementsOfNode(void)
 {
    //Each node
    // Prepare all data dealer (Step 1)
-   for (uint32 u32_ItNode = 0U; u32_ItNode < this->mc_AllNodeIndexes.size(); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0U; u32_ItNode < this->mc_AllNodeIndexes.size(); ++u32_ItNode)
    {
       tgl_assert(this->mrc_ComDriver.NvmSafeClearInternalContent(this->mc_AllNodeIndexes[u32_ItNode]) == C_NO_ERR);
    }
@@ -505,7 +504,7 @@ void C_SyvDaItPaImageRecordWidget::m_StartReadElementsOfNode(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_PrepareVariablesForParametrization(void)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Prepare the writing for each node
    this->mc_AllNodeIndexes.clear();
@@ -516,7 +515,7 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareVariablesForParametrization(void)
    for (u32_Counter = 0U; u32_Counter < this->mc_ListItemIds.size(); ++u32_Counter)
    {
       // Check if a changed element for this node was registered already
-      uint32 u32_NodeCounter;
+      uint32_t u32_NodeCounter;
       bool q_NodeFound = false;
 
       for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_AllNodeIndexes.size(); ++u32_NodeCounter)
@@ -533,14 +532,14 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareVariablesForParametrization(void)
          // Both indexes must be synchronous
          // Add the node index
          this->mc_AllNodeIndexes.push_back(this->mc_ListItemIds[u32_Counter].u32_NodeIndex);
-         u32_NodeCounter = static_cast<uint32>(this->mc_AllNodeIndexes.size()) - 1;
+         u32_NodeCounter = static_cast<uint32_t>(this->mc_AllNodeIndexes.size()) - 1;
          //  Adapt size of vector for each node
          this->mc_RelevantListsForEachNode.resize(this->mc_RelevantListsForEachNode.size() + 1);
       }
 
       // Save all lists
       this->mc_RelevantListsForEachNode[u32_NodeCounter].push_back(
-         static_cast<C_OSCNodeDataPoolListId>(this->mc_ListItemIds[u32_Counter]));
+         static_cast<C_OscNodeDataPoolListId>(this->mc_ListItemIds[u32_Counter]));
    }
 
    //Handle user info
@@ -559,7 +558,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
    {
-      sint32 s32_Return;
+      int32_t s32_Return;
 
       if (this->mq_RequestPending == false)
       {
@@ -585,7 +584,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
       }
       else
       {
-         sint32 s32_ServiceResult;
+         int32_t s32_ServiceResult;
          s32_Return = this->mrc_ComDriver.GetPollResults(s32_ServiceResult);
 
          if (s32_Return == C_NO_ERR)
@@ -670,14 +669,15 @@ void C_SyvDaItPaImageRecordWidget::m_ReadElementsOfNode(const QString & orc_Comm
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & orc_Comment)
+int32_t C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & orc_Comment)
 {
-   const C_OSCParamSetInterpretedFileInfoData c_FileInfo = C_SyvDaItPaImageRecordWidget::h_GetFileInfoData(orc_Comment);
-   sint32 s32_Return = C_NO_ERR;
+   const C_OscParamSetInterpretedFileInfoData c_FileInfo = C_SyvDaItPaImageRecordWidget::h_GetFileInfoData(orc_Comment);
+   int32_t s32_Return = C_NO_ERR;
 
-   for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR);
+        ++u32_ItNode)
    {
-      s32_Return = this->mrc_ComDriver.NvmSafeCreateCleanFileWithoutCRC(
+      s32_Return = this->mrc_ComDriver.NvmSafeCreateCleanFileWithoutCrc(
          this->mc_AllNodeIndexes[u32_ItNode],
          this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNode], this->mc_FilePath),
          c_FileInfo);
@@ -706,7 +706,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & or
          break;
       }
 
-      this->m_ReportError("NvmSafeCreateCleanFileWithoutCRC", c_ErrorText, s32_Return);
+      this->m_ReportError("NvmSafeCreateCleanFileWithoutCrc", c_ErrorText, s32_Return);
    }
 
    return s32_Return;
@@ -725,13 +725,13 @@ sint32 C_SyvDaItPaImageRecordWidget::m_CreateParameterSetFile(const QString & or
    C_RD_WR    specified file does not exist
               specified file is present but structure is invalid (e.g. invalid XML file)
    C_CONFIG   Mismatch of data with current node
-               or no valid pointer to the original instance of "C_OSCNode" is set in "C_OSCDataDealer"
+               or no valid pointer to the original instance of "C_OscNode" is set in "C_OscDataDealer"
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
+int32_t C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
 {
-   sint32 s32_Return = C_NO_ERR;
-   uint32 u32_Counter;
+   int32_t s32_Return = C_NO_ERR;
+   uint32_t u32_Counter;
 
    this->me_Step = eREADBACKFROMFILE;
 
@@ -739,14 +739,14 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
    for (u32_Counter = 0U; (u32_Counter < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_Counter)
    {
       s32_Return =
-         this->mrc_ComDriver.NvmSafeReadFileWithoutCRC(this->mc_AllNodeIndexes[u32_Counter],
+         this->mrc_ComDriver.NvmSafeReadFileWithoutCrc(this->mc_AllNodeIndexes[u32_Counter],
                                                        this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_Counter],
                                                                               this->mc_FilePath));
    }
 
    if (s32_Return == C_NO_ERR)
    {
-      std::vector<std::vector<C_OSCNodeDataPoolListId> > c_DataPoolListsForEachNode;
+      std::vector<std::vector<C_OscNodeDataPoolListId> > c_DataPoolListsForEachNode;
       c_DataPoolListsForEachNode.resize(this->mc_AllNodeIndexes.size());
 
       for (u32_Counter = 0U; u32_Counter < this->mc_AllNodeIndexes.size(); ++u32_Counter)
@@ -769,7 +769,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
             case C_CONFIG:
                c_ErrorText = "Mismatch of data with current node "
                              "or no valid pointer to the original instance of"
-                             " \"C_OSCNode\" is set in \"C_OSCDataDealer\".";
+                             " \"C_OscNode\" is set in \"C_OscDataDealer\".";
                break;
             case C_RANGE:
                c_ErrorText = "Path does not match the path of the preceding function calls or node index out of range.";
@@ -795,7 +795,7 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
    }
    else
    {
-      this->m_ReportError("NvmSafeReadFileWithoutCRC", "Read back of file failed.", s32_Return);
+      this->m_ReportError("NvmSafeReadFileWithoutCrc", "Read back of file failed.", s32_Return);
    }
 
    return s32_Return;
@@ -812,27 +812,27 @@ sint32 C_SyvDaItPaImageRecordWidget::m_ReadBackElementsOfNodeFromFile(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
-   const std::vector<std::vector<C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode,
+   const std::vector<std::vector<C_OscNodeDataPoolListId> > & orc_DataPoolListsForEachNode,
    const bool oq_IsConfirm) const
 {
    std::list<QString> c_NodeText;
    std::list<QString>::const_iterator c_ItNodeText;
    QString c_Text;
-   uint32 u32_NodeCounter;
+   uint32_t u32_NodeCounter;
 
    for (u32_NodeCounter = 0U; u32_NodeCounter < orc_DataPoolListsForEachNode.size(); ++u32_NodeCounter)
    {
       if (orc_DataPoolListsForEachNode[u32_NodeCounter].size() > 0)
       {
-         const uint32 u32_CurNodeIndex = orc_DataPoolListsForEachNode[u32_NodeCounter][0].u32_NodeIndex;
-         const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_CurNodeIndex);
+         const uint32_t u32_CurNodeIndex = orc_DataPoolListsForEachNode[u32_NodeCounter][0].u32_NodeIndex;
+         const C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_CurNodeIndex);
 
          c_Text = "";
 
-         if (pc_OSCNode != NULL)
+         if (pc_OscNode != NULL)
          {
-            uint32 u32_ListCounter;
-            uint32 u32_CurDataPoolIndex = 0xFFFFFFFFU;
+            uint32_t u32_ListCounter;
+            uint32_t u32_CurDataPoolIndex = 0xFFFFFFFFU;
             const QString c_Path = this->m_GetPathForNode(u32_CurNodeIndex, this->mc_FilePath);
             const QString c_PathHtml = C_Uti::h_GetLink(c_Path, mc_STYLE_GUIDE_COLOR_LINK, "file:///" + c_Path);
 
@@ -850,7 +850,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(1UL));
             }
             c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node")) + " - " +
-                      static_cast<QString>(pc_OSCNode->c_Properties.c_Name.c_str());
+                      static_cast<QString>(pc_OscNode->c_Properties.c_Name.c_str());
             if (oq_IsConfirm == true)
             {
                c_Text += "</u>";
@@ -861,8 +861,8 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                  u32_ListCounter < orc_DataPoolListsForEachNode[u32_NodeCounter].size();
                  ++u32_ListCounter)
             {
-               const C_OSCNodeDataPoolList * const pc_OSCList =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+               const C_OscNodeDataPoolList * const pc_OscList =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
                      u32_CurNodeIndex,
                      orc_DataPoolListsForEachNode[u32_NodeCounter][u32_ListCounter].u32_DataPoolIndex,
                      orc_DataPoolListsForEachNode[u32_NodeCounter][u32_ListCounter].u32_ListIndex);
@@ -871,15 +871,15 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                    orc_DataPoolListsForEachNode[u32_NodeCounter][u32_ListCounter].u32_DataPoolIndex)
                {
                   // A new datapool
-                  const C_OSCNodeDataPool * pc_OSCDataPool;
+                  const C_OscNodeDataPool * pc_OscDataPool;
 
                   u32_CurDataPoolIndex =
                      orc_DataPoolListsForEachNode[u32_NodeCounter][u32_ListCounter].u32_DataPoolIndex;
 
-                  pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(u32_CurNodeIndex,
+                  pc_OscDataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(u32_CurNodeIndex,
                                                                                    u32_CurDataPoolIndex);
 
-                  if (pc_OSCDataPool != NULL)
+                  if (pc_OscDataPool != NULL)
                   {
                      if (oq_IsConfirm == true)
                      {
@@ -890,11 +890,11 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                         c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(2UL));
                      }
                      c_Text += static_cast<QString>(C_GtGetText::h_GetText("DataPool")) +
-                               " - " + static_cast<QString>(pc_OSCDataPool->c_Name.c_str()) + "</div>";
+                               " - " + static_cast<QString>(pc_OscDataPool->c_Name.c_str()) + "</div>";
                   }
                }
 
-               if (pc_OSCList != NULL)
+               if (pc_OscList != NULL)
                {
                   // Listname
                   if (oq_IsConfirm == true)
@@ -906,7 +906,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
                      c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(3UL));
                   }
                   c_Text += static_cast<QString>(C_GtGetText::h_GetText("List")) +
-                            " - " + static_cast<QString>(pc_OSCList->c_Name.c_str()) + "</div>";
+                            " - " + static_cast<QString>(pc_OscList->c_Name.c_str()) + "</div>";
                }
             }
          }
@@ -938,7 +938,7 @@ QString C_SyvDaItPaImageRecordWidget::m_GetTextForStep(
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
-   const std::vector<std::vector<C_OSCNodeDataPoolListId> > & orc_DataPoolListsForEachNode)
+   const std::vector<std::vector<C_OscNodeDataPoolListId> > & orc_DataPoolListsForEachNode)
 {
    const QString c_TextConfirm = this->m_GetTextForStep(orc_DataPoolListsForEachNode, true);
 
@@ -954,11 +954,12 @@ void C_SyvDaItPaImageRecordWidget::m_PrepareConfirmStep(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   for (uint32 u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0U; (u32_ItNode < this->mc_AllNodeIndexes.size()) && (s32_Return == C_NO_ERR);
+        ++u32_ItNode)
    {
-      s32_Return = this->mrc_ComDriver.NvmSafeUpdateCRCForFile(
+      s32_Return = this->mrc_ComDriver.NvmSafeUpdateCrcForFile(
          this->mc_AllNodeIndexes[u32_ItNode],
          this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNode], this->mc_FilePath));
    }
@@ -997,7 +998,7 @@ void C_SyvDaItPaImageRecordWidget::m_WriteCrcOfNodeToFile(void)
          break;
       }
 
-      this->m_ReportError("NvmSafeUpdateCRCForFile", c_ErrorText, s32_Return);
+      this->m_ReportError("NvmSafeUpdateCrcForFile", c_ErrorText, s32_Return);
    }
 }
 
@@ -1026,8 +1027,8 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
       c_Message.SetHeading(C_GtGetText::h_GetText("Parameter Set Record interrupt"));
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to interrupt the process? \n"
                                                       "The unfinished file(s) will be deleted."));
-      c_Message.SetNOButtonText("Interrupt");
-      c_Message.SetOKButtonText("Don't Interrupt");
+      c_Message.SetNoButtonText("Interrupt");
+      c_Message.SetOkButtonText("Don't Interrupt");
       c_Message.SetCustomMinHeight(180, 180);
       C_OgeWiCustomMessage::E_Outputs e_Output;
       e_Output = c_Message.Execute();
@@ -1044,7 +1045,7 @@ void C_SyvDaItPaImageRecordWidget::m_OnCancel(void)
          }
          else
          {
-            for (uint32 u32_ItNodes = 0UL; u32_ItNodes < this->mc_AllNodeIndexes.size(); ++u32_ItNodes)
+            for (uint32_t u32_ItNodes = 0UL; u32_ItNodes < this->mc_AllNodeIndexes.size(); ++u32_ItNodes)
             {
                const QString c_FullPath = this->m_GetPathForNode(this->mc_AllNodeIndexes[u32_ItNodes],
                                                                  this->mc_FilePath);
@@ -1153,7 +1154,7 @@ void C_SyvDaItPaImageRecordWidget::m_Timer(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
-                                                 const stw_types::sint32 os32_ErrorCode)
+                                                 const int32_t os32_ErrorCode)
 {
    const QString c_Text = "Function " + orc_FunctionName +
                           " ended with error code \"" + C_Uti::h_StwError(os32_ErrorCode) + "\"";
@@ -1179,14 +1180,14 @@ void C_SyvDaItPaImageRecordWidget::m_ReportError(const QString & orc_FunctionNam
    \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const sint32 os32_ErrorCode)
+void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const int32_t os32_ErrorCode)
 {
-   const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
-   uint8 u8_NRC;
+   const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   uint8_t u8_Nrc;
    QString c_Details = "";
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this);
-   const sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
+   const int32_t s32_Return = this->mrc_ComDriver.GetPollResultNrc(u8_Nrc);
 
    tgl_assert(s32_Return == C_NO_ERR);
 
@@ -1206,7 +1207,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       break;
    case C_CONFIG:
       c_Description += "No valid diagnostic protocol is set";
-      c_Description += "or no valid pointer to the original instance of \"C_OSCNode\" is set in \"C_OSCDataDealer\"";
+      c_Description += "or no valid pointer to the original instance of \"C_OscNode\" is set in \"C_OscDataDealer\"";
       break;
    case C_NOACT:
       c_Description += "Server communication protocol service could not be requested";
@@ -1218,7 +1219,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       c_Description += "Server communication protocol service error response was received";
 
       // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
-      switch (u8_NRC)
+      switch (u8_Nrc)
       {
       case 0x13:
          c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
@@ -1243,7 +1244,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
          break;
       default:
          c_Details =
-            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_Nrc, 16));
          break;
       }
       break;
@@ -1256,7 +1257,7 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
       break;
    }
 
-   C_OSCLoggingHandler::h_Flush();
+   C_OscLoggingHandler::h_Flush();
    c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
@@ -1279,19 +1280,19 @@ void C_SyvDaItPaImageRecordWidget::m_ReportErrorNvmSafeReadParameterValues(const
    The adapted path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItPaImageRecordWidget::m_GetPathForNode(const uint32 ou32_NodeIndex, const QString & orc_Path) const
+QString C_SyvDaItPaImageRecordWidget::m_GetPathForNode(const uint32_t ou32_NodeIndex, const QString & orc_Path) const
 {
    QString c_Retval = orc_Path;
 
    //Only use special handling for recording more than one node
    if (this->mc_AllNodeIndexes.size() > 1UL)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(ou32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(ou32_NodeIndex);
       if (pc_Node != NULL)
       {
          const QFileInfo c_FileInfo(orc_Path);
          const QDir c_Dir(c_FileInfo.absoluteDir());
-         const QString c_NodeFileNameBase = C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(
+         const QString c_NodeFileNameBase = C_OscSystemFilerUtil::h_PrepareItemNameForFileName(
             pc_Node->c_Properties.c_Name).c_str();
          const QString c_NodeFileName = c_FileInfo.completeBaseName() + "_" + c_NodeFileNameBase + "." +
                                         c_FileInfo.suffix();

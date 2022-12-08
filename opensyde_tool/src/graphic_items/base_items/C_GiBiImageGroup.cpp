@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GiBiImageGroup.h"
-#include "C_PuiSdDataElement.h"
-#include "C_PuiBsImage.h"
-#include "gitypes.h"
+#include "stwtypes.hpp"
+#include "C_GiBiImageGroup.hpp"
+#include "C_PuiSdDataElement.hpp"
+#include "C_PuiBsImage.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,15 +39,15 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID      Unique ID
+   \param[in]     oru64_Id      Unique ID
    \param[in]     orc_ImagePath File path of image
    \param[in,out] opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const QString & orc_ImagePath,
+C_GiBiImageGroup::C_GiBiImageGroup(const uint64_t & oru64_Id, const QString & orc_ImagePath,
                                    QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiImageGroupWithoutData(oru64_ID, orc_ImagePath, false, opc_Parent)
+   C_GiImageGroupWithoutData(oru64_Id, orc_ImagePath, false, opc_Parent)
 {
 }
 
@@ -57,17 +56,17 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const QString & orc_
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID    Unique ID
+   \param[in]     oru64_Id    Unique ID
    \param[in]     of64_Width  Width of image view
    \param[in]     of64_Height Height of image view
    \param[in]     orc_Image   Image
    \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const float64 of64_Width, const float64 of64_Height,
+C_GiBiImageGroup::C_GiBiImageGroup(const uint64_t & oru64_Id, const float64_t of64_Width, const float64_t of64_Height,
                                    const QPixmap & orc_Image, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiImageGroupWithoutData(oru64_ID, of64_Width, of64_Height, orc_Image,
+   C_GiImageGroupWithoutData(oru64_Id, of64_Width, of64_Height, orc_Image,
                              opc_Parent)
 {
 }
@@ -78,20 +77,20 @@ C_GiBiImageGroup::C_GiBiImageGroup(const uint64 & oru64_ID, const float64 of64_W
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiBiImageGroup::type(void) const
+int32_t C_GiBiImageGroup::type(void) const
 {
-   return msn_GRAPHICS_ITEM_IMAGE;
+   return ms32_GRAPHICS_ITEM_IMAGE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiImageGroup::SetZValueCustom(const float64 of64_ZValue)
+void C_GiBiImageGroup::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiImageGroupWithoutData::SetZValueCustom(of64_ZValue);
+   C_GiImageGroupWithoutData::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }
@@ -106,5 +105,5 @@ void C_GiBiImageGroup::m_UpdateData(C_PuiBsImage & orc_Data) const
 {
    this->UpdateBasicData(orc_Data);
 
-   orc_Data.c_UIImagePixmap = this->GetImage();
+   orc_Data.c_UiImagePixmap = this->GetImage();
 }

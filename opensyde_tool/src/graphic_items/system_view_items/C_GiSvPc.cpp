@@ -8,47 +8,46 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <windows.h>
 
 #include <QGraphicsView>
 
-#include "gitypes.h"
-#include "C_GiSvPc.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgePopUpDialog.h"
-#include "C_GiCustomFunctions.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SyvSeDllConfigurationDialog.h"
-#include "C_OSCSystemBus.h"
+#include "gitypes.hpp"
+#include "C_GiSvPc.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_GiCustomFunctions.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SyvSeDllConfigurationDialog.hpp"
+#include "C_OscSystemBus.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_0 = 3U; // no scaling -> default
-const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_1 = 0U;
-const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_2 = 1U;
-const uint32 C_GiSvPc::mhu32_SCALE_CATEGORY_3 = 2U;
+const uint32_t C_GiSvPc::mhu32_SCALE_CATEGORY_0 = 3U; // no scaling -> default
+const uint32_t C_GiSvPc::mhu32_SCALE_CATEGORY_1 = 0U;
+const uint32_t C_GiSvPc::mhu32_SCALE_CATEGORY_2 = 1U;
+const uint32_t C_GiSvPc::mhu32_SCALE_CATEGORY_3 = 2U;
 
-const float64 C_GiSvPc::mhaf64_SCALE_MIN_WIDTH_NODE[3] =
+const float64_t C_GiSvPc::mhaf64_SCALE_MIN_WIDTH_NODE[3] =
 {
    250.0, 350.0, 450.0
 };
-const float64 C_GiSvPc::mhaf64_SCALE_MIN_HEIGHT_NODE[3] =
+const float64_t C_GiSvPc::mhaf64_SCALE_MIN_HEIGHT_NODE[3] =
 {
    165.0, 230.0, 300.0
 };
 
-const stw_types::float64 C_GiSvPc::mhf64_INIT_SIZE_OF_PC = 150.0;
+const float64_t C_GiSvPc::mhf64_INIT_SIZE_OF_PC = 150.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,12 +64,12 @@ const stw_types::float64 C_GiSvPc::mhf64_INIT_SIZE_OF_PC = 150.0;
 
    Set up GUI with all elements.
 
-   \param[in] ou64_UniqueID  Unique item ID
+   \param[in] ou64_UniqueId  Unique item ID
    \param[in] ou32_ViewIndex View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvPc::C_GiSvPc(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex) :
-   C_GiImageGroupWithoutData(ou64_UniqueID, "", true),
+C_GiSvPc::C_GiSvPc(const uint64_t ou64_UniqueId, const uint32_t ou32_ViewIndex) :
+   C_GiImageGroupWithoutData(ou64_UniqueId, "", true),
    C_PuiSvDbDataElement(ou32_ViewIndex, 0, 0, C_PuiSvDbDataElement::eUNKNOWN),
    mq_Connected(false)
 {
@@ -129,8 +128,8 @@ C_GiSvPc::~C_GiSvPc(void)
 void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
    const QRectF c_Bounding = this->mpc_SvgGraphicsItem->sceneBoundingRect();
-   bool q_XOk = false;
-   bool q_YOk = false;
+   bool q_HorizontalOk = false;
+   bool q_VerticalOk = false;
 
    //X
    if (c_Bounding.topLeft().x() <= orc_ScenePoint.x())
@@ -139,7 +138,7 @@ void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
       {
          //X OK
          orc_Closest.setX(orc_ScenePoint.x());
-         q_XOk = true;
+         q_HorizontalOk = true;
       }
       else
       {
@@ -157,7 +156,7 @@ void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
       {
          //Y OK
          orc_Closest.setY(orc_ScenePoint.y());
-         q_YOk = true;
+         q_VerticalOk = true;
       }
       else
       {
@@ -169,33 +168,33 @@ void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
       orc_Closest.setY(c_Bounding.topLeft().y());
    }
    //Align necessary
-   if ((q_XOk == true) && (q_YOk == true))
+   if ((q_HorizontalOk == true) && (q_VerticalOk == true))
    {
       //Evaluate which border is the closest one
-      const float64 f64_XRightDist = std::abs(orc_ScenePoint.x() - c_Bounding.bottomRight().x());
-      const float64 f64_XLeftDist = std::abs(orc_ScenePoint.x() - c_Bounding.topLeft().x());
-      const float64 f64_YBottomDist = std::abs(orc_ScenePoint.y() - c_Bounding.bottomRight().y());
-      const float64 f64_YTopDist = std::abs(orc_ScenePoint.y() - c_Bounding.topLeft().y());
-      float64 f64_SmallestXDist;
-      float64 f64_SmallestYDist;
-      if (f64_XRightDist <= f64_XLeftDist)
+      const float64_t f64_HorizontalRightDist = std::abs(orc_ScenePoint.x() - c_Bounding.bottomRight().x());
+      const float64_t f64_HorizontalLeftDist = std::abs(orc_ScenePoint.x() - c_Bounding.topLeft().x());
+      const float64_t f64_VerticalBottomDist = std::abs(orc_ScenePoint.y() - c_Bounding.bottomRight().y());
+      const float64_t f64_VerticalTopDist = std::abs(orc_ScenePoint.y() - c_Bounding.topLeft().y());
+      float64_t f64_SmallestHorizontalDist;
+      float64_t f64_SmallestVerticalDist;
+      if (f64_HorizontalRightDist <= f64_HorizontalLeftDist)
       {
-         f64_SmallestXDist = f64_XRightDist;
+         f64_SmallestHorizontalDist = f64_HorizontalRightDist;
       }
       else
       {
-         f64_SmallestXDist = f64_XLeftDist;
+         f64_SmallestHorizontalDist = f64_HorizontalLeftDist;
       }
-      if (f64_YTopDist <= f64_YBottomDist)
+      if (f64_VerticalTopDist <= f64_VerticalBottomDist)
       {
-         f64_SmallestYDist = f64_YTopDist;
+         f64_SmallestVerticalDist = f64_VerticalTopDist;
       }
       else
       {
-         f64_SmallestYDist = f64_YBottomDist;
+         f64_SmallestVerticalDist = f64_VerticalBottomDist;
       }
       //Align to closest border
-      if (f64_SmallestXDist <= f64_SmallestYDist)
+      if (f64_SmallestHorizontalDist <= f64_SmallestVerticalDist)
       {
          if (orc_ScenePoint.x() < (c_Bounding.topLeft().x() + (c_Bounding.width() / 2.0)))
          {
@@ -226,9 +225,9 @@ void C_GiSvPc::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvPc::type(void) const
+int32_t C_GiSvPc::type(void) const
 {
-   return msn_GRAPHICS_ITEM_PC;
+   return ms32_GRAPHICS_ITEM_PC;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -253,12 +252,12 @@ bool C_GiSvPc::OpenDialog(void) const
 
       if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
       {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
             pc_View->GetPcData().GetBusIndex());
 
          if (pc_Bus != NULL)
          {
-            if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+            if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
             {
                // Dialog only relevant if a CAN bus is connected
                q_OpenDialog  = true;
@@ -269,16 +268,16 @@ bool C_GiSvPc::OpenDialog(void) const
       if ((q_OpenDialog == true) && (pc_View != NULL))
       {
          const C_PuiSvPc c_PcData = pc_View->GetPcData();
-         const uint32 u32_BusIndex = c_PcData.GetBusIndex();
+         const uint32_t u32_BusIndex = c_PcData.GetBusIndex();
 
          //Find connected interface of target node to found bus index
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_BusIndex);
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_BusIndex);
 
          if (pc_Bus != NULL)
          {
-            if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+            if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
             {
-               q_Retval = this->m_OpenCANDllDialog();
+               q_Retval = this->m_OpenCanDllDialog();
             }
             // Ethernet has not a own dialog yet -> Do nothing
          }
@@ -329,12 +328,12 @@ void C_GiSvPc::LoadData(void)
    if (pc_View != NULL)
    {
       C_PuiSvPc c_PcData = pc_View->GetPcData();
-      C_GiCustomFunctions::h_AdaptMouseRangePos(c_PcData.c_UIPosition);
+      C_GiCustomFunctions::h_AdaptMouseRangePos(c_PcData.c_UiPosition);
       this->LoadBasicData(c_PcData);
       //Overwrite z order
-      this->SetZValueCustom(mf64_ZORDER_MAX - 1.0);
+      this->SetZetValueCustom(mf64_ZORDER_MAX - 1.0);
       // And adapt size
-      this->ApplySizeChange(c_PcData.c_UIPosition, QSizeF(c_PcData.f64_Width, c_PcData.f64_Height));
+      this->ApplySizeChange(c_PcData.c_UiPosition, QSizeF(c_PcData.f64_Width, c_PcData.f64_Height));
    }
 }
 
@@ -347,7 +346,7 @@ void C_GiSvPc::UpdateData(void)
    C_PuiBsBox c_Data;
 
    this->UpdateBasicData(c_Data);
-   C_PuiSvHandler::h_GetInstance()->SetViewPCBox(this->mu32_ViewIndex, c_Data);
+   C_PuiSvHandler::h_GetInstance()->SetViewPcBox(this->mu32_ViewIndex, c_Data);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -397,7 +396,7 @@ void C_GiSvPc::GenerateHint()
 
       // content
       c_ToolTipContent += C_GtGetText::h_GetText("CAN Interface: ");
-      switch (c_PcData.GetCANDllType())
+      switch (c_PcData.GetCanDllType())
       {
       case C_PuiSvPc::ePEAK:
          c_ToolTipContent += "PEAK";
@@ -407,7 +406,7 @@ void C_GiSvPc::GenerateHint()
          break;
       case C_PuiSvPc::eOTHER:
          c_ToolTipContent += static_cast<QString>(C_GtGetText::h_GetText("Other (%1)")).arg(
-            c_PcData.GetCustomCANDllPath());
+            c_PcData.GetCustomCanDllPath());
          break;
       default:
          break;
@@ -428,7 +427,7 @@ void C_GiSvPc::GenerateHint()
    \param[in] of64_DiffHeight Height difference
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvPc::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+void C_GiSvPc::m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight)
 {
    this->m_UpdateItems(of64_DiffWidth, of64_DiffHeight, false);
 }
@@ -473,7 +472,7 @@ void C_GiSvPc::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
    false    Cancel was clicked
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvPc::m_OpenCANDllDialog(void) const
+bool C_GiSvPc::m_OpenCanDllDialog(void) const
 {
    bool q_Retval = false;
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -482,16 +481,16 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
    {
       const C_PuiSvPc c_PcData = pc_View->GetPcData();
       QGraphicsView * const pc_GraphicsView = this->scene()->views().at(0);
-      QPointer<C_OgePopUpDialog> const c_DllDialog = new C_OgePopUpDialog(pc_GraphicsView, pc_GraphicsView);
+      const QPointer<C_OgePopUpDialog> c_DllDialog = new C_OgePopUpDialog(pc_GraphicsView, pc_GraphicsView);
       C_SyvSeDllConfigurationDialog * const pc_DllWidget = new C_SyvSeDllConfigurationDialog(*c_DllDialog);
 
       // Initialize the data
-      pc_DllWidget->SetDllType(c_PcData.GetCANDllType());
-      pc_DllWidget->SetCustomDllPath(c_PcData.GetCustomCANDllPath());
+      pc_DllWidget->SetDllType(c_PcData.GetCanDllType());
+      pc_DllWidget->SetCustomDllPath(c_PcData.GetCustomCanDllPath());
       // Bitrate
       if (c_PcData.GetConnected() == true)
       {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(c_PcData.GetBusIndex());
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(c_PcData.GetBusIndex());
 
          if (pc_Bus != NULL)
          {
@@ -502,10 +501,10 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
       // Resize
       c_DllDialog->SetSize(QSize(700, 450));
 
-      if (c_DllDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_DllDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          // Update the data
-         C_PuiSvHandler::h_GetInstance()->SetViewPCCANDll(this->mu32_ViewIndex,
+         C_PuiSvHandler::h_GetInstance()->SetViewPcCanDll(this->mu32_ViewIndex,
                                                           pc_DllWidget->GetDllType(), pc_DllWidget->GetCustomDllPath());
          q_Retval = true;
       }
@@ -529,14 +528,14 @@ bool C_GiSvPc::m_OpenCANDllDialog(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvPc::mh_GetIsLaptop(void)
 {
-   SYSTEM_POWER_STATUS t_PowerStatus;
-   const sintn sn_Success = GetSystemPowerStatus(&t_PowerStatus);
+   SYSTEM_POWER_STATUS c_PowerStatus;
+   const int32_t s32_Success = GetSystemPowerStatus(&c_PowerStatus);
    bool q_Return = false;
 
-   if (sn_Success > 0)
+   if (s32_Success > 0)
    {
-      if ((t_PowerStatus.BatteryFlag != 128) && // No system battery
-          (t_PowerStatus.BatteryFlag != 255))   // Unknown status—unable to read the battery flag information
+      if ((c_PowerStatus.BatteryFlag != 128) && // No system battery
+          (c_PowerStatus.BatteryFlag != 255))   // Unknown status—unable to read the battery flag information
       {
          q_Return = true;
       }
@@ -551,14 +550,17 @@ bool C_GiSvPc::mh_GetIsLaptop(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::m_InitConflictIcon(void)
 {
-   const float64 f64_PosX = (this->mpc_SvgGraphicsItem->boundingRect().width() - 33.0) - // static offset for correct
-                                                                                         // position
-                            (static_cast<float64>(this->ms32_IconSize) - 24.0);          // offset of scaled icon
+   const float64_t f64_PosHorizontal = (this->mpc_SvgGraphicsItem->boundingRect().width() - 33.0) - // static offset for
+                                                                                                    // correct
+                                                                                                    // position
+                                       (static_cast<float64_t>(this->ms32_IconSize) - 24.0);        // offset of scaled
+
+   // icon
 
    // create the conflict icon
-   this->mpc_ConflictIcon = new C_GiRectPixmap(QRectF(f64_PosX, 9.0,
-                                                      static_cast<float64>(this->ms32_IconSize),
-                                                      static_cast<float64>(this->ms32_IconSize)));
+   this->mpc_ConflictIcon = new C_GiRectPixmap(QRectF(f64_PosHorizontal, 9.0,
+                                                      static_cast<float64_t>(this->ms32_IconSize),
+                                                      static_cast<float64_t>(this->ms32_IconSize)));
    this->mpc_ConflictIcon->SetSvg("://images/Error_iconV2.svg");
 
    // set the position of the icon
@@ -574,7 +576,7 @@ void C_GiSvPc::m_InitConflictIcon(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvPc::m_DetectIconSize(void)
 {
-   const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
+   const uint32_t u32_ScaleCategory = this->m_GetScaleCategory();
 
    switch (u32_ScaleCategory)
    {
@@ -605,9 +607,9 @@ void C_GiSvPc::m_DetectIconSize(void)
    \param[in] oq_Initial      Initial flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight, const bool oq_Initial)
+void C_GiSvPc::m_UpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight, const bool oq_Initial)
 {
-   const sint32 s32_OldIconSize = this->ms32_IconSize;
+   const int32_t s32_OldIconSize = this->ms32_IconSize;
 
    // update the scale category
    this->m_DetectIconSize();
@@ -616,10 +618,10 @@ void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    // adapt conflict icon
    if (oq_Initial == false)
    {
-      const sint32 s32_IconSizeDiff = this->ms32_IconSize - s32_OldIconSize;
-      this->mpc_ConflictIcon->moveBy(of64_DiffWidth - static_cast<float64>(s32_IconSizeDiff), 0.0);
-      this->mpc_ConflictIcon->SetNewSize(QSizeF(static_cast<float64>(this->ms32_IconSize),
-                                                static_cast<float64>(this->ms32_IconSize)));
+      const int32_t s32_IconSizeDiff = this->ms32_IconSize - s32_OldIconSize;
+      this->mpc_ConflictIcon->moveBy(of64_DiffWidth - static_cast<float64_t>(s32_IconSizeDiff), 0.0);
+      this->mpc_ConflictIcon->SetNewSize(QSizeF(static_cast<float64_t>(this->ms32_IconSize),
+                                                static_cast<float64_t>(this->ms32_IconSize)));
       this->mpc_ConflictIcon->update();
    }
 }
@@ -634,10 +636,10 @@ void C_GiSvPc::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    mhu32_ScaleCategory3 Category 3
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiSvPc::m_GetScaleCategory(void) const
+uint32_t C_GiSvPc::m_GetScaleCategory(void) const
 {
    const QSizeF c_ActSize = this->mpc_SvgGraphicsItem->boundingRect().size();
-   uint32 u32_ScaleCategory = mhu32_SCALE_CATEGORY_0;
+   uint32_t u32_ScaleCategory = mhu32_SCALE_CATEGORY_0;
 
    // check first scaling
    if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_1]) &&

@@ -11,35 +11,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QFileDialog>
 
-#include "stwtypes.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_PopErrorHandling.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_Uti.h"
-#include "C_HeHandler.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PopErrorHandling.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_Uti.hpp"
+#include "C_HeHandler.hpp"
+#include "stwerrors.hpp"
 
-#include "C_PopSaveAsDialogWidget.h"
+#include "C_PopSaveAsDialogWidget.hpp"
 #include "ui_C_PopSaveAsDialogWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2 = 1;
-const stw_types::sintn C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V3 = 0;
+const int32_t C_PopSaveAsDialogWidget::mhs32_VERSION_INDEX_V2 = 1;
+const int32_t C_PopSaveAsDialogWidget::mhs32_VERSION_INDEX_V3 = 0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -59,7 +58,7 @@ const stw_types::sintn C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V3 = 0;
    \param[in,out] orc_Parent Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PopSaveAsDialogWidget::C_PopSaveAsDialogWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_PopSaveAsDialogWidget::C_PopSaveAsDialogWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_PopSaveAsDialogWidget),
    mrc_ParentDialog(orc_Parent)
@@ -151,8 +150,8 @@ void C_PopSaveAsDialogWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -207,9 +206,9 @@ void C_PopSaveAsDialogWidget::m_InitDefaultProjectName(void) const
    see C_PuiProject::h_GetInstance()->Save(...) for return values
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File, const bool oq_UseDeprecatedFileFormatV2) const
+int32_t C_PopSaveAsDialogWidget::m_SaveToFile(const QString & orc_File, const bool oq_UseDeprecatedFileFormatV2) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    // remember old project path
    const QString c_RememberPath = C_PuiProject::h_GetInstance()->GetPath();
@@ -285,8 +284,8 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
    const QString c_BasePath = this->mpc_Ui->pc_LineEditPath->GetPath();
    const QString c_Name = this->mpc_Ui->pc_LineEditName->text();
 
-   const bool q_ValidName = C_OSCUtils::h_CheckValidFileName(c_Name.toStdString().c_str());
-   const bool q_ValidPath = C_OSCUtils::h_CheckValidFilePath(c_BasePath.toStdString().c_str());
+   const bool q_ValidName = C_OscUtils::h_CheckValidFileName(c_Name.toStdString().c_str());
+   const bool q_ValidPath = C_OscUtils::h_CheckValidFilePath(c_BasePath.toStdString().c_str());
 
    if ((q_ValidName == true) && (q_ValidPath == true))
    {
@@ -297,15 +296,15 @@ void C_PopSaveAsDialogWidget::m_OnSave(void)
       if (c_Dir.exists() == false)
       {
          c_Dir.mkdir(c_Path);
-         if (this->mpc_Ui->pc_ComboBoxVersion->currentIndex() == C_PopSaveAsDialogWidget::mhsn_VERSION_INDEX_V2)
+         if (this->mpc_Ui->pc_ComboBoxVersion->currentIndex() == C_PopSaveAsDialogWidget::mhs32_VERSION_INDEX_V2)
          {
             C_OgeWiCustomMessage c_Box(this, C_OgeWiCustomMessage::eINFORMATION);
             c_Box.SetHeading(C_GtGetText::h_GetText("Project save as \"V2\""));
             c_Box.SetDescription(C_GtGetText::h_GetText("Project is exported in file format \"V2\" "
                                                         "as a copy of the current project.\n"
                                                         "You are still working on current project."));
-            c_Box.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
-            c_Box.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_Box.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+            c_Box.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
             c_Box.SetCustomMinHeight(180, 180);
             if (c_Box.Execute() == C_OgeWiCustomMessage::eOK)
             {

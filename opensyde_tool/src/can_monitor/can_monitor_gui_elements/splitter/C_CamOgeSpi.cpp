@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "constants.h"
-#include "C_CamOgeSpi.h"
+#include "constants.hpp"
+#include "C_CamOgeSpi.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
-using namespace stw_types;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -102,7 +101,7 @@ void C_CamOgeSpiHandle::paintEvent(QPaintEvent * const opc_Event)
 {
    Q_UNUSED(opc_Event)
 
-   const stw_types::sintn sn_HANDLE_HEIGHT = 30;
+   const int32_t s32_HANDLE_HEIGHT = 30;
    QPainter c_Painter(this);
 
    // Draw Background
@@ -119,19 +118,19 @@ void C_CamOgeSpiHandle::paintEvent(QPaintEvent * const opc_Event)
    if (this->orientation() == Qt::Horizontal)
    {
       // horizontal arranged widgets, i.e. splitter looks like ||
-      const QPoint c_PTopCenter = this->rect().center() + QPoint(0, sn_HANDLE_HEIGHT / 2);
-      const QPoint c_PBottomCenter = this->rect().center() - QPoint(0, sn_HANDLE_HEIGHT / 2);
+      const QPoint c_PointTopCenter = this->rect().center() + QPoint(0, s32_HANDLE_HEIGHT / 2);
+      const QPoint c_PointBottomCenter = this->rect().center() - QPoint(0, s32_HANDLE_HEIGHT / 2);
 
-      c_Painter.drawLine(c_PTopCenter + QPoint(1, 0), c_PBottomCenter + QPoint(1, 0));
-      c_Painter.drawLine(c_PTopCenter - QPoint(1, 0), c_PBottomCenter - QPoint(1, 0));
+      c_Painter.drawLine(c_PointTopCenter + QPoint(1, 0), c_PointBottomCenter + QPoint(1, 0));
+      c_Painter.drawLine(c_PointTopCenter - QPoint(1, 0), c_PointBottomCenter - QPoint(1, 0));
    }
    else
    {
       // vertical arranged widgets, i.e. splitter looks like =
-      const QPoint c_PRightCenter = this->rect().center() + QPoint(sn_HANDLE_HEIGHT / 2, 0);
-      const QPoint c_PLeftCenter = this->rect().center() - QPoint(sn_HANDLE_HEIGHT / 2, 0);
+      const QPoint c_PointRightCenter = this->rect().center() + QPoint(s32_HANDLE_HEIGHT / 2, 0);
+      const QPoint c_PointLeftCenter = this->rect().center() - QPoint(s32_HANDLE_HEIGHT / 2, 0);
 
-      c_Painter.drawLine(c_PRightCenter + QPoint(0, 1), c_PLeftCenter + QPoint(0, 1));
-      c_Painter.drawLine(c_PRightCenter - QPoint(0, 1), c_PLeftCenter - QPoint(0, 1));
+      c_Painter.drawLine(c_PointRightCenter + QPoint(0, 1), c_PointLeftCenter + QPoint(0, 1));
+      c_Painter.drawLine(c_PointRightCenter - QPoint(0, 1), c_PointLeftCenter - QPoint(0, 1));
    }
 }

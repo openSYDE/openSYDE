@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
-#include "C_Uti.h"
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_SyvDaItPaArView.h"
-#include "C_SdNdeSingleHeaderView.h"
-#include "TGLUtils.h"
+#include "C_Uti.hpp"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaItPaArView.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -115,14 +114,14 @@ C_SyvDaItPaArView::~C_SyvDaItPaArView(void)
 
    \param[in] ou32_ElementIndex  Element index
    \param[in] opc_DataWidget     Data widget
-   \param[in] oq_ECUValues       Optional flag if the shown values are ECU values
+   \param[in] oq_EcuValues       Optional flag if the shown values are ECU values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaArView::SetElement(const uint32 ou32_ElementIndex,
-                                   stw_opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget,
-                                   const bool oq_ECUValues)
+void C_SyvDaItPaArView::SetElement(const uint32_t ou32_ElementIndex,
+                                   stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * const opc_DataWidget,
+                                   const bool oq_EcuValues)
 {
-   this->mc_Model.SetElement(ou32_ElementIndex, opc_DataWidget, oq_ECUValues);
+   this->mc_Model.SetElement(ou32_ElementIndex, opc_DataWidget, oq_EcuValues);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,11 +140,11 @@ void C_SyvDaItPaArView::OnErrorChangePossible(void)
    Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SyvDaItPaArView::m_GetSelectedIndices(void) const
+std::vector<uint32_t> C_SyvDaItPaArView::m_GetSelectedIndices(void) const
 {
    const QModelIndexList c_SelectedItems = this->selectedIndexes();
 
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
 
    c_Retval.reserve(c_SelectedItems.size());
    for (QModelIndexList::const_iterator c_ItSelectedItem = c_SelectedItems.begin();

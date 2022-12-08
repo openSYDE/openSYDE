@@ -8,24 +8,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-//lint -estring(829,*ctime*)  //this module is specifically for Windows targets; no trouble with unspecified
-// behavior expected
+//we do not use the unspecified values; just "pass through" to get the clearly defined structure "struct tm"
+//lint -estring(829,ctime)
+//lint -estring(586,time)
+//lint -estring(586,localtime)
 #include <ctime>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCComMessageLoggerFileAsc.h"
-#include "TGLFile.h"
-#include "TGLTime.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscComMessageLoggerFileAsc.hpp"
+#include "TglFile.hpp"
+#include "TglTime.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,11 +50,11 @@ using namespace stw_opensyde_core;
    \param[in]  oq_RelativeTimeStampActive   Mode for writing CAN timestamp (relative or absolute)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerFileAsc::C_OSCComMessageLoggerFileAsc(const C_SCLString & orc_FilePath,
-                                                           const C_SCLString & orc_ProtocolName,
+C_OscComMessageLoggerFileAsc::C_OscComMessageLoggerFileAsc(const C_SclString & orc_FilePath,
+                                                           const C_SclString & orc_ProtocolName,
                                                            const bool oq_HexActive,
                                                            const bool oq_RelativeTimeStampActive) :
-   C_OSCComMessageLoggerFileBase(orc_FilePath, orc_ProtocolName),
+   C_OscComMessageLoggerFileBase(orc_FilePath, orc_ProtocolName),
    mq_HexActive(oq_HexActive),
    mq_RelativeTimeStampActive(oq_RelativeTimeStampActive)
 {
@@ -64,13 +66,13 @@ C_OSCComMessageLoggerFileAsc::C_OSCComMessageLoggerFileAsc(const C_SCLString & o
    Writes the end line and closes the open file
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
+C_OscComMessageLoggerFileAsc::~C_OscComMessageLoggerFileAsc(void)
 {
    try
    {
       if (this->mc_File.is_open() == true)
       {
-         const C_SCLString c_EndLine = "End TriggerBlock";
+         const C_SclString c_EndLine = "End TriggerBlock";
          this->mc_File.write(c_EndLine.c_str(), c_EndLine.Length());
          this->mc_File.close();
       }
@@ -91,9 +93,9 @@ C_OSCComMessageLoggerFileAsc::~C_OSCComMessageLoggerFileAsc(void)
    C_RD_WR     Error on creating file, folders or deleting old file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
+int32_t C_OscComMessageLoggerFileAsc::OpenFile(void)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mc_File.is_open() == true)
    {
@@ -107,7 +109,7 @@ sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
       this->mc_FilePath += ".asc";
    }
 
-   s32_Return = C_OSCComMessageLoggerFileBase::OpenFile();
+   s32_Return = C_OscComMessageLoggerFileBase::OpenFile();
 
    if (s32_Return == C_NO_ERR)
    {
@@ -117,7 +119,7 @@ sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
       this->m_WriteHeader();
 
       // Check if the file was really created
-      if (TGL_FileExists(this->mc_FilePath) == false)
+      if (TglFileExists(this->mc_FilePath) == false)
       {
          // File was not created
          s32_Return = C_RD_WR;
@@ -133,13 +135,13 @@ sint32 C_OSCComMessageLoggerFileAsc::OpenFile(void)
    \param[in]     orc_MessageData      Current CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerData & orc_MessageData)
+void C_OscComMessageLoggerFileAsc::AddMessageToFile(const C_OscComMessageLoggerData & orc_MessageData)
 {
    if (this->mc_File.is_open() == true)
    {
-      uint32 u32_SignalCounter;
-      C_SCLString c_LogEntry = "   ";
-      C_SCLString c_Temp;
+      uint32_t u32_SignalCounter;
+      C_SclString c_LogEntry = "   ";
+      C_SclString c_Temp;
 
       // Timestamp
       if (this->mq_RelativeTimeStampActive == true)
@@ -229,7 +231,7 @@ void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerD
       // Detected signals
       for (u32_SignalCounter = 0U; u32_SignalCounter < orc_MessageData.c_Signals.size(); u32_SignalCounter++)
       {
-         const C_OSCComMessageLoggerDataSignal & rc_Signal = orc_MessageData.c_Signals[u32_SignalCounter];
+         const C_OscComMessageLoggerDataSignal & rc_Signal = orc_MessageData.c_Signals[u32_SignalCounter];
          c_LogEntry += "   //Signal   " + rc_Signal.c_Name + " = " + rc_Signal.c_Value;
          if (rc_Signal.c_Unit != "")
          {
@@ -252,12 +254,12 @@ void C_OSCComMessageLoggerFileAsc::AddMessageToFile(const C_OSCComMessageLoggerD
    // version 7.2.0
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComMessageLoggerFileAsc::m_WriteHeader(void)
+void C_OscComMessageLoggerFileAsc::m_WriteHeader(void)
 {
    if (this->mc_File.is_open() == true)
    {
-      C_SCLString c_Header;
-      const C_SCLString c_TimeString = mh_GetAscTimeString();
+      C_SclString c_Header;
+      const C_SclString c_TimeString = mh_GetAscTimeString();
 
       // First line is date and time
       c_Header = "date " + c_TimeString + "\n";
@@ -301,32 +303,32 @@ void C_OSCComMessageLoggerFileAsc::m_WriteHeader(void)
    Time and date in defined format
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
+C_SclString C_OscComMessageLoggerFileAsc::mh_GetAscTimeString(void)
 {
-   C_SCLString c_Result;
-   C_SCLString c_Temp;
+   C_SclString c_Result;
+   C_SclString c_Temp;
 
    // Getting weekday
-   const std::time_t s32_Time = std::time(NULL);      //lint !e8080 using type expected by the library for compatibility
-   const std::tm t_Time = *std::localtime(&s32_Time); //lint !e613 //documentation of localtime says "not NULL"
-   const uint32 u32_TimeMs = TGL_GetTickCount();
+   const std::time_t x_Time = std::time(NULL);      //lint !e8080 using type expected by the library for compatibility
+   const std::tm c_Time = *std::localtime(&x_Time); //lint !e613 //documentation of localtime says "not NULL"
+   const uint32_t u32_TimeMs = TglGetTickCount();
 
-   c_Result += mh_GetDay(t_Time.tm_wday) + " ";
-   c_Result += mh_GetMonth(t_Time.tm_mon) + " ";
-   c_Result += C_SCLString::IntToStr(t_Time.tm_mday) + " ";
+   c_Result += mh_GetDay(c_Time.tm_wday) + " ";
+   c_Result += mh_GetMonth(c_Time.tm_mon) + " ";
+   c_Result += C_SclString::IntToStr(c_Time.tm_mday) + " ";
    // Hours
-   c_Temp.PrintFormatted("%.2d", t_Time.tm_hour);
+   c_Temp.PrintFormatted("%.2d", c_Time.tm_hour);
    c_Result += c_Temp + ":";
    // Minutes
-   c_Temp.PrintFormatted("%.2d", t_Time.tm_min);
+   c_Temp.PrintFormatted("%.2d", c_Time.tm_min);
    c_Result += c_Temp + ":";
    // Seconds
-   c_Temp.PrintFormatted("%.2d", t_Time.tm_sec);
+   c_Temp.PrintFormatted("%.2d", c_Time.tm_sec);
    c_Result += c_Temp + ".";
    // Get the milliseconds
    c_Temp.PrintFormatted("%.3d", u32_TimeMs % 1000U);
    c_Result += c_Temp + " ";
-   c_Result += C_SCLString::IntToStr(1900 + t_Time.tm_year);
+   c_Result += C_SclString::IntToStr(1900 + c_Time.tm_year);
 
    return c_Result;
 }
@@ -334,17 +336,17 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetAscTimeString(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the weekday in the asc format
 
-   \param[in]     osn_Day        Number for weekday, starting with Sunday a 0
+   \param[in]     os32_Day        Number for weekday, starting with Sunday a 0
 
    \return
    Weekday
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
+C_SclString C_OscComMessageLoggerFileAsc::mh_GetDay(const int32_t os32_Day)
 {
-   C_SCLString c_Day;
+   C_SclString c_Day;
 
-   switch (osn_Day)
+   switch (os32_Day)
    {
    case 0:
       c_Day = "Sun";
@@ -368,7 +370,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
       c_Day = "Sat";
       break;
    default:
-      // Should nat happen
+      // Should not happen
       c_Day = "Unk";
       break;
    }
@@ -379,17 +381,17 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetDay(const sintn osn_Day)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Returns the weekday in the asc format
 
-   \param[in]     osn_Month       Number for month, starting with 0
+   \param[in]     os32_Month       Number for month, starting with 0
 
    \return
    Weekday
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
+C_SclString C_OscComMessageLoggerFileAsc::mh_GetMonth(const int32_t os32_Month)
 {
-   C_SCLString c_Month;
+   C_SclString c_Month;
 
-   switch (osn_Month)
+   switch (os32_Month)
    {
    case 0:
       c_Month = "Jan";
@@ -428,7 +430,7 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
       c_Month = "Dec";
       break;
    default:
-      // Should nat happen
+      // Should not happen
       c_Month = "Unk";
       break;
    }
@@ -450,12 +452,12 @@ C_SCLString C_OSCComMessageLoggerFileAsc::mh_GetMonth(const sintn osn_Month)
    Adapted string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComMessageLoggerFileAsc::mh_AdaptTimeStamp(const uint64 ou64_TimeStamp)
+C_SclString C_OscComMessageLoggerFileAsc::mh_AdaptTimeStamp(const uint64_t ou64_TimeStamp)
 {
-   C_SCLString c_TimeStamp;
+   C_SclString c_TimeStamp;
 
-   c_TimeStamp.PrintFormatted("%d.%.6d", static_cast<sintn>(ou64_TimeStamp / 1000000ULL),
-                              static_cast<sintn>(ou64_TimeStamp % 1000000ULL));
+   c_TimeStamp.PrintFormatted("%d.%.6d", static_cast<int32_t>(ou64_TimeStamp / 1000000ULL),
+                              static_cast<int32_t>(ou64_TimeStamp % 1000000ULL));
    c_TimeStamp.PrintFormatted("%9s", c_TimeStamp.c_str());
 
    return c_TimeStamp;

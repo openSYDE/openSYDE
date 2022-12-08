@@ -11,7 +11,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDir>
 #include <QDirModel>
@@ -19,24 +19,23 @@
 #include <QFileDialog>
 #include <QDateTime>
 
-#include "C_CamMosLoggingWidget.h"
+#include "C_CamMosLoggingWidget.hpp"
 #include "ui_C_CamMosLoggingWidget.h"
 
-#include "C_OSCUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "C_CamProHandler.h"
-#include "C_Uti.h"
-#include "C_OgeWiCustomMessage.h"
-#include "stwerrors.h"
-#include "C_CamUti.h"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "stwerrors.hpp"
+#include "C_CamUti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -132,9 +131,9 @@ C_CamMosLoggingWidget::C_CamMosLoggingWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_LeFolder, &C_CamOgeLeFilePath::SigPathDropped,
            this, &C_CamMosLoggingWidget::m_OnDroppedPath);
    connect(this->mpc_Ui->pc_LeFile, &C_OgeLeDark::editingFinished, this, &C_CamMosLoggingWidget::m_OnFileNameEdited);
-   connect(this->mpc_Ui->pc_CbxOverwrite, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_CbxOverwrite, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnOverwriteModeSelected);
-   connect(this->mpc_Ui->pc_CbxFormat, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_CbxFormat, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosLoggingWidget::m_OnFormatSelected);
    connect(this->mpc_Ui->pc_PubBrowse, &C_CamOgePubDarkBrowse::clicked, this, &C_CamMosLoggingWidget::m_OnBrowse);
    connect(this->mpc_Ui->pc_PubVariables, &C_CamOgePubPathVariables::SigVariableSelected,
@@ -199,9 +198,9 @@ void C_CamMosLoggingWidget::OnCommunicationStarted(const bool oq_Online)
    \param[in]   os32_Result   result of log file add operation
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::OnSigLogFileAddResult(const sint32 os32_Result)
+void C_CamMosLoggingWidget::OnSigLogFileAddResult(const int32_t os32_Result)
 {
-   if (os32_Result != stw_errors::C_NO_ERR)
+   if (os32_Result != stw::errors::C_NO_ERR)
    {
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Start logging"));
@@ -232,8 +231,8 @@ void C_CamMosLoggingWidget::m_LoadConfig(void) const
 
    // remaining values
    this->mpc_Ui->pc_LeFile->setText(rc_LoggingData.c_FileName);
-   this->mpc_Ui->pc_CbxOverwrite->setCurrentIndex(static_cast<sintn>(rc_LoggingData.e_OverwriteMode));
-   this->mpc_Ui->pc_CbxFormat->setCurrentIndex(static_cast<sintn>(rc_LoggingData.e_FileFormat));
+   this->mpc_Ui->pc_CbxOverwrite->setCurrentIndex(static_cast<int32_t>(rc_LoggingData.e_OverwriteMode));
+   this->mpc_Ui->pc_CbxFormat->setCurrentIndex(static_cast<int32_t>(rc_LoggingData.e_FileFormat));
    this->mpc_Ui->pc_WiHeader->SetToggleState(rc_LoggingData.q_Enabled);
 }
 
@@ -315,7 +314,7 @@ void C_CamMosLoggingWidget::m_OnFileNameEdited(void)
    \param[in]     os32_Index        new combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::m_OnOverwriteModeSelected(const sint32 os32_Index) const
+void C_CamMosLoggingWidget::m_OnOverwriteModeSelected(const int32_t os32_Index) const
 {
    // update data handling
    C_CamProHandler::h_GetInstance()->SetLoggingOverwriteMode(
@@ -328,7 +327,7 @@ void C_CamMosLoggingWidget::m_OnOverwriteModeSelected(const sint32 os32_Index) c
    \param[in]     os32_Index        new combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosLoggingWidget::m_OnFormatSelected(const sint32 os32_Index) const
+void C_CamMosLoggingWidget::m_OnFormatSelected(const int32_t os32_Index) const
 {
    // update data handling
    C_CamProHandler::h_GetInstance()->SetLoggingFormat(static_cast<C_CamProLoggingData::E_Format>(os32_Index));
@@ -447,10 +446,10 @@ void C_CamMosLoggingWidget::m_CheckAndStartLogging()
    bool q_Continue = true;
 
    // check directory
-   q_ValidDir = stw_opensyde_core::C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str());
+   q_ValidDir = stw::opensyde_core::C_OscUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str());
 
    // check file name
-   q_ValidName = stw_opensyde_core::C_OSCUtils::h_CheckValidFileName(rc_LoggingData.c_FileName.toStdString().c_str());
+   q_ValidName = stw::opensyde_core::C_OscUtils::h_CheckValidFileName(rc_LoggingData.c_FileName.toStdString().c_str());
 
    if ((q_ValidDir == false) || (q_ValidName == false))
    {
@@ -533,7 +532,7 @@ void C_CamMosLoggingWidget::m_CheckAndStartLogging()
                                                                                  "Do you want to overwrite the file?")).
                                      arg(c_FileInfo.absoluteFilePath()));
             c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
+            c_Message.SetOkButtonText(C_GtGetText::h_GetText("Overwrite"));
             q_Continue = (c_Message.Execute() == C_OgeWiCustomMessage::eOK);
          }
       }

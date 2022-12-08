@@ -11,36 +11,35 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPixmap>
 #include <QApplication>
 
-#include "C_Uti.h"
-#include "stwerrors.h"
+#include "C_Uti.hpp"
+#include "stwerrors.hpp"
 
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_NagAboutDialog.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_CamMosFilterPopup.h"
-#include "C_HeHandler.h"
-#include "C_CamProHandler.h"
-#include "C_CamTitleBarWidget.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_UsHandler.h"
-#include "C_CamUti.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_NagAboutDialog.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_CamMosFilterPopup.hpp"
+#include "C_HeHandler.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamTitleBarWidget.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamUti.hpp"
 
 #include "ui_C_CamTitleBarWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //C_GtGetText does not work here (executed before main)
@@ -177,7 +176,7 @@ void C_CamTitleBarWidget::UpdateRecentProjectsAndWindowTitle(void)
    this->mpc_Menu->clear();
 
    // only show last 10 recent projects
-   for (sint32 s32_Pos = 0; (s32_Pos < rc_RecentProjects.size()) && (s32_Pos < 10); ++s32_Pos)
+   for (int32_t s32_Pos = 0; (s32_Pos < rc_RecentProjects.size()) && (s32_Pos < 10); ++s32_Pos)
    {
       this->mpc_Menu->addAction(rc_RecentProjects[s32_Pos]);
    }
@@ -220,8 +219,8 @@ bool C_CamTitleBarWidget::HandleProjectComparison(void)
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
       c_Message.SetHeading(C_GtGetText::h_GetText("Unsaved changes"));
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you want to save the project changes?"));
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Save"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Don't Save"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Save"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Don't Save"));
       c_Message.ShowCancelButton();
       e_Output = c_Message.Execute();
       switch (e_Output)
@@ -299,9 +298,9 @@ void C_CamTitleBarWidget::SaveAsConfig(void)
    see C_CamProHandler::LoadFromFile for return values
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
+int32_t C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    s32_Return = C_CamProHandler::h_GetInstance()->LoadFromFile(orc_FilePath.toStdString().c_str());
@@ -316,12 +315,12 @@ sint32 C_CamTitleBarWidget::LoadConfig(const QString & orc_FilePath)
       c_Message.SetDescription(C_GtGetText::h_GetText("Failed to load project: ") + orc_FilePath);
       c_Details = C_GtGetText::h_GetText("For more information see ");
       c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
-                                    C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+                                    C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       c_Details += ".";
       c_Message.SetDetails(c_Details);
 
       //Update log file
-      C_OSCLoggingHandler::h_Flush();
+      C_OscLoggingHandler::h_Flush();
 
       //Show message
       c_Message.Execute();
@@ -353,7 +352,8 @@ void C_CamTitleBarWidget::resizeEvent(QResizeEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_ShowAbout(void)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+
    new C_NagAboutDialog(*c_New, "openSYDE CAN Monitor", ":/images/CAN_Monitor_logo.png", 20);
 
    //Resize
@@ -373,7 +373,7 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_TriggerHelp(void)
 {
-   stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
+   stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -405,7 +405,7 @@ void C_CamTitleBarWidget::m_NewConfig(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    s32_Return = C_CamProHandler::h_GetInstance()->SaveToFile(orc_File.toStdString().c_str());
@@ -414,15 +414,15 @@ void C_CamTitleBarWidget::m_DoSaveToFileAction(const QString & orc_File)
    if (s32_Return != C_NO_ERR)
    {
       const QString c_Log = C_Uti::h_GetLink(
-         C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str(), mc_STYLE_GUIDE_COLOR_LINK,
-         static_cast<QString>("file:\\\\\\") + C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+         C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str(), mc_STYLE_GUIDE_COLOR_LINK,
+         static_cast<QString>("file:\\\\\\") + C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Project save"));
       c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("For more details see log file %1")).arg(
                                   c_Log));
 
       //Update log file
-      C_OSCLoggingHandler::h_Flush();
+      C_OscLoggingHandler::h_Flush();
 
       //Show message
       c_Message.Execute();
@@ -515,7 +515,7 @@ void C_CamTitleBarWidget::m_RemapOnSaveAs(const QString & orc_NewFileName) const
 {
    // iterate over all databases
    std::vector<C_CamProDatabaseData> c_Databases = C_CamProHandler::h_GetInstance()->GetDatabases();
-   for (uint32 u32_Pos = 0; u32_Pos < c_Databases.size(); u32_Pos++)
+   for (uint32_t u32_Pos = 0; u32_Pos < c_Databases.size(); u32_Pos++)
    {
       C_CamProDatabaseData & rc_Database = c_Databases[u32_Pos];
       const QString c_PrevName = rc_Database.c_Name;
@@ -549,7 +549,7 @@ void C_CamTitleBarWidget::m_SetButtonsText(const bool oq_IconOnly) const
 
    if (oq_IconOnly == true)
    {
-      const uint32 u32_SMALL_MAXIMUM_SIZE = 34;
+      const uint32_t u32_SMALL_MAXIMUM_SIZE = 34;
       this->mpc_Ui->pc_PushButtonNew->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_ToolButtonLoad->setText(C_GtGetText::h_GetText(""));
       this->mpc_Ui->pc_PushButtonSaveAs->setText(C_GtGetText::h_GetText(""));

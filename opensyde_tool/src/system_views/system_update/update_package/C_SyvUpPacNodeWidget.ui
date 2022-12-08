@@ -30,7 +30,7 @@
     <number>5</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeWiBorder" name="pc_WidgetBorder" native="true">
+    <widget class="stw::opensyde_gui_elements::C_OgeWiBorder" name="pc_WidgetBorder" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>0</number>
@@ -48,7 +48,7 @@
        <number>1</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBar" name="pc_WidgetTitle" native="true">
+       <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBar" name="pc_WidgetTitle" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <property name="leftMargin">
           <number>7</number>
@@ -60,14 +60,14 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabUpdateNodeTitle" name="pc_Title">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabUpdateNodeTitle" name="pc_Title">
            <property name="text">
             <string>#1 - Node</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabIconWarning">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabIconWarning">
            <property name="minimumSize">
             <size>
              <width>20</width>
@@ -86,7 +86,7 @@
           </widget>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabIconLock">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabIconLock">
            <property name="minimumSize">
             <size>
              <width>20</width>
@@ -108,7 +108,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameSepTop">
+       <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameSepTop">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -141,14 +141,14 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
+         <widget class="stw::opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidget">
+          <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidget">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -186,43 +186,43 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiProgressBar</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiProgressBar</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiProgressBar.h</header>
+   <header>C_OgeWiProgressBar.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTransparentScrollArea</class>
+   <class>stw::opensyde_gui_elements::C_OgeTransparentScrollArea</class>
    <extends>QScrollArea</extends>
-   <header>C_OgeTransparentScrollArea.h</header>
+   <header>C_OgeTransparentScrollArea.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabUpdateNodeTitle</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabUpdateNodeTitle</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabUpdateNodeTitle.h</header>
+   <header>C_OgeLabUpdateNodeTitle.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiBorder</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiBorder</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiBorder.h</header>
+   <header>C_OgeWiBorder.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

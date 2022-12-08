@@ -8,16 +8,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPixmap>
 
-#include "stwtypes.h"
-#include "C_GiImage.h"
+#include "stwtypes.hpp"
+#include "C_GiImage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,8 +35,8 @@ using namespace stw_opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in]     orc_ImagePath  File path to image
-   \param[in,out] opc_Parent     Optional pointer to parent
+   \param[in]      orc_ImagePath    File path to image
+   \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiImage::C_GiImage(const QString & orc_ImagePath, QGraphicsItem * const opc_Parent) :
@@ -46,8 +45,8 @@ C_GiImage::C_GiImage(const QString & orc_ImagePath, QGraphicsItem * const opc_Pa
 {
    this->mc_OriginalPixmap.load(orc_ImagePath);
 
-   this->f64_Width = static_cast<float64>(this->mc_OriginalPixmap.width());
-   this->f64_Height = static_cast<float64>(this->mc_OriginalPixmap.height());
+   this->f64_Width = static_cast<float64_t>(this->mc_OriginalPixmap.width());
+   this->f64_Height = static_cast<float64_t>(this->mc_OriginalPixmap.height());
 
    this->setPixmap(this->mc_OriginalPixmap);
 }
@@ -57,11 +56,13 @@ C_GiImage::C_GiImage(const QString & orc_ImagePath, QGraphicsItem * const opc_Pa
 
    Set up GUI with all elements.
 
-   \param[in]     orc_Pixmap   Pixmap with image
-   \param[in,out] opc_Parent   Optional pointer to parent
+   \param[in]      orc_Pixmap    Pixmap with image
+   \param[in]      of64_Width    Width
+   \param[in]      of64_Height   Height
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiImage::C_GiImage(const QPixmap & orc_Pixmap, const float64 of64_Width, const float64 of64_Height,
+C_GiImage::C_GiImage(const QPixmap & orc_Pixmap, const float64_t of64_Width, const float64_t of64_Height,
                      QGraphicsItem * const opc_Parent) :
    QGraphicsPixmapItem(opc_Parent),
    C_GiBiSizeableItem(of64_Width, of64_Height),
@@ -85,8 +86,8 @@ C_GiImage::~C_GiImage()
 void C_GiImage::Redraw(void)
 {
    // calculate the scaling on the original picture to get best quality
-   const QPixmap c_Pixmap = this->mc_OriginalPixmap.scaled(QSize(static_cast<sintn>(this->f64_Width),
-                                                                 static_cast<sintn>(this->f64_Height)),
+   const QPixmap c_Pixmap = this->mc_OriginalPixmap.scaled(QSize(static_cast<int32_t>(this->f64_Width),
+                                                                 static_cast<int32_t>(this->f64_Height)),
                                                            Qt::KeepAspectRatio,
                                                            Qt::SmoothTransformation);
 

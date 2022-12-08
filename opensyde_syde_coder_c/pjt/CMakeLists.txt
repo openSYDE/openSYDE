@@ -29,13 +29,13 @@ add_subdirectory(../libs/osy_core ${CMAKE_BINARY_DIR}/osy_core)
 
 # --- Project source file ----------------------------------------------------------------------------------------------
 set(OPENSYDE_SYDE_CODER_C_SOURCES
-   ../src/C_CExport.cpp
+   ../src/C_CodeExport.cpp
    ../src/osy_code_exporter/C_OsyCodeExportBase.cpp
 
    ../src/resources.rc
 
-   ../src/precomp_headers.h
-   ../src/osy_code_exporter/C_OsyCodeExportBase.h
+   ../src/precomp_headers.hpp
+   ../src/osy_code_exporter/C_OsyCodeExportBase.hpp
 )
 
 # define binary name and sources
@@ -48,8 +48,8 @@ target_link_libraries(osy_syde_coder_c
 )
 
 # define precompiled headers for core and application
-target_precompile_headers(opensyde_core PRIVATE ../src/precomp_headers.h)
-target_precompile_headers(osy_syde_coder_c PRIVATE ../src/precomp_headers.h)
+target_precompile_headers(opensyde_core PRIVATE ../src/precomp_headers.hpp)
+target_precompile_headers(osy_syde_coder_c PRIVATE ../src/precomp_headers.hpp)
 
 # create PC-lint configuration files
 if(COMMAND add_pc_lint)

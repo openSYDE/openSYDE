@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SyvDaUnoDeleteCommand.h"
+#include "stwtypes.hpp"
+#include "C_SyvDaUnoDeleteCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,14 +34,14 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
-   \param[in]     orc_IDs    Affected unique IDs
+   \param[in]     orc_Ids    Affected unique IDs
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoDeleteCommand::C_SyvDaUnoDeleteCommand(QGraphicsScene * const opc_Scene,
-                                                 const std::vector<stw_types::uint64> & orc_IDs,
+                                                 const std::vector<uint64_t> & orc_Ids,
                                                  QUndoCommand * const opc_Parent) :
-   C_SyvDaUnoAddDeleteBaseCommand(opc_Scene, orc_IDs, "Delete drawing element(s)", opc_Parent)
+   C_SyvDaUnoAddDeleteBaseCommand(opc_Scene, orc_Ids, "Delete drawing element(s)", opc_Parent)
 {
 }
 

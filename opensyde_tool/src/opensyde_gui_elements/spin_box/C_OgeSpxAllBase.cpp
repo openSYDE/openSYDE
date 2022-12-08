@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QHelpEvent>
-#include "C_GtGetText.h"
-#include "C_OgeSpxAllBase.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeSpxAllBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +38,7 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeSpxAllBase::C_OgeSpxAllBase() :
    C_OgeToolTipBase(),
-   me_ToolTipAdditionalType(stw_opensyde_gui::C_NagToolTip::eDEFAULT)
+   me_ToolTipAdditionalType(stw::opensyde_gui::C_NagToolTip::eDEFAULT)
 {
 }
 
@@ -51,7 +50,7 @@ C_OgeSpxAllBase::C_OgeSpxAllBase() :
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxAllBase::SetToolTipAdditionalInfo(const QString & orc_Text,
-                                               const stw_opensyde_gui::C_NagToolTip::E_Type oe_Type)
+                                               const stw::opensyde_gui::C_NagToolTip::E_Type oe_Type)
 {
    this->mc_ToolTipAdditionalContent = orc_Text;
    this->me_ToolTipAdditionalType = oe_Type;

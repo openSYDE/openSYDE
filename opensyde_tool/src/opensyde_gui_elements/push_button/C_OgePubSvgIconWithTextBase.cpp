@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "C_OgePubSvgIconWithTextBase.h"
+#include "C_OgePubSvgIconWithTextBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,14 +41,14 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubSvgIconWithTextBase::C_OgePubSvgIconWithTextBase(QWidget * const opc_Parent) :
    C_OgePubSvgIconOnly(opc_Parent),
-   msn_RightBorderEnabledWidth(0),
-   msn_TopBorderEnabledWidth(0),
-   msn_LeftBorderEnabledWidth(0),
-   msn_BottomBorderEnabledWidth(0),
-   msn_RightBorderDisabledWidth(0),
-   msn_TopBorderDisabledWidth(0),
-   msn_LeftBorderDisabledWidth(0),
-   msn_BottomBorderDisabledWidth(0),
+   ms32_RightBorderEnabledWidth(0),
+   ms32_TopBorderEnabledWidth(0),
+   ms32_LeftBorderEnabledWidth(0),
+   ms32_BottomBorderEnabledWidth(0),
+   ms32_RightBorderDisabledWidth(0),
+   ms32_TopBorderDisabledWidth(0),
+   ms32_LeftBorderDisabledWidth(0),
+   ms32_BottomBorderDisabledWidth(0),
    mq_IconLeft(true),
    ms32_MarginLeft(0),
    ms32_MarginInBetween(0),
@@ -64,7 +63,7 @@ C_OgePubSvgIconWithTextBase::C_OgePubSvgIconWithTextBase(QWidget * const opc_Par
    \param[in] os32_MarginInBetween Margin between icon and text
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubSvgIconWithTextBase::SetMargins(const sint32 os32_MarginLeft, const sint32 os32_MarginInBetween)
+void C_OgePubSvgIconWithTextBase::SetMargins(const int32_t os32_MarginLeft, const int32_t os32_MarginInBetween)
 {
    this->ms32_MarginLeft = os32_MarginLeft;
    this->ms32_MarginInBetween = os32_MarginInBetween;
@@ -94,24 +93,24 @@ void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
       if (this->mq_IconLeft == true)
       {
          c_IconRect = QRect(this->rect().topLeft() +
-                            QPoint(static_cast<sintn>(this->ms32_MarginLeft),
+                            QPoint(static_cast<int32_t>(this->ms32_MarginLeft),
                                    (this->rect().height() - this->iconSize().height()) / 2),
                             this->iconSize());
          c_TextRect = QRect(this->rect().topLeft() +
-                            QPoint(static_cast<sintn>(this->ms32_MarginLeft) + this->iconSize().width() +
-                                   static_cast<sintn>(this->ms32_MarginInBetween), 0),
+                            QPoint(static_cast<int32_t>(this->ms32_MarginLeft) + this->iconSize().width() +
+                                   static_cast<int32_t>(this->ms32_MarginInBetween), 0),
                             QSize(this->rect().width(), this->rect().height()));
       }
       else
       {
          c_IconRect = QRect(this->rect().topRight() +
-                            QPoint(-(static_cast<sintn>(this->ms32_MarginLeft) + this->iconSize().width()),
+                            QPoint(-(static_cast<int32_t>(this->ms32_MarginLeft) + this->iconSize().width()),
                                    (this->rect().height() - this->iconSize().height()) / 2),
                             this->iconSize());
          c_TextRect = QRect(this->rect().topLeft(),
-                            QSize(this->rect().width() - (static_cast<sintn>(this->ms32_MarginLeft) +
+                            QSize(this->rect().width() - (static_cast<int32_t>(this->ms32_MarginLeft) +
                                                           this->iconSize().width() +
-                                                          static_cast<sintn>(this->ms32_MarginInBetween)),
+                                                          static_cast<int32_t>(this->ms32_MarginInBetween)),
                                   this->rect().height()));
       }
       //Background
@@ -143,16 +142,16 @@ void C_OgePubSvgIconWithTextBase::paintEvent(QPaintEvent * const opc_Event)
       if (this->isEnabled())
       {
          C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(
-            this->rect(), c_Painter, this->msn_LeftBorderEnabledWidth, this->msn_TopBorderEnabledWidth,
-            this->msn_RightBorderEnabledWidth, this->msn_BottomBorderEnabledWidth, this->mc_BorderColorEnabledLeft,
+            this->rect(), c_Painter, this->ms32_LeftBorderEnabledWidth, this->ms32_TopBorderEnabledWidth,
+            this->ms32_RightBorderEnabledWidth, this->ms32_BottomBorderEnabledWidth, this->mc_BorderColorEnabledLeft,
             this->mc_BorderColorEnabledTop, this->mc_BorderColorEnabledRight,
             this->mc_BorderColorEnabledBottom);
       }
       else
       {
          C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(
-            this->rect(), c_Painter, this->msn_LeftBorderDisabledWidth, this->msn_TopBorderDisabledWidth,
-            this->msn_RightBorderDisabledWidth, this->msn_BottomBorderDisabledWidth, this->mc_BorderColorDisabledLeft,
+            this->rect(), c_Painter, this->ms32_LeftBorderDisabledWidth, this->ms32_TopBorderDisabledWidth,
+            this->ms32_RightBorderDisabledWidth, this->ms32_BottomBorderDisabledWidth, this->mc_BorderColorDisabledLeft,
             this->mc_BorderColorDisabledTop, this->mc_BorderColorDisabledRight,
             this->mc_BorderColorDisabledBottom);
       }
@@ -240,10 +239,10 @@ void C_OgePubSvgIconWithTextBase::SetDarkMode(const bool oq_Active)
 
    \param[in]     orc_RectOuter          Outer rectangle to draw borders at/in
    \param[in,out] orc_Painter            Painter to use for drawing
-   \param[in]     osn_LeftBorderWidth   Left border width
-   \param[in]     osn_TopBorderWidth    Top border width
-   \param[in]     osn_RightBorderWidth  Right border width
-   \param[in]     osn_BottomBorderWidth Bottom border width
+   \param[in]     os32_LeftBorderWidth   Left border width
+   \param[in]     os32_TopBorderWidth    Top border width
+   \param[in]     os32_RightBorderWidth  Right border width
+   \param[in]     os32_BottomBorderWidth Bottom border width
    \param[in]     orc_BorderColorLeft    Left border color
    \param[in]     orc_BorderColorTop     Top border color
    \param[in]     orc_BorderColorRight   Right border color
@@ -251,9 +250,10 @@ void C_OgePubSvgIconWithTextBase::SetDarkMode(const bool oq_Active)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(const QRect & orc_RectOuter, QPainter & orc_Painter,
-                                                     const sintn osn_LeftBorderWidth, const sintn osn_TopBorderWidth,
-                                                     const sintn osn_RightBorderWidth,
-                                                     const sintn osn_BottomBorderWidth,
+                                                     const int32_t os32_LeftBorderWidth,
+                                                     const int32_t os32_TopBorderWidth,
+                                                     const int32_t os32_RightBorderWidth,
+                                                     const int32_t os32_BottomBorderWidth,
                                                      const QColor & orc_BorderColorLeft,
                                                      const QColor & orc_BorderColorTop,
                                                      const QColor & orc_BorderColorRight,
@@ -265,11 +265,11 @@ void C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(const QRect & orc_RectOuter
    //for some reason drawing polygons won't fully fill in the bottom and right border
    // so the rect needs to be slightly expanded
    const QRect & rc_Outer = orc_RectOuter.adjusted(0, 0, 1, 1);
-   const QRect c_Inner = rc_Outer.adjusted(osn_LeftBorderWidth, osn_TopBorderWidth, -osn_RightBorderWidth,
-                                           -osn_BottomBorderWidth);
+   const QRect c_Inner = rc_Outer.adjusted(os32_LeftBorderWidth, os32_TopBorderWidth, -os32_RightBorderWidth,
+                                           -os32_BottomBorderWidth);
 
    //Left border
-   if (osn_LeftBorderWidth > 0)
+   if (os32_LeftBorderWidth > 0)
    {
       QPolygon c_Poly;
       c_Poly.append(rc_Outer.bottomLeft());
@@ -281,7 +281,7 @@ void C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(const QRect & orc_RectOuter
       orc_Painter.drawConvexPolygon(c_Poly);
    }
    //Top border
-   if (osn_TopBorderWidth > 0)
+   if (os32_TopBorderWidth > 0)
    {
       QPolygon c_Poly;
       c_Poly.append(rc_Outer.topLeft());
@@ -293,7 +293,7 @@ void C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(const QRect & orc_RectOuter
       orc_Painter.drawConvexPolygon(c_Poly);
    }
    //Right border
-   if (osn_RightBorderWidth > 0)
+   if (os32_RightBorderWidth > 0)
    {
       QPolygon c_Poly;
       c_Poly.append(rc_Outer.topRight());
@@ -305,7 +305,7 @@ void C_OgePubSvgIconWithTextBase::mh_DrawRectBorders(const QRect & orc_RectOuter
       orc_Painter.drawConvexPolygon(c_Poly);
    }
    //Bottom border
-   if (osn_BottomBorderWidth > 0)
+   if (os32_BottomBorderWidth > 0)
    {
       QPolygon c_Poly;
       c_Poly.append(rc_Outer.bottomRight());

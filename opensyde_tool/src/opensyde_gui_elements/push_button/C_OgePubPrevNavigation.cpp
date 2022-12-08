@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "constants.h"
-#include "C_OgePubPrevNavigation.h"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "C_OgePubPrevNavigation.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,7 +45,7 @@ C_OgePubPrevNavigation::C_OgePubPrevNavigation(QWidget * const opc_Parent) :
    C_OgePubSvgIconWithTextBase(opc_Parent)
 {
    this->SetMargins(1, 6);
-   this->msn_LeftBorderEnabledWidth = 0;
+   this->ms32_LeftBorderEnabledWidth = 0;
    this->mc_TextColorEnabled = mc_STYLE_GUIDE_COLOR_5;
    this->mc_TextColorDisabled = mc_STYLE_GUIDE_COLOR_9;
    this->mc_TextColorDarkMode = mc_STYLE_GUIDE_COLOR_5;

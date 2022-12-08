@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QChar>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SdNdeUnoLeDataPoolListElementDataChangeCommand.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementDataChangeCommand.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_tgl;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,11 +55,11 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementDataChangeCommand::C_SdNdeUnoLeDataPoolListElementDataChangeCommand(
-   const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
+   const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex,
    C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-   const uint32 & oru32_DataPoolListElementIndex, const QVariant & orc_NewData,
-   const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32 & oru32_ArrayIndex,
-   const sint32 & ors32_DataSetIndex, QUndoCommand * const opc_Parent) :
+   const uint32_t & oru32_DataPoolListElementIndex, const QVariant & orc_NewData,
+   const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32_t & oru32_ArrayIndex,
+   const int32_t & ors32_DataSetIndex, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                               opc_DataPoolListModelViewManager,
                                               "Change List element data", opc_Parent),
@@ -106,13 +105,13 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::undo(void)
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_PreviousData,
                                                                 const QVariant & orc_NewData)
 {
-   C_PuiSdNodeDataPoolListElement c_UIElement;
-   C_OSCNodeDataPoolListElement c_OSCElement;
+   C_PuiSdNodeDataPoolListElement c_UiElement;
+   C_OscNodeDataPoolListElement c_OscElement;
 
    if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                this->mu32_DataPoolListIndex,
-                                                               this->mu32_DataPoolListElementIndex, c_OSCElement,
-                                                               c_UIElement) == C_NO_ERR)
+                                                               this->mu32_DataPoolListElementIndex, c_OscElement,
+                                                               c_UiElement) == C_NO_ERR)
    {
       bool q_ApplyAutoMin = false;
       bool q_ApplyAutoMax = false;
@@ -120,28 +119,28 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
       bool q_ApplyMaxToDataSet = false;
       bool q_AutoAdaptArraySize = false;
       //Copy previous value
-      C_SdNdeDpUtil::h_ConvertToElementGeneric(c_OSCElement, c_UIElement, this->me_DataChangeType,
+      C_SdNdeDpUtil::h_ConvertToElementGeneric(c_OscElement, c_UiElement, this->me_DataChangeType,
                                                orc_PreviousData, this->mu32_ArrayIndex, this->ms32_DataSetIndex);
       switch (this->me_DataChangeType)
       {
       case C_SdNdeDpUtil::eELEMENT_NAME:
-         c_OSCElement.c_Name = orc_NewData.toString().toStdString().c_str();
+         c_OscElement.c_Name = orc_NewData.toString().toStdString().c_str();
          break;
       case C_SdNdeDpUtil::eELEMENT_COMMENT:
-         c_OSCElement.c_Comment = orc_NewData.toString().toStdString().c_str();
+         c_OscElement.c_Comment = orc_NewData.toString().toStdString().c_str();
          break;
       case C_SdNdeDpUtil::eELEMENT_VALUE_TYPE:
          if (orc_NewData.toInt() == 10)
          {
-            c_UIElement.q_InterpretAsString = true;
-            c_OSCElement.SetType(C_OSCNodeDataPoolContent::E_Type::eSINT8);
+            c_UiElement.q_InterpretAsString = true;
+            c_OscElement.SetType(C_OscNodeDataPoolContent::E_Type::eSINT8);
             //Handle min max (always valid)
             if (this->mq_Initial == true)
             {
                q_ApplyAutoMin = true;
                q_ApplyAutoMax = true;
             }
-            if (c_OSCElement.GetArraySize() == 1)
+            if (c_OscElement.GetArraySize() == 1)
             {
                q_AutoAdaptArraySize = true;
             }
@@ -150,24 +149,24 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          {
             if (this->mq_Initial == true)
             {
-               const C_OSCNodeDataPoolContent::E_Type e_NewType =
-                  C_SdNdeDpUtil::h_ConvertContentTypeFromComboBox(static_cast<sint8>(orc_NewData.toInt()));
-               c_UIElement.q_InterpretAsString = false;
-               if (c_UIElement.q_AutoMinMaxActive == false)
+               const C_OscNodeDataPoolContent::E_Type e_NewType =
+                  C_SdNdeDpUtil::h_ConvertContentTypeFromComboBox(static_cast<int8_t>(orc_NewData.toInt()));
+               c_UiElement.q_InterpretAsString = false;
+               if (c_UiElement.q_AutoMinMaxActive == false)
                {
                   //Manual handling necessary
-                  if (c_OSCElement.c_MinValue.CheckInsideRange(e_NewType) == false)
+                  if (c_OscElement.c_MinValue.CheckInsideRange(e_NewType) == false)
                   {
                      q_ApplyAutoMin = true;
                   }
-                  if (c_OSCElement.c_MaxValue.CheckInsideRange(e_NewType) == false)
+                  if (c_OscElement.c_MaxValue.CheckInsideRange(e_NewType) == false)
                   {
                      q_ApplyAutoMax = true;
                   }
                }
-               c_OSCElement.SetType(e_NewType);
+               c_OscElement.SetType(e_NewType);
                //Recheck auto min max
-               if (c_UIElement.q_AutoMinMaxActive == true)
+               if (c_UiElement.q_AutoMinMaxActive == true)
                {
                   q_ApplyAutoMin = true;
                   q_ApplyAutoMax = true;
@@ -175,40 +174,40 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
             }
             else
             {
-               const C_OSCNodeDataPoolContent::E_Type e_NewType =
-                  C_SdNdeDpUtil::h_ConvertContentTypeFromComboBox(static_cast<sint8>(orc_NewData.toInt()));
-               c_OSCElement.SetType(e_NewType);
-               c_UIElement.q_InterpretAsString = false;
+               const C_OscNodeDataPoolContent::E_Type e_NewType =
+                  C_SdNdeDpUtil::h_ConvertContentTypeFromComboBox(static_cast<int8_t>(orc_NewData.toInt()));
+               c_OscElement.SetType(e_NewType);
+               c_UiElement.q_InterpretAsString = false;
             }
          }
          break;
       case C_SdNdeDpUtil::eELEMENT_ARRAY:
          if (orc_NewData.toInt() <= 1)
          {
-            c_OSCElement.SetArray(false);
+            c_OscElement.SetArray(false);
          }
          else
          {
-            const uint32 u32_NewSize = static_cast<uint32>(orc_NewData.toInt());
-            const C_OSCNodeDataPoolContent c_MinVal = m_GetCurrentTypeMinGeneric();
-            const C_OSCNodeDataPoolContent c_MaxVal = m_GetCurrentTypeMaxGeneric();
-            uint32 u32_PrevSize;
-            c_OSCElement.SetArray(true);
-            u32_PrevSize = c_OSCElement.GetArraySize();
-            c_OSCElement.SetArraySize(u32_NewSize);
+            const uint32_t u32_NewSize = static_cast<uint32_t>(orc_NewData.toInt());
+            const C_OscNodeDataPoolContent c_MinVal = m_GetCurrentTypeMinGeneric();
+            const C_OscNodeDataPoolContent c_MaxVal = m_GetCurrentTypeMaxGeneric();
+            uint32_t u32_PrevSize;
+            c_OscElement.SetArray(true);
+            u32_PrevSize = c_OscElement.GetArraySize();
+            c_OscElement.SetArraySize(u32_NewSize);
             //Auto min max
-            for (uint32 u32_It = u32_PrevSize; u32_It < u32_NewSize; ++u32_It)
+            for (uint32_t u32_It = u32_PrevSize; u32_It < u32_NewSize; ++u32_It)
             {
-               m_CopySingleValueToArrayIndex(c_MinVal, u32_It, c_OSCElement.c_MinValue);
-               m_CopySingleValueToArrayIndex(c_MaxVal, u32_It, c_OSCElement.c_MaxValue);
+               m_CopySingleValueToArrayIndex(c_MinVal, u32_It, c_OscElement.c_MinValue);
+               m_CopySingleValueToArrayIndex(c_MaxVal, u32_It, c_OscElement.c_MaxValue);
             }
          }
          break;
       case C_SdNdeDpUtil::eELEMENT_AUTO_MIN_MAX:
-         c_UIElement.q_AutoMinMaxActive = orc_NewData.toBool();
+         c_UiElement.q_AutoMinMaxActive = orc_NewData.toBool();
          if (this->mq_Initial == true)
          {
-            if (c_UIElement.q_AutoMinMaxActive == true)
+            if (c_UiElement.q_AutoMinMaxActive == true)
             {
                q_ApplyAutoMin = true;
                q_ApplyAutoMax = true;
@@ -217,73 +216,73 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          break;
       case C_SdNdeDpUtil::eELEMENT_MIN:
          //Save scaled value
-         orc_PreviousData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_OSCElement.c_MinValue,
-                                                                                  c_OSCElement.f64_Factor,
-                                                                                  c_OSCElement.f64_Offset,
+         orc_PreviousData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_OscElement.c_MinValue,
+                                                                                  c_OscElement.f64_Factor,
+                                                                                  c_OscElement.f64_Offset,
                                                                                   this->mu32_ArrayIndex);
          //Update value
-         C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_OSCElement.c_MinValue,
-                                                                       c_OSCElement.f64_Factor,
-                                                                       c_OSCElement.f64_Offset,
+         C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_OscElement.c_MinValue,
+                                                                       c_OscElement.f64_Factor,
+                                                                       c_OscElement.f64_Offset,
                                                                        this->mu32_ArrayIndex);
          q_ApplyMinToDataSet = true;
          break;
       case C_SdNdeDpUtil::eELEMENT_MAX:
          //Save scaled value
-         orc_PreviousData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_OSCElement.c_MaxValue,
-                                                                                  c_OSCElement.f64_Factor,
-                                                                                  c_OSCElement.f64_Offset,
+         orc_PreviousData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_OscElement.c_MaxValue,
+                                                                                  c_OscElement.f64_Factor,
+                                                                                  c_OscElement.f64_Offset,
                                                                                   this->mu32_ArrayIndex);
          //Update value
-         C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_OSCElement.c_MaxValue,
-                                                                       c_OSCElement.f64_Factor,
-                                                                       c_OSCElement.f64_Offset,
+         C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData, c_OscElement.c_MaxValue,
+                                                                       c_OscElement.f64_Factor,
+                                                                       c_OscElement.f64_Offset,
                                                                        this->mu32_ArrayIndex);
          q_ApplyMaxToDataSet = true;
          break;
       case C_SdNdeDpUtil::eELEMENT_FACTOR:
-         c_OSCElement.f64_Factor = orc_NewData.toDouble();
+         c_OscElement.f64_Factor = orc_NewData.toDouble();
          break;
       case C_SdNdeDpUtil::eELEMENT_OFFSET:
-         c_OSCElement.f64_Offset = orc_NewData.toDouble();
+         c_OscElement.f64_Offset = orc_NewData.toDouble();
          break;
       case C_SdNdeDpUtil::eELEMENT_UNIT:
-         c_OSCElement.c_Unit = orc_NewData.toString().toStdString().c_str();
+         c_OscElement.c_Unit = orc_NewData.toString().toStdString().c_str();
          break;
       case C_SdNdeDpUtil::eELEMENT_DATA_SET:
          if ((this->ms32_DataSetIndex >= 0) &&
-             (static_cast<uint32>(this->ms32_DataSetIndex) < c_OSCElement.c_DataSetValues.size()))
+             (static_cast<uint32_t>(this->ms32_DataSetIndex) < c_OscElement.c_DataSetValues.size()))
          {
-            if (c_UIElement.q_InterpretAsString == true)
+            if (c_UiElement.q_InterpretAsString == true)
             {
-               C_SdNdeDpUtil::h_SetString(
-                  orc_NewData.toString(), c_OSCElement.c_DataSetValues[static_cast<uint32>(this->ms32_DataSetIndex)]);
+               C_SdNdeDpContentUtil::h_SetString(
+                  orc_NewData.toString(), c_OscElement.c_DataSetValues[static_cast<uint32_t>(this->ms32_DataSetIndex)]);
             }
             else
             {
-               const uint32 u32_DataSetIndex = static_cast<uint32>(this->ms32_DataSetIndex);
+               const uint32_t u32_DataSetIndex = static_cast<uint32_t>(this->ms32_DataSetIndex);
                //Save scaled value
                orc_PreviousData =
-                  C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_OSCElement.c_DataSetValues[
+                  C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_OscElement.c_DataSetValues[
                                                                            u32_DataSetIndex],
-                                                                        c_OSCElement.f64_Factor,
-                                                                        c_OSCElement.f64_Offset,
+                                                                        c_OscElement.f64_Factor,
+                                                                        c_OscElement.f64_Offset,
                                                                         this->mu32_ArrayIndex);
                C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_NewData,
-                                                                             c_OSCElement.c_DataSetValues[
+                                                                             c_OscElement.c_DataSetValues[
                                                                                 u32_DataSetIndex],
-                                                                             c_OSCElement.f64_Factor,
-                                                                             c_OSCElement.f64_Offset,
+                                                                             c_OscElement.f64_Factor,
+                                                                             c_OscElement.f64_Offset,
                                                                              this->mu32_ArrayIndex);
             }
          }
          break;
       case C_SdNdeDpUtil::eELEMENT_ACCESS:
-         c_OSCElement.e_Access =
-            C_SdNdeDpUtil::h_ConvertElementAccesFromComboBox(static_cast<sint8>(orc_NewData.toInt()));
+         c_OscElement.e_Access =
+            C_SdNdeDpUtil::h_ConvertElementAccesFromComboBox(static_cast<int8_t>(orc_NewData.toInt()));
          break;
       case C_SdNdeDpUtil::eELEMENT_EVENT_CALL:
-         c_OSCElement.q_DiagEventCall = orc_NewData.toBool();
+         c_OscElement.q_DiagEventCall = orc_NewData.toBool();
          break;
       default:
          break;
@@ -291,8 +290,8 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
       C_PuiSdHandler::h_GetInstance()->SetDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                               this->mu32_DataPoolListIndex,
                                                               this->mu32_DataPoolListElementIndex,
-                                                              c_OSCElement,
-                                                              c_UIElement);
+                                                              c_OscElement,
+                                                              c_UiElement);
       //Auto min max handling AFTER changes were applied (Min max should include the changes)
       if (this->mq_Initial == true)
       {
@@ -318,14 +317,14 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          if (q_ApplyMinToDataSet == true)
          {
             const QVariant c_NewData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-               c_OSCElement.c_MinValue,
-               c_OSCElement.f64_Factor,
-               c_OSCElement.f64_Offset,
+               c_OscElement.c_MinValue,
+               c_OscElement.f64_Factor,
+               c_OscElement.f64_Offset,
                this->mu32_ArrayIndex);
-            for (uint32 u32_ItDataSet = 0; u32_ItDataSet < c_OSCElement.c_DataSetValues.size(); ++u32_ItDataSet)
+            for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < c_OscElement.c_DataSetValues.size(); ++u32_ItDataSet)
             {
-               if (C_SdNdeDpUtil::h_CompareSpecifiedItemSmaller(c_OSCElement.c_DataSetValues[u32_ItDataSet],
-                                                                c_OSCElement.c_MinValue,
+               if (C_SdNdeDpUtil::h_CompareSpecifiedItemSmaller(c_OscElement.c_DataSetValues[u32_ItDataSet],
+                                                                c_OscElement.c_MinValue,
                                                                 this->mu32_ArrayIndex) == true)
                {
                   new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
@@ -340,14 +339,14 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
          if (q_ApplyMaxToDataSet == true)
          {
             const QVariant c_NewData = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-               c_OSCElement.c_MaxValue,
-               c_OSCElement.f64_Factor,
-               c_OSCElement.f64_Offset,
+               c_OscElement.c_MaxValue,
+               c_OscElement.f64_Factor,
+               c_OscElement.f64_Offset,
                this->mu32_ArrayIndex);
-            for (uint32 u32_ItDataSet = 0; u32_ItDataSet < c_OSCElement.c_DataSetValues.size(); ++u32_ItDataSet)
+            for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < c_OscElement.c_DataSetValues.size(); ++u32_ItDataSet)
             {
-               if (C_SdNdeDpUtil::h_CompareSpecifiedItemSmaller(c_OSCElement.c_MaxValue,
-                                                                c_OSCElement.c_DataSetValues[u32_ItDataSet],
+               if (C_SdNdeDpUtil::h_CompareSpecifiedItemSmaller(c_OscElement.c_MaxValue,
+                                                                c_OscElement.c_DataSetValues[u32_ItDataSet],
                                                                 this->mu32_ArrayIndex) == true)
                {
                   new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
@@ -381,7 +380,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
             }
             else if (this->me_DataChangeType == C_SdNdeDpUtil::eELEMENT_ARRAY)
             {
-               const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+               const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
                   this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                   this->mu32_DataPoolListIndex);
                //Array size change can affect min & max & data sets cells
@@ -392,17 +391,17 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
                //All data sets
                if (pc_List != NULL)
                {
-                  for (uint32 u32_ItDataSet = 0; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
+                  for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
                   {
                      pc_Model->HandleDataChange(this->mu32_DataPoolListElementIndex,
                                                 C_SdNdeDpUtil::eELEMENT_DATA_SET,
-                                                static_cast<sint32>(u32_ItDataSet));
+                                                static_cast<int32_t>(u32_ItDataSet));
                   }
                }
             }
             else if (this->me_DataChangeType == C_SdNdeDpUtil::eELEMENT_VALUE_TYPE)
             {
-               const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+               const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
                   this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                   this->mu32_DataPoolListIndex);
                //Array size change can affect auto & min & max & factor & offset & unit data sets cells
@@ -421,11 +420,11 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
                //All data sets
                if (pc_List != NULL)
                {
-                  for (uint32 u32_ItDataSet = 0; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
+                  for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
                   {
                      pc_Model->HandleDataChange(this->mu32_DataPoolListElementIndex,
                                                 C_SdNdeDpUtil::eELEMENT_DATA_SET,
-                                                static_cast<sint32>(u32_ItDataSet));
+                                                static_cast<int32_t>(u32_ItDataSet));
                   }
                }
             }
@@ -444,22 +443,22 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Change(QVariant & orc_P
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
 {
-   const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+   const C_OscNodeDataPoolListElement * const pc_OscElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
                                                                  this->mu32_DataPoolListElementIndex);
 
-   tgl_assert(pc_OSCElement != NULL);
-   if (pc_OSCElement != NULL)
+   tgl_assert(pc_OscElement != NULL);
+   if (pc_OscElement != NULL)
    {
       QVariant c_Data;
-      const C_OSCNodeDataPoolContent c_TemporaryElement = m_GetCurrentTypeMinGeneric();
+      const C_OscNodeDataPoolContent c_TemporaryElement = m_GetCurrentTypeMinGeneric();
       c_Data = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_TemporaryElement,
-                                                                     pc_OSCElement->f64_Factor,
-                                                                     pc_OSCElement->f64_Offset, 0);
+                                                                     pc_OscElement->f64_Factor,
+                                                                     pc_OscElement->f64_Offset, 0);
 
       //Append to current command
-      if (pc_OSCElement->c_MinValue.GetArray() == false)
+      if (pc_OscElement->c_MinValue.GetArray() == false)
       {
          new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                               this->mu32_DataPoolListIndex,
@@ -470,7 +469,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
       }
       else
       {
-         for (uint32 u32_ItArray = 0; u32_ItArray < pc_OSCElement->c_MinValue.GetArraySize(); ++u32_ItArray)
+         for (uint32_t u32_ItArray = 0; u32_ItArray < pc_OscElement->c_MinValue.GetArraySize(); ++u32_ItArray)
          {
             new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
@@ -489,22 +488,22 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMin(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
 {
-   const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+   const C_OscNodeDataPoolListElement * const pc_OscElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
                                                                  this->mu32_DataPoolListElementIndex);
 
-   tgl_assert(pc_OSCElement != NULL);
-   if (pc_OSCElement != NULL)
+   tgl_assert(pc_OscElement != NULL);
+   if (pc_OscElement != NULL)
    {
       QVariant c_Data;
-      const C_OSCNodeDataPoolContent c_TemporaryElement = m_GetCurrentTypeMaxGeneric();
+      const C_OscNodeDataPoolContent c_TemporaryElement = m_GetCurrentTypeMaxGeneric();
       c_Data = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(c_TemporaryElement,
-                                                                     pc_OSCElement->f64_Factor,
-                                                                     pc_OSCElement->f64_Offset, 0);
+                                                                     pc_OscElement->f64_Factor,
+                                                                     pc_OscElement->f64_Offset, 0);
 
       //Append to current command
-      if (pc_OSCElement->c_MaxValue.GetArray() == false)
+      if (pc_OscElement->c_MaxValue.GetArray() == false)
       {
          new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                               this->mu32_DataPoolListIndex,
@@ -515,7 +514,7 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
       }
       else
       {
-         for (uint32 u32_ItArray = 0; u32_ItArray < pc_OSCElement->c_MaxValue.GetArraySize(); ++u32_ItArray)
+         for (uint32_t u32_ItArray = 0; u32_ItArray < pc_OscElement->c_MaxValue.GetArraySize(); ++u32_ItArray)
          {
             new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
@@ -535,50 +534,50 @@ void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_ApplyAutoMax(void)
    Current minimum value in generic format
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_GetCurrentTypeMinGeneric(void) const
+C_OscNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_GetCurrentTypeMinGeneric(void) const
 {
-   C_OSCNodeDataPoolContent c_Retval;
-   const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+   C_OscNodeDataPoolContent c_Retval;
+   const C_OscNodeDataPoolListElement * const pc_OscElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
                                                                  this->mu32_DataPoolListElementIndex);
 
-   if (pc_OSCElement != NULL)
+   if (pc_OscElement != NULL)
    {
-      c_Retval.SetType(pc_OSCElement->GetType());
+      c_Retval.SetType(pc_OscElement->GetType());
       c_Retval.SetArray(false);
 
       switch (c_Retval.GetType())
       {
-      case C_OSCNodeDataPoolContent::E_Type::eUINT8:
-         c_Retval.SetValueU8(std::numeric_limits<uint8>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eUINT8:
+         c_Retval.SetValueU8(std::numeric_limits<uint8_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eUINT16:
-         c_Retval.SetValueU16(std::numeric_limits<uint16>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eUINT16:
+         c_Retval.SetValueU16(std::numeric_limits<uint16_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eUINT32:
-         c_Retval.SetValueU32(std::numeric_limits<uint32>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eUINT32:
+         c_Retval.SetValueU32(std::numeric_limits<uint32_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eUINT64:
-         c_Retval.SetValueU64(std::numeric_limits<uint64>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eUINT64:
+         c_Retval.SetValueU64(std::numeric_limits<uint64_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT8:
-         c_Retval.SetValueS8(std::numeric_limits<sint8>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eSINT8:
+         c_Retval.SetValueS8(std::numeric_limits<int8_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT16:
-         c_Retval.SetValueS16(std::numeric_limits<sint16>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eSINT16:
+         c_Retval.SetValueS16(std::numeric_limits<int16_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT32:
-         c_Retval.SetValueS32(std::numeric_limits<sint32>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eSINT32:
+         c_Retval.SetValueS32(std::numeric_limits<int32_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT64:
-         c_Retval.SetValueS64(std::numeric_limits<sint64>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eSINT64:
+         c_Retval.SetValueS64(std::numeric_limits<int64_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
-         c_Retval.SetValueF32(std::numeric_limits<float32>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eFLOAT32:
+         c_Retval.SetValueF32(std::numeric_limits<float32_t>::lowest());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
-         c_Retval.SetValueF64(std::numeric_limits<float64>::lowest());
+      case C_OscNodeDataPoolContent::E_Type::eFLOAT64:
+         c_Retval.SetValueF64(std::numeric_limits<float64_t>::lowest());
          break;
       default:
          //Unknown min/max
@@ -595,50 +594,50 @@ C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Get
    Current maximum value in generic format
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_GetCurrentTypeMaxGeneric(void) const
+C_OscNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_GetCurrentTypeMaxGeneric(void) const
 {
-   C_OSCNodeDataPoolContent c_Retval;
-   const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+   C_OscNodeDataPoolContent c_Retval;
+   const C_OscNodeDataPoolListElement * const pc_OscElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
                                                                  this->mu32_DataPoolListElementIndex);
 
-   if (pc_OSCElement != NULL)
+   if (pc_OscElement != NULL)
    {
-      c_Retval.SetType(pc_OSCElement->GetType());
+      c_Retval.SetType(pc_OscElement->GetType());
       c_Retval.SetArray(false);
 
       switch (c_Retval.GetType())
       {
-      case C_OSCNodeDataPoolContent::E_Type::eUINT8:
-         c_Retval.SetValueU8(std::numeric_limits<uint8>::max());
+      case C_OscNodeDataPoolContent::E_Type::eUINT8:
+         c_Retval.SetValueU8(std::numeric_limits<uint8_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eUINT16:
-         c_Retval.SetValueU16(std::numeric_limits<uint16>::max());
+      case C_OscNodeDataPoolContent::E_Type::eUINT16:
+         c_Retval.SetValueU16(std::numeric_limits<uint16_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eUINT32:
-         c_Retval.SetValueU32(std::numeric_limits<uint32>::max());
+      case C_OscNodeDataPoolContent::E_Type::eUINT32:
+         c_Retval.SetValueU32(std::numeric_limits<uint32_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eUINT64:
-         c_Retval.SetValueU64(std::numeric_limits<uint64>::max());
+      case C_OscNodeDataPoolContent::E_Type::eUINT64:
+         c_Retval.SetValueU64(std::numeric_limits<uint64_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT8:
-         c_Retval.SetValueS8(std::numeric_limits<sint8>::max());
+      case C_OscNodeDataPoolContent::E_Type::eSINT8:
+         c_Retval.SetValueS8(std::numeric_limits<int8_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT16:
-         c_Retval.SetValueS16(std::numeric_limits<sint16>::max());
+      case C_OscNodeDataPoolContent::E_Type::eSINT16:
+         c_Retval.SetValueS16(std::numeric_limits<int16_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT32:
-         c_Retval.SetValueS32(std::numeric_limits<sint32>::max());
+      case C_OscNodeDataPoolContent::E_Type::eSINT32:
+         c_Retval.SetValueS32(std::numeric_limits<int32_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eSINT64:
-         c_Retval.SetValueS64(std::numeric_limits<sint64>::max());
+      case C_OscNodeDataPoolContent::E_Type::eSINT64:
+         c_Retval.SetValueS64(std::numeric_limits<int64_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
-         c_Retval.SetValueF32(std::numeric_limits<float32>::max());
+      case C_OscNodeDataPoolContent::E_Type::eFLOAT32:
+         c_Retval.SetValueF32(std::numeric_limits<float32_t>::max());
          break;
-      case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
-         c_Retval.SetValueF64(std::numeric_limits<float64>::max());
+      case C_OscNodeDataPoolContent::E_Type::eFLOAT64:
+         c_Retval.SetValueF64(std::numeric_limits<float64_t>::max());
          break;
       default:
          //Unknown min/max
@@ -657,43 +656,43 @@ C_OSCNodeDataPoolContent C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_Get
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementDataChangeCommand::m_CopySingleValueToArrayIndex(
-   const C_OSCNodeDataPoolContent & orc_Single, const uint32 & oru32_ArrayIndex,
-   C_OSCNodeDataPoolContent & orc_Output) const
+   const C_OscNodeDataPoolContent & orc_Single, const uint32_t & oru32_ArrayIndex,
+   C_OscNodeDataPoolContent & orc_Output) const
 {
    if ((((orc_Single.GetArray() == false) && (orc_Output.GetArray() == true)) &&
         (orc_Single.GetType() == orc_Output.GetType())) && (oru32_ArrayIndex < orc_Output.GetArraySize()))
    {
       switch (orc_Single.GetType())
       {
-      case C_OSCNodeDataPoolContent::eUINT8:
-         orc_Output.SetValueAU8Element(orc_Single.GetValueU8(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eUINT8:
+         orc_Output.SetValueArrU8Element(orc_Single.GetValueU8(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eUINT16:
-         orc_Output.SetValueAU16Element(orc_Single.GetValueU16(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eUINT16:
+         orc_Output.SetValueArrU16Element(orc_Single.GetValueU16(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eUINT32:
-         orc_Output.SetValueAU32Element(orc_Single.GetValueU32(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eUINT32:
+         orc_Output.SetValueArrU32Element(orc_Single.GetValueU32(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eUINT64:
-         orc_Output.SetValueAU64Element(orc_Single.GetValueU64(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eUINT64:
+         orc_Output.SetValueArrU64Element(orc_Single.GetValueU64(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eSINT8:
-         orc_Output.SetValueAS8Element(orc_Single.GetValueS8(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eSINT8:
+         orc_Output.SetValueArrS8Element(orc_Single.GetValueS8(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eSINT16:
-         orc_Output.SetValueAS16Element(orc_Single.GetValueS16(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eSINT16:
+         orc_Output.SetValueArrS16Element(orc_Single.GetValueS16(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eSINT32:
-         orc_Output.SetValueAS32Element(orc_Single.GetValueS32(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eSINT32:
+         orc_Output.SetValueArrS32Element(orc_Single.GetValueS32(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eSINT64:
-         orc_Output.SetValueAS64Element(orc_Single.GetValueS64(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eSINT64:
+         orc_Output.SetValueArrS64Element(orc_Single.GetValueS64(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eFLOAT32:
-         orc_Output.SetValueAF32Element(orc_Single.GetValueF32(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eFLOAT32:
+         orc_Output.SetValueArrF32Element(orc_Single.GetValueF32(), oru32_ArrayIndex);
          break;
-      case C_OSCNodeDataPoolContent::eFLOAT64:
-         orc_Output.SetValueAF64Element(orc_Single.GetValueF64(), oru32_ArrayIndex);
+      case C_OscNodeDataPoolContent::eFLOAT64:
+         orc_Output.SetValueArrF64Element(orc_Single.GetValueF64(), oru32_ArrayIndex);
          break;
       default:
          break;

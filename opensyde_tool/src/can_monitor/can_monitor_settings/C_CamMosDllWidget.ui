@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeWiSettingSubSection" name="pc_WiHeader" native="true"/>
+    <widget class="stw::opensyde_gui_elements::C_CamOgeWiSettingSubSection" name="pc_WiHeader" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="pc_WiContent" native="true">
@@ -84,7 +84,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PushButtonConfigure">
+         <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PushButtonConfigure">
           <property name="text">
            <string>Configure Btn</string>
           </property>
@@ -93,7 +93,7 @@
        </layout>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameTop">
+       <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameTop">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -120,7 +120,7 @@
          <number>9</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonPeak">
+         <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonPeak">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -142,7 +142,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonVector">
+         <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonVector">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -161,7 +161,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonOther">
+         <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonOther">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -180,7 +180,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetCustomDll" native="true">
+         <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetCustomDll" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_13">
            <property name="spacing">
             <number>0</number>
@@ -198,7 +198,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCustomDllPath">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCustomDllPath">
              <property name="text">
               <string>DLL</string>
              </property>
@@ -221,7 +221,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_CamOgeLeFilePath" name="pc_LineEditCustomDllPath">
+            <widget class="stw::opensyde_gui_elements::C_CamOgeLeFilePath" name="pc_LineEditCustomDllPath">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -237,7 +237,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_CamOgePubPathVariables" name="pc_PushButtonVariables">
+            <widget class="stw::opensyde_gui_elements::C_CamOgePubPathVariables" name="pc_PushButtonVariables">
              <property name="minimumSize">
               <size>
                <width>30</width>
@@ -256,7 +256,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_CamOgePubDarkBrowse" name="pc_PushButtonBrowse">
+            <widget class="stw::opensyde_gui_elements::C_CamOgePubDarkBrowse" name="pc_PushButtonBrowse">
              <property name="minimumSize">
               <size>
                <width>30</width>
@@ -293,7 +293,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameBottom">
+       <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameBottom">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -321,52 +321,52 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeWiSettingSubSection</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeWiSettingSubSection</class>
    <extends>QWidget</extends>
-   <header>C_CamOgeWiSettingSubSection.h</header>
+   <header>C_CamOgeWiSettingSubSection.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubDarkBrowse.h</header>
+   <header>C_CamOgePubDarkBrowse.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeRabProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeRabProperties</class>
    <extends>QRadioButton</extends>
-   <header>C_OgeRabProperties.h</header>
+   <header>C_OgeRabProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubSettingsAdd.h</header>
+   <header>C_CamOgePubSettingsAdd.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubPathVariables</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubPathVariables</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubPathVariables.h</header>
+   <header>C_CamOgePubPathVariables.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeLeFilePath</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeLeFilePath</class>
    <extends>QLineEdit</extends>
-   <header>C_CamOgeLeFilePath.h</header>
+   <header>C_CamOgeLeFilePath.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -8,33 +8,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <list>
 
-#include "C_SyvDaItPaWriteWidget.h"
+#include "C_SyvDaItPaWriteWidget.hpp"
 #include "ui_C_SyvDaItPaWriteWidget.h"
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_Uti.h"
-#include "C_SyvDaItUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_PuiSvDbDataElementHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_Uti.hpp"
+#include "C_SyvDaItUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_PuiSvDbDataElementHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -59,10 +58,10 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      orc_InvalidLists       All lists to update CRC for
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItPaWriteWidget::C_SyvDaItPaWriteWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+C_SyvDaItPaWriteWidget::C_SyvDaItPaWriteWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                C_SyvComDriverDiag & orc_ComDriver,
-                                               const std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements,
-                                               const std::vector<C_OSCNodeDataPoolListId> & orc_InvalidLists) :
+                                               const std::vector<C_OscNodeDataPoolListElementId> & orc_ChangedElements,
+                                               const std::vector<C_OscNodeDataPoolListId> & orc_InvalidLists) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaItPaWriteWidget),
    mpc_ParentDialog(&orc_Parent),
@@ -99,7 +98,7 @@ C_SyvDaItPaWriteWidget::C_SyvDaItPaWriteWidget(stw_opensyde_gui_elements::C_OgeP
    connect(this->mpc_Ui->pc_PbConfirm, &QPushButton::clicked, this, &C_SyvDaItPaWriteWidget::m_ConfirmClicked);
    connect(this->mpc_ParentDialog, &C_OgePopUpDialog::SigCloseIgnored, this,
            &C_SyvDaItPaWriteWidget::m_OnCancel);
-   connect(this->mpc_Ui->pc_CbConfirm, &stw_opensyde_gui_elements::C_OgeChxProperties::stateChanged, this,
+   connect(this->mpc_Ui->pc_CbConfirm, &stw::opensyde_gui_elements::C_OgeChxProperties::stateChanged, this,
            &C_SyvDaItPaWriteWidget::m_ConfirmCheckBoxChanged);
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvDaItPaWriteWidget::m_Timer);
    this->mc_Timer.setInterval(10);
@@ -172,10 +171,10 @@ C_SyvDaItPaWriteWidget::E_Step C_SyvDaItPaWriteWidget::GetStep(void) const
    C_RD_WR     An error occurred. The data on the server may not be valid.
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItPaWriteWidget::GetChangedElements(std::map<C_OSCNodeDataPoolListElementId,
-                                                           C_SyvDaItPaValuePairs> & orc_AffectedElementValues) const
+int32_t C_SyvDaItPaWriteWidget::GetChangedElements(std::map<C_OscNodeDataPoolListElementId,
+                                                            C_SyvDaItPaValuePairs> & orc_AffectedElementValues) const
 {
-   sint32 s32_Return = C_RD_WR;
+   int32_t s32_Return = C_RD_WR;
 
    orc_AffectedElementValues.clear();
 
@@ -198,7 +197,7 @@ sint32 C_SyvDaItPaWriteWidget::GetChangedElements(std::map<C_OSCNodeDataPoolList
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       m_OnCancel();
    }
@@ -218,11 +217,11 @@ void C_SyvDaItPaWriteWidget::keyPressEvent(QKeyEvent * const opc_Event)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
-   const std::vector<C_OSCNodeDataPoolListElementId> & orc_ChangedElements,
-   const std::vector<C_OSCNodeDataPoolListId> & orc_InvalidLists)
+   const std::vector<C_OscNodeDataPoolListElementId> & orc_ChangedElements,
+   const std::vector<C_OscNodeDataPoolListId> & orc_InvalidLists)
 {
    // Prepare the writing for each node
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    this->mc_AllNodeIndexes.clear();
    this->mc_ReadNodeValues.clear();
@@ -234,11 +233,11 @@ void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
 
    for (u32_Counter = 0U; u32_Counter < orc_ChangedElements.size(); ++u32_Counter)
    {
-      const C_OSCNodeDataPoolListElementId & rc_Id = orc_ChangedElements[u32_Counter];
-      const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+      const C_OscNodeDataPoolListElementId & rc_Id = orc_ChangedElements[u32_Counter];
+      const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
          rc_Id.u32_NodeIndex, rc_Id.u32_DataPoolIndex, rc_Id.u32_ListIndex);
       // Check if a changed element for this node was registered already
-      uint32 u32_NodeCounter;
+      uint32_t u32_NodeCounter;
       bool q_NodeFound = false;
 
       for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_AllNodeIndexes.size(); ++u32_NodeCounter)
@@ -263,21 +262,21 @@ void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
       }
 
       // Save all lists
-      this->mc_RelevantLists.insert(static_cast<C_OSCNodeDataPoolListId>(orc_ChangedElements[u32_Counter]));
+      this->mc_RelevantLists.insert(static_cast<C_OscNodeDataPoolListId>(orc_ChangedElements[u32_Counter]));
 
       //Parse original values
       if (pc_List != NULL)
       {
-         for (uint32 u32_ItElement = 0UL; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
+         for (uint32_t u32_ItElement = 0UL; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
          {
             const bool q_Changed = (u32_ItElement == rc_Id.u32_ElementIndex);
-            const C_OSCNodeDataPoolListElementId c_Id(rc_Id.u32_NodeIndex, rc_Id.u32_DataPoolIndex,
+            const C_OscNodeDataPoolListElementId c_Id(rc_Id.u32_NodeIndex, rc_Id.u32_DataPoolIndex,
                                                       rc_Id.u32_ListIndex, u32_ItElement);
             //Add if not containing or if it is more important (changed!)
             if ((this->mc_AllAffectedValues.find(c_Id) == this->mc_AllAffectedValues.end()) ||
                 (q_Changed == true))
             {
-               const C_OSCNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_ItElement];
+               const C_OscNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_ItElement];
                const C_SyvDaItPaValuePairs c_Pair(rc_Element.c_NvmValue, q_Changed);
                this->mc_AllAffectedValues[c_Id] = c_Pair;
             }
@@ -287,10 +286,10 @@ void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
 
    for (u32_Counter = 0U; u32_Counter < orc_InvalidLists.size(); ++u32_Counter)
    {
-      const C_OSCNodeDataPoolListId & rc_CurListId = orc_InvalidLists[u32_Counter];
-      const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+      const C_OscNodeDataPoolListId & rc_CurListId = orc_InvalidLists[u32_Counter];
+      const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
          rc_CurListId.u32_NodeIndex, rc_CurListId.u32_DataPoolIndex, rc_CurListId.u32_ListIndex);
-      uint32 u32_NodeCounter;
+      uint32_t u32_NodeCounter;
       bool q_NodeFound = false;
 
       for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_AllNodeIndexes.size(); ++u32_NodeCounter)
@@ -304,7 +303,7 @@ void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
 
       if (q_NodeFound == false)
       {
-         std::vector<C_OSCNodeDataPoolListId> c_NewList;
+         std::vector<C_OscNodeDataPoolListId> c_NewList;
          c_NewList.push_back(rc_CurListId);
          // Both indexes must be synchronous
          // Add the node index
@@ -325,15 +324,15 @@ void C_SyvDaItPaWriteWidget::m_StartWriteChangedElements(
       //Parse original values
       if (pc_List != NULL)
       {
-         for (uint32 u32_ItElement = 0UL; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
+         for (uint32_t u32_ItElement = 0UL; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
          {
-            const C_OSCNodeDataPoolListElementId c_ElementId(rc_CurListId.u32_NodeIndex,
+            const C_OscNodeDataPoolListElementId c_ElementId(rc_CurListId.u32_NodeIndex,
                                                              rc_CurListId.u32_DataPoolIndex,
                                                              rc_CurListId.u32_ListIndex, u32_ItElement);
             //Only add if not already containing
             if (this->mc_AllAffectedValues.find(c_ElementId) == this->mc_AllAffectedValues.end())
             {
-               const C_OSCNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_ItElement];
+               const C_OscNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_ItElement];
                const C_SyvDaItPaValuePairs c_Pair(rc_Element.c_NvmValue, false);
                this->mc_AllAffectedValues[c_ElementId] = c_Pair;
             }
@@ -368,7 +367,7 @@ void C_SyvDaItPaWriteWidget::m_WriteChangedElementsOfNode(void)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
    {
-      sint32 s32_Return;
+      int32_t s32_Return;
 
       if (this->mq_RequestPending == false)
       {
@@ -393,7 +392,7 @@ void C_SyvDaItPaWriteWidget::m_WriteChangedElementsOfNode(void)
       }
       else
       {
-         sint32 s32_ServiceResult;
+         int32_t s32_ServiceResult;
          s32_Return = this->mrc_ComDriver.GetPollResults(s32_ServiceResult);
 
          if (s32_Return == C_NO_ERR)
@@ -458,7 +457,7 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
    {
-      sint32 s32_Return;
+      int32_t s32_Return;
 
       if (this->mq_RequestPending == false)
       {
@@ -481,7 +480,7 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
       }
       else
       {
-         sint32 s32_ServiceResult;
+         int32_t s32_ServiceResult;
          s32_Return = this->mrc_ComDriver.GetPollResults(s32_ServiceResult);
 
          if (s32_Return == C_NO_ERR)
@@ -575,14 +574,14 @@ void C_SyvDaItPaWriteWidget::m_ReadBackElementsOfNode(void)
 void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
 {
    // Show the read list in the confirm area
-   std::set<stw_opensyde_core::C_OSCNodeDataPoolListId>::const_iterator c_ItItem;
+   std::set<stw::opensyde_core::C_OscNodeDataPoolListId>::const_iterator c_ItItem;
    // List for sorting all nodes
    std::list<QString> c_NodeText;
    std::list<QString>::const_iterator c_ItNodeText;
    QString c_Text = "";
-   uint32 u32_CurNodeIndex = 0xFFFFFFFFU;
-   uint32 u32_CurDataPoolIndex = 0xFFFFFFFFU;
-   const C_OSCNode * pc_OSCNode = NULL;
+   uint32_t u32_CurNodeIndex = 0xFFFFFFFFU;
+   uint32_t u32_CurDataPoolIndex = 0xFFFFFFFFU;
+   const C_OscNode * pc_OscNode = NULL;
 
    for (c_ItItem = this->mc_RelevantLists.begin(); c_ItItem != this->mc_RelevantLists.end(); ++c_ItItem)
    {
@@ -591,7 +590,7 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
       {
          // A new node
          u32_CurNodeIndex = (*c_ItItem).u32_NodeIndex;
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_CurNodeIndex);
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_CurNodeIndex);
 
          if (c_Text != "")
          {
@@ -601,56 +600,56 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
             c_Text = "";
          }
 
-         if (pc_OSCNode != NULL)
+         if (pc_OscNode != NULL)
          {
             c_Text += "<u>" + static_cast<QString>(C_GtGetText::h_GetText("Node")) + " - " +
-                      static_cast<QString>(pc_OSCNode->c_Properties.c_Name.c_str()) + "</u>";
+                      static_cast<QString>(pc_OscNode->c_Properties.c_Name.c_str()) + "</u>";
          }
       }
 
-      if (pc_OSCNode != NULL)
+      if (pc_OscNode != NULL)
       {
-         const C_PuiSdNodeDataPoolList * const pc_UIList =
-            C_PuiSdHandler::h_GetInstance()->GetUIDataPoolList(u32_CurNodeIndex,
+         const C_PuiSdNodeDataPoolList * const pc_UiList =
+            C_PuiSdHandler::h_GetInstance()->GetUiDataPoolList(u32_CurNodeIndex,
                                                                (*c_ItItem).u32_DataPoolIndex,
                                                                (*c_ItItem).u32_ListIndex);
-         const C_OSCNodeDataPoolList * const pc_OSCList =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(u32_CurNodeIndex,
+         const C_OscNodeDataPoolList * const pc_OscList =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(u32_CurNodeIndex,
                                                                 (*c_ItItem).u32_DataPoolIndex,
                                                                 (*c_ItItem).u32_ListIndex);
 
          if (u32_CurDataPoolIndex != (*c_ItItem).u32_DataPoolIndex)
          {
             // A new datapool
-            const C_OSCNodeDataPool * pc_OSCDataPool;
+            const C_OscNodeDataPool * pc_OscDataPool;
             u32_CurDataPoolIndex = (*c_ItItem).u32_DataPoolIndex;
 
-            pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(u32_CurNodeIndex,
+            pc_OscDataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(u32_CurNodeIndex,
                                                                              u32_CurDataPoolIndex);
 
-            if (pc_OSCDataPool != NULL)
+            if (pc_OscDataPool != NULL)
             {
                c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(1UL));
                c_Text += static_cast<QString>(C_GtGetText::h_GetText("Datapool")) +
-                         " - " + static_cast<QString>(pc_OSCDataPool->c_Name.c_str()) + "</div>";
+                         " - " + static_cast<QString>(pc_OscDataPool->c_Name.c_str()) + "</div>";
             }
          }
 
-         if (((pc_OSCList != NULL) && (pc_UIList != NULL)) &&
-             (pc_OSCList->c_Elements.size() == pc_UIList->c_DataPoolListElements.size()))
+         if (((pc_OscList != NULL) && (pc_UiList != NULL)) &&
+             (pc_OscList->c_Elements.size() == pc_UiList->c_DataPoolListElements.size()))
          {
-            uint32 u32_ElementCounter;
+            uint32_t u32_ElementCounter;
             // Heading for list
             c_Text += static_cast<QString>("<div %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(2UL));
             c_Text += static_cast<QString>(C_GtGetText::h_GetText("List")) + " - " +
-                      static_cast<QString>(pc_OSCList->c_Name.c_str()) + "</div>";
+                      static_cast<QString>(pc_OscList->c_Name.c_str()) + "</div>";
             c_Text += static_cast<QString>("<table width=\"100%\" %1>").arg(C_SyvDaItUtil::h_GetHtmlIndentStyle(3UL));
 
-            for (u32_ElementCounter = 0U; u32_ElementCounter < pc_OSCList->c_Elements.size(); ++u32_ElementCounter)
+            for (u32_ElementCounter = 0U; u32_ElementCounter < pc_OscList->c_Elements.size(); ++u32_ElementCounter)
             {
-               const C_OSCNodeDataPoolListElement * pc_OSCElement;
+               const C_OscNodeDataPoolListElement * pc_OscElement;
                const C_PuiSdNodeDataPoolListElement & rc_CurUiListElement =
-                  pc_UIList->c_DataPoolListElements[u32_ElementCounter];
+                  pc_UiList->c_DataPoolListElements[u32_ElementCounter];
                std::vector<QString> c_NvmValues;
                QString c_ElementNumber;
                QString c_ElementText;
@@ -670,34 +669,34 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
                }
 
                c_ElementNumber = "#" + QString::number(u32_ElementCounter + 1U);
-               c_ElementText = pc_OSCList->c_Elements[u32_ElementCounter].c_Name.c_str();
+               c_ElementText = pc_OscList->c_Elements[u32_ElementCounter].c_Name.c_str();
 
                if (oq_ShowReadValues == true)
                {
-                  pc_OSCElement = m_GetReadElementById(u32_CurNodeIndex,
+                  pc_OscElement = m_GetReadElementById(u32_CurNodeIndex,
                                                        (*c_ItItem).u32_DataPoolIndex,
                                                        (*c_ItItem).u32_ListIndex,
                                                        u32_ElementCounter);
-                  tgl_assert(pc_OSCElement != NULL);
+                  tgl_assert(pc_OscElement != NULL);
                }
                else
                {
-                  pc_OSCElement = &pc_OSCList->c_Elements[u32_ElementCounter];
+                  pc_OscElement = &pc_OscList->c_Elements[u32_ElementCounter];
                }
-               if (pc_OSCElement != NULL)
+               if (pc_OscElement != NULL)
                {
                   if (rc_CurUiListElement.q_InterpretAsString == true)
                   {
-                     const QString c_Tmp = "\"" + C_SdNdeDpUtil::h_ConvertToString(pc_OSCElement->c_NvmValue) +
+                     const QString c_Tmp = "\"" + C_SdNdeDpContentUtil::h_ConvertToString(pc_OscElement->c_NvmValue) +
                                            "\"";
                      c_NvmValues.push_back(c_Tmp);
                   }
                   else
                   {
                      C_SdNdeDpContentUtil::h_GetValuesAsScaledString(
-                        pc_OSCElement->c_NvmValue,
-                        pc_OSCList->c_Elements[u32_ElementCounter].f64_Factor,
-                        pc_OSCList->c_Elements[u32_ElementCounter].f64_Offset,
+                        pc_OscElement->c_NvmValue,
+                        pc_OscList->c_Elements[u32_ElementCounter].f64_Factor,
+                        pc_OscList->c_Elements[u32_ElementCounter].f64_Offset,
                         c_NvmValues, false);
                   }
                }
@@ -708,17 +707,17 @@ void C_SyvDaItPaWriteWidget::m_ShowParameterValues(const bool oq_ShowReadValues)
                   c_Text += "<tr>";
                   // Filling of all table data cells
                   c_Text += "<td width=\"5%\">" + c_SpanChangedStart + c_ElementNumber + c_SpanChangedEnd + "</td>";
-                  c_Text += "<td width=\"15%\">" + c_SpanChangedStart + c_ElementText + c_SpanChangedEnd + "</td>";
+                  c_Text += "<td width=\"25%\">" + c_SpanChangedStart + c_ElementText + c_SpanChangedEnd + "</td>";
 
                   // Array
                   c_Text += "<td>" + c_SpanChangedStart;
 
-                  for (uintn un_ArrayCounter = 0U; un_ArrayCounter < c_NvmValues.size(); ++un_ArrayCounter)
+                  for (uint32_t u32_ArrayCounter = 0U; u32_ArrayCounter < c_NvmValues.size(); ++u32_ArrayCounter)
                   {
-                     c_Text += c_NvmValues[un_ArrayCounter] + ";";
+                     c_Text += c_NvmValues[u32_ArrayCounter] + ";";
                   }
                   c_Text.chop(1); // remove last ";"
-                  c_Text += " " + static_cast<QString>(pc_OSCList->c_Elements[u32_ElementCounter].c_Unit.c_str()) +
+                  c_Text += " " + static_cast<QString>(pc_OscList->c_Elements[u32_ElementCounter].c_Unit.c_str()) +
                             c_SpanChangedEnd + "</td>";
                   c_Text += "</tr>";
                }
@@ -770,7 +769,7 @@ void C_SyvDaItPaWriteWidget::m_WriteCrcOfNode(void)
 {
    if (this->mu32_CurrentNode < this->mc_AllNodeIndexes.size())
    {
-      sint32 s32_Return;
+      int32_t s32_Return;
 
       if (this->mq_RequestPending == false)
       {
@@ -793,7 +792,7 @@ void C_SyvDaItPaWriteWidget::m_WriteCrcOfNode(void)
       }
       else
       {
-         sint32 s32_ServiceResult;
+         int32_t s32_ServiceResult;
          s32_Return = this->mrc_ComDriver.GetPollResults(s32_ServiceResult);
 
          if (s32_Return == C_NO_ERR)
@@ -867,8 +866,8 @@ bool C_SyvDaItPaWriteWidget::m_SendNotification(void)
 
       this->me_Step = eSEND_NOTIFICATION;
       this->mrc_ComDriver.PollNvmNotifyOfChanges((*this->mc_NotificationIterator).u32_NodeIndex,
-                                                 static_cast<uint8>((*this->mc_NotificationIterator).u32_DataPoolIndex),
-                                                 static_cast<uint16>((*this->mc_NotificationIterator).u32_ListIndex));
+                                                 static_cast<uint8_t>((*this->mc_NotificationIterator).u32_DataPoolIndex),
+                                                 static_cast<uint16_t>((*this->mc_NotificationIterator).u32_ListIndex));
       //Important iterator step (strange notation because of lint)
       this->mc_NotificationIterator.operator ++();
       this->mc_Timer.start();
@@ -882,7 +881,7 @@ bool C_SyvDaItPaWriteWidget::m_SendNotification(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
 {
-   sint32 s32_Result;
+   int32_t s32_Result;
 
    if (this->mrc_ComDriver.GetPollResults(s32_Result) == C_NO_ERR)
    {
@@ -893,21 +892,21 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
          this->mc_NotificationResult.push_back(q_Ack);
          if (this->mc_NotificationIterator != this->mc_RelevantLists.end())
          {
-            sint32 s32_Tmp;
+            int32_t s32_Tmp;
             //Process thread finished event to allow next request
             QApplication::processEvents();
             //Start next thread
             s32_Tmp = this->mrc_ComDriver.PollNvmNotifyOfChanges(
                (*this->mc_NotificationIterator).u32_NodeIndex,
-               static_cast<uint8>((*this->mc_NotificationIterator).u32_DataPoolIndex),
-               static_cast<uint16>((*this->mc_NotificationIterator).u32_ListIndex));
+               static_cast<uint8_t>((*this->mc_NotificationIterator).u32_DataPoolIndex),
+               static_cast<uint16_t>((*this->mc_NotificationIterator).u32_ListIndex));
             tgl_assert(s32_Tmp == C_NO_ERR);
             //Important iterator step (strange notation because of lint)
             this->mc_NotificationIterator.operator ++();
          }
          else
          {
-            std::set<stw_opensyde_core::C_OSCNodeDataPoolListId>::const_iterator c_NotificationIterator =
+            std::set<stw::opensyde_core::C_OscNodeDataPoolListId>::const_iterator c_NotificationIterator =
                this->mc_RelevantLists.begin();
             QString c_Text;
             bool q_AnyNonAcks = false;
@@ -917,7 +916,7 @@ void C_SyvDaItPaWriteWidget::m_SendNextNotification(void)
 
             tgl_assert(this->mc_NotificationResult.size() == this->mc_RelevantLists.size());
 
-            for (uint32 u32_ItAck = 0; u32_ItAck < this->mc_NotificationResult.size(); ++u32_ItAck)
+            for (uint32_t u32_ItAck = 0; u32_ItAck < this->mc_NotificationResult.size(); ++u32_ItAck)
             {
                QString c_Result;
                if (this->mc_NotificationResult[u32_ItAck] == false)
@@ -988,8 +987,8 @@ void C_SyvDaItPaWriteWidget::m_OnCancel(void)
       c_Message.SetHeading(C_GtGetText::h_GetText("Parametrization interrupt "));
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to interrupt the process?\nWithout writing "
                                                       "CRC the lists will become invalid!"));
-      c_Message.SetNOButtonText("Interrupt");
-      c_Message.SetOKButtonText("Don't Interrupt");
+      c_Message.SetNoButtonText("Interrupt");
+      c_Message.SetOkButtonText("Don't Interrupt");
       c_Message.SetCustomMinHeight(180, 180);
       C_OgeWiCustomMessage::E_Outputs e_Output;
       e_Output = c_Message.Execute();
@@ -1074,8 +1073,8 @@ void C_SyvDaItPaWriteWidget::m_ConfirmClicked(void)
    false    Element was not changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                 const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex,
+bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                 const uint32_t ou32_ListIndex, const uint32_t ou32_ElementIndex,
                                                  const bool oq_CheckReadValues)
 {
    bool q_Changed = false;
@@ -1084,7 +1083,7 @@ bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32 ou32_NodeIndex, co
    {
       bool q_NodeFound = false;
 
-      uint32 u32_VectorNodeIndex;
+      uint32_t u32_VectorNodeIndex;
 
       // Search the matching node vector
       for (u32_VectorNodeIndex = 0U; u32_VectorNodeIndex < this->mc_AllNodeIndexes.size(); ++u32_VectorNodeIndex)
@@ -1099,13 +1098,13 @@ bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32 ou32_NodeIndex, co
 
       if (q_NodeFound == true)
       {
-         uint32 u32_ElementCounter;
+         uint32_t u32_ElementCounter;
 
          for (u32_ElementCounter = 0U;
               u32_ElementCounter < this->mc_ChangedElementsForEachNode[u32_VectorNodeIndex].size();
               ++u32_ElementCounter)
          {
-            C_OSCNodeDataPoolListElementId & rc_ElementId =
+            C_OscNodeDataPoolListElementId & rc_ElementId =
                this->mc_ChangedElementsForEachNode[u32_VectorNodeIndex][u32_ElementCounter];
             if ((rc_ElementId.u32_DataPoolIndex == ou32_DataPoolIndex) &&
                 (rc_ElementId.u32_ListIndex == ou32_ListIndex) &&
@@ -1119,10 +1118,10 @@ bool C_SyvDaItPaWriteWidget::m_WasElementChanged(const uint32 ou32_NodeIndex, co
    }
    else
    {
-      const C_OSCNodeDataPoolListElementId c_ElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
+      const C_OscNodeDataPoolListElementId c_ElementId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
                                                        ou32_ElementIndex);
-      const std::map<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                     stw_opensyde_gui_logic::C_SyvDaItPaValuePairs>::const_iterator c_It =
+      const std::map<stw::opensyde_core::C_OscNodeDataPoolListElementId,
+                     stw::opensyde_gui_logic::C_SyvDaItPaValuePairs>::const_iterator c_It =
          this->mc_AllAffectedValues.find(c_ElementId);
       tgl_assert(c_It != this->mc_AllAffectedValues.end());
       if (c_It != this->mc_AllAffectedValues.end())
@@ -1145,8 +1144,8 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
 {
    QString c_Retval;
 
-   for (std::map<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                 stw_opensyde_gui_logic::C_SyvDaItPaValuePairs>::const_iterator c_It =
+   for (std::map<stw::opensyde_core::C_OscNodeDataPoolListElementId,
+                 stw::opensyde_gui_logic::C_SyvDaItPaValuePairs>::const_iterator c_It =
            this->mc_AllAffectedValues.begin();
         c_It != this->mc_AllAffectedValues.end(); ++c_It)
    {
@@ -1156,8 +1155,8 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
       }
       else
       {
-         const C_OSCNodeDataPoolListElement * const pc_Element =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_It->first);
+         const C_OscNodeDataPoolListElement * const pc_Element =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_It->first);
          tgl_assert(pc_Element != NULL);
          if (pc_Element != NULL)
          {
@@ -1215,7 +1214,7 @@ void C_SyvDaItPaWriteWidget::m_Timer(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, const QString & orc_ErrorText,
-                                           const stw_types::sint32 os32_ErrorCode)
+                                           const int32_t os32_ErrorCode)
 {
    const QString c_Text = "Function " + orc_FunctionName +
                           " ended with error code \"" + C_Uti::h_StwError(os32_ErrorCode) + "\"";
@@ -1242,14 +1241,14 @@ void C_SyvDaItPaWriteWidget::m_ReportError(const QString & orc_FunctionName, con
    \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32 os32_ErrorCode)
+void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const int32_t os32_ErrorCode)
 {
-   const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
-   uint8 u8_NRC;
+   const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   uint8_t u8_Nrc;
    QString c_Details;
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
-   const sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
+   const int32_t s32_Return = this->mrc_ComDriver.GetPollResultNrc(u8_Nrc);
 
    tgl_assert(s32_Return == C_NO_ERR);
    switch (os32_ErrorCode)
@@ -1275,7 +1274,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
       break;
    // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
    case C_WARN:
-      switch (u8_NRC)
+      switch (u8_Nrc)
       {
       case 0x13:
          c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
@@ -1300,7 +1299,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
          break;
       default:
          c_Details =
-            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_Nrc, 16));
          break;
       }
       c_Description += "Server sent error response";
@@ -1317,7 +1316,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
       break;
    }
 
-   C_OSCLoggingHandler::h_Flush();
+   C_OscLoggingHandler::h_Flush();
    c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
@@ -1336,14 +1335,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteChangedValues(const sint32
    \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_ErrorCode)
+void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const int32_t os32_ErrorCode)
 {
-   const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
-   uint8 u8_NRC;
+   const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   uint8_t u8_Nrc;
    QString c_Details;
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this);
-   const sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
+   const int32_t s32_Return = this->mrc_ComDriver.GetPollResultNrc(u8_Nrc);
 
    tgl_assert(s32_Return == C_NO_ERR);
 
@@ -1376,7 +1375,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
    // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
    case C_WARN:
       c_Description += "Server sent error response or malformed protocol response";
-      switch (u8_NRC)
+      switch (u8_Nrc)
       {
       case 0x13:
          c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
@@ -1401,7 +1400,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
          break;
       default:
          c_Details =
-            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_Nrc, 16));
          break;
       }
       break;
@@ -1414,7 +1413,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
       break;
    }
 
-   C_OSCLoggingHandler::h_Flush();
+   C_OscLoggingHandler::h_Flush();
    c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
@@ -1434,14 +1433,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeReadValues(const sint32 os32_Er
    \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_ErrorCode)
+void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const int32_t os32_ErrorCode)
 {
-   const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
-   uint8 u8_NRC;
+   const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   uint8_t u8_Nrc;
    QString c_Details;
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this);
-   const sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
+   const int32_t s32_Return = this->mrc_ComDriver.GetPollResultNrc(u8_Nrc);
 
    tgl_assert(s32_Return == C_NO_ERR);
 
@@ -1456,14 +1455,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       break;
    case C_CHECKSUM:
       c_Description += "At least one Datapool of type \"NVM\" has the flag q_IsSafety set to true and";
-      c_Description += "at least one of its lists has the flag q_NvMCRCActive set to false.";
+      c_Description += "at least one of its lists has the flag q_NvmCrcActive set to false.";
       break;
    case C_RANGE:
       c_Description +=
-         "The size of at least one list of NVM Datapools of the copy of C_OSCNode differs to the original instance.\n";
+         "The size of at least one list of NVM Datapools of the copy of C_OscNode differs to the original instance.\n";
       c_Description +=
-         "The count of lists of NVM Datapools of the copy of C_OSCNode differs from the original instance.\n";
-      c_Description += "The count of the Datapools of the copy of C_OSCNode differs from the original instance.";
+         "The count of lists of NVM Datapools of the copy of C_OscNode differs from the original instance.\n";
+      c_Description += "The count of the Datapools of the copy of C_OscNode differs from the original instance.";
       break;
    case C_BUSY:
       c_Description += "No list contains Datapool elements that were";
@@ -1484,7 +1483,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
    // Using <br/> as new line symbol instead of \n due to problems with the h_GetLink syntax
    case C_WARN:
       c_Description += "Server sent error response";
-      switch (u8_NRC)
+      switch (u8_Nrc)
       {
       case 0x13:
          c_Details = C_GtGetText::h_GetText("Incorrect length of request<br/>");
@@ -1509,7 +1508,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
          break;
       default:
          c_Details =
-            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_NRC, 16));
+            static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1<br/>")).arg(QString::number(u8_Nrc, 16));
          break;
       }
       break;
@@ -1525,7 +1524,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
       break;
    }
 
-   C_OSCLoggingHandler::h_Flush();
+   C_OscLoggingHandler::h_Flush();
    c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
@@ -1545,14 +1544,14 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmSafeWriteCrcs(const sint32 os32_Err
    \param[in]  os32_ErrorCode    Function result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_ErrorCode)
+void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const int32_t os32_ErrorCode)
 {
-   const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
-   uint8 u8_NRC;
+   const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   uint8_t u8_Nrc;
    QString c_Details;
    QString c_Description;
    C_OgeWiCustomMessage c_Message(this);
-   const sint32 s32_Return = this->mrc_ComDriver.GetPollResultNRC(u8_NRC);
+   const int32_t s32_Return = this->mrc_ComDriver.GetPollResultNrc(u8_Nrc);
 
    tgl_assert(s32_Return == C_NO_ERR);
 
@@ -1573,7 +1572,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
       break;
    case C_WARN:
       c_Description += "Server sent error response";
-      switch (u8_NRC)
+      switch (u8_Nrc)
       {
       case 0x13:
          c_Details = C_GtGetText::h_GetText("Incorrect length of request");
@@ -1598,7 +1597,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
             C_GtGetText::h_GetText("Server is not in the correct diagnostic session<br/>");
          break;
       default:
-         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_NRC, 16));
+         c_Details = static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(u8_Nrc, 16));
          break;
       }
       break;
@@ -1614,7 +1613,7 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
       break;
    }
 
-   C_OSCLoggingHandler::h_Flush();
+   C_OscLoggingHandler::h_Flush();
    c_Details += static_cast<QString>(C_GtGetText::h_GetText("See log file for details: ")) +
                 C_Uti::h_GetLink(c_Log, mc_STYLESHEET_GUIDE_COLOR_LINK, c_Log);
 
@@ -1637,12 +1636,12 @@ void C_SyvDaItPaWriteWidget::m_ReportErrorNvmNotifyOfChanges(const sint32 os32_E
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvDaItPaWriteWidget::m_ReadAndStoreUpdatedValues(void)
 {
-   for (std::map<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                 stw_opensyde_gui_logic::C_SyvDaItPaValuePairs>::iterator c_It =
+   for (std::map<stw::opensyde_core::C_OscNodeDataPoolListElementId,
+                 stw::opensyde_gui_logic::C_SyvDaItPaValuePairs>::iterator c_It =
            this->mc_AllAffectedValues.begin();
         c_It != this->mc_AllAffectedValues.end(); ++c_It)
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element = m_GetReadElementById(c_It->first.u32_NodeIndex,
+      const C_OscNodeDataPoolListElement * const pc_Element = m_GetReadElementById(c_It->first.u32_NodeIndex,
                                                                                    c_It->first.u32_DataPoolIndex,
                                                                                    c_It->first.u32_ListIndex,
                                                                                    c_It->first.u32_ElementIndex);
@@ -1664,13 +1663,13 @@ QString C_SyvDaItPaWriteWidget::m_ReadAndStoreUpdatedValues(void)
    List name (and containers) as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
+QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OscNodeDataPoolListId & orc_Id)
 {
    QString c_Default = C_GtGetText::h_GetText("Unknown");
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_Id.u32_NodeIndex);
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_Id.u32_NodeIndex);
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_Id.u32_NodeIndex,
                                                                                                  orc_Id.u32_DataPoolIndex);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex, orc_Id.u32_ListIndex);
 
    if (((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL))
@@ -1695,28 +1694,29 @@ QString C_SyvDaItPaWriteWidget::mh_GetId(const C_OSCNodeDataPoolListId & orc_Id)
    Else Valid element
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_SyvDaItPaWriteWidget::m_GetReadElementById(const uint32 ou32_NodeIndex,
-                                                                                  const uint32 ou32_DataPoolIndex,
-                                                                                  const uint32 ou32_ListIndex,
-                                                                                  const uint32 ou32_ElementIndex) const
+const C_OscNodeDataPoolListElement * C_SyvDaItPaWriteWidget::m_GetReadElementById(const uint32_t ou32_NodeIndex,
+                                                                                  const uint32_t ou32_DataPoolIndex,
+                                                                                  const uint32_t ou32_ListIndex,
+                                                                                  const uint32_t ou32_ElementIndex)
+const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
 
    if (this->mc_AllNodeIndexes.size() == this->mc_ReadNodeValues.size())
    {
-      for (uint32 u32_ItKnownIndices = 0UL; u32_ItKnownIndices < this->mc_AllNodeIndexes.size(); ++u32_ItKnownIndices)
+      for (uint32_t u32_ItKnownIndices = 0UL; u32_ItKnownIndices < this->mc_AllNodeIndexes.size(); ++u32_ItKnownIndices)
       {
          if (this->mc_AllNodeIndexes[u32_ItKnownIndices] == ou32_NodeIndex)
          {
-            const stw_opensyde_core::C_OSCNode * const pc_Node = this->mc_ReadNodeValues[u32_ItKnownIndices];
+            const stw::opensyde_core::C_OscNode * const pc_Node = this->mc_ReadNodeValues[u32_ItKnownIndices];
             if (pc_Node != NULL)
             {
                if (ou32_DataPoolIndex < pc_Node->c_DataPools.size())
                {
-                  const C_OSCNodeDataPool & rc_Datapool = pc_Node->c_DataPools[ou32_DataPoolIndex];
+                  const C_OscNodeDataPool & rc_Datapool = pc_Node->c_DataPools[ou32_DataPoolIndex];
                   if (ou32_ListIndex < rc_Datapool.c_Lists.size())
                   {
-                     const C_OSCNodeDataPoolList & rc_List = rc_Datapool.c_Lists[ou32_ListIndex];
+                     const C_OscNodeDataPoolList & rc_List = rc_Datapool.c_Lists[ou32_ListIndex];
                      if (ou32_ElementIndex < rc_List.c_Elements.size())
                      {
                         pc_Retval = &rc_List.c_Elements[ou32_ElementIndex];

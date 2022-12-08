@@ -10,20 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_CamDbHandler.h"
-#include "C_CamProHandler.h"
-#include "C_CamGenSigUtil.h"
-#include "C_CamGenSigWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamGenSigUtil.hpp"
+#include "C_CamGenSigWidget.hpp"
 #include "ui_C_CamGenSigWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -129,9 +129,9 @@ void C_CamGenSigWidget::TriggerSignalReload(void)
    \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigWidget::UpdateMessageDLC(const stw_types::uint32 ou32_MessageIndex) const
+void C_CamGenSigWidget::UpdateMessageDlc(const uint32_t ou32_MessageIndex) const
 {
-   this->mpc_Ui->pc_TableView->UpdateMessageDLC(ou32_MessageIndex);
+   this->mpc_Ui->pc_TableView->UpdateMessageDlc(ou32_MessageIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -141,7 +141,7 @@ void C_CamGenSigWidget::UpdateMessageDLC(const stw_types::uint32 ou32_MessageInd
    \param[in]  ou32_Row                Selected row
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelectedItems, const stw_types::uint32 ou32_Row)
+void C_CamGenSigWidget::UpdateSelection(const uint32_t ou32_NumSelectedItems, const uint32_t ou32_Row)
 {
    QString c_Name = "-";
 
@@ -171,7 +171,7 @@ void C_CamGenSigWidget::UpdateSelection(const stw_types::uint32 ou32_NumSelected
          //Either DBC or OSY message should return a valid message
          if (rc_Message.c_DataBaseFilePath.IsEmpty() == false)
          {
-            if (((C_CamDbHandler::h_GetInstance()->GetOSCMessage(rc_Message.c_DataBaseFilePath.c_str(),
+            if (((C_CamDbHandler::h_GetInstance()->GetOscMessage(rc_Message.c_DataBaseFilePath.c_str(),
                                                                  rc_Message.c_Name.c_str(),
                                                                  rc_Message.q_ContainsValidHash,
                                                                  rc_Message.u32_Hash) != NULL)) ||

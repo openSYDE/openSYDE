@@ -8,38 +8,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "TGLUtils.h"
-#include "C_ImpUtil.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "TglUtils.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
 
-#include "C_SyvUpPacSectionNodeFilesWidget.h"
+#include "C_SyvUpPacSectionNodeFilesWidget.hpp"
 #include "ui_C_SyvUpPacSectionNodeWidget.h"
-#include "C_SyvUpPacListNodeItemFileWidget.h"
-#include "C_SyvUpPacListNodeItemParamSetWidget.h"
-#include "C_SyvUpPacListNodeItemPemFileWidget.h"
-#include "C_PuiSvNodeUpdateParamInfo.h"
-#include "C_SyvUpPacPemFileOptionsPopUp.h"
+#include "C_SyvUpPacListNodeItemFileWidget.hpp"
+#include "C_SyvUpPacListNodeItemParamSetWidget.hpp"
+#include "C_SyvUpPacListNodeItemPemFileWidget.hpp"
+#include "C_PuiSvNodeUpdateParamInfo.hpp"
+#include "C_SyvUpPacPemFileOptionsPopUp.hpp"
 
-#include "C_OgeWiCustomMessage.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -83,7 +82,7 @@ void C_SyvUpPacSectionNodeFilesWidget::AddFile(const QString & orc_File)
    if ((q_ParamSet == false) &&
        (q_PemFile == false))
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
       if ((pc_Node != NULL) &&
@@ -181,8 +180,8 @@ void C_SyvUpPacSectionNodeFilesWidget::AddFile(const QString & orc_File)
          pc_ParamWidget->SetOwnerSectionName(this->mc_SectionName);
 
          // Inserting psi files before all "other" files
-         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(static_cast<uint32>(this->mu32_PemFileCount +
-                                                                               this->mu32_ParamSetFileCount),
+         this->mpc_Ui->pc_FileVerticalLayout->insertWidget(static_cast<uint32_t>(this->mu32_PemFileCount +
+                                                                                 this->mu32_ParamSetFileCount),
                                                            pc_ParamWidget);
 
          // Save the new file as parameter path
@@ -315,7 +314,7 @@ void C_SyvUpPacSectionNodeFilesWidget::RemoveFile(C_SyvUpPacListNodeItemWidget *
 {
    if (opc_App != NULL)
    {
-      const uint32 u32_Number = opc_App->GetAppNumber();
+      const uint32_t u32_Number = opc_App->GetAppNumber();
       if (opc_App->GetType() == mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE)
       {
          // Remove the application file path
@@ -362,7 +361,7 @@ void C_SyvUpPacSectionNodeFilesWidget::OpenPemFileSettings(C_SyvUpPacListNodeIte
 
       // Adapt the states
       {
-         QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
          C_SyvUpPacPemFileOptionsPopUp * const pc_InfoDialog = new C_SyvUpPacPemFileOptionsPopUp(*c_New,
                                                                                                  e_StateSecurity,
                                                                                                  e_StateDebugger);
@@ -370,7 +369,7 @@ void C_SyvUpPacSectionNodeFilesWidget::OpenPemFileSettings(C_SyvUpPacListNodeIte
          //Resize
          c_New->SetSize(QSize(500, 400));
 
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             //No confirmation
             e_StateSecurity = pc_InfoDialog->GetComboBoxSecState();
@@ -402,13 +401,13 @@ void C_SyvUpPacSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpPacConfigNode 
 {
    if (this->mpc_Ui->pc_FileVerticalLayout->count() > 0)
    {
-      sintn sn_Counter;
+      int32_t s32_Counter;
       orc_NodeConfig.c_FileConfigs.reserve(this->mu32_PrimaryFileCount);
       orc_NodeConfig.c_ParamSetConfigs.reserve(orc_NodeConfig.c_ParamSetConfigs.size() + this->mu32_ParamSetFileCount);
 
-      for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++sn_Counter)
+      for (s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++s32_Counter)
       {
-         QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_Counter);
+         QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_Counter);
 
          if (pc_Item != NULL)
          {
@@ -451,7 +450,7 @@ void C_SyvUpPacSectionNodeFilesWidget::PrepareExportConfig(C_SyvUpPacConfigNode 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpPacConfig & orc_Config)
 {
-   uint32 u32_ConfigCounter;
+   uint32_t u32_ConfigCounter;
 
    // Search the matching configuration
    for (u32_ConfigCounter = 0; u32_ConfigCounter < orc_Config.c_NodeConfigs.size(); ++u32_ConfigCounter)
@@ -459,17 +458,17 @@ void C_SyvUpPacSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpPacConfig &
       if ((orc_Config.c_NodeConfigs[u32_ConfigCounter].c_Name == this->mc_NodeName) &&
           (orc_Config.c_NodeConfigs[u32_ConfigCounter].c_DeviceType == this->mc_DeviceType))
       {
-         uintn un_FileCounter;
+         uint32_t u32_FileCounter;
 
          // Remove the previous applications
          this->RemoveAllFiles();
 
          // Add the imported configuration as new parameter set image files
-         for (un_FileCounter = this->mu32_CountSkippedParamSetFiles;
-              un_FileCounter < orc_Config.c_NodeConfigs[u32_ConfigCounter].c_ParamSetConfigs.size();
-              ++un_FileCounter)
+         for (u32_FileCounter = this->mu32_CountSkippedParamSetFiles;
+              u32_FileCounter < orc_Config.c_NodeConfigs[u32_ConfigCounter].c_ParamSetConfigs.size();
+              ++u32_FileCounter)
          {
-            const QString c_Path = orc_Config.c_NodeConfigs[u32_ConfigCounter].c_ParamSetConfigs[un_FileCounter];
+            const QString c_Path = orc_Config.c_NodeConfigs[u32_ConfigCounter].c_ParamSetConfigs[u32_FileCounter];
 
             if (mh_IsFileParamSetFile(c_Path) == true)
             {
@@ -481,12 +480,12 @@ void C_SyvUpPacSectionNodeFilesWidget::LoadImportConfig(const C_SyvUpPacConfig &
          // Add the imported configuration as new applications
          if (this->mq_FileBased == true)
          {
-            for (un_FileCounter = 0U;
-                 un_FileCounter < orc_Config.c_NodeConfigs[u32_ConfigCounter].c_FileConfigs.size();
-                 ++un_FileCounter)
+            for (u32_FileCounter = 0U;
+                 u32_FileCounter < orc_Config.c_NodeConfigs[u32_ConfigCounter].c_FileConfigs.size();
+                 ++u32_FileCounter)
             {
                // Update UI and update view data handling
-               this->AddFile(orc_Config.c_NodeConfigs[u32_ConfigCounter].c_FileConfigs[un_FileCounter]);
+               this->AddFile(orc_Config.c_NodeConfigs[u32_ConfigCounter].c_FileConfigs[u32_FileCounter]);
             }
          }
 
@@ -550,7 +549,7 @@ bool C_SyvUpPacSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, con
 
       if (q_Retval == true)
       {
-         sintn sn_PathCounter = 0;
+         int32_t s32_PathCounter = 0;
 
          q_Retval = false;
 
@@ -559,7 +558,7 @@ bool C_SyvUpPacSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, con
          // add it to the "other files"
          do
          {
-            const QString & rc_CurrentPath = orc_PathList[sn_PathCounter];
+            const QString & rc_CurrentPath = orc_PathList[s32_PathCounter];
 
             if (mh_IsFileParamSetFile(rc_CurrentPath) == true)
             {
@@ -567,7 +566,7 @@ bool C_SyvUpPacSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, con
                {
                   opc_RelevantParamSetImagePaths->push_back(rc_CurrentPath);
                }
-               orc_PathList.erase(orc_PathList.begin() + sn_PathCounter);
+               orc_PathList.erase(orc_PathList.begin() + s32_PathCounter);
                q_Retval = true;
             }
             else if (mh_IsFilePemFile(rc_CurrentPath) == true)
@@ -576,7 +575,7 @@ bool C_SyvUpPacSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, con
                {
                   opc_RelevantPemFilePaths->push_back(rc_CurrentPath);
                }
-               orc_PathList.erase(orc_PathList.begin() + sn_PathCounter);
+               orc_PathList.erase(orc_PathList.begin() + s32_PathCounter);
                q_Retval = true;
             }
             else if (this->mq_FileBased == true)
@@ -585,16 +584,16 @@ bool C_SyvUpPacSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, con
                {
                   opc_RelevantFilePaths->push_back(rc_CurrentPath);
                }
-               orc_PathList.erase(orc_PathList.begin() + sn_PathCounter);
+               orc_PathList.erase(orc_PathList.begin() + s32_PathCounter);
                q_Retval = true;
             }
             else
             {
                // File not relevant
-               ++sn_PathCounter;
+               ++s32_PathCounter;
             }
          }
-         while (sn_PathCounter < orc_PathList.size());
+         while (s32_PathCounter < orc_PathList.size());
 
          if ((q_Retval == true) &&
              (oppc_App != NULL))
@@ -613,7 +612,7 @@ bool C_SyvUpPacSectionNodeFilesWidget::CheckMime(QStringList & orc_PathList, con
    \retval type file of a file based node
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeFilesWidget::Type(void) const
+uint32_t C_SyvUpPacSectionNodeFilesWidget::Type(void) const
 {
    return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE;
 }
@@ -625,7 +624,7 @@ uint32 C_SyvUpPacSectionNodeFilesWidget::Type(void) const
                                        datablock sections
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeFilesWidget::SetCountSkippedParamSetFiles(const uint32 ou32_CountSkippedFiles)
+void C_SyvUpPacSectionNodeFilesWidget::SetCountSkippedParamSetFiles(const uint32_t ou32_CountSkippedFiles)
 {
    this->mu32_CountSkippedParamSetFiles = ou32_CountSkippedFiles;
 }
@@ -637,8 +636,8 @@ void C_SyvUpPacSectionNodeFilesWidget::SetCountSkippedParamSetFiles(const uint32
    \param[in]  orc_UpdateInfo    Configured update configuration of view
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeFilesWidget::m_InitSpecificItem(const stw_opensyde_core::C_OSCNode & orc_Node,
-                                                          const stw_opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInfo)
+void C_SyvUpPacSectionNodeFilesWidget::m_InitSpecificItem(const stw::opensyde_core::C_OscNode & orc_Node,
+                                                          const stw::opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInfo)
 {
    const std::vector<QString> c_ViewAppPaths = orc_UpdateInfo.GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
    const std::vector<C_PuiSvNodeUpdateParamInfo> c_ViewParamsetPaths = orc_UpdateInfo.GetParamInfos();
@@ -648,7 +647,7 @@ void C_SyvUpPacSectionNodeFilesWidget::m_InitSpecificItem(const stw_opensyde_cor
       C_PuiSvNodeUpdate::eFTP_FILE_BASED);
    std::vector<bool> c_ViewParamSetSkipFlags = orc_UpdateInfo.GetSkipUpdateOfParamInfosFlags();
    const bool q_ViewPemSkipFlag = orc_UpdateInfo.GetSkipUpdateOfPemFile();
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    Q_UNUSED(orc_Node)
 
@@ -764,7 +763,7 @@ void C_SyvUpPacSectionNodeFilesWidget::m_UpdateTitle(void)
    Adapted number of param set file
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeFilesWidget::m_AdaptParamSetNumber(const uint32 ou32_Number)
+uint32_t C_SyvUpPacSectionNodeFilesWidget::m_AdaptParamSetNumber(const uint32_t ou32_Number)
 {
    return (this->mu32_CountSkippedParamSetFiles + ou32_Number);
 }

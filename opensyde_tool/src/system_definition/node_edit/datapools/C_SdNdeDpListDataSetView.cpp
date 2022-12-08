@@ -10,31 +10,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QMimeData>
 #include <QDrag>
-#include "C_SdNdeDpListDataSetView.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_SdClipBoardHelper.h"
-#include "C_Uti.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeSingleHeaderView.h"
-#include "C_OgeWiUtil.h"
-#include "C_SdUtil.h"
+#include "C_SdNdeDpListDataSetView.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_SdClipBoardHelper.hpp"
+#include "C_Uti.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_errors;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -147,8 +146,8 @@ C_SdNdeDpListDataSetView::~C_SdNdeDpListDataSetView(void)
    \param[in] oru32_ListIndex     Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                       const uint32 & oru32_ListIndex)
+void C_SdNdeDpListDataSetView::SetList(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                       const uint32_t & oru32_ListIndex)
 {
    if (this->mpc_ModelViewManager != NULL)
    {
@@ -173,8 +172,8 @@ void C_SdNdeDpListDataSetView::SetList(const uint32 & oru32_NodeIndex, const uin
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListDataSetView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                      const uint32 & oru32_ListIndex) const
+bool C_SdNdeDpListDataSetView::Equals(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                      const uint32_t & oru32_ListIndex) const
 {
    bool q_Retval;
 
@@ -196,31 +195,31 @@ bool C_SdNdeDpListDataSetView::Equals(const uint32 & oru32_NodeIndex, const uint
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::Copy(void) const
 {
-   std::vector<uint32> c_SelectedIndices = m_GetSelectedIndices();
+   std::vector<uint32_t> c_SelectedIndices = m_GetSelectedIndices();
 
    if (c_SelectedIndices.size() > 0)
    {
-      std::vector<C_OSCNodeDataPoolDataSet> c_OSCNames;
-      std::vector<std::vector<C_OSCNodeDataPoolContent> > c_OSCDataSetValues;
+      std::vector<C_OscNodeDataPoolDataSet> c_OscNames;
+      std::vector<std::vector<C_OscNodeDataPoolContent> > c_OscDataSetValues;
 
-      c_OSCNames.resize(c_SelectedIndices.size());
-      c_OSCDataSetValues.resize(c_SelectedIndices.size());
+      c_OscNames.resize(c_SelectedIndices.size());
+      c_OscDataSetValues.resize(c_SelectedIndices.size());
 
       //Sort to have "correct" copy order
       C_SdUtil::h_SortIndicesAscending(c_SelectedIndices);
-      for (uint32 u32_ItSelectedIndex = 0; u32_ItSelectedIndex < c_SelectedIndices.size(); ++u32_ItSelectedIndex)
+      for (uint32_t u32_ItSelectedIndex = 0; u32_ItSelectedIndex < c_SelectedIndices.size(); ++u32_ItSelectedIndex)
       {
          tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolListDataSet(this->mu32_NodeIndex,
                                                                             this->mu32_DataPoolIndex,
                                                                             this->mu32_ListIndex,
                                                                             c_SelectedIndices[
                                                                                u32_ItSelectedIndex],
-                                                                            c_OSCNames[u32_ItSelectedIndex],
-                                                                            c_OSCDataSetValues[
+                                                                            c_OscNames[u32_ItSelectedIndex],
+                                                                            c_OscDataSetValues[
                                                                                u32_ItSelectedIndex]) == C_NO_ERR);
       }
 
-      C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToClipBoard(c_OSCNames, c_OSCDataSetValues);
+      C_SdClipBoardHelper::h_StoreDataPoolListDataSetsToClipBoard(c_OscNames, c_OscDataSetValues);
    }
 }
 
@@ -240,7 +239,7 @@ void C_SdNdeDpListDataSetView::Cut(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::Paste(void)
 {
-   const uint32 u32_LastIndex = m_GetOneAfterHighestSelected();
+   const uint32_t u32_LastIndex = m_GetOneAfterHighestSelected();
 
    this->mc_UndoManager.DoPaste(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                 this->mpc_ModelViewManager,
@@ -253,7 +252,7 @@ void C_SdNdeDpListDataSetView::Paste(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::Delete(void)
 {
-   const std::vector<uint32> c_SelectedIndices = m_GetSelectedIndices();
+   const std::vector<uint32_t> c_SelectedIndices = m_GetSelectedIndices();
 
    if (c_SelectedIndices.size() > 0)
    {
@@ -271,8 +270,8 @@ void C_SdNdeDpListDataSetView::Delete(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::Insert(const bool & orq_SetFocus)
 {
-   std::vector<uint32> c_Indices;
-   const uint32 u32_Index = m_GetOneAfterHighestSelected();
+   std::vector<uint32_t> c_Indices;
+   const uint32_t u32_Index = m_GetOneAfterHighestSelected();
    c_Indices.push_back(u32_Index);
 
    this->mc_UndoManager.DoAddElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
@@ -280,7 +279,7 @@ void C_SdNdeDpListDataSetView::Insert(const bool & orq_SetFocus)
                                       c_Indices);
    if (orq_SetFocus == true)
    {
-      this->edit(this->model()->index(0, static_cast<sintn>(u32_Index)));
+      this->edit(this->model()->index(0, static_cast<int32_t>(u32_Index)));
    }
 }
 
@@ -294,13 +293,13 @@ void C_SdNdeDpListDataSetView::DoMoveLeft(void)
    {
       bool q_AllowMove = true;
 
-      std::vector<uint32> c_TargetIndices;
-      std::vector<uint32> c_SourceIndices = m_GetSelectedIndices();
+      std::vector<uint32_t> c_TargetIndices;
+      std::vector<uint32_t> c_SourceIndices = m_GetSelectedIndices();
       c_TargetIndices.resize(c_SourceIndices.size());
 
       //Sort to have "correct" move order
       C_SdUtil::h_SortIndicesAscending(c_SourceIndices);
-      for (uint32 u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
+      for (uint32_t u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
       {
          //Check if not first
          if (c_SourceIndices[u32_ItItem] > 0)
@@ -332,20 +331,20 @@ void C_SdNdeDpListDataSetView::DoMoveRight(void)
       {
          bool q_AllowMove = true;
 
-         std::vector<uint32> c_TargetIndices;
-         std::vector<uint32> c_SourceIndices = m_GetSelectedIndices();
-         const uint32 u32_LastIndex =
-            static_cast<uint32>(this->mpc_ModelViewManager->GetDataSetModel(this->mu32_NodeIndex,
-                                                                            this->
-                                                                            mu32_DataPoolIndex,
-                                                                            this->
-                                                                            mu32_ListIndex)->columnCount() -
-                                1);
+         std::vector<uint32_t> c_TargetIndices;
+         std::vector<uint32_t> c_SourceIndices = m_GetSelectedIndices();
+         const uint32_t u32_LastIndex =
+            static_cast<uint32_t>(this->mpc_ModelViewManager->GetDataSetModel(this->mu32_NodeIndex,
+                                                                              this->
+                                                                              mu32_DataPoolIndex,
+                                                                              this->
+                                                                              mu32_ListIndex)->columnCount() -
+                                  1);
          c_TargetIndices.resize(c_SourceIndices.size());
 
          //Sort to have "correct" move order
          C_SdUtil::h_SortIndicesAscending(c_SourceIndices);
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
          {
             //Check if not last
             if (c_SourceIndices[u32_ItItem] < u32_LastIndex)
@@ -389,7 +388,8 @@ QUndoCommand * C_SdNdeDpListDataSetView::TakeUndoCommand(void)
    \param[in] ore_DataChangeType             Data change type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::OnDataChange(const uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData,
+void C_SdNdeDpListDataSetView::OnDataChange(const uint32_t & oru32_DataPoolListDataSetIndex,
+                                            const QVariant & orc_NewData,
                                             const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType)
 {
    this->mc_UndoManager.DoDataChangeElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
@@ -416,7 +416,7 @@ void C_SdNdeDpListDataSetView::SetModelViewManager(C_SdNdeDpListModelViewManager
    \param[in] ors32_NewColumnCount New column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::OnColumnCountChange(const sint32 & ors32_NewColumnCount)
+void C_SdNdeDpListDataSetView::OnColumnCountChange(const int32_t & ors32_NewColumnCount)
 {
    Q_EMIT this->SigColumnCountChange(ors32_NewColumnCount);
 }
@@ -450,30 +450,30 @@ void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
                   if ((pc_MimeData->hasFormat(pc_Model->mimeTypes().at(1)) == true) &&
                       (pc_MimeData->hasFormat(pc_Model->mimeTypes().at(2)) == true))
                   {
-                     std::vector<C_OSCNodeDataPoolDataSet> c_OSCNames;
-                     std::vector<std::vector<C_OSCNodeDataPoolContent> > c_OSCDataSetValues;
+                     std::vector<C_OscNodeDataPoolDataSet> c_OscNames;
+                     std::vector<std::vector<C_OscNodeDataPoolContent> > c_OscDataSetValues;
                      const QString c_Content = pc_MimeData->data(pc_Model->mimeTypes().at(1));
                      //Insert indices
-                     if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(c_OSCNames, c_OSCDataSetValues,
+                     if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(c_OscNames, c_OscDataSetValues,
                                                                                      c_Content) == C_NO_ERR)
                      {
-                        std::vector<uint32> c_SourceIndices;
-                        uint32 u32_TargetCol;
+                        std::vector<uint32_t> c_SourceIndices;
+                        uint32_t u32_TargetCol;
                         const QString c_IndicesString = pc_MimeData->data(pc_Model->mimeTypes().at(2));
-                        std::vector<uint32> c_NewIndices;
+                        std::vector<uint32_t> c_NewIndices;
                         const QModelIndex c_Index = this->indexAt(opc_Event->pos());
                         //Target row
                         if (c_Index.isValid())
                         {
-                           u32_TargetCol = static_cast<uint32>(c_Index.column()) + 1UL;
+                           u32_TargetCol = static_cast<uint32_t>(c_Index.column()) + 1UL;
                         }
                         else
                         {
                            u32_TargetCol = pc_Model->columnCount();
                         }
                         //Calculate target indices
-                        c_NewIndices.resize(c_OSCNames.size());
-                        for (uint32 u32_ItNewIndex = 0; u32_ItNewIndex < c_NewIndices.size(); ++u32_ItNewIndex)
+                        c_NewIndices.resize(c_OscNames.size());
+                        for (uint32_t u32_ItNewIndex = 0; u32_ItNewIndex < c_NewIndices.size(); ++u32_ItNewIndex)
                         {
                            c_NewIndices[u32_ItNewIndex] = u32_TargetCol + u32_ItNewIndex;
                         }
@@ -497,7 +497,7 @@ void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
                                                                          this->mu32_ListIndex,
                                                                          this->mpc_ModelViewManager,
                                                                          c_NewIndices,
-                                                                         c_OSCNames, c_OSCDataSetValues);
+                                                                         c_OscNames, c_OscDataSetValues);
                               //Delete indices in source
                               pc_SourceTable->m_DeleteIndices(c_SourceIndices);
                            }
@@ -523,7 +523,7 @@ void C_SdNdeDpListDataSetView::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_HoveredCol = -1;
+   int32_t s32_HoveredCol = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
    C_TblViewScroll::mouseMoveEvent(opc_Event);
@@ -567,7 +567,7 @@ void C_SdNdeDpListDataSetView::leaveEvent(QEvent * const opc_Event)
 void C_SdNdeDpListDataSetView::selectionChanged(const QItemSelection & orc_Selected,
                                                 const QItemSelection & orc_Deselected)
 {
-   std::vector<uint32> c_SelectedIndices;
+   std::vector<uint32_t> c_SelectedIndices;
    C_TblViewScroll::selectionChanged(orc_Selected, orc_Deselected);
 
    c_SelectedIndices = C_SdNdeDpUtil::h_ConvertVector(this->selectedIndexes(), false);
@@ -587,7 +587,7 @@ void C_SdNdeDpListDataSetView::selectionChanged(const QItemSelection & orc_Selec
 void C_SdNdeDpListDataSetView::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    const QModelIndexList c_SelectedItems = this->selectedIndexes();
-   const std::vector<uint32> c_ReallySelectedItems = this->m_GetSelectedIndices();
+   const std::vector<uint32_t> c_ReallySelectedItems = this->m_GetSelectedIndices();
 
    if (c_ReallySelectedItems.size() > 0)
    {
@@ -605,9 +605,9 @@ void C_SdNdeDpListDataSetView::startDrag(const Qt::DropActions oc_SupportedActio
    \param[in] orc_Indices Indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::m_DeleteIndices(const std::vector<uint32> & orc_Indices)
+void C_SdNdeDpListDataSetView::m_DeleteIndices(const std::vector<uint32_t> & orc_Indices)
 {
-   std::vector<uint32> c_Indices = orc_Indices;
+   std::vector<uint32_t> c_Indices = orc_Indices;
    C_Uti::h_Uniqueify(c_Indices);
    this->mc_UndoManager.DoDeleteElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                          this->mpc_ModelViewManager,
@@ -617,16 +617,16 @@ void C_SdNdeDpListDataSetView::m_DeleteIndices(const std::vector<uint32> & orc_I
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move item in tree
 
-   \param[in] oru32_SourceIndices Source index
-   \param[in] oru32_TargetIndices Target index
+   \param[in] orc_SourceIndices Source index
+   \param[in] orc_TargetIndices Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::m_Move(const std::vector<uint32> & oru32_SourceIndices,
-                                      const std::vector<uint32> & oru32_TargetIndices)
+void C_SdNdeDpListDataSetView::m_Move(const std::vector<uint32_t> & orc_SourceIndices,
+                                      const std::vector<uint32_t> & orc_TargetIndices)
 {
    this->mc_UndoManager.DoMoveElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                        this->mpc_ModelViewManager,
-                                       oru32_SourceIndices, oru32_TargetIndices, false);
+                                       orc_SourceIndices, orc_TargetIndices, false);
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get selected indices
@@ -635,9 +635,9 @@ void C_SdNdeDpListDataSetView::m_Move(const std::vector<uint32> & oru32_SourceIn
    Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SdNdeDpListDataSetView::m_GetSelectedIndices(void) const
+std::vector<uint32_t> C_SdNdeDpListDataSetView::m_GetSelectedIndices(void) const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    QModelIndexList c_SelectedItems = this->selectedIndexes();
 
    c_Retval.reserve(c_SelectedItems.size());
@@ -657,7 +657,7 @@ std::vector<uint32> C_SdNdeDpListDataSetView::m_GetSelectedIndices(void) const
    \param[in] orc_SelectedIndices Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetView::m_CheckActions(const std::vector<uint32> & orc_SelectedIndices)
+void C_SdNdeDpListDataSetView::m_CheckActions(const std::vector<uint32_t> & orc_SelectedIndices)
 {
    if (orc_SelectedIndices.size() > 0)
    {
@@ -673,14 +673,14 @@ void C_SdNdeDpListDataSetView::m_CheckActions(const std::vector<uint32> & orc_Se
             //Move left & right
             q_AllowMoveLeft = true;
             q_AllowMoveRight = true;
-            for (uint32 u32_ItSelectedIndex = 0; u32_ItSelectedIndex < orc_SelectedIndices.size();
+            for (uint32_t u32_ItSelectedIndex = 0; u32_ItSelectedIndex < orc_SelectedIndices.size();
                  ++u32_ItSelectedIndex)
             {
                if (orc_SelectedIndices[u32_ItSelectedIndex] == 0)
                {
                   q_AllowMoveLeft = false;
                }
-               if (orc_SelectedIndices[u32_ItSelectedIndex] == static_cast<uint32>(pc_Model->columnCount() - 1))
+               if (orc_SelectedIndices[u32_ItSelectedIndex] == static_cast<uint32_t>(pc_Model->columnCount() - 1))
                {
                   q_AllowMoveRight = false;
                }
@@ -750,16 +750,16 @@ void C_SdNdeDpListDataSetView::m_UpdateCornerButton(void)
    Index of element after highest selected element
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDpListDataSetView::m_GetOneAfterHighestSelected(void)
+uint32_t C_SdNdeDpListDataSetView::m_GetOneAfterHighestSelected(void)
 {
-   uint32 u32_Retval = 0;
-   const std::vector<uint32> c_SelectedItems = this->m_GetSelectedIndices();
+   uint32_t u32_Retval = 0;
+   const std::vector<uint32_t> c_SelectedItems = this->m_GetSelectedIndices();
 
    if (c_SelectedItems.size() > 0)
    {
-      for (uint32 u32_ItSelected = 0; u32_ItSelected < c_SelectedItems.size(); ++u32_ItSelected)
+      for (uint32_t u32_ItSelected = 0; u32_ItSelected < c_SelectedItems.size(); ++u32_ItSelected)
       {
-         const uint32 u32_Cur = c_SelectedItems[u32_ItSelected];
+         const uint32_t u32_Cur = c_SelectedItems[u32_ItSelected];
          u32_Retval = std::max(u32_Retval, u32_Cur);
       }
       ++u32_Retval;
@@ -769,12 +769,12 @@ uint32 C_SdNdeDpListDataSetView::m_GetOneAfterHighestSelected(void)
       if (this->mpc_ModelViewManager != NULL)
       {
          //Add at end
-         const sint32 s32_ColCount = this->mpc_ModelViewManager->GetDataSetModel(this->mu32_NodeIndex,
-                                                                                 this->mu32_DataPoolIndex,
-                                                                                 this->mu32_ListIndex)->columnCount();
+         const int32_t s32_ColCount = this->mpc_ModelViewManager->GetDataSetModel(this->mu32_NodeIndex,
+                                                                                  this->mu32_DataPoolIndex,
+                                                                                  this->mu32_ListIndex)->columnCount();
          if (s32_ColCount >= 0)
          {
-            u32_Retval = static_cast<uint32>(s32_ColCount);
+            u32_Retval = static_cast<uint32_t>(s32_ColCount);
          }
       }
    }

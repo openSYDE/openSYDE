@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GiRectBaseGroup.h"
+#include "stwtypes.hpp"
+#include "C_GiRectBaseGroup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +38,7 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]     ors32_Index            Index of data element in system definition
    \param[in]     ore_Type               Type for data storage
-   \param[in]     oru64_ID               Unique ID
+   \param[in]     oru64_Id               Unique ID
    \param[in]     of64_MinWidth          Minimum width of node
    \param[in]     of64_MinHeight         Minimum height of node
    \param[in]     of64_ActionPointOffset Action point offset
@@ -47,11 +46,11 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiRectBaseGroup::C_GiRectBaseGroup(const sint32 & ors32_Index, const E_Type & ore_Type, const uint64 & oru64_ID,
-                                     const float64 of64_MinWidth, const float64 of64_MinHeight,
-                                     const float64 of64_ActionPointOffset, const bool oq_KeepAspectRatio,
+C_GiRectBaseGroup::C_GiRectBaseGroup(const int32_t & ors32_Index, const E_Type & ore_Type, const uint64_t & oru64_Id,
+                                     const float64_t of64_MinWidth, const float64_t of64_MinHeight,
+                                     const float64_t of64_ActionPointOffset, const bool oq_KeepAspectRatio,
                                      QGraphicsItem * const opc_Parent) :
-   C_GiBiRectBaseGroup(oru64_ID, of64_MinWidth, of64_MinHeight, of64_ActionPointOffset, oq_KeepAspectRatio, opc_Parent),
+   C_GiBiRectBaseGroup(oru64_Id, of64_MinWidth, of64_MinHeight, of64_ActionPointOffset, oq_KeepAspectRatio, opc_Parent),
    C_PuiSdDataElement(ors32_Index, ore_Type)
 {
 }
@@ -69,12 +68,12 @@ C_GiRectBaseGroup::~C_GiRectBaseGroup(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
+void C_GiRectBaseGroup::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiRectBaseGroup::SetZValueCustom(of64_ZValue);
+   C_GiBiRectBaseGroup::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }

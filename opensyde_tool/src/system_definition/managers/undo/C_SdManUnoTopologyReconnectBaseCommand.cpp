@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdManUnoTopologyReconnectBaseCommand.h"
-#include "C_SebUnoTopBusConnectorMoveCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdManUnoTopologyReconnectBaseCommand.hpp"
+#include "C_SebUnoTopBusConnectorMoveCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 using namespace std;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -38,9 +37,9 @@ using namespace std;
 /*! \brief   Default constructor
 
    \param[in,out]  opc_Scene              Pointer to currently active scene
-   \param[in]      orc_IDs                Affected unique IDs
-   \param[in]      oru64_StartingItemID   Initial item ID
-   \param[in]      oru64_LastItemID       New item ID
+   \param[in]      orc_Ids                Affected unique IDs
+   \param[in]      oru64_StartingItemId   Initial item ID
+   \param[in]      oru64_LastItemId       New item ID
    \param[in]      orc_ConnectionPos      Event position
    \param[in]      ors32_Interface        Interface to connect to
    \param[in]      orc_Properties         Properties
@@ -49,16 +48,16 @@ using namespace std;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyReconnectBaseCommand::C_SdManUnoTopologyReconnectBaseCommand(QGraphicsScene * const opc_Scene,
-                                                                               const std::vector<uint64> & orc_IDs,
-                                                                               const uint64 & oru64_StartingItemID,
-                                                                               const uint64 & oru64_LastItemID,
+                                                                               const std::vector<uint64_t> & orc_Ids,
+                                                                               const uint64_t & oru64_StartingItemId,
+                                                                               const uint64_t & oru64_LastItemId,
                                                                                const QPointF & orc_ConnectionPos,
-                                                                               const sint32 & ors32_Interface,
+                                                                               const int32_t & ors32_Interface,
                                                                                const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, const QString & orc_Description,
                                                                                QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, orc_Description, opc_Parent),
-   mu64_StartingItemID(oru64_StartingItemID),
-   mu64_LastItemID(oru64_LastItemID),
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, orc_Description, opc_Parent),
+   mu64_StartingItemId(oru64_StartingItemId),
+   mu64_LastItemId(oru64_LastItemId),
    mc_ConnectionPos(orc_ConnectionPos),
    ms32_Interface(ors32_Interface),
    mu8_InitialInterface(255U),
@@ -82,7 +81,7 @@ C_SdManUnoTopologyReconnectBaseCommand::~C_SdManUnoTopologyReconnectBaseCommand(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectBaseCommand::undo(void)
 {
-   m_Reconnect(this->mu64_LastItemID, this->mu64_StartingItemID, static_cast<sint32>(this->mu8_InitialInterface),
+   m_Reconnect(this->mu64_LastItemId, this->mu64_StartingItemId, static_cast<int32_t>(this->mu8_InitialInterface),
                this->mc_InitialProperties);
    QUndoCommand::undo();
 }
@@ -93,7 +92,7 @@ void C_SdManUnoTopologyReconnectBaseCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyReconnectBaseCommand::redo(void)
 {
-   m_Reconnect(this->mu64_StartingItemID, this->mu64_LastItemID, this->ms32_Interface, this->mc_Properties);
+   m_Reconnect(this->mu64_StartingItemId, this->mu64_LastItemId, this->ms32_Interface, this->mc_Properties);
    QUndoCommand::redo();
 }
 

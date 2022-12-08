@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCParamSetHandler.h"
-#include "C_SyvUpPacParamSetFileInfo.h"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscParamSetHandler.hpp"
+#include "C_SyvUpPacParamSetFileInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpPacParamSetFileInfo::mhc_START_HEADING_TD = "<td style=\"padding: 9px 9px 0 0;\">";
@@ -49,7 +48,7 @@ const QString C_SyvUpPacParamSetFileInfo::mhc_CONTINUE_DATA_TD = "<td style=\"pa
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPacParamSetFileInfo::C_SyvUpPacParamSetFileInfo(const QString & orc_Path, const QString & orc_StoragePath,
-                                                       const stw_types::uint32 ou32_NodeIndex) :
+                                                       const uint32_t ou32_NodeIndex) :
    mc_Path(orc_Path),
    mc_StoragePath(orc_StoragePath),
    mu32_NodeIndex(ou32_NodeIndex)
@@ -67,13 +66,13 @@ C_SyvUpPacParamSetFileInfo::C_SyvUpPacParamSetFileInfo(const QString & orc_Path,
    C_CONFIG   file does not contain essential information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacParamSetFileInfo::ReadFile(void)
+int32_t C_SyvUpPacParamSetFileInfo::ReadFile(void)
 {
-   uint16 u16_FileCrc;
+   uint16_t u16_FileCrc;
    bool q_OptionlContentMissing;
-   C_OSCParamSetHandler c_FileHandler;
+   C_OscParamSetHandler c_FileHandler;
 
-   const sint32 s32_Retval = c_FileHandler.ReadFile(
+   const int32_t s32_Retval = c_FileHandler.ReadFile(
       this->mc_Path.toStdString().c_str(), false, true, &u16_FileCrc, &q_OptionlContentMissing);
 
    if (s32_Retval == C_NO_ERR)
@@ -132,27 +131,27 @@ const QString & C_SyvUpPacParamSetFileInfo::GetComparisonResultsHtml(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissing)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if ((pc_Node != NULL) && (this->mc_InterpretedFileInfo.c_InterpretedNodes.size() > 0UL))
    {
-      const C_OSCParamSetInterpretedNode & rc_InterpretedNode = this->mc_InterpretedFileInfo.c_InterpretedNodes[0UL];
+      const C_OscParamSetInterpretedNode & rc_InterpretedNode = this->mc_InterpretedFileInfo.c_InterpretedNodes[0UL];
       //Node
       //Node name
       this->m_CompareString(rc_InterpretedNode.c_Name.c_str(),
                             pc_Node->c_Properties.c_Name.c_str(), C_GtGetText::h_GetText("Node name"), 0UL);
-      for (uint32 u32_ItInDp = 0UL; u32_ItInDp < rc_InterpretedNode.c_DataPools.size(); ++u32_ItInDp)
+      for (uint32_t u32_ItInDp = 0UL; u32_ItInDp < rc_InterpretedNode.c_DataPools.size(); ++u32_ItInDp)
       {
          //Datapools
          bool q_DpMatch = false;
-         const C_OSCParamSetInterpretedDataPool & rc_InDp = rc_InterpretedNode.c_DataPools[u32_ItInDp];
-         for (uint32 u32_ItNoDp = 0UL; u32_ItNoDp < pc_Node->c_DataPools.size(); ++u32_ItNoDp)
+         const C_OscParamSetInterpretedDataPool & rc_InDp = rc_InterpretedNode.c_DataPools[u32_ItInDp];
+         for (uint32_t u32_ItNoDp = 0UL; u32_ItNoDp < pc_Node->c_DataPools.size(); ++u32_ItNoDp)
          {
-            const C_OSCNodeDataPool & rc_NoDp = pc_Node->c_DataPools[u32_ItNoDp];
+            const C_OscNodeDataPool & rc_NoDp = pc_Node->c_DataPools[u32_ItNoDp];
             if (rc_InDp.c_DataPoolInfo.c_Name == rc_NoDp.c_Name)
             {
                QString c_Value;
-               uint32 u32_DpHash = 0UL;
+               uint32_t u32_DpHash = 0UL;
                //Datapool
                q_DpMatch = true;
                //Datapool name
@@ -171,9 +170,9 @@ void C_SyvUpPacParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissin
                }
                else
                {
-                  c_Value = static_cast<QString>("%1").arg(rc_NoDp.u32_NvMStartAddress);
+                  c_Value = static_cast<QString>("%1").arg(rc_NoDp.u32_NvmStartAddress);
                }
-               this->m_CompareString(static_cast<QString>("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvMStartAddress),
+               this->m_CompareString(static_cast<QString>("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvmStartAddress),
                                      c_Value, C_GtGetText::h_GetText("Datapool NVM start address"), 1UL);
                //Datapool NVM size
                if (oq_OptionlContentMissing)
@@ -182,9 +181,9 @@ void C_SyvUpPacParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissin
                }
                else
                {
-                  c_Value = static_cast<QString>("%1").arg(rc_NoDp.u32_NvMSize);
+                  c_Value = static_cast<QString>("%1").arg(rc_NoDp.u32_NvmSize);
                }
-               this->m_CompareString(static_cast<QString>("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvMSize),
+               this->m_CompareString(static_cast<QString>("%1").arg(rc_InDp.c_DataPoolInfo.u32_NvmSize),
                                      c_Value, C_GtGetText::h_GetText("Datapool NVM size"), 1UL);
                //Datapool version
                this->m_CompareString(C_SyvUpPacParamSetFileInfo::mh_GetVersionString(rc_InDp.c_DataPoolInfo.au8_Version[
@@ -197,14 +196,14 @@ void C_SyvUpPacParamSetFileInfo::m_Comparison(const bool oq_OptionlContentMissin
                                                                                      rc_NoDp.au8_Version[1],
                                                                                      rc_NoDp.au8_Version[2]),
                                      C_GtGetText::h_GetText("Datapool version"), 1UL);
-               for (uint32 u32_ItInLi = 0UL; u32_ItInLi < rc_InDp.c_Lists.size(); ++u32_ItInLi)
+               for (uint32_t u32_ItInLi = 0UL; u32_ItInLi < rc_InDp.c_Lists.size(); ++u32_ItInLi)
                {
                   //Lists
                   bool q_LiMatch = false;
-                  const C_OSCParamSetInterpretedList & rc_InLi = rc_InDp.c_Lists[u32_ItInLi];
-                  for (uint32 u32_ItNoLi = 0UL; u32_ItNoLi < rc_NoDp.c_Lists.size(); ++u32_ItNoLi)
+                  const C_OscParamSetInterpretedList & rc_InLi = rc_InDp.c_Lists[u32_ItInLi];
+                  for (uint32_t u32_ItNoLi = 0UL; u32_ItNoLi < rc_NoDp.c_Lists.size(); ++u32_ItNoLi)
                   {
-                     const C_OSCNodeDataPoolList & rc_NoLi = rc_NoDp.c_Lists[u32_ItNoLi];
+                     const C_OscNodeDataPoolList & rc_NoLi = rc_NoDp.c_Lists[u32_ItNoLi];
                      if (rc_InLi.c_Name == rc_NoLi.c_Name)
                      {
                         //List
@@ -359,14 +358,14 @@ void C_SyvUpPacParamSetFileInfo::m_ConvertToHtmlString(const bool oq_OptionlCont
    this->mc_ComparisonHtml += "</tr>";
 
    //Table content
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->mc_ComparisonResults.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->mc_ComparisonResults.size(); ++u32_ItItem)
    {
       const C_SyvUpPacParamSetFileInfoComparisonDescription & rc_Descritpion = this->mc_ComparisonResults[u32_ItItem];
       this->mc_ComparisonHtml += "<tr>";
 
       //Description
       this->mc_ComparisonHtml += C_SyvUpPacParamSetFileInfo::mhc_START_DATA_TD;
-      for (uint32 u32_It = 0UL; u32_It < rc_Descritpion.u32_LayerNum; ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < rc_Descritpion.u32_LayerNum; ++u32_It)
       {
          this->mc_ComparisonHtml += "   ";
       }
@@ -384,7 +383,7 @@ void C_SyvUpPacParamSetFileInfo::m_ConvertToHtmlString(const bool oq_OptionlCont
       {
          this->mc_ComparisonHtml += "<b>";
       }
-      this->mc_ComparisonHtml += rc_Descritpion.c_SDValue;
+      this->mc_ComparisonHtml += rc_Descritpion.c_SdValue;
       if (rc_Descritpion.e_ResultType == C_SyvUpPacParamSetFileInfoComparisonDescription::eRT_NOT_FOUND)
       {
          this->mc_ComparisonHtml += "</b>";
@@ -417,7 +416,7 @@ void C_SyvUpPacParamSetFileInfo::m_ConvertToHtmlString(const bool oq_OptionlCont
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacParamSetFileInfo::m_DisplayNoMatch(const QString & orc_Item, const QString & orc_Description,
-                                                  const uint32 ou32_LayerNum)
+                                                  const uint32_t ou32_LayerNum)
 {
    C_SyvUpPacParamSetFileInfoComparisonDescription c_Description;
 
@@ -427,7 +426,7 @@ void C_SyvUpPacParamSetFileInfo::m_DisplayNoMatch(const QString & orc_Item, cons
 
    //Value
    c_Description.c_FileValue = orc_Item;
-   c_Description.c_SDValue = C_GtGetText::h_GetText("not found");
+   c_Description.c_SdValue = C_GtGetText::h_GetText("not found");
 
    //Result
    c_Description.e_ResultType = C_SyvUpPacParamSetFileInfoComparisonDescription::eRT_NOT_FOUND;
@@ -444,13 +443,13 @@ void C_SyvUpPacParamSetFileInfo::m_DisplayNoMatch(const QString & orc_Item, cons
    \param[in] orc_Description Description for the compared items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacParamSetFileInfo::m_CompareString(const QString & orc_StrFile, const QString & orc_StrSD,
-                                                 const QString & orc_Description, const uint32 ou32_LayerNum)
+void C_SyvUpPacParamSetFileInfo::m_CompareString(const QString & orc_StrFile, const QString & orc_StrSd,
+                                                 const QString & orc_Description, const uint32_t ou32_LayerNum)
 {
    C_SyvUpPacParamSetFileInfoComparisonDescription c_Description;
 
    //Result
-   if (orc_StrFile.compare(orc_StrSD) == 0)
+   if (orc_StrFile.compare(orc_StrSd) == 0)
    {
       c_Description.e_ResultType = C_SyvUpPacParamSetFileInfoComparisonDescription::eRT_MATCH;
    }
@@ -465,7 +464,7 @@ void C_SyvUpPacParamSetFileInfo::m_CompareString(const QString & orc_StrFile, co
 
    //Value
    c_Description.c_FileValue = orc_StrFile;
-   c_Description.c_SDValue = orc_StrSD;
+   c_Description.c_SdValue = orc_StrSd;
 
    //Add
    this->mc_ComparisonResults.push_back(c_Description);
@@ -482,8 +481,9 @@ void C_SyvUpPacParamSetFileInfo::m_CompareString(const QString & orc_StrFile, co
    Formatted version string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpPacParamSetFileInfo::mh_GetVersionString(const uint32 ou32_VersionByte1, const uint32 ou32_VersionByte2,
-                                                        const uint32 ou32_VersionByte3)
+QString C_SyvUpPacParamSetFileInfo::mh_GetVersionString(const uint32_t ou32_VersionByte1,
+                                                        const uint32_t ou32_VersionByte2,
+                                                        const uint32_t ou32_VersionByte3)
 {
    const QString c_Retval =
       static_cast<QString>("v%1.%2r%3").arg(ou32_VersionByte1, 2, 10, QChar('0')).arg(ou32_VersionByte2, 2, 10,

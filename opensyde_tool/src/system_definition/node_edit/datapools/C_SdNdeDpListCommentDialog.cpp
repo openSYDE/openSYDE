@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpListCommentDialog.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpListCommentDialog.hpp"
 #include "ui_C_SdNdeDpListCommentDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,10 +47,9 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      ou32_ListIndex      List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListCommentDialog::C_SdNdeDpListCommentDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                       const stw_types::uint32 ou32_NodeIndex,
-                                                       const stw_types::uint32 ou32_DataPoolIndex,
-                                                       const stw_types::uint32 ou32_ListIndex) :
+C_SdNdeDpListCommentDialog::C_SdNdeDpListCommentDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                       const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                       const uint32_t ou32_ListIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListCommentDialog),
    mrc_ParentDialog(orc_Parent),
@@ -91,7 +89,7 @@ C_SdNdeDpListCommentDialog::~C_SdNdeDpListCommentDialog(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListCommentDialog::InitStaticNames(void) const
 {
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
    if (pc_List != NULL)
@@ -131,8 +129,8 @@ void C_SdNdeDpListCommentDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

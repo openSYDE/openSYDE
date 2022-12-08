@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeTabBar.h"
+#include "C_OgeTabBar.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,28 +45,28 @@ C_OgeTabBar::C_OgeTabBar(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Tab size hint
 
-   \param[in] osn_Index Tab index
+   \param[in] os32_Index Tab index
 
    \return
    Tab size hint
 */
 //----------------------------------------------------------------------------------------------------------------------
-QSize C_OgeTabBar::tabSizeHint(const sintn osn_Index) const
+QSize C_OgeTabBar::tabSizeHint(const int32_t os32_Index) const
 {
-   QSize c_Retval = QTabBar::tabSizeHint(osn_Index);
+   QSize c_Retval = QTabBar::tabSizeHint(os32_Index);
 
    if (this->count() > 0)
    {
-      const sint32 s32_Error = static_cast<sint32>(this->width() % this->count());
-      sint32 s32_Width = static_cast<sint32>(this->width() / this->count());
+      const int32_t s32_Error = static_cast<int32_t>(this->width() % this->count());
+      int32_t s32_Width = static_cast<int32_t>(this->width() / this->count());
       if (s32_Error > 1)
       {
          //Add most to start, some to end
-         if (osn_Index == 0)
+         if (os32_Index == 0)
          {
             s32_Width += s32_Error - 1;
          }
-         else if (osn_Index == (this->count() - 1))
+         else if (os32_Index == (this->count() - 1))
          {
             ++s32_Width;
          }
@@ -79,7 +78,7 @@ QSize C_OgeTabBar::tabSizeHint(const sintn osn_Index) const
       else
       {
          //Add to end
-         if (osn_Index == 0)
+         if (os32_Index == 0)
          {
             s32_Width += s32_Error;
          }

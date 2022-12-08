@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QScrollBar>
 
-#include "stwtypes.h"
-#include "C_SdNdeDbListWidget.h"
-#include "C_SdNdeDbWidget.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeHorizontalListWidget.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeDbListWidget.hpp"
+#include "C_SdNdeDbWidget.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeHorizontalListWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +46,7 @@ using namespace stw_opensyde_gui_elements;
 C_SdNdeDbListWidget::C_SdNdeDbListWidget(QWidget * const opc_Parent) :
    QListWidget(opc_Parent),
    mu32_NodeIndex(0U),
-   msn_DragItemIndex(-1)
+   ms32_DragItemIndex(-1)
 {
    // configuration of list widget
    this->setFrameShape(QFrame::NoFrame);
@@ -91,7 +90,7 @@ C_SdNdeDbListWidget::~C_SdNdeDbListWidget()
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbListWidget::SetIndex(const stw_types::uint32 ou32_NodeIndex)
+void C_SdNdeDbListWidget::SetIndex(const uint32_t ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
 }
@@ -103,9 +102,10 @@ void C_SdNdeDbListWidget::SetIndex(const stw_types::uint32 ou32_NodeIndex)
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
+void C_SdNdeDbListWidget::AddApplication(const uint32_t ou32_NodeIndex, const uint32_t ou32_ApplicationIndex)
 {
-   QListWidgetItem * const pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
+   QListWidgetItem * const pc_Item =
+      new QListWidgetItem(NULL, static_cast<int32_t>(QListWidgetItem::ItemType::UserType));
    C_SdNdeDbWidget * const pc_ItemWidget = new C_SdNdeDbWidget(ou32_NodeIndex, ou32_ApplicationIndex, this);
 
    //signal to handle "there are no data blocks declared..." label, data block count and button visibility
@@ -137,9 +137,9 @@ void C_SdNdeDbListWidget::AddApplication(const uint32 ou32_NodeIndex, const uint
 void C_SdNdeDbListWidget::UpdateApplications(void) const
 {
    // Update all application indexes of the concrete widgets
-   for (sintn sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (int32_t s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SdNdeDbWidget * const pc_WidgetItem =
          dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(pc_Item));
@@ -163,7 +163,7 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
    // deactivate the painting of the drag widget
    this->mc_Delegate.StopPaint();
 
-   if (this->msn_DragItemIndex >= 0)
+   if (this->ms32_DragItemIndex >= 0)
    {
       bool q_AllowedMoveAction = false;
       const QListWidget::DropIndicatorPosition e_DropIndicator = this->dropIndicatorPosition();
@@ -183,9 +183,9 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
 
       if (q_AllowedMoveAction == true)
       {
-         sint32 s32_TargetRow = this->indexAt(opc_Event->pos()).row();
+         int32_t s32_TargetRow = this->indexAt(opc_Event->pos()).row();
          //If drag below inserted adapt target row
-         if (this->msn_DragItemIndex < s32_TargetRow)
+         if (this->ms32_DragItemIndex < s32_TargetRow)
          {
             --s32_TargetRow;
          }
@@ -202,19 +202,19 @@ void C_SdNdeDbListWidget::dropEvent(QDropEvent * const opc_Event)
             s32_TargetRow = this->count();
          }
 
-         if (C_OgeHorizontalListWidget::h_CheckValidMoveAction(this->msn_DragItemIndex, s32_TargetRow, *this))
+         if (C_OgeHorizontalListWidget::h_CheckValidMoveAction(this->ms32_DragItemIndex, s32_TargetRow, *this))
          {
             // move only if changed
             QListWidget::dropEvent(opc_Event);
 
-            this->m_MoveApplication(this->msn_DragItemIndex, s32_TargetRow);
+            this->m_MoveApplication(this->ms32_DragItemIndex, s32_TargetRow);
             // the number must be updated
             this->m_UpdateApplicationIndexes();
          }
       }
 
       // reset the counter;
-      this->msn_DragItemIndex = -1;
+      this->ms32_DragItemIndex = -1;
    }
    else
    {
@@ -238,23 +238,23 @@ void C_SdNdeDbListWidget::startDrag(const Qt::DropActions oc_SupportedActions)
    this->mc_Delegate.StartPaint(this->currentIndex().row(), pc_ItemWidget);
 
    // save the actual index for the next drag and drop events
-   this->msn_DragItemIndex = this->currentRow();
+   this->ms32_DragItemIndex = this->currentRow();
 
    QListWidget::startDrag(oc_SupportedActions);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbListWidget::m_MoveApplication(const sintn osn_SourceIndex, const sintn osn_TargetIndex)
+void C_SdNdeDbListWidget::m_MoveApplication(const int32_t os32_SourceIndex, const int32_t os32_TargetIndex)
 {
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
    // check for index errors
-   if ((osn_SourceIndex >= 0) &&
-       (osn_TargetIndex >= 0))
+   if ((os32_SourceIndex >= 0) &&
+       (os32_TargetIndex >= 0))
    {
-      C_PuiSdHandler::h_GetInstance()->MoveApplication(this->mu32_NodeIndex, osn_SourceIndex, osn_TargetIndex);
+      C_PuiSdHandler::h_GetInstance()->MoveApplication(this->mu32_NodeIndex, os32_SourceIndex, os32_TargetIndex);
 
-      this->setCurrentRow(osn_TargetIndex);
+      this->setCurrentRow(os32_TargetIndex);
    }
 
    QApplication::restoreOverrideCursor();
@@ -263,18 +263,18 @@ void C_SdNdeDbListWidget::m_MoveApplication(const sintn osn_SourceIndex, const s
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbListWidget::m_UpdateApplicationIndexes(void) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    // Update all application indexes of the concrete widgets
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SdNdeDbWidget * const pc_WidgetItem =
          dynamic_cast<C_SdNdeDbWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
-         pc_WidgetItem->UpdateApplicationIndex(static_cast<uint32>(sn_Counter));
+         pc_WidgetItem->UpdateApplicationIndex(static_cast<uint32_t>(s32_Counter));
       }
    }
 }
@@ -286,9 +286,9 @@ void C_SdNdeDbListWidget::m_UpdateApplicationIndexes(void) const
 void C_SdNdeDbListWidget::m_CheckNodeId(void) const
 {
    // Update all application indexes of the concrete widgets
-   for (sintn sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (int32_t s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       const C_SdNdeDbWidget * const pc_WidgetItem =
          dynamic_cast<const C_SdNdeDbWidget *>(this->itemWidget(pc_Item));

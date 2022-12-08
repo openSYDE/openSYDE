@@ -10,18 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_OSCNodeDataPoolListElement.h"
-#include "CSCLChecksums.h"
+#include "C_OscNodeDataPoolListElement.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +39,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
+C_OscNodeDataPoolListElement::C_OscNodeDataPoolListElement(void) :
    c_Name("NewDataElement"),
    c_Comment(""),
    c_MinValue(),
@@ -52,11 +52,11 @@ C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
    c_DataSetValues(),
    c_Value(),
    c_NvmValue(),
-   q_NvMValueChanged(false),
+   q_NvmValueChanged(false),
    q_NvmValueIsValid(false),
-   u32_NvMStartAddress(0)
+   u32_NvmStartAddress(0)
 {
-   this->SetType(C_OSCNodeDataPoolContent::eUINT8);
+   this->SetType(C_OscNodeDataPoolContent::eUINT8);
    this->SetArray(false);
    this->c_MinValue.SetValueU8(0U);
    this->c_MaxValue.SetValueU8(255U);
@@ -71,28 +71,28 @@ C_OSCNodeDataPoolListElement::C_OSCNodeDataPoolListElement(void) :
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeDataPoolListElement::CalcHash(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    this->c_MinValue.CalcHash(oru32_HashValue);
    this->c_MaxValue.CalcHash(oru32_HashValue);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataSetValues.size(); ++u32_Counter)
    {
       this->c_DataSetValues[u32_Counter].CalcHash(oru32_HashValue);
    }
    // Do not calculate the value to the CRC
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmStartAddress, sizeof(this->u32_NvmStartAddress), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -104,28 +104,28 @@ void C_OSCNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
    \param[in]      ou32_Index       Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElement::CalcHashElement(uint32 & oru32_HashValue, const uint32 ou32_Index) const
+void C_OscNodeDataPoolListElement::CalcHashElement(uint32_t & oru32_HashValue, const uint32_t ou32_Index) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    this->c_MinValue.CalcHashElement(oru32_HashValue, ou32_Index);
    this->c_MaxValue.CalcHashElement(oru32_HashValue, ou32_Index);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataSetValues.size(); ++u32_Counter)
    {
       this->c_DataSetValues[u32_Counter].CalcHashElement(oru32_HashValue, ou32_Index);
    }
    // Do not calculate the value to the CRC
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmStartAddress, sizeof(this->u32_NvmStartAddress), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,28 +136,28 @@ void C_OSCNodeDataPoolListElement::CalcHashElement(uint32 & oru32_HashValue, con
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElement::CalcHashStructure(uint32 & oru32_HashValue) const
+void C_OscNodeDataPoolListElement::CalcHashStructure(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
    this->c_MinValue.CalcHashStructure(oru32_HashValue);
    this->c_MaxValue.CalcHashStructure(oru32_HashValue);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Factor, sizeof(this->f64_Factor), oru32_HashValue);
    //lint -e{9110} //we do not really use the bit representation; we just assume it is "stable" for this type
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->f64_Offset, sizeof(this->f64_Offset), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Unit.c_str(), this->c_Unit.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_Access, sizeof(this->e_Access), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_DiagEventCall, sizeof(this->q_DiagEventCall), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataSetValues.size(); ++u32_Counter)
    {
       this->c_DataSetValues[u32_Counter].CalcHashStructure(oru32_HashValue);
    }
    // Do not calculate the value to the CRC
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmStartAddress, sizeof(this->u32_NvmStartAddress), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ void C_OSCNodeDataPoolListElement::CalcHashStructure(uint32 & oru32_HashValue) c
    size of element in bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCNodeDataPoolListElement::GetSizeByte(void) const
+uint32_t C_OscNodeDataPoolListElement::GetSizeByte(void) const
 {
    return this->c_Value.GetSizeByte();
 }
@@ -180,13 +180,13 @@ uint32 C_OSCNodeDataPoolListElement::GetSizeByte(void) const
    \param[in]  ore_Value   New type value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElement::SetType(const C_OSCNodeDataPoolContent::E_Type & ore_Value)
+void C_OscNodeDataPoolListElement::SetType(const C_OscNodeDataPoolContent::E_Type & ore_Value)
 {
    c_MinValue.SetType(ore_Value);
    c_MaxValue.SetType(ore_Value);
    c_Value.SetType(ore_Value);
    c_NvmValue.SetType(ore_Value);
-   for (uint32 u32_It = 0; u32_It < c_DataSetValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0; u32_It < c_DataSetValues.size(); ++u32_It)
    {
       c_DataSetValues[u32_It].SetType(ore_Value);
    }
@@ -198,13 +198,13 @@ void C_OSCNodeDataPoolListElement::SetType(const C_OSCNodeDataPoolContent::E_Typ
    \param[in]  oq_Array    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElement::SetArray(const bool oq_Array)
+void C_OscNodeDataPoolListElement::SetArray(const bool oq_Array)
 {
    c_MinValue.SetArray(oq_Array);
    c_MaxValue.SetArray(oq_Array);
    c_Value.SetArray(oq_Array);
    c_NvmValue.SetArray(oq_Array);
-   for (uint32 u32_It = 0; u32_It < c_DataSetValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0; u32_It < c_DataSetValues.size(); ++u32_It)
    {
       c_DataSetValues[u32_It].SetArray(oq_Array);
    }
@@ -216,13 +216,13 @@ void C_OSCNodeDataPoolListElement::SetArray(const bool oq_Array)
    \param[in]  oru32_Size  New size value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElement::SetArraySize(const uint32 & oru32_Size)
+void C_OscNodeDataPoolListElement::SetArraySize(const uint32_t & oru32_Size)
 {
    c_MinValue.SetArraySize(oru32_Size);
    c_MaxValue.SetArraySize(oru32_Size);
    c_Value.SetArraySize(oru32_Size);
    c_NvmValue.SetArraySize(oru32_Size);
-   for (uint32 u32_It = 0; u32_It < c_DataSetValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0; u32_It < c_DataSetValues.size(); ++u32_It)
    {
       c_DataSetValues[u32_It].SetArraySize(oru32_Size);
    }
@@ -235,7 +235,7 @@ void C_OSCNodeDataPoolListElement::SetArraySize(const uint32 & oru32_Size)
    Internal type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent::E_Type C_OSCNodeDataPoolListElement::GetType(void) const
+C_OscNodeDataPoolContent::E_Type C_OscNodeDataPoolListElement::GetType(void) const
 {
    return this->c_Value.GetType();
 }
@@ -247,7 +247,7 @@ C_OSCNodeDataPoolContent::E_Type C_OSCNodeDataPoolListElement::GetType(void) con
    Array status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeDataPoolListElement::GetArray(void) const
+bool C_OscNodeDataPoolListElement::GetArray(void) const
 {
    return this->c_Value.GetArray();
 }
@@ -259,7 +259,7 @@ bool C_OSCNodeDataPoolListElement::GetArray(void) const
    Current array size
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCNodeDataPoolListElement::GetArraySize(void) const
+uint32_t C_OscNodeDataPoolListElement::GetArraySize(void) const
 {
    return this->c_Value.GetArraySize();
 }
@@ -275,9 +275,9 @@ uint32 C_OSCNodeDataPoolListElement::GetArraySize(void) const
    C_CONFIG   Wrong types are set in minimum or maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolListElement::CheckValueRange(void) const
+int32_t C_OscNodeDataPoolListElement::CheckValueRange(void) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    try
    {
@@ -318,9 +318,9 @@ sint32 C_OSCNodeDataPoolListElement::CheckValueRange(void) const
    C_CONFIG   Wrong types are set in minimum or maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolListElement::CheckNvmValueRange(void) const
+int32_t C_OscNodeDataPoolListElement::CheckNvmValueRange(void) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    try
    {

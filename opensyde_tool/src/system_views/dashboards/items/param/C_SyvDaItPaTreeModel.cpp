@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_GiSvDaParam.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SyvDaItPaTreeModel.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_OSCNodeDataPoolContentUtil.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_SyvDaItPaTreeModel.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaTreeModel::mhc_ICON_ALL_NODE = "";
@@ -95,7 +94,7 @@ bool C_SyvDaItPaTreeModel::IsEmpty(void) const
 {
    bool q_Retval;
 
-   if (this->mc_ECUValuesReadStatus.size() == 0UL)
+   if (this->mc_EcuValuesReadStatus.size() == 0UL)
    {
       q_Retval = true;
    }
@@ -112,10 +111,10 @@ bool C_SyvDaItPaTreeModel::IsEmpty(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaTreeModel::ReloadSetValues(void)
 {
-   QVector<sintn> c_Roles;
-   const sint32 s32_ColSet = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
-   const sint32 s32_ColTree = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eTREE);
-   c_Roles.append(static_cast<sintn>(Qt::DisplayRole));
+   QVector<int32_t> c_Roles;
+   const int32_t s32_ColSet = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
+   const int32_t s32_ColTree = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eTREE);
+   c_Roles.append(static_cast<int32_t>(Qt::DisplayRole));
 
    //Trigger set value change
    Q_EMIT this->dataChanged(this->index(0, s32_ColSet), this->index(this->rowCount() - 1, s32_ColSet), c_Roles);
@@ -184,16 +183,16 @@ void C_SyvDaItPaTreeModel::SetActionActive(const bool oq_Active)
    \param[in]  orc_ListIds    List IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
+void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OscNodeDataPoolListElementId> & orc_ListIds)
 {
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if (pc_ParamWidget != NULL)
    {
-      std::vector<C_OSCNodeDataPoolListId> c_ListIds;
-      for (uint32 u32_ItList = 0UL; u32_ItList < orc_ListIds.size(); ++u32_ItList)
+      std::vector<C_OscNodeDataPoolListId> c_ListIds;
+      for (uint32_t u32_ItList = 0UL; u32_ItList < orc_ListIds.size(); ++u32_ItList)
       {
-         const C_OSCNodeDataPoolListElementId & rc_CurId = orc_ListIds[u32_ItList];
+         const C_OscNodeDataPoolListElementId & rc_CurId = orc_ListIds[u32_ItList];
          c_ListIds.push_back(rc_CurId);
       }
       pc_ParamWidget->DeleteLists(c_ListIds);
@@ -204,32 +203,32 @@ void C_SyvDaItPaTreeModel::DeleteSpecified(const std::vector<C_OSCNodeDataPoolLi
 /*! \brief   Reset all stored ECU values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::ClearECUValues(void)
+void C_SyvDaItPaTreeModel::ClearEcuValues(void)
 {
-   QVector<sintn> c_RolesDisplay;
-   QVector<sintn> c_RolesStyle;
-   const sint32 s32_ColSet = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
-   const sint32 s32_ColECU = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eDEVICE_VALUE);
-   const sint32 s32_ColTree = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eTREE);
-   c_RolesDisplay.append(static_cast<sintn>(Qt::DisplayRole));
-   c_RolesStyle.append(static_cast<sintn>(Qt::FontRole));
-   if (this->mc_ECUValuesString.size() == this->mc_ECUValuesReadStatus.size())
+   QVector<int32_t> c_RolesDisplay;
+   QVector<int32_t> c_RolesStyle;
+   const int32_t s32_ColSet = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
+   const int32_t s32_ColECU = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eDEVICE_VALUE);
+   const int32_t s32_ColTree = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eTREE);
+   c_RolesDisplay.append(static_cast<int32_t>(Qt::DisplayRole));
+   c_RolesStyle.append(static_cast<int32_t>(Qt::FontRole));
+   if (this->mc_EcuValuesString.size() == this->mc_EcuValuesReadStatus.size())
    {
-      for (uint32 u32_ItElement = 0UL; u32_ItElement < this->mc_ECUValuesString.size(); ++u32_ItElement)
+      for (uint32_t u32_ItElement = 0UL; u32_ItElement < this->mc_EcuValuesString.size(); ++u32_ItElement)
       {
-         auto && rc_Ref = this->mc_ECUValuesReadStatus[u32_ItElement];
+         auto && rc_Ref = this->mc_EcuValuesReadStatus[u32_ItElement];
          rc_Ref = false;
-         for (uint32 u32_ItValue = 0UL; u32_ItValue < this->mc_ECUValuesString[u32_ItElement].size(); ++u32_ItValue)
+         for (uint32_t u32_ItValue = 0UL; u32_ItValue < this->mc_EcuValuesString[u32_ItElement].size(); ++u32_ItValue)
          {
             //Overwrite all previous values
-            this->mc_ECUValuesString[u32_ItElement][u32_ItValue] = C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING;
+            this->mc_EcuValuesString[u32_ItElement][u32_ItValue] = C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING;
          }
       }
    }
    //Reset all valid flags
-   for (uint32 u32_ItList = 0; u32_ItList < this->mc_ECUCRCValidStatus.size(); ++u32_ItList)
+   for (uint32_t u32_ItList = 0; u32_ItList < this->mc_EcuCrcValidStatus.size(); ++u32_ItList)
    {
-      auto && rc_Ref = this->mc_ECUCRCValidStatus[u32_ItList];
+      auto && rc_Ref = this->mc_EcuCrcValidStatus[u32_ItList];
       rc_Ref = false;
    }
    //Trigger set value change
@@ -250,8 +249,8 @@ void C_SyvDaItPaTreeModel::ClearECUValues(void)
    \param[in,out]  orc_NewValues          New values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
-                                          std::vector<C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds,
+void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OscNodeDataPoolListElementId> & orc_ListIds,
+                                          std::vector<C_OscNodeDataPoolListElementId> & orc_InvalidValueIds,
                                           std::vector<QString> & orc_InvalidValues,
                                           std::vector<QString> & orc_NewValues)
 {
@@ -260,21 +259,21 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
    if (pc_ParamWidget != NULL)
    {
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
-      if ((((pc_Param != NULL) && (pc_Param->c_ListValues.size() == this->mc_ECUValues.size())) &&
-           (pc_Param->c_ListValues.size() == this->mc_ECUValuesReadStatus.size())) &&
+      if ((((pc_Param != NULL) && (pc_Param->c_ListValues.size() == this->mc_EcuValues.size())) &&
+           (pc_Param->c_ListValues.size() == this->mc_EcuValuesReadStatus.size())) &&
           (pc_Param->c_ListValues.size() == pc_Param->c_DataPoolElementsConfig.size()))
       {
          bool q_AllRead = true;
          C_PuiSvDbParam c_Copy = *pc_Param;
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_ListValues.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_ListValues.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
                bool q_Found = false;
-               for (uint32 u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
+               for (uint32_t u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
                {
-                  const C_OSCNodeDataPoolListElementId & rc_ListId = orc_ListIds[u32_ItList];
+                  const C_OscNodeDataPoolListElementId & rc_ListId = orc_ListIds[u32_ItList];
                   if (((rc_Config.c_ElementId.u32_NodeIndex == rc_ListId.u32_NodeIndex) &&
                        (rc_Config.c_ElementId.u32_DataPoolIndex == rc_ListId.u32_DataPoolIndex)) &&
                       (rc_Config.c_ElementId.u32_ListIndex == rc_ListId.u32_ListIndex))
@@ -285,9 +284,9 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
                if (q_Found == true)
                {
                   //Apply read value
-                  c_Copy.c_ListValues[u32_ItConfig] = this->mc_ECUValues[u32_ItConfig];
+                  c_Copy.c_ListValues[u32_ItConfig] = this->mc_EcuValues[u32_ItConfig];
                   //Check if read value valid
-                  if (this->mc_ECUValuesReadStatus[u32_ItConfig] == false)
+                  if (this->mc_EcuValuesReadStatus[u32_ItConfig] == false)
                   {
                      q_AllRead = false;
                   }
@@ -304,13 +303,13 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
          //Do not apply if not all are read
          if (q_AllRead == true)
          {
-            QVector<sintn> c_Roles;
-            const sintn sn_Col = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
-            c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
-            c_Roles.push_back(static_cast<sintn>(Qt::FontRole));
+            QVector<int32_t> c_Roles;
+            const int32_t s32_Col = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
+            c_Roles.push_back(static_cast<int32_t>(Qt::DisplayRole));
+            c_Roles.push_back(static_cast<int32_t>(Qt::FontRole));
             pc_ParamWidget->SetParamItem(c_Copy);
             //Update set value column
-            Q_EMIT this->dataChanged(this->index(0, sn_Col), this->index(this->rowCount() - 1, sn_Col), c_Roles);
+            Q_EMIT this->dataChanged(this->index(0, s32_Col), this->index(this->rowCount() - 1, s32_Col), c_Roles);
          }
          else
          {
@@ -334,8 +333,8 @@ void C_SyvDaItPaTreeModel::ApplyEcuValues(const std::vector<C_OSCNodeDataPoolLis
    False Not in range
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::CheckRange(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds,
-                                      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds2)
+bool C_SyvDaItPaTreeModel::CheckRange(const std::vector<C_OscNodeDataPoolListElementId> & orc_ListIds,
+                                      const std::vector<stw::opensyde_core::C_OscNodeDataPoolListId> & orc_ListIds2)
 const
 {
    bool q_Retval = true;
@@ -347,18 +346,18 @@ const
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if ((rc_Config.c_ElementId.GetIsValid() == true) && (u32_ItConfig < pc_Param->c_ListValues.size()))
             {
                bool q_IsInteresting = false;
                //Check if the list is part of the first interesting elements
-               for (uint32 u32_ItInterestingElements = 0UL;
+               for (uint32_t u32_ItInterestingElements = 0UL;
                     (u32_ItInterestingElements < orc_ListIds.size()) && (q_IsInteresting == false);
                     ++u32_ItInterestingElements)
                {
-                  const C_OSCNodeDataPoolListElementId & rc_ListId = orc_ListIds[u32_ItInterestingElements];
+                  const C_OscNodeDataPoolListElementId & rc_ListId = orc_ListIds[u32_ItInterestingElements];
                   if (((rc_ListId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
                        (rc_ListId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
                       (rc_ListId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
@@ -367,11 +366,11 @@ const
                   }
                }
                //Check if the list is part of the second interesting elements
-               for (uint32 u32_ItInterestingElements = 0UL;
+               for (uint32_t u32_ItInterestingElements = 0UL;
                     (u32_ItInterestingElements < orc_ListIds2.size()) && (q_IsInteresting == false);
                     ++u32_ItInterestingElements)
                {
-                  const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds2[u32_ItInterestingElements];
+                  const C_OscNodeDataPoolListId & rc_ListId = orc_ListIds2[u32_ItInterestingElements];
                   if (((rc_ListId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
                        (rc_ListId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
                       (rc_ListId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
@@ -381,18 +380,18 @@ const
                }
                if (q_IsInteresting)
                {
-                  const C_OSCNodeDataPoolContent * const pc_SetVal = m_GetSetValue(u32_ItConfig);
+                  const C_OscNodeDataPoolContent * const pc_SetVal = m_GetSetValue(u32_ItConfig);
                   if (pc_SetVal != NULL)
                   {
-                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                     const C_OscNodeDataPoolListElement * const pc_OscElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                                    rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                                    rc_Config.c_ElementId.u32_ListIndex,
                                                                                    rc_Config.c_ElementId.u32_ElementIndex);
-                     if (pc_OSCElement != NULL)
+                     if (pc_OscElement != NULL)
                      {
                         //With arrays the check has to be exactly like this
-                        if ((pc_OSCElement->c_MinValue <= *pc_SetVal) && (*pc_SetVal <= pc_OSCElement->c_MaxValue))
+                        if ((pc_OscElement->c_MinValue <= *pc_SetVal) && (*pc_SetVal <= pc_OscElement->c_MaxValue))
                         {
                            //No change
                         }
@@ -426,9 +425,9 @@ bool C_SyvDaItPaTreeModel::CheckAllListsRead(void) const
 {
    bool q_Retval = true;
 
-   for (uint32 u32_ItElement = 0UL; u32_ItElement < this->mc_ECUValuesReadStatus.size(); ++u32_ItElement)
+   for (uint32_t u32_ItElement = 0UL; u32_ItElement < this->mc_EcuValuesReadStatus.size(); ++u32_ItElement)
    {
-      if (this->mc_ECUValuesReadStatus[u32_ItElement] == false)
+      if (this->mc_EcuValuesReadStatus[u32_ItElement] == false)
       {
          q_Retval = false;
       }
@@ -443,25 +442,25 @@ bool C_SyvDaItPaTreeModel::CheckAllListsRead(void) const
    \param[in]  orc_ListIds    List IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
+void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OscNodeDataPoolListElementId> & orc_ListIds) const
 {
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
    if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
    {
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
-      if (((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_ECUValuesReadStatus.size())) &&
-          (this->mc_ECUValuesReadStatus.size() == this->mc_ECUValues.size()))
+      if (((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_EcuValuesReadStatus.size())) &&
+          (this->mc_EcuValuesReadStatus.size() == this->mc_EcuValues.size()))
       {
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
                bool q_Found = false;
-               for (uint32 u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
+               for (uint32_t u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
                {
-                  const C_OSCNodeDataPoolListElementId & rc_InputElementId = orc_ListIds[u32_ItList];
+                  const C_OscNodeDataPoolListElementId & rc_InputElementId = orc_ListIds[u32_ItList];
 
                   if (((rc_InputElementId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
                        (rc_InputElementId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
@@ -472,25 +471,25 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataP
                }
                if (q_Found == true)
                {
-                  const C_OSCNodeDataPoolContent * const pc_SetVal = m_GetSetValue(u32_ItConfig);
-                  if ((pc_SetVal != NULL) && (this->mc_ECUValuesReadStatus[u32_ItConfig] == true))
+                  const C_OscNodeDataPoolContent * const pc_SetVal = m_GetSetValue(u32_ItConfig);
+                  if ((pc_SetVal != NULL) && (this->mc_EcuValuesReadStatus[u32_ItConfig] == true))
                   {
                      //Only apply values if necessary
-                     if (this->mc_ECUValues[u32_ItConfig] == *pc_SetVal)
+                     if (this->mc_EcuValues[u32_ItConfig] == *pc_SetVal)
                      {
                         //Skip this one
                      }
                      else
                      {
-                        const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                        const C_OscNodeDataPoolListElement * const pc_OscElement =
+                           C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                               rc_Config.c_ElementId.u32_NodeIndex,
                               rc_Config.c_ElementId.u32_DataPoolIndex,
                               rc_Config.c_ElementId.u32_ListIndex,
                               rc_Config.c_ElementId.u32_ElementIndex);
-                        if (pc_OSCElement != NULL)
+                        if (pc_OscElement != NULL)
                         {
-                           tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValue(
+                           tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNvmValue(
                                          rc_Config.c_ElementId.u32_NodeIndex,
                                          rc_Config.c_ElementId.u32_DataPoolIndex,
                                          rc_Config.c_ElementId.u32_ListIndex,
@@ -512,7 +511,7 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OSCNodeDataP
    \param[in]  orc_ListIds    List IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::RemoveValuesChangedFlag(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds)
+void C_SyvDaItPaTreeModel::RemoveValuesChangedFlag(const std::vector<C_OscNodeDataPoolListElementId> & orc_ListIds)
 const
 {
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
@@ -520,18 +519,18 @@ const
    if ((pc_ParamWidget != NULL) && (orc_ListIds.size() > 0UL))
    {
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
-      if (((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_ECUValuesReadStatus.size())) &&
-          (this->mc_ECUValuesReadStatus.size() == this->mc_ECUValues.size()))
+      if (((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_EcuValuesReadStatus.size())) &&
+          (this->mc_EcuValuesReadStatus.size() == this->mc_EcuValues.size()))
       {
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
                bool q_Found = false;
-               for (uint32 u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
+               for (uint32_t u32_ItList = 0UL; (u32_ItList < orc_ListIds.size()) && (q_Found == false); ++u32_ItList)
                {
-                  const C_OSCNodeDataPoolListElementId & rc_InputElementId = orc_ListIds[u32_ItList];
+                  const C_OscNodeDataPoolListElementId & rc_InputElementId = orc_ListIds[u32_ItList];
 
                   if (((rc_InputElementId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
                        (rc_InputElementId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
@@ -542,15 +541,15 @@ const
                }
                if (q_Found == true)
                {
-                  const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                  const C_OscNodeDataPoolListElement * const pc_OscElement =
+                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                         rc_Config.c_ElementId.u32_NodeIndex,
                         rc_Config.c_ElementId.u32_DataPoolIndex,
                         rc_Config.c_ElementId.u32_ListIndex,
                         rc_Config.c_ElementId.u32_ElementIndex);
-                  if (pc_OSCElement != NULL)
+                  if (pc_OscElement != NULL)
                   {
-                     tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNVMValueChanged(
+                     tgl_assert(C_PuiSdHandler::h_GetInstance()->SetDataPoolListElementNvmValueChanged(
                                    rc_Config.c_ElementId.u32_NodeIndex,
                                    rc_Config.c_ElementId.u32_DataPoolIndex,
                                    rc_Config.c_ElementId.u32_ListIndex,
@@ -584,7 +583,7 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
          const C_TblTreSimpleItem * const pc_AllNode = *c_ItAll;
          if (pc_AllNode != NULL)
          {
-            uint32 u32_ItNode = 0UL;
+            uint32_t u32_ItNode = 0UL;
             const QModelIndex c_AllBase = this->index(0, 0);
             for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                  c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
@@ -593,8 +592,8 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
                const C_TblTreSimpleItem * const pc_Node = *c_ItNode;
                if (pc_Node != NULL)
                {
-                  uint32 u32_ItDp = 0UL;
-                  const QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllBase);
+                  uint32_t u32_ItDp = 0UL;
+                  const QModelIndex c_Node = this->index(static_cast<int32_t>(u32_ItNode), 0, c_AllBase);
                   for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                        c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                   {
@@ -602,8 +601,8 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
                      const C_TblTreSimpleItem * const pc_Dp = *c_ItDp;
                      if (pc_Dp != NULL)
                      {
-                        uint32 u32_ItLi = 0UL;
-                        const QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
+                        uint32_t u32_ItLi = 0UL;
+                        const QModelIndex c_Dp = this->index(static_cast<int32_t>(u32_ItDp), 0, c_Node);
                         for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItLi = pc_Dp->c_Children.begin();
                              c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
                         {
@@ -611,11 +610,11 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
                            const C_TblTreSimpleItem * const pc_Li = *c_ItLi;
                            if (pc_Li != NULL)
                            {
-                              const QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
-                              for (uint32 u32_ItEl = 0L; u32_ItEl < pc_Li->c_Children.size(); ++u32_ItEl)
+                              const QModelIndex c_Li = this->index(static_cast<int32_t>(u32_ItLi), 0, c_Dp);
+                              for (uint32_t u32_ItEl = 0L; u32_ItEl < pc_Li->c_Children.size(); ++u32_ItEl)
                               {
                                  //Element level
-                                 const QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0, c_Li);
+                                 const QModelIndex c_El = this->index(static_cast<int32_t>(u32_ItEl), 0, c_Li);
                                  c_Retval.push_back(c_El);
                               }
                               c_Retval.push_back(c_Li);
@@ -648,14 +647,14 @@ QModelIndexList C_SyvDaItPaTreeModel::GetAllAvailableIndixesForOneColumn(void) c
    Model index, might be invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListElementId & orc_Id,
-                                                  const uint32 & oru32_ValidLayers) const
+QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OscNodeDataPoolListElementId & orc_Id,
+                                                  const uint32_t & oru32_ValidLayers) const
 {
    QModelIndex c_Retval;
 
    if ((oru32_ValidLayers <= 4UL) && (this->mpc_InvisibleRootItem != NULL))
    {
-      uint32 u32_ItAll = 0UL;
+      uint32_t u32_ItAll = 0UL;
       for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItAll = this->mpc_InvisibleRootItem->c_Children.begin();
            c_ItAll != this->mpc_InvisibleRootItem->c_Children.end(); ++c_ItAll)
       {
@@ -664,14 +663,14 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
          const C_TblTreItem * const pc_AllNode = dynamic_cast<const C_TblTreItem * const>(*c_ItAll);
          if (pc_AllNode != NULL)
          {
-            const QModelIndex c_AllNode = this->index(static_cast<sintn>(u32_ItAll), 0);
+            const QModelIndex c_AllNode = this->index(static_cast<int32_t>(u32_ItAll), 0);
             if (oru32_ValidLayers == 0UL)
             {
                c_Retval = c_AllNode;
             }
             else
             {
-               uint32 u32_ItNode = 0UL;
+               uint32_t u32_ItNode = 0UL;
                for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItNode = pc_AllNode->c_Children.begin();
                     c_ItNode != pc_AllNode->c_Children.end(); ++c_ItNode)
                {
@@ -680,14 +679,14 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                   const C_TblTreItem * const pc_Node = dynamic_cast<const C_TblTreItem * const>(*c_ItNode);
                   if ((pc_Node != NULL) && (pc_Node->u32_Index == orc_Id.u32_NodeIndex))
                   {
-                     const QModelIndex c_Node = this->index(static_cast<sintn>(u32_ItNode), 0, c_AllNode);
+                     const QModelIndex c_Node = this->index(static_cast<int32_t>(u32_ItNode), 0, c_AllNode);
                      if (oru32_ValidLayers == 1UL)
                      {
                         c_Retval = c_Node;
                      }
                      else
                      {
-                        uint32 u32_ItDp = 0UL;
+                        uint32_t u32_ItDp = 0UL;
                         for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItDp = pc_Node->c_Children.begin();
                              c_ItDp != pc_Node->c_Children.end(); ++c_ItDp)
                         {
@@ -696,14 +695,14 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                            const C_TblTreItem * const pc_Dp = dynamic_cast<const C_TblTreItem * const>(*c_ItDp);
                            if ((pc_Dp != NULL) && (pc_Dp->u32_Index == orc_Id.u32_DataPoolIndex))
                            {
-                              const QModelIndex c_Dp = this->index(static_cast<sintn>(u32_ItDp), 0, c_Node);
+                              const QModelIndex c_Dp = this->index(static_cast<int32_t>(u32_ItDp), 0, c_Node);
                               if (oru32_ValidLayers == 2UL)
                               {
                                  c_Retval = c_Dp;
                               }
                               else
                               {
-                                 uint32 u32_ItLi = 0UL;
+                                 uint32_t u32_ItLi = 0UL;
                                  for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItLi =
                                          pc_Dp->c_Children.begin();
                                       c_ItLi != pc_Dp->c_Children.end(); ++c_ItLi)
@@ -714,14 +713,14 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                                        dynamic_cast<const C_TblTreItem * const>(*c_ItLi);
                                     if ((pc_Li != NULL) && (pc_Li->u32_Index == orc_Id.u32_ListIndex))
                                     {
-                                       const QModelIndex c_Li = this->index(static_cast<sintn>(u32_ItLi), 0, c_Dp);
+                                       const QModelIndex c_Li = this->index(static_cast<int32_t>(u32_ItLi), 0, c_Dp);
                                        if (oru32_ValidLayers == 3UL)
                                        {
                                           c_Retval = c_Li;
                                        }
                                        else
                                        {
-                                          uint32 u32_ItEl = 0UL;
+                                          uint32_t u32_ItEl = 0UL;
                                           for (std::vector<C_TblTreSimpleItem *>::const_iterator c_ItEl =
                                                   pc_Li->c_Children.begin();
                                                c_ItEl != pc_Li->c_Children.end(); ++c_ItEl)
@@ -732,7 +731,7 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
                                                 dynamic_cast<const C_TblTreItem * const>(*c_ItEl);
                                              if ((pc_El != NULL) && (pc_El->u32_Index == orc_Id.u32_ElementIndex))
                                              {
-                                                const QModelIndex c_El = this->index(static_cast<sintn>(u32_ItEl), 0,
+                                                const QModelIndex c_El = this->index(static_cast<int32_t>(u32_ItEl), 0,
                                                                                      c_Li);
                                                 c_Retval = c_El;
                                              }
@@ -766,9 +765,9 @@ QModelIndex C_SyvDaItPaTreeModel::GetIndexForItem(const C_OSCNodeDataPoolListEle
    All list IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetAllListIds(void) const
+std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetAllListIds(void) const
 {
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_Retval;
+   std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> c_Retval;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -778,7 +777,7 @@ std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeMo
       if (pc_Param != NULL)
       {
          c_Retval.reserve(pc_Param->c_DataPoolElementsConfig.size());
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if (rc_Config.c_ElementId.GetIsValid() == true)
@@ -802,7 +801,7 @@ std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeMo
    False Not read
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolListElementId> & orc_ListIds) const
+bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OscNodeDataPoolListElementId> & orc_ListIds) const
 {
    bool q_Retval = true;
 
@@ -811,22 +810,22 @@ bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolLis
    if (pc_ParamWidget != NULL)
    {
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
-      if ((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_ECUValuesReadStatus.size()))
+      if ((pc_Param != NULL) && (pc_Param->c_DataPoolElementsConfig.size() == this->mc_EcuValuesReadStatus.size()))
       {
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
-               for (uint32 u32_ItInput = 0UL; u32_ItInput < orc_ListIds.size(); ++u32_ItInput)
+               for (uint32_t u32_ItInput = 0UL; u32_ItInput < orc_ListIds.size(); ++u32_ItInput)
                {
-                  const C_OSCNodeDataPoolListElementId & rc_Input = orc_ListIds[u32_ItInput];
+                  const C_OscNodeDataPoolListElementId & rc_Input = orc_ListIds[u32_ItInput];
                   if (((rc_Config.c_ElementId.u32_NodeIndex == rc_Input.u32_NodeIndex) &&
                        (rc_Config.c_ElementId.u32_DataPoolIndex == rc_Input.u32_DataPoolIndex)) &&
                       (rc_Config.c_ElementId.u32_ListIndex == rc_Input.u32_ListIndex))
                   {
                      //If any not read invalidate return flag
-                     if (this->mc_ECUValuesReadStatus[u32_ItConfig] == false)
+                     if (this->mc_EcuValuesReadStatus[u32_ItConfig] == false)
                      {
                         q_Retval = false;
                      }
@@ -846,10 +845,10 @@ bool C_SyvDaItPaTreeModel::CheckListsRead(const std::vector<C_OSCNodeDataPoolLis
    All changed list IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetChangedListElementIds(void)
+std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetChangedListElementIds(void)
 const
 {
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> c_Retval;
+   std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> c_Retval;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -858,20 +857,20 @@ const
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         if (((this->mc_ECUValuesReadStatus.size() == this->mc_ECUValues.size()) &&
-              (this->mc_ECUValues.size() == pc_Param->c_ListValues.size())) &&
+         if (((this->mc_EcuValuesReadStatus.size() == this->mc_EcuValues.size()) &&
+              (this->mc_EcuValues.size() == pc_Param->c_ListValues.size())) &&
              (pc_Param->c_DataPoolElementsConfig.size() == pc_Param->c_ListValues.size()))
          {
-            for (uint32 u32_ItElement = 0UL; u32_ItElement < this->mc_ECUValuesReadStatus.size(); ++u32_ItElement)
+            for (uint32_t u32_ItElement = 0UL; u32_ItElement < this->mc_EcuValuesReadStatus.size(); ++u32_ItElement)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItElement];
 
-               if (this->mc_ECUValuesReadStatus[u32_ItElement] == true)
+               if (this->mc_EcuValuesReadStatus[u32_ItElement] == true)
                {
-                  const C_OSCNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItElement);
+                  const C_OscNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItElement);
                   if (pc_Value != NULL)
                   {
-                     if (this->mc_ECUValues[u32_ItElement] == *pc_Value)
+                     if (this->mc_EcuValues[u32_ItElement] == *pc_Value)
                      {
                         //No add necessary
                      }
@@ -906,9 +905,9 @@ const
    All invalid list IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(void) const
+std::vector<C_OscNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(void) const
 {
-   std::vector<C_OSCNodeDataPoolListId> c_Retval;
+   std::vector<C_OscNodeDataPoolListId> c_Retval;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -917,28 +916,28 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(voi
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         if (this->mc_ECUValuesReadStatus.size() == pc_Param->c_DataPoolElementsConfig.size())
+         if (this->mc_EcuValuesReadStatus.size() == pc_Param->c_DataPoolElementsConfig.size())
          {
-            for (uint32 u32_ItElement = 0UL; u32_ItElement < this->mc_ECUValuesReadStatus.size(); ++u32_ItElement)
+            for (uint32_t u32_ItElement = 0UL; u32_ItElement < this->mc_EcuValuesReadStatus.size(); ++u32_ItElement)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItElement];
 
                //Only consider read elements
-               if ((this->mc_ECUValuesReadStatus[u32_ItElement] == true) &&
+               if ((this->mc_EcuValuesReadStatus[u32_ItElement] == true) &&
                    (rc_Config.c_ElementId.GetIsValid() == true))
                {
-                  uint32 u32_ItFinalIndex;
+                  uint32_t u32_ItFinalIndex;
                   const bool q_Found1 = m_GetListIndex(rc_Config.c_ElementId, u32_ItFinalIndex);
 
-                  if (((q_Found1 == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size())) &&
-                      (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == false))
+                  if (((q_Found1 == true) && (u32_ItFinalIndex < this->mc_EcuCrcValidStatus.size())) &&
+                      (this->mc_EcuCrcValidStatus[u32_ItFinalIndex] == false))
                   {
                      //Append unique
                      bool q_Found = false;
-                     for (uint32 u32_ItExisting = 0UL; (u32_ItExisting < c_Retval.size()) && (q_Found == false);
+                     for (uint32_t u32_ItExisting = 0UL; (u32_ItExisting < c_Retval.size()) && (q_Found == false);
                           ++u32_ItExisting)
                      {
-                        const C_OSCNodeDataPoolListId & rc_ListId = c_Retval[u32_ItExisting];
+                        const C_OscNodeDataPoolListId & rc_ListId = c_Retval[u32_ItExisting];
                         if (((rc_ListId.u32_NodeIndex == rc_Config.c_ElementId.u32_NodeIndex) &&
                              (rc_ListId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
                             (rc_ListId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
@@ -963,7 +962,7 @@ std::vector<C_OSCNodeDataPoolListId> C_SyvDaItPaTreeModel::GetInvalidListIds(voi
 /*! \brief   Update ECU values for specified ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::UpdateECUValues(void)
+void C_SyvDaItPaTreeModel::UpdateEcuValues(void)
 {
    C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -972,47 +971,47 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
       const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
       if (pc_ParamData != NULL)
       {
-         for (uint32 u32_Index = 0UL; u32_Index < pc_ParamData->c_DataPoolElementsConfig.size(); ++u32_Index)
+         for (uint32_t u32_Index = 0UL; u32_Index < pc_ParamData->c_DataPoolElementsConfig.size(); ++u32_Index)
          {
-            C_OSCNodeDataPoolContent c_Content;
+            C_OscNodeDataPoolContent c_Content;
             if (pc_ParamWidget->GetLastValue(u32_Index, c_Content) == C_NO_ERR)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_Index];
                if (rc_Config.c_ElementId.GetIsValid() == true)
                {
-                  if (((u32_Index < this->mc_ECUValuesReadStatus.size()) && (u32_Index < this->mc_ECUValues.size())) &&
-                      (u32_Index < this->mc_ECUValuesString.size()))
+                  if (((u32_Index < this->mc_EcuValuesReadStatus.size()) && (u32_Index < this->mc_EcuValues.size())) &&
+                      (u32_Index < this->mc_EcuValuesString.size()))
                   {
-                     auto && rc_Ref = this->mc_ECUValuesReadStatus[u32_Index];
-                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                     auto && rc_Ref = this->mc_EcuValuesReadStatus[u32_Index];
+                     const C_OscNodeDataPoolListElement * const pc_OscElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                                    rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                                    rc_Config.c_ElementId.u32_ListIndex,
                                                                                    rc_Config.c_ElementId.u32_ElementIndex);
                      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-                        C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                        C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                                   rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                                   rc_Config.c_ElementId.u32_ListIndex,
                                                                                   rc_Config.c_ElementId.u32_ElementIndex);
                      //Confirm read status
                      rc_Ref = true;
                      //Just check
-                     if (pc_OSCElement != NULL)
+                     if (pc_OscElement != NULL)
                      {
-                        std::vector<QString> & rc_ValueStrings = this->mc_ECUValuesString[u32_Index];
-                        this->mc_ECUValues[u32_Index] = c_Content;
+                        std::vector<QString> & rc_ValueStrings = this->mc_EcuValuesString[u32_Index];
+                        this->mc_EcuValues[u32_Index] = c_Content;
                         //Handle string
                         if ((pc_UiElement->q_InterpretAsString == true) && (rc_ValueStrings.size() > 0UL))
                         {
                            rc_ValueStrings[0] =
-                              C_SdNdeDpUtil::h_ConvertToString(c_Content);
+                              C_SdNdeDpContentUtil::h_ConvertToString(c_Content);
                         }
                         else
                         {
                            rc_ValueStrings.clear();
                            C_SdNdeDpContentUtil::h_GetValuesAsScaledString(c_Content,
-                                                                           pc_OSCElement->f64_Factor,
-                                                                           pc_OSCElement->f64_Offset,
+                                                                           pc_OscElement->f64_Factor,
+                                                                           pc_OscElement->f64_Offset,
                                                                            rc_ValueStrings, false);
                         }
                      }
@@ -1031,10 +1030,10 @@ void C_SyvDaItPaTreeModel::UpdateECUValues(void)
    \param[in]  oq_Status   New CRC status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_ListId, const bool oq_Status)
+void C_SyvDaItPaTreeModel::SetCrcStatus(const C_OscNodeDataPoolListId & orc_ListId, const bool oq_Status)
 {
-   C_OSCNodeDataPoolListElementId c_TmpId;
-   uint32 u32_ItFinalIndex;
+   C_OscNodeDataPoolListElementId c_TmpId;
+   uint32_t u32_ItFinalIndex;
    bool q_Found;
 
    //Get list
@@ -1044,10 +1043,10 @@ void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_List
    c_TmpId.u32_ElementIndex = 0UL;
    q_Found = m_GetListIndex(c_TmpId, u32_ItFinalIndex);
 
-   if ((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size()))
+   if ((q_Found == true) && (u32_ItFinalIndex < this->mc_EcuCrcValidStatus.size()))
    {
       //Update CRC flag
-      auto && rc_Ref = this->mc_ECUCRCValidStatus[u32_ItFinalIndex];
+      auto && rc_Ref = this->mc_EcuCrcValidStatus[u32_ItFinalIndex];
       rc_Ref = oq_Status;
    }
 }
@@ -1059,8 +1058,8 @@ void C_SyvDaItPaTreeModel::SetCRCStatus(const C_OSCNodeDataPoolListId & orc_List
    \param[out]  orc_ListValues   Set values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId & orc_ListId,
-                                            std::vector<C_OSCNodeDataPoolContent> & orc_ListValues) const
+void C_SyvDaItPaTreeModel::GetListSetValues(const C_OscNodeDataPoolListElementId & orc_ListId,
+                                            std::vector<C_OscNodeDataPoolContent> & orc_ListValues) const
 {
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -1069,7 +1068,7 @@ void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if ((rc_Config.c_ElementId.GetIsValid() == true) && (u32_ItConfig < pc_Param->c_ListValues.size()))
@@ -1078,7 +1077,7 @@ void C_SyvDaItPaTreeModel::GetListSetValues(const C_OSCNodeDataPoolListElementId
                     (orc_ListId.u32_DataPoolIndex == rc_Config.c_ElementId.u32_DataPoolIndex)) &&
                    (orc_ListId.u32_ListIndex == rc_Config.c_ElementId.u32_ListIndex))
                {
-                  const C_OSCNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItConfig);
+                  const C_OscNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItConfig);
                   if (pc_Value != NULL)
                   {
                      //Check if the order is as expected
@@ -1107,10 +1106,10 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
    delete (this->mpc_InvisibleRootItem);
    this->mpc_InvisibleRootItem = new C_TblTreItem();
    this->mpc_DataWidget = opc_DataWidget;
-   this->mc_ECUValuesString.clear();
-   this->mc_ECUCRCValidStatus.clear();
-   this->mc_ECUValuesReadStatus.clear();
-   this->mc_ECUValues.clear();
+   this->mc_EcuValuesString.clear();
+   this->mc_EcuCrcValidStatus.clear();
+   this->mc_EcuValuesReadStatus.clear();
+   this->mc_EcuValues.clear();
 
    if (pc_ParamWidget != NULL)
    {
@@ -1122,16 +1121,16 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
          mh_InitAllNode(pc_AllNode, pc_ParamWidget->GetViewIndex());
          this->mpc_InvisibleRootItem->AddChild(pc_AllNode);
          //init
-         this->mc_ECUValues = pc_Param->c_ListValues;
-         this->mc_ECUValuesString.reserve(pc_Param->c_ListValues.size());
-         this->mc_ECUValuesReadStatus.resize(pc_Param->c_ListValues.size(), false);
-         for (uint32 u32_It1 = 0UL; u32_It1 < pc_Param->c_DataPoolElementsConfig.size(); ++u32_It1)
+         this->mc_EcuValues = pc_Param->c_ListValues;
+         this->mc_EcuValuesString.reserve(pc_Param->c_ListValues.size());
+         this->mc_EcuValuesReadStatus.resize(pc_Param->c_ListValues.size(), false);
+         for (uint32_t u32_It1 = 0UL; u32_It1 < pc_Param->c_DataPoolElementsConfig.size(); ++u32_It1)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_It1];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
                const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-                  C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+                  C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                             rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                             rc_Config.c_ElementId.u32_ListIndex,
                                                                             rc_Config.c_ElementId.u32_ElementIndex);
@@ -1167,7 +1166,7 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
                               rc_Config.c_ElementId.u32_ListIndex, pc_Node->q_Enabled);
                   pc_DataPool->AddChild(pc_List);
                   //Necessary for each new list
-                  this->mc_ECUCRCValidStatus.push_back(false);
+                  this->mc_EcuCrcValidStatus.push_back(false);
                }
                pc_Element = pc_List->GetItem(rc_Config.c_ElementId.u32_ElementIndex);
                //Continue
@@ -1193,7 +1192,7 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
                   {
                      if (u32_It1 < pc_Param->c_ListValues.size())
                      {
-                        const C_OSCNodeDataPoolContent & rc_Content = pc_Param->c_ListValues[u32_It1];
+                        const C_OscNodeDataPoolContent & rc_Content = pc_Param->c_ListValues[u32_It1];
                         if (rc_Content.GetArray() == false)
                         {
                            c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING);
@@ -1201,14 +1200,14 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
                         else
                         {
                            c_Entry.reserve(rc_Content.GetArraySize());
-                           for (uint32 u32_ItArr = 0UL; u32_ItArr < rc_Content.GetArraySize(); ++u32_ItArr)
+                           for (uint32_t u32_ItArr = 0UL; u32_ItArr < rc_Content.GetArraySize(); ++u32_ItArr)
                            {
                               c_Entry.push_back(C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING);
                            }
                         }
                      }
                   }
-                  this->mc_ECUValuesString.push_back(c_Entry);
+                  this->mc_EcuValuesString.push_back(c_Entry);
                }
             }
          }
@@ -1220,23 +1219,23 @@ void C_SyvDaItPaTreeModel::Init(C_PuiSvDbDataElementHandler * const opc_DataWidg
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                          const sintn osn_Role) const
+QVariant C_SyvDaItPaTreeModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                          const int32_t os32_Role) const
 {
-   QVariant c_Retval = C_TblTreModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = C_TblTreModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_SyvDaItPaTreeModel::E_Columns e_Col = C_SyvDaItPaTreeModel::h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const C_SyvDaItPaTreeModel::E_Columns e_Col = C_SyvDaItPaTreeModel::h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -1280,7 +1279,7 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          switch (e_Col)
          {
@@ -1324,7 +1323,7 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          const QString c_PhysicalValueInfo = C_GtGetText::h_GetText("The raw value of a data element is the value as it is transmitted in the network."
                                                                     "\nThe physical value of a data element is the value of the physical quantity (e.g. speed, "
@@ -1383,7 +1382,7 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -1404,7 +1403,7 @@ QVariant C_SyvDaItPaTreeModel::headerData(const sintn osn_Section, const Qt::Ori
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItPaTreeModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SyvDaItPaTreeModel::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 12;
@@ -1414,24 +1413,24 @@ sintn C_SyvDaItPaTreeModel::columnCount(const QModelIndex & orc_Parent) const
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
-   QVariant c_Retval = C_TblTreModel::data(orc_Index, osn_Role);
+   QVariant c_Retval = C_TblTreModel::data(orc_Index, os32_Role);
 
    //Other columns need manual handling
    if (orc_Index.column() > 0)
    {
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         C_OSCNodeDataPoolListElementId c_Id;
-         uint32 u32_ValidLayers;
-         const C_OSCNodeDataPoolListElement * pc_OSCElement;
+         C_OscNodeDataPoolListElementId c_Id;
+         uint32_t u32_ValidLayers;
+         const C_OscNodeDataPoolListElement * pc_OscElement;
          const C_PuiSdNodeDataPoolListElement * pc_UiElement;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
@@ -1440,9 +1439,9 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          switch (u32_ValidLayers)
          {
          case 1:
-            if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) && (e_Col == C_SyvDaItPaTreeModel::eCOMMENT))
+            if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) && (e_Col == C_SyvDaItPaTreeModel::eCOMMENT))
             {
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_Id.u32_NodeIndex);
+               const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_Id.u32_NodeIndex);
                if (pc_Node != NULL)
                {
                   c_Retval = pc_Node->c_Properties.c_Comment.c_str();
@@ -1450,9 +1449,9 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             }
             break;
          case 2:
-            if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) && (e_Col == C_SyvDaItPaTreeModel::eCOMMENT))
+            if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) && (e_Col == C_SyvDaItPaTreeModel::eCOMMENT))
             {
-               const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+               const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
                   c_Id.u32_NodeIndex,
                   c_Id.u32_DataPoolIndex);
                if (pc_DataPool != NULL)
@@ -1466,10 +1465,10 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eCOMMENT:
-               if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+               if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                {
-                  const C_OSCNodeDataPoolList * const pc_List =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_Id.u32_NodeIndex,
+                  const C_OscNodeDataPoolList * const pc_List =
+                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(c_Id.u32_NodeIndex,
                                                                          c_Id.u32_DataPoolIndex,
                                                                          c_Id.u32_ListIndex);
                   if (pc_List != NULL)
@@ -1482,11 +1481,11 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                if (orc_Index.row() >= 0)
                {
                   //Only show CRC if active
-                  const C_OSCNodeDataPoolList * const pc_List =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_Id.u32_NodeIndex,
+                  const C_OscNodeDataPoolList * const pc_List =
+                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(c_Id.u32_NodeIndex,
                                                                          c_Id.u32_DataPoolIndex,
                                                                          c_Id.u32_ListIndex);
-                  if ((pc_List != NULL) && (pc_List->q_NvMCRCActive == true))
+                  if ((pc_List != NULL) && (pc_List->q_NvmCrcActive == true))
                   {
                      if (pc_ParamWidget != NULL)
                      {
@@ -1495,16 +1494,16 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                         c_Id.u32_ElementIndex = 0UL;
                         if (pc_ParamData != NULL)
                         {
-                           const uint32 u32_Index = GetParamIndexId(c_Id);
-                           if (u32_Index < this->mc_ECUValuesReadStatus.size())
+                           const uint32_t u32_Index = GetParamIndexId(c_Id);
+                           if (u32_Index < this->mc_EcuValuesReadStatus.size())
                            {
-                              if (this->mc_ECUValuesReadStatus[u32_Index] == true)
+                              if (this->mc_EcuValuesReadStatus[u32_Index] == true)
                               {
-                                 uint32 u32_ItFinalIndex;
+                                 uint32_t u32_ItFinalIndex;
                                  const bool q_Found = m_GetListIndex(c_Id, u32_ItFinalIndex);
-                                 if ((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size()))
+                                 if ((q_Found == true) && (u32_ItFinalIndex < this->mc_EcuCrcValidStatus.size()))
                                  {
-                                    if (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == true)
+                                    if (this->mc_EcuCrcValidStatus[u32_ItFinalIndex] == true)
                                     {
                                        c_Retval = C_GtGetText::h_GetText("CRC: Valid");
                                     }
@@ -1537,11 +1536,11 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                   c_Id.u32_ElementIndex = 0UL;
                   if (pc_ParamData != NULL)
                   {
-                     const uint32 u32_Index = GetParamIndexId(c_Id);
+                     const uint32_t u32_Index = GetParamIndexId(c_Id);
                      if (u32_Index < pc_ParamData->c_DataSetSelectionIndices.size())
                      {
-                        const sint32 s32_DataSetIndex = pc_ParamData->c_DataSetSelectionIndices[u32_Index];
-                        if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                        const int32_t s32_DataSetIndex = pc_ParamData->c_DataSetSelectionIndices[u32_Index];
+                        if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                         {
                            if (s32_DataSetIndex < 0)
                            {
@@ -1549,22 +1548,22 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                            }
                            else
                            {
-                              const uint32 u32_DataSet = static_cast<uint32>(s32_DataSetIndex);
-                              const C_OSCNodeDataPoolList * const pc_List =
-                                 C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_Id.u32_NodeIndex,
+                              const uint32_t u32_DataSet = static_cast<uint32_t>(s32_DataSetIndex);
+                              const C_OscNodeDataPoolList * const pc_List =
+                                 C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(c_Id.u32_NodeIndex,
                                                                                      c_Id.u32_DataPoolIndex,
                                                                                      c_Id.u32_ListIndex);
                               if ((pc_List != NULL) && (u32_DataSet < pc_List->c_DataSets.size()))
                               {
-                                 const C_OSCNodeDataPoolDataSet & rc_DataSet = pc_List->c_DataSets[u32_DataSet];
+                                 const C_OscNodeDataPoolDataSet & rc_DataSet = pc_List->c_DataSets[u32_DataSet];
                                  c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Dataset \"%1\"")).arg(
                                     rc_DataSet.c_Name.c_str());
                               }
                            }
                         }
-                        else if (osn_Role == static_cast<sintn>(Qt::EditRole))
+                        else if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                         {
-                           c_Retval = static_cast<sintn>(s32_DataSetIndex + 1L);
+                           c_Retval = static_cast<int32_t>(s32_DataSetIndex + 1L);
                         }
                         else
                         {
@@ -1584,15 +1583,15 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eCOMMENT:
-               if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+               if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                {
-                  pc_OSCElement = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id.u32_NodeIndex,
+                  pc_OscElement = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id.u32_NodeIndex,
                                                                                              c_Id.u32_DataPoolIndex,
                                                                                              c_Id.u32_ListIndex,
                                                                                              c_Id.u32_ElementIndex);
-                  if (pc_OSCElement != NULL)
+                  if (pc_OscElement != NULL)
                   {
-                     c_Retval = pc_OSCElement->c_Comment.c_str();
+                     c_Retval = pc_OscElement->c_Comment.c_str();
                   }
                }
                break;
@@ -1602,30 +1601,30 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                   const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
                   if (pc_ParamData != NULL)
                   {
-                     const uint32 u32_Index = GetParamIndexId(c_Id);
-                     if ((u32_Index < this->mc_ECUValuesString.size()) &&
-                         (u32_Index < this->mc_ECUValuesReadStatus.size()))
+                     const uint32_t u32_Index = GetParamIndexId(c_Id);
+                     if ((u32_Index < this->mc_EcuValuesString.size()) &&
+                         (u32_Index < this->mc_EcuValuesReadStatus.size()))
                      {
-                        if (this->mc_ECUValuesReadStatus[u32_Index] == false)
+                        if (this->mc_EcuValuesReadStatus[u32_Index] == false)
                         {
                            c_Retval = C_SyvDaItPaTreeModel::mhc_ECU_VALUE_INIT_STRING;
                         }
                         else
                         {
-                           pc_OSCElement = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                           pc_OscElement = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                               c_Id.u32_NodeIndex,
                               c_Id.u32_DataPoolIndex,
                               c_Id.u32_ListIndex,
                               c_Id.u32_ElementIndex);
-                           pc_UiElement = C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(c_Id.u32_NodeIndex,
+                           pc_UiElement = C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(c_Id.u32_NodeIndex,
                                                                                                     c_Id.u32_DataPoolIndex,
                                                                                                     c_Id.u32_ListIndex,
                                                                                                     c_Id.u32_ElementIndex);
-                           if ((pc_OSCElement != NULL) && (pc_UiElement != NULL))
+                           if ((pc_OscElement != NULL) && (pc_UiElement != NULL))
                            {
-                              if ((pc_UiElement->q_InterpretAsString == false) && (pc_OSCElement->GetArray() == true))
+                              if ((pc_UiElement->q_InterpretAsString == false) && (pc_OscElement->GetArray() == true))
                               {
-                                 if (osn_Role == static_cast<sintn>(Qt::EditRole))
+                                 if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                                  {
                                     //Special link value
                                     c_Retval = QPoint();
@@ -1634,14 +1633,14 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  {
                                     //Return display value (no edit required)
                                     c_Retval =
-                                       C_SdNdeDpContentUtil::h_CombineString(this->mc_ECUValuesString[u32_Index]);
+                                       C_SdNdeDpContentUtil::h_CombineString(this->mc_EcuValuesString[u32_Index]);
                                  }
                               }
                               else
                               {
                                  //Return display value (no edit required)
                                  c_Retval =
-                                    C_SdNdeDpContentUtil::h_CombineString(this->mc_ECUValuesString[u32_Index]);
+                                    C_SdNdeDpContentUtil::h_CombineString(this->mc_EcuValuesString[u32_Index]);
                               }
                            }
                         }
@@ -1655,28 +1654,28 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                   const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
                   if (pc_ParamData != NULL)
                   {
-                     const uint32 u32_Index = GetParamIndexId(c_Id);
-                     const C_OSCNodeDataPoolContent * const pc_Content = m_GetSetValue(u32_Index);
+                     const uint32_t u32_Index = GetParamIndexId(c_Id);
+                     const C_OscNodeDataPoolContent * const pc_Content = m_GetSetValue(u32_Index);
                      if (pc_Content != NULL)
                      {
-                        pc_OSCElement = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                        pc_OscElement = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                            c_Id.u32_NodeIndex,
                            c_Id.u32_DataPoolIndex,
                            c_Id.u32_ListIndex,
                            c_Id.u32_ElementIndex);
-                        pc_UiElement = C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(c_Id.u32_NodeIndex,
+                        pc_UiElement = C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(c_Id.u32_NodeIndex,
                                                                                                  c_Id.u32_DataPoolIndex,
                                                                                                  c_Id.u32_ListIndex,
                                                                                                  c_Id.u32_ElementIndex);
-                        if ((pc_OSCElement != NULL) && (pc_UiElement != NULL))
+                        if ((pc_OscElement != NULL) && (pc_UiElement != NULL))
                         {
                            if (pc_UiElement->q_InterpretAsString == true)
                            {
-                              c_Retval = C_SdNdeDpUtil::h_ConvertToString(*pc_Content);
+                              c_Retval = C_SdNdeDpContentUtil::h_ConvertToString(*pc_Content);
                            }
                            else
                            {
-                              if (osn_Role == static_cast<sintn>(Qt::EditRole))
+                              if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                               {
                                  if (pc_Content->GetArray() == true)
                                  {
@@ -1687,8 +1686,8 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                                  {
                                     //Return value for edit
                                     c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Content,
-                                                                                                     pc_OSCElement->f64_Factor,
-                                                                                                     pc_OSCElement->f64_Offset,
+                                                                                                     pc_OscElement->f64_Factor,
+                                                                                                     pc_OscElement->f64_Offset,
                                                                                                      0, false);
                                  }
                               }
@@ -1696,8 +1695,8 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                               {
                                  QString c_Output;
                                  C_SdNdeDpContentUtil::h_GetValuesAsScaledCombinedString(*pc_Content,
-                                                                                         pc_OSCElement->f64_Factor,
-                                                                                         pc_OSCElement->f64_Offset,
+                                                                                         pc_OscElement->f64_Factor,
+                                                                                         pc_OscElement->f64_Offset,
                                                                                          c_Output, false);
                                  c_Retval = c_Output;
                               }
@@ -1708,15 +1707,15 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                }
                break;
             case C_SyvDaItPaTreeModel::eUNIT:
-               if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+               if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                {
-                  pc_OSCElement = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id.u32_NodeIndex,
+                  pc_OscElement = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id.u32_NodeIndex,
                                                                                              c_Id.u32_DataPoolIndex,
                                                                                              c_Id.u32_ListIndex,
                                                                                              c_Id.u32_ElementIndex);
-                  if (pc_OSCElement != NULL)
+                  if (pc_OscElement != NULL)
                   {
-                     c_Retval = pc_OSCElement->c_Unit.c_str();
+                     c_Retval = pc_OscElement->c_Unit.c_str();
                   }
                }
                break;
@@ -1730,10 +1729,10 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_ICON)
+      else if (os32_Role == ms32_USER_ROLE_ICON)
       {
-         C_OSCNodeDataPoolListElementId c_Id;
-         uint32 u32_ValidLayers;
+         C_OscNodeDataPoolListElementId c_Id;
+         uint32_t u32_ValidLayers;
 
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
@@ -1802,7 +1801,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          }
          c_Retval = c_Icons;
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
       {
          QFont c_Font;
 
@@ -1812,7 +1811,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          //Default
          c_Font = mc_STYLE_GUIDE_FONT_REGULAR_11;
          if ((data(orc_Index,
-                   static_cast<sintn>(Qt::EditRole)).type() == QVariant::Point) &&
+                   static_cast<int32_t>(Qt::EditRole)).type() == QVariant::Point) &&
              (flags(orc_Index).testFlag(Qt::ItemIsEditable) == true))
          {
             //Special link handling
@@ -1821,29 +1820,29 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          if (pc_ParamWidget != NULL)
          {
             const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
-            C_OSCNodeDataPoolListElementId c_Id;
-            uint32 u32_ValidLayers;
+            C_OscNodeDataPoolListElementId c_Id;
+            uint32_t u32_ValidLayers;
             switch (e_Col) //lint !e788 not all cases handled here explicitly
             {
             case C_SyvDaItPaTreeModel::eSET:
                C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
                if ((pc_ParamData != NULL) && (u32_ValidLayers == 4))
                {
-                  const uint32 u32_Index = GetParamIndexId(c_Id);
-                  const C_OSCNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_Index);
-                  const C_OSCNodeDataPoolListElement * const pc_Element =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                  const uint32_t u32_Index = GetParamIndexId(c_Id);
+                  const C_OscNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_Index);
+                  const C_OscNodeDataPoolListElement * const pc_Element =
+                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
                   if ((pc_Element != NULL) && (pc_Value != NULL))
                   {
                      //Check error
                      if ((*pc_Value >= pc_Element->c_MinValue) && (*pc_Value >= pc_Element->c_MinValue))
                      {
                         //No error
-                        if (((u32_Index < this->mc_ECUValuesReadStatus.size()) &&
-                             (u32_Index < this->mc_ECUValues.size())) &&
-                            (this->mc_ECUValuesReadStatus[u32_Index] == true))
+                        if (((u32_Index < this->mc_EcuValuesReadStatus.size()) &&
+                             (u32_Index < this->mc_EcuValues.size())) &&
+                            (this->mc_EcuValuesReadStatus[u32_Index] == true))
                         {
-                           if (*pc_Value == this->mc_ECUValues[u32_Index])
+                           if (*pc_Value == this->mc_EcuValues[u32_Index])
                            {
                               //Use default font
                            }
@@ -1866,14 +1865,14 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
                if ((pc_ParamData != NULL) && (u32_ValidLayers == 3))
                {
-                  const uint32 u32_ItemIndex = GetParamIndexId(c_Id);
-                  uint32 u32_ItFinalIndex;
+                  const uint32_t u32_ItemIndex = GetParamIndexId(c_Id);
+                  uint32_t u32_ItFinalIndex;
                   const bool q_Found = m_GetListIndex(c_Id, u32_ItFinalIndex);
                   //Check if CRC read and still invalid
-                  if (((((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size())) &&
-                        (u32_ItemIndex < this->mc_ECUValuesReadStatus.size())) &&
-                       (this->mc_ECUValuesReadStatus[u32_ItemIndex] == true)) &&
-                      (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == false))
+                  if (((((q_Found == true) && (u32_ItFinalIndex < this->mc_EcuCrcValidStatus.size())) &&
+                        (u32_ItemIndex < this->mc_EcuValuesReadStatus.size())) &&
+                       (this->mc_EcuValuesReadStatus[u32_ItemIndex] == true)) &&
+                      (this->mc_EcuCrcValidStatus[u32_ItFinalIndex] == false))
                   {
                      c_Font.setBold(true);
                   }
@@ -1888,10 +1887,10 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
          c_Font.setPixelSize(c_Font.pointSize());
          c_Retval = c_Font;
       }
-      else if (osn_Role == static_cast<sintn>(msn_USER_ROLE_TOOL_TIP_HEADING))
+      else if (os32_Role == static_cast<int32_t>(ms32_USER_ROLE_TOOL_TIP_HEADING))
       {
-         C_OSCNodeDataPoolListElementId c_Id;
-         uint32 u32_ValidLayers;
+         C_OscNodeDataPoolListElementId c_Id;
+         uint32_t u32_ValidLayers;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
 
@@ -1927,15 +1926,15 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(msn_USER_ROLE_TOOL_TIP_CONTENT))
+      else if (os32_Role == static_cast<int32_t>(ms32_USER_ROLE_TOOL_TIP_CONTENT))
       {
-         C_OSCNodeDataPoolListElementId c_Id;
-         uint32 u32_ValidLayers;
+         C_OscNodeDataPoolListElementId c_Id;
+         uint32_t u32_ValidLayers;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          if (e_Col == C_SyvDaItPaTreeModel::eCOMMENT)
          {
-            c_Retval = this->data(orc_Index, static_cast<sintn>(Qt::DisplayRole));
+            c_Retval = this->data(orc_Index, static_cast<int32_t>(Qt::DisplayRole));
          }
          else if (((e_Col == C_SyvDaItPaTreeModel::eDEVICE_VALUE) || (e_Col == C_SyvDaItPaTreeModel::eSET)) &&
                   (u32_ValidLayers == 4UL))
@@ -1947,25 +1946,25 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
                if (pc_ParamData != NULL)
                {
-                  const uint32 u32_Index = GetParamIndexId(c_Id);
-                  if (((u32_Index < this->mc_ECUValuesReadStatus.size()) &&
-                       (this->mc_ECUValuesReadStatus[u32_Index] == true)) || (e_Col == C_SyvDaItPaTreeModel::eSET))
+                  const uint32_t u32_Index = GetParamIndexId(c_Id);
+                  if (((u32_Index < this->mc_EcuValuesReadStatus.size()) &&
+                       (this->mc_EcuValuesReadStatus[u32_Index] == true)) || (e_Col == C_SyvDaItPaTreeModel::eSET))
                   {
-                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                     const C_OscNodeDataPoolListElement * const pc_OscElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                            c_Id.u32_NodeIndex,
                            c_Id.u32_DataPoolIndex,
                            c_Id.u32_ListIndex,
                            c_Id.u32_ElementIndex);
                      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-                        C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(c_Id.u32_NodeIndex,
+                        C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(c_Id.u32_NodeIndex,
                                                                                   c_Id.u32_DataPoolIndex,
                                                                                   c_Id.u32_ListIndex,
                                                                                   c_Id.u32_ElementIndex);
-                     if ((((pc_OSCElement != NULL) && (pc_UiElement != NULL)) &&
-                          (pc_UiElement->q_InterpretAsString == false)) && (pc_OSCElement->GetArray() == true))
+                     if ((((pc_OscElement != NULL) && (pc_UiElement != NULL)) &&
+                          (pc_UiElement->q_InterpretAsString == false)) && (pc_OscElement->GetArray() == true))
                      {
-                        c_Retval = this->data(orc_Index, static_cast<sintn>(Qt::DisplayRole));
+                        c_Retval = this->data(orc_Index, static_cast<int32_t>(Qt::DisplayRole));
                      }
                   }
                }
@@ -2003,7 +2002,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
    else
    {
       //Handle changed marker
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          if (this->m_IsChanged(orc_Index) == true)
          {
@@ -2014,7 +2013,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
       }
    }
    //Handle colors for all columns
-   if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+   if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
    {
       QColor c_DefaultNonInteractive;
       QColor c_Default;
@@ -2033,8 +2032,8 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
       c_Retval = c_DefaultNonInteractive;
       if (e_Col == C_SyvDaItPaTreeModel::eSET)
       {
-         C_OSCNodeDataPoolListElementId c_Id;
-         uint32 u32_ValidLayers;
+         C_OscNodeDataPoolListElementId c_Id;
+         uint32_t u32_ValidLayers;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          if (u32_ValidLayers < 4UL)
          {
@@ -2054,16 +2053,16 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
                const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
                if (pc_ParamData != NULL)
                {
-                  const uint32 u32_Index = GetParamIndexId(c_Id);
+                  const uint32_t u32_Index = GetParamIndexId(c_Id);
                   if ((u32_Index < pc_ParamData->c_DataSetSelectionIndices.size()) &&
                       (pc_ParamData->c_DataSetSelectionIndices[u32_Index] < 0L))
                   {
-                     const C_OSCNodeDataPoolListElement * const pc_Element =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                     const C_OscNodeDataPoolListElement * const pc_Element =
+                        C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
                      //Check error
                      if ((pc_Element != NULL) && (u32_Index < pc_ParamData->c_ListValues.size()))
                      {
-                        const C_OSCNodeDataPoolContent & rc_Value = pc_ParamData->c_ListValues[u32_Index];
+                        const C_OscNodeDataPoolContent & rc_Value = pc_ParamData->c_ListValues[u32_Index];
                         if ((rc_Value >= pc_Element->c_MinValue) && (rc_Value <= pc_Element->c_MaxValue))
                         {
                            //No error
@@ -2090,21 +2089,21 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const sintn o
 
    \param[in]  orc_Index   Index
    \param[in]  orc_Value   New data
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
+bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const int32_t os32_Role)
 {
    bool q_Retval = false;
 
-   if (osn_Role == static_cast<sintn>(Qt::EditRole))
+   if (os32_Role == static_cast<int32_t>(Qt::EditRole))
    {
-      C_OSCNodeDataPoolListElementId c_Id;
-      uint32 u32_ValidLayers;
+      C_OscNodeDataPoolListElementId c_Id;
+      uint32_t u32_ValidLayers;
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
@@ -2123,12 +2122,12 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                if (pc_ParamData != NULL)
                {
                   bool q_Ok;
-                  const sint32 s32_NewDataSetValue = static_cast<sint32>(orc_Value.toInt(&q_Ok)) - 1L;
+                  const int32_t s32_NewDataSetValue = static_cast<int32_t>(orc_Value.toInt(&q_Ok)) - 1L;
                   if (q_Ok == true)
                   {
                      C_PuiSvDbParam c_Copy = *pc_ParamData;
                      //Step 2: for each element of this list apply data set value
-                     for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_ParamData->c_DataPoolElementsConfig.size();
+                     for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_ParamData->c_DataPoolElementsConfig.size();
                           ++u32_ItConfig)
                      {
                         const C_PuiSvDbNodeDataElementConfig & rc_Config =
@@ -2159,7 +2158,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
                if (pc_ParamData != NULL)
                {
-                  const uint32 u32_Index = GetParamIndexId(c_Id);
+                  const uint32_t u32_Index = GetParamIndexId(c_Id);
                   if (u32_Index < pc_ParamData->c_DataPoolElementsConfig.size())
                   {
                      const C_PuiSvDbNodeDataElementConfig & rc_Config =
@@ -2167,11 +2166,11 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                      C_PuiSvDbParam c_Copy = *pc_ParamData;
                      if (u32_Index < c_Copy.c_ListValues.size())
                      {
-                        C_OSCNodeDataPoolContent & rc_Content = c_Copy.c_ListValues[u32_Index];
+                        C_OscNodeDataPoolContent & rc_Content = c_Copy.c_ListValues[u32_Index];
                         if (rc_Content.GetArray() == false)
                         {
-                           const C_OSCNodeDataPoolListElement * const pc_Element =
-                              C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                           const C_OscNodeDataPoolListElement * const pc_Element =
+                              C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                                  rc_Config.c_ElementId.u32_NodeIndex, rc_Config.c_ElementId.u32_DataPoolIndex,
                                  rc_Config.c_ElementId.u32_ListIndex, rc_Config.c_ElementId.u32_ElementIndex);
                            if (pc_Element != NULL)
@@ -2185,7 +2184,7 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
                         else
                         {
                            //Array edit should handle this use-case except string
-                           C_SdNdeDpUtil::h_SetString(orc_Value.toString(), rc_Content);
+                           C_SdNdeDpContentUtil::h_SetString(orc_Value.toString(), rc_Content);
                         }
                         tgl_assert(pc_ParamWidget->SetParamItem(c_Copy) == C_NO_ERR);
                      }
@@ -2218,8 +2217,8 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
 Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
 {
    Qt::ItemFlags c_Retval = C_TblTreModel::flags(orc_Index);
-   C_OSCNodeDataPoolListElementId c_Id;
-   uint32 u32_ValidLayers;
+   C_OscNodeDataPoolListElementId c_Id;
+   uint32_t u32_ValidLayers;
    C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
    const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
 
@@ -2351,19 +2350,19 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
             const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
             if (pc_ParamData != NULL)
             {
-               const uint32 u32_Index = GetParamIndexId(c_Id);
+               const uint32_t u32_Index = GetParamIndexId(c_Id);
                if (u32_Index < pc_ParamData->c_DataPoolElementsConfig.size())
                {
                   const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_Index];
                   if (rc_Config.c_ElementId.GetIsValid() == true)
                   {
-                     const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                        C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                     const C_OscNodeDataPoolListElement * const pc_OscElement =
+                        C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                            rc_Config.c_ElementId.u32_NodeIndex,
                            rc_Config.c_ElementId.u32_DataPoolIndex,
                            rc_Config.c_ElementId.u32_ListIndex,
                            rc_Config.c_ElementId.u32_ElementIndex);
-                     if ((pc_OSCElement != NULL) && (pc_OSCElement->c_DataSetValues.size() > 0UL))
+                     if ((pc_OscElement != NULL) && (pc_OscElement->c_DataSetValues.size() > 0UL))
                      {
                         c_Retval = c_Retval | Qt::ItemIsEditable;
                      }
@@ -2387,12 +2386,12 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
             const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
             if (pc_ParamData != NULL)
             {
-               const uint32 u32_Index = GetParamIndexId(c_Id);
+               const uint32_t u32_Index = GetParamIndexId(c_Id);
                if (((u32_Index < pc_ParamData->c_DataSetSelectionIndices.size()) &&
                     (u32_Index < pc_ParamData->c_DataPoolElementsConfig.size())) &&
-                   (u32_Index < this->mc_ECUValuesReadStatus.size()))
+                   (u32_Index < this->mc_EcuValuesReadStatus.size()))
                {
-                  if ((e_Col == C_SyvDaItPaTreeModel::eSET) || (this->mc_ECUValuesReadStatus[u32_Index] == true))
+                  if ((e_Col == C_SyvDaItPaTreeModel::eSET) || (this->mc_EcuValuesReadStatus[u32_Index] == true))
                   {
                      const C_PuiSvDbNodeDataElementConfig & rc_Config =
                         pc_ParamData->c_DataPoolElementsConfig[u32_Index];
@@ -2400,21 +2399,21 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
                      {
                         if (pc_ParamData->c_DataSetSelectionIndices[u32_Index] >= 0)
                         {
-                           const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                              C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                           const C_OscNodeDataPoolListElement * const pc_OscElement =
+                              C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                                  rc_Config.c_ElementId.u32_NodeIndex,
                                  rc_Config.c_ElementId.u32_DataPoolIndex,
                                  rc_Config.c_ElementId.u32_ListIndex,
                                  rc_Config.c_ElementId.u32_ElementIndex);
                            const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-                              C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(
+                              C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(
                                  rc_Config.c_ElementId.u32_NodeIndex,
                                  rc_Config.c_ElementId.u32_DataPoolIndex,
                                  rc_Config.c_ElementId.u32_ListIndex,
                                  rc_Config.c_ElementId.u32_ElementIndex);
-                           if ((pc_OSCElement != NULL) && (pc_UiElement != NULL))
+                           if ((pc_OscElement != NULL) && (pc_UiElement != NULL))
                            {
-                              if ((pc_UiElement->q_InterpretAsString == false) && (pc_OSCElement->GetArray() == true))
+                              if ((pc_UiElement->q_InterpretAsString == false) && (pc_OscElement->GetArray() == true))
                               {
                                  c_Retval = c_Retval | Qt::ItemIsEditable;
                               }
@@ -2428,22 +2427,22 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
                            }
                            else
                            {
-                              const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                                 C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+                              const C_OscNodeDataPoolListElement * const pc_OscElement =
+                                 C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                                     rc_Config.c_ElementId.u32_NodeIndex,
                                     rc_Config.c_ElementId.u32_DataPoolIndex,
                                     rc_Config.c_ElementId.u32_ListIndex,
                                     rc_Config.c_ElementId.u32_ElementIndex);
                               const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
-                                 C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(
+                                 C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(
                                     rc_Config.c_ElementId.u32_NodeIndex,
                                     rc_Config.c_ElementId.u32_DataPoolIndex,
                                     rc_Config.c_ElementId.u32_ListIndex,
                                     rc_Config.c_ElementId.u32_ElementIndex);
-                              if ((pc_OSCElement != NULL) && (pc_UiElement != NULL))
+                              if ((pc_OscElement != NULL) && (pc_UiElement != NULL))
                               {
                                  if ((pc_UiElement->q_InterpretAsString == false) &&
-                                     (pc_OSCElement->GetArray() == true))
+                                     (pc_OscElement->GetArray() == true))
                                  {
                                     c_Retval = c_Retval | Qt::ItemIsEditable;
                                  }
@@ -2473,7 +2472,7 @@ Qt::ItemFlags C_SyvDaItPaTreeModel::flags(const QModelIndex & orc_Index) const
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItPaTreeModel::E_Columns C_SyvDaItPaTreeModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_SyvDaItPaTreeModel::E_Columns C_SyvDaItPaTreeModel::h_ColumnToEnum(const int32_t & ors32_Column)
 {
    C_SyvDaItPaTreeModel::E_Columns e_Retval;
    switch (ors32_Column)
@@ -2532,9 +2531,9 @@ C_SyvDaItPaTreeModel::E_Columns C_SyvDaItPaTreeModel::h_ColumnToEnum(const sint3
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItPaTreeModel::h_EnumToColumn(const C_SyvDaItPaTreeModel::E_Columns & ore_Value)
+int32_t C_SyvDaItPaTreeModel::h_EnumToColumn(const C_SyvDaItPaTreeModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {
@@ -2596,8 +2595,8 @@ sint32 C_SyvDaItPaTreeModel::h_EnumToColumn(const C_SyvDaItPaTreeModel::E_Column
                                     Else: undefined
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNodeDataPoolListElementId & orc_Id,
-                                         uint32 & oru32_ValidLayers)
+void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OscNodeDataPoolListElementId & orc_Id,
+                                         uint32_t & oru32_ValidLayers)
 {
    oru32_ValidLayers = 0UL;
    if (orc_Index.isValid() == true)
@@ -2696,9 +2695,9 @@ void C_SyvDaItPaTreeModel::h_DecodeIndex(const QModelIndex & orc_Index, C_OSCNod
    Element config index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDaItPaTreeModel::GetParamIndexId(const C_OSCNodeDataPoolListElementId & orc_Id) const
+uint32_t C_SyvDaItPaTreeModel::GetParamIndexId(const C_OscNodeDataPoolListElementId & orc_Id) const
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -2707,7 +2706,7 @@ uint32 C_SyvDaItPaTreeModel::GetParamIndexId(const C_OSCNodeDataPoolListElementI
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
             if (rc_Config.c_ElementId.GetIsValid() == true)
@@ -2731,14 +2730,14 @@ uint32 C_SyvDaItPaTreeModel::GetParamIndexId(const C_OSCNodeDataPoolListElementI
    \param[in]      orc_ListId    New list ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::h_AppendOnlyUniqueListId(std::vector<C_OSCNodeDataPoolListElementId> & orc_Vec,
-                                                    const C_OSCNodeDataPoolListElementId & orc_ListId)
+void C_SyvDaItPaTreeModel::h_AppendOnlyUniqueListId(std::vector<C_OscNodeDataPoolListElementId> & orc_Vec,
+                                                    const C_OscNodeDataPoolListElementId & orc_ListId)
 {
    bool q_Found = false;
 
-   for (uint32 u32_ItExisting = 0UL; u32_ItExisting < orc_Vec.size(); ++u32_ItExisting)
+   for (uint32_t u32_ItExisting = 0UL; u32_ItExisting < orc_Vec.size(); ++u32_ItExisting)
    {
-      const C_OSCNodeDataPoolListElementId & rc_Entry = orc_Vec[u32_ItExisting];
+      const C_OscNodeDataPoolListElementId & rc_Entry = orc_Vec[u32_ItExisting];
       if (((rc_Entry.u32_NodeIndex == orc_ListId.u32_NodeIndex) &&
            (rc_Entry.u32_DataPoolIndex == orc_ListId.u32_DataPoolIndex)) &&
           (rc_Entry.u32_ListIndex == orc_ListId.u32_ListIndex))
@@ -2766,8 +2765,8 @@ QString C_SyvDaItPaTreeModel::h_GetSelectedItemTypeTemplate(const QModelIndex & 
 {
    QString c_Retval;
 
-   C_OSCNodeDataPoolListElementId c_Id;
-   uint32 u32_ValidLayers;
+   C_OscNodeDataPoolListElementId c_Id;
+   uint32_t u32_ValidLayers;
 
    C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
    switch (u32_ValidLayers)
@@ -2805,12 +2804,12 @@ QString C_SyvDaItPaTreeModel::h_GetSelectedItemTypeTemplate(const QModelIndex & 
    All list IDs for the specified item
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForId(
-   const C_OSCNodeDataPoolListElementId & orc_Id, const uint32 ou32_ValidLayers) const
+std::vector<C_OscNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForId(
+   const C_OscNodeDataPoolListElementId & orc_Id, const uint32_t ou32_ValidLayers) const
 {
-   C_OSCNodeDataPoolListElementId c_IdCopy = orc_Id;
+   C_OscNodeDataPoolListElementId c_IdCopy = orc_Id;
 
-   std::vector<C_OSCNodeDataPoolListElementId> c_Retval;
+   std::vector<C_OscNodeDataPoolListElementId> c_Retval;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
    switch (ou32_ValidLayers)
@@ -2822,7 +2821,7 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
          const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
          if (pc_Param != NULL)
          {
-            for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+            for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
                if (rc_Config.c_ElementId.GetIsValid() == true)
@@ -2840,7 +2839,7 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
          const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
          if (pc_Param != NULL)
          {
-            for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+            for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
                if (rc_Config.c_ElementId.GetIsValid() == true)
@@ -2861,7 +2860,7 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
          const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
          if (pc_Param != NULL)
          {
-            for (uint32 u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+            for (uint32_t u32_ItConfig = 0UL; u32_ItConfig < pc_Param->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItConfig];
                if (rc_Config.c_ElementId.GetIsValid() == true)
@@ -2904,25 +2903,25 @@ std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetListIdsForI
    All element IDs for the specified item
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetElementIdsForId(
-   const C_OSCNodeDataPoolListElementId & orc_Id, const uint32 ou32_ValidLayers)
+std::vector<C_OscNodeDataPoolListElementId> C_SyvDaItPaTreeModel::GetElementIdsForId(
+   const C_OscNodeDataPoolListElementId & orc_Id, const uint32_t ou32_ValidLayers)
 const
 {
-   std::vector<C_OSCNodeDataPoolListElementId> c_Retval;
-   const std::vector<C_OSCNodeDataPoolListElementId> c_Tmp = GetListIdsForId(orc_Id, ou32_ValidLayers);
-   for (uint32 u32_ItList = 0UL; u32_ItList < c_Tmp.size(); ++u32_ItList)
+   std::vector<C_OscNodeDataPoolListElementId> c_Retval;
+   const std::vector<C_OscNodeDataPoolListElementId> c_Tmp = GetListIdsForId(orc_Id, ou32_ValidLayers);
+   for (uint32_t u32_ItList = 0UL; u32_ItList < c_Tmp.size(); ++u32_ItList)
    {
-      const C_OSCNodeDataPoolListElementId & rc_ListId = c_Tmp[u32_ItList];
-      const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+      const C_OscNodeDataPoolListElementId & rc_ListId = c_Tmp[u32_ItList];
+      const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
          rc_ListId.u32_NodeIndex, rc_ListId.u32_DataPoolIndex, rc_ListId.u32_ListIndex);
       if (pc_List != NULL)
       {
-         C_OSCNodeDataPoolListElementId c_Copy = rc_ListId;
-         for (uint32 u32_ItElem = 0UL; u32_ItElem < pc_List->c_Elements.size(); ++u32_ItElem)
+         C_OscNodeDataPoolListElementId c_Copy = rc_ListId;
+         for (uint32_t u32_ItElem = 0UL; u32_ItElem < pc_List->c_Elements.size(); ++u32_ItElem)
          {
             bool q_Contains = false;
             c_Copy.u32_ElementIndex = u32_ItElem;
-            for (uint32 u32_ItCurRet = 0UL; u32_ItCurRet < c_Retval.size(); ++u32_ItCurRet)
+            for (uint32_t u32_ItCurRet = 0UL; u32_ItCurRet < c_Retval.size(); ++u32_ItCurRet)
             {
                if (c_Retval[u32_ItCurRet] == c_Copy)
                {
@@ -2950,23 +2949,23 @@ const
    \param[in,out]  orc_NewValues          New values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValueAndAppendResults(C_OSCNodeDataPoolContent & orc_Content,
-                                                                    const C_OSCNodeDataPoolListElementId & orc_DescriptionId, std::vector<C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds, std::vector<QString> & orc_InvalidValues,
+void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValueAndAppendResults(C_OscNodeDataPoolContent & orc_Content,
+                                                                    const C_OscNodeDataPoolListElementId & orc_DescriptionId, std::vector<C_OscNodeDataPoolListElementId> & orc_InvalidValueIds, std::vector<QString> & orc_InvalidValues,
                                                                     std::vector<QString> & orc_NewValues)
 {
-   const C_OSCNodeDataPoolListElement * const pc_Element =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DescriptionId);
+   const C_OscNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_DescriptionId);
 
    if (pc_Element != NULL)
    {
       bool q_WasChanged = false;
-      std::vector<float64> c_Values;
+      std::vector<float64_t> c_Values;
       C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_Content, c_Values);
-      for (uint32 u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
+      for (uint32_t u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
       {
-         const float64 f64_Val = C_OSCUtils::h_GetValueScaled(c_Values[u32_ItVal],
-                                                              pc_Element->f64_Factor,
-                                                              pc_Element->f64_Offset, false);
+         const float64_t f64_Val = C_OscUtils::h_GetValueScaled(c_Values[u32_ItVal],
+                                                                pc_Element->f64_Factor,
+                                                                pc_Element->f64_Offset, false);
          if (std::isnan(f64_Val) || std::isinf(f64_Val))
          {
             q_WasChanged = true;
@@ -2999,22 +2998,22 @@ void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValueAndAppendResults(C_OSCNodeDat
    \param[in]      orc_Description  Description to use as reference
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValue(C_OSCNodeDataPoolContent & orc_Content,
-                                                    const C_OSCNodeDataPoolListElement & orc_Description)
+void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValue(C_OscNodeDataPoolContent & orc_Content,
+                                                    const C_OscNodeDataPoolListElement & orc_Description)
 {
-   std::vector<float64> c_Values;
+   std::vector<float64_t> c_Values;
    C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_Content, c_Values);
-   for (uint32 u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
+   for (uint32_t u32_ItVal = 0UL; u32_ItVal < c_Values.size(); ++u32_ItVal)
    {
-      float64 f64_Val = C_OSCUtils::h_GetValueScaled(c_Values[u32_ItVal],
-                                                     orc_Description.f64_Factor,
-                                                     orc_Description.f64_Offset, false);
+      float64_t f64_Val = C_OscUtils::h_GetValueScaled(c_Values[u32_ItVal],
+                                                       orc_Description.f64_Factor,
+                                                       orc_Description.f64_Offset, false);
       if (std::isnan(f64_Val) || std::isinf(f64_Val))
       {
          C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(f64_Val);
-         f64_Val = C_OSCUtils::h_GetValueUnscaled(f64_Val, orc_Description.f64_Factor,
+         f64_Val = C_OscUtils::h_GetValueUnscaled(f64_Val, orc_Description.f64_Factor,
                                                   orc_Description.f64_Offset);
-         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(f64_Val, orc_Content, u32_ItVal);
+         C_OscNodeDataPoolContentUtil::h_SetValueInContent(f64_Val, orc_Content, u32_ItVal);
       }
    }
 }
@@ -3025,7 +3024,7 @@ void C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValue(C_OSCNodeDataPoolContent & o
    \param[out]  orf64_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(float64 & orf64_Value)
+void C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(float64_t & orf64_Value)
 {
    if (std::isnan(orf64_Value))
    {
@@ -3033,7 +3032,7 @@ void C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(float64 & orf64_Value)
    }
    else
    {
-      C_OSCUtils::h_RangeCheckFloat(orf64_Value);
+      C_OscUtils::h_RangeCheckFloat(orf64_Value);
    }
 }
 
@@ -3044,7 +3043,7 @@ void C_SyvDaItPaTreeModel::h_FixInvalidFloatValue(float64 & orf64_Value)
    \param[in]      ou32_ViewIndex   View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, const uint32 ou32_ViewIndex)
+void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, const uint32_t ou32_ViewIndex)
 {
    if (opc_TreeNode != NULL)
    {
@@ -3072,20 +3071,20 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
    \param[in]      ou32_ViewIndex   View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
-                                       const uint32 ou32_ViewIndex)
+void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const uint32_t ou32_NodeIndex,
+                                       const uint32_t ou32_ViewIndex)
 {
    if (opc_TreeNode != NULL)
    {
-      const C_OSCNode * const pc_NodeData = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      const C_OscNode * const pc_NodeData = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
       //Index
       opc_TreeNode->u32_Index = ou32_NodeIndex;
       tgl_assert(pc_NodeData != NULL);
       if (pc_NodeData != NULL)
       {
-         std::vector<uint8> c_NodeActiveFlags;
-         const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+         std::vector<uint8_t> c_NodeActiveFlags;
+         const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
             ou32_ViewIndex,
             c_NodeActiveFlags);
 
@@ -3133,12 +3132,12 @@ void C_SyvDaItPaTreeModel::mh_InitNode(C_TblTreItem * const opc_TreeNode, const 
    \param[in]      oq_Enabled          Info if element should be enabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
-                                           const uint32 ou32_DataPoolIndex, const bool oq_Enabled)
+void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, const uint32_t ou32_NodeIndex,
+                                           const uint32_t ou32_DataPoolIndex, const bool oq_Enabled)
 {
    if (opc_TreeNode != NULL)
    {
-      const C_OSCNodeDataPool * const pc_NodeDataPoolData = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNodeDataPool * const pc_NodeDataPoolData = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          ou32_NodeIndex,
          ou32_DataPoolIndex);
 
@@ -3168,13 +3167,13 @@ void C_SyvDaItPaTreeModel::mh_InitDataPool(C_TblTreItem * const opc_TreeNode, co
    \param[in]      oq_Enabled          Info if element should be enabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
-                                       const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
+void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const uint32_t ou32_NodeIndex,
+                                       const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
                                        const bool oq_Enabled)
 {
    if (opc_TreeNode != NULL)
    {
-      const C_OSCNodeDataPoolList * const pc_ListData = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+      const C_OscNodeDataPoolList * const pc_ListData = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
          ou32_NodeIndex,
          ou32_DataPoolIndex,
          ou32_ListIndex);
@@ -3207,14 +3206,14 @@ void C_SyvDaItPaTreeModel::mh_InitList(C_TblTreItem * const opc_TreeNode, const 
    \param[in]      oq_Enabled          Info if element should be enabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, const uint32 ou32_NodeIndex,
-                                          const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
-                                          const uint32 ou32_ElementIndex, const bool oq_Enabled)
+void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, const uint32_t ou32_NodeIndex,
+                                          const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+                                          const uint32_t ou32_ElementIndex, const bool oq_Enabled)
 {
    if (opc_TreeNode != NULL)
    {
-      const C_OSCNodeDataPoolListElement * const pc_ElementData =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+      const C_OscNodeDataPoolListElement * const pc_ElementData =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
             ou32_NodeIndex,
             ou32_DataPoolIndex,
             ou32_ListIndex, ou32_ElementIndex);
@@ -3246,9 +3245,9 @@ void C_SyvDaItPaTreeModel::mh_InitElement(C_TblTreItem * const opc_TreeNode, con
    Else Valid value
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint32 ou32_DataIndex) const
+const C_OscNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint32_t ou32_DataIndex) const
 {
-   const C_OSCNodeDataPoolContent * pc_Retval = NULL;
+   const C_OscNodeDataPoolContent * pc_Retval = NULL;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
 
@@ -3264,9 +3263,10 @@ const C_OSCNodeDataPoolContent * C_SyvDaItPaTreeModel::m_GetSetValue(const uint3
          {
             if (pc_Param->c_DataSetSelectionIndices[ou32_DataIndex] >= 0L)
             {
-               const uint32 u32_DataSetIndex = static_cast<uint32>(pc_Param->c_DataSetSelectionIndices[ou32_DataIndex]);
-               const C_OSCNodeDataPoolListElement * const pc_Element =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+               const uint32_t u32_DataSetIndex =
+                  static_cast<uint32_t>(pc_Param->c_DataSetSelectionIndices[ou32_DataIndex]);
+               const C_OscNodeDataPoolListElement * const pc_Element =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                              rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                              rc_Config.c_ElementId.u32_ListIndex,
                                                                              rc_Config.c_ElementId.u32_ElementIndex);
@@ -3306,19 +3306,19 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
       const C_PuiSvDbParam * const pc_ParamData = pc_ParamWidget->GetParamItem();
       if (pc_ParamData != NULL)
       {
-         C_OSCNodeDataPoolListElementId c_Id;
-         uint32 u32_ValidLayers;
+         C_OscNodeDataPoolListElementId c_Id;
+         uint32_t u32_ValidLayers;
          C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
          switch (u32_ValidLayers)
          {
          case 0UL:
-            for (uint32 u32_ItConfig = 0UL;
+            for (uint32_t u32_ItConfig = 0UL;
                  (u32_ItConfig < pc_ParamData->c_DataPoolElementsConfig.size()) && (q_Retval == false); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_ItConfig];
                if (rc_Config.c_ElementId.GetIsValid() == true)
                {
-                  if (m_CheckListCRCIsChanged(rc_Config.c_ElementId) == true)
+                  if (m_CheckListCrcIsChanged(rc_Config.c_ElementId) == true)
                   {
                      q_Retval = true;
                   }
@@ -3330,7 +3330,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
             }
             break;
          case 1UL:
-            for (uint32 u32_ItConfig = 0UL;
+            for (uint32_t u32_ItConfig = 0UL;
                  (u32_ItConfig < pc_ParamData->c_DataPoolElementsConfig.size()) && (q_Retval == false); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_ItConfig];
@@ -3338,7 +3338,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
                {
                   if (rc_Config.c_ElementId.u32_NodeIndex == c_Id.u32_NodeIndex)
                   {
-                     if (m_CheckListCRCIsChanged(rc_Config.c_ElementId) == true)
+                     if (m_CheckListCrcIsChanged(rc_Config.c_ElementId) == true)
                      {
                         q_Retval = true;
                      }
@@ -3351,7 +3351,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
             }
             break;
          case 2UL:
-            for (uint32 u32_ItConfig = 0UL;
+            for (uint32_t u32_ItConfig = 0UL;
                  (u32_ItConfig < pc_ParamData->c_DataPoolElementsConfig.size()) && (q_Retval == false); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_ItConfig];
@@ -3360,7 +3360,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
                   if ((rc_Config.c_ElementId.u32_NodeIndex == c_Id.u32_NodeIndex) &&
                       (rc_Config.c_ElementId.u32_DataPoolIndex == c_Id.u32_DataPoolIndex))
                   {
-                     if (m_CheckListCRCIsChanged(rc_Config.c_ElementId) == true)
+                     if (m_CheckListCrcIsChanged(rc_Config.c_ElementId) == true)
                      {
                         q_Retval = true;
                      }
@@ -3373,7 +3373,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
             }
             break;
          case 3UL:
-            for (uint32 u32_ItConfig = 0UL;
+            for (uint32_t u32_ItConfig = 0UL;
                  (u32_ItConfig < pc_ParamData->c_DataPoolElementsConfig.size()) && (q_Retval == false); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamData->c_DataPoolElementsConfig[u32_ItConfig];
@@ -3383,7 +3383,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
                        (rc_Config.c_ElementId.u32_DataPoolIndex == c_Id.u32_DataPoolIndex)) &&
                       (rc_Config.c_ElementId.u32_ListIndex == c_Id.u32_ListIndex))
                   {
-                     if (m_CheckListCRCIsChanged(rc_Config.c_ElementId) == true)
+                     if (m_CheckListCrcIsChanged(rc_Config.c_ElementId) == true)
                      {
                         q_Retval = true;
                      }
@@ -3418,7 +3418,7 @@ bool C_SyvDaItPaTreeModel::m_IsChanged(const QModelIndex & orc_Index) const
    False Valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListElementId & orc_Id) const
+bool C_SyvDaItPaTreeModel::m_CheckListCrcIsChanged(const C_OscNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
    bool q_Read = true;
@@ -3431,10 +3431,10 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         if (pc_Param->c_DataPoolElementsConfig.size() == this->mc_ECUValuesReadStatus.size())
+         if (pc_Param->c_DataPoolElementsConfig.size() == this->mc_EcuValuesReadStatus.size())
          {
-            for (uint32 u32_ItElement = 0UL;
-                 (u32_ItElement < this->mc_ECUValuesReadStatus.size()) && (q_Read == true); ++u32_ItElement)
+            for (uint32_t u32_ItElement = 0UL;
+                 (u32_ItElement < this->mc_EcuValuesReadStatus.size()) && (q_Read == true); ++u32_ItElement)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItElement];
                if ((((rc_Config.c_ElementId.GetIsValid() == true) &&
@@ -3442,7 +3442,7 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
                     (rc_Config.c_ElementId.u32_DataPoolIndex == orc_Id.u32_DataPoolIndex)) &&
                    (rc_Config.c_ElementId.u32_ListIndex == orc_Id.u32_ListIndex))
                {
-                  if (this->mc_ECUValuesReadStatus[u32_ItElement] == false)
+                  if (this->mc_EcuValuesReadStatus[u32_ItElement] == false)
                   {
                      q_Read = false;
                   }
@@ -3455,12 +3455,12 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
    //If not read assume it does not change
    if (q_Read == true)
    {
-      uint32 u32_ItFinalIndex;
+      uint32_t u32_ItFinalIndex;
       const bool q_Found = m_GetListIndex(orc_Id, u32_ItFinalIndex);
 
-      if ((q_Found == true) && (u32_ItFinalIndex < this->mc_ECUCRCValidStatus.size()))
+      if ((q_Found == true) && (u32_ItFinalIndex < this->mc_EcuCrcValidStatus.size()))
       {
-         if (this->mc_ECUCRCValidStatus[u32_ItFinalIndex] == false)
+         if (this->mc_EcuCrcValidStatus[u32_ItFinalIndex] == false)
          {
             q_Retval = true;
          }
@@ -3479,7 +3479,7 @@ bool C_SyvDaItPaTreeModel::m_CheckListCRCIsChanged(const C_OSCNodeDataPoolListEl
    False No change
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListElementId & orc_Id) const
+bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OscNodeDataPoolListElementId & orc_Id) const
 {
    bool q_Retval = false;
 
@@ -3490,23 +3490,23 @@ bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListEl
       const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
       if (pc_Param != NULL)
       {
-         if (((this->mc_ECUValuesReadStatus.size() == this->mc_ECUValues.size()) &&
-              (this->mc_ECUValues.size() == pc_Param->c_ListValues.size())) &&
+         if (((this->mc_EcuValuesReadStatus.size() == this->mc_EcuValues.size()) &&
+              (this->mc_EcuValues.size() == pc_Param->c_ListValues.size())) &&
              (pc_Param->c_DataPoolElementsConfig.size() == pc_Param->c_ListValues.size()))
          {
-            for (uint32 u32_ItElement = 0UL;
-                 (u32_ItElement < this->mc_ECUValuesReadStatus.size()) && (q_Retval == false); ++u32_ItElement)
+            for (uint32_t u32_ItElement = 0UL;
+                 (u32_ItElement < this->mc_EcuValuesReadStatus.size()) && (q_Retval == false); ++u32_ItElement)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Param->c_DataPoolElementsConfig[u32_ItElement];
                if ((rc_Config.c_ElementId.GetIsValid() == true) && (rc_Config.c_ElementId == orc_Id))
                {
                   //If not read assume it does not change
-                  if (this->mc_ECUValuesReadStatus[u32_ItElement] == true)
+                  if (this->mc_EcuValuesReadStatus[u32_ItElement] == true)
                   {
-                     const C_OSCNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItElement);
+                     const C_OscNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItElement);
                      if (pc_Value != NULL)
                      {
-                        if (this->mc_ECUValues[u32_ItElement] == *pc_Value)
+                        if (this->mc_EcuValues[u32_ItElement] == *pc_Value)
                         {
                            //No change
                         }
@@ -3540,7 +3540,7 @@ bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OSCNodeDataPoolListEl
    False Not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OSCNodeDataPoolListElementId & orc_Id, uint32 & oru32_Index) const
+bool C_SyvDaItPaTreeModel::m_GetListIndex(const C_OscNodeDataPoolListElementId & orc_Id, uint32_t & oru32_Index) const
 {
    bool q_Found = false;
 

@@ -11,17 +11,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMetStatusBarWidget.h"
+#include "C_CamMetStatusBarWidget.hpp"
 #include "ui_C_CamMetStatusBarWidget.h"
 
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -93,13 +93,13 @@ void C_CamMetStatusBarWidget::InitStaticNames(void)
 /*! \brief  Updates the label with CAN bus load
 
    \param[in] ou8_BusLoad     CAN bus load in percentage
-   \param[in] os32_CANBitrate CAN bitrate
+   \param[in] os32_CanBitrate CAN bitrate
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, const stw_types::sint32 os32_CANBitrate)
+void C_CamMetStatusBarWidget::SetBusLoad(const uint8_t ou8_BusLoad, const int32_t os32_CanBitrate)
 {
    const QString c_Bitrate =
-      (os32_CANBitrate > 0) ? static_cast<QString>(" (@%1 kBit/s)").arg(QString::number(os32_CANBitrate)) : "";
+      (os32_CanBitrate > 0) ? static_cast<QString>(" (@%1 kBit/s)").arg(QString::number(os32_CanBitrate)) : "";
 
    this->mpc_Ui->pc_BusLoadLabel->setText(static_cast<QString>(C_GtGetText::h_GetText("Bus Load: %1%%2")).
                                           arg(QString::number(ou8_BusLoad)).arg(c_Bitrate));
@@ -108,15 +108,15 @@ void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, con
    if ((this->mq_BusLoadWarning == false) &&
        (ou8_BusLoad >= 100U))
    {
-      stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BusLoadLabel, "Error",
-                                                                     true);
+      stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BusLoadLabel, "Error",
+                                                                      true);
       this->mq_BusLoadWarning = true;
    }
    else if ((this->mq_BusLoadWarning == true) &&
             (ou8_BusLoad < 100U))
    {
-      stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BusLoadLabel, "Error",
-                                                                     false);
+      stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_BusLoadLabel, "Error",
+                                                                      false);
       this->mq_BusLoadWarning = false;
    }
    else
@@ -131,7 +131,7 @@ void C_CamMetStatusBarWidget::SetBusLoad(const stw_types::uint8 ou8_BusLoad, con
    \param[in] ou32_TxErrors Count of Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
+void C_CamMetStatusBarWidget::SetTxErrors(const uint32_t ou32_TxErrors)
 {
    this->mu32_TxErrors = ou32_TxErrors;
    this->m_UpdateTxLabel();
@@ -143,7 +143,7 @@ void C_CamMetStatusBarWidget::SetTxErrors(const stw_types::uint32 ou32_TxErrors)
    \param[in] ou32_NumTxMessages Number of transmitted messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetStatusBarWidget::SetTransmittedMessages(const stw_types::uint32 ou32_NumTxMessages)
+void C_CamMetStatusBarWidget::SetTransmittedMessages(const uint32_t ou32_NumTxMessages)
 {
    this->mu32_TransmittedMessages = ou32_NumTxMessages;
    this->m_UpdateTxLabel();
@@ -155,7 +155,7 @@ void C_CamMetStatusBarWidget::SetTransmittedMessages(const stw_types::uint32 ou3
    \param[in] ou32_FilteredMessages Number of filtered messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetStatusBarWidget::SetFilteredMessages(const stw_types::uint32 ou32_FilteredMessages)
+void C_CamMetStatusBarWidget::SetFilteredMessages(const uint32_t ou32_FilteredMessages)
 {
    this->mu32_FilteredMessages = ou32_FilteredMessages;
    this->m_UpdateFilterLabel();
@@ -167,7 +167,7 @@ void C_CamMetStatusBarWidget::SetFilteredMessages(const stw_types::uint32 ou32_F
    \param[in] ou32_ActiveFilters Number of active CAN filters
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetStatusBarWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters)
+void C_CamMetStatusBarWidget::SetActiveFilters(const uint32_t ou32_ActiveFilters)
 {
    this->mu32_ActiveFilters = ou32_ActiveFilters;
    this->m_UpdateFilterLabel();
@@ -218,8 +218,8 @@ void C_CamMetStatusBarWidget::m_UpdateTxLabel(void)
       // Prevent applying the stylesheet each call
       if (this->mq_TxError == false)
       {
-         stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxInfoLabel, "Error",
-                                                                        true);
+         stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxInfoLabel, "Error",
+                                                                         true);
          this->mq_TxError = true;
       }
    }
@@ -228,8 +228,8 @@ void C_CamMetStatusBarWidget::m_UpdateTxLabel(void)
       // Prevent applying the stylesheet each call
       if (this->mq_TxError == true)
       {
-         stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxInfoLabel, "Error",
-                                                                        false);
+         stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TxInfoLabel, "Error",
+                                                                         false);
          this->mq_TxError = false;
       }
    }

@@ -8,18 +8,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_NagTopTreeView.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_NagTopTreeView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -68,11 +67,11 @@ void C_NagTopTreeView::SetTypeNode(const bool oq_IsNode)
    \param[in]  os32_Selected  Selected index (-1 if no selection)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagTopTreeView::SetSelectedIndexAndScroll(const sint32 os32_Selected)
+void C_NagTopTreeView::SetSelectedIndexAndScroll(const int32_t os32_Selected)
 {
    if (os32_Selected >= 0)
    {
-      const QModelIndex & rc_Index = this->mc_Model.GetModelIndexFromFlatIndex(static_cast<uint32>(os32_Selected));
+      const QModelIndex & rc_Index = this->mc_Model.GetModelIndexFromFlatIndex(static_cast<uint32_t>(os32_Selected));
       this->selectionModel()->select(rc_Index, QItemSelectionModel::Select);
       this->scrollTo(rc_Index);
    }
@@ -113,7 +112,7 @@ void C_NagTopTreeView::SetError(const std::vector<bool> & orc_Error)
    \param[in]  orc_Content    Content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagTopTreeView::UpdateItem(const uint32 ou32_Index, const QString & orc_Content)
+void C_NagTopTreeView::UpdateItem(const uint32_t ou32_Index, const QString & orc_Content)
 {
    this->mc_Model.UpdateItem(ou32_Index, orc_Content);
 }

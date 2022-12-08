@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCHALCMagicianUtil.h"
-#include "C_SdNdeHalcChannelDpPreviewPopUp.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscHalcMagicianUtil.hpp"
+#include "C_SdNdeHalcChannelDpPreviewPopUp.hpp"
 #include "ui_C_SdNdeHalcChannelDpPreviewPopUp.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING = 50;
+const int32_t C_SdNdeHalcChannelDpPreviewPopUp::mhs32_TABLE_SPACING = 50;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -54,8 +53,8 @@ const sintn C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING = 50;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcChannelDpPreviewPopUp::C_SdNdeHalcChannelDpPreviewPopUp(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-   const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32_t ou32_NodeIndex,
+   const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex, const bool oq_UseChannelIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeHalcChannelDpPreviewPopUp),
    mrc_ParentDialog(orc_Parent)
@@ -66,8 +65,8 @@ C_SdNdeHalcChannelDpPreviewPopUp::C_SdNdeHalcChannelDpPreviewPopUp(
 
    //Dynamic title
    {
-      const C_OSCHalcConfigChannel * const pc_Channel =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
+      const C_OscHalcConfigChannel * const pc_Channel =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
                                                                          ou32_ChannelIndex, oq_UseChannelIndex);
       if (pc_Channel != NULL)
       {
@@ -120,8 +119,8 @@ void C_SdNdeHalcChannelDpPreviewPopUp::keyPressEvent(QKeyEvent * const opc_KeyEv
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -158,8 +157,8 @@ void C_SdNdeHalcChannelDpPreviewPopUp::m_OkClicked(void)
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelDpPreviewPopUp::m_UpdateContent(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                       const uint32 ou32_ChannelIndex,
+void C_SdNdeHalcChannelDpPreviewPopUp::m_UpdateContent(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
+                                                       const uint32_t ou32_ChannelIndex,
                                                        const bool oq_UseChannelIndex) const
 {
    QString c_Content = "<html><body>";
@@ -183,13 +182,13 @@ void C_SdNdeHalcChannelDpPreviewPopUp::m_UpdateContent(const uint32 ou32_NodeInd
    \param[in,out]  orc_Text            Text
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                       const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
+                                                       const uint32_t ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                        QString & orc_Text)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-   const C_OSCHalcConfigChannel * const pc_Channel =
-      C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+   const C_OscHalcConfigChannel * const pc_Channel =
+      C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
                                                                       ou32_ChannelIndex, oq_UseChannelIndex);
 
    orc_Text += "<h3>";
@@ -197,15 +196,15 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
    orc_Text += "</h3>";
    if ((pc_Channel != NULL) && (pc_Node != NULL))
    {
-      const C_OSCNodeDataPool * const pc_Datapool =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDatapool(ou32_NodeIndex, pc_Channel->q_SafetyRelevant);
-      const C_OSCNodeApplication * pc_Appl = NULL;
+      const C_OscNodeDataPool * const pc_Datapool =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDatapool(ou32_NodeIndex, pc_Channel->q_SafetyRelevant);
+      const C_OscNodeApplication * pc_Appl = NULL;
 
       orc_Text += "<table style=\"width:100%;\">";
       orc_Text += "<tr>";
       orc_Text += "<td>" + static_cast<QString>(C_GtGetText::h_GetText("Datapool:")) + "</td>";
       orc_Text += "<td>" +
-                  static_cast<QString>(C_OSCHALCMagicianUtil::h_GetDatapoolName(pc_Channel->q_SafetyRelevant).c_str()) +
+                  static_cast<QString>(C_OscHalcMagicianUtil::h_GetDatapoolName(pc_Channel->q_SafetyRelevant).c_str()) +
                   "</td>";
       orc_Text += "</tr>";
       orc_Text += "<tr>";
@@ -215,7 +214,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
       {
          pc_Appl =
             C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex,
-                                                            static_cast<uint32>(pc_Datapool->s32_RelatedDataBlockIndex));
+                                                            static_cast<uint32_t>(pc_Datapool->s32_RelatedDataBlockIndex));
       }
       if (pc_Appl != NULL)
       {
@@ -243,17 +242,17 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDpSection(const uint32 ou32_NodeInd
    \param[in,out]  orc_Text            Text
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                       const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
+                                                       const uint32_t ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                        QString & orc_Text)
 {
    const QString c_Column1HeadingTagStart =
       static_cast<QString>("<td style=\"padding: 30px %1 6px 0px;font-weight: bold;\">").
-      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
+      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhs32_TABLE_SPACING);
    const QString c_ColumnContentHeadingTagStart =
       static_cast<QString>("<td style=\"padding: 30px %1 6px %1;font-weight: bold;\">").
-      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
-   const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      arg(C_SdNdeHalcChannelDpPreviewPopUp::mhs32_TABLE_SPACING);
+   const C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    orc_Text += "<h3>";
    orc_Text += C_GtGetText::h_GetText("Used Datapool Elements");
@@ -278,21 +277,25 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
    orc_Text += C_GtGetText::h_GetText("Description");
    orc_Text += "</td>";
    orc_Text += "</tr>";
-   if (pc_OSCNode != NULL)
+   if (pc_OscNode != NULL)
    {
-      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLP(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_PARAM,
-                                                               true /*irrelevant here*/);
-      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLI(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_INPUT,
-                                                               true /*irrelevant here*/);
-      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLO(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_OUTPUT,
-                                                               true /*irrelevant here*/);
-      const C_OSCHALCMagicianDatapoolListHandler c_DpHandlerLS(pc_OSCNode->c_HALCConfig, C_OSCHalcDefDomain::eVA_STATUS,
-                                                               true /*irrelevant here*/);
-      std::vector<uint32> c_ParameterIndices;
-      std::vector<uint32> c_InputIndices;
-      std::vector<uint32> c_OutputIndices;
-      std::vector<uint32> c_StatusIndices;
-      if (C_PuiSdHandler::h_GetInstance()->GetHALCRelevantIndicesForSelectedUseCase(ou32_NodeIndex, ou32_DomainIndex,
+      const C_OscHalcMagicianDatapoolListHandler c_DpHandlerListParam(pc_OscNode->c_HalcConfig,
+                                                                      C_OscHalcDefDomain::eVA_PARAM,
+                                                                      true /*irrelevant here*/);
+      const C_OscHalcMagicianDatapoolListHandler c_DpHandlerListInput(pc_OscNode->c_HalcConfig,
+                                                                      C_OscHalcDefDomain::eVA_INPUT,
+                                                                      true /*irrelevant here*/);
+      const C_OscHalcMagicianDatapoolListHandler c_DpHandlerListOutput(pc_OscNode->c_HalcConfig,
+                                                                       C_OscHalcDefDomain::eVA_OUTPUT,
+                                                                       true /*irrelevant here*/);
+      const C_OscHalcMagicianDatapoolListHandler c_DpHandlerListStatus(pc_OscNode->c_HalcConfig,
+                                                                       C_OscHalcDefDomain::eVA_STATUS,
+                                                                       true /*irrelevant here*/);
+      std::vector<uint32_t> c_ParameterIndices;
+      std::vector<uint32_t> c_InputIndices;
+      std::vector<uint32_t> c_OutputIndices;
+      std::vector<uint32_t> c_StatusIndices;
+      if (C_PuiSdHandler::h_GetInstance()->GetHalcRelevantIndicesForSelectedUseCase(ou32_NodeIndex, ou32_DomainIndex,
                                                                                     ou32_ChannelIndex,
                                                                                     oq_UseChannelIndex,
                                                                                     &c_ParameterIndices,
@@ -300,58 +303,58 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
                                                                                     &c_OutputIndices,
                                                                                     &c_StatusIndices) == C_NO_ERR)
       {
-         const C_OSCHalcConfig * const pc_HALCConfig = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(ou32_NodeIndex);
+         const C_OscHalcConfig * const pc_HalcConfig = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(ou32_NodeIndex);
 
-         if (pc_HALCConfig != NULL)
+         if (pc_HalcConfig != NULL)
          {
-            const C_OSCHalcDefDomain * const pc_Domain = pc_HALCConfig->GetDomainDefDataConst(ou32_DomainIndex);
+            const C_OscHalcDefDomain * const pc_Domain = pc_HalcConfig->GetDomainDefDataConst(ou32_DomainIndex);
             if (pc_Domain != NULL)
             {
-               const stw_scl::C_SCLString c_ListName1 = C_OSCHALCMagicianUtil::h_GetListName(
-                  C_OSCHalcDefDomain::eVA_PARAM);
-               const stw_scl::C_SCLString c_ListName2 = C_OSCHALCMagicianUtil::h_GetListName(
-                  C_OSCHalcDefDomain::eVA_INPUT);
-               const stw_scl::C_SCLString c_ListName3 = C_OSCHALCMagicianUtil::h_GetListName(
-                  C_OSCHalcDefDomain::eVA_OUTPUT);
-               const stw_scl::C_SCLString c_ListName4 = C_OSCHALCMagicianUtil::h_GetListName(
-                  C_OSCHalcDefDomain::eVA_STATUS);
+               const stw::scl::C_SclString c_ListName1 = C_OscHalcMagicianUtil::h_GetListName(
+                  C_OscHalcDefDomain::eVA_PARAM);
+               const stw::scl::C_SclString c_ListName2 = C_OscHalcMagicianUtil::h_GetListName(
+                  C_OscHalcDefDomain::eVA_INPUT);
+               const stw::scl::C_SclString c_ListName3 = C_OscHalcMagicianUtil::h_GetListName(
+                  C_OscHalcDefDomain::eVA_OUTPUT);
+               const stw::scl::C_SclString c_ListName4 = C_OscHalcMagicianUtil::h_GetListName(
+                  C_OscHalcDefDomain::eVA_STATUS);
                if (oq_UseChannelIndex)
                {
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_Parameters,
                                                                       c_ParameterIndices, c_ListName1,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLP, true);
+                                                                      *pc_Domain, c_DpHandlerListParam, true);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_InputValues,
                                                                       c_InputIndices, c_ListName2,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLI, false);
+                                                                      *pc_Domain, c_DpHandlerListInput, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_OutputValues,
                                                                       c_OutputIndices, c_ListName3,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLO, false);
+                                                                      *pc_Domain, c_DpHandlerListOutput, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_ChannelValues.c_StatusValues,
                                                                       c_StatusIndices, c_ListName4,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLS, false);
+                                                                      *pc_Domain, c_DpHandlerListStatus, false);
                }
                else
                {
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_Parameters,
                                                                       c_ParameterIndices, c_ListName1,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLP, true);
+                                                                      *pc_Domain, c_DpHandlerListParam, true);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_InputValues,
                                                                       c_InputIndices, c_ListName2,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLI, false);
+                                                                      *pc_Domain, c_DpHandlerListInput, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_OutputValues,
                                                                       c_OutputIndices, c_ListName3,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLO, false);
+                                                                      *pc_Domain, c_DpHandlerListOutput, false);
                   C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(pc_Domain->c_DomainValues.c_StatusValues,
                                                                       c_StatusIndices, c_ListName4,
                                                                       pc_Domain->c_SingularName, orc_Text,
-                                                                      *pc_Domain, c_DpHandlerLS, false);
+                                                                      *pc_Domain, c_DpHandlerListStatus, false);
                }
             }
          }
@@ -370,23 +373,23 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddDeSection(const uint32 ou32_NodeInd
    \param[in,out]  orc_Text            Text
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddUseCase(const uint32 ou32_NodeIndex, const uint32 ou32_DomainIndex,
-                                                     const uint32 ou32_ChannelIndex, const bool oq_UseChannelIndex,
+void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddUseCase(const uint32_t ou32_NodeIndex, const uint32_t ou32_DomainIndex,
+                                                     const uint32_t ou32_ChannelIndex, const bool oq_UseChannelIndex,
                                                      QString & orc_Text)
 {
    const QString c_UseCase = "";
 
    if (oq_UseChannelIndex == true)
    {
-      const C_OSCHalcConfigChannel * const pc_Channel =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
+      const C_OscHalcConfigChannel * const pc_Channel =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(ou32_NodeIndex, ou32_DomainIndex,
                                                                          ou32_ChannelIndex, oq_UseChannelIndex);
-      const C_OSCHalcConfigDomain * const pc_Domain =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
+      const C_OscHalcConfigDomain * const pc_Domain =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainConfigDataConst(ou32_NodeIndex, ou32_DomainIndex);
       if ((pc_Domain != NULL) && (pc_Channel != NULL) &&
           (pc_Channel->u32_UseCaseIndex < pc_Domain->c_ChannelUseCases.size()))
       {
-         const C_OSCHalcDefChannelUseCase & rc_UseCase = pc_Domain->c_ChannelUseCases[pc_Channel->u32_UseCaseIndex];
+         const C_OscHalcDefChannelUseCase & rc_UseCase = pc_Domain->c_ChannelUseCases[pc_Channel->u32_UseCaseIndex];
          orc_Text += C_GtGetText::h_GetText(" (use case \'");
          orc_Text += rc_UseCase.c_Display.c_str();
          orc_Text += c_UseCase;
@@ -408,13 +411,13 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddUseCase(const uint32 ou32_NodeIndex
    \param[in]      oq_AddSpecialVars         Add special vars
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSCHalcDefStruct> & orc_Definition,
-                                                         const std::vector<uint32> & orc_Indices,
-                                                         const stw_scl::C_SCLString & orc_ListName,
-                                                         const stw_scl::C_SCLString & orc_DomainSingularName,
+void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OscHalcDefStruct> & orc_Definition,
+                                                         const std::vector<uint32_t> & orc_Indices,
+                                                         const stw::scl::C_SclString & orc_ListName,
+                                                         const stw::scl::C_SclString & orc_DomainSingularName,
                                                          QString & orc_Text,
-                                                         const stw_opensyde_core::C_OSCHalcDefDomain & orc_Domain,
-                                                         const C_OSCHALCMagicianDatapoolListHandler & orc_DpHandler,
+                                                         const stw::opensyde_core::C_OscHalcDefDomain & orc_Domain,
+                                                         const C_OscHalcMagicianDatapoolListHandler & orc_DpHandler,
                                                          const bool oq_AddSpecialVars)
 {
    bool q_AddedList = false;
@@ -425,30 +428,30 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSC
       {
          if (orc_DpHandler.CheckChanNumVariableNecessary(orc_Domain))
          {
-            const C_OSCNodeDataPoolListElement c_Tmp = C_OSCHALCMagicianUtil::h_GetChanNumVariable(
+            const C_OscNodeDataPoolListElement c_Tmp = C_OscHalcMagicianUtil::h_GetChanNumVariable(
                orc_DomainSingularName, true /*irrelevant here*/, 1UL, false);
             C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Tmp.c_Name, c_Tmp.c_Comment,
                                                               orc_Text);
          }
          if (orc_DpHandler.CheckUseCaseVariableNecessary(orc_Domain))
          {
-            const C_OSCNodeDataPoolListElement c_Tmp = C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
+            const C_OscNodeDataPoolListElement c_Tmp = C_OscHalcMagicianUtil::h_GetUseCaseVariable(
                orc_DomainSingularName, true /*irrelevant here*/, 1UL, false);
             C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Tmp.c_Name, c_Tmp.c_Comment,
                                                               orc_Text);
          }
       }
-      for (uint32 u32_ItIndex = 0UL; u32_ItIndex < orc_Indices.size(); ++u32_ItIndex)
+      for (uint32_t u32_ItIndex = 0UL; u32_ItIndex < orc_Indices.size(); ++u32_ItIndex)
       {
          if (orc_Indices[u32_ItIndex] < orc_Definition.size())
          {
-            stw_scl::C_SCLString c_Name;
-            const C_OSCHalcDefStruct & rc_Def = orc_Definition[orc_Indices[u32_ItIndex]];
+            stw::scl::C_SclString c_Name;
+            const C_OscHalcDefStruct & rc_Def = orc_Definition[orc_Indices[u32_ItIndex]];
             //Multiple
-            for (uint32 u32_ItElem = 0UL; u32_ItElem < rc_Def.c_StructElements.size(); ++u32_ItElem)
+            for (uint32_t u32_ItElem = 0UL; u32_ItElem < rc_Def.c_StructElements.size(); ++u32_ItElem)
             {
-               const C_OSCHalcDefElement & rc_Elem = rc_Def.c_StructElements[u32_ItElem];
-               C_OSCHALCMagicianUtil::h_GetVariableName(orc_Definition, orc_Indices[u32_ItIndex], u32_ItElem,
+               const C_OscHalcDefElement & rc_Elem = rc_Def.c_StructElements[u32_ItElem];
+               C_OscHalcMagicianUtil::h_GetVariableName(orc_Definition, orc_Indices[u32_ItIndex], u32_ItElem,
                                                         orc_DomainSingularName, c_Name);
                C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Name, rc_Elem.c_Comment,
                                                                  orc_Text);
@@ -456,7 +459,7 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSC
             //Single
             if (rc_Def.c_StructElements.size() == 0UL)
             {
-               C_OSCHALCMagicianUtil::h_GetVariableName(orc_Definition, orc_Indices[u32_ItIndex], 0UL,
+               C_OscHalcMagicianUtil::h_GetVariableName(orc_Definition, orc_Indices[u32_ItIndex], 0UL,
                                                         orc_DomainSingularName, c_Name);
                C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(orc_ListName, q_AddedList, c_Name, rc_Def.c_Comment,
                                                                  orc_Text);
@@ -482,14 +485,14 @@ void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListSection(const std::vector<C_OSC
    \param[in,out]  orc_Text         Text
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(const stw_scl::C_SCLString & orc_ListName, bool & orq_ListAdded,
-                                                       const stw_scl::C_SCLString & orc_VarName,
-                                                       const stw_scl::C_SCLString & orc_VarComment, QString & orc_Text)
+void C_SdNdeHalcChannelDpPreviewPopUp::mh_AddListEntry(const stw::scl::C_SclString & orc_ListName, bool & orq_ListAdded,
+                                                       const stw::scl::C_SclString & orc_VarName,
+                                                       const stw::scl::C_SclString & orc_VarComment, QString & orc_Text)
 {
    const QString c_Column1TagStart = static_cast<QString>("<td style=\"padding: 0 %1 0 0px;\">").arg(
-      C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
+      C_SdNdeHalcChannelDpPreviewPopUp::mhs32_TABLE_SPACING);
    const QString c_ColumnContentTagStart = static_cast<QString>(
-      "<td valign=\"middle\" style=\"padding: 0 %1 0 %1;\">").arg(C_SdNdeHalcChannelDpPreviewPopUp::mhsn_TABLE_SPACING);
+      "<td valign=\"middle\" style=\"padding: 0 %1 0 %1;\">").arg(C_SdNdeHalcChannelDpPreviewPopUp::mhs32_TABLE_SPACING);
 
    orc_Text += "<tr>";
    orc_Text += c_Column1TagStart;

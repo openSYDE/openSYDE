@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
-#include "stwerrors.h"
+#include "precomp_headers.hpp"
+#include "stwerrors.hpp"
 
 #include <limits>
 
@@ -21,21 +21,20 @@
 #include <QStyleOption>
 #include <QDesktopWidget>
 
-#include "C_OSCUtils.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_OscUtils.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -85,7 +84,7 @@ void C_OgeWiUtil::h_DrawBackground(QWidget * const opc_Widget, QPainter * const 
    \param[in,out]  orc_Value     Property value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const stw_types::charn * const opcn_Name,
+void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const char_t * const opcn_Name,
                                             const QVariant & orc_Value)
 {
    //set property
@@ -105,12 +104,12 @@ void C_OgeWiUtil::h_ApplyStylesheetProperty(QWidget * const opc_Widget, const st
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(QWidget * const opc_Widget,
-                                                                  const stw_types::charn * const opcn_Name,
+                                                                  const char_t * const opcn_Name,
                                                                   const QVariant & orc_Value)
 {
    h_ApplyStylesheetProperty(opc_Widget, opcn_Name, orc_Value);
    //Children
-   for (stw_types::sint32 s32_ItChild = 0; s32_ItChild < opc_Widget->children().size(); ++s32_ItChild)
+   for (int32_t s32_ItChild = 0; s32_ItChild < opc_Widget->children().size(); ++s32_ItChild)
    {
       QWidget * const pc_Wid = dynamic_cast<QWidget * const>(opc_Widget->children()[s32_ItChild]);
       if (pc_Wid != NULL)
@@ -190,17 +189,17 @@ void C_OgeWiUtil::h_CheckAndFixDialogPositionAndSize(QPoint & orc_GlobalPosition
    Else New point size
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & orc_Text,
-                                    const float32 of32_HeightScaling, const bool oq_IgnoreContentMargins,
-                                    const QSize * const opc_ImprovedSize)
+int32_t C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & orc_Text,
+                                      const float32_t of32_HeightScaling, const bool oq_IgnoreContentMargins,
+                                      const QSize * const opc_ImprovedSize)
 {
-   sintn sn_Retval = -1;
+   int32_t s32_Retval = -1;
 
    if ((orc_Text.compare("") != 0) && (opc_Widget != NULL))
    {
       QFont c_Font = opc_Widget->font();
       QSize c_EffectiveSize;
-      sintn sn_NewPointSize;
+      int32_t s32_NewPointSize;
       if (opc_ImprovedSize != NULL)
       {
          c_EffectiveSize = *opc_ImprovedSize;
@@ -214,21 +213,21 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
          }
          else
          {
-            const sintn sn_MarginLeft = opc_Widget->contentsMargins().left();
-            const sintn sn_MarginTop = opc_Widget->contentsMargins().top();
-            const sintn sn_MarginRight = opc_Widget->contentsMargins().right();
-            const sintn sn_MarginBottom = opc_Widget->contentsMargins().bottom();
-            c_EffectiveSize = QSize(opc_Widget->size().width() - (sn_MarginLeft + sn_MarginRight),
-                                    opc_Widget->size().height() - (sn_MarginTop + sn_MarginBottom));
+            const int32_t s32_MarginLeft = opc_Widget->contentsMargins().left();
+            const int32_t s32_MarginTop = opc_Widget->contentsMargins().top();
+            const int32_t s32_MarginRight = opc_Widget->contentsMargins().right();
+            const int32_t s32_MarginBottom = opc_Widget->contentsMargins().bottom();
+            c_EffectiveSize = QSize(opc_Widget->size().width() - (s32_MarginLeft + s32_MarginRight),
+                                    opc_Widget->size().height() - (s32_MarginTop + s32_MarginBottom));
          }
       }
-      sn_NewPointSize = C_OgeWiUtil::h_GetNextOptimalPointSize(c_Font, c_EffectiveSize, orc_Text,
-                                                               of32_HeightScaling);
-      sn_Retval = sn_NewPointSize;
-      c_Font.setPointSize(sn_NewPointSize);
+      s32_NewPointSize = C_OgeWiUtil::h_GetNextOptimalPointSize(c_Font, c_EffectiveSize, orc_Text,
+                                                                of32_HeightScaling);
+      s32_Retval = s32_NewPointSize;
+      c_Font.setPointSize(s32_NewPointSize);
       opc_Widget->setFont(c_Font);
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -243,58 +242,58 @@ sintn C_OgeWiUtil::h_UpdateFontSize(QWidget * const opc_Widget, const QString & 
    Font point size
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize & orc_Size, const QString & orc_Text,
-                                             const float32 of32_HeightScaling)
+int32_t C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize & orc_Size, const QString & orc_Text,
+                                               const float32_t of32_HeightScaling)
 {
-   sintn sn_Retval;
-   static QMap<QString, sintn> hc_PreviousResults;
+   int32_t s32_Retval;
+   static QMap<QString, int32_t> hc_PreviousResults;
    //Find some way to uniquely identify the input parameter situation
    const QString c_CompleteInput =
       static_cast<QString>("%1,%2,%3,%4,%5").arg(orc_Font.toString()).arg(orc_Size.width()).arg(
-         orc_Size.height()).arg(orc_Text).arg(static_cast<float64>(of32_HeightScaling));
+         orc_Size.height()).arg(orc_Text).arg(static_cast<float64_t>(of32_HeightScaling));
    //Look up
-   const QMap<QString, sintn>::const_iterator c_It = hc_PreviousResults.find(c_CompleteInput);
+   const QMap<QString, int32_t>::const_iterator c_It = hc_PreviousResults.find(c_CompleteInput);
 
    //Check if anything found
    if (c_It == hc_PreviousResults.end())
    {
-      const float32 f32_WidgetHeight = static_cast<float32>(orc_Size.height()) * of32_HeightScaling;
-      const sintn sn_WidgetHeight = static_cast<sintn>(f32_WidgetHeight);
-      const sintn sn_Init = std::max(std::max(orc_Font.pointSize(), orc_Font.pixelSize()), 1);
-      QFont c_Font(orc_Font.family(), sn_Init, orc_Font.weight(), orc_Font.italic());
+      const float32_t f32_WidgetHeight = static_cast<float32_t>(orc_Size.height()) * of32_HeightScaling;
+      const int32_t s32_WidgetHeight = static_cast<int32_t>(f32_WidgetHeight);
+      const int32_t s32_Init = std::max(std::max(orc_Font.pointSize(), orc_Font.pixelSize()), 1);
+      QFont c_Font(orc_Font.family(), s32_Init, orc_Font.weight(), orc_Font.italic());
 
-      sn_Retval = sn_Init;
-      for (sintn sn_StepWidth = 2; sn_StepWidth > 0; --sn_StepWidth)
+      s32_Retval = s32_Init;
+      for (int32_t s32_StepWidth = 2; s32_StepWidth > 0; --s32_StepWidth)
       {
          //Check size increase (iterative)
-         for (; sn_Retval < 2000; sn_Retval += sn_StepWidth)
+         for (; s32_Retval < 2000; s32_Retval += s32_StepWidth)
          {
-            c_Font.setPointSize(sn_Retval);
+            c_Font.setPointSize(s32_Retval);
             {
                const QFontMetrics c_Metric(c_Font);
-               if ((c_Metric.horizontalAdvance(orc_Text) > orc_Size.width()) || (c_Metric.height() > sn_WidgetHeight))
+               if ((c_Metric.horizontalAdvance(orc_Text) > orc_Size.width()) || (c_Metric.height() > s32_WidgetHeight))
                {
                   //Assuming previous one was ok
                   //lint -e{850} No problem because of break
-                  sn_Retval -= sn_StepWidth;
+                  s32_Retval -= s32_StepWidth;
                   break;
                }
             }
          }
          //Check if size increase did at least one iteration
          //(We don't need to iterate in the other direction if increase already worked)
-         if (sn_Retval < sn_Init)
+         if (s32_Retval < s32_Init)
          {
             //Undo last step
-            sn_Retval += sn_StepWidth;
+            s32_Retval += s32_StepWidth;
             //Check size decrease (iterative)
-            for (; sn_Retval > sn_StepWidth; sn_Retval -= sn_StepWidth)
+            for (; s32_Retval > s32_StepWidth; s32_Retval -= s32_StepWidth)
             {
-               c_Font.setPointSize(sn_Retval);
+               c_Font.setPointSize(s32_Retval);
                {
                   const QFontMetrics c_Metric(c_Font);
                   if ((c_Metric.horizontalAdvance(orc_Text) <= orc_Size.width()) &&
-                      (c_Metric.height() <= sn_WidgetHeight))
+                      (c_Metric.height() <= s32_WidgetHeight))
                   {
                      break;
                   }
@@ -303,14 +302,14 @@ sintn C_OgeWiUtil::h_GetNextOptimalPointSize(const QFont & orc_Font, const QSize
          }
       }
       //Store new value for further calls
-      hc_PreviousResults.insert(c_CompleteInput, sn_Retval);
+      hc_PreviousResults.insert(c_CompleteInput, s32_Retval);
    }
    else
    {
-      sn_Retval = c_It.value();
+      s32_Retval = c_It.value();
    }
 
-   return std::max(sn_Retval, 1);
+   return std::max(s32_Retval, 1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -338,8 +337,8 @@ QWidget * C_OgeWiUtil::h_GetWidgetUnderNextPopUp(QWidget * const opc_Input)
          QWidget * pc_Parent = opc_Input->parentWidget();
          do
          {
-            const stw_opensyde_gui_elements::C_OgePopUpDialog * const pc_PopUp =
-               dynamic_cast<const stw_opensyde_gui_elements::C_OgePopUpDialog * const>(pc_Parent);
+            const stw::opensyde_gui_elements::C_OgePopUpDialog * const pc_PopUp =
+               dynamic_cast<const stw::opensyde_gui_elements::C_OgePopUpDialog * const>(pc_Parent);
             if (pc_PopUp == NULL)
             {
                //Current candidate for return
@@ -375,21 +374,21 @@ bool C_OgeWiUtil::h_CheckGlobalKey(const QKeyEvent * const opc_Event)
 {
    bool q_Retval;
 
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_S)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_S)) &&
        (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       q_Retval = true;
    }
-   else if ((opc_Event->key() == static_cast<sintn>(Qt::Key_F)) &&
+   else if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_F)) &&
             (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       q_Retval = true;
    }
-   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F12))
+   else if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F12))
    {
       q_Retval = true;
    }
-   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
+   else if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F8))
    {
       q_Retval = true;
    }
@@ -481,9 +480,9 @@ void C_OgeWiUtil::h_ShowPathInvalidError(QWidget * const opc_Parent, const QStri
    C_NOACT     user does not want to overwrite
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QString & orc_FilePath)
+int32_t C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QString & orc_FilePath)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    const QFile c_File(orc_FilePath);
 
@@ -494,8 +493,8 @@ sint32 C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QString
 
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Save File"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("File does already exist. Do you want to overwrite?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Overwrite"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Back"));
       c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
@@ -521,7 +520,7 @@ sint32 C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QString
    \param[in]      orc_Filter             QFileDialog filter
    \param[in]      orc_DefaultFileName    QFileDialog default file name
    \param[in]      orc_DefaultSuffix      Default suffix
-   \param[in]      orc_SaveOrOpen         Save or open
+   \param[in]      ore_SaveOrOpen         Save or open
    \param[in]      orc_Option             QFileDialog option
 
    \return
@@ -531,7 +530,7 @@ sint32 C_OgeWiUtil::h_AskOverwriteFile(QWidget * const opc_Parent, const QString
 QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & orc_Heading,
                                     const QString & orc_StartingFolder, const QString & orc_Filter,
                                     const QString & orc_DefaultFileName, const QString & orc_DefaultSuffix,
-                                    const QFileDialog::AcceptMode & orc_SaveOrOpen,
+                                    const QFileDialog::AcceptMode & ore_SaveOrOpen,
                                     const QFileDialog::Options & orc_Option)
 {
    QString c_Retval = "";
@@ -539,14 +538,14 @@ QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & 
    QFileDialog c_FileDialog(opc_Parent, orc_Heading, orc_StartingFolder, orc_Filter);
 
    c_FileDialog.setFileMode(QFileDialog::AnyFile);
-   c_FileDialog.setAcceptMode(orc_SaveOrOpen);
+   c_FileDialog.setAcceptMode(ore_SaveOrOpen);
    c_FileDialog.setOptions(orc_Option);
    c_FileDialog.setDefaultSuffix(orc_DefaultSuffix);
    c_FileDialog.selectFile(orc_DefaultFileName);
    while (q_Stop == false)
    {
-      const sintn sn_UserChoice = c_FileDialog.exec();
-      if (sn_UserChoice == static_cast<sintn>(QDialog::Accepted))
+      const int32_t s32_UserChoice = c_FileDialog.exec();
+      if (s32_UserChoice == static_cast<int32_t>(QDialog::Accepted))
       {
          // take file name (we save only one file therefore take first entry)
          const QString c_FullFilePath = c_FileDialog.selectedFiles().at(0);
@@ -554,7 +553,7 @@ QString C_OgeWiUtil::mh_GetFileName(QWidget * const opc_Parent, const QString & 
          if (c_FullFilePath != "")
          {
             // check if file name contains invalid characters
-            if (C_OSCUtils::h_CheckValidFilePath(c_FullFilePath.toStdString().c_str()) == true)
+            if (C_OscUtils::h_CheckValidFilePath(c_FullFilePath.toStdString().c_str()) == true)
             {
                c_Retval = c_FullFilePath;
                q_Stop = true;

@@ -13,13 +13,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeTedPropertiesComment.h"
+#include "C_OgeTedPropertiesComment.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -82,9 +81,9 @@ void C_OgeTedPropertiesComment::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    if (opc_KeyEvent != NULL)
    {
       C_OgeTedContextMenuBase::keyPressEvent(opc_KeyEvent);
-      if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Tab)) ||
-          (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)) ||
-          (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)))
+      if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Tab)) ||
+          (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)) ||
+          (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)))
       {
          Q_EMIT (this->SigCommentConfirmed());
       }

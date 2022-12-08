@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstddef>
 
-#include "C_OSCNodeDataPoolListId.h"
+#include "C_OscNodeDataPoolListId.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,8 +35,8 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListId::C_OSCNodeDataPoolListId(void) :
-   C_OSCNodeDataPoolId(),
+C_OscNodeDataPoolListId::C_OscNodeDataPoolListId(void) :
+   C_OscNodeDataPoolId(),
    u32_ListIndex(0U)
 {
 }
@@ -49,10 +49,9 @@ C_OSCNodeDataPoolListId::C_OSCNodeDataPoolListId(void) :
    \param[in] ou32_ListIndex     List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListId::C_OSCNodeDataPoolListId(const stw_types::uint32 ou32_NodeIndex,
-                                                 const stw_types::uint32 ou32_DataPoolIndex,
-                                                 const stw_types::uint32 ou32_ListIndex) :
-   C_OSCNodeDataPoolId(ou32_NodeIndex, ou32_DataPoolIndex),
+C_OscNodeDataPoolListId::C_OscNodeDataPoolListId(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                 const uint32_t ou32_ListIndex) :
+   C_OscNodeDataPoolId(ou32_NodeIndex, ou32_DataPoolIndex),
    u32_ListIndex(ou32_ListIndex)
 {
 }
@@ -67,7 +66,7 @@ C_OSCNodeDataPoolListId::C_OSCNodeDataPoolListId(const stw_types::uint32 ou32_No
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeDataPoolListId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) const
+bool C_OscNodeDataPoolListId::operator <(const C_OscNodeDataPoolId & orc_Cmp) const
 {
    bool q_Return;
 
@@ -83,8 +82,8 @@ bool C_OSCNodeDataPoolListId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) co
       }
       else if (this->u32_DataPoolIndex == orc_Cmp.u32_DataPoolIndex)
       {
-         const C_OSCNodeDataPoolListId * const pc_NonBase =
-            dynamic_cast<const C_OSCNodeDataPoolListId *>(&orc_Cmp);
+         const C_OscNodeDataPoolListId * const pc_NonBase =
+            dynamic_cast<const C_OscNodeDataPoolListId *>(&orc_Cmp);
          //Not current class, assume base comparison is correct
          if (pc_NonBase != NULL)
          {
@@ -126,14 +125,14 @@ bool C_OSCNodeDataPoolListId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) co
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeDataPoolListId::operator ==(const C_OSCNodeDataPoolId & orc_Cmp) const
+bool C_OscNodeDataPoolListId::operator ==(const C_OscNodeDataPoolId & orc_Cmp) const
 {
-   bool q_Return = C_OSCNodeDataPoolId::operator ==(orc_Cmp);
+   bool q_Return = C_OscNodeDataPoolId::operator ==(orc_Cmp);
 
    if (q_Return == true)
    {
-      const C_OSCNodeDataPoolListId * const pc_NonBase =
-         dynamic_cast<const C_OSCNodeDataPoolListId *>(&orc_Cmp);
+      const C_OscNodeDataPoolListId * const pc_NonBase =
+         dynamic_cast<const C_OscNodeDataPoolListId *>(&orc_Cmp);
       //Not current class, assume base comparison is correct
       if (pc_NonBase != NULL)
       {

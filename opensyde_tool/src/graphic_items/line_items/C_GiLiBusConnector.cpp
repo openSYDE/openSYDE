@@ -11,24 +11,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsScene>
-#include "C_GiNode.h"
-#include "C_GiLiBusConnector.h"
-#include "gitypes.h"
-#include "C_OSCNode.h"
-#include "C_OSCSystemBus.h"
-#include "C_GtGetText.h"
-#include "C_SebUtil.h"
-#include "C_PuiSdUtil.h"
-#include "C_Uti.h"
+#include "C_GiNode.hpp"
+#include "C_GiLiBusConnector.hpp"
+#include "gitypes.hpp"
+#include "C_OscNode.hpp"
+#include "C_OscSystemBus.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SebUtil.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +46,7 @@ using namespace stw_types;
 
    Set up GUI with all elements.
 
-   \param[in]      oru64_ID         Unique ID
+   \param[in]      oru64_Id         Unique ID
    \param[in]      orc_TriggerPos   Ideal position of connector
    \param[in]      opc_NodeItem     Start of connection at node
    \param[in]      opc_BusItem      End of connection at bus
@@ -55,10 +54,10 @@ using namespace stw_types;
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & orc_TriggerPos,
+C_GiLiBusConnector::C_GiLiBusConnector(const uint64_t & oru64_Id, const QPointF & orc_TriggerPos,
                                        C_GiNode * const opc_NodeItem, const C_GiLiBus * const opc_BusItem,
                                        const bool oq_MiddleLine, QGraphicsItem * const opc_Parent) :
-   C_GiLiBusConnectorBase(oru64_ID, orc_TriggerPos, opc_BusItem, oq_MiddleLine, opc_Parent),
+   C_GiLiBusConnectorBase(oru64_Id, orc_TriggerPos, opc_BusItem, oq_MiddleLine, opc_Parent),
    mq_OnInteractionPointMoveFoundNode(false)
 {
    // Update node and port
@@ -70,7 +69,7 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & 
 
    Set up GUI with all elements.
 
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in]      orc_InteractionPoints  Ideal interaction point positions
    \param[in]      opc_NodeItem           Start of connection at node
    \param[in]      opc_BusItem            End of connection at bus
@@ -78,18 +77,18 @@ C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const QPointF & 
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBusConnector::C_GiLiBusConnector(const uint64 & oru64_ID, const std::vector<QPointF> & orc_InteractionPoints,
+C_GiLiBusConnector::C_GiLiBusConnector(const uint64_t & oru64_Id, const std::vector<QPointF> & orc_InteractionPoints,
                                        C_GiNode * const opc_NodeItem, const C_GiLiBus * const opc_BusItem,
                                        const bool oq_MiddleLine, QGraphicsItem * const opc_Parent) :
-   C_GiLiBusConnectorBase(oru64_ID, orc_InteractionPoints, opc_BusItem, oq_MiddleLine, opc_Parent),
+   C_GiLiBusConnectorBase(oru64_Id, orc_InteractionPoints, opc_BusItem, oq_MiddleLine, opc_Parent),
    mq_OnInteractionPointMoveFoundNode(false)
 {
    std::vector<QPointF> c_SaveVec = orc_InteractionPoints;
    // Minimum two points are necessary. If vector has not enough points, add two points.
    if (c_SaveVec.size() < 2)
    {
-      c_SaveVec.push_back(QPointF(0.0, 0.0));
-      c_SaveVec.push_back(QPointF(0.0, 0.0));
+      c_SaveVec.emplace_back(QPointF(0.0, 0.0));
+      c_SaveVec.emplace_back(QPointF(0.0, 0.0));
    }
 
    // Update node and port
@@ -112,9 +111,9 @@ C_GiLiBusConnector::~C_GiLiBusConnector(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiLiBusConnector::type(void) const
+int32_t C_GiLiBusConnector::type(void) const
 {
-   return msn_GRAPHICS_ITEM_BUS_CONNECT;
+   return ms32_GRAPHICS_ITEM_BUS_CONNECT;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,9 +142,9 @@ void C_GiLiBusConnector::SetPoints(const std::vector<QPointF> & orc_ScenePos)
 {
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
    C_GiNode * const pc_LastNode = dynamic_cast<C_GiNode *>(this->mpc_LastKnownGenericSignalItem);
-   const sint32 s32_Index = C_GiLiBusConnector::mh_GetGenericInteractionIndex();
+   const int32_t s32_Index = C_GiLiBusConnector::mh_GetGenericInteractionIndex();
 
-   if (static_cast<uint32>(s32_Index) < orc_ScenePos.size())
+   if (static_cast<uint32_t>(s32_Index) < orc_ScenePos.size())
    {
       this->m_UpdatePort(orc_ScenePos[s32_Index]);
    }
@@ -187,12 +186,12 @@ C_GiNode * C_GiLiBusConnector::GetNodeItem(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Write current GUI layer connection information to connector class.
 
-   \param[in,out]  opc_UIConnection    Storage for GUI information
+   \param[in,out]  opc_UiConnection    Storage for GUI information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnection) const
+void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UiConnection) const
 {
-   if (opc_UIConnection != NULL)
+   if (opc_UiConnection != NULL)
    {
       const C_GiNode * const pc_Node = dynamic_cast<const C_GiNode *>(this->mpc_GenericSignalItem);
       //ID
@@ -201,15 +200,15 @@ void C_GiLiBusConnector::UpdateData(C_PuiSdNodeConnection * const opc_UIConnecti
          const C_PuiSdNodeConnectionId * const pc_ID = pc_Node->GetNodeConnectionId(this);
          if (pc_ID != NULL)
          {
-            opc_UIConnection->c_ConnectionID = *pc_ID;
+            opc_UiConnection->c_ConnectionId = *pc_ID;
          }
       }
-      opc_UIConnection->c_UINodeConnectionInteractionPoints.clear();
-      opc_UIConnection->c_UINodeConnectionInteractionPoints.reserve(this->mc_Points.size());
+      opc_UiConnection->c_UiNodeConnectionInteractionPoints.clear();
+      opc_UiConnection->c_UiNodeConnectionInteractionPoints.reserve(this->mc_Points.size());
       for (QVector<C_GiLiInteractionPoint *>::const_iterator pc_ItPoint = this->mc_Points.begin();
            pc_ItPoint != this->mc_Points.end(); ++pc_ItPoint)
       {
-         opc_UIConnection->c_UINodeConnectionInteractionPoints.push_back((*pc_ItPoint)->scenePos());
+         opc_UiConnection->c_UiNodeConnectionInteractionPoints.push_back((*pc_ItPoint)->scenePos());
       }
    }
 }
@@ -227,11 +226,11 @@ void C_GiLiBusConnector::GenerateHint(void)
    if ((pc_Node != NULL) && (this->GetBusItem() != NULL))
    {
       const C_PuiSdNodeConnectionId * const pc_NodeConnection = this->GetConnectionData();
-      const C_OSCNode * pc_NodeData;
-      pc_Node->GetOSCNodeConst(pc_NodeData);
+      const C_OscNode * pc_NodeData;
+      pc_Node->GetOscNodeConst(pc_NodeData);
       if ((pc_NodeConnection != NULL) && (pc_NodeData != NULL))
       {
-         const C_OSCNodeComInterfaceSettings * const pc_ComInterfaceData = pc_NodeData->c_Properties.GetComInterface(
+         const C_OscNodeComInterfaceSettings * const pc_ComInterfaceData = pc_NodeData->c_Properties.GetComInterface(
             pc_NodeConnection->e_InterfaceType, pc_NodeConnection->u8_InterfaceNumber);
          if (pc_ComInterfaceData != NULL)
          {
@@ -291,7 +290,7 @@ const C_PuiSdNodeConnectionId * C_GiLiBusConnector::GetConnectionData(void) cons
    \param[in]  orc_Properties       Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface,
+void C_GiLiBusConnector::ChangeInterface(const uint8_t & oru8_NewInterface,
                                          const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    C_GiNode * const pc_Node = dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem);
@@ -310,8 +309,8 @@ void C_GiLiBusConnector::ChangeInterface(const uint8 & oru8_NewInterface,
    \param[in]      orc_ScenePos        Last known scene position of interaction point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingNode,
-                                const stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos)
+void C_GiLiBusConnector::Revert(stw::opensyde_gui::C_GiNode * const opc_StartingNode,
+                                const stw::opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ScenePos)
 {
    Q_UNUSED(opc_LastNode)
    this->mpc_GenericSignalItem = opc_StartingNode;
@@ -329,9 +328,9 @@ void C_GiLiBusConnector::Revert(stw_opensyde_gui::C_GiNode * const opc_StartingN
    \param[in]      orc_Properties      Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_StartingNode,
-                                   stw_opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                                   const stw_types::sint32 & ors32_Interface,
+void C_GiLiBusConnector::Reconnect(stw::opensyde_gui::C_GiNode * const opc_StartingNode,
+                                   stw::opensyde_gui::C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
+                                   const int32_t & ors32_Interface,
                                    const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    this->mpc_GenericSignalItem = opc_LastNode;
@@ -342,7 +341,7 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
          //Update data
          C_PuiSdNodeConnectionId c_NodeConn;
          c_NodeConn.e_InterfaceType = this->GetBusItem()->GetType();
-         c_NodeConn.u8_InterfaceNumber = static_cast<uint8>(ors32_Interface);
+         c_NodeConn.u8_InterfaceNumber = static_cast<uint8_t>(ors32_Interface);
          //Node
 
          if (opc_StartingNode != NULL)
@@ -352,7 +351,7 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
          }
          //Add connection to new node
          opc_LastNode->AddConnectionAndData(this, c_NodeConn, orc_Properties,
-                                            static_cast<uint32>(this->GetBusItem()->GetIndex()));
+                                            static_cast<uint32_t>(this->GetBusItem()->GetIndex()));
          //Update tool tip
          Q_EMIT this->SigHintUpdate();
       }
@@ -371,9 +370,9 @@ void C_GiLiBusConnector::Reconnect(stw_opensyde_gui::C_GiNode * const opc_Starti
    \param[in]      orc_Properties      Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
-                                   const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
-                                   const QPointF & orc_ConnectionPos, const stw_types::sint32 & ors32_Interface,
+void C_GiLiBusConnector::Reconnect(const stw::opensyde_gui::C_GiLiBus * const opc_StartingBus,
+                                   const stw::opensyde_gui::C_GiLiBus * const opc_LastBus,
+                                   const QPointF & orc_ConnectionPos, const int32_t & ors32_Interface,
                                    const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    Q_UNUSED(opc_StartingBus)
@@ -384,12 +383,12 @@ void C_GiLiBusConnector::Reconnect(const stw_opensyde_gui::C_GiLiBus * const opc
       //Update data
       C_PuiSdNodeConnectionId c_NodeConn;
       c_NodeConn.e_InterfaceType = this->GetBusItem()->GetType();
-      c_NodeConn.u8_InterfaceNumber = static_cast<uint8>(ors32_Interface);
+      c_NodeConn.u8_InterfaceNumber = static_cast<uint8_t>(ors32_Interface);
       //Bus
       if (pc_Node != NULL)
       {
          pc_Node->UpdateConnection(this, c_NodeConn, orc_Properties,
-                                   static_cast<uint32>(this->GetBusItem()->GetIndex()));
+                                   static_cast<uint32_t>(this->GetBusItem()->GetIndex()));
       }
       //Update tool tip
       Q_EMIT this->SigHintUpdate();
@@ -421,10 +420,10 @@ void C_GiLiBusConnector::m_OnInteractionPointMove(void)
    if (mq_InAir == true)
    {
       //Check if active line is at border
-      if ((this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
-          (this->msn_ActiveItemIndex == m_GetBusInteractionIndex()))
+      if ((this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
+          (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex()))
       {
-         if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
+         if (this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex())
          {
             if (this->mq_OnInteractionPointMoveFoundNode == false)
             {
@@ -509,7 +508,7 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
       {
          if (this->GetBusItem() != NULL)
          {
-            this->mc_Points[this->msn_ActiveItemIndex]->setCursor(pc_Node->cursor());
+            this->mc_Points[this->ms32_ActiveItemIndex]->setCursor(pc_Node->cursor());
             orq_RestoreMouseCursor = false;
             if (pc_Node->CheckConnectionAvailable(this->GetBusItem()->GetType()) == true)
             {
@@ -542,7 +541,7 @@ void C_GiLiBusConnector::m_OnIterationGenericInteractionPointMove(QGraphicsItem 
          if (((pc_Other != NULL) && (orq_RestoreMouseCursor == true)) &&
              (opc_HighestParentItem->isUnderMouse() == true))
          {
-            this->mc_Points[this->msn_ActiveItemIndex]->setCursor(opc_HighestParentItem->cursor());
+            this->mc_Points[this->ms32_ActiveItemIndex]->setCursor(opc_HighestParentItem->cursor());
             orq_RestoreMouseCursor = false;
          }
       }
@@ -590,12 +589,12 @@ bool C_GiLiBusConnector::m_OnGenericInteractionPointMouseRelease(const QPointF &
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnector::m_OnBusChange(const QPointF & orc_ScenePos)
 {
-   sint32 s32_Interface = -1;
+   int32_t s32_Interface = -1;
    const C_PuiSdNodeConnectionId * const pc_Id = this->GetConnectionData();
 
    if (pc_Id != NULL)
    {
-      s32_Interface = static_cast<sint32>(pc_Id->u8_InterfaceNumber);
+      s32_Interface = static_cast<int32_t>(pc_Id->u8_InterfaceNumber);
    }
    Q_EMIT this->SigShowReconnectContextMenu(orc_ScenePos, dynamic_cast<C_GiNode *>(this->mpc_GenericSignalItem),
                                             this->GetBusItem(), s32_Interface, this);

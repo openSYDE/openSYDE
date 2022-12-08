@@ -1,19 +1,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Configuration of an openSYDE system definition for C_OSCComMessageLogger (implementation)
+   \brief       Configuration of an openSYDE system definition for C_OscComMessageLogger (implementation)
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCComMessageLoggerOsySysDefConfig.h"
+#include "C_OscComMessageLoggerOsySysDefConfig.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,8 +34,8 @@ using namespace stw_opensyde_core;
    \param[in]     ou32_BusIndex       Current bus index of system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerOsySysDefConfig::C_OSCComMessageLoggerOsySysDefConfig(const C_OSCSystemDefinition & orc_OsySysDef,
-                                                                           const stw_types::uint32 ou32_BusIndex) :
+C_OscComMessageLoggerOsySysDefConfig::C_OscComMessageLoggerOsySysDefConfig(const C_OscSystemDefinition & orc_OsySysDef,
+                                                                           const uint32_t ou32_BusIndex) :
    c_OsySysDef(orc_OsySysDef),
    u32_BusIndex(ou32_BusIndex)
 {

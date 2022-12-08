@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdUtil.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_OSCSystemBus.h"
-#include "TGLUtils.h"
+#include "C_SdUtil.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OscSystemBus.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,17 +51,17 @@ using namespace stw_opensyde_gui_logic;
    \param[out]     orc_ErrorTooltipText         Error tooltip information
    \param[out]     ore_TooltipType              Tooltip type
    \param[in,out]  orc_IconPath                 Icon path
-   \param[out]     orsn_ColorID                 Color ID
+   \param[out]     ors32_ColorId                Color ID
 
    \return
    True  Show label
    False Hide label
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUtil::h_GetViewStatusLabelInfo(const uint32 ou32_ViewIndex, const sint32 os32_ViewSubMode,
+bool C_SyvUtil::h_GetViewStatusLabelInfo(const uint32_t ou32_ViewIndex, const int32_t os32_ViewSubMode,
                                          QString & orc_ErrorLabelHeadingText, QString & orc_ErrorLabelText,
                                          QString & orc_ErrorTooltipText, C_NagToolTip::E_Type & ore_TooltipType,
-                                         QString & orc_IconPath, sintn & orsn_ColorID)
+                                         QString & orc_IconPath, int32_t & ors32_ColorId)
 {
    bool q_Retval = false;
    bool q_NameInvalid;
@@ -75,7 +74,7 @@ bool C_SyvUtil::h_GetViewStatusLabelInfo(const uint32 ou32_ViewIndex, const sint
 
    std::vector<QString> c_RoutingErrorText;
    QString c_SetupRoutingWarningText;
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    s32_Return = C_PuiSvHandler::h_GetInstance()->CheckViewError(ou32_ViewIndex,
                                                                 &q_NameInvalid,
@@ -161,14 +160,14 @@ bool C_SyvUtil::h_GetViewStatusLabelInfo(const uint32 ou32_ViewIndex, const sint
       // Error message
       ore_TooltipType = C_NagToolTip::eERROR;
       orc_IconPath = "://images/Error_iconV2.svg";
-      orsn_ColorID = 24;
+      ors32_ColorId = 24;
    }
    else
    {
       // Info message
       ore_TooltipType = C_NagToolTip::eDEFAULT;
       orc_IconPath = "://images/Info_Icon_MessageBox.svg";
-      orsn_ColorID = 3;
+      ors32_ColorId = 3;
 
       if (orc_ErrorLabelHeadingText != "")
       {
@@ -196,35 +195,35 @@ bool C_SyvUtil::h_GetViewStatusLabelInfo(const uint32 ou32_ViewIndex, const sint
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUtil::h_GetIndicesFromBusId(const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier,
-                                        uint32 & oru32_NodeIndex, uint32 & oru32_BusIndex)
+int32_t C_SyvUtil::h_GetIndicesFromBusId(const uint8_t ou8_BusIdentifier, const uint8_t ou8_NodeIdentifier,
+                                         uint32_t & oru32_NodeIndex, uint32_t & oru32_BusIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    bool q_NodeFound = false;
 
-   for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+   for (uint32_t u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_ItBus)
    {
-      const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_ItBus);
-      if ((pc_Bus != NULL) && (pc_Bus->u8_BusID == ou8_BusIdentifier))
+      const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_ItBus);
+      if ((pc_Bus != NULL) && (pc_Bus->u8_BusId == ou8_BusIdentifier))
       {
-         std::vector<uint32> c_NodeIndexes;
-         std::vector<uint32> c_InterfaceIndexes;
+         std::vector<uint32_t> c_NodeIndexes;
+         std::vector<uint32_t> c_InterfaceIndexes;
          oru32_BusIndex = u32_ItBus;
          //Node
-         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(u32_ItBus, c_NodeIndexes,
+         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(u32_ItBus, c_NodeIndexes,
                                                                                             c_InterfaceIndexes);
          tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
          if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
          {
-            for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+            for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
             {
-               const C_OSCNode * const pc_Node =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItNode]);
+               const C_OscNode * const pc_Node =
+                  C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndexes[u32_ItNode]);
                if ((pc_Node != NULL) && (c_InterfaceIndexes[u32_ItNode] < pc_Node->c_Properties.c_ComInterfaces.size()))
                {
-                  const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+                  const C_OscNodeComInterfaceSettings & rc_ComInterface =
                      pc_Node->c_Properties.c_ComInterfaces[c_InterfaceIndexes[u32_ItNode]];
-                  if (rc_ComInterface.u8_NodeID == ou8_NodeIdentifier)
+                  if (rc_ComInterface.u8_NodeId == ou8_NodeIdentifier)
                   {
                      oru32_NodeIndex = c_NodeIndexes[u32_ItNode];
                      q_NodeFound = true;
@@ -251,7 +250,7 @@ sint32 C_SyvUtil::h_GetIndicesFromBusId(const uint8 ou8_BusIdentifier, const uin
    Update mode details
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
+QString C_SyvUtil::h_GetUpdateModeDescription(const uint32_t ou32_ViewIndex,
                                               const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
 {
    QString c_Retval;
@@ -264,12 +263,12 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
 
          if (pc_View != NULL)
          {
-            const QMap<C_OSCNodeDataPoolListElementId,
+            const QMap<C_OscNodeDataPoolListElementId,
                        C_PuiSvReadDataConfiguration>::const_iterator c_Result = pc_View->GetReadRailAssignments().find(
                orc_Id);
             if (c_Result != pc_View->GetReadRailAssignments().end())
             {
-               const C_OSCNodeDataPoolContent & rc_Content = c_Result.value().c_ChangeThreshold;
+               const C_OscNodeDataPoolContent & rc_Content = c_Result.value().c_ChangeThreshold;
                QString c_Text;
                QString c_CyclicText;
                QString c_ThresholdText;
@@ -313,34 +312,34 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
                   {
                      switch (rc_Content.GetType())
                      {
-                     case C_OSCNodeDataPoolContent::E_Type::eUINT8:
-                        c_ThresholdText = QString::number(static_cast<uint64>(rc_Content.GetValueU8()));
+                     case C_OscNodeDataPoolContent::E_Type::eUINT8:
+                        c_ThresholdText = QString::number(static_cast<uint64_t>(rc_Content.GetValueU8()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eUINT16:
-                        c_ThresholdText = QString::number(static_cast<uint64>(rc_Content.GetValueU16()));
+                     case C_OscNodeDataPoolContent::E_Type::eUINT16:
+                        c_ThresholdText = QString::number(static_cast<uint64_t>(rc_Content.GetValueU16()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eUINT32:
-                        c_ThresholdText = QString::number(static_cast<uint64>(rc_Content.GetValueU32()));
+                     case C_OscNodeDataPoolContent::E_Type::eUINT32:
+                        c_ThresholdText = QString::number(static_cast<uint64_t>(rc_Content.GetValueU32()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eUINT64:
+                     case C_OscNodeDataPoolContent::E_Type::eUINT64:
                         c_ThresholdText = QString::number(rc_Content.GetValueU64());
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eSINT8:
-                        c_ThresholdText = QString::number(static_cast<sint64>(rc_Content.GetValueS8()));
+                     case C_OscNodeDataPoolContent::E_Type::eSINT8:
+                        c_ThresholdText = QString::number(static_cast<int64_t>(rc_Content.GetValueS8()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eSINT16:
-                        c_ThresholdText = QString::number(static_cast<sint64>(rc_Content.GetValueS16()));
+                     case C_OscNodeDataPoolContent::E_Type::eSINT16:
+                        c_ThresholdText = QString::number(static_cast<int64_t>(rc_Content.GetValueS16()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eSINT32:
-                        c_ThresholdText = QString::number(static_cast<sint64>(rc_Content.GetValueS32()));
+                     case C_OscNodeDataPoolContent::E_Type::eSINT32:
+                        c_ThresholdText = QString::number(static_cast<int64_t>(rc_Content.GetValueS32()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eSINT64:
+                     case C_OscNodeDataPoolContent::E_Type::eSINT64:
                         c_ThresholdText = QString::number(rc_Content.GetValueS64());
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eFLOAT32:
-                        c_ThresholdText = QString::number(static_cast<float64>(rc_Content.GetValueF32()));
+                     case C_OscNodeDataPoolContent::E_Type::eFLOAT32:
+                        c_ThresholdText = QString::number(static_cast<float64_t>(rc_Content.GetValueF32()));
                         break;
-                     case C_OSCNodeDataPoolContent::E_Type::eFLOAT64:
+                     case C_OscNodeDataPoolContent::E_Type::eFLOAT64:
                         c_ThresholdText = QString::number(rc_Content.GetValueF64());
                         break;
                      default:
@@ -364,32 +363,42 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
       else
       {
          //Step 1 convert ID to message ID!
-         uint32 u32_SignalIndex;
-         C_OSCCanMessageIdentificationIndices c_MessageID;
-         if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageID, u32_SignalIndex) == C_NO_ERR)
+         uint32_t u32_SignalIndex;
+         C_OscCanMessageIdentificationIndices c_MessageId;
+         if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageId, u32_SignalIndex) == C_NO_ERR)
          {
             //Step 2 Get message info and format it
-            const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageID);
+            const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
             if (pc_Message != NULL)
             {
                switch (pc_Message->e_TxMethod)
                {
-               case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
+               case C_OscCanMessage::eTX_METHOD_ON_EVENT:
                   c_Retval = static_cast<QString>(C_GtGetText::h_GetText("On Event"));
                   break;
-               case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+               case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_0:
+                  c_Retval =
+                     static_cast<QString>(C_GtGetText::h_GetText(
+                                             "Type 0 - synchronous transmission after next SYNC and change"));
+                  break;
+               case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_1_TO_240:
+                  c_Retval =
+                     static_cast<QString>(C_GtGetText::h_GetText(
+                                             "Type 1 to 240 - synchronous transmission after 1st to 240th SYNC"));
+                  break;
+               case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
                   c_Retval =
                      static_cast<QString>(C_GtGetText::h_GetText("Type 254 - asynchronous manufacturer specific"));
                   break;
-               case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+               case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
                   c_Retval =
                      static_cast<QString>(C_GtGetText::h_GetText("Type 255 - asynchronous device specific"));
                   break;
-               case C_OSCCanMessage::eTX_METHOD_CYCLIC:
+               case C_OscCanMessage::eTX_METHOD_CYCLIC:
                   c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Cyclic (%1 ms)")).arg(
                      pc_Message->u32_CycleTimeMs);
                   break;
-               case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
+               case C_OscCanMessage::eTX_METHOD_ON_CHANGE:
                   //Translation1: Timeout, 2: Minimum delay, 3: "greater than or equal" - sign, 4: "less than or equal"
                   // - sign
                   c_Retval =
@@ -420,10 +429,10 @@ QString C_SyvUtil::h_GetUpdateModeDescription(const uint32 ou32_ViewIndex,
    Common dashboard item tool tip
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
+QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32_t ou32_ViewIndex,
                                                    const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
                                                    const bool oq_ReadItem,
-                                                   const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode)
+                                                   const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_WriteMode oe_WriteMode)
 {
    QString c_Retval;
    QString c_DashboardDescription;
@@ -467,7 +476,7 @@ QString C_SyvUtil::h_GetCommonDashboardItemToolTip(const uint32 ou32_ViewIndex,
    \param[out]  orc_SubSubMode   Sub sub mode heading
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUtil::h_GetViewDisplayName(const uint32 ou32_ViewIndex, const sint32 os32_SubMode, QString & orc_SubMode,
+void C_SyvUtil::h_GetViewDisplayName(const uint32_t ou32_ViewIndex, const int32_t os32_SubMode, QString & orc_SubMode,
                                      QString & orc_SubSubMode)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);

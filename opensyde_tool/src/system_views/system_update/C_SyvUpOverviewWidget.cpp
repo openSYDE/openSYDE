@@ -6,11 +6,11 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#include "C_SyvUpOverviewWidget.h"
+#include "C_SyvUpOverviewWidget.hpp"
 #include "ui_C_SyvUpOverviewWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

@@ -35,24 +35,23 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <QGraphicsDropShadowEffect>
 
-#include "C_OgeWiCustomMessage.h"
+#include "C_OgeWiCustomMessage.hpp"
 #include "ui_C_OgeWiCustomMessage.h"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeOverlay.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeOverlay.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 using namespace std;
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -205,8 +204,8 @@ void C_OgeWiCustomMessage::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -226,7 +225,7 @@ void C_OgeWiCustomMessage::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    }
 
    // close window when escape key is pressed (did not work without this, and now safe cancel is called)
-   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       me_Output = E_Outputs::eCANCEL;
       this->reject();
@@ -269,8 +268,8 @@ void C_OgeWiCustomMessage::m_InitButtons(void)
 
    // Make the buttons behave similar to QToolButtonBox or QMessageBox
    me_Output = E_Outputs::eCANCEL; // gets overwritten when box is closed (by button-click)
-   connect(this->mpc_Ui->pc_ButtonOk, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_OKClicked);
-   connect(this->mpc_Ui->pc_ButtonNo, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_NOClicked);
+   connect(this->mpc_Ui->pc_ButtonOk, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_OkClicked);
+   connect(this->mpc_Ui->pc_ButtonNo, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_NoClicked);
    connect(this->mpc_Ui->pc_ButtonCancel, &QPushButton::clicked, this, &C_OgeWiCustomMessage::m_CancelClicked);
 }
 
@@ -408,11 +407,11 @@ C_OgeWiCustomMessage::E_Outputs C_OgeWiCustomMessage::Execute(void)
    const QWidget * const pc_TopWidget = C_OgeOverlay::h_GetTopWidget();
 
    // store recent override cursor shape
-   sintn sn_CursorShape = -1;
+   int32_t s32_CursorShape = -1;
 
    if (QApplication::overrideCursor() != NULL)
    {
-      sn_CursorShape = static_cast<sintn>(QApplication::overrideCursor()->shape());
+      s32_CursorShape = static_cast<int32_t>(QApplication::overrideCursor()->shape());
       QApplication::restoreOverrideCursor();
    }
 
@@ -427,9 +426,9 @@ C_OgeWiCustomMessage::E_Outputs C_OgeWiCustomMessage::Execute(void)
    // Execute
    this->exec();
 
-   if (sn_CursorShape != -1)
+   if (s32_CursorShape != -1)
    {
-      QApplication::setOverrideCursor(static_cast<QCursor>(static_cast<Qt::CursorShape>(sn_CursorShape)));
+      QApplication::setOverrideCursor(static_cast<QCursor>(static_cast<Qt::CursorShape>(s32_CursorShape)));
    }
 
    return me_Output;
@@ -439,7 +438,7 @@ C_OgeWiCustomMessage::E_Outputs C_OgeWiCustomMessage::Execute(void)
 /*! \brief   Slot for OK or YES Button
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::m_OKClicked(void)
+void C_OgeWiCustomMessage::m_OkClicked(void)
 {
    this->accept();
    me_Output = E_Outputs::eOK;
@@ -449,7 +448,7 @@ void C_OgeWiCustomMessage::m_OKClicked(void)
 /*! \brief   Slot for NO Button
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::m_NOClicked(void)
+void C_OgeWiCustomMessage::m_NoClicked(void)
 {
    this->reject();
    me_Output = E_Outputs::eNO;
@@ -546,7 +545,7 @@ void C_OgeWiCustomMessage::SetDetails(const QString & orc_Text)
    \param[in]  orc_Text    button text string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::SetOKButtonText(const QString & orc_Text) const
+void C_OgeWiCustomMessage::SetOkButtonText(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_ButtonOk->setText(orc_Text);
 }
@@ -557,7 +556,7 @@ void C_OgeWiCustomMessage::SetOKButtonText(const QString & orc_Text) const
    \param[in]  orc_Text    button text string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::SetNOButtonText(const QString & orc_Text) const
+void C_OgeWiCustomMessage::SetNoButtonText(const QString & orc_Text) const
 {
    this->mpc_Ui->pc_ButtonNo->setText(orc_Text);
 
@@ -602,7 +601,7 @@ void C_OgeWiCustomMessage::ShowCancelButton(void)
    \param[in]  ors32_MinWidth    new minimum width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::SetCustomMinWidth(const sint32 & ors32_MinWidth) const
+void C_OgeWiCustomMessage::SetCustomMinWidth(const int32_t & ors32_MinWidth) const
 {
    this->mpc_Ui->pc_GroupBoxBackground->setMinimumWidth(ors32_MinWidth);
 }
@@ -618,7 +617,7 @@ void C_OgeWiCustomMessage::SetCustomMinWidth(const sint32 & ors32_MinWidth) cons
    \param[in]  ors32_MaxHeight   new maximum height
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiCustomMessage::SetCustomMinHeight(const sint32 & ors32_MinHeight, const sint32 & ors32_MaxHeight)
+void C_OgeWiCustomMessage::SetCustomMinHeight(const int32_t & ors32_MinHeight, const int32_t & ors32_MaxHeight)
 {
    this->ms32_MinHeight = ors32_MinHeight;
    this->ms32_MaxHeight = ors32_MaxHeight;

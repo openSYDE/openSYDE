@@ -45,21 +45,21 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelNodeId">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelNodeId">
        <property name="text">
         <string>ID</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="stw_opensyde_gui_elements::C_OgeLabPropertiesSubHeading" name="pc_LabelName">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabPropertiesSubHeading" name="pc_LabelName">
        <property name="text">
         <string>Name</string>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelDeviceType">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelDeviceType">
        <property name="text">
         <string>Device</string>
        </property>
@@ -71,14 +71,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabPropertiesSubHeading</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabPropertiesSubHeading</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabPropertiesSubHeading.h</header>
+   <header>C_OgeLabPropertiesSubHeading.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupSubItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupSubItem.h</header>
+   <header>C_OgeLabGroupSubItem.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

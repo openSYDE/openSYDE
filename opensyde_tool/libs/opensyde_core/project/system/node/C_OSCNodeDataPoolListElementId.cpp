@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstddef>
 
-#include "C_OSCNodeDataPoolListElementId.h"
+#include "C_OscNodeDataPoolListElementId.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,8 +38,8 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(void) :
-   C_OSCNodeDataPoolListId(),
+C_OscNodeDataPoolListElementId::C_OscNodeDataPoolListElementId(void) :
+   C_OscNodeDataPoolListId(),
    u32_ElementIndex(0U)
 {
 }
@@ -53,11 +53,11 @@ C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(void) :
    \param[in] ou32_ElementIndex  Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(const stw_types::uint32 ou32_NodeIndex,
-                                                               const stw_types::uint32 ou32_DataPoolIndex,
-                                                               const stw_types::uint32 ou32_ListIndex,
-                                                               const stw_types::uint32 ou32_ElementIndex) :
-   C_OSCNodeDataPoolListId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex),
+C_OscNodeDataPoolListElementId::C_OscNodeDataPoolListElementId(const uint32_t ou32_NodeIndex,
+                                                               const uint32_t ou32_DataPoolIndex,
+                                                               const uint32_t ou32_ListIndex,
+                                                               const uint32_t ou32_ElementIndex) :
+   C_OscNodeDataPoolListId(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex),
    u32_ElementIndex(ou32_ElementIndex)
 {
 }
@@ -72,7 +72,7 @@ C_OSCNodeDataPoolListElementId::C_OSCNodeDataPoolListElementId(const stw_types::
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_Cmp) const
+bool C_OscNodeDataPoolListElementId::operator <(const C_OscNodeDataPoolId & orc_Cmp) const
 {
    bool q_Return;
 
@@ -88,8 +88,8 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
       }
       else if (this->u32_DataPoolIndex == orc_Cmp.u32_DataPoolIndex)
       {
-         const C_OSCNodeDataPoolListId * const pc_NonBaseList =
-            dynamic_cast<const C_OSCNodeDataPoolListId *>(&orc_Cmp);
+         const C_OscNodeDataPoolListId * const pc_NonBaseList =
+            dynamic_cast<const C_OscNodeDataPoolListId *>(&orc_Cmp);
          //Not current class, assume base comparison is correct
          if (pc_NonBaseList != NULL)
          {
@@ -99,8 +99,8 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
             }
             else if (this->u32_ListIndex == pc_NonBaseList->u32_ListIndex)
             {
-               const C_OSCNodeDataPoolListElementId * const pc_NonBaseElement =
-                  dynamic_cast<const C_OSCNodeDataPoolListElementId *>(&orc_Cmp);
+               const C_OscNodeDataPoolListElementId * const pc_NonBaseElement =
+                  dynamic_cast<const C_OscNodeDataPoolListElementId *>(&orc_Cmp);
                //Not current class, assume base comparison is correct
                if (pc_NonBaseElement != NULL)
                {
@@ -152,14 +152,14 @@ bool C_OSCNodeDataPoolListElementId::operator <(const C_OSCNodeDataPoolId & orc_
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId & orc_Cmp) const
+bool C_OscNodeDataPoolListElementId::operator ==(const C_OscNodeDataPoolId & orc_Cmp) const
 {
-   bool q_Return = C_OSCNodeDataPoolListId::operator ==(orc_Cmp);
+   bool q_Return = C_OscNodeDataPoolListId::operator ==(orc_Cmp);
 
    if (q_Return == true)
    {
-      const C_OSCNodeDataPoolListElementId * const pc_NonBase =
-         dynamic_cast<const C_OSCNodeDataPoolListElementId *>(&orc_Cmp);
+      const C_OscNodeDataPoolListElementId * const pc_NonBase =
+         dynamic_cast<const C_OscNodeDataPoolListElementId *>(&orc_Cmp);
       //Not current class, assume base comparison is correct
       if (pc_NonBase != NULL)
       {
@@ -190,10 +190,10 @@ bool C_OSCNodeDataPoolListElementId::operator ==(const C_OSCNodeDataPoolId & orc
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolListElementId::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeDataPoolListElementId::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NodeIndex, sizeof(this->u32_NodeIndex), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_DataPoolIndex, sizeof(this->u32_DataPoolIndex), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ListIndex, sizeof(this->u32_ListIndex), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ElementIndex, sizeof(this->u32_ElementIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NodeIndex, sizeof(this->u32_NodeIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_DataPoolIndex, sizeof(this->u32_DataPoolIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_ListIndex, sizeof(this->u32_ListIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_ElementIndex, sizeof(this->u32_ElementIndex), oru32_HashValue);
 }

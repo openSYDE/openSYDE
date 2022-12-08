@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdNodeCanProtocol.h"
+#include "C_PuiSdNodeCanProtocol.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,9 +45,9 @@ C_PuiSdNodeCanProtocol::C_PuiSdNodeCanProtocol(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdNodeCanProtocol::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_PuiSdNodeCanProtocol::CalcHash(uint32_t & oru32_HashValue) const
 {
-   for (stw_types::uint32 u32_ItContainer = 0; u32_ItContainer < this->c_ComMessages.size(); ++u32_ItContainer)
+   for (uint32_t u32_ItContainer = 0; u32_ItContainer < this->c_ComMessages.size(); ++u32_ItContainer)
    {
       const C_PuiSdNodeCanMessageContainer & rc_Container = this->c_ComMessages[u32_ItContainer];
       rc_Container.CalcHash(oru32_HashValue);

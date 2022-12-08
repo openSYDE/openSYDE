@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeWiPieChart.h"
-#include "CSCLString.h"
+#include "C_OgeWiPieChart.hpp"
+#include "C_SclString.hpp"
 #include "ui_C_OgeWiPieChart.h"
-#include "constants.h"
+#include "constants.hpp"
 
 #include <QPainter>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,7 +53,7 @@ C_OgeWiPieChart::C_OgeWiPieChart(QWidget * const opc_Parent) :
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBox, static_cast<void (QSpinBox::*)(
-                                                    stw_types::sintn)>(&QSpinBox::valueChanged), this,
+                                                    int32_t)>(&QSpinBox::valueChanged), this,
            &C_OgeWiPieChart::m_OnSpinboxValuechanged);
 }
 
@@ -87,9 +86,9 @@ void C_OgeWiPieChart::paintEvent(QPaintEvent * const opc_Event)
    QPen c_Pen(QColor(91, 91, 91));
    QFont c_Font;
    QRect c_Rect(50, 50, 200, 200);
-   stw_types::sint16 s16_StartAngle;
-   stw_types::float32 f32_SpanAngle;
-   stw_scl::C_SCLString c_String;
+   int16_t s16_StartAngle;
+   float32_t f32_SpanAngle;
+   stw::scl::C_SclString c_String;
 
    c_BackgroundBrush.setColor(QColor(2, 155, 136));
    c_ForegroundBrush.setColor(QColor(40, 40, 40));
@@ -108,10 +107,10 @@ void C_OgeWiPieChart::paintEvent(QPaintEvent * const opc_Event)
    //pie
    c_Rect.setRect(50, 50, 200, 200);
    s16_StartAngle = 90 * 16;
-   f32_SpanAngle = (-1.0F * (360.0F / 100.0F) * static_cast<float32>(mu16_ValueInPercent)  * 16.0F);
+   f32_SpanAngle = (-1.0F * (360.0F / 100.0F) * static_cast<float32_t>(mu16_ValueInPercent)  * 16.0F);
 
    c_Painter.setBrush(c_PieBrush);
-   c_Painter.drawPie(c_Rect, s16_StartAngle, static_cast<sintn>(f32_SpanAngle));
+   c_Painter.drawPie(c_Rect, s16_StartAngle, static_cast<int32_t>(f32_SpanAngle));
 
    //foreground cycle
    c_Painter.setBrush(c_ForegroundBrush);
@@ -120,17 +119,17 @@ void C_OgeWiPieChart::paintEvent(QPaintEvent * const opc_Event)
    //text
    c_Painter.setPen(c_Pen);
    c_Painter.setFont(c_Font);
-   c_String = stw_scl::C_SCLString::IntToStr(mu16_ValueInPercent);
+   c_String = stw::scl::C_SclString::IntToStr(mu16_ValueInPercent);
    c_String += "%";
-   c_Painter.drawText(c_Rect, static_cast<sintn>(Qt::AlignCenter), c_String.c_str());
+   c_Painter.drawText(c_Rect, static_cast<int32_t>(Qt::AlignCenter), c_String.c_str());
 
    c_Painter.restore();
    QWidget::paintEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void stw_opensyde_gui::C_OgeWiPieChart::m_OnSpinboxValuechanged(const stw_types::sintn osn_Value)
+void stw::opensyde_gui::C_OgeWiPieChart::m_OnSpinboxValuechanged(const int32_t os32_Value)
 {
-   mu16_ValueInPercent = static_cast<uint16>(osn_Value);
+   mu16_ValueInPercent = static_cast<uint16_t>(os32_Value);
    this->repaint();
 }

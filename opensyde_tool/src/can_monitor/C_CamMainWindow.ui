@@ -31,7 +31,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="stw_opensyde_gui_elements::C_OgeSaMain" name="scrollArea">
+     <widget class="stw::opensyde_gui_elements::C_OgeSaMain" name="scrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -61,7 +61,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui::C_CamTitleBarWidget" name="pc_TitleBarWidget" native="true"/>
+         <widget class="stw::opensyde_gui::C_CamTitleBarWidget" name="pc_TitleBarWidget" native="true"/>
         </item>
         <item>
          <widget class="QWidget" name="pc_ShowWidget" native="true">
@@ -79,7 +79,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterSettings">
+            <widget class="stw::opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterSettings">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
@@ -104,20 +104,20 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterMessageGen">
+                <widget class="stw::opensyde_gui_elements::C_CamOgeSpi" name="pc_SplitterMessageGen">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
                  </property>
                  <property name="childrenCollapsible">
                   <bool>false</bool>
                  </property>
-                 <widget class="stw_opensyde_gui::C_CamMetWidget" name="pc_TraceWidget" native="true"/>
-                 <widget class="stw_opensyde_gui::C_CamGenWidget" name="pc_GeneratorWidget" native="true"/>
+                 <widget class="stw::opensyde_gui::C_CamMetWidget" name="pc_TraceWidget" native="true"/>
+                 <widget class="stw::opensyde_gui::C_CamGenWidget" name="pc_GeneratorWidget" native="true"/>
                 </widget>
                </item>
               </layout>
              </widget>
-             <widget class="stw_opensyde_gui::C_CamMosWidget" name="pc_SettingsWidget" native="true"/>
+             <widget class="stw::opensyde_gui::C_CamMosWidget" name="pc_SettingsWidget" native="true"/>
             </widget>
            </item>
           </layout>
@@ -134,39 +134,39 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamTitleBarWidget</class>
+   <class>stw::opensyde_gui::C_CamTitleBarWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamTitleBarWidget.h</header>
+   <header>C_CamTitleBarWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamMosWidget</class>
+   <class>stw::opensyde_gui::C_CamMosWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamMosWidget.h</header>
+   <header>C_CamMosWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamMetWidget</class>
+   <class>stw::opensyde_gui::C_CamMetWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamMetWidget.h</header>
+   <header>C_CamMetWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamGenWidget</class>
+   <class>stw::opensyde_gui::C_CamGenWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamGenWidget.h</header>
+   <header>C_CamGenWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeSpi</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeSpi</class>
    <extends>QSplitter</extends>
-   <header>C_CamOgeSpi.h</header>
+   <header>C_CamOgeSpi.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSaMain</class>
+   <class>stw::opensyde_gui_elements::C_OgeSaMain</class>
    <extends>QScrollArea</extends>
-   <header>C_OgeSaMain.h</header>
+   <header>C_OgeSaMain.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

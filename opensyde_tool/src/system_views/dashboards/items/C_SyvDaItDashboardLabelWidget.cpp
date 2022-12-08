@@ -8,18 +8,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_SyvDaItDashboardLabelWidget.h"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_SyvDaItDashboardLabelWidget.hpp"
 #include "ui_C_SyvDaItDashboardLabelWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -190,7 +189,7 @@ void C_SyvDaItDashboardLabelWidget::resizeEvent(QResizeEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardLabelWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 

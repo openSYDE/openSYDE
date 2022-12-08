@@ -8,22 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <set>
 
-#include "stwerrors.h"
-#include "CSCLString.h"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
 
-#include "C_OSCRoutingCalculation.h"
-#include "C_OSCLoggingHandler.h"
+#include "C_OscRoutingCalculation.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace std;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,9 +49,10 @@ using namespace stw_opensyde_core;
    \param[in]     oe_Mode              Decision for update or diagnostic routing
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCRoutingCalculation::C_OSCRoutingCalculation(const vector<C_OSCNode> & orc_AllNodes,
-                                                 const vector<uint8> & orc_ActiveNodes, const uint32 ou32_StartBusIndex,
-                                                 const uint32 ou32_TargetNodeIndex, const E_Mode oe_Mode) :
+C_OscRoutingCalculation::C_OscRoutingCalculation(const vector<C_OscNode> & orc_AllNodes,
+                                                 const vector<uint8_t> & orc_ActiveNodes,
+                                                 const uint32_t ou32_StartBusIndex, const uint32_t ou32_TargetNodeIndex,
+                                                 const E_Mode oe_Mode) :
    mu32_StartBusIndex(ou32_StartBusIndex),
    mu32_TargetNodeIndex(ou32_TargetNodeIndex),
    me_Mode(oe_Mode),
@@ -69,7 +70,7 @@ C_OSCRoutingCalculation::C_OSCRoutingCalculation(const vector<C_OSCNode> & orc_A
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCRoutingCalculation::~C_OSCRoutingCalculation()
+C_OscRoutingCalculation::~C_OscRoutingCalculation()
 {
    this->mc_AllOpenRoutes.clear();
 }
@@ -81,7 +82,7 @@ C_OSCRoutingCalculation::~C_OSCRoutingCalculation()
    Vector with all found routes
 */
 //----------------------------------------------------------------------------------------------------------------------
-const vector<C_OSCRoutingRoute> * C_OSCRoutingCalculation::GetRoutes(void) const
+const vector<C_OscRoutingRoute> * C_OscRoutingCalculation::GetRoutes(void) const
 {
    return &this->mc_RoutesToTarget;
 }
@@ -94,21 +95,21 @@ const vector<C_OSCRoutingRoute> * C_OSCRoutingCalculation::GetRoutes(void) const
    NULL:             No route found
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCRoutingRoute * C_OSCRoutingCalculation::GetBestRoute(void) const
+const C_OscRoutingRoute * C_OscRoutingCalculation::GetBestRoute(void) const
 {
-   const C_OSCRoutingRoute * pc_Result = NULL;
+   const C_OscRoutingRoute * pc_Result = NULL;
 
    if (this->mc_RoutesToTarget.size() > 0)
    {
-      uint32 u32_CountHops = 0xFFFFFFFFU;
-      uint32 u32_Counter;
+      uint32_t u32_CountHops = 0xFFFFFFFFU;
+      uint32_t u32_Counter;
 
       // Search the smallest count of hops
       for (u32_Counter = 0U; u32_Counter < this->mc_RoutesToTarget.size(); ++u32_Counter)
       {
          if (this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints.size() < u32_CountHops)
          {
-            u32_CountHops = this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints.size();
+            u32_CountHops = static_cast<uint32_t>(this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints.size());
 
             if (pc_Result == NULL)
             {
@@ -124,14 +125,14 @@ const C_OSCRoutingRoute * C_OSCRoutingCalculation::GetBestRoute(void) const
          if ((this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints.size() == u32_CountHops) &&
              (this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints.size() > 0U))
          {
-            uint32 u32_PointCounter;
+            uint32_t u32_PointCounter;
 
             for (u32_PointCounter = 0U;
                  u32_PointCounter < this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints.size();
                  ++u32_PointCounter)
             {
                if (this->mc_RoutesToTarget[u32_Counter].c_VecRoutePoints[u32_PointCounter].e_OutInterfaceType ==
-                   C_OSCSystemBus::eETHERNET)
+                   C_OscSystemBus::eETHERNET)
                {
                   // Route with Ethernet
                   pc_Result = &this->mc_RoutesToTarget[u32_Counter];
@@ -156,7 +157,7 @@ const C_OSCRoutingRoute * C_OSCRoutingCalculation::GetBestRoute(void) const
    C_NOACT     Target function (update or diagnostic) deactivated on all connected bus. No routing necessary.
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCRoutingCalculation::GetState(void) const
+int32_t C_OscRoutingCalculation::GetState(void) const
 {
    return this->ms32_ResultState;
 }
@@ -171,8 +172,8 @@ sint32 C_OSCRoutingCalculation::GetState(void) const
    \retval   false  Interface can not be used or is not relevant
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 ou32_TargetNodeIndex,
-                                                       const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
+bool C_OscRoutingCalculation::CheckItfNumberForRouting(const uint32_t ou32_TargetNodeIndex,
+                                                       const C_OscNodeComInterfaceSettings & orc_ComItfSettings) const
 {
    // Check if the interface can be used for routing
    bool q_Return = false;
@@ -183,19 +184,19 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
       {
          // Node is target and must support the function on the current interface
 
-         if ((this->me_Mode == C_OSCRoutingCalculation::eDIAGNOSTIC) &&
+         if ((this->me_Mode == C_OscRoutingCalculation::eDIAGNOSTIC) &&
              (orc_ComItfSettings.q_IsDiagnosisEnabled == true))
          {
             // At least one com interface is relevant
             q_Return = true;
          }
-         else if ((this->me_Mode == C_OSCRoutingCalculation::eUPDATE) &&
+         else if ((this->me_Mode == C_OscRoutingCalculation::eUPDATE) &&
                   (orc_ComItfSettings.q_IsUpdateEnabled == true))
          {
             // At least one com interface is relevant
             q_Return = true;
          }
-         else if (this->me_Mode == C_OSCRoutingCalculation::eROUTING_CHECK)
+         else if (this->me_Mode == C_OscRoutingCalculation::eROUTING_CHECK)
          {
             // Independent of any update or diagnostic functionality of the interface
             q_Return = true;
@@ -222,7 +223,7 @@ bool C_OSCRoutingCalculation::CheckItfNumberForRouting(const stw_types::uint32 o
 /*! \brief   Start searching all route possibilities
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCRoutingCalculation::m_SearchRoute(void)
+void C_OscRoutingCalculation::m_SearchRoute(void)
 {
    // maximum number of buses
    this->mc_CheckedBuses.reserve(16);
@@ -236,7 +237,7 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
    if (this->mu32_TargetNodeIndex < this->mrc_AllNodes.size())
    {
       // Is the node configured for update or diagnostic on its connected buses and is connected to a bus
-      sint32 s32_Result = this->m_CheckTargetNodeConfig();
+      int32_t s32_Result = this->m_CheckTargetNodeConfig();
       if (s32_Result == C_NO_ERR)
       {
          // Start searching
@@ -252,7 +253,7 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
          else if (s32_Result != C_NO_ERR)
          {
             osc_write_log_info("Routing calculation", "No valid route found (target node index: " +
-                               C_SCLString::IntToStr(this->mu32_TargetNodeIndex) +
+                               C_SclString::IntToStr(this->mu32_TargetNodeIndex) +
                                "). CAN to Ethernet routing is not possible.");
             // A route was available, but was removed due to limitations. No valid routes are left
             this->ms32_ResultState = s32_Result;
@@ -260,7 +261,7 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
          else
          {
             osc_write_log_info("Routing calculation", "No route found (target node index: " +
-                               C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
+                               C_SclString::IntToStr(this->mu32_TargetNodeIndex) + ")");
             // No route available
             this->ms32_ResultState = C_COM;
          }
@@ -287,14 +288,13 @@ void C_OSCRoutingCalculation::m_SearchRoute(void)
    C_COM       No bus is connected to minimum one activated relevant function
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
+int32_t C_OscRoutingCalculation::m_CheckTargetNodeConfig(void) const
 {
    // Check if the target node must be routable
-   sint32 s32_Return;
+   int32_t s32_Return;
    bool q_UsableBusFound = false;
    bool q_AtLeastOneFunctionActive = false;
-   const C_OSCNode * const pc_Node = &this->mrc_AllNodes[this->mu32_TargetNodeIndex];
-   uint32 u32_Counter;
+   const C_OscNode * const pc_Node = &this->mrc_AllNodes[this->mu32_TargetNodeIndex];
 
    tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
    if (pc_Node->pc_DeviceDefinition != NULL)
@@ -302,7 +302,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
       if (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size())
       {
-         const C_OSCSubDeviceDefinition & rc_SubDevDef =
+         const C_OscSubDeviceDefinition & rc_SubDevDef =
             pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex];
 
          // But with one exception: A node without any functionality like a third party device. This must be handled
@@ -311,10 +311,11 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
              (rc_SubDevDef.q_FlashloaderOpenSydeCan == true) ||
              (rc_SubDevDef.q_FlashloaderStwCan == true))
          {
+            uint32_t u32_Counter;
             for (u32_Counter = 0U; u32_Counter < pc_Node->c_Properties.c_ComInterfaces.size(); ++u32_Counter)
             {
                // Bus is connected and for the routing and check relevant
-               if ((this->me_Mode == C_OSCRoutingCalculation::eDIAGNOSTIC) &&
+               if ((this->me_Mode == C_OscRoutingCalculation::eDIAGNOSTIC) &&
                    (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsDiagnosisEnabled == true))
                {
                   q_AtLeastOneFunctionActive = true;
@@ -325,7 +326,7 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
                      q_UsableBusFound = true;
                   }
                }
-               else if ((this->me_Mode == C_OSCRoutingCalculation::eUPDATE) &&
+               else if ((this->me_Mode == C_OscRoutingCalculation::eUPDATE) &&
                         (pc_Node->c_Properties.c_ComInterfaces[u32_Counter].q_IsUpdateEnabled == true))
                {
                   q_AtLeastOneFunctionActive = true;
@@ -372,14 +373,14 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
       // Minimum one function (diagnosis or update) is active but no bus is connected to a matching interface
       // No routing possible
       osc_write_log_info("Routing calculation", "No connected bus found (target node index: " +
-                         C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
+                         C_SclString::IntToStr(this->mu32_TargetNodeIndex) + ")");
       s32_Return = C_COM;
    }
    else
    {
       // Target node must not be routed, because the relevant function is deactivated on all buses
       osc_write_log_info("Routing calculation", "No usable bus found (target node index: " +
-                         C_SCLString::IntToStr(this->mu32_TargetNodeIndex) + ")");
+                         C_SclString::IntToStr(this->mu32_TargetNodeIndex) + ")");
       s32_Return = C_NOACT;
    }
 
@@ -396,20 +397,20 @@ sint32 C_OSCRoutingCalculation::m_CheckTargetNodeConfig(void) const
    \param[in]       ou32_BusIndex     Bus index for concrete bus to analyze
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusIndex)
+void C_OscRoutingCalculation::m_SearchRoutePointsOnBus(const uint32_t ou32_BusIndex)
 {
-   uint32 u32_NodeCounter;
+   uint32_t u32_NodeCounter;
 
-   set<uint32> c_SetBusesToSearch;
-   set<uint32>::const_iterator c_ItBusToSearch;
+   set<uint32_t> c_SetBusesToSearch;
+   set<uint32_t>::const_iterator c_ItBusToSearch;
 
    // search all nodes connected to the bus
    for (u32_NodeCounter = 0U; u32_NodeCounter < this->mrc_AllNodes.size(); ++u32_NodeCounter)
    {
       if (this->mrc_ActiveNodes[u32_NodeCounter] == 1U)
       {
-         uint32 u32_InItfCounter;
-         const C_OSCNode * const pc_ActNode = &this->mrc_AllNodes[u32_NodeCounter];
+         uint32_t u32_InItfCounter;
+         const C_OscNode * const pc_ActNode = &this->mrc_AllNodes[u32_NodeCounter];
 
          for (u32_InItfCounter = 0U;
               u32_InItfCounter < pc_ActNode->c_Properties.c_ComInterfaces.size();
@@ -419,14 +420,14 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
                 (this->CheckItfNumberForRouting(u32_NodeCounter,
                                                 pc_ActNode->c_Properties.c_ComInterfaces[u32_InItfCounter]) == true))
             {
-               C_OSCRoutingRoutePoint c_PointIn;
-               vector<uint32> c_VecBusesToSearchOfNode;
-               uint32 u32_NodeBuses;
+               C_OscRoutingRoutePoint c_PointIn;
+               vector<uint32_t> c_VecBusesToSearchOfNode;
+               uint32_t u32_NodeBuses;
 
                // Configure the input and common parameter of the route point
                c_PointIn.u32_NodeIndex = u32_NodeCounter;
                c_PointIn.u32_InBusIndex = ou32_BusIndex;
-               c_PointIn.u8_InNodeID = pc_ActNode->c_Properties.c_ComInterfaces[u32_InItfCounter].u8_NodeID;
+               c_PointIn.u8_InNodeId = pc_ActNode->c_Properties.c_ComInterfaces[u32_InItfCounter].u8_NodeId;
                c_PointIn.e_InInterfaceType =
                   pc_ActNode->c_Properties.c_ComInterfaces[u32_InItfCounter].e_InterfaceType;
                c_PointIn.u8_InInterfaceNumber =
@@ -464,14 +465,13 @@ void C_OSCRoutingCalculation::m_SearchRoutePointsOnBus(const uint32 ou32_BusInde
    \param[in]       ou32_InItfNumber  The interface index of the interface set in orc_InPoint
 */
 //----------------------------------------------------------------------------------------------------------------------
-vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(const C_OSCRoutingRoutePoint & orc_InPoint,
-                                                                            const uint32 ou32_InItfNumber)
+vector<uint32_t> C_OscRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(
+   const C_OscRoutingRoutePoint & orc_InPoint, const uint32_t ou32_InItfNumber)
 {
-   uint32 u32_OutItfCounter;
-   const C_OSCNode * const pc_ActNode = &this->mrc_AllNodes[orc_InPoint.u32_NodeIndex];
+   const C_OscNode * const pc_ActNode = &this->mrc_AllNodes[orc_InPoint.u32_NodeIndex];
 
-   vector<uint32> c_VecBussesToSearch;
-   C_OSCRoutingRoutePoint c_Point = orc_InPoint;
+   vector<uint32_t> c_VecBussesToSearch;
+   C_OscRoutingRoutePoint c_Point = orc_InPoint;
 
    if (c_Point.u32_NodeIndex == this->mu32_TargetNodeIndex)
    {
@@ -484,6 +484,7 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
    }
    else
    {
+      uint32_t u32_OutItfCounter;
       // Check all possible output variants for the node. All are possible routes.
       // Except output channels to previous buses
       for (u32_OutItfCounter = 0U;
@@ -496,7 +497,7 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
              (orc_InPoint.u32_InBusIndex != pc_ActNode->c_Properties.c_ComInterfaces[u32_OutItfCounter].u32_BusIndex))
          {
             // not the same interface and is connected too and is not connected to same bus as the in point
-            uint32 u32_PreviousBusCounter;
+            uint32_t u32_PreviousBusCounter;
             bool q_NewBus = true;
 
             // check if it is a new bus
@@ -520,7 +521,7 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
                   pc_ActNode->c_Properties.c_ComInterfaces[u32_OutItfCounter].u8_InterfaceNumber;
                c_Point.u32_OutBusIndex =
                   pc_ActNode->c_Properties.c_ComInterfaces[u32_OutItfCounter].u32_BusIndex;
-               c_Point.u8_OutNodeID = pc_ActNode->c_Properties.c_ComInterfaces[u32_OutItfCounter].u8_NodeID;
+               c_Point.u8_OutNodeId = pc_ActNode->c_Properties.c_ComInterfaces[u32_OutItfCounter].u8_NodeId;
 
                // save the route point
                this->m_AddOneRoutePoint(c_Point);
@@ -541,10 +542,10 @@ vector<uint32> C_OSCRoutingCalculation::m_GetAllRoutePointsOfNodeOnOneInput(cons
    \param[in]       orc_Point     Fully filled routing point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCRoutingCalculation::m_AddOneRoutePoint(const C_OSCRoutingRoutePoint & orc_Point)
+void C_OscRoutingCalculation::m_AddOneRoutePoint(const C_OscRoutingRoutePoint & orc_Point)
 {
    // add the point only if it is not already in the vector
-   std::vector<C_OSCRoutingRoutePoint>::const_iterator c_ItPoint;
+   std::vector<C_OscRoutingRoutePoint>::const_iterator c_ItPoint;
    bool q_Found = false;
 
    for (c_ItPoint = this->mc_AllRoutePoints.begin(); c_ItPoint != this->mc_AllRoutePoints.end(); ++c_ItPoint)
@@ -567,12 +568,12 @@ void C_OSCRoutingCalculation::m_AddOneRoutePoint(const C_OSCRoutingRoutePoint & 
    \param[in]       ou32_BusIndex     Bus index for concrete bus to calculate
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
+void C_OscRoutingCalculation::m_CalculateRoutes(const uint32_t ou32_BusIndex)
 {
-   uint32 u32_PointCounter;
+   uint32_t u32_PointCounter;
 
-   set<uint32> c_SetBussesToSearch;
-   set<uint32>::const_iterator c_ItBusToSearch;
+   set<uint32_t> c_SetBussesToSearch;
+   set<uint32_t>::const_iterator c_ItBusToSearch;
 
    // search all points with this bus as input
    for (u32_PointCounter = 0U; u32_PointCounter < this->mc_AllRoutePoints.size(); ++u32_PointCounter)
@@ -582,7 +583,7 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
          if (this->mq_PcBus == true)
          {
             // The first bus, add all found route points as new routes
-            C_OSCRoutingRoute c_Route(this->mu32_TargetNodeIndex);
+            C_OscRoutingRoute c_Route(this->mu32_TargetNodeIndex);
 
             if (this->mc_AllRoutePoints[u32_PointCounter].u32_NodeIndex == this->mu32_TargetNodeIndex)
             {
@@ -602,8 +603,8 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
          else
          {
             // Searching the matching routing points on the previous routes
-            const list<C_OSCRoutingRoute> c_AllOldOpenRoutes = this->mc_AllOpenRoutes;
-            list<C_OSCRoutingRoute>::const_iterator c_ItOldRoute;
+            const list<C_OscRoutingRoute> c_AllOldOpenRoutes = this->mc_AllOpenRoutes;
+            list<C_OscRoutingRoute>::const_iterator c_ItOldRoute;
 
             // Further searching
             // The input bus of the actual route point must be equal to the output bus of the last routing point
@@ -615,9 +616,9 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
             {
                if ((*c_ItOldRoute).c_VecRoutePoints.size() > 0)
                {
-                  const vector<C_OSCRoutingRoutePoint> * const pc_RoutePoints = &((*c_ItOldRoute).c_VecRoutePoints);
-                  const uint32 u32_RoutePointIndex = static_cast<uint32>(pc_RoutePoints->size() - 1U);
-                  const C_OSCRoutingRoutePoint * const pc_LastPointOfRoute = &((*pc_RoutePoints)[u32_RoutePointIndex]);
+                  const vector<C_OscRoutingRoutePoint> * const pc_RoutePoints = &((*c_ItOldRoute).c_VecRoutePoints);
+                  const uint32_t u32_RoutePointIndex = static_cast<uint32_t>(pc_RoutePoints->size() - 1U);
+                  const C_OscRoutingRoutePoint * const pc_LastPointOfRoute = &((*pc_RoutePoints)[u32_RoutePointIndex]);
 
                   if (this->mc_AllRoutePoints[u32_PointCounter].u32_InBusIndex ==
                       pc_LastPointOfRoute->u32_OutBusIndex)
@@ -631,7 +632,7 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
                      }
                      else
                      {
-                        uint32 u32_RoutePointCounter;
+                        uint32_t u32_RoutePointCounter;
                         bool q_AlreadyUsed = false;
 
                         // Was this node already used for this route?
@@ -650,7 +651,7 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
                         if (q_AlreadyUsed == false)
                         {
                            // Make a copy of the old route and add the new route point
-                           C_OSCRoutingRoute c_NewRoute = *c_ItOldRoute;
+                           C_OscRoutingRoute c_NewRoute = *c_ItOldRoute;
                            c_NewRoute.c_VecRoutePoints.push_back(this->mc_AllRoutePoints[u32_PointCounter]);
                            this->m_AddOneOpenRoute(c_NewRoute);
 
@@ -683,10 +684,10 @@ void C_OSCRoutingCalculation::m_CalculateRoutes(const uint32 ou32_BusIndex)
    \param[in]       orc_Route     Calculated route
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCRoutingCalculation::m_AddOneOpenRoute(const C_OSCRoutingRoute & orc_Route)
+void C_OscRoutingCalculation::m_AddOneOpenRoute(const C_OscRoutingRoute & orc_Route)
 {
    // add the route only if it is not already in the list
-   std::list<C_OSCRoutingRoute>::const_iterator c_ItRoute;
+   std::list<C_OscRoutingRoute>::const_iterator c_ItRoute;
    bool q_Found = false;
 
    for (c_ItRoute = this->mc_AllOpenRoutes.begin(); c_ItRoute != this->mc_AllOpenRoutes.end(); ++c_ItRoute)
@@ -709,10 +710,10 @@ void C_OSCRoutingCalculation::m_AddOneOpenRoute(const C_OSCRoutingRoute & orc_Ro
    \param[in]       orc_Route     Calculated route
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCRoutingCalculation::m_AddOneRouteToTarget(const C_OSCRoutingRoute & orc_Route)
+void C_OscRoutingCalculation::m_AddOneRouteToTarget(const C_OscRoutingRoute & orc_Route)
 {
    // add the route only if it is not already in the vector
-   std::vector<C_OSCRoutingRoute>::const_iterator c_ItRoute;
+   std::vector<C_OscRoutingRoute>::const_iterator c_ItRoute;
    bool q_Found = false;
 
    for (c_ItRoute = this->mc_RoutesToTarget.begin(); c_ItRoute != this->mc_RoutesToTarget.end(); ++c_ItRoute)
@@ -738,28 +739,28 @@ void C_OSCRoutingCalculation::m_AddOneRouteToTarget(const C_OSCRoutingRoute & or
    \retval   C_CONFIG    A route was removed due to not possible routing from CAN to Ethernet
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCRoutingCalculation::m_CheckRoutesForLimitations(void)
+int32_t C_OscRoutingCalculation::m_CheckRoutesForLimitations(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   std::vector<C_OSCRoutingRoute>::iterator c_ItRoute;
+   std::vector<C_OscRoutingRoute>::iterator c_ItRoute;
 
    // Check all routes
    for (c_ItRoute = this->mc_RoutesToTarget.begin(); c_ItRoute != this->mc_RoutesToTarget.end();)
    {
-      const C_OSCRoutingRoute & rc_Route = *c_ItRoute;
+      const C_OscRoutingRoute & rc_Route = *c_ItRoute;
       bool q_Removed = false;
-      uint32 u32_PointCounter;
+      uint32_t u32_PointCounter;
 
       // and all points of the route
       for (u32_PointCounter = 0U; u32_PointCounter < rc_Route.c_VecRoutePoints.size(); ++u32_PointCounter)
       {
-         const C_OSCRoutingRoutePoint & rc_Point = rc_Route.c_VecRoutePoints[u32_PointCounter];
+         const C_OscRoutingRoutePoint & rc_Point = rc_Route.c_VecRoutePoints[u32_PointCounter];
 
          // for the limitations. No CAN to Ethernet routing. The other direction is possible.
          if ((rc_Point.u32_OutBusIndex != 0xFFFFFFFFU) &&
-             (rc_Point.e_InInterfaceType == C_OSCSystemBus::eCAN) &&
-             (rc_Point.e_OutInterfaceType == C_OSCSystemBus::eETHERNET))
+             (rc_Point.e_InInterfaceType == C_OscSystemBus::eCAN) &&
+             (rc_Point.e_OutInterfaceType == C_OscSystemBus::eETHERNET))
          {
             this->mc_RoutesToTarget.erase(c_ItRoute);
             q_Removed = true;

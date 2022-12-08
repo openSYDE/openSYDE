@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdNdeCoOverviewTableModel.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdHandlerBusLogic.h"
-//#include "C_PuiSdHandlerCanOpenLogic.h"
-#include "C_OSCCanOpenManagerDeviceInfo.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdNdeCoOverviewTableModel.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdHandlerBusLogic.hpp"
+//#include "C_PuiSdHandlerCanOpenLogic.hpp"
+#include "C_OscCanOpenManagerDeviceInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,7 +69,7 @@ void C_SdNdeCoOverviewTableModel::UpdateData()
    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeCoOverviewTableModel::GetNodeIndex(void) const
+uint32_t C_SdNdeCoOverviewTableModel::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
@@ -81,7 +80,7 @@ uint32 C_SdNdeCoOverviewTableModel::GetNodeIndex(void) const
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoOverviewTableModel::SetNodeIndex(const uint32 ou32_NodeIndex)
+void C_SdNdeCoOverviewTableModel::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
    this->beginResetModel();
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -100,14 +99,14 @@ void C_SdNdeCoOverviewTableModel::SetNodeIndex(const uint32 ou32_NodeIndex)
    \retval   C_NOACT          Node not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeCoOverviewTableModel::MapRowToNodeConfig(const sint32 os32_RowIndex,
-                                                       C_SdNdeCoOverviewTableModel::E_NodeType & ore_NodeType,
-                                                       uint8 & oru8_InterfaceNumber,
-                                                       C_OSCCanInterfaceId & orc_CanInterfaceId)
+int32_t C_SdNdeCoOverviewTableModel::MapRowToNodeConfig(const int32_t os32_RowIndex,
+                                                        C_SdNdeCoOverviewTableModel::E_NodeType & ore_NodeType,
+                                                        uint8_t & oru8_InterfaceNumber,
+                                                        C_OscCanInterfaceId & orc_CanInterfaceId)
 {
-   sint32 s32_Error = C_NO_ERR;
+   int32_t s32_Error = C_NO_ERR;
 
-   if ((os32_RowIndex >= 0) && (static_cast<uintn>(os32_RowIndex) < this->mc_CoInfoAll.size()))
+   if ((os32_RowIndex >= 0) && (static_cast<uint32_t>(os32_RowIndex) < this->mc_CoInfoAll.size()))
    {
       ore_NodeType = this->mc_CoInfoAll.at(os32_RowIndex).c_CoNodeConfig.e_NodeType;
       oru8_InterfaceNumber = this->mc_CoInfoAll.at(os32_RowIndex).c_CoNodeConfig.u8_InterfaceNumber;
@@ -124,24 +123,23 @@ sint32 C_SdNdeCoOverviewTableModel::MapRowToNodeConfig(const sint32 os32_RowInde
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeCoOverviewTableModel::headerData(const stw_types::sintn osn_Section,
-                                                 const Qt::Orientation oe_Orientation,
-                                                 const stw_types::sintn osn_Role) const
+QVariant C_SdNdeCoOverviewTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                                 const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const E_Columns e_Col = static_cast<E_Columns>(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const E_Columns e_Col = static_cast<E_Columns>(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -170,7 +168,7 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const stw_types::sintn osn_Sect
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          switch (e_Col)
          {
@@ -199,7 +197,7 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const stw_types::sintn osn_Sect
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
@@ -229,7 +227,7 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const stw_types::sintn osn_Sect
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -250,32 +248,32 @@ QVariant C_SdNdeCoOverviewTableModel::headerData(const stw_types::sintn osn_Sect
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeCoOverviewTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeCoOverviewTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
-      std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_IterManagers;
+      std::map<uint8_t, C_OscCanOpenManagerInfo>::const_iterator c_IterManagers;
       for (c_IterManagers = pc_Node->c_CanOpenManagers.begin(); c_IterManagers != pc_Node->c_CanOpenManagers.end();
            ++c_IterManagers)
       {
-         sn_Retval++; // manager found
+         s32_Retval++; // manager found
 
          // iterate through devices of manager
-         std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
+         std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
          for (c_IterDevices = c_IterManagers->second.c_CanOpenDevices.begin();
               c_IterDevices != c_IterManagers->second.c_CanOpenDevices.end();
               ++c_IterDevices)
          {
             // found normal server device
-            sn_Retval++;
+            s32_Retval++;
          }
       }
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -287,38 +285,38 @@ sintn C_SdNdeCoOverviewTableModel::rowCount(const QModelIndex & orc_Parent) cons
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeCoOverviewTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeCoOverviewTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 7;
+      s32_Retval = 7;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
       const E_Columns e_Col = static_cast<E_Columns>(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         if ((static_cast<uintn>(orc_Index.row()) < this->mc_CoInfoAll.size()) && (orc_Index.row() >= 0))
+         if ((static_cast<uint32_t>(orc_Index.row()) < this->mc_CoInfoAll.size()) && (orc_Index.row() >= 0))
          {
             switch (e_Col)
             {
@@ -335,20 +333,20 @@ QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const 
                c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_Role;
                break;
             case eCANOPENNODEID:
-               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_CANopenId;
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_CanOpenId;
                break;
             case eTPDOS:
-               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_TPDOs;
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_TxPdos;
                break;
             case eRPDOS:
-               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_RPDOs;
+               c_Retval = this->mc_CoInfoAll.at(orc_Index.row()).c_CoTableData.c_RxPdos;
                break;
             default:
                break;
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -369,9 +367,9 @@ QVariant C_SdNdeCoOverviewTableModel::data(const QModelIndex & orc_Index, const 
    \param[out]      opc_PdoDeviceMap     PDO Rx/Tx message numbers <active/total> of device nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoOverviewTableModel::m_GetPdoCountsByManager(const C_OSCNode * const opc_Node,
-                                                          const uint8 ou8_InterfaceIndex,
-                                                          C_PdoCount * const opc_PdoManagerCnt, std::map<uint32,
+void C_SdNdeCoOverviewTableModel::m_GetPdoCountsByManager(const C_OscNode * const opc_Node,
+                                                          const uint8_t ou8_InterfaceIndex,
+                                                          C_PdoCount * const opc_PdoManagerCnt, std::map<uint32_t,
                                                                                                          C_PdoCount> * const opc_PdoDeviceMap)
 const
 {
@@ -382,21 +380,21 @@ const
    opc_PdoDeviceMap->clear(); // empty pdo device list for current manager
 
    // get message container of CANopen protocol
-   std::vector<C_OSCCanProtocol>::const_iterator c_IterComProtocols;
+   std::vector<C_OscCanProtocol>::const_iterator c_IterComProtocols;
    for (c_IterComProtocols = opc_Node->c_ComProtocols.begin();
         c_IterComProtocols != opc_Node->c_ComProtocols.end();
         ++c_IterComProtocols)
    {
-      if (c_IterComProtocols->e_Type == C_OSCCanProtocol::E_Type::eCAN_OPEN)
+      if (c_IterComProtocols->e_Type == C_OscCanProtocol::E_Type::eCAN_OPEN)
       {
-         const C_OSCCanMessageContainer * const pc_MsgContainer =
+         const C_OscCanMessageContainer * const pc_MsgContainer =
             C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
-               this->mu32_NodeIndex, C_OSCCanProtocol::E_Type::eCAN_OPEN,
+               this->mu32_NodeIndex, C_OscCanProtocol::E_Type::eCAN_OPEN,
                ou8_InterfaceIndex, c_IterComProtocols->u32_DataPoolIndex);
 
          // Tx
-         opc_PdoManagerCnt->u16_TxTotal = static_cast<uint16>(pc_MsgContainer->c_TxMessages.size());
-         std::vector<C_OSCCanMessage>::const_iterator c_MsgIter;
+         opc_PdoManagerCnt->u16_TxTotal = static_cast<uint16_t>(pc_MsgContainer->c_TxMessages.size());
+         std::vector<C_OscCanMessage>::const_iterator c_MsgIter;
          for (c_MsgIter = pc_MsgContainer->c_TxMessages.begin();
               c_MsgIter != pc_MsgContainer->c_TxMessages.end();
               ++c_MsgIter)
@@ -412,7 +410,7 @@ const
          }
 
          // Rx
-         opc_PdoManagerCnt->u16_RxTotal = static_cast<uint16>(pc_MsgContainer->c_RxMessages.size());
+         opc_PdoManagerCnt->u16_RxTotal = static_cast<uint16_t>(pc_MsgContainer->c_RxMessages.size());
          for (c_MsgIter = pc_MsgContainer->c_RxMessages.begin();
               c_MsgIter != pc_MsgContainer->c_RxMessages.end();
               ++c_MsgIter)
@@ -436,31 +434,31 @@ const
 /*! \brief  Converts C_PdoCount structure to user readable form.
 
    \param[in]       opc_PdoCount        PDO Rx/Tx message numbers <active/total> of current node
-   \param[out]      orc_ActiveTPDOs     "<active number Tx Pdos> / <total number Tx PDOs>"
-   \param[out]      orc_ActiveRPDOs     "<active number Rx Pdos> / <total number Rx PDOs>"
+   \param[out]      orc_ActiveTxPdos     "<active number Tx Pdos> / <total number Tx PDOs>"
+   \param[out]      orc_ActiveRxPdos     "<active number Rx Pdos> / <total number Rx PDOs>"
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewTableModel::m_GetResultStringsOfPdos(
-   const C_SdNdeCoOverviewTableModel::C_PdoCount * const opc_PdoCount, QString & orc_ActiveTPDOs,
-   QString & orc_ActiveRPDOs) const
+   const C_SdNdeCoOverviewTableModel::C_PdoCount * const opc_PdoCount, QString & orc_ActiveTxPdos,
+   QString & orc_ActiveRxPdos) const
 {
    if ((opc_PdoCount->u16_TxActive == 0U) && (opc_PdoCount->u16_TxTotal == 0U))
    {
-      orc_ActiveTPDOs = "none";
+      orc_ActiveTxPdos = "none";
    }
    else
    {
-      orc_ActiveTPDOs = QString::number(opc_PdoCount->u16_TxActive) + " / " + QString::number(
+      orc_ActiveTxPdos = QString::number(opc_PdoCount->u16_TxActive) + " / " + QString::number(
          opc_PdoCount->u16_TxTotal);
    }
 
    if ((opc_PdoCount->u16_RxActive == 0U) && (opc_PdoCount->u16_RxTotal == 0U))
    {
-      orc_ActiveRPDOs = "none";
+      orc_ActiveRxPdos = "none";
    }
    else
    {
-      orc_ActiveRPDOs = QString::number(opc_PdoCount->u16_RxActive) + " / " + QString::number(
+      orc_ActiveRxPdos = QString::number(opc_PdoCount->u16_RxActive) + " / " + QString::number(
          opc_PdoCount->u16_RxTotal);
    }
 }
@@ -474,13 +472,13 @@ void C_SdNdeCoOverviewTableModel::m_GetResultStringsOfPdos(
    \param[in,out]   opc_PdoDeviceMap   to add a message to current PDO device map of messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoOverviewTableModel::m_AddToMessageDeviceCount(const uint32 ou32_NodeId, const bool oq_MessageActive,
+void C_SdNdeCoOverviewTableModel::m_AddToMessageDeviceCount(const uint32_t ou32_NodeId, const bool oq_MessageActive,
                                                             const C_SdNdeCoOverviewTableModel::E_PdoType oe_PdoType,
-                                                            std::map<uint32,
+                                                            std::map<uint32_t,
                                                                      C_PdoCount> * const opc_PdoDeviceMap)
 const
 {
-   std::map<uint32, C_PdoCount>::iterator c_MapIter;
+   std::map<uint32_t, C_PdoCount>::iterator c_MapIter;
 
    c_MapIter = opc_PdoDeviceMap->find(ou32_NodeId);
 
@@ -489,21 +487,21 @@ const
       // map entry already exists for device
       if (oe_PdoType == E_PdoType::eTX)
       {
-         uint16 & ru16_TmpTotal = c_MapIter->second.u16_TxTotal;
+         uint16_t & ru16_TmpTotal = c_MapIter->second.u16_TxTotal;
          ru16_TmpTotal++;
          if (oq_MessageActive == true)
          {
-            uint16 & ru16_TmpActive = c_MapIter->second.u16_TxActive;
+            uint16_t & ru16_TmpActive = c_MapIter->second.u16_TxActive;
             ru16_TmpActive++;
          }
       }
       else
       {
-         uint16 & ru16_TmpTotal = c_MapIter->second.u16_RxTotal;
+         uint16_t & ru16_TmpTotal = c_MapIter->second.u16_RxTotal;
          ru16_TmpTotal++;
          if (oq_MessageActive == true)
          {
-            uint16 & ru16_TmpActive = c_MapIter->second.u16_RxActive;
+            uint16_t & ru16_TmpActive = c_MapIter->second.u16_RxActive;
             ru16_TmpActive++;
          }
       }
@@ -541,15 +539,15 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
 {
    this->mc_CoInfoAll.clear();
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    C_PdoCount c_PdoManagerCnt;
-   std::map<uint32, C_PdoCount> c_PdoDeviceMap;
+   std::map<uint32_t, C_PdoCount> c_PdoDeviceMap;
 
    if (pc_Node->c_CanOpenManagers.empty() == false)
    {
       // we have a CANopen Manager node
-      uint8 u8_InterfaceIndex;
-      std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_IterManagers;
+      uint8_t u8_InterfaceIndex;
+      std::map<uint8_t, C_OscCanOpenManagerInfo>::const_iterator c_IterManagers;
       for (c_IterManagers = pc_Node->c_CanOpenManagers.begin();
            c_IterManagers != pc_Node->c_CanOpenManagers.end();
            ++c_IterManagers)
@@ -560,21 +558,21 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
          c_CoInfoManager.c_CoNodeConfig.e_NodeType = E_NodeType::eMANAGER;
          u8_InterfaceIndex = c_IterManagers->first;
          c_CoInfoManager.c_CoNodeConfig.u8_InterfaceNumber = u8_InterfaceIndex;
-         c_CoInfoManager.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+         c_CoInfoManager.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN,
                                                                                      u8_InterfaceIndex);
          //lint -e{1946} // use of functional-style cast is fine here
          c_CoInfoManager.c_CoTableData.c_Node = QString(pc_Node->c_Properties.c_Name.c_str());
          c_CoInfoManager.c_CoTableData.c_Role = "Manager";
-         c_CoInfoManager.c_CoTableData.c_CANopenId = QString::number(c_IterManagers->second.u8_NodeIDValue);
+         c_CoInfoManager.c_CoTableData.c_CanOpenId = QString::number(c_IterManagers->second.u8_NodeIdValue);
          // get TPDOs and RPDOs via message container
          this->m_GetPdoCountsByManager(pc_Node, u8_InterfaceIndex, &c_PdoManagerCnt, &c_PdoDeviceMap);
-         this->m_GetResultStringsOfPdos(&c_PdoManagerCnt, c_CoInfoManager.c_CoTableData.c_TPDOs,
-                                        c_CoInfoManager.c_CoTableData.c_RPDOs);
+         this->m_GetResultStringsOfPdos(&c_PdoManagerCnt, c_CoInfoManager.c_CoTableData.c_TxPdos,
+                                        c_CoInfoManager.c_CoTableData.c_RxPdos);
 
          this->mc_CoInfoAll.push_back(c_CoInfoManager);
 
          // iterate throuch normal server devices
-         std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
+         std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_IterDevices;
          for (c_IterDevices = c_IterManagers->second.c_CanOpenDevices.begin();
               c_IterDevices != c_IterManagers->second.c_CanOpenDevices.end();
               ++c_IterDevices)
@@ -582,26 +580,26 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
             // found normal server device
             C_CoInfo c_CoInfoDevice;
 
-            const C_OSCNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            const C_OscNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                c_IterDevices->first.u32_NodeIndex);
             c_CoInfoDevice.c_CoNodeConfig.e_NodeType = E_NodeType::eDEVICE;
             u8_InterfaceIndex = c_IterManagers->first; // we display the CAN interface from Manager
             c_CoInfoDevice.c_CoNodeConfig.u8_InterfaceNumber = u8_InterfaceIndex;
-            c_CoInfoDevice.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+            c_CoInfoDevice.c_CoTableData.c_Interface = C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN,
                                                                                        u8_InterfaceIndex);
             c_CoInfoDevice.c_CoNodeConfig.c_CanInterfaceId = c_IterDevices->first;
             //lint -e{1946} // use of functional-style cast is fine here
             c_CoInfoDevice.c_CoTableData.c_Node = QString(pc_DeviceNode->c_Properties.c_Name.c_str());
             c_CoInfoDevice.c_CoTableData.c_Role = "Device";
-            c_CoInfoDevice.c_CoTableData.c_CANopenId = QString::number(c_IterDevices->second.u8_NodeIDValue);
+            c_CoInfoDevice.c_CoTableData.c_CanOpenId = QString::number(c_IterDevices->second.u8_NodeIdValue);
             // get TPDOs and RPDOs via message container
             C_PdoCount c_PdoCount = {0U, 0U, 0U, 0U};
             if (c_PdoDeviceMap.find(c_IterDevices->first.u32_NodeIndex) != c_PdoDeviceMap.end())
             {
                c_PdoCount = (c_PdoDeviceMap.find(c_IterDevices->first.u32_NodeIndex))->second;
             }
-            this->m_GetResultStringsOfPdos(&c_PdoCount, c_CoInfoDevice.c_CoTableData.c_TPDOs,
-                                           c_CoInfoDevice.c_CoTableData.c_RPDOs);
+            this->m_GetResultStringsOfPdos(&c_PdoCount, c_CoInfoDevice.c_CoTableData.c_TxPdos,
+                                           c_CoInfoDevice.c_CoTableData.c_RxPdos);
 
             this->mc_CoInfoAll.push_back(c_CoInfoDevice);
          }

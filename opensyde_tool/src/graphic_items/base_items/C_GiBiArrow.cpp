@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 #include <QGraphicsView>
 
-#include "C_GiBiArrow.h"
-#include "C_GiBiLineBounding.h"
-#include "C_OgePopUpDialog.h"
-#include "C_GtGetText.h"
-#include "C_GiSyBaseWidget.h"
-#include "C_GiSyLineWidget.h"
-#include "gitypes.h"
+#include "C_GiBiArrow.hpp"
+#include "C_GiBiLineBounding.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSyBaseWidget.hpp"
+#include "C_GiSyLineWidget.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +35,7 @@ using namespace stw_opensyde_gui_elements;
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_GiBiArrow::mhf64_SHAPE_OFFSET_FACTOR = 4.0;
+const float64_t C_GiBiArrow::mhf64_SHAPE_OFFSET_FACTOR = 4.0;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -47,15 +46,15 @@ const stw_types::float64 C_GiBiArrow::mhf64_SHAPE_OFFSET_FACTOR = 4.0;
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID   Unique ID
+   \param[in]     oru64_Id   Unique ID
    \param[in]     opc_Points Points for line
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiArrow::C_GiBiArrow(const uint64 & oru64_ID, const std::vector<QPointF> * const opc_Points,
+C_GiBiArrow::C_GiBiArrow(const uint64_t & oru64_Id, const std::vector<QPointF> * const opc_Points,
                          QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(opc_Points, false, opc_Parent),
-   C_GiUnique(oru64_ID),
+   C_GiUnique(oru64_Id),
    me_StartArrowHeadType(C_PuiBsLineArrow::E_ArrowHeadType::eNONE),
    me_EndArrowHeadType(C_PuiBsLineArrow::E_ArrowHeadType::eNONE),
    me_LineType(C_PuiBsLineArrow::E_LineType::eSOLID),
@@ -110,13 +109,13 @@ C_GiBiArrow::~C_GiBiArrow(void)
 //----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiBiArrow::shape() const
 {
-   const float64 f64_AdaptedWidth = static_cast<stw_types::float64>(this->GetWidth()) * mhf64_SHAPE_OFFSET_FACTOR;
-   float64 f64_InteractioWidth = 0.0;
+   const float64_t f64_AdaptedWidth = static_cast<float64_t>(this->GetWidth()) * mhf64_SHAPE_OFFSET_FACTOR;
+   float64_t f64_InteractioWidth = 0.0;
 
    //Copy points for interface
    QVector<QPointF> c_Points;
    c_Points.reserve(this->mc_Points.size());
-   for (sint32 s32_ItPoint = 0; s32_ItPoint < this->mc_Points.size(); ++s32_ItPoint)
+   for (int32_t s32_ItPoint = 0; s32_ItPoint < this->mc_Points.size(); ++s32_ItPoint)
    {
       c_Points.push_back(this->mc_Points[s32_ItPoint]->pos());
       f64_InteractioWidth = this->mc_Points[s32_ItPoint]->sceneBoundingRect().width();
@@ -133,11 +132,11 @@ QPainterPath C_GiBiArrow::shape() const
    \param[in] ors32_Width New width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiArrow::SetWidth(const sint32 & ors32_Width)
+void C_GiBiArrow::SetWidth(const int32_t & ors32_Width)
 {
    C_GiLiLineGroup::SetWidth(ors32_Width);
-   mf64_ArrowLength = mhf64_SHAPE_OFFSET_FACTOR * static_cast<float64>(ors32_Width);
-   mf64_ArrowHeight = mhf64_SHAPE_OFFSET_FACTOR * static_cast<float64>(ors32_Width);
+   mf64_ArrowLength = mhf64_SHAPE_OFFSET_FACTOR * static_cast<float64_t>(ors32_Width);
+   mf64_ArrowHeight = mhf64_SHAPE_OFFSET_FACTOR * static_cast<float64_t>(ors32_Width);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -146,9 +145,9 @@ void C_GiBiArrow::SetWidth(const sint32 & ors32_Width)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiBiArrow::type() const
+int32_t C_GiBiArrow::type() const
 {
-   return msn_GRAPHICS_ITEM_LINE_ARROW;
+   return ms32_GRAPHICS_ITEM_LINE_ARROW;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -166,7 +165,7 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
 
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
    C_GiSyBaseWidget * const pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Line/Arrow"), oq_DarkMode);
    C_GiSyLineWidget * const pc_SettingsWidget = new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eLINE, *pc_Dialog);
 
@@ -176,7 +175,7 @@ bool C_GiBiArrow::OpenStyleDialog(const bool oq_DarkMode)
    pc_SettingsWidget->SetStartArrow(this->me_StartArrowHeadType);
    pc_SettingsWidget->SetEndArrow(this->me_EndArrowHeadType);
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       this->ApplyStyle(pc_SettingsWidget->GetLineColor(),
                        pc_SettingsWidget->GetLineWidth(),
@@ -220,19 +219,19 @@ void C_GiBiArrow::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 /*! \brief  Apply style
 
    \param[in] orc_LineColor line color
-   \param[in] osn_Width     line width
+   \param[in] os32_Width     line width
    \param[in] oe_LineType   line type
    \param[in] oe_StartArrow start arrow head type
    \param[in] oe_EndArrow   end arrow head type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const sintn osn_Width,
-                             const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_LineType,
-                             const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_StartArrow,
-                             const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_EndArrow)
+void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const int32_t os32_Width,
+                             const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_LineType,
+                             const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_StartArrow,
+                             const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_EndArrow)
 {
    this->SetColor(orc_LineColor);
-   this->SetWidth(osn_Width);
+   this->SetWidth(os32_Width);
    this->SetLineType(oe_LineType);
    this->SetStartArrowHeadType(oe_StartArrow);
    this->SetEndArrowHeadType(oe_EndArrow);
@@ -246,7 +245,7 @@ void C_GiBiArrow::ApplyStyle(const QColor & orc_LineColor, const sintn osn_Width
    Current value
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetStartArrowHeadType() const
+stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetStartArrowHeadType() const
 {
    return this->me_StartArrowHeadType;
 }
@@ -258,7 +257,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetStartA
    Current value
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetEndArrowHeadType() const
+stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetEndArrowHeadType() const
 {
    return this->me_EndArrowHeadType;
 }
@@ -270,7 +269,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiBiArrow::GetEndArr
    Current value
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiBiArrow::GetLineType() const
+stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiBiArrow::GetLineType() const
 {
    return this->me_LineType;
 }
@@ -281,7 +280,7 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiBiArrow::GetLineType() 
    \param[in] ore_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiArrow::SetStartArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_New)
+void C_GiBiArrow::SetStartArrowHeadType(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_New)
 {
    this->me_StartArrowHeadType = ore_New;
    m_GenerateArrows();
@@ -293,7 +292,7 @@ void C_GiBiArrow::SetStartArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLin
    \param[in] ore_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiArrow::SetEndArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_New)
+void C_GiBiArrow::SetEndArrowHeadType(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType & ore_New)
 {
    this->me_EndArrowHeadType = ore_New;
    m_GenerateArrows();
@@ -305,7 +304,7 @@ void C_GiBiArrow::SetEndArrowHeadType(const stw_opensyde_gui_logic::C_PuiBsLineA
    \param[in] ore_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiArrow::SetLineType(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType & ore_New)
+void C_GiBiArrow::SetLineType(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType & ore_New)
 {
    this->me_LineType = ore_New;
    this->mpc_LinePath->SetLineStyle(me_LineType);
@@ -342,12 +341,12 @@ void C_GiBiArrow::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event)
          if (this->mpc_ArrowHeadStart->isUnderMouse() == true)
          {
             this->me_ActiveResizeMode = eLINE;
-            this->msn_ActiveItemIndex = 0;
+            this->ms32_ActiveItemIndex = 0;
          }
          if (this->mpc_ArrowHeadEnd->isUnderMouse() == true)
          {
             this->me_ActiveResizeMode = eLINE;
-            this->msn_ActiveItemIndex = this->mc_Points.size() - 2;
+            this->ms32_ActiveItemIndex = this->mc_Points.size() - 2;
          }
       }
    }
@@ -417,7 +416,7 @@ void C_GiBiArrow::m_GenerateArrow(QGraphicsPathItem * const opc_ArrowItem,
       QPolygonF c_Poly;
       QRectF c_Rect;
       QPen c_Pen;
-      sint32 s32_Width;
+      int32_t s32_Width;
       const QPointF c_LineStart = this->mapFromScene(opc_Conn->mapToScene(opc_Conn->GetP1()));
       const QPointF c_LineEnd = this->mapFromScene(opc_Conn->mapToScene(opc_Conn->GetP2()));
       const QPointF c_LineDiff = c_LineEnd - c_LineStart;
@@ -536,16 +535,16 @@ void C_GiBiArrow::m_GenerateArrow(QGraphicsPathItem * const opc_ArrowItem,
       case C_PuiBsLineArrow::E_ArrowHeadType::eLINE:
          s32_Width = this->GetWidth();
          //Offsets to include pen width and still half a 45 degree angle
-         c_WidthAdaptedLineDiff = C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff, static_cast<float64>(s32_Width));
+         c_WidthAdaptedLineDiff = C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff, static_cast<float64_t>(s32_Width));
          c_WidthAdaptedWingVector =
-            C_GiBiLineBounding::h_AdaptVecToWidth(c_ArrowWingVector, static_cast<float64>(s32_Width) / 2.0);
+            C_GiBiLineBounding::h_AdaptVecToWidth(c_ArrowWingVector, static_cast<float64_t>(s32_Width) / 2.0);
          if (orq_Start == true)
          {
-            this->mpc_LinePath->SetOffsetStart(static_cast<float64>(s32_Width));
+            this->mpc_LinePath->SetOffsetStart(static_cast<float64_t>(s32_Width));
          }
          else
          {
-            this->mpc_LinePath->SetOffsetEnd(static_cast<float64>(s32_Width));
+            this->mpc_LinePath->SetOffsetEnd(static_cast<float64_t>(s32_Width));
          }
          //Adapt for pen width
          c_Poly.append(c_ArrowLeft - c_WidthAdaptedWingVector);

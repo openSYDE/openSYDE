@@ -10,25 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <fstream>
 
-#include "TGLFile.h"
+#include "TglFile.hpp"
 #define MINIZ_NO_ZLIB_COMPATIBLE_NAMES //prevent namespace pollution
 #include "miniz.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCZipFile.h"
-#include "C_OSCUtils.h"
-#include "CSCLString.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscZipFile.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SclString.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
 using namespace std;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -76,19 +76,20 @@ using namespace std;
    C_NOACT     could not add data to zip file (does the path to the file exist ?)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const std::set<C_SCLString> & orc_SupFiles,
-                                     const C_SCLString & orc_ZipArchivePath, stw_scl::C_SCLString * const opc_ErrorText)
+int32_t C_OscZipFile::h_CreateZipFile(const C_SclString & orc_SourcePath, const std::set<C_SclString> & orc_SupFiles,
+                                      const C_SclString & orc_ZipArchivePath,
+                                      stw::scl::C_SclString * const opc_ErrorText)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   std::set<C_SCLString>::const_iterator c_Iter;
+   std::set<C_SclString>::const_iterator c_Iter;
 
    // check whether input file(s) exist:
    // go through all files and store in zip archive
    for (c_Iter = orc_SupFiles.begin(); c_Iter != orc_SupFiles.end(); ++c_Iter)
    {
-      const C_SCLString c_AbsPath = orc_SourcePath + (*c_Iter);
-      if (TGL_FileExists(c_AbsPath) == false)
+      const C_SclString c_AbsPath = orc_SourcePath + (*c_Iter);
+      if (TglFileExists(c_AbsPath) == false)
       {
          if (opc_ErrorText != NULL)
          {
@@ -101,35 +102,35 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
 
    if (s32_Return == C_NO_ERR)
    {
-      sintn sn_MzStatus = MZ_TRUE;
+      mz_bool x_MzStatus = MZ_TRUE; //lint !e8080  //using type to match library interface
       // go through all files and store in zip archive
-      for (c_Iter = orc_SupFiles.begin(); (c_Iter != orc_SupFiles.end()) && (sn_MzStatus == MZ_TRUE); ++c_Iter)
+      for (c_Iter = orc_SupFiles.begin(); (c_Iter != orc_SupFiles.end()) && (x_MzStatus == MZ_TRUE); ++c_Iter)
       {
-         C_SCLString c_FileName = *c_Iter;
-         const C_SCLString c_AbsPath = orc_SourcePath + c_FileName;                  // absolute path
+         C_SclString c_FileName = *c_Iter;
+         const C_SclString c_AbsPath = orc_SourcePath + c_FileName;                  // absolute path
          ifstream c_FileStream(c_AbsPath.c_str(), ifstream::binary | ifstream::ate); // open file and set pos
                                                                                      // to the end of file
          if (c_FileStream.is_open() == true)
          {
-            C_SCLString c_FilePathWithSlashes;
+            C_SclString c_FilePathWithSlashes;
             // get file length, position is at the end of the input sequence
-            const sintn sn_FileLength = static_cast<sintn>(c_FileStream.tellg());
+            const streampos c_FileLength = c_FileStream.tellg();
             // set position to the beginning of the input sequence
             c_FileStream.seekg(0LL, ifstream::beg);
 
             // allocate memory
-            charn * const pcn_FileData = new charn[static_cast<uintn>(sn_FileLength)];
-            const C_SCLString c_Comment = "Zipping file: " + c_FileName; // set filename as comment
+            char_t * const pcn_FileData = new char_t[c_FileLength];
+            const C_SclString c_Comment = "Zipping file: " + c_FileName; // set filename as comment
 
             // read file content
-            c_FileStream.read(pcn_FileData, sn_FileLength);
+            c_FileStream.read(pcn_FileData, static_cast<streamsize>(c_FileLength));
 
             // close file
             c_FileStream.close();
 
             // miniz cannot handle windows '\\' directories
             // therefore change to '/'
-            for (uint32 u32_Pos = 1U; u32_Pos <= c_FileName.Length(); u32_Pos++)
+            for (uint32_t u32_Pos = 1U; u32_Pos <= c_FileName.Length(); u32_Pos++)
             {
                if (c_FileName[u32_Pos] == '\\')
                {
@@ -144,12 +145,12 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
             // store file content to zip archive
             // mz_zip_add_mem_to_archive_file_in_place is creating, appending and always finalizing the archive
             // after successful operation
-            sn_MzStatus = mz_zip_add_mem_to_archive_file_in_place(
+            x_MzStatus = mz_zip_add_mem_to_archive_file_in_place(
                orc_ZipArchivePath.c_str(), c_FilePathWithSlashes.c_str(),
-               pcn_FileData, sn_FileLength,
-               c_Comment.c_str(), static_cast<uint16>(c_Comment.Length()),
+               pcn_FileData, static_cast<size_t>(c_FileLength),
+               c_Comment.c_str(), static_cast<uint16_t>(c_Comment.Length()),
                MZ_BEST_COMPRESSION);
-            if (sn_MzStatus == MZ_FALSE)
+            if (x_MzStatus == MZ_FALSE)
             {
                if (opc_ErrorText != NULL)
                {
@@ -195,20 +196,20 @@ sint32 C_OSCZipFile::h_CreateZipFile(const C_SCLString & orc_SourcePath, const s
    C_RD_WR     could not unpack archive to target path
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C_SCLString & orc_TargetUnzipPath,
-                                     stw_scl::C_SCLString * const opc_ErrorText)
+int32_t C_OscZipFile::h_UnpackZipFile(const C_SclString & orc_SourcePath, const C_SclString & orc_TargetUnzipPath,
+                                      stw::scl::C_SclString * const opc_ErrorText)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    mz_zip_archive c_ZipArchive;
-   sintn sn_MzStatus;
+   mz_bool x_MzStatus; //lint !e8080  //using type to match library interface
 
    vector<mz_zip_archive_file_stat> c_Files; // to store content of zip archive
 
    // open archive
    (void)memset(&c_ZipArchive, 0, sizeof(c_ZipArchive));
-   sn_MzStatus = mz_zip_reader_init_file(&c_ZipArchive, orc_SourcePath.c_str(), 0);
-   if (sn_MzStatus == MZ_FALSE)
+   x_MzStatus = mz_zip_reader_init_file(&c_ZipArchive, orc_SourcePath.c_str(), 0);
+   if (x_MzStatus == MZ_FALSE)
    {
       if (opc_ErrorText != NULL)
       {
@@ -221,18 +222,19 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
    if (s32_Return == C_NO_ERR)
    {
       // get content of zip archive
-      for (uintn un_Pos = 0; (un_Pos < mz_zip_reader_get_num_files(&c_ZipArchive)) && (sn_MzStatus == MZ_TRUE);
-           un_Pos++)
+      //lint -e{8080}  //using type to match library interface
+      for (mz_uint x_Pos = 0; (x_Pos < mz_zip_reader_get_num_files(&c_ZipArchive)) && (x_MzStatus == MZ_TRUE);
+           x_Pos++)
       {
          mz_zip_archive_file_stat c_FileStat;
-         sn_MzStatus = mz_zip_reader_file_stat(&c_ZipArchive, un_Pos, &c_FileStat);
-         if (sn_MzStatus == MZ_FALSE)
+         x_MzStatus = mz_zip_reader_file_stat(&c_ZipArchive, x_Pos, &c_FileStat);
+         if (x_MzStatus == MZ_FALSE)
          {
             mz_zip_reader_end(&c_ZipArchive);
             if (opc_ErrorText != NULL)
             {
                (*opc_ErrorText) = "Could not get information of zip archive \"" + orc_SourcePath +
-                                  "\" for position \"" + C_SCLString::IntToStr(un_Pos) + "\".";
+                                  "\" for position \"" + C_SclString::IntToStr(x_Pos) + "\".";
             }
             s32_Return = C_RD_WR;
          }
@@ -247,21 +249,21 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
       for (c_Iter = c_Files.begin(); (c_Iter != c_Files.end()) && (s32_Return == C_NO_ERR); ++c_Iter)
       {
          //lint -e{8080} //using type expected by the library for compatibility
-         size_t un_UncompFileSize;
+         size_t x_UncompFileSize;
          void * const pv_Data = mz_zip_reader_extract_file_to_heap(&c_ZipArchive, &c_Iter->m_filename[0],
-                                                                   &un_UncompFileSize, 0);
+                                                                   &x_UncompFileSize, 0);
          if (pv_Data != NULL)
          {
             // get complete file path of current file
-            const C_SCLString c_CompleteFilePath = TGL_FileIncludeTrailingDelimiter(orc_TargetUnzipPath) +
+            const C_SclString c_CompleteFilePath = TglFileIncludeTrailingDelimiter(orc_TargetUnzipPath) +
                                                    c_Iter->m_filename;
 
             // check if we have to create a subfolder
-            const C_SCLString c_Path = TGL_ExtractFilePath(c_CompleteFilePath);
-            if (TGL_DirectoryExists(c_Path) == false)
+            const C_SclString c_Path = TglExtractFilePath(c_CompleteFilePath);
+            if (TglDirectoryExists(c_Path) == false)
             {
                // create subfolder
-               s32_Return = C_OSCUtils::h_CreateFolderRecursively(c_Path);
+               s32_Return = C_OscUtils::h_CreateFolderRecursively(c_Path);
                if ((s32_Return != C_NO_ERR) && (opc_ErrorText != NULL))
                {
                   (*opc_ErrorText) = "Could not create subfolder \"" + c_Path + "\".";
@@ -279,11 +281,11 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
                   if (pc_File != NULL)
                   {
                      //lint -e{8080} //using type expected by the library for compatibility
-                     const size_t un_SIZE_OF_ELEMENT = sizeof(charn);
+                     const size_t x_SIZE_OF_ELEMENT = sizeof(char_t);
                      //lint -e{8080} //using type expected by the library for compatibility
-                     const size_t un_NumOfBytesWritten = std::fwrite(pv_Data, un_SIZE_OF_ELEMENT, un_UncompFileSize,
-                                                                     pc_File);
-                     if (un_NumOfBytesWritten != un_UncompFileSize)
+                     const size_t x_NumOfBytesWritten = std::fwrite(pv_Data, x_SIZE_OF_ELEMENT, x_UncompFileSize,
+                                                                    pc_File);
+                     if (x_NumOfBytesWritten != x_UncompFileSize)
                      {
                         // data not written completely
                         if (opc_ErrorText != NULL)
@@ -312,7 +314,7 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
          {
             if (opc_ErrorText != NULL)
             {
-               (*opc_ErrorText) = static_cast<C_SCLString>("Could not read file \"") +
+               (*opc_ErrorText) = static_cast<C_SclString>("Could not read file \"") +
                                   c_Iter->m_filename + "\" from zip archive \"" + orc_SourcePath + "\".";
             }
             s32_Return = C_RD_WR;
@@ -337,14 +339,14 @@ sint32 C_OSCZipFile::h_UnpackZipFile(const C_SCLString & orc_SourcePath, const C
    \param[in]     orc_BasePath Path the files will be raltive to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCZipFile::h_AppendFilesRelative(std::set<C_SCLString> & orc_Set, const std::vector<C_SCLString> & orc_Files,
-                                         const C_SCLString & orc_BasePath)
+void C_OscZipFile::h_AppendFilesRelative(std::set<C_SclString> & orc_Set, const std::vector<C_SclString> & orc_Files,
+                                         const C_SclString & orc_BasePath)
 {
-   for (uint32 u32_PosFilesToFlash = 0;
+   for (uint32_t u32_PosFilesToFlash = 0;
         u32_PosFilesToFlash < orc_Files.size();
         u32_PosFilesToFlash++)
    {
-      C_SCLString c_RelativeFilePath = orc_Files[u32_PosFilesToFlash];
+      C_SclString c_RelativeFilePath = orc_Files[u32_PosFilesToFlash];
       c_RelativeFilePath = c_RelativeFilePath.SubString(
          orc_BasePath.Length() + 1,
          c_RelativeFilePath.Length() - orc_BasePath.Length());
@@ -364,11 +366,11 @@ void C_OSCZipFile::h_AppendFilesRelative(std::set<C_SCLString> & orc_Set, const 
    C_RD_WR     could not open input file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCZipFile::h_IsZipFile(const C_SCLString & orc_FilePath)
+int32_t C_OscZipFile::h_IsZipFile(const C_SclString & orc_FilePath)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   if (TGL_FileExists(orc_FilePath) == false)
+   if (TglFileExists(orc_FilePath) == false)
    {
       s32_Return = C_CONFIG;
    }
@@ -377,14 +379,16 @@ sint32 C_OSCZipFile::h_IsZipFile(const C_SCLString & orc_FilePath)
       ifstream c_FileStream(orc_FilePath.c_str(), ifstream::binary | ifstream::ate); // open file and set pos
       if (c_FileStream.is_open() == true)
       {
-         const sint32 s32_FileLength = static_cast<sint32>(c_FileStream.tellg());
+         const int32_t s32_FileLength = static_cast<int32_t>(c_FileStream.tellg());
 
          s32_Return = C_RANGE;
 
          if (s32_FileLength > 4)
          {
-            const stw_types::charn acn_ZIP_HEADER[4] = {0x50, 0x4B, 0x03, 0x04};
-            stw_types::charn acn_Header[4];
+            //using type to match library interface; if char_t had a size different than a "uint8"
+            //this spot would be the smallest of our problems
+            const char_t acn_ZIP_HEADER[4] = {0x50, 0x4B, 0x03, 0x04}; //lint !e970 !e9128
+            char_t acn_Header[4];
             c_FileStream.seekg(0LL, std::ios::beg);
             c_FileStream.read(&acn_Header[0], 4);
 

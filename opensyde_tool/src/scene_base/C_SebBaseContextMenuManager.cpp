@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_SebBaseContextMenuManager.h"
+#include "C_SebBaseContextMenuManager.hpp"
 
-#include "C_GtGetText.h"
-#include "gitypes.h"
+#include "C_GtGetText.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,17 +46,20 @@ C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
    // add all actions
    this->mpc_ActionCut = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                            "Cut"), this, &C_SebBaseContextMenuManager::m_Cut,
-                                                        static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_X));
+                                                        static_cast<int32_t>(Qt::CTRL) +
+                                                        static_cast<int32_t>(Qt::Key_X));
 
    this->mpc_ActionCopy = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                             "Copy"), this, &C_SebBaseContextMenuManager::m_Copy,
-                                                         static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_C));
+                                                         static_cast<int32_t>(Qt::CTRL) +
+                                                         static_cast<int32_t>(Qt::Key_C));
 
    this->mpc_ActionCopySeparator = this->mc_ContextMenu.addSeparator();
 
    this->mpc_ActionPaste = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                              "Paste"), this, &C_SebBaseContextMenuManager::m_Paste,
-                                                          static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_V));
+                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                          static_cast<int32_t>(Qt::Key_V));
 
    this->mpc_ActionSetupStyle = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                                   "Setup Style"), this,
@@ -114,7 +116,7 @@ C_SebBaseContextMenuManager::C_SebBaseContextMenuManager() :
 
    this->mpc_ActionDelete = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText("Delete"), this,
                                                            &C_SebBaseContextMenuManager::m_Delete,
-                                                           static_cast<sintn>(Qt::Key_Delete));
+                                                           static_cast<int32_t>(Qt::Key_Delete));
 
    // connect signal to detect closing the context menu
    connect(&this->mc_ContextMenu, &C_OgeContextMenu::aboutToHide,
@@ -175,10 +177,10 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
    {
       // special case: text element and its subelement
       if ((orc_SelectedItems.size() == 2) &&
-          (((orc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) &&
-            (orc_SelectedItems[1]->type() == msn_GRAPHICS_ITEM_TEXT)) ||
-           ((orc_SelectedItems[1]->type() == msn_GRAPHICS_ITEM_TEXTELEMENT) &&
-            (orc_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_TEXT))))
+          (((orc_SelectedItems[0]->type() == ms32_GRAPHICS_ITEM_TEXTELEMENT) &&
+            (orc_SelectedItems[1]->type() == ms32_GRAPHICS_ITEM_TEXT)) ||
+           ((orc_SelectedItems[1]->type() == ms32_GRAPHICS_ITEM_TEXTELEMENT) &&
+            (orc_SelectedItems[0]->type() == ms32_GRAPHICS_ITEM_TEXT))))
       {
          // in this case the text element is in the edit mode and the item context menu functionality shall not be
          // available
@@ -186,7 +188,7 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
       }
       else
       {
-         float64 f64_CurZ = std::numeric_limits<float64>::max() * -1.0;
+         float64_t f64_CurZet = std::numeric_limits<float64_t>::max() * -1.0;
          // more than one element was selected. only common functionality is available
          this->mpc_ActionCut->setVisible(true);
          this->mpc_ActionCopy->setVisible(true);
@@ -196,15 +198,15 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
          this->mpc_ActionAlignment->setVisible(true);
          q_ShowMenu = true;
          //Get current guideline item for alignment
-         for (sint32 s32_ItItem = 0; s32_ItItem < orc_SelectedItems.size(); ++s32_ItItem)
+         for (int32_t s32_ItItem = 0; s32_ItItem < orc_SelectedItems.size(); ++s32_ItItem)
          {
             QGraphicsItem * const pc_CurItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[s32_ItItem]);
             if (pc_CurItem->isUnderMouse() == true)
             {
-               if (f64_CurZ < pc_CurItem->zValue())
+               if (f64_CurZet < pc_CurItem->zValue())
                {
                   this->mpc_ActiveItem = pc_CurItem;
-                  f64_CurZ = pc_CurItem->zValue();
+                  f64_CurZet = pc_CurItem->zValue();
                }
             }
          }
@@ -215,7 +217,7 @@ void C_SebBaseContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMe
             if (pc_FirstItem != NULL)
             {
                bool q_AllEqual = true;
-               for (sint32 s32_ItItem = 0; s32_ItItem < orc_SelectedItems.size(); ++s32_ItItem)
+               for (int32_t s32_ItItem = 0; s32_ItItem < orc_SelectedItems.size(); ++s32_ItItem)
                {
                   const QGraphicsItem * const pc_CurItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[s32_ItItem]);
                   if (pc_CurItem->type() != pc_FirstItem->type())
@@ -261,15 +263,15 @@ void C_SebBaseContextMenuManager::m_SetActionsInvisible(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the input item type requires a setup style in the context menu
 
-   \param[in] osn_ItemType Item type to check
+   \param[in] os32_ItemType Item type to check
 
    \retval   True    Setup style menu is required
    \retval   False   Setup style menu should stay hidden
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SebBaseContextMenuManager::m_ItemTypeHasSetupStyle(const sintn osn_ItemType)
+bool C_SebBaseContextMenuManager::m_ItemTypeHasSetupStyle(const int32_t os32_ItemType)
 {
-   Q_UNUSED(osn_ItemType)
+   Q_UNUSED(os32_ItemType)
    return false;
 }
 

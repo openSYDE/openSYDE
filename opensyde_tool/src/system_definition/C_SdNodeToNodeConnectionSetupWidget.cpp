@@ -8,31 +8,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdNodeToNodeConnectionSetupWidget.h"
+#include "C_SdNodeToNodeConnectionSetupWidget.hpp"
 #include "ui_C_SdNodeToNodeConnectionSetupWidget.h"
-#include "constants.h"
-#include "C_Uti.h"
-#include "C_GtGetText.h"
-#include "stwerrors.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "C_SdUtil.h"
-#include "C_PuiSdUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeWiCustomMessage.h"
+#include "constants.hpp"
+#include "C_Uti.hpp"
+#include "C_GtGetText.hpp"
+#include "stwerrors.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,15 +56,15 @@ using namespace stw_tgl;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNodeToNodeConnectionSetupWidget::C_SdNodeToNodeConnectionSetupWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 & oru32_Node1Index,
-   const uint32 & oru32_Node2Index) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32_t & oru32_Node1Index,
+   const uint32_t & oru32_Node2Index) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNodeToNodeConnectionSetupWidget),
    mrc_ParentDialog(orc_Parent),
    mu32_Node1Index(oru32_Node1Index),
    mu32_Node2Index(oru32_Node2Index),
-   mu32_NodeID1(0),
-   mu32_NodeID2(0),
+   mu32_NodeId1(0),
+   mu32_NodeId2(0),
    mq_InteractionPossible(false),
    mc_BusTypeCan(C_GtGetText::h_GetText("CAN")),
    mc_BusTypeEthernet(C_GtGetText::h_GetText("Ethernet"))
@@ -87,16 +86,16 @@ C_SdNodeToNodeConnectionSetupWidget::C_SdNodeToNodeConnectionSetupWidget(
            &C_SdNodeToNodeConnectionSetupWidget::m_OkClicked);
    connect(this->mpc_Ui->pc_BushButtonCancel, &QPushButton::clicked,
            this, &C_SdNodeToNodeConnectionSetupWidget::m_CancelClicked);
-   connect(this->mpc_Ui->pc_RadioButtonCreateNew, &stw_opensyde_gui_elements::C_OgeRabProperties::toggled, this,
+   connect(this->mpc_Ui->pc_RadioButtonCreateNew, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled, this,
            &C_SdNodeToNodeConnectionSetupWidget::m_OnNewOrExistingChange);
    //lint -e{929}  Qt interface
-   connect(this->mpc_Ui->pc_ComboBoxBusType, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_ComboBoxBusType, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_SdNodeToNodeConnectionSetupWidget::m_OnBusTypeChange);
    //lint -e{929}  Qt interface
    connect(this->mpc_Ui->pc_ComboBoxExistingBus,
-           static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdNodeToNodeConnectionSetupWidget::m_OnExistingBusChange);
-   connect(this->mpc_Ui->pc_LineEditBusName, &stw_opensyde_gui_elements::C_OgeLeProperties::textChanged, this,
+   connect(this->mpc_Ui->pc_LineEditBusName, &stw::opensyde_gui_elements::C_OgeLeProperties::textChanged, this,
            &C_SdNodeToNodeConnectionSetupWidget::m_OnBusNameChange);
 }
 
@@ -136,7 +135,7 @@ void C_SdNodeToNodeConnectionSetupWidget::InitStaticNames(void) const
    Selected node interface (Not necessarily the index)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNodeToNodeConnectionSetupWidget::GetSelectedInterface1(void) const
+uint32_t C_SdNodeToNodeConnectionSetupWidget::GetSelectedInterface1(void) const
 {
    return C_SdUtil::h_GetActiveNodeInterface(*this->mpc_Ui->pc_ComboBoxComIntf1, this->mu32_Node1Index,
                                              this->GetBusType());
@@ -149,7 +148,7 @@ uint32 C_SdNodeToNodeConnectionSetupWidget::GetSelectedInterface1(void) const
    Selected node interface (Not necessarily the index)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNodeToNodeConnectionSetupWidget::GetSelectedInterface2(void) const
+uint32_t C_SdNodeToNodeConnectionSetupWidget::GetSelectedInterface2(void) const
 {
    return C_SdUtil::h_GetActiveNodeInterface(*this->mpc_Ui->pc_ComboBoxComIntf2, this->mu32_Node2Index,
                                              this->GetBusType());
@@ -162,24 +161,24 @@ uint32 C_SdNodeToNodeConnectionSetupWidget::GetSelectedInterface2(void) const
    Current active bus type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSystemBus::E_Type C_SdNodeToNodeConnectionSetupWidget::GetBusType(void) const
+C_OscSystemBus::E_Type C_SdNodeToNodeConnectionSetupWidget::GetBusType(void) const
 {
-   C_OSCSystemBus::E_Type e_Retval;
+   C_OscSystemBus::E_Type e_Retval;
 
    if (this->mpc_Ui->pc_RadioButtonCreateNew->isChecked() == true)
    {
       if (this->mpc_Ui->pc_ComboBoxBusType->currentText() == this->mc_BusTypeEthernet)
       {
-         e_Retval = C_OSCSystemBus::eETHERNET;
+         e_Retval = C_OscSystemBus::eETHERNET;
       }
       else
       {
-         e_Retval = C_OSCSystemBus::eCAN;
+         e_Retval = C_OscSystemBus::eCAN;
       }
    }
    else
    {
-      const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->GetBusIndex());
+      const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->GetBusIndex());
       tgl_assert(pc_Bus != NULL);
       if (pc_Bus != NULL)
       {
@@ -187,7 +186,7 @@ C_OSCSystemBus::E_Type C_SdNodeToNodeConnectionSetupWidget::GetBusType(void) con
       }
       else
       {
-         e_Retval = C_OSCSystemBus::eCAN;
+         e_Retval = C_OscSystemBus::eCAN;
       }
    }
 
@@ -203,9 +202,9 @@ C_OSCSystemBus::E_Type C_SdNodeToNodeConnectionSetupWidget::GetBusType(void) con
    Current selected bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNodeToNodeConnectionSetupWidget::GetBusIndex(void) const
+uint32_t C_SdNodeToNodeConnectionSetupWidget::GetBusIndex(void) const
 {
-   uint32 u32_Retval = static_cast<uint32>(this->mpc_Ui->pc_ComboBoxExistingBus->currentIndex());
+   uint32_t u32_Retval = static_cast<uint32_t>(this->mpc_Ui->pc_ComboBoxExistingBus->currentIndex());
 
    if (u32_Retval < this->mc_BusIndices.size())
    {
@@ -267,8 +266,8 @@ void C_SdNodeToNodeConnectionSetupWidget::keyPressEvent(QKeyEvent * const opc_Ke
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -311,8 +310,8 @@ void C_SdNodeToNodeConnectionSetupWidget::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
 {
-   const C_OSCNode * const pc_Node1 = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Node1Index);
-   const C_OSCNode * const pc_Node2 = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Node2Index);
+   const C_OscNode * const pc_Node1 = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Node1Index);
+   const C_OscNode * const pc_Node2 = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Node2Index);
 
    if ((pc_Node1 != NULL) && (pc_Node2 != NULL))
    {
@@ -320,8 +319,8 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
       bool q_ExistingBusExists;
       bool q_NewBusRestricted;
       bool q_ExistingBusRestricted;
-      stw_opensyde_core::C_OSCSystemBus::E_Type e_NewBusRestrictedType;
-      stw_opensyde_core::C_OSCSystemBus::E_Type e_ExistingBusRestrictedType;
+      stw::opensyde_core::C_OscSystemBus::E_Type e_NewBusRestrictedType;
+      stw::opensyde_core::C_OscSystemBus::E_Type e_ExistingBusRestrictedType;
 
       this->m_CheckTypeRestrictions(q_NewBusPossible,  q_NewBusRestricted, e_NewBusRestrictedType, q_ExistingBusExists,
                                     q_ExistingBusRestricted,
@@ -335,7 +334,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
          // Adapt enable states if necessary
          if (q_NewBusPossible == true)
          {
-            const C_OSCSystemBus c_OSCBus;
+            const C_OscSystemBus c_OscBus;
 
             if (q_ExistingBusExists == false)
             {
@@ -345,7 +344,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
             //Init name
             this->mpc_Ui->pc_LineEditBusName->setText(C_Uti::h_GetUniqueName(C_PuiSdHandler::h_GetInstance()->
                                                                              GetExistingBusNames(),
-                                                                             c_OSCBus.c_Name).c_str());
+                                                                             c_OscBus.c_Name).c_str());
          }
          else
          {
@@ -366,7 +365,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
          {
             if (q_NewBusRestricted == true)
             {
-               if (e_NewBusRestrictedType == C_OSCSystemBus::eCAN)
+               if (e_NewBusRestrictedType == C_OscSystemBus::eCAN)
                {
                   this->mpc_Ui->pc_ComboBoxBusType->addItem(this->mc_BusTypeCan);
                }
@@ -390,13 +389,13 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
          this->mpc_Ui->pc_ComboBoxExistingBus->clear();
          if (q_ExistingBusExists == true)
          {
-            const uint32 u32_BusCount = C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize();
+            const uint32_t u32_BusCount = C_PuiSdHandler::h_GetInstance()->GetOscBusesSize();
 
             this->mc_BusIndices.clear();
-            for (uint32 u32_ItBus = 0; u32_ItBus < u32_BusCount; ++u32_ItBus)
+            for (uint32_t u32_ItBus = 0; u32_ItBus < u32_BusCount; ++u32_ItBus)
             {
-               uint32 u32_InterfaceCounter;
-               const C_OSCSystemBus * pc_Bus = NULL;
+               uint32_t u32_InterfaceCounter;
+               const C_OscSystemBus * pc_Bus = NULL;
 
                // Check if this bus is already connected to the target
                for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < pc_Node2->c_Properties.c_ComInterfaces.size();
@@ -407,7 +406,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
                       (pc_Node2->c_Properties.c_ComInterfaces[u32_InterfaceCounter].u32_BusIndex == u32_ItBus))
                   {
                      // Bus is connected to at least one interface of the node
-                     pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_ItBus);
+                     pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_ItBus);
                      break;
                   }
                }
@@ -416,7 +415,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
                {
                   QString c_Text = pc_Bus->c_Name.c_str();
 
-                  if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+                  if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
                   {
                      c_Text += " (" + QString::number(pc_Bus->u64_BitRate / 1000ULL);
                      c_Text += " kbit/s)";
@@ -444,12 +443,12 @@ void C_SdNodeToNodeConnectionSetupWidget::m_InitFromData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNodeToNodeConnectionSetupWidget::m_HandleTypeChange(void) const
 {
-   const C_OSCNode * const pc_Node1 = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Node1Index);
-   const C_OSCNode * const pc_Node2 = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Node2Index);
+   const C_OscNode * const pc_Node1 = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Node1Index);
+   const C_OscNode * const pc_Node2 = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Node2Index);
 
    if ((pc_Node1 != NULL) && (pc_Node2 != NULL))
    {
-      const C_OSCSystemBus::E_Type e_Type = this->GetBusType();
+      const C_OscSystemBus::E_Type e_Type = this->GetBusType();
 
       // Node 1
       C_SdUtil::h_InitNodeInterfaceComboBox(*pc_Node1,
@@ -467,13 +466,13 @@ void C_SdNodeToNodeConnectionSetupWidget::m_HandleTypeChange(void) const
       }
       else
       {
-         const uint32 u32_CurBusIndex = this->GetBusIndex();
-         uint32 u32_Intfcounter;
+         const uint32_t u32_CurBusIndex = this->GetBusIndex();
+         uint32_t u32_Intfcounter;
 
          // Select the used interface for the current bus which is not changeable for the target node in this case
          for (u32_Intfcounter = 0U; u32_Intfcounter < pc_Node2->c_Properties.c_ComInterfaces.size(); ++u32_Intfcounter)
          {
-            const C_OSCNodeComInterfaceSettings & rc_Interface =
+            const C_OscNodeComInterfaceSettings & rc_Interface =
                pc_Node2->c_Properties.c_ComInterfaces[u32_Intfcounter];
 
             if ((rc_Interface.GetBusConnectedRawValue() == true) &&
@@ -482,7 +481,7 @@ void C_SdNodeToNodeConnectionSetupWidget::m_HandleTypeChange(void) const
                // Target node can have no free interfaces and "select existing bus" is checked
                C_SdUtil::h_InitNodeInterfaceComboBox(
                   *pc_Node2, e_Type, this->mpc_Ui->pc_ComboBoxComIntf2,
-                  static_cast<sint32>(rc_Interface.u8_InterfaceNumber));
+                  static_cast<int32_t>(rc_Interface.u8_InterfaceNumber));
 
                this->mpc_Ui->pc_ComboBoxComIntf2->setEnabled(false);
             }
@@ -561,13 +560,13 @@ void C_SdNodeToNodeConnectionSetupWidget::m_OnExistingBusChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNodeToNodeConnectionSetupWidget::m_CheckTypeRestrictions(bool & orq_NewBusPossible,
                                                                   bool & orq_NewBusRestricted,
-                                                                  C_OSCSystemBus::E_Type & ore_NewBusType,
+                                                                  C_OscSystemBus::E_Type & ore_NewBusType,
                                                                   bool & orq_ExistingBusExists,
                                                                   bool & orq_ExistingBusRestricted,
-                                                                  C_OSCSystemBus::E_Type & ore_ExistingBusType) const
+                                                                  C_OscSystemBus::E_Type & ore_ExistingBusType) const
 {
-   const C_OSCNode * const pc_Node1 = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Node1Index);
-   const C_OSCNode * const pc_Node2 = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Node2Index);
+   const C_OscNode * const pc_Node1 = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Node1Index);
+   const C_OscNode * const pc_Node2 = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Node2Index);
 
    orq_NewBusPossible = false;
    orq_NewBusRestricted = false;
@@ -578,24 +577,24 @@ void C_SdNodeToNodeConnectionSetupWidget::m_CheckTypeRestrictions(bool & orq_New
    {
       // Flags for the source node only
       const bool q_SourceCanWorks = C_SdUtil::h_CheckNodeInterfaceAvailable(pc_Node1->c_Properties.c_ComInterfaces,
-                                                                            C_OSCSystemBus::eCAN);
+                                                                            C_OscSystemBus::eCAN);
       const bool q_SourceEthWorks = C_SdUtil::h_CheckNodeInterfaceAvailable(pc_Node1->c_Properties.c_ComInterfaces,
-                                                                            C_OSCSystemBus::eETHERNET);
+                                                                            C_OscSystemBus::eETHERNET);
       // Flags for creating a new bus
       const bool q_NewCanWorks = q_SourceCanWorks &&
                                  C_SdUtil::h_CheckNodeInterfaceAvailable(pc_Node2->c_Properties.c_ComInterfaces,
-                                                                         C_OSCSystemBus::eCAN);
+                                                                         C_OscSystemBus::eCAN);
       const bool q_NewEthernetWorks = q_SourceEthWorks &&
                                       C_SdUtil::h_CheckNodeInterfaceAvailable(pc_Node2->c_Properties.c_ComInterfaces,
-                                                                              C_OSCSystemBus::eETHERNET);
+                                                                              C_OscSystemBus::eETHERNET);
 
       // Flags for using an existing bus
       const bool q_ExistingCanWorks = q_SourceCanWorks &&
                                       C_SdUtil::h_CheckNodeInterfaceConnected(pc_Node2->c_Properties.c_ComInterfaces,
-                                                                              C_OSCSystemBus::eCAN);
+                                                                              C_OscSystemBus::eCAN);
       const bool q_ExistingEthernetWorks = q_SourceEthWorks &&
                                            C_SdUtil::h_CheckNodeInterfaceConnected(
-         pc_Node2->c_Properties.c_ComInterfaces, C_OSCSystemBus::eETHERNET);
+         pc_Node2->c_Properties.c_ComInterfaces, C_OscSystemBus::eETHERNET);
 
       // Adapt output parameter for new bus
       if ((q_NewCanWorks == true) && (q_NewEthernetWorks == true))
@@ -607,13 +606,13 @@ void C_SdNodeToNodeConnectionSetupWidget::m_CheckTypeRestrictions(bool & orq_New
       {
          orq_NewBusPossible = true;
          orq_NewBusRestricted = true;
-         ore_NewBusType = C_OSCSystemBus::eCAN;
+         ore_NewBusType = C_OscSystemBus::eCAN;
       }
       else if (q_NewEthernetWorks == true)
       {
          orq_NewBusPossible = true;
          orq_NewBusRestricted = true;
-         ore_NewBusType = C_OSCSystemBus::eETHERNET;
+         ore_NewBusType = C_OscSystemBus::eETHERNET;
       }
       else
       {
@@ -630,13 +629,13 @@ void C_SdNodeToNodeConnectionSetupWidget::m_CheckTypeRestrictions(bool & orq_New
       {
          orq_ExistingBusExists = true;
          orq_ExistingBusRestricted = true;
-         ore_ExistingBusType = C_OSCSystemBus::eCAN;
+         ore_ExistingBusType = C_OscSystemBus::eCAN;
       }
       else if (q_ExistingEthernetWorks == true)
       {
          orq_ExistingBusExists = true;
          orq_ExistingBusRestricted = true;
-         ore_ExistingBusType = C_OSCSystemBus::eETHERNET;
+         ore_ExistingBusType = C_OscSystemBus::eETHERNET;
       }
       else
       {

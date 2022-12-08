@@ -10,31 +10,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_CieDbcImportNodeAssignmentWidget.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_CieDbcImportNodeAssignmentWidget.hpp"
 #include "ui_C_CieDbcImportNodeAssignmentWidget.h"
 
-#include "TGLUtils.h"
-#include "C_SdUtil.h"
-#include "C_Uti.h"
-#include "C_CieConverter.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "C_SdUtil.hpp"
+#include "C_Uti.hpp"
+#include "C_CieConverter.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::uint8 C_CieDbcImportNodeAssignmentWidget::mhu8_INDEX_TRANSMIT = 0;
-const stw_types::uint8 C_CieDbcImportNodeAssignmentWidget::mhu8_INDEX_RECEIVE = 1;
+const uint8_t C_CieDbcImportNodeAssignmentWidget::mhu8_INDEX_TRANSMIT = 0;
+const uint8_t C_CieDbcImportNodeAssignmentWidget::mhu8_INDEX_RECEIVE = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -52,13 +51,14 @@ const stw_types::uint8 C_CieDbcImportNodeAssignmentWidget::mhu8_INDEX_RECEIVE = 
    Set up GUI with all elements.
 
    \param[in,out] orc_Parent        Reference to parent
+   \param[in]     orc_FilePath      File path of DBC file
    \param[in]     ou32_BusIndex     Index of bus where messages get imported
-   \param[in]     orc_CIECommDef    Data structure read from DBC file
+   \param[in]     orc_CieCommDef    Data structure read from DBC file
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieDbcImportNodeAssignmentWidget::C_CieDbcImportNodeAssignmentWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,  const QString & orc_FilePath,  const uint32 ou32_BusIndex,
-   const C_CieConverter::C_CIECommDefinition & orc_CIECommDef) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,  const QString & orc_FilePath,
+   const uint32_t ou32_BusIndex, const C_CieConverter::C_CieCommDefinition & orc_CieCommDef) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieDbcImportNodeAssignmentWidget),
    mrc_ParentDialog(orc_Parent)
@@ -77,7 +77,7 @@ C_CieDbcImportNodeAssignmentWidget::C_CieDbcImportNodeAssignmentWidget(
    this->mpc_Ui->pc_LabPath->SetToolTipInformation(C_GtGetText::h_GetText("DBC Source File"),
                                                    C_GtGetText::h_GetText(orc_FilePath.toStdString().c_str()));
 
-   this->m_InitNodes(ou32_BusIndex, orc_CIECommDef);
+   this->m_InitNodes(ou32_BusIndex, orc_CieCommDef);
 
    this->mpc_Ui->pc_LabDbcNodeTitle->SetFontPixel(14, true);
    this->mpc_Ui->pc_LabInfoTitle->SetFontPixel(14, true);
@@ -93,7 +93,7 @@ C_CieDbcImportNodeAssignmentWidget::C_CieDbcImportNodeAssignmentWidget(
            this, &C_CieDbcImportNodeAssignmentWidget::m_CancelClicked);
 
    //lint -e{929} Cast required to avoid ambiguous signal of Qt interface
-   connect(this->mpc_Ui->pc_CbxAssignee, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_CbxAssignee, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_CieDbcImportNodeAssignmentWidget::m_OnUnmappedCbxIndexChanged);
 }
 
@@ -166,7 +166,7 @@ void C_CieDbcImportNodeAssignmentWidget::InitStaticNames(void) const
    Only returns those tuple the user selected (checkbox checked).
 
   \return
-   class package of DBC nodes an its assigned node indexes and interface indexes
+   class package of DBC nodes and its assigned node indexes and interface indexes
 */
 //----------------------------------------------------------------------------------------------------------------------
 std::vector<C_CieDbcOsyNodeAssignment> C_CieDbcImportNodeAssignmentWidget::GetNodeAssignments(void) const
@@ -174,7 +174,7 @@ std::vector<C_CieDbcOsyNodeAssignment> C_CieDbcImportNodeAssignmentWidget::GetNo
    std::vector<C_CieDbcOsyNodeAssignment> c_Return;
    std::vector<C_CieDbcImportNodeAssignmentItemWidget *>::const_iterator c_It;
 
-   const sint32 s32_UnmappedIndex = this->mpc_Ui->pc_CbxAssignee->currentIndex();
+   const int32_t s32_UnmappedIndex = this->mpc_Ui->pc_CbxAssignee->currentIndex();
 
    // collect data from entry widgets
    for (c_It = this->mc_Entries.begin(); c_It != this->mc_Entries.end(); ++c_It)
@@ -195,7 +195,7 @@ std::vector<C_CieDbcOsyNodeAssignment> C_CieDbcImportNodeAssignmentWidget::GetNo
       C_CieDbcOsyNodeAssignment c_UnmappedMessages;
 
       // subtract one of current index because of ignore item in combobox
-      const uint32 u32_DataIndex = static_cast<uint32>(s32_UnmappedIndex - 1);
+      const uint32_t u32_DataIndex = static_cast<uint32_t>(s32_UnmappedIndex - 1);
 
       // messages
       c_UnmappedMessages.c_CieNode.c_Properties.c_Name = C_GtGetText::h_GetText("Unmapped");
@@ -214,6 +214,11 @@ std::vector<C_CieDbcOsyNodeAssignment> C_CieDbcImportNodeAssignmentWidget::GetNo
       {
          c_UnmappedMessages.s32_AssignedOsyNodeIndex = this->mc_NodeIndexes[u32_DataIndex];
          c_UnmappedMessages.s32_AssignedOsyInterfaceIndex = this->mc_InterfaceIndexes[u32_DataIndex];
+      }
+      else
+      {
+         c_UnmappedMessages.s32_AssignedOsyNodeIndex = -1;
+         c_UnmappedMessages.s32_AssignedOsyInterfaceIndex = -1;
       }
 
       c_Return.push_back(c_UnmappedMessages);
@@ -235,8 +240,8 @@ void C_CieDbcImportNodeAssignmentWidget::keyPressEvent(QKeyEvent * const opc_Key
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -309,22 +314,22 @@ void C_CieDbcImportNodeAssignmentWidget::m_CancelClicked(void) const
 /*! \brief  Wrapper for inserting all item widgets
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
-                                                     const C_CieConverter::C_CIECommDefinition & orc_CIECommDef)
+void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32_t ou32_BusIndex,
+                                                     const C_CieConverter::C_CieCommDefinition & orc_CieCommDef)
 {
-   const bool q_UnmappedMessagesFound = (orc_CIECommDef.c_UnmappedMessages.size() > 0);
+   const bool q_UnmappedMessagesFound = (orc_CieCommDef.c_UnmappedMessages.size() > 0);
 
    std::vector<QString> c_NodeNames;
 
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
                                                                                       this->mc_NodeIndexes,
                                                                                       this->mc_InterfaceIndexes);
    tgl_assert(C_SdUtil::h_GetNames(this->mc_NodeIndexes, this->mc_InterfaceIndexes, c_NodeNames, false) ==
-              stw_errors::C_NO_ERR);
+              stw::errors::C_NO_ERR);
 
    // mapped messages section: insert item widgets
-   for (std::vector<C_CieConverter::C_CIENode>::const_iterator c_It = orc_CIECommDef.c_Nodes.begin();
-        c_It != orc_CIECommDef.c_Nodes.end(); ++c_It)
+   for (std::vector<C_CieConverter::C_CieNode>::const_iterator c_It = orc_CieCommDef.c_Nodes.begin();
+        c_It != orc_CieCommDef.c_Nodes.end(); ++c_It)
    {
       C_CieDbcImportNodeAssignmentItemWidget * const pc_NewItem =
          new C_CieDbcImportNodeAssignmentItemWidget(*c_It, c_NodeNames, this->mc_NodeIndexes,
@@ -342,9 +347,9 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
    } //lint !e429  //no memory leak because of the parent of pc_NewItem and the Qt memory management
 
    // handle no mapped messages case
-   this->mpc_Ui->pc_ScrollAreaMapped->setVisible(orc_CIECommDef.c_Nodes.size() > 0);
-   this->mpc_Ui->pc_WiMappedTitles->setVisible(orc_CIECommDef.c_Nodes.size() > 0);
-   this->mpc_Ui->pc_WiNoMapped->setVisible(orc_CIECommDef.c_Nodes.size() == 0);
+   this->mpc_Ui->pc_ScrollAreaMapped->setVisible(orc_CieCommDef.c_Nodes.size() > 0);
+   this->mpc_Ui->pc_WiMappedTitles->setVisible(orc_CieCommDef.c_Nodes.size() > 0);
+   this->mpc_Ui->pc_WiNoMapped->setVisible(orc_CieCommDef.c_Nodes.size() == 0);
 
    // unmapped messages section:
    this->mpc_Ui->pc_WiNoUnmapped->setVisible(!q_UnmappedMessagesFound);
@@ -352,7 +357,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
    this->mpc_Ui->pc_LabNumberUnmapped->setVisible(q_UnmappedMessagesFound);
    if (q_UnmappedMessagesFound == true)
    {
-      this->mpc_Ui->pc_LabNumberUnmapped->setText(static_cast<QString>("(%1)").arg(orc_CIECommDef.c_UnmappedMessages.
+      this->mpc_Ui->pc_LabNumberUnmapped->setText(static_cast<QString>("(%1)").arg(orc_CieCommDef.c_UnmappedMessages.
                                                                                    size()));
 
       // fill combobox with all connected topology nodes
@@ -363,7 +368,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
       }
 
       // remember messages
-      this->mc_UnmappedMessages = orc_CIECommDef.c_UnmappedMessages;
+      this->mc_UnmappedMessages = orc_CieCommDef.c_UnmappedMessages;
 
       // disable direction combobox on start
       this->mpc_Ui->pc_CbxDirection->setEnabled(false);
@@ -378,7 +383,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_InitNodes(const uint32 ou32_BusIndex,
    \param[in]       os32_Index   new index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentWidget::m_OnUnmappedCbxIndexChanged(const sint32 os32_Index)
+void C_CieDbcImportNodeAssignmentWidget::m_OnUnmappedCbxIndexChanged(const int32_t os32_Index)
 {
    this->mpc_Ui->pc_CbxDirection->setEnabled(os32_Index != 0);
 }
@@ -392,7 +397,7 @@ void C_CieDbcImportNodeAssignmentWidget::m_OnUnmappedCbxIndexChanged(const sint3
    \param[in]       oq_Enable     flag of enable or disable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentWidget::m_UpdateComboboxEntries(const uint32 ou32_Index, const bool oq_Enable,
+void C_CieDbcImportNodeAssignmentWidget::m_UpdateComboboxEntries(const uint32_t ou32_Index, const bool oq_Enable,
                                                                  const C_CieDbcImportNodeAssignmentItemWidget * const opc_Sender)
 {
    std::vector<C_CieDbcImportNodeAssignmentItemWidget *>::const_iterator c_It;

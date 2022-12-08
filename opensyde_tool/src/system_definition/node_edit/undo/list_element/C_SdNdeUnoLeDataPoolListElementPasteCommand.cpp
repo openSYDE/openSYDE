@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SdNdeUnoLeDataPoolListElementPasteCommand.h"
-#include "C_SdClipBoardHelper.h"
-#include "C_PuiSdHandler.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDpListTableView.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementPasteCommand.hpp"
+#include "C_SdClipBoardHelper.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeDpListTableView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,13 +51,12 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoLeDataPoolListElementPasteCommand::C_SdNdeUnoLeDataPoolListElementPasteCommand(const uint32 & oru32_NodeIndex,
-                                                                                         const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                                                         QUndoCommand * const opc_Parent)
-   :
+C_SdNdeUnoLeDataPoolListElementPasteCommand::C_SdNdeUnoLeDataPoolListElementPasteCommand(
+   const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex,
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                                        opc_DataPoolListModelViewManager,
-                                                       std::vector<stw_types::uint32>(),
+                                                       std::vector<uint32_t>(),
                                                        "Paste List element", opc_Parent)
 {
 }
@@ -73,37 +71,37 @@ C_SdNdeUnoLeDataPoolListElementPasteCommand::C_SdNdeUnoLeDataPoolListElementPast
    false: Discarded
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::uint32 & oru32_FirstIndex)
+bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const uint32_t & oru32_FirstIndex)
 {
-   std::vector<C_OSCNodeDataPoolListElement> c_OSCContent;
-   std::vector<C_PuiSdNodeDataPoolListElement> c_UIContent;
+   std::vector<C_OscNodeDataPoolListElement> c_OscContent;
+   std::vector<C_PuiSdNodeDataPoolListElement> c_UiContent;
    bool q_Retval =
-      (C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(c_OSCContent, c_UIContent) == C_NO_ERR);
+      (C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(c_OscContent, c_UiContent) == C_NO_ERR);
 
    if (q_Retval == true)
    {
-      q_Retval = (c_OSCContent.size() == c_UIContent.size());
+      q_Retval = (c_OscContent.size() == c_UiContent.size());
       if (q_Retval == true)
       {
-         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
          if (pc_List != NULL)
          {
             q_Retval =
-               (static_cast<uint32>(pc_List->c_Elements.size() + c_OSCContent.size()) <=
-                C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST);
+               (static_cast<uint32_t>(pc_List->c_Elements.size() + c_OscContent.size()) <=
+                C_OscNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST);
             if (q_Retval == true)
             {
-               std::vector<stw_types::uint32> c_Indices;
+               std::vector<uint32_t> c_Indices;
 
-               c_Indices.reserve(c_OSCContent.size());
-               q_Retval = (c_OSCContent.size() == c_UIContent.size());
-               for (uint32 u32_NewIndices = 0; u32_NewIndices < c_OSCContent.size(); ++u32_NewIndices)
+               c_Indices.reserve(c_OscContent.size());
+               q_Retval = (c_OscContent.size() == c_UiContent.size());
+               for (uint32_t u32_NewIndices = 0; u32_NewIndices < c_OscContent.size(); ++u32_NewIndices)
                {
                   c_Indices.push_back(oru32_FirstIndex + u32_NewIndices);
                }
                this->m_SetIndices(c_Indices);
-               this->m_SetInitialData(c_OSCContent, c_UIContent);
+               this->m_SetInitialData(c_OscContent, c_UiContent);
             }
             else
             {
@@ -112,7 +110,7 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
                                                     this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                     this->mu32_DataPoolListIndex));
                c_MessageBox.SetType(C_OgeWiCustomMessage::E_Type::eERROR);
-               const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+               const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
                   this->mu32_NodeIndex,
                   this->mu32_DataPoolIndex);
                if (pc_DataPool != NULL)
@@ -125,7 +123,7 @@ bool C_SdNdeUnoLeDataPoolListElementPasteCommand::InitialSetup(const stw_types::
                }
                c_MessageBox.SetDescription(
                   static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2s allowed per list.")).
-                  arg(C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST).arg(c_Text));
+                  arg(C_OscNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST).arg(c_Text));
                c_MessageBox.SetCustomMinHeight(180, 180);
                c_MessageBox.Execute();
             }

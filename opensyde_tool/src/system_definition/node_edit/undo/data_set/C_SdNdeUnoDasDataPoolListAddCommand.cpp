@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoDasDataPoolListAddCommand.h"
-#include "C_PuiSdHandler.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoDasDataPoolListAddCommand.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,39 +43,39 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoDasDataPoolListAddCommand::C_SdNdeUnoDasDataPoolListAddCommand(const uint32 & oru32_NodeIndex,
-                                                                         const uint32 & oru32_DataPoolIndex,
-                                                                         const uint32 & oru32_DataPoolListIndex,
+C_SdNdeUnoDasDataPoolListAddCommand::C_SdNdeUnoDasDataPoolListAddCommand(const uint32_t & oru32_NodeIndex,
+                                                                         const uint32_t & oru32_DataPoolIndex,
+                                                                         const uint32_t & oru32_DataPoolListIndex,
                                                                          C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                                         const std::vector<uint32> & orc_Indices,
+                                                                         const std::vector<uint32_t> & orc_Indices,
                                                                          QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                                  opc_DataPoolListModelViewManager,
                                                  orc_Indices,
                                                  "Add List Dataset", opc_Parent)
 {
-   const C_OSCNodeDataPoolList * const pc_List =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex,
+   const C_OscNodeDataPoolList * const pc_List =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(oru32_NodeIndex, oru32_DataPoolIndex,
                                                           oru32_DataPoolListIndex);
 
-   std::vector<C_OSCNodeDataPoolDataSet> c_OSCNames;
-   std::vector<std::vector<C_OSCNodeDataPoolContent> > c_OSCDataSetValues;
-   c_OSCNames.resize(orc_Indices.size());
-   c_OSCDataSetValues.resize(orc_Indices.size());
+   std::vector<C_OscNodeDataPoolDataSet> c_OscNames;
+   std::vector<std::vector<C_OscNodeDataPoolContent> > c_OscDataSetValues;
+   c_OscNames.resize(orc_Indices.size());
+   c_OscDataSetValues.resize(orc_Indices.size());
    //Init data set values
    if (pc_List != NULL)
    {
-      for (uint32 u32_ItDataSet = 0; u32_ItDataSet < c_OSCDataSetValues.size(); ++u32_ItDataSet)
+      for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < c_OscDataSetValues.size(); ++u32_ItDataSet)
       {
-         c_OSCDataSetValues[u32_ItDataSet].resize(pc_List->c_Elements.size());
-         for (uint32 u32_ItElement = 0; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
+         c_OscDataSetValues[u32_ItDataSet].resize(pc_List->c_Elements.size());
+         for (uint32_t u32_ItElement = 0; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
          {
-            const C_OSCNodeDataPoolListElement & rc_DataElement = pc_List->c_Elements[u32_ItElement];
-            c_OSCDataSetValues[u32_ItDataSet][u32_ItElement] = rc_DataElement.c_MinValue;
+            const C_OscNodeDataPoolListElement & rc_DataElement = pc_List->c_Elements[u32_ItElement];
+            c_OscDataSetValues[u32_ItDataSet][u32_ItElement] = rc_DataElement.c_MinValue;
          }
       }
    }
-   this->m_SetInitialData(c_OSCNames, c_OSCDataSetValues);
+   this->m_SetInitialData(c_OscNames, c_OscDataSetValues);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

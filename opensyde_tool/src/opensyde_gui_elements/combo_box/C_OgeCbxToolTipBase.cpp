@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
@@ -18,12 +18,12 @@
 #include <QAbstractItemView>
 #include <QStandardItemModel>
 #include <QListView>
-#include "C_OgeWiUtil.h"
-#include "C_OgeCbxToolTipBase.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeCbxToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -125,7 +125,7 @@ bool C_OgeCbxToolTipBase::event(QEvent * const opc_Event)
    \param[in] oq_Status  Item status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeCbxToolTipBase::SetItemState(const stw_types::sint32 os32_Index, const bool oq_Status) const
+void C_OgeCbxToolTipBase::SetItemState(const int32_t os32_Index, const bool oq_Status) const
 {
    if (os32_Index < this->count())
    {
@@ -152,7 +152,7 @@ void C_OgeCbxToolTipBase::SetItemState(const stw_types::sint32 os32_Index, const
    \param[in] oq_Visible Item visibility flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeCbxToolTipBase::SetItemVisible(const stw_types::sint32 os32_Index, const bool oq_Visible) const
+void C_OgeCbxToolTipBase::SetItemVisible(const int32_t os32_Index, const bool oq_Visible) const
 {
    if (os32_Index < this->count())
    {

@@ -11,17 +11,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_NagUseCaseWidget.h"
-#include "C_OgePopUpDialog.h"
-#include "C_PopSaveAsDialogWidget.h"
-#include "C_GiSyColorSelectWidget.h"
+#include "constants.hpp"
+#include "C_NagUseCaseWidget.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_PopSaveAsDialogWidget.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -91,7 +90,7 @@ QVector<C_NagToolBarButtonProperties> C_NagUseCaseWidget::GetVecToolBarFuncNames
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_NagUseCaseWidget::UserInputFunc(const uint32 ou32_FuncNumber)
+void C_NagUseCaseWidget::UserInputFunc(const uint32_t ou32_FuncNumber)
 {
    // empty implementation if the derived class doesn't need function
    // it can not be a pure virtual function
@@ -124,8 +123,9 @@ void C_NagUseCaseWidget::Save(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_NagUseCaseWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
-                                    const sint32 os32_SubSubSubIndex, const stw_types::sint32 os32_Flag)
+void C_NagUseCaseWidget::OpenDetail(const int32_t os32_Index, const int32_t os32_SubIndex,
+                                    const int32_t os32_SubSubIndex, const int32_t os32_SubSubSubIndex,
+                                    const int32_t os32_Flag)
 {
    // empty implementation if the derived class doesn't need function
    // it can not be a pure virtual function
@@ -165,7 +165,7 @@ bool C_NagUseCaseWidget::PrepareToClose(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_NagUseCaseWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
+void C_NagUseCaseWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou32_Index, const uint32_t ou32_Flag)
 {
    // empty implementation if the derived class doesn't need function
    // it can not be a pure virtual function
@@ -208,12 +208,12 @@ void C_NagUseCaseWidget::OnPushButtonIconPress(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::SaveAs(void)
 {
-   QPointer<stw_opensyde_gui_elements::C_OgePopUpDialog> const c_New =
-      new stw_opensyde_gui_elements::C_OgePopUpDialog(this, this);
+   const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> c_New =
+      new stw::opensyde_gui_elements::C_OgePopUpDialog(this, this);
    C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
 
    // open save-as dialog
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       Q_EMIT this->SigNewUserSettings();
    }
@@ -231,15 +231,15 @@ void C_NagUseCaseWidget::SaveAs(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagUseCaseWidget::OpenColorPicker(void)
 {
-   QPointer<stw_opensyde_gui_elements::C_OgePopUpDialog> const c_Popup =
-      new stw_opensyde_gui_elements::C_OgePopUpDialog(this, this);
+   const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> c_Popup =
+      new stw::opensyde_gui_elements::C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
    // open color picker dialog
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       pc_ColorWidget->ChooseSelectedColor();
    }

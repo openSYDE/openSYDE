@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QClipboard>
@@ -18,15 +18,14 @@
 #include <QTextCursor>
 #include <QGraphicsSceneMouseEvent>
 
-#include "stwtypes.h"
-#include "C_GiText.h"
-#include "gitypes.h"
-#include "C_Uti.h"
+#include "stwtypes.hpp"
+#include "C_GiText.hpp"
+#include "gitypes.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -75,9 +74,9 @@ C_GiText::~C_GiText(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiText::type(void) const
+int32_t C_GiText::type(void) const
 {
-   return msn_GRAPHICS_ITEM_TEXT;
+   return ms32_GRAPHICS_ITEM_TEXT;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,7 +135,7 @@ bool C_GiText::IsEditModeActive() const
 {
    bool q_Return = false;
 
-   if (this->textInteractionFlags() == static_cast<sintn>(Qt::TextEditorInteraction))
+   if (this->textInteractionFlags() == static_cast<int32_t>(Qt::TextEditorInteraction))
    {
       q_Return = true;
    }
@@ -161,7 +160,7 @@ void C_GiText::AutoAdaptSize(void)
 void C_GiText::SetTextInteraction(const bool oq_On, const bool oq_SelectAll)
 {
    if ((oq_On == true) &&
-       (this->textInteractionFlags() == static_cast<sintn>(Qt::NoTextInteraction)))
+       (this->textInteractionFlags() == static_cast<int32_t>(Qt::NoTextInteraction)))
    {
       // switch on editor mode:
       this->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -178,7 +177,7 @@ void C_GiText::SetTextInteraction(const bool oq_On, const bool oq_SelectAll)
       Q_EMIT this->SigTextInteractionModeStateChanged(oq_On);
    }
    else if ((oq_On == false) &&
-            (textInteractionFlags() == static_cast<sintn>(Qt::TextEditorInteraction)))
+            (textInteractionFlags() == static_cast<int32_t>(Qt::TextEditorInteraction)))
    {
       // turn off editor mode:
       this->setTextInteractionFlags(Qt::NoTextInteraction);
@@ -207,7 +206,8 @@ void C_GiText::SetTextInteraction(const bool oq_On, const bool oq_SelectAll)
 void C_GiText::keyPressEvent(QKeyEvent * const opc_Event)
 {
    if ((C_Uti::h_CheckKeyModifier(opc_Event->modifiers(),
-                                  Qt::ControlModifier) == true) && (opc_Event->key() == static_cast<sintn>(Qt::Key_V)))
+                                  Qt::ControlModifier) == true) &&
+       (opc_Event->key() == static_cast<int32_t>(Qt::Key_V)))
    {
       const QClipboard * const pc_ClipBoard = QApplication::clipboard();
       QTextCursor c_Cursor = this->textCursor();
@@ -233,7 +233,7 @@ void C_GiText::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
    if (this->mq_Editable == true)
    {
-      if (this->textInteractionFlags() == static_cast<sintn>(Qt::TextEditorInteraction))
+      if (this->textInteractionFlags() == static_cast<int32_t>(Qt::TextEditorInteraction))
       {
          // if editor mode is already on: pass double click events on to the editor:
          QGraphicsTextItem::mouseDoubleClickEvent(opc_Event);
@@ -270,7 +270,7 @@ void C_GiText::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Event)
 QVariant C_GiText::itemChange(const GraphicsItemChange oe_Change, const QVariant & orc_Value)
 {
    if ((oe_Change == QGraphicsItem::ItemSelectedChange) &&
-       (this->textInteractionFlags() != static_cast<sintn>(Qt::NoTextInteraction)) &&
+       (this->textInteractionFlags() != static_cast<int32_t>(Qt::NoTextInteraction)) &&
        (orc_Value.toBool() == false))
    {
       // item received SelectedChange event AND is in editor mode AND is about to be deselected:

@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_TblTreSimpleModel.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_TblTreSimpleModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,20 +49,20 @@ C_TblTreSimpleModel::C_TblTreSimpleModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data index
 
-   \param[in]  osn_Row     Row
-   \param[in]  osn_Column  Column
-   \param[in]  orc_Parent  Parent
+   \param[in]  os32_Row     Row
+   \param[in]  os32_Column  Column
+   \param[in]  orc_Parent   Parent
 
    \return
    Data index (may be invalid = invalid parameters)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Column,
+QModelIndex C_TblTreSimpleModel::index(const int32_t os32_Row, const int32_t os32_Column,
                                        const QModelIndex & orc_Parent) const
 {
    QModelIndex c_Retval;
 
-   if (hasIndex(osn_Row, osn_Column, orc_Parent) == true)
+   if (hasIndex(os32_Row, os32_Column, orc_Parent) == true)
    {
       if (orc_Parent.isValid() == true)
       {
@@ -73,7 +72,7 @@ QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Colu
          if (pc_TreeItem != NULL)
          {
             c_Retval =
-               this->createIndex(osn_Row, osn_Column, pc_TreeItem->c_Children.at(static_cast<uint32>(osn_Row)));
+               this->createIndex(os32_Row, os32_Column, pc_TreeItem->c_Children.at(static_cast<uint32_t>(os32_Row)));
          }
       }
       else
@@ -82,8 +81,8 @@ QModelIndex C_TblTreSimpleModel::index(const sintn osn_Row, const sintn osn_Colu
          {
             //Top level
             c_Retval =
-               this->createIndex(osn_Row, osn_Column,
-                                 this->mpc_InvisibleRootItem->c_Children.at(static_cast<uint32>(osn_Row)));
+               this->createIndex(os32_Row, os32_Column,
+                                 this->mpc_InvisibleRootItem->c_Children.at(static_cast<uint32_t>(os32_Row)));
          }
       }
    }
@@ -116,7 +115,7 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
       {
          if (pc_TreeItem->pc_Parent != NULL)
          {
-            const sint32 s32_Index = pc_TreeItem->pc_Parent->GetIndexInParentNumber();
+            const int32_t s32_Index = pc_TreeItem->pc_Parent->GetIndexInParentNumber();
             if (s32_Index >= 0)
             {
                //Parent should always use column 0
@@ -137,9 +136,9 @@ QModelIndex C_TblTreSimpleModel::parent(const QModelIndex & orc_Index) const
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (orc_Parent.isValid() == true)
    {
@@ -148,7 +147,7 @@ sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
          static_cast<const C_TblTreSimpleItem *>(orc_Parent.internalPointer());
       if (pc_TreeItem != NULL)
       {
-         sn_Retval = pc_TreeItem->c_Children.size();
+         s32_Retval = pc_TreeItem->c_Children.size();
       }
    }
    else
@@ -156,11 +155,11 @@ sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
       if (this->mpc_InvisibleRootItem != NULL)
       {
          //Top level
-         sn_Retval = this->mpc_InvisibleRootItem->c_Children.size();
+         s32_Retval = this->mpc_InvisibleRootItem->c_Children.size();
       }
    }
 
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -176,9 +175,9 @@ sintn C_TblTreSimpleModel::rowCount(const QModelIndex & orc_Parent) const
    \retval   C_CONFIG   Could not determine number of valid layers
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_TblTreSimpleModel::m_CountLayers(const QModelIndex & orc_Index, uint32 & oru32_ValidLayers) const
+int32_t C_TblTreSimpleModel::m_CountLayers(const QModelIndex & orc_Index, uint32_t & oru32_ValidLayers) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_Index.isValid())
    {

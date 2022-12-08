@@ -8,21 +8,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <algorithm> //for std::sort
 
-#include "C_PuiSdSharedDatapools.h"
+#include "C_PuiSdSharedDatapools.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "CSCLChecksums.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,25 +51,25 @@ C_PuiSdSharedDatapools::C_PuiSdSharedDatapools(void)
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdSharedDatapools::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSdSharedDatapools::CalcHash(uint32_t & oru32_HashValue) const
 {
-   std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolId> >::const_iterator c_ItSharedGroup;
-   uint32 u32_GroupCounter = 0U;
+   std::vector<std::vector<stw::opensyde_core::C_OscNodeDataPoolId> >::const_iterator c_ItSharedGroup;
+   uint32_t u32_GroupCounter = 0U;
 
    for (c_ItSharedGroup = this->c_SharedDatapools.begin(); c_ItSharedGroup != this->c_SharedDatapools.end();
         ++c_ItSharedGroup)
    {
-      uint32 u32_DpCounter;
+      uint32_t u32_DpCounter;
 
       // The group as index is relevant too
-      stw_scl::C_SCLChecksums::CalcCRC32(&u32_GroupCounter, sizeof(u32_GroupCounter), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&u32_GroupCounter, sizeof(u32_GroupCounter), oru32_HashValue);
 
       for (u32_DpCounter = 0U; u32_DpCounter < c_ItSharedGroup->size(); ++u32_DpCounter)
       {
-         const C_OSCNodeDataPoolId & rc_DpId = c_ItSharedGroup->at(u32_DpCounter);
-         stw_scl::C_SCLChecksums::CalcCRC32(&rc_DpId.u32_NodeIndex, sizeof(rc_DpId.u32_NodeIndex), oru32_HashValue);
-         stw_scl::C_SCLChecksums::CalcCRC32(&rc_DpId.u32_DataPoolIndex, sizeof(rc_DpId.u32_DataPoolIndex),
-                                            oru32_HashValue);
+         const C_OscNodeDataPoolId & rc_DpId = c_ItSharedGroup->at(u32_DpCounter);
+         stw::scl::C_SclChecksums::CalcCRC32(&rc_DpId.u32_NodeIndex, sizeof(rc_DpId.u32_NodeIndex), oru32_HashValue);
+         stw::scl::C_SclChecksums::CalcCRC32(&rc_DpId.u32_DataPoolIndex, sizeof(rc_DpId.u32_DataPoolIndex),
+                                             oru32_HashValue);
       }
 
       ++u32_GroupCounter;
@@ -93,10 +92,10 @@ void C_PuiSdSharedDatapools::Clear(void)
    \param[in]  orc_ShareDatapool    ID of the Datapool which shall be the share partner
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_NewDatapool,
-                                               const C_OSCNodeDataPoolId & orc_ShareDatapool)
+void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OscNodeDataPoolId & orc_NewDatapool,
+                                               const C_OscNodeDataPoolId & orc_ShareDatapool)
 {
-   uint32 u32_GroupIndex = 0U;
+   uint32_t u32_GroupIndex = 0U;
 
    // Check if the new Datapool was not already shared. That should not happen
    tgl_assert(this->IsSharedDatapool(orc_NewDatapool, NULL) == false);
@@ -113,7 +112,7 @@ void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_N
    else
    {
       // New group
-      std::vector<stw_opensyde_core::C_OSCNodeDataPoolId> c_Group;
+      std::vector<stw::opensyde_core::C_OscNodeDataPoolId> c_Group;
 
       c_Group.push_back(orc_ShareDatapool);
       c_Group.push_back(orc_NewDatapool);
@@ -134,10 +133,10 @@ void C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_N
    \retval C_RANGE    Index of shared Datapool group out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc_NewDatapool,
-                                                 const uint32 ou32_SharedDatapoolGroup)
+int32_t C_PuiSdSharedDatapools::AddSharedDatapool(const C_OscNodeDataPoolId & orc_NewDatapool,
+                                                  const uint32_t ou32_SharedDatapoolGroup)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (ou32_SharedDatapoolGroup < this->c_SharedDatapools.size())
    {
@@ -163,17 +162,17 @@ sint32 C_PuiSdSharedDatapools::AddSharedDatapool(const C_OSCNodeDataPoolId & orc
    C_NOACT     Nothing was removed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdSharedDatapools::RemoveSharedDatapool(const C_OSCNodeDataPoolId & orc_Datapool)
+int32_t C_PuiSdSharedDatapools::RemoveSharedDatapool(const C_OscNodeDataPoolId & orc_Datapool)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
-   std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolId> >::iterator c_ItGroup;
+   std::vector<std::vector<stw::opensyde_core::C_OscNodeDataPoolId> >::iterator c_ItGroup;
 
    // Search for a matching Datapool
    for (c_ItGroup = this->c_SharedDatapools.begin(); c_ItGroup != this->c_SharedDatapools.end(); ++c_ItGroup)
    {
-      std::vector<stw_opensyde_core::C_OSCNodeDataPoolId> & rc_Group = *c_ItGroup;
-      std::vector<stw_opensyde_core::C_OSCNodeDataPoolId>::iterator c_ItSharedDatapool;
+      std::vector<stw::opensyde_core::C_OscNodeDataPoolId> & rc_Group = *c_ItGroup;
+      std::vector<stw::opensyde_core::C_OscNodeDataPoolId>::iterator c_ItSharedDatapool;
       bool q_Found = false;
 
       for (c_ItSharedDatapool = rc_Group.begin(); c_ItSharedDatapool != rc_Group.end(); ++c_ItSharedDatapool)
@@ -220,10 +219,11 @@ sint32 C_PuiSdSharedDatapools::RemoveSharedDatapool(const C_OSCNodeDataPoolId & 
    false    Datapool is stand-alone
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdSharedDatapools::IsSharedDatapool(const uint32 ou32_SharedNodeIndex, const uint32 ou32_SharedDatapoolIndex,
-                                              uint32 * const opu32_SharedDatapoolGroup) const
+bool C_PuiSdSharedDatapools::IsSharedDatapool(const uint32_t ou32_SharedNodeIndex,
+                                              const uint32_t ou32_SharedDatapoolIndex,
+                                              uint32_t * const opu32_SharedDatapoolGroup) const
 {
-   return this->IsSharedDatapool(C_OSCNodeDataPoolId(ou32_SharedNodeIndex, ou32_SharedDatapoolIndex),
+   return this->IsSharedDatapool(C_OscNodeDataPoolId(ou32_SharedNodeIndex, ou32_SharedDatapoolIndex),
                                  opu32_SharedDatapoolGroup);
 }
 
@@ -239,17 +239,17 @@ bool C_PuiSdSharedDatapools::IsSharedDatapool(const uint32 ou32_SharedNodeIndex,
    false    Datapool is stand-alone
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdSharedDatapools::IsSharedDatapool(const C_OSCNodeDataPoolId & orc_Datapool,
-                                              uint32 * const opu32_SharedDatapoolGroup) const
+bool C_PuiSdSharedDatapools::IsSharedDatapool(const C_OscNodeDataPoolId & orc_Datapool,
+                                              uint32_t * const opu32_SharedDatapoolGroup) const
 {
-   uint32 u32_GroupCounter;
+   uint32_t u32_GroupCounter;
    bool q_Found = false;
 
    // Search for a matching Datapool
    for (u32_GroupCounter = 0U; u32_GroupCounter < this->c_SharedDatapools.size(); ++u32_GroupCounter)
    {
-      uint32 u32_SharedDatapoolCounter;
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
+      uint32_t u32_SharedDatapoolCounter;
+      const std::vector<stw::opensyde_core::C_OscNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
 
       for (u32_SharedDatapoolCounter = 0U; u32_SharedDatapoolCounter < rc_Group.size(); ++u32_SharedDatapoolCounter)
       {
@@ -287,11 +287,11 @@ bool C_PuiSdSharedDatapools::IsSharedDatapool(const C_OSCNodeDataPoolId & orc_Da
    C_RANGE     ou32_SharedDatapoolGroup is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdSharedDatapools::GetSharedDatapoolGroup(const uint32 ou32_SharedDatapoolGroup,
-                                                      std::vector<C_OSCNodeDataPoolId> & orc_SharedDatapoolGroup)
+int32_t C_PuiSdSharedDatapools::GetSharedDatapoolGroup(const uint32_t ou32_SharedDatapoolGroup,
+                                                       std::vector<C_OscNodeDataPoolId> & orc_SharedDatapoolGroup)
 const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    orc_SharedDatapoolGroup.clear();
 
@@ -321,12 +321,12 @@ const
    false    Datapool is stand-alone
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdSharedDatapools::IsSharedAndGetDatapoolGroup(const uint32 ou32_SharedNodeIndex,
-                                                         const uint32 ou32_SharedDatapoolIndex,
-                                                         std::vector<C_OSCNodeDataPoolId> & orc_SharedDatapoolGroup)
+bool C_PuiSdSharedDatapools::IsSharedAndGetDatapoolGroup(const uint32_t ou32_SharedNodeIndex,
+                                                         const uint32_t ou32_SharedDatapoolIndex,
+                                                         std::vector<C_OscNodeDataPoolId> & orc_SharedDatapoolGroup)
 const
 {
-   return this->IsSharedAndGetDatapoolGroup(C_OSCNodeDataPoolId(ou32_SharedNodeIndex, ou32_SharedDatapoolIndex),
+   return this->IsSharedAndGetDatapoolGroup(C_OscNodeDataPoolId(ou32_SharedNodeIndex, ou32_SharedDatapoolIndex),
                                             orc_SharedDatapoolGroup);
 }
 
@@ -345,11 +345,11 @@ const
    false    Datapool is stand-alone
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdSharedDatapools::IsSharedAndGetDatapoolGroup(const C_OSCNodeDataPoolId & orc_Datapool,
-                                                         std::vector<C_OSCNodeDataPoolId> & orc_SharedDatapoolGroup)
+bool C_PuiSdSharedDatapools::IsSharedAndGetDatapoolGroup(const C_OscNodeDataPoolId & orc_Datapool,
+                                                         std::vector<C_OscNodeDataPoolId> & orc_SharedDatapoolGroup)
 const
 {
-   uint32 u32_SharedGroup;
+   uint32_t u32_SharedGroup;
    const bool q_Found = this->IsSharedDatapool(orc_Datapool, &u32_SharedGroup);
 
    orc_SharedDatapoolGroup.clear();
@@ -357,8 +357,8 @@ const
    if (q_Found == true)
    {
       // Copy the shared Datapool Ids
-      uint32 u32_DpIdCounter;
-      const std::vector<stw_opensyde_core::C_OSCNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_SharedGroup];
+      uint32_t u32_DpIdCounter;
+      const std::vector<stw::opensyde_core::C_OscNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_SharedGroup];
 
       for (u32_DpIdCounter = 0U; u32_DpIdCounter < rc_Group.size(); ++u32_DpIdCounter)
       {
@@ -379,15 +379,15 @@ const
    \param[in]  ou32_NodeIndex    Index of removed node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdSharedDatapools::OnNodeRemoved(const uint32 ou32_NodeIndex)
+void C_PuiSdSharedDatapools::OnNodeRemoved(const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_GroupCounter = 0U;
+   uint32_t u32_GroupCounter = 0U;
 
    // Check all groups
    while (u32_GroupCounter < this->c_SharedDatapools.size())
    {
-      uint32 u32_DpIdCounter = 0U;
-      std::vector<C_OSCNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
+      uint32_t u32_DpIdCounter = 0U;
+      std::vector<C_OscNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
       bool q_GroupRemoved = false;
 
       while (u32_DpIdCounter < rc_Group.size())
@@ -429,19 +429,19 @@ void C_PuiSdSharedDatapools::OnNodeRemoved(const uint32 ou32_NodeIndex)
    \param[in]  orc_Datapool   ID of Datapool for remove
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdSharedDatapools::OnDatapoolInserted(const C_OSCNodeDataPoolId & orc_Datapool)
+void C_PuiSdSharedDatapools::OnDatapoolInserted(const C_OscNodeDataPoolId & orc_Datapool)
 {
-   uint32 u32_GroupCounter;
+   uint32_t u32_GroupCounter;
 
    // Check all groups
    for (u32_GroupCounter = 0U; u32_GroupCounter < this->c_SharedDatapools.size(); ++u32_GroupCounter)
    {
-      uint32 u32_DpIdCounter;
-      std::vector<C_OSCNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
+      uint32_t u32_DpIdCounter;
+      std::vector<C_OscNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
 
       for (u32_DpIdCounter = 0U; u32_DpIdCounter < rc_Group.size(); ++u32_DpIdCounter)
       {
-         C_OSCNodeDataPoolId & rc_CurDpId = rc_Group[u32_DpIdCounter];
+         C_OscNodeDataPoolId & rc_CurDpId = rc_Group[u32_DpIdCounter];
 
          // Only Datapools of same node are relevant
          if ((rc_CurDpId.u32_NodeIndex == orc_Datapool.u32_NodeIndex) &&
@@ -462,9 +462,9 @@ void C_PuiSdSharedDatapools::OnDatapoolInserted(const C_OSCNodeDataPoolId & orc_
    \param[in]  orc_Datapool   ID of Datapool for remove
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdSharedDatapools::OnDatapoolRemoved(const C_OSCNodeDataPoolId & orc_Datapool)
+void C_PuiSdSharedDatapools::OnDatapoolRemoved(const C_OscNodeDataPoolId & orc_Datapool)
 {
-   uint32 u32_GroupCounter;
+   uint32_t u32_GroupCounter;
 
    // Search for an complete match for removing first for each group to avoid removing an already adapted Datapool Id
    this->RemoveSharedDatapool(orc_Datapool);
@@ -472,12 +472,12 @@ void C_PuiSdSharedDatapools::OnDatapoolRemoved(const C_OSCNodeDataPoolId & orc_D
    // Check all groups
    for (u32_GroupCounter = 0U; u32_GroupCounter < this->c_SharedDatapools.size(); ++u32_GroupCounter)
    {
-      uint32 u32_DpIdCounter;
-      std::vector<C_OSCNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
+      uint32_t u32_DpIdCounter;
+      std::vector<C_OscNodeDataPoolId> & rc_Group = this->c_SharedDatapools[u32_GroupCounter];
 
       for (u32_DpIdCounter = 0U; u32_DpIdCounter < rc_Group.size(); ++u32_DpIdCounter)
       {
-         C_OSCNodeDataPoolId & rc_CurDpId = rc_Group[u32_DpIdCounter];
+         C_OscNodeDataPoolId & rc_CurDpId = rc_Group[u32_DpIdCounter];
 
          // Only Datapools of same node are relevant
          if ((rc_CurDpId.u32_NodeIndex == orc_Datapool.u32_NodeIndex) &&
@@ -496,14 +496,14 @@ void C_PuiSdSharedDatapools::OnDatapoolRemoved(const C_OSCNodeDataPoolId & orc_D
    \param[in]  orc_TargetDatapool   ID of target Datapool for move
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdSharedDatapools::OnDatapoolMoved(const C_OSCNodeDataPoolId & orc_SourceDatapool,
-                                             const C_OSCNodeDataPoolId & orc_TargetDatapool)
+void C_PuiSdSharedDatapools::OnDatapoolMoved(const C_OscNodeDataPoolId & orc_SourceDatapool,
+                                             const C_OscNodeDataPoolId & orc_TargetDatapool)
 {
-   uint32 u32_SharedGroup = 0U;
+   uint32_t u32_SharedGroup = 0U;
    // Save if the Datapool is a shared Datapool
    const bool q_IsShared = this->IsSharedDatapool(orc_SourceDatapool, &u32_SharedGroup);
 
-   std::vector<C_OSCNodeDataPoolId> c_SharedGroup;
+   std::vector<C_OscNodeDataPoolId> c_SharedGroup;
 
    if (q_IsShared == true)
    {
@@ -530,7 +530,7 @@ void C_PuiSdSharedDatapools::OnDatapoolMoved(const C_OSCNodeDataPoolId & orc_Sou
          // Special case. Shared Datapool with only one other Datapool
          // The group was removed completely with OnDatapoolRemoved.
          // Add both Datapool Ids again.
-         C_OSCNodeDataPoolId c_OtherDatapoolId;
+         C_OscNodeDataPoolId c_OtherDatapoolId;
 
          // Get the "other" Datapool Id
          if (c_SharedGroup[0] == orc_SourceDatapool)

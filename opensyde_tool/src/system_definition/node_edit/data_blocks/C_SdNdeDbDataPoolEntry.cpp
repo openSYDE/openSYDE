@@ -10,18 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_GtGetText.h"
-#include "C_SdNdeDbDataPoolEntry.h"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdNdeDbDataPoolEntry.hpp"
 #include "ui_C_SdNdeDbDataPoolEntry.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,9 +45,9 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDbDataPoolEntry::C_SdNdeDbDataPoolEntry(const stw_types::uint32 ou32_NodeIndex,
-                                               const stw_types::uint32 ou32_DataPoolIndex, QWidget * const opc_Parent) :
-   stw_opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
+C_SdNdeDbDataPoolEntry::C_SdNdeDbDataPoolEntry(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                               QWidget * const opc_Parent) :
+   stw::opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbDataPoolEntry),
    mu32_DataPoolIndex(ou32_DataPoolIndex)
 {
@@ -88,11 +88,11 @@ void C_SdNdeDbDataPoolEntry::m_OnDeleteClick(void)
    \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, const stw_types::uint32 ou32_DataPoolIndex)
+void C_SdNdeDbDataPoolEntry::m_Init(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex)
 {
-   const C_OSCNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
+   const C_OscNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(ou32_NodeIndex,
                                                                                                  ou32_DataPoolIndex);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    if ((pc_Node != NULL) && (pc_Datapool != NULL))
    {
@@ -101,11 +101,11 @@ void C_SdNdeDbDataPoolEntry::m_Init(const stw_types::uint32 ou32_NodeIndex, cons
       c_Text = pc_Datapool->c_Name.c_str();
       c_Text += " (";
       c_Text += C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Datapool->e_Type);
-      if (pc_Datapool->e_Type == C_OSCNodeDataPool::eCOM)
+      if (pc_Datapool->e_Type == C_OscNodeDataPool::eCOM)
       {
          c_Text += ", ";
          c_Text += C_GtGetText::h_GetText("Protocol: ");
-         c_Text += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
+         c_Text += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCanProtocolType(
                                                                  ou32_NodeIndex, ou32_DataPoolIndex));
       }
       c_Text += ")";

@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFlags>
 #include <QTransform>
 #include <QStyleOptionGraphicsItem>
 
-#include "C_SdTopologyScene.h"
-#include "C_GiPointInteraction.h"
-#include "constants.h"
-#include "gitypes.h"
+#include "C_SdTopologyScene.hpp"
+#include "C_GiPointInteraction.hpp"
+#include "constants.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -73,9 +72,9 @@ C_GiPointInteraction::~C_GiPointInteraction()
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiPointInteraction::type() const
+int32_t C_GiPointInteraction::type() const
 {
-   return msn_GRAPHICS_ITEM_POINTINTERACTION;
+   return ms32_GRAPHICS_ITEM_POINTINTERACTION;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

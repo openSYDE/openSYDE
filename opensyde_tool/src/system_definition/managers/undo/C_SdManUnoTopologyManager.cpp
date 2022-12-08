@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdManUnoTopologyManager.h"
-#include "C_GiUnique.h"
-#include "C_SdManUnoTopologySetupStyleCommand.h"
-#include "C_SdManUnoTopologyZOrderCommand.h"
-#include "C_SdManUnoTopologyDeleteCommand.h"
-#include "C_SdManUnoTopologyAddSnapshotCommand.h"
-#include "C_SdManUnoTopologyReconnectNodeCommand.h"
-#include "C_SdManUnoTopologyReconnectBusCommand.h"
-#include "C_SdManUnoTopologyChangeInterfaceCommand.h"
+#include "C_SdManUnoTopologyManager.hpp"
+#include "C_GiUnique.hpp"
+#include "C_SdManUnoTopologySetupStyleCommand.hpp"
+#include "C_SdManUnoTopologyZetOrderCommand.hpp"
+#include "C_SdManUnoTopologyDeleteCommand.hpp"
+#include "C_SdManUnoTopologyAddSnapshotCommand.hpp"
+#include "C_SdManUnoTopologyReconnectNodeCommand.hpp"
+#include "C_SdManUnoTopologyReconnectBusCommand.hpp"
+#include "C_SdManUnoTopologyChangeInterfaceCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
 using namespace std;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -72,29 +71,29 @@ C_SdManUnoTopologyManager::~C_SdManUnoTopologyManager(void)
    \param[in]  oq_BringToFront      Flag if this is the bring to front action (otherwise send to back assumed)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyManager::AdaptZOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
-                                            const QList<QGraphicsItem *> & orc_Items, const bool oq_BringToFront)
+void C_SdManUnoTopologyManager::AdaptZetOrder(const QList<QGraphicsItem *> & orc_SelectedItems,
+                                              const QList<QGraphicsItem *> & orc_Items, const bool oq_BringToFront)
 {
-   QMap<QGraphicsItem *, float64> c_Changes;
-   vector<uint64> c_IDs;
-   vector<float64> c_Values;
+   QMap<QGraphicsItem *, float64_t> c_Changes;
+   vector<uint64_t> c_Ids;
+   vector<float64_t> c_Values;
    QList<QGraphicsItem *> c_List;
-   C_SdManUnoTopologyZOrderCommand * pc_ZOrderCommand;
+   C_SdManUnoTopologyZetOrderCommand * pc_ZetOrderCommand;
 
-   C_SdManUnoTopologyZOrderCommand::h_AdaptZOrder(this->mpc_Scene, orc_Items, orc_SelectedItems, oq_BringToFront,
-                                                  c_Changes);
-   C_SdManUnoTopologyZOrderCommand::h_CheckZOrderPriority(orc_SelectedItems, orc_Items, c_Changes);
+   C_SdManUnoTopologyZetOrderCommand::h_AdaptZetOrder(this->mpc_Scene, orc_Items, orc_SelectedItems, oq_BringToFront,
+                                                      c_Changes);
+   C_SdManUnoTopologyZetOrderCommand::h_CheckZetOrderPriority(orc_SelectedItems, orc_Items, c_Changes);
 
-   for (QMap<QGraphicsItem *, float64>::const_iterator c_ItChanges = c_Changes.begin();
+   for (QMap<QGraphicsItem *, float64_t>::const_iterator c_ItChanges = c_Changes.begin();
         c_ItChanges != c_Changes.end();
         ++c_ItChanges)
    {
       c_List.push_back(c_ItChanges.key());
       c_Values.push_back(c_ItChanges.value());
    }
-   mh_MapItemToID(c_List, c_IDs);
-   pc_ZOrderCommand = new C_SdManUnoTopologyZOrderCommand(this->mpc_Scene, c_IDs, c_Values);
-   this->DoPush(pc_ZOrderCommand);
+   mh_MapItemToId(c_List, c_Ids);
+   pc_ZetOrderCommand = new C_SdManUnoTopologyZetOrderCommand(this->mpc_Scene, c_Ids, c_Values);
+   this->DoPush(pc_ZetOrderCommand);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,7 +106,7 @@ void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Item
 {
    if (orc_Items.size() > 0)
    {
-      vector<uint64> c_IDs;
+      vector<uint64_t> c_Ids;
       C_SdManUnoTopologyDeleteCommand * pc_DeleteCommand;
       QList<QGraphicsItem *> c_ImprovedItemList;
 
@@ -116,13 +115,13 @@ void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Item
          //Special handling if possible to include all affected items, not only the selected ones
          C_SdManUnoTopologyAddDeleteBaseCommand::h_GetAllRelevantObjects(
             this->mpc_Scene->items(), orc_Items, c_ImprovedItemList);
-         mh_MapItemToID(c_ImprovedItemList, c_IDs);
+         mh_MapItemToId(c_ImprovedItemList, c_Ids);
       }
       else
       {
-         mh_MapItemToID(orc_Items, c_IDs);
+         mh_MapItemToId(orc_Items, c_Ids);
       }
-      pc_DeleteCommand = new C_SdManUnoTopologyDeleteCommand(this->mpc_Scene, c_IDs);
+      pc_DeleteCommand = new C_SdManUnoTopologyDeleteCommand(this->mpc_Scene, c_Ids);
       connect(pc_DeleteCommand,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
@@ -134,20 +133,20 @@ void C_SdManUnoTopologyManager::DoDelete(const QList<QGraphicsItem *> & orc_Item
 /*! \brief   Add one element
 
    \param[in]  ore_Type                   Type
-   \param[in]  oru64_UniqueID             Unique ID
+   \param[in]  oru64_UniqueId             Unique ID
    \param[in]  orc_NewPos                 Position
    \param[in]  orc_AdditionalInformation  Additional string information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddGeneric(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
-                                             const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
+                                             const uint64_t & oru64_UniqueId, const QPointF & orc_NewPos,
                                              const QString & orc_AdditionalInformation)
 {
-   vector<uint64> c_IDs;
+   vector<uint64_t> c_Ids;
    C_SdManUnoTopologyAddCommand * pc_AddCommand;
 
-   c_IDs.push_back(oru64_UniqueID);
-   pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs, ore_Type, orc_NewPos,
+   c_Ids.push_back(oru64_UniqueId);
+   pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids, ore_Type, orc_NewPos,
                                                     orc_AdditionalInformation);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
@@ -158,21 +157,21 @@ void C_SdManUnoTopologyManager::DoAddGeneric(const C_SdManUnoTopologyAddCommand:
 /*! \brief   Add one element
 
    \param[in]  ore_Type                Type
-   \param[in]  oru64_UniqueIDBus       Unique ID for bus element
-   \param[in]  oru64_UniqueIDBusName   Unique ID for bus name text element
+   \param[in]  oru64_UniqueIdBus       Unique ID for bus element
+   \param[in]  oru64_UniqueIdBusName   Unique ID for bus name text element
    \param[in]  orc_NewPos              Position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_ElementType & ore_Type,
-                                         const uint64 & oru64_UniqueIDBus, const uint64 & oru64_UniqueIDBusName,
+                                         const uint64_t & oru64_UniqueIdBus, const uint64_t & oru64_UniqueIdBusName,
                                          const QPointF & orc_NewPos)
 {
-   vector<uint64> c_IDs;
+   vector<uint64_t> c_Ids;
    C_SdManUnoTopologyAddCommand * pc_AddCommand;
 
-   c_IDs.push_back(oru64_UniqueIDBus);
-   c_IDs.push_back(oru64_UniqueIDBusName);
-   pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs, ore_Type, orc_NewPos, "");
+   c_Ids.push_back(oru64_UniqueIdBus);
+   c_Ids.push_back(oru64_UniqueIdBusName);
+   pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids, ore_Type, orc_NewPos, "");
 
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
@@ -182,7 +181,7 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add one bus connector element
 
-   \param[in]  oru64_UniqueID          Unique ID
+   \param[in]  oru64_UniqueId          Unique ID
    \param[in]  orc_NewPos              Position
    \param[in]  opc_Node                Node for bus connector creation
    \param[in]  opc_Bus                 Bus for bus connector creation
@@ -190,24 +189,24 @@ void C_SdManUnoTopologyManager::DoAddBus(const C_SdManUnoTopologyAddCommand::E_E
    \param[in]  orc_Properties          Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID, const QPointF & orc_NewPos,
+void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64_t & oru64_UniqueId, const QPointF & orc_NewPos,
                                                   const QGraphicsItem * const opc_Node,
                                                   const QGraphicsItem * const opc_Bus,
-                                                  const stw_types::uint8 & oru8_InterfaceNumber,
+                                                  const uint8_t & oru8_InterfaceNumber,
                                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
-   vector<uint64> c_IDs;
-   uint64 u64_NodeID;
-   uint64 u64_BusID;
+   vector<uint64_t> c_Ids;
+   uint64_t u64_NodeId;
+   uint64_t u64_BusId;
    C_SdManUnoTopologyAddCommand * pc_AddCommand;
 
-   c_IDs.push_back(oru64_UniqueID);
-   mh_MapItemToID(opc_Node, u64_NodeID);
-   mh_MapItemToID(opc_Bus, u64_BusID);
-   pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
+   c_Ids.push_back(oru64_UniqueId);
+   mh_MapItemToId(opc_Node, u64_NodeId);
+   mh_MapItemToId(opc_Bus, u64_BusId);
+   pc_AddCommand = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids,
                                                     C_SdManUnoTopologyAddCommand::E_ElementType::eBUS_CONNECTOR,
                                                     orc_NewPos,
-                                                    u64_NodeID, u64_BusID, oru8_InterfaceNumber, orc_Properties);
+                                                    u64_NodeId, u64_BusId, oru8_InterfaceNumber, orc_Properties);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
    this->m_DoPushAndSignalError(pc_AddCommand);
@@ -220,31 +219,29 @@ void C_SdManUnoTopologyManager::DoAddBusConnector(const uint64 & oru64_UniqueID,
    \param[in]  ore_BusType                Bus type to create
    \param[in]  orc_BusName                Bus name to use initially
    \param[in]  orc_BusPosition            Target bus position
-   \param[in]  oru64_Node1UniqueID        Node 1 unique ID
-   \param[in]  oru64_Node2UniqueID        Node 2 unique ID
+   \param[in]  oru64_Node1UniqueId        Node 1 unique ID
+   \param[in]  oru64_Node2UniqueId        Node 2 unique ID
    \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
    \param[in]  oru8_Node2InterfaceNumber  Node 2 interface number
    \param[in]  orc_Node1Properties        Node 1 properties
    \param[in]  orc_Node2Properties        Node 2 properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const std::vector<uint64> & orc_FourUniqueIds, const stw_opensyde_core::C_OSCSystemBus::E_Type
-                                                                         & ore_BusType, const QString & orc_BusName,
-                                                                         const QPointF & orc_BusPosition,
-                                                                         const uint64 & oru64_Node1UniqueID,
-                                                                         const uint64 & oru64_Node2UniqueID,
-                                                                         const uint8 & oru8_Node1InterfaceNumber,
-                                                                         const uint8 & oru8_Node2InterfaceNumber,
-                                                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node1Properties,
-                                                                         const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node2Properties)
+void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(
+   const std::vector<uint64_t> & orc_FourUniqueIds, const stw::opensyde_core::C_OscSystemBus::E_Type
+   & ore_BusType, const QString & orc_BusName,
+   const QPointF & orc_BusPosition, const uint64_t & oru64_Node1UniqueId, const uint64_t & oru64_Node2UniqueId,
+   const uint8_t & oru8_Node1InterfaceNumber, const uint8_t & oru8_Node2InterfaceNumber,
+   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node1Properties,
+   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node2Properties)
 {
    if (orc_FourUniqueIds.size() >= 4)
    {
       QUndoCommand * const pc_UndoCommand = new QUndoCommand("Add node to node connection (creating new bus)");
       C_SdManUnoTopologyAddCommand * pc_TmpAddCmd;
-      vector<uint64> c_IDs;
+      vector<uint64_t> c_Ids;
       C_SdManUnoTopologyAddCommand::E_ElementType e_ElementType;
-      if (ore_BusType == stw_opensyde_core::C_OSCSystemBus::eETHERNET)
+      if (ore_BusType == stw::opensyde_core::C_OscSystemBus::eETHERNET)
       {
          e_ElementType = C_SdManUnoTopologyAddCommand::eETHERNET_BUS;
       }
@@ -253,34 +250,34 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
          e_ElementType = C_SdManUnoTopologyAddCommand::eCAN_BUS;
       }
 
-      c_IDs.push_back(orc_FourUniqueIds[0]);
-      c_IDs.push_back(orc_FourUniqueIds[1]);
-      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs, e_ElementType, orc_BusPosition,
+      c_Ids.push_back(orc_FourUniqueIds[0]);
+      c_Ids.push_back(orc_FourUniqueIds[1]);
+      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids, e_ElementType, orc_BusPosition,
                                                       orc_BusName,
                                                       pc_UndoCommand, true);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
-      c_IDs.clear();
-      c_IDs.push_back(orc_FourUniqueIds[2]);
+      c_Ids.clear();
+      c_Ids.push_back(orc_FourUniqueIds[2]);
       //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
-      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
+      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_BusPosition,
-                                                      oru64_Node1UniqueID, orc_FourUniqueIds[0],
+                                                      oru64_Node1UniqueId, orc_FourUniqueIds[0],
                                                       oru8_Node1InterfaceNumber,
                                                       orc_Node1Properties,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
               &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this,
               &C_SdManUnoTopologyManager::m_OnErrorChange);
-      c_IDs.clear();
-      c_IDs.push_back(orc_FourUniqueIds[3]);
+      c_Ids.clear();
+      c_Ids.push_back(orc_FourUniqueIds[3]);
       //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
-      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
+      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
                                                       orc_BusPosition,
-                                                      oru64_Node2UniqueID, orc_FourUniqueIds[0],
+                                                      oru64_Node2UniqueId, orc_FourUniqueIds[0],
                                                       oru8_Node2InterfaceNumber,
                                                       orc_Node2Properties,
                                                       pc_UndoCommand);
@@ -295,31 +292,29 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionAndCreateNewBus(const s
 /*! \brief   Do add one node to node connection and use an existing bus. Node 1 is new to the bus.
 
    \param[in]  orc_TwoUniqueIds           Two unique IDs for the two new items created by this action
-   \param[in]  oru64_BusUniqueID          Bus unique ID
+   \param[in]  oru64_BusUniqueId          Bus unique ID
    \param[in]  orc_Node1Position          Node 1 position
-   \param[in]  oru64_Node1UniqueID        Node 1 unique ID
+   \param[in]  oru64_Node1UniqueId        Node 1 unique ID
    \param[in]  oru8_Node1InterfaceNumber  Node 1 interface number
    \param[in]  orc_Node1Properties        Node 1 properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const std::vector<uint64> & orc_TwoUniqueIds,
-                                                                          const uint64 & oru64_BusUniqueID,
-                                                                          const QPointF & orc_Node1Position,
-                                                                          const uint64 & oru64_Node1UniqueID,
-                                                                          const uint8 & oru8_Node1InterfaceNumber,
-                                                                          const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node1Properties)
+void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(
+   const std::vector<uint64_t> & orc_TwoUniqueIds, const uint64_t & oru64_BusUniqueId,
+   const QPointF & orc_Node1Position, const uint64_t & oru64_Node1UniqueId, const uint8_t & oru8_Node1InterfaceNumber,
+   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Node1Properties)
 {
    if (orc_TwoUniqueIds.size() >= 2)
    {
       QUndoCommand * const pc_UndoCommand = new QUndoCommand("Add node to node connection (using existing bus)");
-      vector<uint64> c_IDs;
+      vector<uint64_t> c_Ids;
       C_SdManUnoTopologyAddCommand * pc_TmpAddCmd;
-      c_IDs.clear();
-      c_IDs.push_back(orc_TwoUniqueIds[0]);
+      c_Ids.clear();
+      c_Ids.push_back(orc_TwoUniqueIds[0]);
       //lint -e{423}  //no memory leak because of Qt memory management and redo engine handling
-      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_IDs,
+      pc_TmpAddCmd = new C_SdManUnoTopologyAddCommand(this->mpc_Scene, c_Ids,
                                                       C_SdManUnoTopologyAddCommand::eBUS_CONNECTOR,
-                                                      orc_Node1Position, oru64_Node1UniqueID, oru64_BusUniqueID,
+                                                      orc_Node1Position, oru64_Node1UniqueId, oru64_BusUniqueId,
                                                       oru8_Node1InterfaceNumber, orc_Node1Properties,
                                                       pc_UndoCommand);
       connect(pc_TmpAddCmd,
@@ -332,20 +327,20 @@ void C_SdManUnoTopologyManager::DoAddNodeToNodeConnectionUsingExistingBus(const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add new data based on a snapshot and reserved IDs
 
-   \param[in]  oru64_UniqueIDs         Reserved unique IDs for snapshot data
+   \param[in]  orc_UniqueIds         Reserved unique IDs for snapshot data
    \param[in]  orc_Snapshot            Snapshot data
    \param[in]  orc_NewPos              Position offset for all items
-   \param[in]  of64_HighestUsedZValue  Highest used Z value
+   \param[in]  of64_HighestUsedZetValue  Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_UniqueIDs,
+void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64_t> & orc_UniqueIds,
                                               const C_SdTopologyDataSnapshot & orc_Snapshot, const QPointF & orc_NewPos,
-                                              const float64 of64_HighestUsedZValue)
+                                              const float64_t of64_HighestUsedZetValue)
 {
    C_SdManUnoTopologyAddSnapshotCommand * pc_AddCommand;
 
    pc_AddCommand = new C_SdManUnoTopologyAddSnapshotCommand(this->mpc_Scene, orc_Snapshot,
-                                                            oru64_UniqueIDs, orc_NewPos, of64_HighestUsedZValue);
+                                                            orc_UniqueIds, orc_NewPos, of64_HighestUsedZetValue);
    connect(pc_AddCommand,
            &C_SdManUnoTopologyAddDeleteBaseCommand::SigErrorChange, this, &C_SdManUnoTopologyManager::m_OnErrorChange);
    this->DoPush(pc_AddCommand);
@@ -365,20 +360,20 @@ void C_SdManUnoTopologyManager::DoAddSnapshot(const std::vector<uint64> & oru64_
 void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const opc_BusConnector,
                                                 const C_GiNode * const opc_StartingNode,
                                                 const C_GiNode * const opc_LastNode, const QPointF & orc_ConnectionPos,
-                                                const sint32 & ors32_Interface,
+                                                const int32_t & ors32_Interface,
                                                 const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    if ((opc_StartingNode != NULL) && (opc_LastNode != NULL))
    {
-      vector<uint64> c_IDs;
-      uint64 u64_ID;
+      vector<uint64_t> c_Ids;
+      uint64_t u64_Id;
       C_SdManUnoTopologyReconnectNodeCommand * pc_ReconnectCommand;
 
-      mh_MapItemToID(opc_BusConnector, u64_ID);
-      c_IDs.push_back(u64_ID);
-      pc_ReconnectCommand = new C_SdManUnoTopologyReconnectNodeCommand(this->mpc_Scene, c_IDs,
-                                                                       opc_StartingNode->GetID(),
-                                                                       opc_LastNode->GetID(), orc_ConnectionPos,
+      mh_MapItemToId(opc_BusConnector, u64_Id);
+      c_Ids.push_back(u64_Id);
+      pc_ReconnectCommand = new C_SdManUnoTopologyReconnectNodeCommand(this->mpc_Scene, c_Ids,
+                                                                       opc_StartingNode->GetId(),
+                                                                       opc_LastNode->GetId(), orc_ConnectionPos,
                                                                        ors32_Interface, orc_Properties);
       m_MergeWithPrev(pc_ReconnectCommand);
       //Deactivate due to data change
@@ -405,20 +400,20 @@ void C_SdManUnoTopologyManager::DoReconnectNode(const C_GiLiBusConnector * const
 void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const opc_BusConnector,
                                                const C_GiLiBus * const opc_StartingBus,
                                                const C_GiLiBus * const opc_LastBus, const QPointF & orc_ConnectionPos,
-                                               const sint32 & ors32_Interface,
+                                               const int32_t & ors32_Interface,
                                                const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    if ((opc_StartingBus != NULL) && (opc_LastBus != NULL))
    {
-      vector<uint64> c_IDs;
-      uint64 u64_ID;
+      vector<uint64_t> c_Ids;
+      uint64_t u64_Id;
       C_SdManUnoTopologyReconnectBusCommand * pc_ReconnectCommand;
 
-      mh_MapItemToID(opc_BusConnector, u64_ID);
-      c_IDs.push_back(u64_ID);
-      pc_ReconnectCommand = new C_SdManUnoTopologyReconnectBusCommand(this->mpc_Scene, c_IDs,
-                                                                      opc_StartingBus->GetID(),
-                                                                      opc_LastBus->GetID(), orc_ConnectionPos,
+      mh_MapItemToId(opc_BusConnector, u64_Id);
+      c_Ids.push_back(u64_Id);
+      pc_ReconnectCommand = new C_SdManUnoTopologyReconnectBusCommand(this->mpc_Scene, c_Ids,
+                                                                      opc_StartingBus->GetId(),
+                                                                      opc_LastBus->GetId(), orc_ConnectionPos,
                                                                       ors32_Interface, orc_Properties);
       m_MergeWithPrev(pc_ReconnectCommand);
       //Deactivate due to data change
@@ -442,20 +437,20 @@ void C_SdManUnoTopologyManager::DoReconnectBus(const C_GiLiBusConnector * const 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * const opc_BusConnector,
-                                                  const uint8 & oru8_PreviousInterfaceNumber,
-                                                  const uint8 & oru8_NewInterfaceNumber,
+                                                  const uint8_t & oru8_PreviousInterfaceNumber,
+                                                  const uint8_t & oru8_NewInterfaceNumber,
                                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_PreviousProperties,
                                                   const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_NewProperties)
 {
    if (opc_BusConnector != NULL)
    {
-      vector<uint64> c_IDs;
-      uint64 u64_ID;
+      vector<uint64_t> c_Ids;
+      uint64_t u64_Id;
       C_SdManUnoTopologyChangeInterfaceCommand * pc_ReconnectCommand;
 
-      mh_MapItemToID(opc_BusConnector, u64_ID);
-      c_IDs.push_back(u64_ID);
-      pc_ReconnectCommand = new C_SdManUnoTopologyChangeInterfaceCommand(this->mpc_Scene, c_IDs,
+      mh_MapItemToId(opc_BusConnector, u64_Id);
+      c_Ids.push_back(u64_Id);
+      pc_ReconnectCommand = new C_SdManUnoTopologyChangeInterfaceCommand(this->mpc_Scene, c_Ids,
                                                                          oru8_PreviousInterfaceNumber,
                                                                          oru8_NewInterfaceNumber,
                                                                          orc_PreviousProperties, orc_NewProperties);
@@ -479,7 +474,7 @@ void C_SdManUnoTopologyManager::DoChangeInterface(const C_GiLiBusConnector * con
    Valid pointer to new style command
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SebUnoSetupStyleCommand * C_SdManUnoTopologyManager::m_GetNewStyleCommand(const std::vector<uint64> & orc_Items,
+C_SebUnoSetupStyleCommand * C_SdManUnoTopologyManager::m_GetNewStyleCommand(const std::vector<uint64_t> & orc_Items,
                                                                             const bool oq_DarkMode)
 {
    return new C_SdManUnoTopologySetupStyleCommand(this->mpc_Scene, orc_Items, oq_DarkMode);
@@ -493,7 +488,7 @@ C_SebUnoSetupStyleCommand * C_SdManUnoTopologyManager::m_GetNewStyleCommand(cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdManUnoTopologyManager::m_MergeWithPrev(QUndoCommand * const opc_Command)
 {
-   const sint32 s32_LastIndex = static_cast<sint32>(this->count()) - 1L;
+   const int32_t s32_LastIndex = static_cast<int32_t>(this->count()) - 1L;
    const QUndoCommand * const opc_LastCommand = this->command(s32_LastIndex);
 
    if (opc_LastCommand != NULL)

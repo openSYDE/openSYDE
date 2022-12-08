@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SdNdeUnoDasDataPoolListDataChangeCommand.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCNodeDataPoolDataSet.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SdNdeUnoDasDataPoolListDataChangeCommand.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNodeDataPoolDataSet.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,8 +49,8 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoDasDataPoolListDataChangeCommand::C_SdNdeUnoDasDataPoolListDataChangeCommand(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType,
+C_SdNdeUnoDasDataPoolListDataChangeCommand::C_SdNdeUnoDasDataPoolListDataChangeCommand(const uint32_t & oru32_NodeIndex,
+                                                                                       const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32_t & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType,
                                                                                        QUndoCommand * const opc_Parent)
    :
    C_SdNdeUnoDasDataPoolListBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
@@ -93,22 +92,22 @@ void C_SdNdeUnoDasDataPoolListDataChangeCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDasDataPoolListDataChangeCommand::m_Change(QVariant & orc_PreviousData, const QVariant & orc_NewData)
 {
-   const C_OSCNodeDataPoolDataSet * const pc_OSCData = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListDataSet(
+   const C_OscNodeDataPoolDataSet * const pc_OscData = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListDataSet(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex,
       this->mu32_DataPoolListIndex,
       this->mu32_DataPoolListDataSetIndex);
 
-   if (pc_OSCData != NULL)
+   if (pc_OscData != NULL)
    {
-      C_OSCNodeDataPoolDataSet c_OSCData = *pc_OSCData;
+      C_OscNodeDataPoolDataSet c_OscData = *pc_OscData;
       //Copy previous value
       switch (this->me_DataChangeType)
       {
       case C_SdNdeDpUtil::eDATA_SET_NAME:
-         orc_PreviousData = static_cast<QString>(c_OSCData.c_Name.c_str());
+         orc_PreviousData = static_cast<QString>(c_OscData.c_Name.c_str());
          break;
       case C_SdNdeDpUtil::eDATA_SET_COMMENT:
-         orc_PreviousData = static_cast<QString>(c_OSCData.c_Comment.c_str());
+         orc_PreviousData = static_cast<QString>(c_OscData.c_Comment.c_str());
          break;
       default:
          break;
@@ -117,18 +116,18 @@ void C_SdNdeUnoDasDataPoolListDataChangeCommand::m_Change(QVariant & orc_Previou
       switch (this->me_DataChangeType)
       {
       case C_SdNdeDpUtil::eDATA_SET_NAME:
-         c_OSCData.c_Name = orc_NewData.toString().toStdString().c_str();
+         c_OscData.c_Name = orc_NewData.toString().toStdString().c_str();
          break;
       case C_SdNdeDpUtil::eDATA_SET_COMMENT:
-         c_OSCData.c_Comment = orc_NewData.toString().toStdString().c_str();
+         c_OscData.c_Comment = orc_NewData.toString().toStdString().c_str();
          break;
       default:
          break;
       }
-      C_PuiSdHandler::h_GetInstance()->SetOSCNodeDataPoolDataSet(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+      C_PuiSdHandler::h_GetInstance()->SetOscNodeDataPoolDataSet(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                  this->mu32_DataPoolListIndex,
                                                                  this->mu32_DataPoolListDataSetIndex,
-                                                                 c_OSCData);
+                                                                 c_OscData);
 
       //Signal data change
       if (this->mpc_DataPoolListModelViewManager != NULL)

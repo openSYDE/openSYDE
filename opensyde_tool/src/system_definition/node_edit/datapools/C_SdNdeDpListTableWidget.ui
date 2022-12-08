@@ -61,7 +61,7 @@
        </spacer>
       </item>
       <item row="1" column="1">
-       <widget class="stw_opensyde_gui_elements::C_OgeChxDefaultCheckedDisabled" name="pc_CheckBoxCRC">
+       <widget class="stw::opensyde_gui_elements::C_OgeChxDefaultCheckedDisabled" name="pc_CheckBoxCrc">
         <property name="text">
          <string>checksum</string>
         </property>
@@ -103,7 +103,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui::C_SdNdeDpListTableView" name="pc_TableView">
+    <widget class="stw::opensyde_gui::C_SdNdeDpListTableView" name="pc_TableView">
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
      </attribute>
@@ -126,14 +126,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpListTableView</class>
+   <class>stw::opensyde_gui::C_SdNdeDpListTableView</class>
    <extends>QTableView</extends>
-   <header>C_SdNdeDpListTableView.h</header>
+   <header>C_SdNdeDpListTableView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxDefaultCheckedDisabled</class>
+   <class>stw::opensyde_gui_elements::C_OgeChxDefaultCheckedDisabled</class>
    <extends>QCheckBox</extends>
-   <header>C_OgeChxDefaultCheckedDisabled.h</header>
+   <header>C_OgeChxDefaultCheckedDisabled.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

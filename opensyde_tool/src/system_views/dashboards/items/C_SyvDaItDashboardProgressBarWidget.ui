@@ -30,7 +30,7 @@
     <number>50</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeDashboardProgressBar" name="pc_ProgressBar">
+    <widget class="stw::opensyde_gui_elements::C_OgeDashboardProgressBar" name="pc_ProgressBar">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -52,9 +52,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeDashboardProgressBar</class>
+   <class>stw::opensyde_gui_elements::C_OgeDashboardProgressBar</class>
    <extends>QProgressBar</extends>
-   <header>C_OgeDashboardProgressBar.h</header>
+   <header>C_OgeDashboardProgressBar.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

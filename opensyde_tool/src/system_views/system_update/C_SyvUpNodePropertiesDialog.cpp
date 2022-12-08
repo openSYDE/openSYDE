@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "TGLUtils.h"
+#include "TglUtils.hpp"
 
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
-#include "C_SyvUpNodePropertiesDialog.h"
+#include "C_SyvUpNodePropertiesDialog.hpp"
 #include "ui_C_SyvUpNodePropertiesDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_diag_lib;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::diag_lib;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpNodePropertiesDialog::mhc_HTML_CELL_TAG_START_MAIN = "<td style=\"padding: 0px 40px 10px 0px;\">";
@@ -57,8 +56,8 @@ const QString C_SyvUpNodePropertiesDialog::mhc_HTML_CELL_TAG_START_STATUS = "<td
    \param[in]      orc_NodeData     Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                         const uint32 ou32_NodeIndex,
+C_SyvUpNodePropertiesDialog::C_SyvUpNodePropertiesDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                         const uint32_t ou32_NodeIndex,
                                                          const C_GiSvNodeData & orc_NodeData) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpNodePropertiesDialog),
@@ -176,9 +175,9 @@ void C_SyvUpNodePropertiesDialog::CopyUpdateStatus(C_GiSvNodeData & orc_NodeData
    \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpNodePropertiesDialog::CopySTWDeviceInfo(C_GiSvNodeData & orc_NodeData) const
+void C_SyvUpNodePropertiesDialog::CopyStwDeviceInfo(C_GiSvNodeData & orc_NodeData) const
 {
-   this->mc_NodeData.CopySTWDeviceInfo(orc_NodeData);
+   this->mc_NodeData.CopyStwDeviceInfo(orc_NodeData);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,9 +186,9 @@ void C_SyvUpNodePropertiesDialog::CopySTWDeviceInfo(C_GiSvNodeData & orc_NodeDat
    \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpNodePropertiesDialog::CopyOSYDeviceInfo(C_GiSvNodeData & orc_NodeData) const
+void C_SyvUpNodePropertiesDialog::CopyOpenSydeDeviceInfo(C_GiSvNodeData & orc_NodeData) const
 {
-   this->mc_NodeData.CopyOSYDeviceInfo(orc_NodeData);
+   this->mc_NodeData.CopyOsyDeviceInfo(orc_NodeData);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -216,8 +215,8 @@ void C_SyvUpNodePropertiesDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -313,16 +312,16 @@ void C_SyvUpNodePropertiesDialog::m_InitStatus(void) const
 void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
 {
    QString c_Content = "<html><body>";
-   const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+   const std::vector<uint32_t> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
       this->mu32_NodeIndex);
 
    tgl_assert(c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount());
    if (c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount())
    {
-      for (uint32 u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
+      for (uint32_t u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
       {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItDevice]);
+         const C_OscNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndices[u32_ItDevice]);
          const C_GiSvSubNodeData * const pc_SubDevice =
             this->mc_NodeData.GetSubNodeByNodeIndex(c_NodeIndices[u32_ItDevice]);
          tgl_assert((pc_Node != NULL) && (pc_SubDevice != NULL));
@@ -349,7 +348,7 @@ void C_SyvUpNodePropertiesDialog::m_InitDataBlockTable(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNodeData & orc_NodeInfo,
-                                                               QString & orc_Content, const C_OSCNode & orc_Node,
+                                                               QString & orc_Content, const C_OscNode & orc_Node,
                                                                const bool oq_IsMultiDevice)
 {
    QString c_NewContent;
@@ -373,7 +372,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
             {
                if (orc_Node.c_Applications.size() == orc_NodeInfo.GetHexFileInfosCount())
                {
-                  for (uint32 u32_ItFile = 0; u32_ItFile < orc_NodeInfo.GetHexFileInfosCount();
+                  for (uint32_t u32_ItFile = 0; u32_ItFile < orc_NodeInfo.GetHexFileInfosCount();
                        ++u32_ItFile)
                   {
                      QString c_FileProjectName;
@@ -440,8 +439,8 @@ void C_SyvUpNodePropertiesDialog::mh_InitDataBlockTableForNode(const C_GiSvSubNo
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNodeData & orc_NodeInfo,
-                                                               const C_OSCNode & orc_Node,
-                                                               const uint32 ou32_ApplicationIndex,
+                                                               const C_OscNode & orc_Node,
+                                                               const uint32_t ou32_ApplicationIndex,
                                                                QString & orc_ApplicationName,
                                                                QString & orc_ApplicationStateIcon,
                                                                QString & orc_ApplicationState,
@@ -455,7 +454,7 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
 {
    const C_XFLECUInformation * const pc_FileInfo = orc_NodeInfo.GetHexFileInfo(
       ou32_ApplicationIndex);
-   const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[ou32_ApplicationIndex];
+   const C_OscNodeApplication & rc_Application = orc_Node.c_Applications[ou32_ApplicationIndex];
    bool q_Missing = true;
    bool q_Match = true;
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
@@ -483,8 +482,8 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
    //If error happened also skip this
    if (((((orc_NodeInfo.GetInitialStatus() == C_SyvUtil::eI_APPLICATION_MATCH) ||
           (orc_NodeInfo.GetUpdateSuccessStatus())) &&
-         ((c_DeviceInfo.pc_OSYDevice != NULL) ||
-          (c_DeviceInfo.pc_STWDevice != NULL))) &&
+         ((c_DeviceInfo.pc_OpenSydeDevice != NULL) ||
+          (c_DeviceInfo.pc_StwDevice != NULL))) &&
         (orc_NodeInfo.GetUpdateFailedStatus() == false)) &&
        (orc_NodeInfo.IsDeviceInfoDiscarded() == false))
    {
@@ -492,7 +491,7 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
       orc_DeviceProjectName = orc_FileProjectName;
       orc_DeviceFileVersion = orc_FileVersion;
       orc_DeviceBuildDate = orc_FileBuildDate;
-      if (c_DeviceInfo.pc_OSYDevice != NULL)
+      if (c_DeviceInfo.pc_OpenSydeDevice != NULL)
       {
          orc_DeviceValidStatus = C_GtGetText::h_GetText("Valid");
       }
@@ -510,7 +509,7 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
       orc_DeviceProjectName = orc_FileProjectName;
       orc_DeviceFileVersion = orc_FileVersion;
       orc_DeviceBuildDate = orc_FileBuildDate;
-      if (c_DeviceInfo.pc_STWDevice != NULL)
+      if (c_DeviceInfo.pc_StwDevice != NULL)
       {
          orc_DeviceValidStatus = C_GtGetText::h_GetText("Valid");
       }
@@ -536,21 +535,21 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
    }
    else
    {
-      if (c_DeviceInfo.pc_STWDevice != NULL)
+      if (c_DeviceInfo.pc_StwDevice != NULL)
       {
-         C_SyvUpNodePropertiesDialog::mh_ExtractSTWDeviceInformation(orc_NodeInfo, orc_FileProjectName,
+         C_SyvUpNodePropertiesDialog::mh_ExtractStwDeviceInformation(orc_NodeInfo, orc_FileProjectName,
                                                                      orc_DeviceProjectName,
                                                                      orc_FileVersion, orc_DeviceFileVersion,
                                                                      orc_FileBuildDate, orc_DeviceBuildDate,
                                                                      orc_DeviceValidStatus, q_Missing, q_Match);
       }
-      else if (c_DeviceInfo.pc_OSYDevice != NULL)
+      else if (c_DeviceInfo.pc_OpenSydeDevice != NULL)
       {
-         C_SyvUpNodePropertiesDialog::mh_ExtractOSYDeviceInformation(orc_NodeInfo, orc_FileProjectName,
-                                                                     orc_DeviceProjectName,
-                                                                     orc_FileVersion, orc_DeviceFileVersion,
-                                                                     orc_FileBuildDate, orc_DeviceBuildDate,
-                                                                     orc_DeviceValidStatus, q_Missing, q_Match);
+         C_SyvUpNodePropertiesDialog::mh_ExtractOpenSydeDeviceInformation(orc_NodeInfo, orc_FileProjectName,
+                                                                          orc_DeviceProjectName,
+                                                                          orc_FileVersion, orc_DeviceFileVersion,
+                                                                          orc_FileBuildDate, orc_DeviceBuildDate,
+                                                                          orc_DeviceValidStatus, q_Missing, q_Match);
       }
       else
       {
@@ -595,7 +594,7 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
    \param[in,out]  orq_MatchStatus        Match status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpNodePropertiesDialog::mh_ExtractSTWDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
+void C_SyvUpNodePropertiesDialog::mh_ExtractStwDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
                                                                  const QString & orc_FileProjectName,
                                                                  QString & orc_DeviceProjectName,
                                                                  const QString & orc_FileVersion,
@@ -607,25 +606,25 @@ void C_SyvUpNodePropertiesDialog::mh_ExtractSTWDeviceInformation(const C_GiSvSub
 {
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
 
-   for (sint32 s32_ItDeviceInfoBlock = 0;
+   for (int32_t s32_ItDeviceInfoBlock = 0;
         s32_ItDeviceInfoBlock <
-        c_DeviceInfo.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks.
+        c_DeviceInfo.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks.
         GetLength();
         ++s32_ItDeviceInfoBlock)
    {
-      const C_XFLECUInformation & rc_STWDeviceInfo =
-         c_DeviceInfo.pc_STWDevice->c_BasicInformation.c_DeviceInfoBlocks[
+      const C_XFLECUInformation & rc_StwDeviceInfo =
+         c_DeviceInfo.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks[
             s32_ItDeviceInfoBlock];
       //Search for name match
-      if (orc_FileProjectName.compare(rc_STWDeviceInfo.acn_ProjectName) == 0)
+      if (orc_FileProjectName.compare(rc_StwDeviceInfo.acn_ProjectName) == 0)
       {
          //Signal found
          orq_MissingStatus = false;
          //Apply
-         orc_DeviceProjectName = rc_STWDeviceInfo.acn_ProjectName;
-         orc_DeviceFileVersion = rc_STWDeviceInfo.acn_ProjectVersion;
-         orc_DeviceBuildDate = static_cast<QString>(rc_STWDeviceInfo.acn_Date) + " " +
-                               rc_STWDeviceInfo.acn_Time;
+         orc_DeviceProjectName = rc_StwDeviceInfo.acn_ProjectName;
+         orc_DeviceFileVersion = rc_StwDeviceInfo.acn_ProjectVersion;
+         orc_DeviceBuildDate = static_cast<QString>(rc_StwDeviceInfo.acn_Date) + " " +
+                               rc_StwDeviceInfo.acn_Time;
          //Highlighting
          orq_MatchStatus = C_SyvUpNodePropertiesDialog::mh_HandleHighlighting(orc_FileProjectName,
                                                                               orc_DeviceProjectName,
@@ -653,26 +652,26 @@ void C_SyvUpNodePropertiesDialog::mh_ExtractSTWDeviceInformation(const C_GiSvSub
    \param[in,out]  orq_MatchStatus        Match status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpNodePropertiesDialog::mh_ExtractOSYDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
-                                                                 const QString & orc_FileProjectName,
-                                                                 QString & orc_DeviceProjectName,
-                                                                 const QString & orc_FileVersion,
-                                                                 QString & orc_DeviceFileVersion,
-                                                                 const QString & orc_FileBuildDate,
-                                                                 QString & orc_DeviceBuildDate,
-                                                                 QString & orc_DeviceValidStatus,
-                                                                 bool & orq_MissingStatus, bool & orq_MatchStatus)
+void C_SyvUpNodePropertiesDialog::mh_ExtractOpenSydeDeviceInformation(const C_GiSvSubNodeData & orc_NodeInfo,
+                                                                      const QString & orc_FileProjectName,
+                                                                      QString & orc_DeviceProjectName,
+                                                                      const QString & orc_FileVersion,
+                                                                      QString & orc_DeviceFileVersion,
+                                                                      const QString & orc_FileBuildDate,
+                                                                      QString & orc_DeviceBuildDate,
+                                                                      QString & orc_DeviceValidStatus,
+                                                                      bool & orq_MissingStatus, bool & orq_MatchStatus)
 {
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
 
    //Skip first application because this is the flashloader (OSY ONLY!)
-   for (uint32 u32_ItOsyApplication = 1;
+   for (uint32_t u32_ItOsyApplication = 1;
         u32_ItOsyApplication <
-        c_DeviceInfo.pc_OSYDevice->c_Applications.size();
+        c_DeviceInfo.pc_OpenSydeDevice->c_Applications.size();
         ++u32_ItOsyApplication)
    {
-      const C_OSCProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
-         c_DeviceInfo.pc_OSYDevice->c_Applications[u32_ItOsyApplication];
+      const C_OscProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
+         c_DeviceInfo.pc_OpenSydeDevice->c_Applications[u32_ItOsyApplication];
       //Search for name match
       if (orc_FileProjectName.compare(rc_OsyDeviceInfo.c_ApplicationName.c_str()) == 0)
       {
@@ -841,7 +840,7 @@ void C_SyvUpNodePropertiesDialog::mh_ExtractDetailsPartFromDataForNode(const boo
    \param[in,out]  orc_Content               Content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpNodePropertiesDialog::mh_AppendApplicationForNode(const uint32 ou32_ApplicationIndex,
+void C_SyvUpNodePropertiesDialog::mh_AppendApplicationForNode(const uint32_t ou32_ApplicationIndex,
                                                               const QString & orc_ApplicationName,
                                                               const QString & orc_ApplicationStateIcon,
                                                               const QString & orc_ApplicationState,
@@ -932,16 +931,16 @@ void C_SyvUpNodePropertiesDialog::m_InitFlashloaderTable(void) const
 {
    QString c_Content = "<html><body>";
 
-   const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+   const std::vector<uint32_t> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
       this->mu32_NodeIndex);
 
    tgl_assert(c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount());
    if (c_NodeIndices.size() == this->mc_NodeData.GetSubNodeCount())
    {
-      for (uint32 u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
+      for (uint32_t u32_ItDevice = 0UL; u32_ItDevice < c_NodeIndices.size(); ++u32_ItDevice)
       {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItDevice]);
+         const C_OscNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndices[u32_ItDevice]);
          const C_GiSvSubNodeData * const pc_SubDevice =
             this->mc_NodeData.GetSubNodeByNodeIndex(c_NodeIndices[u32_ItDevice]);
          tgl_assert((pc_Node != NULL) && (pc_SubDevice != NULL));
@@ -967,21 +966,21 @@ void C_SyvUpNodePropertiesDialog::m_InitFlashloaderTable(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(const C_GiSvSubNodeData & orc_NodeInfo,
-                                                                 QString & orc_Content, const C_OSCNode & orc_Node,
+                                                                 QString & orc_Content, const C_OscNode & orc_Node,
                                                                  const bool oq_IsMultiDevice)
 {
    QString c_NewContent = "";
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
 
-   stw_scl::C_SCLStringList c_List;
+   stw::scl::C_SclStringList c_List;
 
-   if (c_DeviceInfo.pc_OSYDevice != NULL)
+   if (c_DeviceInfo.pc_OpenSydeDevice != NULL)
    {
-      C_OSCSuSequences::h_OpenSydeFlashloaderInformationToText(*c_DeviceInfo.pc_OSYDevice, c_List);
+      C_OscSuSequences::h_OpenSydeFlashloaderInformationToText(*c_DeviceInfo.pc_OpenSydeDevice, c_List);
    }
-   else if (c_DeviceInfo.pc_STWDevice != NULL)
+   else if (c_DeviceInfo.pc_StwDevice != NULL)
    {
-      C_OSCSuSequences::h_StwFlashloaderInformationToText(*c_DeviceInfo.pc_STWDevice, c_List);
+      C_OscSuSequences::h_StwFlashloaderInformationToText(*c_DeviceInfo.pc_StwDevice, c_List);
    }
    else
    {
@@ -992,7 +991,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(const C_GiSvSub
       c_NewContent +=
          static_cast<QString>(C_GtGetText::h_GetText("Note: Flashloader data is read during \"Enter Update Mode\""));
       c_NewContent += "<p>";
-      for (sint32 s32_ItString = 0; s32_ItString < c_List.Strings.GetLength(); ++s32_ItString)
+      for (int32_t s32_ItString = 0; s32_ItString < c_List.Strings.GetLength(); ++s32_ItString)
       {
          c_NewContent += static_cast<QString>(c_List.Strings[s32_ItString].c_str()) + "<br/>";
       }
@@ -1011,7 +1010,7 @@ void C_SyvUpNodePropertiesDialog::mh_InitFlashloaderTableForNode(const C_GiSvSub
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpNodePropertiesDialog::mh_HandleSectionAppend(const QString & orc_NewPart, QString & orc_CompleteSection,
-                                                         const C_OSCNode & orc_Node, const bool oq_IsMultiDevice)
+                                                         const C_OscNode & orc_Node, const bool oq_IsMultiDevice)
 {
    if ((!orc_NewPart.isEmpty()) && (oq_IsMultiDevice))
    {
@@ -1071,8 +1070,8 @@ QString C_SyvUpNodePropertiesDialog::m_GetProgressLogConnectStatesString(void) c
 
    if (this->mc_NodeData.IsNodeConnectStatesSet() == true)
    {
-      const uint32 u32_SubNodeCount = this->mc_NodeData.GetSubNodeCount();
-      uint32 u32_SubNodeCounter;
+      const uint32_t u32_SubNodeCount = this->mc_NodeData.GetSubNodeCount();
+      uint32_t u32_SubNodeCounter;
 
       for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < u32_SubNodeCount; ++u32_SubNodeCounter)
       {
@@ -1088,8 +1087,8 @@ QString C_SyvUpNodePropertiesDialog::m_GetProgressLogConnectStatesString(void) c
                if (u32_SubNodeCount > 1)
                {
                   // In case of a multiple CPU node, printing each name
-                  const uint32 u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
-                  const C_OSCNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+                  const uint32_t u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
+                  const C_OscNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
                   if (opc_OscNode != NULL)
                   {
                      c_Text += static_cast<QString>(C_GtGetText::h_GetText("Node: ")) +
@@ -1142,7 +1141,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogConnectStatesStringForSubN
       const QString c_Yes = static_cast<QString>(C_GtGetText::h_GetText("Yes"));
       const QString c_No = static_cast<QString>(C_GtGetText::h_GetText("No"));
       const QString c_Skipped = static_cast<QString>(C_GtGetText::h_GetText("Skipped"));
-      const C_OSCSuSequencesNodeConnectStates & rc_States = opc_SubNodeData->GetNodeConnectStates();
+      const C_OscSuSequencesNodeConnectStates & rc_States = opc_SubNodeData->GetNodeConnectStates();
       const C_GiSvSubNodeData::C_GiSvSubNodeDataPreconditionErrors & rc_PreconditionErrors =
          opc_SubNodeData->GetNodeConnectPreconditionErrors();
 
@@ -1232,8 +1231,8 @@ QString C_SyvUpNodePropertiesDialog::m_GetProgressLogUpdateStatesString(void) co
 
       if (q_UpdateStatesSet == true)
       {
-         const uint32 u32_SubNodeCount = this->mc_NodeData.GetSubNodeCount();
-         uint32 u32_SubNodeCounter;
+         const uint32_t u32_SubNodeCount = this->mc_NodeData.GetSubNodeCount();
+         uint32_t u32_SubNodeCounter;
 
          for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < u32_SubNodeCount; ++u32_SubNodeCounter)
          {
@@ -1249,8 +1248,8 @@ QString C_SyvUpNodePropertiesDialog::m_GetProgressLogUpdateStatesString(void) co
                   if (u32_SubNodeCount > 1)
                   {
                      // In case of a multiple CPU node, printing each name
-                     const uint32 u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
-                     const C_OSCNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                     const uint32_t u32_NodeIndex = pc_SubNodeData->GetNodeIndex();
+                     const C_OscNode * const opc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                         u32_NodeIndex);
                      if (opc_OscNode != NULL)
                      {
@@ -1294,14 +1293,14 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
 
    if (opc_SubNodeData != NULL)
    {
-      const C_OSCSuSequencesNodeUpdateStates & rc_States = opc_SubNodeData->GetNodeUpdateStates();
-      uint32 u32_FileCounter;
+      const C_OscSuSequencesNodeUpdateStates & rc_States = opc_SubNodeData->GetNodeUpdateStates();
+      uint32_t u32_FileCounter;
       bool q_AtLeastOneFile = false;
 
       // Hex files
       for (u32_FileCounter = 0U; u32_FileCounter < rc_States.c_StateHexFiles.size(); ++u32_FileCounter)
       {
-         const C_OSCSuSequencesNodeHexFileStates & rc_FileState = rc_States.c_StateHexFiles[u32_FileCounter];
+         const C_OscSuSequencesNodeHexFileStates & rc_FileState = rc_States.c_StateHexFiles[u32_FileCounter];
 
          q_AtLeastOneFile = true;
 
@@ -1356,7 +1355,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
       // STW flashloader files
       for (u32_FileCounter = 0U; u32_FileCounter < rc_States.c_StateStwFlHexFiles.size(); ++u32_FileCounter)
       {
-         const C_OSCSuSequencesNodeStwFlHexFileStates & rc_FileState = rc_States.c_StateStwFlHexFiles[u32_FileCounter];
+         const C_OscSuSequencesNodeStwFlHexFileStates & rc_FileState = rc_States.c_StateStwFlHexFiles[u32_FileCounter];
 
          q_AtLeastOneFile = true;
 
@@ -1381,7 +1380,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
       // Other files
       for (u32_FileCounter = 0U; u32_FileCounter < rc_States.c_StateOtherFiles.size(); ++u32_FileCounter)
       {
-         const C_OSCSuSequencesNodeOtherFileStates & rc_FileState = rc_States.c_StateOtherFiles[u32_FileCounter];
+         const C_OscSuSequencesNodeOtherFileStates & rc_FileState = rc_States.c_StateOtherFiles[u32_FileCounter];
 
          q_AtLeastOneFile = true;
 
@@ -1420,7 +1419,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
       // PSI files
       for (u32_FileCounter = 0U; u32_FileCounter < rc_States.c_StatePsiFiles.size(); ++u32_FileCounter)
       {
-         const C_OSCSuSequencesNodePsiFileStates & rc_FileState = rc_States.c_StatePsiFiles[u32_FileCounter];
+         const C_OscSuSequencesNodePsiFileStates & rc_FileState = rc_States.c_StatePsiFiles[u32_FileCounter];
 
          q_AtLeastOneFile = true;
 
@@ -1444,7 +1443,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
       // PEM file
       if (rc_States.c_StatePemFile.c_FileName != "")
       {
-         const C_OSCSuSequencesNodePemFileStates & rc_FileState = rc_States.c_StatePemFile;
+         const C_OscSuSequencesNodePemFileStates & rc_FileState = rc_States.c_StatePemFile;
 
          q_AtLeastOneFile = true;
 
@@ -1505,29 +1504,29 @@ QString C_SyvUpNodePropertiesDialog::mh_GetProgressLogUpdateStatesStringForSubNo
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUpNodePropertiesDialog::mh_GetTableLineForBrowser(const QString & orc_FirstRow,
-                                                               const QString & orc_SecondRow, const uint32 ou32_Layer)
+                                                               const QString & orc_SecondRow, const uint32_t ou32_Layer)
 {
    QString c_Text = "";
-   sintn sn_UsedMargin;
-   sintn sn_UsedWidthCol1;
+   int32_t s32_UsedMargin;
+   int32_t s32_UsedWidthCol1;
 
    // Configuration of the table layout dependent of the layer
    switch (ou32_Layer)
    {
    case 2:
-      sn_UsedMargin = 29;
-      sn_UsedWidthCol1 = 59;
+      s32_UsedMargin = 29;
+      s32_UsedWidthCol1 = 59;
       break;
    case 1:
    default: // 1 is default
-      sn_UsedMargin = 10;
-      sn_UsedWidthCol1 = 60;
+      s32_UsedMargin = 10;
+      s32_UsedWidthCol1 = 60;
       break;
    }
 
-   c_Text += "<table width=\"100%\" style =\" margin-left:" + QString::number(sn_UsedMargin) + "px\">";
+   c_Text += "<table width=\"100%\" style =\" margin-left:" + QString::number(s32_UsedMargin) + "px\">";
    c_Text += "<tr>";
-   c_Text += "<td width=\"" + QString::number(sn_UsedWidthCol1) + "%\">" + orc_FirstRow + "</td>";
+   c_Text += "<td width=\"" + QString::number(s32_UsedWidthCol1) + "%\">" + orc_FirstRow + "</td>";
    c_Text += "<td width=\"20%\">" + orc_SecondRow + "</td>";
    c_Text += "</tr>";
    c_Text += "</table>";
@@ -1544,7 +1543,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetTableLineForBrowser(const QString & o
    Text interpretation of state
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodeStateString(const E_OSCSuSequencesNodeState oe_State)
+QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodeStateString(const E_OscSuSequencesNodeState oe_State)
 {
    QString c_Text;
    const QString c_Ok = static_cast<QString>(C_GtGetText::h_GetText("Ok"));
@@ -1585,8 +1584,8 @@ QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodeStateString(const E_OSC
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodeFileLoadStateString(
-   const stw_opensyde_core::E_OSCSuSequencesNodeState oe_StateExists,
-   const stw_opensyde_core::E_OSCSuSequencesNodeState oe_StateLoadedd)
+   const stw::opensyde_core::E_OscSuSequencesNodeState oe_StateExists,
+   const stw::opensyde_core::E_OscSuSequencesNodeState oe_StateLoadedd)
 {
    QString c_Text;
    const QString c_Ok = static_cast<QString>(C_GtGetText::h_GetText("Ok"));

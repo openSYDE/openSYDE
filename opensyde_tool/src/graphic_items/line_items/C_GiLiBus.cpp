@@ -8,22 +8,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GiLiBus.h"
-#include "C_GtGetText.h"
-#include "C_GiSyLineWidget.h"
-#include "gitypes.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCUtils.h"
+#include "C_GiLiBus.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSyLineWidget.hpp"
+#include "gitypes.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +42,7 @@ using namespace stw_types;
    Set up GUI with all elements.
 
    \param[in]      ors32_Index            Index of data element in system definition
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in]      opc_TextElementName    Pointer to text element for showing bus name
    \param[in]      oq_DoErrorCheck        Optional flag to trigger error check directly in constructor
    \param[in]      opc_Points             Points for line
@@ -51,13 +50,13 @@ using namespace stw_types;
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiLiBus::C_GiLiBus(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                      C_GiTextElementBus * const opc_TextElementName, const bool oq_DoErrorCheck,
                      const std::vector<QPointF> * const opc_Points, const bool & orq_MiddleLine,
                      QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(opc_Points, orq_MiddleLine, opc_Parent),
    C_PuiSdDataElement(ors32_Index, C_PuiSdDataElement::eBUS),
-   C_GiUnique(oru64_ID),
+   C_GiUnique(oru64_Id),
    mpc_TextElementName(opc_TextElementName)
 {
    // Init z order
@@ -68,18 +67,19 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
 
    if (opc_Points == NULL)
    {
-      const stw_opensyde_gui_logic::C_PuiSdBus * const pc_UIBus = C_PuiSdHandler::h_GetInstance()->GetUIBus(ms32_Index);
-      if (pc_UIBus != NULL)
+      const stw::opensyde_gui_logic::C_PuiSdBus * const pc_UiBus =
+         C_PuiSdHandler::h_GetInstance()->GetUiBus(ms32_Index);
+      if (pc_UiBus != NULL)
       {
-         stw_opensyde_gui_logic::C_PuiSdBus c_UIBus = *pc_UIBus;
+         stw::opensyde_gui_logic::C_PuiSdBus c_UiBus = *pc_UiBus;
          //Safety first
-         if (c_UIBus.c_UIInteractionPoints.size() < 2)
+         if (c_UiBus.c_UiInteractionPoints.size() < 2)
          {
-            c_UIBus.c_UIInteractionPoints.push_back(QPointF(0.0, 0.0));
-            c_UIBus.c_UIInteractionPoints.push_back(QPointF(25.0, 25.0));
+            c_UiBus.c_UiInteractionPoints.emplace_back(QPointF(0.0, 0.0));
+            c_UiBus.c_UiInteractionPoints.emplace_back(QPointF(25.0, 25.0));
          }
-         m_Init(c_UIBus.c_UIInteractionPoints);
-         C_PuiSdHandler::h_GetInstance()->SetUIBus(ms32_Index, c_UIBus);
+         m_Init(c_UiBus.c_UiInteractionPoints);
+         C_PuiSdHandler::h_GetInstance()->SetUiBus(ms32_Index, c_UiBus);
          this->C_GiLiBus::LoadData();
       }
    }
@@ -88,8 +88,8 @@ C_GiLiBus::C_GiLiBus(const stw_types::sint32 & ors32_Index, const uint64 & oru64
    if (this->mpc_TextElementName != NULL)
    {
       // initial values?
-      if ((C_OSCUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().x(), 0.0) == true) &&
-          (C_OSCUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().y(), 0.0) == true))
+      if ((C_OscUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().x(), 0.0) == true) &&
+          (C_OscUtils::h_IsFloat64NearlyEqual(this->mpc_TextElementName->pos().y(), 0.0) == true))
       {
          QPointF c_Pos = this->C_GiLiBus::GetPos();
          // Add a little offset to the text element
@@ -130,9 +130,9 @@ C_GiLiBus::~C_GiLiBus() //lint !e1540  no memory leak because of the parent of m
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiLiBus::type() const
+int32_t C_GiLiBus::type() const
 {
-   return msn_GRAPHICS_ITEM_BUS;
+   return ms32_GRAPHICS_ITEM_BUS;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,7 +147,7 @@ QString C_GiLiBus::GetName(void) const
    //Translation: Default bus name
    QString c_Name = C_GtGetText::h_GetText("Bus");
 
-   const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
+   const stw::opensyde_core::C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(ms32_Index);
 
    if (pc_Bus != NULL)
    {
@@ -169,10 +169,10 @@ QString C_GiLiBus::GetName(void) const
 QString C_GiLiBus::GetBitrate(const bool oq_WithComma) const
 {
    QString c_Bitrate = "";
-   const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
+   const stw::opensyde_core::C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(ms32_Index);
 
    if ((pc_Bus != NULL) &&
-       (pc_Bus->e_Type == C_OSCSystemBus::eCAN))
+       (pc_Bus->e_Type == C_OscSystemBus::eCAN))
    {
       if (oq_WithComma == true)
       {
@@ -190,18 +190,18 @@ QString C_GiLiBus::GetBitrate(const bool oq_WithComma) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::LoadData(void)
 {
-   const C_OSCSystemBus * const pc_OSCBus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ms32_Index);
-   const stw_opensyde_gui_logic::C_PuiSdBus * const pc_UIBus = C_PuiSdHandler::h_GetInstance()->GetUIBus(ms32_Index);
+   const C_OscSystemBus * const pc_OscBus = C_PuiSdHandler::h_GetInstance()->GetOscBus(ms32_Index);
+   const stw::opensyde_gui_logic::C_PuiSdBus * const pc_UiBus = C_PuiSdHandler::h_GetInstance()->GetUiBus(ms32_Index);
 
-   if (pc_UIBus != NULL)
+   if (pc_UiBus != NULL)
    {
-      this->m_LoadBasicData(*pc_UIBus);
-      this->SetMiddleLineColor(pc_UIBus->c_UIColorMiddleLine);
+      this->m_LoadBasicData(*pc_UiBus);
+      this->SetMiddleLineColor(pc_UiBus->c_UiColorMiddleLine);
    }
    //Object name for test
-   if (pc_OSCBus != NULL)
+   if (pc_OscBus != NULL)
    {
-      this->setObjectName(static_cast<QString>("Bus: %1").arg(pc_OSCBus->c_Name.c_str()));
+      this->setObjectName(static_cast<QString>("Bus: %1").arg(pc_OscBus->c_Name.c_str()));
    }
 }
 
@@ -211,14 +211,14 @@ void C_GiLiBus::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBus::UpdateData(void)
 {
-   const stw_opensyde_gui_logic::C_PuiSdBus * const pc_UIBus = C_PuiSdHandler::h_GetInstance()->GetUIBus(ms32_Index);
+   const stw::opensyde_gui_logic::C_PuiSdBus * const pc_UiBus = C_PuiSdHandler::h_GetInstance()->GetUiBus(ms32_Index);
 
-   if (pc_UIBus != NULL)
+   if (pc_UiBus != NULL)
    {
-      stw_opensyde_gui_logic::C_PuiSdBus c_UIBus = *pc_UIBus;
-      this->m_UpdateBasicData(c_UIBus);
-      c_UIBus.c_UIColorMiddleLine = this->GetMiddleLineColor();
-      C_PuiSdHandler::h_GetInstance()->SetUIBus(ms32_Index, c_UIBus);
+      stw::opensyde_gui_logic::C_PuiSdBus c_UiBus = *pc_UiBus;
+      this->m_UpdateBasicData(c_UiBus);
+      c_UiBus.c_UiColorMiddleLine = this->GetMiddleLineColor();
+      C_PuiSdHandler::h_GetInstance()->SetUiBus(ms32_Index, c_UiBus);
    }
 
    this->m_UpdateTextElementName();
@@ -241,8 +241,8 @@ void C_GiLiBus::GenerateHint(void)
 {
    bool q_Entry = false;
    QString c_ToolTip;
-   const uint32 u32_BusIndex = static_cast<uint32>(this->GetIndex());
-   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_BusIndex);
+   const uint32_t u32_BusIndex = static_cast<uint32_t>(this->GetIndex());
+   const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_BusIndex);
 
    //Translation: 1 = Bus name
    //title
@@ -257,27 +257,27 @@ void C_GiLiBus::GenerateHint(void)
 
    if (pc_Bus != NULL)
    {
-      c_ToolTip.append(static_cast<QString>("Bus ID: %1").arg(QString::number(pc_Bus->u8_BusID)));
+      c_ToolTip.append(static_cast<QString>("Bus ID: %1").arg(QString::number(pc_Bus->u8_BusId)));
 
-      if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+      if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
       {
          c_ToolTip.append(static_cast<QString>("\nBitrate: %1 kbit/s").arg(QString::number(pc_Bus->u64_BitRate /
-                                                                                           static_cast<uint64>(1000))));
+                                                                                           static_cast<uint64_t>(1000))));
       }
    }
 
    c_ToolTip.append(C_GtGetText::h_GetText("\n\nConnected nodes:"));
 
-   for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ItNode);
 
       if (pc_Node != NULL)
       {
-         for (uint32 u32_ItComInterface = 0; u32_ItComInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+         for (uint32_t u32_ItComInterface = 0; u32_ItComInterface < pc_Node->c_Properties.c_ComInterfaces.size();
               ++u32_ItComInterface)
          {
-            const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+            const C_OscNodeComInterfaceSettings & rc_ComInterface =
                pc_Node->c_Properties.c_ComInterfaces[u32_ItComInterface];
 
             // in case of subnodes from multi nodes we need to know if the interface is internally connected
@@ -296,7 +296,7 @@ void C_GiLiBus::GenerateHint(void)
                                    arg(pc_Node->c_Properties.c_Name.c_str(), //Node
                                        C_PuiSdUtil::h_GetInterfaceName(rc_ComInterface.e_InterfaceType,
                                                                        rc_ComInterface.u8_InterfaceNumber), //Interface
-                                       QString::number(rc_ComInterface.u8_NodeID)));                        //Node
+                                       QString::number(rc_ComInterface.u8_NodeId)));                        //Node
                                                                                                             // ID
                   q_Entry = true;
                }
@@ -334,16 +334,16 @@ void C_GiLiBus::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in]  of64_ZValue    New Z value
+   \param[in]  of64_ZetValue    New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBus::SetZValueCustom(const float64 of64_ZValue)
+void C_GiLiBus::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiLiLineGroup::SetZValueCustom(of64_ZValue);
+   C_GiLiLineGroup::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
    //Signal update
-   Q_EMIT this->SigChangedZOrder();
+   Q_EMIT this->SigChangedZeOrder();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -366,13 +366,13 @@ void C_GiLiBus::SetDisabledLook(const bool oq_Disabled)
 /*! \brief  Apply style
 
    \param[in]  orc_LineColor  line color
-   \param[in]  osn_Width      line width
+   \param[in]  os32_Width      line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBus::ApplyStyle(const QColor & orc_LineColor, const stw_types::sintn osn_Width)
+void C_GiLiBus::ApplyStyle(const QColor & orc_LineColor, const int32_t os32_Width)
 {
    this->SetColor(orc_LineColor);
-   this->SetWidth(osn_Width);
+   this->SetWidth(os32_Width);
    this->TriggerSigChangedGraphic();
 }
 
@@ -468,7 +468,7 @@ void C_GiLiBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Event)
    \param[in]  orc_PositionDifference  Dialog with style result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBus::m_BusWasMoved(const stw_types::sint32 & ors32_LineIndex, const QPointF & orc_PositionDifference)
+void C_GiLiBus::m_BusWasMoved(const int32_t & ors32_LineIndex, const QPointF & orc_PositionDifference)
 {
    if ((this->mpc_TextElementName != NULL) &&
        (ors32_LineIndex == 0) &&

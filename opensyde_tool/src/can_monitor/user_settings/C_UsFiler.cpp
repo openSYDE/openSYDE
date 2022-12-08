@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QDir>
-#include "stwerrors.h"
-#include "C_Uti.h"
-#include "C_UsFiler.h"
+#include "stwerrors.hpp"
+#include "C_Uti.hpp"
+#include "C_UsFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui_logic;
-using namespace stw_scl;
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const std::string C_UsFiler::mhc_TRACE_COL_WIDTH_IDENTIFIER = "TraceColWidths";
@@ -64,10 +63,10 @@ C_UsFiler::C_UsFiler(void)
    C_NOACT:  File open failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & orc_Path,
-                         const QString & orc_ActiveProject)
+int32_t C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & orc_Path,
+                          const QString & orc_ActiveProject)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (orc_Path.compare("") != 0)
    {
@@ -85,7 +84,7 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
       try
       {
          //Parse ini
-         C_SCLIniFile c_Ini(orc_Path.toStdString().c_str());
+         C_SclIniFile c_Ini(orc_Path.toStdString().c_str());
          mh_SaveRecentProjects(orc_UserSettings, c_Ini);
          mh_SaveProjectIndependentSection(orc_UserSettings, c_Ini);
          mh_SaveProjectDependentSection(orc_UserSettings, c_Ini, orc_ActiveProject);
@@ -118,15 +117,15 @@ sint32 C_UsFiler::h_Save(const C_UsHandler & orc_UserSettings, const QString & o
    C_NOACT:  File open failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Path, const QString & orc_ActiveProject)
+int32_t C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Path, const QString & orc_ActiveProject)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (orc_Path.compare("") != 0)
    {
       try
       {
-         C_SCLIniFile c_Ini(orc_Path.toStdString().c_str());
+         C_SclIniFile c_Ini(orc_Path.toStdString().c_str());
          s32_Retval = C_NO_ERR;
 
          orc_UserSettings.SetDefault();
@@ -158,7 +157,7 @@ sint32 C_UsFiler::h_Load(C_UsHandler & orc_UserSettings, const QString & orc_Pat
    \param[in,out] orc_Ini          Ini handler
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
 {
    const QStringList c_List = orc_UserSettings.GetRecentProjects();
 
@@ -169,9 +168,9 @@ void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SC
    }
 
    //Recent projects
-   for (uint8 u8_It = 0; u8_It < c_List.count(); ++u8_It)
+   for (uint8_t u8_It = 0; u8_It < c_List.count(); ++u8_It)
    {
-      orc_Ini.WriteString("RecentProjects", C_SCLString::IntToStr(
+      orc_Ini.WriteString("RecentProjects", C_SclString::IntToStr(
                              u8_It), c_List.at(u8_It).toStdString().c_str());
    }
 }
@@ -183,7 +182,7 @@ void C_UsFiler::mh_SaveRecentProjects(const C_UsHandler & orc_UserSettings, C_SC
    \param[in,out] orc_Ini          Ini handler
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
 {
    //Screen position
    orc_Ini.WriteInteger("Screen", "Position_x", orc_UserSettings.GetScreenPos().x());
@@ -210,22 +209,22 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
    orc_Ini.WriteInteger("Protocol", "Value", orc_UserSettings.GetSelectedProtocolIndex());
 
    // Message generator splitter
-   orc_Ini.WriteInteger("Layout", "MessageGenSplitter_y", orc_UserSettings.GetSplitterMessageGenY());
+   orc_Ini.WriteInteger("Layout", "MessageGenSplitter_y", orc_UserSettings.GetSplitterMessageGenVertical());
    orc_Ini.WriteBool("Layout", "MessageGen_expanded", orc_UserSettings.GetMessageGenIsExpanded());
 
    // Settings splitter
-   orc_Ini.WriteInteger("Layout", "SettingsSplitter_x", orc_UserSettings.GetSplitterSettingsX());
+   orc_Ini.WriteInteger("Layout", "SettingsSplitter_x", orc_UserSettings.GetSplitterSettingsHorizontal());
    orc_Ini.WriteBool("Layout", "Settings_expanded", orc_UserSettings.GetSettingsAreExpanded());
 
    // Messages signals splitter
-   orc_Ini.WriteInteger("Layout", "MessagesSignalsSplitter_x", orc_UserSettings.GetSplitterMesSigX());
+   orc_Ini.WriteInteger("Layout", "MessagesSignalsSplitter_x", orc_UserSettings.GetSplitterMesSigHorizontal());
 
    // Settings expanded collapsed
    orc_Ini.WriteBool("Settings", "DatabaseExpanded", orc_UserSettings.GetWiDatabaseExpanded());
    orc_Ini.WriteBool("Settings", "DllExpanded", orc_UserSettings.GetWiDllConfigExpanded());
    orc_Ini.WriteBool("Settings", "FilterExpanded", orc_UserSettings.GetWiFilterExpanded());
    orc_Ini.WriteBool("Settings", "LoggingExpanded", orc_UserSettings.GetWiLoggingExpanded());
-   orc_Ini.WriteInteger("Settings", "PopOpenSection", static_cast<sint32>(orc_UserSettings.GetPopOpenSection()));
+   orc_Ini.WriteInteger("Settings", "PopOpenSection", static_cast<int32_t>(orc_UserSettings.GetPopOpenSection()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -237,7 +236,7 @@ void C_UsFiler::mh_SaveProjectIndependentSection(const C_UsHandler & orc_UserSet
                                    Empty string results in saving no information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini,
+void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini,
                                                const QString & orc_ActiveProject)
 {
    if (orc_ActiveProject != "")
@@ -276,17 +275,17 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
    \param[in,out] orc_Ini          Current ini
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
 {
    QStringList c_List;
    QString c_Cur;
 
    //Recent projects
    c_List.clear();
-   for (uint8 u8_It = 0; u8_It < C_UsHandler::h_GetMaxRecentProjects(); ++u8_It)
+   for (uint8_t u8_It = 0; u8_It < C_UsHandler::h_GetMaxRecentProjects(); ++u8_It)
    {
       c_Cur =
-         orc_Ini.ReadString("RecentProjects", C_SCLString::IntToStr(u8_It), "").c_str();
+         orc_Ini.ReadString("RecentProjects", C_SclString::IntToStr(u8_It), "").c_str();
       if (c_Cur.compare("") != 0)
       {
          QFileInfo c_File;
@@ -314,12 +313,12 @@ void C_UsFiler::mh_LoadRecentProjects(C_UsHandler & orc_UserSettings, C_SCLIniFi
    \param[in,out] orc_Ini          Current ini
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini)
+void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini)
 {
    QPoint c_Pos;
    QSize c_Size;
    bool q_Flag;
-   sint32 s32_Value;
+   int32_t s32_Value;
 
    // Screen position
    c_Pos.setX(orc_Ini.ReadInteger("Screen", "Position_x", 50));
@@ -347,7 +346,7 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    q_Flag = orc_Ini.ReadBool("Trace_Settings", "TimeStampAbsoluteTimeOfDay", false);
    orc_UserSettings.SetTraceSettingDisplayTimestampAbsoluteTimeOfDay(q_Flag);
    s32_Value = orc_Ini.ReadInteger("Trace_Settings", "TraceBufferSize", 1000);
-   orc_UserSettings.SetTraceSettingBufferSize(static_cast<uint32>(s32_Value));
+   orc_UserSettings.SetTraceSettingBufferSize(static_cast<uint32_t>(s32_Value));
 
    // Protocol
    s32_Value = orc_Ini.ReadInteger("Protocol", "Value", 0);
@@ -355,19 +354,19 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
 
    // Message Generator splitter
    s32_Value = orc_Ini.ReadInteger("Layout", "MessageGenSplitter_y", 348);
-   orc_UserSettings.SetSplitterMessageGenY(s32_Value);
+   orc_UserSettings.SetSplitterMessageGenVertical(s32_Value);
    q_Flag = orc_Ini.ReadBool("Layout", "MessageGen_expanded", true);
    orc_UserSettings.SetMessageGenIsExpanded(q_Flag);
 
    // Settings splitter
    s32_Value = orc_Ini.ReadInteger("Layout", "SettingsSplitter_x", 0);
-   orc_UserSettings.SetSplitterSettingsX(s32_Value);
+   orc_UserSettings.SetSplitterSettingsHorizontal(s32_Value);
    q_Flag = orc_Ini.ReadBool("Layout", "Settings_expanded", true);
    orc_UserSettings.SetSettingsAreExpanded(q_Flag);
 
    // Messages signals splitter
    s32_Value = orc_Ini.ReadInteger("Layout", "MessagesSignalsSplitter_x", 1005);
-   orc_UserSettings.SetSplitterMesSigX(s32_Value);
+   orc_UserSettings.SetSplitterMesSigHorizontal(s32_Value);
 
    // Settings expanded collapsed
    q_Flag = orc_Ini.ReadBool("Settings", "DatabaseExpanded", true);
@@ -379,7 +378,7 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
    q_Flag = orc_Ini.ReadBool("Settings", "LoggingExpanded", true);
    orc_UserSettings.SetWiLoggingExpanded(q_Flag);
    s32_Value = orc_Ini.ReadInteger("Settings", "PopOpenSection",
-                                   static_cast<sint32>(C_UsHandler::E_SettingsSubSection::eNONE));
+                                   static_cast<int32_t>(C_UsHandler::E_SettingsSubSection::eNONE));
    orc_UserSettings.SetPopOpenSection(static_cast< C_UsHandler::E_SettingsSubSection>(s32_Value));
 }
 
@@ -392,12 +391,12 @@ void C_UsFiler::mh_LoadProjectIndependentSection(C_UsHandler & orc_UserSettings,
                                     Empty string results in default values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C_SCLIniFile & orc_Ini,
+void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C_SclIniFile & orc_Ini,
                                                const QString & orc_ActiveProject)
 {
    if (orc_ActiveProject != "")
    {
-      std::vector<sint32> c_Columns;
+      std::vector<int32_t> c_Columns;
       // project specific settings
 
       // message generator
@@ -440,13 +439,13 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
    \param[in]     orc_Columns            Columns
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_SectionName,
-                               const std::string & orc_IdentifierBaseName, const std::vector<sint32> & orc_Columns)
+void C_UsFiler::mh_SaveColumns(C_SclIniFile & orc_Ini, const C_SclString & orc_SectionName,
+                               const std::string & orc_IdentifierBaseName, const std::vector<int32_t> & orc_Columns)
 {
    const QString c_CountId = static_cast<QString>("%1_count").arg(orc_IdentifierBaseName.c_str());
 
    orc_Ini.WriteInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(), orc_Columns.size());
-   for (uint32 u32_ItCol = 0UL; u32_ItCol < orc_Columns.size(); ++u32_ItCol)
+   for (uint32_t u32_ItCol = 0UL; u32_ItCol < orc_Columns.size(); ++u32_ItCol)
    {
       const QString c_ItemId = static_cast<QString>("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(u32_ItCol);
       orc_Ini.WriteInteger(orc_SectionName.c_str(), c_ItemId.toStdString().c_str(), orc_Columns[u32_ItCol]);
@@ -462,18 +461,18 @@ void C_UsFiler::mh_SaveColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_S
    \param[in,out] orc_Columns            Columns
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsFiler::mh_LoadColumns(C_SCLIniFile & orc_Ini, const C_SCLString & orc_SectionName,
-                               const std::string & orc_IdentifierBaseName, std::vector<sint32> & orc_Columns)
+void C_UsFiler::mh_LoadColumns(C_SclIniFile & orc_Ini, const C_SclString & orc_SectionName,
+                               const std::string & orc_IdentifierBaseName, std::vector<int32_t> & orc_Columns)
 {
    const QString c_CountId = static_cast<QString>("%1_count").arg(orc_IdentifierBaseName.c_str());
-   const sint32 s32_Count = orc_Ini.ReadInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(), 0);
+   const int32_t s32_Count = orc_Ini.ReadInteger(orc_SectionName.c_str(), c_CountId.toStdString().c_str(), 0);
 
    orc_Columns.clear();
    orc_Columns.reserve(s32_Count);
-   for (sint32 s32_ItCol = 0L; s32_ItCol < s32_Count; ++s32_ItCol)
+   for (int32_t s32_ItCol = 0L; s32_ItCol < s32_Count; ++s32_ItCol)
    {
       const QString c_ItemId = static_cast<QString>("%1_%2").arg(orc_IdentifierBaseName.c_str()).arg(s32_ItCol);
-      const sint32 s32_Value = orc_Ini.ReadInteger(orc_SectionName.c_str(), c_ItemId.toStdString().c_str(), 50);
+      const int32_t s32_Value = orc_Ini.ReadInteger(orc_SectionName.c_str(), c_ItemId.toStdString().c_str(), 50);
       orc_Columns.push_back(s32_Value);
    }
 }

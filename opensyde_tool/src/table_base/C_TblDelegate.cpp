@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QBitArray>
 #include <QSvgRenderer>
 
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_TblDelegate.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_TblDelegate.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -73,7 +72,7 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
 {
    QWidget * pc_Retval = NULL;
 
-   if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == false)
+   if (orc_Index.data(ms32_USER_ROLE_INTERACTION_IS_LINK).toBool() == false)
    {
       C_OgeCbxTableBase * pc_ComboBox;
       C_OgeCbxMultiSelect * pc_MultiSelectComboBox;
@@ -88,22 +87,22 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
          break;
       case eURIEL_COMBO_BOX:
          pc_ComboBox = m_CreateComboBox(opc_Parent);
-         c_StringListValues = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST).toStringList();
-         c_StringListStrings = orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST).toStringList();
+         c_StringListValues = orc_Index.data(ms32_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST).toStringList();
+         c_StringListStrings = orc_Index.data(ms32_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST).toStringList();
          pc_ComboBox->InitFromStringList(c_StringListStrings, c_StringListValues);
-         if (orc_Index.data(msn_USER_ROLE_INTERACTION_COMBO_BOX_EDITABLE).toBool() == true)
+         if (orc_Index.data(ms32_USER_ROLE_INTERACTION_COMBO_BOX_EDITABLE).toBool() == true)
          {
             // make editable
             pc_ComboBox->setEditable(true);
             pc_ComboBox->setInsertPolicy(QComboBox::NoInsert);
             // minimum and maximum
-            c_StringList = orc_Index.data(msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST).toStringList();
+            c_StringList = orc_Index.data(ms32_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST).toStringList();
             if (c_StringList.size() == 4)
             {
-               C_OSCNodeDataPoolContent c_Min;
-               C_OSCNodeDataPoolContent c_Max;
-               float64 f64_Factor;
-               float64 f64_Offset;
+               C_OscNodeDataPoolContent c_Min;
+               C_OscNodeDataPoolContent c_Max;
+               float64_t f64_Factor;
+               float64_t f64_Offset;
                bool q_Ok;
                const QString & rc_Factor = c_StringList.at(2);
                const QString & rc_Offset = c_StringList.at(3);
@@ -117,7 +116,7 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
             }
          }
          // connect combo box with model (commit on index change; includes commit on text change)
-         connect(pc_ComboBox, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+         connect(pc_ComboBox, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
                  this, &C_TblDelegate::m_CommitData);
          pc_Retval = pc_ComboBox;
          break;
@@ -128,13 +127,13 @@ QWidget * C_TblDelegate::createEditor(QWidget * const opc_Parent, const QStyleOp
          pc_Retval = pc_MultiSelectComboBox;
          break;
       case eURIEL_GENERIC_SPIN_BOX:
-         c_StringList = orc_Index.data(msn_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST).toStringList();
+         c_StringList = orc_Index.data(ms32_USER_ROLE_INTERACTION_GENERIC_SPIN_BOX_PARAMETERS_LIST).toStringList();
          if (c_StringList.size() == 4)
          {
-            C_OSCNodeDataPoolContent c_Min;
-            C_OSCNodeDataPoolContent c_Max;
-            float64 f64_Factor;
-            float64 f64_Offset;
+            C_OscNodeDataPoolContent c_Min;
+            C_OscNodeDataPoolContent c_Max;
+            float64_t f64_Factor;
+            float64_t f64_Offset;
             bool q_Ok;
             const QString & rc_Factor = c_StringList.at(2);
             const QString & rc_Offset = c_StringList.at(3);
@@ -178,15 +177,15 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
       pc_LineEdit = dynamic_cast<C_TblEditLineEditBase *>(opc_Editor);
       if (pc_LineEdit != NULL)
       {
-         pc_LineEdit->SetFromVariant(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)),
-                                     orc_Index.data(static_cast<sintn>(Qt::EditRole)));
-         if (orc_Index.data(msn_USER_ROLE_INTERACTION_USE_MIN_VALUE).toBool())
+         pc_LineEdit->SetFromVariant(orc_Index.data(static_cast<int32_t>(Qt::DisplayRole)),
+                                     orc_Index.data(static_cast<int32_t>(Qt::EditRole)));
+         if (orc_Index.data(ms32_USER_ROLE_INTERACTION_USE_MIN_VALUE).toBool())
          {
-            pc_LineEdit->SetMinFromVariant(orc_Index.data(msn_USER_ROLE_INTERACTION_MINIMUM_VALUE));
+            pc_LineEdit->SetMinFromVariant(orc_Index.data(ms32_USER_ROLE_INTERACTION_MINIMUM_VALUE));
          }
-         if (orc_Index.data(msn_USER_ROLE_INTERACTION_USE_MAX_VALUE).toBool())
+         if (orc_Index.data(ms32_USER_ROLE_INTERACTION_USE_MAX_VALUE).toBool())
          {
-            pc_LineEdit->SetMaxFromVariant(orc_Index.data(msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE));
+            pc_LineEdit->SetMaxFromVariant(orc_Index.data(ms32_USER_ROLE_INTERACTION_MAXIMUM_VALUE));
          }
       }
       break;
@@ -196,7 +195,7 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
       if (pc_ComboBox != NULL)
       {
          bool q_Ok;
-         const sint64 s64_Val = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toLongLong(&q_Ok);
+         const int64_t s64_Val = orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toLongLong(&q_Ok);
          if (q_Ok)
          {
             pc_ComboBox->SetValue(s64_Val);
@@ -208,9 +207,9 @@ void C_TblDelegate::setEditorData(QWidget * const opc_Editor, const QModelIndex 
       pc_MultiSelectComboBox = dynamic_cast<C_OgeCbxMultiSelect *>(opc_Editor);
       if (pc_MultiSelectComboBox != NULL)
       {
-         const QBitArray c_BitArrayValues = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toBitArray();
+         const QBitArray c_BitArrayValues = orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toBitArray();
          const QStringList c_StringListStrings =
-            orc_Index.data(msn_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST).toStringList();
+            orc_Index.data(ms32_USER_ROLE_INTERACTION_MULTI_SELECT_COMBO_BOX_STRINGS_LIST).toStringList();
          pc_MultiSelectComboBox->Init(c_StringListStrings, c_BitArrayValues);
       }
       break;
@@ -254,7 +253,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
          QVariant c_Value;
          if (pc_LineEdit->GetValueAsVariant(c_Value, c_ErrorDescription) == C_NO_ERR)
          {
-            opc_Model->setData(orc_Index, c_Value, static_cast<sintn>(Qt::EditRole));
+            opc_Model->setData(orc_Index, c_Value, static_cast<int32_t>(Qt::EditRole));
          }
          else
          {
@@ -274,10 +273,10 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
       if (pc_ComboBox != NULL)
       {
          QString c_ErrorDescription;
-         sint64 s64_Value;
+         int64_t s64_Value;
          if (pc_ComboBox->GetValue(s64_Value, c_ErrorDescription) == C_NO_ERR)
          {
-            opc_Model->setData(orc_Index, s64_Value, static_cast<sintn>(Qt::EditRole));
+            opc_Model->setData(orc_Index, s64_Value, static_cast<int32_t>(Qt::EditRole));
          }
          else
          {
@@ -296,7 +295,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
       if (pc_MultiSelectComboBox != NULL)
       {
          const QBitArray c_BitArrayValues = pc_MultiSelectComboBox->GetValuesAsBitArray();
-         opc_Model->setData(orc_Index, c_BitArrayValues, static_cast<sintn>(Qt::EditRole));
+         opc_Model->setData(orc_Index, c_BitArrayValues, static_cast<int32_t>(Qt::EditRole));
       }
       break;
    case eURIEL_GENERIC_SPIN_BOX:
@@ -324,7 +323,7 @@ void C_TblDelegate::setModelData(QWidget * const opc_Editor, QAbstractItemModel 
 void C_TblDelegate::paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
                           const QModelIndex & orc_Index) const
 {
-   const QStringList c_IconPaths = orc_Index.data(msn_USER_ROLE_ICON).toStringList();
+   const QStringList c_IconPaths = orc_Index.data(ms32_USER_ROLE_ICON).toStringList();
 
    QStyledItemDelegate::paint(opc_Painter, orc_Option, orc_Index);
    if (c_IconPaths.count() == 2)
@@ -359,7 +358,7 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
 {
    E_UserRoleInteractionElementValue e_Retval;
 
-   switch (orc_Index.data(msn_USER_ROLE_INTERACTION_ELEMENT_TYPE).toInt())
+   switch (orc_Index.data(ms32_USER_ROLE_INTERACTION_ELEMENT_TYPE).toInt())
    {
    case 1:
       e_Retval = eURIEL_LINE_EDIT;
@@ -396,9 +395,9 @@ E_UserRoleInteractionElementValue C_TblDelegate::mh_GetInteractionElementValue(c
 */
 //----------------------------------------------------------------------------------------------------------------------
 QWidget * C_TblDelegate::m_CreateGenericEditor(QWidget * const opc_Parent, const QModelIndex & orc_Index,
-                                               const C_OSCNodeDataPoolContent & orc_Min,
-                                               const C_OSCNodeDataPoolContent & orc_Max, const float64 of64_Factor,
-                                               const float64 of64_Offset, const uint32 & oru32_ArrayIndex) const
+                                               const C_OscNodeDataPoolContent & orc_Min,
+                                               const C_OscNodeDataPoolContent & orc_Max, const float64_t of64_Factor,
+                                               const float64_t of64_Offset, const uint32_t & oru32_ArrayIndex) const
 {
    QWidget * pc_Retval = NULL;
 
@@ -431,7 +430,7 @@ void C_TblDelegate::m_SetGenericEditorDataVariable(QWidget * const opc_Editor, c
    if (pc_SpinBox != NULL)
    {
       //Special setter
-      pc_SpinBox->SetValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)));
+      pc_SpinBox->SetValue(orc_Index.data(static_cast<int32_t>(Qt::EditRole)));
       //Initial selection
       if (mq_InitialSelection)
       {

@@ -12,14 +12,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFile>
-#include "C_OgePubToolBar.h"
+#include "C_OgePubToolBar.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,7 +42,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgePubToolBar::C_OgePubToolBar(QWidget * const opc_Parent, const stw_types::uint32 ou32_Index) :
+C_OgePubToolBar::C_OgePubToolBar(QWidget * const opc_Parent, const uint32_t ou32_Index) :
    C_OgePubStandard(opc_Parent),
    mu32_Index(ou32_Index)
 {

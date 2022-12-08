@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_CamDbHandler.h"
-#include "C_CamGenSigUtil.h"
-#include "C_SdTooltipUtil.h"
-#include "C_CamMosDatabaseSelectionModel.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_CamGenSigUtil.hpp"
+#include "C_SdTooltipUtil.hpp"
+#include "C_CamMosDatabaseSelectionModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_CamMosDatabaseSelectionModel::mhc_ICON_DATABASE = "://images/IconDatabaseBlue.svg";
@@ -100,7 +99,7 @@ std::vector<std::array<QString,
    if (orc_Index.isValid() == false)
    {
       //Invisible root
-      for (sint32 s32_ItChild = 0L; s32_ItChild < this->rowCount(orc_Index); ++s32_ItChild)
+      for (int32_t s32_ItChild = 0L; s32_ItChild < this->rowCount(orc_Index); ++s32_ItChild)
       {
          mh_CombineIndices(c_Retval, this->GetDataElements(this->index(s32_ItChild, 0, orc_Index)));
       }
@@ -110,7 +109,7 @@ std::vector<std::array<QString,
       if (orc_Index.parent().isValid() == false)
       {
          //Database
-         for (sint32 s32_ItChild = 0L; s32_ItChild < this->rowCount(orc_Index); ++s32_ItChild)
+         for (int32_t s32_ItChild = 0L; s32_ItChild < this->rowCount(orc_Index); ++s32_ItChild)
          {
             mh_CombineIndices(c_Retval, this->GetDataElements(this->index(s32_ItChild, 0, orc_Index)));
          }
@@ -146,7 +145,7 @@ std::vector<std::array<QString,
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMosDatabaseSelectionModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_CamMosDatabaseSelectionModel::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 1;
@@ -165,9 +164,9 @@ QModelIndex C_CamMosDatabaseSelectionModel::GetIndexForItem(const QString & orc_
 {
    QModelIndex c_Retval;
 
-   for (sintn sn_ItChild = 0; sn_ItChild < this->rowCount(); ++sn_ItChild)
+   for (int32_t s32_ItChild = 0; s32_ItChild < this->rowCount(); ++s32_ItChild)
    {
-      const QModelIndex c_Tmp = this->index(sn_ItChild, 0);
+      const QModelIndex c_Tmp = this->index(s32_ItChild, 0);
       if (this->data(c_Tmp).toString().compare(orc_ItemText) == 0)
       {
          c_Retval = c_Tmp;
@@ -186,10 +185,10 @@ QModelIndex C_CamMosDatabaseSelectionModel::GetIndexForItem(const QString & orc_
    Generic item representation
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamMosDatabaseSelectionModel::GetGenericRepresentationForIndex(const QModelIndex & orc_ItemIndex)
+std::vector<uint32_t> C_CamMosDatabaseSelectionModel::GetGenericRepresentationForIndex(const QModelIndex & orc_ItemIndex)
 const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    QModelIndex c_CurItem = orc_ItemIndex;
    while (c_CurItem.isValid() == true)
    {
@@ -216,15 +215,15 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseSelectionModel::m_Init(void)
 {
-   const QMap<QString, C_CamDbDbc> & rc_DBCFiles = C_CamDbHandler::h_GetInstance()->GetDBCFiles();
-   const QMap<QString, C_CamDbOsy> & rc_OSYFiles = C_CamDbHandler::h_GetInstance()->GetOSYFiles();
+   const QMap<QString, C_CamDbDbc> & rc_DbcFiles = C_CamDbHandler::h_GetInstance()->GetDbcFiles();
+   const QMap<QString, C_CamDbOsy> & rc_OsyFiles = C_CamDbHandler::h_GetInstance()->GetOsyFiles();
 
    //Reserve
-   this->mpc_InvisibleRootItem->ReserveChildrenSpace(static_cast<uint32>(rc_DBCFiles.size()) +
-                                                     static_cast<uint32>(rc_OSYFiles.size()));
+   this->mpc_InvisibleRootItem->ReserveChildrenSpace(static_cast<uint32_t>(rc_DbcFiles.size()) +
+                                                     static_cast<uint32_t>(rc_OsyFiles.size()));
 
    //DBC
-   for (QMap<QString, C_CamDbDbc>::const_iterator c_ItDbc = rc_DBCFiles.begin(); c_ItDbc != rc_DBCFiles.end();
+   for (QMap<QString, C_CamDbDbc>::const_iterator c_ItDbc = rc_DbcFiles.begin(); c_ItDbc != rc_DbcFiles.end();
         ++c_ItDbc)
    {
       if (c_ItDbc->GetActive())
@@ -247,13 +246,13 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
             for (std::vector<QString>::const_iterator c_ItMessage = c_Messages.begin();
                  c_ItMessage != c_Messages.end(); ++c_ItMessage)
             {
-               const C_CieConverter::C_CIECanMessage * const pc_Message =
+               const C_CieConverter::C_CieCanMessage * const pc_Message =
                   C_CamDbHandler::h_GetInstance()->GetDbcMessage(c_ItDbc.key(), *c_ItMessage, false, 0UL);
                if (pc_Message != NULL)
                {
-                  const C_OSCCanMessage c_OSCMessage = C_CamGenSigUtil::h_ConvertDBCToOSY(*pc_Message);
+                  const C_OscCanMessage c_OscMessage = C_CamGenSigUtil::h_ConvertDbcToOsy(*pc_Message);
 
-                  m_CreateAndFillMessageNode(c_OSCMessage, pc_DatabaseItem);
+                  m_CreateAndFillMessageNode(c_OscMessage, pc_DatabaseItem);
                }
             }
          }
@@ -261,7 +260,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
    }
 
    //OSY
-   for (QMap<QString, C_CamDbOsy>::const_iterator c_ItOsy = rc_OSYFiles.begin(); c_ItOsy != rc_OSYFiles.end();
+   for (QMap<QString, C_CamDbOsy>::const_iterator c_ItOsy = rc_OsyFiles.begin(); c_ItOsy != rc_OsyFiles.end();
         ++c_ItOsy)
    {
       if (c_ItOsy->GetActive())
@@ -270,7 +269,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
          //Database
          C_TblTreItem * const pc_DatabaseItem = this->m_CreateAndFillDatabaseNode(
             c_ItOsy.key(), this->mpc_InvisibleRootItem);
-         if (static_cast<uint32>(rc_Messages.size()) == 0UL)
+         if (static_cast<uint32_t>(rc_Messages.size()) == 0UL)
          {
             //Special handling for no messages
             pc_DatabaseItem->c_Name = static_cast<QString>(C_GtGetText::h_GetText("%1 (No mapped messages)")).arg(
@@ -284,7 +283,7 @@ void C_CamMosDatabaseSelectionModel::m_Init(void)
             for (QMap<QString, C_CamDbOsyMessageId>::const_iterator c_ItMessage = rc_Messages.begin();
                  c_ItMessage != rc_Messages.end(); ++c_ItMessage)
             {
-               const C_OSCCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOSCMessage(
+               const C_OscCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOscMessage(
                   c_ItOsy.key(), c_ItMessage.key(), true, c_ItMessage->u32_Hash);
                if (pc_Message != NULL)
                {
@@ -331,7 +330,7 @@ C_TblTreItem * C_CamMosDatabaseSelectionModel::m_CreateAndFillDatabaseNode(const
    \param[in,out]  opc_ParentItem   Parent item to insert this node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OSCCanMessage & orc_Message,
+void C_CamMosDatabaseSelectionModel::m_CreateAndFillMessageNode(const C_OscCanMessage & orc_Message,
                                                                 C_TblTreSimpleItem * const opc_ParentItem)
 {
    C_TblTreItem * const pc_MessageItem = new C_TblTreItem();
@@ -364,7 +363,7 @@ void C_CamMosDatabaseSelectionModel::mh_CombineIndices(std::vector<std::array<QS
    //Reserve
    orc_BigVectorToAppendTo.reserve(orc_BigVectorToAppendTo.size() + orc_SmallVectorToAdd.size());
    //Append all
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < orc_SmallVectorToAdd.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < orc_SmallVectorToAdd.size(); ++u32_ItItem)
    {
       orc_BigVectorToAppendTo.push_back(orc_SmallVectorToAdd[u32_ItItem]);
    }

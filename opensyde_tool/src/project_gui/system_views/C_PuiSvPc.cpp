@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QFileInfo>
 
-#include "C_Uti.h"
-#include "C_PuiUtil.h"
-#include "stwtypes.h"
-#include "C_PuiSvPc.h"
-#include "CSCLChecksums.h"
-#include "constants.h"
+#include "C_Uti.hpp"
+#include "C_PuiUtil.hpp"
+#include "stwtypes.hpp"
+#include "C_PuiSvPc.hpp"
+#include "C_SclChecksums.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,9 +44,9 @@ using namespace stw_opensyde_gui_logic;
 C_PuiSvPc::C_PuiSvPc(void) :
    C_PuiBsBox(),
    mq_Connected(false),
-   mu32_BusIndex(std::numeric_limits<uint32>::max()),
-   me_CANDllType(ePEAK),
-   mc_CustomCANDllPath("")
+   mu32_BusIndex(std::numeric_limits<uint32_t>::max()),
+   me_CanDllType(ePEAK),
+   mc_CustomCanDllPath("")
 {
 }
 
@@ -59,13 +58,13 @@ C_PuiSvPc::C_PuiSvPc(void) :
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSvPc::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_CANDllType, sizeof(this->me_CANDllType), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_CustomCANDllPath.toStdString().c_str(),
-                                      this->mc_CustomCANDllPath.length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_Connected, sizeof(this->mq_Connected), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mu32_BusIndex, sizeof(this->mu32_BusIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_CanDllType, sizeof(this->me_CanDllType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->mc_CustomCanDllPath.toStdString().c_str(),
+                                       this->mc_CustomCanDllPath.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->mq_Connected, sizeof(this->mq_Connected), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->mu32_BusIndex, sizeof(this->mu32_BusIndex), oru32_HashValue);
 
    this->mc_ConnectionData.CalcHash(oru32_HashValue);
 
@@ -91,7 +90,7 @@ bool C_PuiSvPc::GetConnected(void) const
    Current bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_PuiSvPc::GetBusIndex(void) const
+uint32_t C_PuiSvPc::GetBusIndex(void) const
 {
    return this->mu32_BusIndex;
 }
@@ -127,7 +126,7 @@ void C_PuiSvPc::SetConnectionData(const C_PuiBsLineBase & orc_Value)
    \param[in]  orq_ForceSimpleSet   Optional flag to indicate if this function is used as a simple set or a logic operation
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex, const bool & orq_ForceSimpleSet)
+void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32_t ou32_BusIndex, const bool & orq_ForceSimpleSet)
 {
    this->mq_Connected = oq_Connected;
    if ((orq_ForceSimpleSet == true) || (this->mq_Connected == true))
@@ -142,9 +141,9 @@ void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32 ou32_BusIndex
    \return   CAN Dll type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvPc::E_CANDllType C_PuiSvPc::GetCANDllType() const
+C_PuiSvPc::E_CanDllType C_PuiSvPc::GetCanDllType() const
 {
-   return this->me_CANDllType;
+   return this->me_CanDllType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,23 +153,23 @@ C_PuiSvPc::E_CANDllType C_PuiSvPc::GetCANDllType() const
    CAN DLL path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSvPc::GetCANDll(void) const
+QString C_PuiSvPc::GetCanDll(void) const
 {
    QString c_Return;
 
-   switch (this->me_CANDllType)
+   switch (this->me_CanDllType)
    {
    case ePEAK:
-      c_Return = stw_opensyde_gui::mc_DLL_PATH_PEAK;
+      c_Return = stw::opensyde_gui::mc_DLL_PATH_PEAK;
       break;
    case eVECTOR:
-      c_Return = stw_opensyde_gui::mc_DLL_PATH_VECTOR;
+      c_Return = stw::opensyde_gui::mc_DLL_PATH_VECTOR;
       break;
    case eOTHER:
-      c_Return = this->mc_CustomCANDllPath;
+      c_Return = this->mc_CustomCanDllPath;
       break;
    default:
-      c_Return = stw_opensyde_gui::mc_DLL_PATH_PEAK;
+      c_Return = stw::opensyde_gui::mc_DLL_PATH_PEAK;
       break;
    }
 
@@ -183,9 +182,9 @@ QString C_PuiSvPc::GetCANDll(void) const
    \return Custom CAN DLL Path string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSvPc::GetCustomCANDllPath() const
+QString C_PuiSvPc::GetCustomCanDllPath() const
 {
-   return this->mc_CustomCANDllPath;
+   return this->mc_CustomCanDllPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -195,14 +194,14 @@ QString C_PuiSvPc::GetCustomCANDllPath() const
    Absolute CAN DLL path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSvPc::GetCANDllAbsolute(void) const
+QString C_PuiSvPc::GetCanDllAbsolute(void) const
 {
-   QString c_Return = this->GetCANDll();
+   QString c_Return = this->GetCanDll();
 
-   if (this->GetCANDll().isEmpty() == false)
+   if (this->GetCanDll().isEmpty() == false)
    {
       // resolve variables and make absolute if it is relative
-      c_Return = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->GetCANDll());
+      c_Return = C_PuiUtil::h_GetResolvedAbsPathFromExe(this->GetCanDll());
    }
    return c_Return;
 }
@@ -213,9 +212,9 @@ QString C_PuiSvPc::GetCANDllAbsolute(void) const
    \param[in]  oe_Type  CAN DLL type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::SetCANDllType(const C_PuiSvPc::E_CANDllType oe_Type)
+void C_PuiSvPc::SetCanDllType(const C_PuiSvPc::E_CanDllType oe_Type)
 {
-   this->me_CANDllType = oe_Type;
+   this->me_CanDllType = oe_Type;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -224,9 +223,9 @@ void C_PuiSvPc::SetCANDllType(const C_PuiSvPc::E_CANDllType oe_Type)
    \param[in]  orc_Path    Path for the CAN DLL
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::SetCustomCANDllPath(const QString & orc_Path)
+void C_PuiSvPc::SetCustomCanDllPath(const QString & orc_Path)
 {
-   this->mc_CustomCANDllPath = orc_Path;
+   this->mc_CustomCanDllPath = orc_Path;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -237,10 +236,10 @@ void C_PuiSvPc::SetCustomCANDllPath(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
 {
-   this->c_UIPosition = orc_Box.c_UIPosition;
+   this->c_UiPosition = orc_Box.c_UiPosition;
    this->f64_Height = orc_Box.f64_Height;
    this->f64_Width = orc_Box.f64_Width;
-   this->f64_ZOrder = orc_Box.f64_ZOrder;
+   this->f64_ZetOrder = orc_Box.f64_ZetOrder;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -249,7 +248,7 @@ void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
    \param[in]  ou32_Index  Added bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::OnSyncBusAdded(const uint32 ou32_Index)
+void C_PuiSvPc::OnSyncBusAdded(const uint32_t ou32_Index)
 {
    if (ou32_Index < this->mu32_BusIndex)
    {
@@ -278,7 +277,7 @@ void C_PuiSvPc::OnSyncBusAdded(const uint32 ou32_Index)
    \param[in]  ou32_Index  Deleted bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::OnSyncBusDeleted(const uint32 ou32_Index)
+void C_PuiSvPc::OnSyncBusDeleted(const uint32_t ou32_Index)
 {
    if (ou32_Index < this->mu32_BusIndex)
    {
@@ -306,7 +305,7 @@ bool C_PuiSvPc::CheckIndirectDisconnection(void) const
 {
    bool q_Retval;
 
-   if ((this->mq_Connected == false) && (this->mu32_BusIndex != std::numeric_limits<uint32>::max()))
+   if ((this->mq_Connected == false) && (this->mu32_BusIndex != std::numeric_limits<uint32_t>::max()))
    {
       q_Retval = true;
    }

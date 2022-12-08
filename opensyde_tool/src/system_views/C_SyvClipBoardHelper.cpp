@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SyvClipBoardHelper.h"
-#include "C_PuiSvHandlerFiler.h"
-#include "C_PuiSvDashboardFiler.h"
+#include "TglUtils.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SyvClipBoardHelper.hpp"
+#include "C_PuiSvHandlerFiler.hpp"
+#include "C_PuiSvDashboardFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,15 +46,15 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & orc_Data,
-                                                       const QMap<C_OSCNodeDataPoolListElementId,
+                                                       const QMap<C_OscNodeDataPoolListElementId,
                                                                   C_PuiSvReadDataConfiguration> & orc_Rails,
                                                        const QString & orc_GenericTagName)
 {
    const QMap<C_PuiSvDbNodeDataPoolListElementId,
-              C_PuiSvDbElementIdCRCGroup> c_ElementIDGroups = C_SyvClipBoardHelper::mh_FillElementIDGroups(orc_Data,
+              C_PuiSvDbElementIdCrcGroup> c_ElementIdGroups = C_SyvClipBoardHelper::mh_FillElementIdGroups(orc_Data,
                                                                                                            orc_Rails);
 
-   C_SyvClipBoardHelper::mh_StoreDashboardToClipboard(orc_Data, orc_Rails, c_ElementIDGroups, orc_GenericTagName);
+   C_SyvClipBoardHelper::mh_StoreDashboardToClipboard(orc_Data, orc_Rails, c_ElementIdGroups, orc_GenericTagName);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -63,7 +62,7 @@ void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & 
 
    \param[out]     orc_Data               System view dashboard
    \param[in]      orc_Rails              System view dashboard rails
-   \param[in,out]  orc_ElementIDGroups    Element ID groups
+   \param[in,out]  orc_ElementIdGroups    Element ID groups
    \param[in]      orc_GenericTagName     Generic content tag name
 
    \return
@@ -71,19 +70,19 @@ void C_SyvClipBoardHelper::h_StoreDashboardToClipboard(const C_PuiSvDashboard & 
    C_CONFIG Clipboard invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(C_PuiSvDashboard & orc_Data,
-                                                          QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                                                               C_PuiSvReadDataConfiguration> & orc_Rails,
-                                                          QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                               C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
-                                                          const QString & orc_GenericTagName)
+int32_t C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(C_PuiSvDashboard & orc_Data,
+                                                           QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId,
+                                                                C_PuiSvReadDataConfiguration> & orc_Rails,
+                                                           QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                                C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups,
+                                                           const QString & orc_GenericTagName)
 {
-   sint32 s32_Retval =
-      C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(orc_Data, orc_Rails, orc_ElementIDGroups, orc_GenericTagName);
+   int32_t s32_Retval =
+      C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(orc_Data, orc_Rails, orc_ElementIdGroups, orc_GenericTagName);
 
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_SyvClipBoardHelper::mh_ValidateIds(orc_Data, orc_Rails, orc_ElementIDGroups);
+      s32_Retval = C_SyvClipBoardHelper::mh_ValidateIds(orc_Data, orc_Rails, orc_ElementIdGroups);
    }
 
    return s32_Retval;
@@ -103,19 +102,19 @@ C_SyvClipBoardHelper::C_SyvClipBoardHelper(void) :
 
    \param[in]  orc_Data             System view dashboard
    \param[in]  orc_Rails            System view dashboard rails
-   \param[in]  orc_ElementIDGroups  Element ID groups
+   \param[in]  orc_ElementIdGroups  Element ID groups
    \param[in]  orc_GenericTagName   Generic content tag name
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvClipBoardHelper::mh_StoreDashboardToClipboard(const C_PuiSvDashboard & orc_Data,
-                                                        const QMap<C_OSCNodeDataPoolListElementId,
+                                                        const QMap<C_OscNodeDataPoolListElementId,
                                                                    C_PuiSvReadDataConfiguration> & orc_Rails,
                                                         const QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                                   C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
+                                                                   C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups,
                                                         const QString & orc_GenericTagName)
 {
-   stw_scl::C_SCLString c_XMLContent;
-   C_OSCXMLParserString c_StringXml;
+   stw::scl::C_SclString c_XmlContent;
+   C_OscXmlParser c_StringXml;
 
    c_StringXml.CreateAndSelectNodeChild(orc_GenericTagName.toStdString().c_str());
    c_StringXml.CreateAndSelectNodeChild("rail-assignments");
@@ -125,54 +124,54 @@ void C_SyvClipBoardHelper::mh_StoreDashboardToClipboard(const C_PuiSvDashboard &
    c_StringXml.CreateAndSelectNodeChild("gui-only");
    C_PuiSvDashboardFiler::h_SaveDashboard(orc_Data, c_StringXml);
    c_StringXml.SelectNodeParent();
-   C_SyvClipBoardHelper::mh_StoreElementIDGroups(orc_ElementIDGroups, orc_GenericTagName, c_StringXml);
-   c_StringXml.SaveToString(c_XMLContent);
+   C_SyvClipBoardHelper::mh_StoreElementIdGroups(orc_ElementIdGroups, orc_GenericTagName, c_StringXml);
+   c_StringXml.SaveToString(c_XmlContent);
 
-   mh_SetClipBoard(c_XMLContent.c_str());
+   mh_SetClipBoard(c_XmlContent.c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Store element ID groups
 
-   \param[in]      orc_ElementIDGroups    Element ID groups
+   \param[in]      orc_ElementIdGroups    Element ID groups
    \param[in]      orc_GenericTagName     Generic tag name
-   \param[in,out]  orc_XMLParser          XML parser
+   \param[in,out]  orc_XmlParser          XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvClipBoardHelper::mh_StoreElementIDGroups(const QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                              C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
+void C_SyvClipBoardHelper::mh_StoreElementIdGroups(const QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                              C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups,
                                                    const QString & orc_GenericTagName,
-                                                   C_OSCXMLParserBase & orc_XMLParser)
+                                                   C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild("element-id-groups");
+   orc_XmlParser.CreateAndSelectNodeChild("element-id-groups");
    for (QMap<C_PuiSvDbNodeDataPoolListElementId,
-             C_PuiSvDbElementIdCRCGroup>::ConstIterator c_It = orc_ElementIDGroups.cbegin();
-        c_It != orc_ElementIDGroups.cend(); ++c_It)
+             C_PuiSvDbElementIdCrcGroup>::ConstIterator c_It = orc_ElementIdGroups.cbegin();
+        c_It != orc_ElementIdGroups.cend(); ++c_It)
    {
-      C_SyvClipBoardHelper::mh_StoreElementIDGroup(c_It.key(), c_It.value(), orc_XMLParser);
+      C_SyvClipBoardHelper::mh_StoreElementIdGroup(c_It.key(), c_It.value(), orc_XmlParser);
    }
-   tgl_assert(orc_XMLParser.SelectNodeParent() == orc_GenericTagName.toStdString().c_str());
+   tgl_assert(orc_XmlParser.SelectNodeParent() == orc_GenericTagName.toStdString().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Store element ID group
 
-   \param[in]      orc_ElementID       Element ID
-   \param[in]      orc_ElementIDGroup  Element ID group
-   \param[in,out]  orc_XMLParser       XML parser
+   \param[in]      orc_ElementId       Element ID
+   \param[in]      orc_ElementIdGroup  Element ID group
+   \param[in,out]  orc_XmlParser       XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvClipBoardHelper::mh_StoreElementIDGroup(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementID,
-                                                  const C_PuiSvDbElementIdCRCGroup & orc_ElementIDGroup,
-                                                  C_OSCXMLParserBase & orc_XMLParser)
+void C_SyvClipBoardHelper::mh_StoreElementIdGroup(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
+                                                  const C_PuiSvDbElementIdCrcGroup & orc_ElementIdGroup,
+                                                  C_OscXmlParserBase & orc_XmlParser)
 {
-   tgl_assert(orc_ElementID == orc_ElementIDGroup.GetElementId());
-   orc_XMLParser.CreateAndSelectNodeChild("element-id-group");
-   orc_XMLParser.CreateAndSelectNodeChild("index");
-   C_PuiSvDashboardFiler::h_SaveUiIndex(orc_ElementID, orc_XMLParser);
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "element-id-group");
-   orc_XMLParser.SetAttributeUint32("crc", orc_ElementIDGroup.GetCRC());
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "element-id-groups");
+   tgl_assert(orc_ElementId == orc_ElementIdGroup.GetElementId());
+   orc_XmlParser.CreateAndSelectNodeChild("element-id-group");
+   orc_XmlParser.CreateAndSelectNodeChild("index");
+   C_PuiSvDashboardFiler::h_SaveUiIndex(orc_ElementId, orc_XmlParser);
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "element-id-group");
+   orc_XmlParser.SetAttributeUint32("crc", orc_ElementIdGroup.GetCrc());
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "element-id-groups");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -180,7 +179,7 @@ void C_SyvClipBoardHelper::mh_StoreElementIDGroup(const C_PuiSvDbNodeDataPoolLis
 
    \param[out]     orc_Data               System view dashboard
    \param[out]     orc_Rails              System view dashboard rails
-   \param[in,out]  orc_ElementIDGroups    Element ID groups
+   \param[in,out]  orc_ElementIdGroups    Element ID groups
    \param[in]      orc_GenericTagName     Generic content tag name
 
    \return
@@ -188,15 +187,15 @@ void C_SyvClipBoardHelper::mh_StoreElementIDGroup(const C_PuiSvDbNodeDataPoolLis
    C_CONFIG Clipboard invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(C_PuiSvDashboard & orc_Data,
-                                                           QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
-                                                                C_PuiSvReadDataConfiguration> & orc_Rails,
-                                                           QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                                C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
-                                                           const QString & orc_GenericTagName)
+int32_t C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(C_PuiSvDashboard & orc_Data,
+                                                            QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId,
+                                                                 C_PuiSvReadDataConfiguration> & orc_Rails,
+                                                            QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                                 C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups,
+                                                            const QString & orc_GenericTagName)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_OSCXMLParserString c_StringXml;
+   int32_t s32_Retval = C_NO_ERR;
+   C_OscXmlParser c_StringXml;
 
    c_StringXml.LoadFromString(mh_GetClipBoard().toStdString().c_str());
 
@@ -223,7 +222,7 @@ sint32 C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(C_PuiSvDashboard & or
       if (s32_Retval == C_NO_ERR)
       {
          s32_Retval =
-            C_SyvClipBoardHelper::mh_LoadElementIDGroups(orc_ElementIDGroups, orc_GenericTagName, c_StringXml);
+            C_SyvClipBoardHelper::mh_LoadElementIdGroups(orc_ElementIdGroups, orc_GenericTagName, c_StringXml);
       }
       else
       {
@@ -241,9 +240,9 @@ sint32 C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(C_PuiSvDashboard & or
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load element ID groups
 
-   \param[in,out]  orc_ElementIDGroups    Element ID groups
+   \param[in,out]  orc_ElementIdGroups    Element ID groups
    \param[in]      orc_GenericTagName     Generic tag name
-   \param[in,out]  orc_XMLParser          XML parser
+   \param[in,out]  orc_XmlParser          XML parser
 
    \return
    STW error codes
@@ -252,35 +251,35 @@ sint32 C_SyvClipBoardHelper::mh_LoadDashboardFromClipboard(C_PuiSvDashboard & or
    \retval   C_CONFIG   Clipboard invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvClipBoardHelper::mh_LoadElementIDGroups(QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                         C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
-                                                    const QString & orc_GenericTagName,
-                                                    C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_SyvClipBoardHelper::mh_LoadElementIdGroups(QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                          C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups,
+                                                     const QString & orc_GenericTagName,
+                                                     C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = orc_XMLParser.SelectNodeChildError("element-id-groups");
+   int32_t s32_Retval = orc_XmlParser.SelectNodeChildError("element-id-groups");
 
    if  (s32_Retval == C_NO_ERR)
    {
-      stw_scl::C_SCLString c_CurrentGroupNode = orc_XMLParser.SelectNodeChild("element-id-group");
+      stw::scl::C_SclString c_CurrentGroupNode = orc_XmlParser.SelectNodeChild("element-id-group");
 
       if (c_CurrentGroupNode == "element-id-group")
       {
          do
          {
             C_PuiSvDbNodeDataPoolListElementId c_Id;
-            C_PuiSvDbElementIdCRCGroup c_GroupData;
-            s32_Retval = C_SyvClipBoardHelper::mh_LoadElementIDGroup(c_Id, c_GroupData, orc_XMLParser);
+            C_PuiSvDbElementIdCrcGroup c_GroupData;
+            s32_Retval = C_SyvClipBoardHelper::mh_LoadElementIdGroup(c_Id, c_GroupData, orc_XmlParser);
             //Insert
-            orc_ElementIDGroups.insert(c_Id, c_GroupData);
+            orc_ElementIdGroups.insert(c_Id, c_GroupData);
             //Next
-            c_CurrentGroupNode = orc_XMLParser.SelectNodeNext("element-id-group");
+            c_CurrentGroupNode = orc_XmlParser.SelectNodeNext("element-id-group");
          }
          while ((c_CurrentGroupNode == "element-id-group") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "element-id-groups");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "element-id-groups");
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == orc_GenericTagName.toStdString().c_str());
+      tgl_assert(orc_XmlParser.SelectNodeParent() == orc_GenericTagName.toStdString().c_str());
    }
    return s32_Retval;
 }
@@ -288,9 +287,9 @@ sint32 C_SyvClipBoardHelper::mh_LoadElementIDGroups(QMap<C_PuiSvDbNodeDataPoolLi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Load element ID group
 
-   \param[in,out]  orc_ElementID       Element ID
-   \param[in,out]  orc_ElementIDGroup  Element ID group
-   \param[in,out]  orc_XMLParser       XML parser
+   \param[in,out]  orc_ElementId       Element ID
+   \param[in,out]  orc_ElementIdGroup  Element ID group
+   \param[in,out]  orc_XmlParser       XML parser
 
    \return
    STW error codes
@@ -299,24 +298,24 @@ sint32 C_SyvClipBoardHelper::mh_LoadElementIDGroups(QMap<C_PuiSvDbNodeDataPoolLi
    \retval   C_CONFIG   Clipboard invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvClipBoardHelper::mh_LoadElementIDGroup(C_PuiSvDbNodeDataPoolListElementId & orc_ElementID,
-                                                   C_PuiSvDbElementIdCRCGroup & orc_ElementIDGroup,
-                                                   C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_SyvClipBoardHelper::mh_LoadElementIdGroup(C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
+                                                    C_PuiSvDbElementIdCrcGroup & orc_ElementIdGroup,
+                                                    C_OscXmlParserBase & orc_XmlParser)
 {
-   uint32 u32_Crc;
-   sint32 s32_Retval = orc_XMLParser.GetAttributeUint32Error("crc", u32_Crc);
+   uint32_t u32_Crc;
+   int32_t s32_Retval = orc_XmlParser.GetAttributeUint32Error("crc", u32_Crc);
 
-   orc_ElementIDGroup.SetCRC(u32_Crc);
+   orc_ElementIdGroup.SetCrc(u32_Crc);
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = orc_XMLParser.SelectNodeChildError("index");
+      s32_Retval = orc_XmlParser.SelectNodeChildError("index");
       if (s32_Retval == C_NO_ERR)
       {
-         C_PuiSvDashboardFiler::h_LoadUiIndex(orc_ElementID, orc_XMLParser);
+         C_PuiSvDashboardFiler::h_LoadUiIndex(orc_ElementId, orc_XmlParser);
 
-         orc_ElementIDGroup.SetElementId(orc_ElementID);
+         orc_ElementIdGroup.SetElementId(orc_ElementId);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "element-id-group");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "element-id-group");
       }
    }
 
@@ -333,18 +332,18 @@ sint32 C_SyvClipBoardHelper::mh_LoadElementIDGroup(C_PuiSvDbNodeDataPoolListElem
    All element ID groups
 */
 //----------------------------------------------------------------------------------------------------------------------
-QMap<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbElementIdCRCGroup> C_SyvClipBoardHelper::mh_FillElementIDGroups(
-   const C_PuiSvDashboard & orc_Data, const QMap<C_OSCNodeDataPoolListElementId,
+QMap<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbElementIdCrcGroup> C_SyvClipBoardHelper::mh_FillElementIdGroups(
+   const C_PuiSvDashboard & orc_Data, const QMap<C_OscNodeDataPoolListElementId,
                                                  C_PuiSvReadDataConfiguration> & orc_Rails)
 {
-   QMap<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbElementIdCRCGroup> c_Retval;
+   QMap<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbElementIdCrcGroup> c_Retval;
    const std::set<C_PuiSvDbNodeDataPoolListElementId> c_Ids = C_SyvClipBoardHelper::mh_GetAllIds(orc_Data, orc_Rails);
    for (std::set<C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_It = c_Ids.cbegin(); c_It != c_Ids.cend();
         ++c_It)
    {
-      C_PuiSvDbElementIdCRCGroup c_Tmp;
+      C_PuiSvDbElementIdCrcGroup c_Tmp;
       c_Tmp.SetElementId(*c_It);
-      tgl_assert(c_Tmp.UpdateCRC() == C_NO_ERR);
+      tgl_assert(c_Tmp.UpdateCrc() == C_NO_ERR);
       c_Retval.insert(*c_It, c_Tmp);
    }
    return c_Retval;
@@ -361,12 +360,12 @@ QMap<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbElementIdCRCGroup> C_SyvClipBo
 */
 //----------------------------------------------------------------------------------------------------------------------
 std::set<C_PuiSvDbNodeDataPoolListElementId> C_SyvClipBoardHelper::mh_GetAllIds(const C_PuiSvDashboard & orc_Data,
-                                                                                const QMap<C_OSCNodeDataPoolListElementId,
+                                                                                const QMap<C_OscNodeDataPoolListElementId,
                                                                                            C_PuiSvReadDataConfiguration> & orc_Rails)
 {
    std::set<C_PuiSvDbNodeDataPoolListElementId> c_Retval;
    orc_Data.GetAllRegisteredDashboardElementsGuiId(c_Retval);
-   for (QMap<C_OSCNodeDataPoolListElementId,
+   for (QMap<C_OscNodeDataPoolListElementId,
              C_PuiSvReadDataConfiguration>::ConstIterator c_It = orc_Rails.cbegin(); c_It != orc_Rails.cend(); ++c_It)
    {
       const C_PuiSvDbNodeDataPoolListElementId c_Tmp(
@@ -381,7 +380,7 @@ std::set<C_PuiSvDbNodeDataPoolListElementId> C_SyvClipBoardHelper::mh_GetAllIds(
 
    \param[in]  orc_Data             System view dashboard
    \param[in]  orc_Rails            System view dashboard rails
-   \param[in]  orc_ElementIDGroups  Element ID groups
+   \param[in]  orc_ElementIdGroups  Element ID groups
 
    \return
    STW error codes
@@ -390,20 +389,20 @@ std::set<C_PuiSvDbNodeDataPoolListElementId> C_SyvClipBoardHelper::mh_GetAllIds(
    \retval   C_CONFIG   At least one missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvClipBoardHelper::mh_ValidateIds(const C_PuiSvDashboard & orc_Data,
-                                            const QMap<C_OSCNodeDataPoolListElementId,
-                                                       C_PuiSvReadDataConfiguration> & orc_Rails,
-                                            const QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                       C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups)
+int32_t C_SyvClipBoardHelper::mh_ValidateIds(const C_PuiSvDashboard & orc_Data,
+                                             const QMap<C_OscNodeDataPoolListElementId,
+                                                        C_PuiSvReadDataConfiguration> & orc_Rails,
+                                             const QMap<C_PuiSvDbNodeDataPoolListElementId,
+                                                        C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    const std::set<C_PuiSvDbNodeDataPoolListElementId> c_Ids = C_SyvClipBoardHelper::mh_GetAllIds(orc_Data, orc_Rails);
 
    //Check
    for (std::set<C_PuiSvDbNodeDataPoolListElementId>::const_iterator c_It = c_Ids.cbegin(); c_It != c_Ids.cend();
         ++c_It)
    {
-      if (!orc_ElementIDGroups.contains(*c_It))
+      if (!orc_ElementIdGroups.contains(*c_It))
       {
          s32_Retval = C_CONFIG;
       }

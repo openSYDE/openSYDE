@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamProDatabaseData.h"
-#include "CSCLChecksums.h"
+#include "C_CamProDatabaseData.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,10 +50,10 @@ C_CamProDatabaseData::C_CamProDatabaseData(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProDatabaseData::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_CamProDatabaseData::CalcHash(uint32_t & oru32_HashValue) const
 {
    // Database properties (name, state)
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.toStdString().c_str(), this->c_Name.length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->s32_BusIndex, sizeof(this->s32_BusIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.toStdString().c_str(), this->c_Name.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->s32_BusIndex, sizeof(this->s32_BusIndex), oru32_HashValue);
 }

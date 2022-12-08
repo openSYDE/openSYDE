@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstdio>
-#include "TGLFile.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_OSCChecksummedXML.h"
-#include "C_OSCParamSetRawNodeFiler.h"
-#include "C_OSCLoggingHandler.h"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_OscChecksummedXml.hpp"
+#include "C_OscParamSetRawNodeFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +47,7 @@ using namespace stw_opensyde_core;
    post-condition: the passed XML parser has the active node set to the same "node"
 
    \param[out]    orc_Node                   data storage
-   \param[in,out] orc_XMLParser              XML with specified node active
+   \param[in,out] orc_XmlParser              XML with specified node active
    \param[in,out] orq_MissingOptionalContent Flag for indication of optional content missing
                                              Warning: flag is never set to false if optional content is present
 
@@ -56,18 +56,18 @@ using namespace stw_opensyde_core;
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode & orc_Node,
-                                                           C_OSCXMLParserBase & orc_XMLParser,
-                                                           bool & orq_MissingOptionalContent)
+int32_t C_OscParamSetRawNodeFiler::h_LoadRawNode(C_OscParamSetRawNode & orc_Node, C_OscXmlParserBase & orc_XmlParser,
+                                                 bool & orq_MissingOptionalContent)
 {
-   stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::mh_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
+   int32_t s32_Retval = C_OscParamSetFilerBase::mh_LoadNodeName(orc_Node.c_Name, orc_XmlParser);
+
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_OSCParamSetFilerBase::mh_LoadDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser,
+      s32_Retval = C_OscParamSetFilerBase::mh_LoadDataPoolInfos(orc_Node.c_DataPools, orc_XmlParser,
                                                                 orq_MissingOptionalContent);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = C_OSCParamSetRawNodeFiler::mh_LoadEntries(orc_Node.c_Entries, orc_XMLParser);
+         s32_Retval = C_OscParamSetRawNodeFiler::mh_LoadEntries(orc_Node.c_Entries, orc_XmlParser);
       }
    }
 
@@ -82,22 +82,22 @@ stw_types::sint32 C_OSCParamSetRawNodeFiler::h_LoadRawNode(C_OSCParamSetRawNode 
    post-condition: the passed XML parser has the active node set to the same "node"
 
    \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out] orc_XmlParser XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetRawNodeFiler::h_SaveRawNode(const C_OSCParamSetRawNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetRawNodeFiler::h_SaveRawNode(const C_OscParamSetRawNode & orc_Node, C_OscXmlParserBase & orc_XmlParser)
 {
-   C_OSCParamSetFilerBase::mh_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
-   C_OSCParamSetFilerBase::mh_SaveDataPoolInfos(orc_Node.c_DataPools, orc_XMLParser);
-   C_OSCParamSetRawNodeFiler::mh_SaveEntries(orc_Node.c_Entries, orc_XMLParser);
+   C_OscParamSetFilerBase::mh_SaveNodeName(orc_Node.c_Name, orc_XmlParser);
+   C_OscParamSetFilerBase::mh_SaveDataPoolInfos(orc_Node.c_DataPools, orc_XmlParser);
+   C_OscParamSetRawNodeFiler::mh_SaveEntries(orc_Node.c_Entries, orc_XmlParser);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetRawNodeFiler::C_OSCParamSetRawNodeFiler(void) :
-   C_OSCParamSetFilerBase()
+C_OscParamSetRawNodeFiler::C_OscParamSetRawNodeFiler(void) :
+   C_OscParamSetFilerBase()
 {
 }
 
@@ -109,40 +109,40 @@ C_OSCParamSetRawNodeFiler::C_OSCParamSetRawNodeFiler(void) :
    post-condition: the passed XML parser has the active node set to the same "node"
 
    \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out] orc_XmlParser XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEntry> & orc_Entries,
-                                                 C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OscParamSetRawEntry> & orc_Entries,
+                                                  C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_Entries.clear();
-   if (orc_XMLParser.SelectNodeChild("raw") == "raw")
+   if (orc_XmlParser.SelectNodeChild("raw") == "raw")
    {
-      C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("raw-entry");
+      C_SclString c_SelectedNode = orc_XmlParser.SelectNodeChild("raw-entry");
 
       if (c_SelectedNode == "raw-entry")
       {
          do
          {
-            C_OSCParamSetRawEntry c_Item;
-            s32_Retval = C_OSCParamSetRawNodeFiler::mh_LoadEntry(c_Item, orc_XMLParser);
+            C_OscParamSetRawEntry c_Item;
+            s32_Retval = C_OscParamSetRawNodeFiler::mh_LoadEntry(c_Item, orc_XmlParser);
             if (s32_Retval == C_NO_ERR)
             {
                orc_Entries.push_back(c_Item);
             }
 
             //Next
-            c_SelectedNode = orc_XMLParser.SelectNodeNext("raw-entry");
+            c_SelectedNode = orc_XmlParser.SelectNodeNext("raw-entry");
          }
          while ((c_SelectedNode == "raw-entry") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "raw");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "raw");
       }
       else
       {
@@ -150,7 +150,7 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEnt
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
    }
    else
    {
@@ -167,28 +167,28 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntries(std::vector<C_OSCParamSetRawEnt
    post-condition: the passed XML parser has the active node set to the same "node"
 
    \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out] orc_XmlParser XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetRawNodeFiler::mh_SaveEntries(const std::vector<C_OSCParamSetRawEntry> & orc_Entries,
-                                               C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetRawNodeFiler::mh_SaveEntries(const std::vector<C_OscParamSetRawEntry> & orc_Entries,
+                                               C_OscXmlParserBase & orc_XmlParser)
 {
    //Clean start
-   if (orc_XMLParser.SelectNodeChild("raw") == "raw")
+   if (orc_XmlParser.SelectNodeChild("raw") == "raw")
    {
-      tgl_assert(orc_XMLParser.DeleteNode() == "raw");
-      tgl_assert(orc_XMLParser.SelectRoot() == "opensyde-parameter-sets");
+      tgl_assert(orc_XmlParser.DeleteNode() == "raw");
+      tgl_assert(orc_XmlParser.SelectRoot() == "opensyde-parameter-sets");
    }
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("raw") == "raw");
-   for (uint32 u32_Index = 0U; u32_Index < orc_Entries.size(); u32_Index++)
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("raw") == "raw");
+   for (uint32_t u32_Index = 0U; u32_Index < orc_Entries.size(); u32_Index++)
    {
-      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("raw-entry") == "raw-entry");
-      C_OSCParamSetRawNodeFiler::mh_SaveEntry(orc_Entries[u32_Index], orc_XMLParser);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("raw-entry") == "raw-entry");
+      C_OscParamSetRawNodeFiler::mh_SaveEntry(orc_Entries[u32_Index], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "raw");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "raw");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -199,31 +199,31 @@ void C_OSCParamSetRawNodeFiler::mh_SaveEntries(const std::vector<C_OSCParamSetRa
    post-condition: the passed XML parser has the active node set to the same "raw-entry"
 
    \param[out]    orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out] orc_XmlParser XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetRawNodeFiler::mh_LoadEntry(C_OscParamSetRawEntry & orc_Entry, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("address") == "address")
+   if (orc_XmlParser.SelectNodeChild("address") == "address")
    {
       try
       {
-         orc_Entry.u32_StartAddress = static_cast<uint32>(orc_XMLParser.GetNodeContent().ToInt64());
+         orc_Entry.u32_StartAddress = static_cast<uint32_t>(orc_XmlParser.GetNodeContent().ToInt64());
       }
       catch (...)
       {
          osc_write_log_error("Loading Dataset data", "Node \"node\".\"raw\".\"raw-entry\".\"address\" contains non-integer value (" +
-                             orc_XMLParser.GetNodeContent() + ").");
+                             orc_XmlParser.GetNodeContent() + ").");
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "raw-entry");
    }
    else
    {
@@ -232,18 +232,18 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("value") == "value")
+      if (orc_XmlParser.SelectNodeChild("value") == "value")
       {
-         const C_SCLString c_Content = orc_XMLParser.GetNodeContent();
-         SCLDynamicArray<C_SCLString> c_Tokens;
+         const C_SclString c_Content = orc_XmlParser.GetNodeContent();
+         C_SclDynamicArray<C_SclString> c_Tokens;
          c_Content.Tokenize(";", c_Tokens);
          orc_Entry.c_Bytes.reserve(c_Tokens.GetLength());
-         for (sint32 s32_It = 0; (s32_It < c_Tokens.GetLength()) && (s32_Retval == C_NO_ERR); ++s32_It)
+         for (int32_t s32_It = 0; (s32_It < c_Tokens.GetLength()) && (s32_Retval == C_NO_ERR); ++s32_It)
          {
-            const C_SCLString & rc_Token = c_Tokens[s32_It];
+            const C_SclString & rc_Token = c_Tokens[s32_It];
             try
             {
-               orc_Entry.c_Bytes.push_back(static_cast<uint8>(rc_Token.ToInt()));
+               orc_Entry.c_Bytes.push_back(static_cast<uint8_t>(rc_Token.ToInt()));
             }
             catch (...)
             {
@@ -254,7 +254,7 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
             }
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "raw-entry");
       }
       else
       {
@@ -264,12 +264,12 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("size") == "size")
+      if (orc_XmlParser.SelectNodeChild("size") == "size")
       {
-         uint32 u32_Size = 0;
+         uint32_t u32_Size = 0;
          try
          {
-            u32_Size = static_cast<uint32>(orc_XMLParser.GetNodeContent().ToInt64());
+            u32_Size = static_cast<uint32_t>(orc_XmlParser.GetNodeContent().ToInt64());
          }
          catch (...)
          {
@@ -283,7 +283,7 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
             }
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "raw-entry");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "raw-entry");
       }
       else
       {
@@ -303,28 +303,28 @@ sint32 C_OSCParamSetRawNodeFiler::mh_LoadEntry(C_OSCParamSetRawEntry & orc_Entry
    post-condition: the passed XML parser has the active node set to the same "raw-entry"
 
    \param[in]     orc_Node      data storage
-   \param[in,out] orc_XMLParser XML with specified node active
+   \param[in,out] orc_XmlParser XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetRawNodeFiler::mh_SaveEntry(const C_OSCParamSetRawEntry & orc_Entry,
-                                             C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetRawNodeFiler::mh_SaveEntry(const C_OscParamSetRawEntry & orc_Entry,
+                                             C_OscXmlParserBase & orc_XmlParser)
 {
-   C_SCLString c_Bytes;
+   C_SclString c_Bytes;
 
-   orc_XMLParser.CreateNodeChild("address", C_SCLString::IntToStr(orc_Entry.u32_StartAddress));
-   orc_XMLParser.CreateNodeChild("size", C_SCLString::IntToStr(orc_Entry.c_Bytes.size()));
+   orc_XmlParser.CreateNodeChild("address", C_SclString::IntToStr(orc_Entry.u32_StartAddress));
+   orc_XmlParser.CreateNodeChild("size", C_SclString::IntToStr(orc_Entry.c_Bytes.size()));
    if (orc_Entry.c_Bytes.size() > 0)
    {
-      c_Bytes = C_SCLString::IntToStr(orc_Entry.c_Bytes[0]);
-      for (uint32 u32_It = 1; u32_It < orc_Entry.c_Bytes.size(); ++u32_It)
+      c_Bytes = C_SclString::IntToStr(orc_Entry.c_Bytes[0]);
+      for (uint32_t u32_It = 1; u32_It < orc_Entry.c_Bytes.size(); ++u32_It)
       {
          c_Bytes += ';';
-         c_Bytes += C_SCLString::IntToStr(orc_Entry.c_Bytes[u32_It]);
+         c_Bytes += C_SclString::IntToStr(orc_Entry.c_Bytes[u32_It]);
       }
    }
    else
    {
       c_Bytes = "";
    }
-   orc_XMLParser.CreateNodeChild("value", c_Bytes);
+   orc_XmlParser.CreateNodeChild("value", c_Bytes);
 }

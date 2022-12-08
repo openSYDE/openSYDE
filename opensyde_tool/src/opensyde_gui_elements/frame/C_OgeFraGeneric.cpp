@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeFraGeneric.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeFraGeneric.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,21 +47,21 @@ C_OgeFraGeneric::C_OgeFraGeneric(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set border color (stylesheet color index)
 
-   \param[in]  osn_Value   Value
+   \param[in]  os32_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeFraGeneric::SetBorderColor(const stw_types::sintn osn_Value)
+void C_OgeFraGeneric::SetBorderColor(const int32_t os32_Value)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Border", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Border", os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set background color (stylesheet color index)
 
-   \param[in]  osn_Value   Value
+   \param[in]  os32_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeFraGeneric::SetBackgroundColor(const stw_types::sintn osn_Value)
+void C_OgeFraGeneric::SetBackgroundColor(const int32_t os32_Value)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Background", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Background", os32_Value);
 }

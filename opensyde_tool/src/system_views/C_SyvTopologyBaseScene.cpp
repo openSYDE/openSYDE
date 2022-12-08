@@ -8,28 +8,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsView>
 
-#include "C_SyvTopologyBaseScene.h"
-#include "C_GiSvPc.h"
-#include "C_GiSvCANBus.h"
-#include "C_GiSvEthernetBus.h"
-#include "C_GiSvTextElementBus.h"
-#include "C_GiSvPcBusConnector.h"
-#include "gitypes.h"
-#include "TGLUtils.h"
-#include "C_PuiSvHandler.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_SyvTopologyBaseScene.hpp"
+#include "C_GiSvPc.hpp"
+#include "C_GiSvCanBus.hpp"
+#include "C_GiSvEthernetBus.hpp"
+#include "C_GiSvTextElementBus.hpp"
+#include "C_GiSvPcBusConnector.hpp"
+#include "gitypes.hpp"
+#include "TglUtils.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvTopologyBaseScene::C_SyvTopologyBaseScene(const stw_types::uint32 ou32_ViewIndex, QObject * const opc_Parent) :
+C_SyvTopologyBaseScene::C_SyvTopologyBaseScene(const uint32_t ou32_ViewIndex, QObject * const opc_Parent) :
    C_SebTopologyBaseScene(opc_Parent),
    mu32_ViewIndex(ou32_ViewIndex)
 {
@@ -73,7 +72,7 @@ C_SyvTopologyBaseScene::~C_SyvTopologyBaseScene()
 void C_SyvTopologyBaseScene::Load(void)
 {
    bool q_Change = false;
-   C_GiSvPc * const pc_PC = new C_GiSvPc(this->m_GetNewUniqueID(), this->mu32_ViewIndex);
+   C_GiSvPc * const pc_PC = new C_GiSvPc(this->m_GetNewUniqueId(), this->mu32_ViewIndex);
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    QString c_BusName = "";
 
@@ -90,7 +89,7 @@ void C_SyvTopologyBaseScene::Load(void)
    {
       if (pc_View->GetPcData().GetConnected() == true)
       {
-         const uint32 u32_BusIndex = pc_View->GetPcData().GetBusIndex();
+         const uint32_t u32_BusIndex = pc_View->GetPcData().GetBusIndex();
          QList<QGraphicsItem *> c_Items = this->items();
          C_GiLiBus * pc_Bus = NULL;
 
@@ -103,7 +102,7 @@ void C_SyvTopologyBaseScene::Load(void)
                C_GiLiBus * const pc_CurBus = dynamic_cast<C_GiLiBus *>(pc_CurItemParent);
                if (pc_CurBus != NULL)
                {
-                  if (static_cast<uint32>(pc_CurBus->GetIndex()) == u32_BusIndex)
+                  if (static_cast<uint32_t>(pc_CurBus->GetIndex()) == u32_BusIndex)
                   {
                      pc_Bus = pc_CurBus;
                      break;
@@ -186,7 +185,7 @@ bool C_SyvTopologyBaseScene::IsItemDeletable(const QGraphicsItem * const opc_Ite
    false    Z order is not changeable
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvTopologyBaseScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item) const
+bool C_SyvTopologyBaseScene::IsZetOrderChangeable(const QGraphicsItem * const opc_Item) const
 {
    Q_UNUSED(opc_Item)
 
@@ -234,7 +233,7 @@ bool C_SyvTopologyBaseScene::IsSceneRubberBandAvailable(void) const
    Else Valid copy paste manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManager(void)
+stw::opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManager(void)
 {
    return NULL;
 }
@@ -247,7 +246,8 @@ stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_Ge
    Else Valid copy paste manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManagerConst(void) const
+const stw::opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene::m_GetCopyPasteManagerConst(void)
+const
 {
    return NULL;
 }
@@ -256,7 +256,7 @@ const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene
 /*! \brief   Get specific CAN bus
 
    \param[in]      ors32_Index            Index of data element in system definition
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in]      opc_TextElementName    Pointer to text element for showing bus name
    \param[in]      opc_Points             Points for line
    \param[in,out]  opc_Parent             Optional pointer to parent
@@ -265,19 +265,19 @@ const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvTopologyBaseScene
    Specific CAN bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiLiCanBus * C_SyvTopologyBaseScene::m_CreateCanBus(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                                                       C_GiTextElementBus * const opc_TextElementName,
                                                       const std::vector<QPointF> * const opc_Points,
                                                       QGraphicsItem * const opc_Parent)
 {
-   return new C_GiSvCANBus(this->mu32_ViewIndex, ors32_Index, oru64_ID, opc_TextElementName, opc_Points, opc_Parent);
+   return new C_GiSvCanBus(this->mu32_ViewIndex, ors32_Index, oru64_Id, opc_TextElementName, opc_Points, opc_Parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get specific ethernet bus
 
    \param[in]      ors32_Index            Index of data element in system definition
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in]      opc_TextElementName    Pointer to text element for showing bus name
    \param[in]      opc_Points             Points for line
    \param[in,out]  opc_Parent             Optional pointer to parent
@@ -286,12 +286,12 @@ C_GiLiCANBus * C_SyvTopologyBaseScene::m_CreateCANBus(const sint32 & ors32_Index
    Specific ethernet bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                                                                 C_GiTextElementBus * const opc_TextElementName,
                                                                 const std::vector<QPointF> * const opc_Points,
                                                                 QGraphicsItem * const opc_Parent)
 {
-   return new C_GiSvEthernetBus(this->mu32_ViewIndex, ors32_Index, oru64_ID, opc_TextElementName, opc_Points,
+   return new C_GiSvEthernetBus(this->mu32_ViewIndex, ors32_Index, oru64_Id, opc_TextElementName, opc_Points,
                                 opc_Parent);
 }
 
@@ -299,17 +299,18 @@ C_GiLiEthernetBus * C_SyvTopologyBaseScene::m_CreateEthernetBus(const sint32 & o
 /*! \brief   Get specific bus text element
 
    \param[in]      ors32_Index   Index of data element in system definition
-   \param[in]      oru64_ID      Unique ID
+   \param[in]      oru64_Id      Unique ID
    \param[in,out]  opc_Parent    Optional pointer to parent
 
    \return
    Specific bus text element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiTextElementBus * C_SyvTopologyBaseScene::m_CreateBusTextElement(const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiTextElementBus * C_SyvTopologyBaseScene::m_CreateBusTextElement(const int32_t & ors32_Index,
+                                                                    const uint64_t & oru64_Id,
                                                                     QGraphicsItem * const opc_Parent)
 {
-   return new C_GiSvTextElementBus(ors32_Index, oru64_ID, opc_Parent);
+   return new C_GiSvTextElementBus(ors32_Index, oru64_Id, opc_Parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -524,12 +525,12 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
             tgl_assert((pc_Node != NULL) && (pc_View != NULL));
             if ((pc_Node != NULL) && (pc_View != NULL))
             {
-               const std::vector<uint8> & rc_NodeActiveFlages = pc_View->GetNodeActiveFlags();
-               const sint32 s32_NodeIndex = pc_Node->GetIndex();
-               tgl_assert((s32_NodeIndex >= 0) && (static_cast<uint32>(s32_NodeIndex) < rc_NodeActiveFlages.size()));
-               if ((s32_NodeIndex >= 0) && (static_cast<uint32>(s32_NodeIndex) < rc_NodeActiveFlages.size()))
+               const std::vector<uint8_t> & rc_NodeActiveFlages = pc_View->GetNodeActiveFlags();
+               const int32_t s32_NodeIndex = pc_Node->GetIndex();
+               tgl_assert((s32_NodeIndex >= 0) && (static_cast<uint32_t>(s32_NodeIndex) < rc_NodeActiveFlages.size()));
+               if ((s32_NodeIndex >= 0) && (static_cast<uint32_t>(s32_NodeIndex) < rc_NodeActiveFlages.size()))
                {
-                  pc_BusConnector->SetDisabledLook(rc_NodeActiveFlages[static_cast<uint32>(s32_NodeIndex)] == false);
+                  pc_BusConnector->SetDisabledLook(rc_NodeActiveFlages[static_cast<uint32_t>(s32_NodeIndex)] == 0U);
                }
             }
          }
@@ -549,26 +550,26 @@ C_GiLiBus * C_SyvTopologyBaseScene::m_CheckBusState(void) const
 void C_SyvTopologyBaseScene::m_AddPcBusConnector(const C_GiLiBus * const opc_Bus, C_GiBiConnectableItem * const opc_Pc,
                                                  const C_PuiBsLineBase & orc_LineData)
 {
-   std::vector<QPointF> c_UIInteractionPoints;
+   std::vector<QPointF> c_UiInteractionPoints;
    //Initial points
-   if (orc_LineData.c_UIInteractionPoints.size() == 0)
+   if (orc_LineData.c_UiInteractionPoints.size() == 0)
    {
       const QGraphicsItem * const pc_GI = dynamic_cast<const QGraphicsItem * const>(opc_Pc);
       const QPointF c_BottomCenter = mh_GetInitialConnectionPoint(pc_GI);
-      c_UIInteractionPoints.push_back(c_BottomCenter);
-      c_UIInteractionPoints.push_back(c_BottomCenter);
+      c_UiInteractionPoints.push_back(c_BottomCenter);
+      c_UiInteractionPoints.push_back(c_BottomCenter);
    }
    else
    {
-      c_UIInteractionPoints = orc_LineData.c_UIInteractionPoints;
+      c_UiInteractionPoints = orc_LineData.c_UiInteractionPoints;
    }
    if ((opc_Bus != NULL) && (opc_Pc != NULL))
    {
       //Create and add bus connection
       C_GiSvPcBusConnector * const pc_PcBusConnection = new C_GiSvPcBusConnector(
-         this->m_GetNewUniqueID(), this->mu32_ViewIndex, c_UIInteractionPoints, opc_Bus, opc_Pc);
+         this->m_GetNewUniqueId(), this->mu32_ViewIndex, c_UiInteractionPoints, opc_Bus, opc_Pc);
       //Update Z value
-      pc_PcBusConnection->RestoreZOrder();
+      pc_PcBusConnection->RestoreZetOrder();
       //Save/Update
       pc_PcBusConnection->UpdateData();
       m_AddPcBusConnectorToScene(pc_PcBusConnection);
@@ -632,14 +633,15 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
       }
       //Delete connection if existing
       tgl_assert(c_ItemsToBeDeleted.size() <= 1);
-      for (uint32 u32_ItItemToBeDeleted = 0; u32_ItItemToBeDeleted < c_ItemsToBeDeleted.size(); ++u32_ItItemToBeDeleted)
+      for (uint32_t u32_ItItemToBeDeleted = 0; u32_ItItemToBeDeleted < c_ItemsToBeDeleted.size();
+           ++u32_ItItemToBeDeleted)
       {
          QGraphicsItem * const pc_ItemToBeDeleted = c_ItemsToBeDeleted[u32_ItItemToBeDeleted];
          delete (pc_ItemToBeDeleted);
          q_Retval = true;
       }
       //Save/Update
-      C_PuiSvHandler::h_GetInstance()->SetViewPCConnected(this->mu32_ViewIndex, false, 0);
+      C_PuiSvHandler::h_GetInstance()->SetViewPcConnected(this->mu32_ViewIndex, false, 0);
    }
    else
    {
@@ -657,7 +659,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
             C_GiLiBus * const pc_Item = dynamic_cast<C_GiLiBus *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-               if (static_cast<uint32>(pc_Item->GetIndex()) == pc_PcData->GetPcData().GetBusIndex())
+               if (static_cast<uint32_t>(pc_Item->GetIndex()) == pc_PcData->GetPcData().GetBusIndex())
                {
                   //Check if valid
                   const bool q_Disabled = C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(this->mu32_ViewIndex,
@@ -705,7 +707,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
                   q_Retval = true;
                   //Update Z value
                   // (misuse of interface does no update of z value as the class thinks it has already the right one)
-                  pc_PcConnector->RestoreZOrder();
+                  pc_PcConnector->RestoreZetOrder();
                   //Save/Update
                   pc_PcConnector->UpdateData();
                }
@@ -717,7 +719,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
       //Bus connector creation necessary
       if (q_Found == false)
       {
-         C_GiSvPc * pc_PCItem = NULL;
+         C_GiSvPc * pc_PcItem = NULL;
 
          //Search pc item
          for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
@@ -725,17 +727,17 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
             C_GiSvPc * const pc_Item = dynamic_cast<C_GiSvPc *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-               pc_PCItem = pc_Item;
+               pc_PcItem = pc_Item;
             }
          }
          if (pc_LastBus != NULL)
          {
-            m_AddPcBusConnector(pc_LastBus, pc_PCItem);
+            m_AddPcBusConnector(pc_LastBus, pc_PcItem);
             orc_BusName = pc_LastBus->GetName();
          }
          else
          {
-            m_AddPcBusConnector(pc_ValidBus, pc_PCItem);
+            m_AddPcBusConnector(pc_ValidBus, pc_PcItem);
             orc_BusName = pc_ValidBus->GetName();
          }
          q_Retval = true;

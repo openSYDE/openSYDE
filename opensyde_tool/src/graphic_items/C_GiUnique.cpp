@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GiUnique.h"
+#include "C_GiUnique.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,11 +32,11 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in] oru64_ID Unique ID
+   \param[in] oru64_Id Unique ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiUnique::C_GiUnique(const stw_types::uint64 & oru64_ID) :
-   mu64_ID(oru64_ID)
+C_GiUnique::C_GiUnique(const uint64_t & oru64_Id) :
+   mu64_Id(oru64_Id)
 {
 }
 
@@ -52,16 +51,16 @@ C_GiUnique::~C_GiUnique(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if unique ID matches
 
-   \param[in] oru64_ID Unique ID to check for
+   \param[in] oru64_Id Unique ID to check for
 
    \return
    true:  match
    false: no match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiUnique::CheckMatch(const uint64 & oru64_ID) const
+bool C_GiUnique::CheckMatch(const uint64_t & oru64_Id) const
 {
-   return (this->mu64_ID == oru64_ID);
+   return (this->mu64_Id == oru64_Id);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -71,7 +70,7 @@ bool C_GiUnique::CheckMatch(const uint64 & oru64_ID) const
    Current ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint64 C_GiUnique::GetID() const
+uint64_t C_GiUnique::GetId() const
 {
-   return mu64_ID;
+   return mu64_Id;
 }

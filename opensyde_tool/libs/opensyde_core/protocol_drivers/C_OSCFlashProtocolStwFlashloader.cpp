@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "TGLUtils.h"
-#include "C_OSCFlashProtocolStwFlashloader.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
+#include "C_OscFlashProtocolStwFlashloader.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_diag_lib;
-using namespace stw_tgl;
-using namespace stw_scl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::diag_lib;
+using namespace stw::tgl;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,7 +48,7 @@ using namespace stw_scl;
    \param[in]  opv_Instance  instance pointer to pass as parameter when reporting progress
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress,
+C_OscFlashProtocolStwFlashloader::C_OscFlashProtocolStwFlashloader(const PR_ReportProgress opr_Progress,
                                                                    void * const opv_Instance) :
    C_XFLFlashWrite(),
    pr_ReportProgress(opr_Progress),
@@ -62,7 +62,7 @@ C_OSCFlashProtocolStwFlashloader::C_OSCFlashProtocolStwFlashloader(const PR_Repo
    Tear down class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
+C_OscFlashProtocolStwFlashloader::~C_OscFlashProtocolStwFlashloader(void)
 {
    pr_ReportProgress = NULL;
    pv_ReportProgressInstance = NULL;
@@ -82,14 +82,14 @@ C_OSCFlashProtocolStwFlashloader::~C_OSCFlashProtocolStwFlashloader(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001,8011}  //name of function dictated by base class
-sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Progress1_1000,
-                                                            const C_SCLString & orc_AdditionalText)
+int32_t C_OscFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16_t ou16_Progress1_1000,
+                                                             const C_SclString & orc_AdditionalText)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (pr_ReportProgress != NULL)
    {
-      s32_Return = pr_ReportProgress(pv_ReportProgressInstance, static_cast<uint8>(ou16_Progress1_1000 / 10U),
+      s32_Return = pr_ReportProgress(pv_ReportProgressInstance, static_cast<uint8_t>(ou16_Progress1_1000 / 10U),
                                      "Information: " + orc_AdditionalText);
    }
    return s32_Return;
@@ -105,11 +105,11 @@ sint32 C_OSCFlashProtocolStwFlashloader::TRG_ReportProgress(const uint16 ou16_Pr
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001,8011}  //name of function dictated by base class
-void C_OSCFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SCLString & orc_Text, const uint8 ou8_Type)
+void C_OscFlashProtocolStwFlashloader::TRG_ReportStatus(const C_SclString & orc_Text, const uint8_t ou8_Type)
 {
    if (pr_ReportProgress != NULL)
    {
-      C_SCLString c_Text;
+      C_SclString c_Text;
 
       switch (ou8_Type)
       {

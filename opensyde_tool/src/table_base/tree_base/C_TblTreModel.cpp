@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_TblTreItem.h"
-#include "C_TblTreModel.h"
+#include "TglUtils.hpp"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_TblTreItem.hpp"
+#include "C_TblTreModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,19 +51,19 @@ C_TblTreModel::C_TblTreModel(QObject * const opc_Parent) :
 /*! \brief  Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if ((orc_Index.isValid() == true) && (orc_Index.column() == 0))
    {
-      if (osn_Role == static_cast<stw_types::sintn>(Qt::DisplayRole))
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
@@ -74,7 +73,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
             c_Retval = pc_TreeItem->c_Name;
          }
       }
-      else if  (osn_Role == static_cast<stw_types::sintn>(Qt::DecorationRole))
+      else if  (os32_Role == static_cast<int32_t>(Qt::DecorationRole))
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
@@ -84,7 +83,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
             c_Retval = pc_TreeItem->c_Icon;
          }
       }
-      else if  (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if  (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =
@@ -94,7 +93,7 @@ QVariant C_TblTreModel::data(const QModelIndex & orc_Index, const sintn osn_Role
             c_Retval = pc_TreeItem->c_ToolTipHeading;
          }
       }
-      else if  (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if  (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          //lint -e{9079}  Result of Qt interface restrictions, set by index function
          const C_TblTreItem * const pc_TreeItem =

@@ -10,18 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGroupBox>
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeWiNavigationTab.h"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeWiNavigationTab.hpp"
 #include "ui_C_OgeWiNavigationTab.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

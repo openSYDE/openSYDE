@@ -8,44 +8,43 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsView>
 #include <QMimeData>
 
-#include "C_GiWiProxyBase.h"
+#include "C_GiWiProxyBase.hpp"
 
-#include "gitypes.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "gitypes.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "TGLUtils.h"
-#include "C_GiSvDaArrow.h"
-#include "C_GiSvDaBoundary.h"
-#include "C_GiSvDaLabelBase.h"
-#include "C_GiSvDaParam.h"
-#include "C_GiSvDaPieChartBase.h"
-#include "C_GiSvDaSpinBoxBase.h"
-#include "C_GiSvDaSliderBase.h"
-#include "C_GiSvDaProgressBarBase.h"
-#include "C_GiSvDaTableBase.h"
-#include "C_GiSvDaToggleBase.h"
-#include "C_GiSvDaImageGroup.h"
-#include "C_GiSvDaTextElement.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDaDashboardScene.h"
-#include "C_SdTopologyListWidget.h"
-#include "C_GtGetText.h"
-#include "C_SyvClipBoardHelper.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "C_GiSvDaArrow.hpp"
+#include "C_GiSvDaBoundary.hpp"
+#include "C_GiSvDaLabelBase.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_GiSvDaPieChartBase.hpp"
+#include "C_GiSvDaSpinBoxBase.hpp"
+#include "C_GiSvDaSliderBase.hpp"
+#include "C_GiSvDaProgressBarBase.hpp"
+#include "C_GiSvDaTableBase.hpp"
+#include "C_GiSvDaToggleBase.hpp"
+#include "C_GiSvDaImageGroup.hpp"
+#include "C_GiSvDaTextElement.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDaDashboardScene.hpp"
+#include "C_SdTopologyListWidget.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvClipBoardHelper.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,7 +69,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardScene::C_SyvDaDashboardScene(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
+C_SyvDaDashboardScene::C_SyvDaDashboardScene(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
                                              const bool oq_LoadDashboard, QObject * const opc_Parent) :
    C_SebScene(opc_Parent),
    mc_UndoManager(this),
@@ -246,7 +245,7 @@ void C_SyvDaDashboardScene::SetDrawingActive(const bool oq_Active) const
    \param[in]  ou32_DashboardIndex  New dashboard index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardScene::SetDashboardIndex(const uint32 ou32_DashboardIndex)
+void C_SyvDaDashboardScene::SetDashboardIndex(const uint32_t ou32_DashboardIndex)
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
 
@@ -274,7 +273,7 @@ void C_SyvDaDashboardScene::SetDashboardIndex(const uint32 ou32_DashboardIndex)
 void C_SyvDaDashboardScene::Load(void)
 {
    //Fill up with zeros
-   const QVector<uint32> c_SaveIndices(13, 0);
+   const QVector<uint32_t> c_SaveIndices(13, 0);
 
    //Sync system definition scaling information
    tgl_assert(C_PuiSvHandler::h_GetInstance()->SyncDashboardScalingInformation(this->mu32_ViewIndex,
@@ -308,12 +307,12 @@ void C_SyvDaDashboardScene::Save(void) const
 /*! \brief   Copy snapshot to scene
 
    \param[in]  orc_Snapshot   Object snapshot
-   \param[in]  opc_IDMap      Optional map for IDs to use
+   \param[in]  opc_IdMap      Optional map for IDs to use
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc_Snapshot,
-                                                    const QMap<C_PuiBsTemporaryDataID,
-                                                               uint64> * const opc_IDMap)
+                                                    const QMap<C_PuiBsTemporaryDataId,
+                                                               uint64_t> * const opc_IdMap)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -322,7 +321,7 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
       const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
       if (pc_Dashboard != NULL)
       {
-         uint32 u32_ItElem;
+         uint32_t u32_ItElem;
          const std::vector<C_PuiSvDbLabel> & rc_Labels = orc_Snapshot.GetLabels();
          const std::vector<C_PuiSvDbParam> & rc_Params = orc_Snapshot.GetParams();
          const std::vector<C_PuiSvDbPieChart> & rc_PieCharts = orc_Snapshot.GetPieCharts();
@@ -345,7 +344,7 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
          10: Table
          11: Param
          */
-         QVector<uint32> c_OtherIndices;
+         QVector<uint32_t> c_OtherIndices;
          //Indices
          c_OtherIndices.push_back(pc_Dashboard->c_Boundaries.size());
          c_OtherIndices.push_back(pc_Dashboard->c_TextElements.size());
@@ -451,7 +450,7 @@ void C_SyvDaDashboardScene::CopyFromSnapshotToScene(const C_PuiSvDashboard & orc
             C_PuiSvHandler::h_GetInstance()->AddDashboardImage(this->mu32_ViewIndex, this->mu32_DashboardIndex,
                                                                orc_Snapshot.c_Images[u32_ItElem]);
          }
-         m_LoadSubset(c_OtherIndices, true, opc_IDMap);
+         m_LoadSubset(c_OtherIndices, true, opc_IdMap);
       }
    }
 }
@@ -633,33 +632,33 @@ void C_SyvDaDashboardScene::CopyFromManagerToScene(const QPointF * const opc_Pos
 
    const C_SyvDaDashboardSnapshot * const pc_SnapShot =
       dynamic_cast<const C_SyvDaDashboardSnapshot * const>(pc_Data);
-   const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+   const QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId,
               C_PuiSvReadDataConfiguration> * const pc_Rails = this->mc_CopyPasteManager.GetRails();
 
    if ((pc_SnapShot != NULL) && (pc_Rails != NULL))
    {
       const QPointF c_OFFSET = QPointF(10.0, 10.0);
-      const uint32 u32_ItemCount = pc_SnapShot->Count();
+      const uint32_t u32_ItemCount = pc_SnapShot->Count();
 
-      std::vector<uint64> c_UniqueIDs;
+      std::vector<uint64_t> c_UniqueIds;
       QPointF c_TotalOffset;
       if (opc_Pos == NULL)
       {
          //Add point offset
          this->mc_CopyPasteManager.IncrementPasteCounter();
-         c_TotalOffset = static_cast<float64>(this->mc_CopyPasteManager.GetPasteCounter()) * c_OFFSET;
+         c_TotalOffset = static_cast<float64_t>(this->mc_CopyPasteManager.GetPasteCounter()) * c_OFFSET;
       }
       else
       {
          //Set absolute position
          c_TotalOffset = this->mc_CopyPasteManager.GetDiff(*opc_Pos);
       }
-      c_UniqueIDs.resize(u32_ItemCount);
-      for (uint32 u32_ItItem = 0; u32_ItItem < u32_ItemCount; ++u32_ItItem)
+      c_UniqueIds.resize(u32_ItemCount);
+      for (uint32_t u32_ItItem = 0; u32_ItItem < u32_ItemCount; ++u32_ItItem)
       {
-         c_UniqueIDs[u32_ItItem] = m_GetNewUniqueID();
+         c_UniqueIds[u32_ItItem] = m_GetNewUniqueId();
       }
-      this->mc_UndoManager.DoAddSnapshot(c_UniqueIDs, *pc_SnapShot, *pc_Rails, c_TotalOffset, this->GetHighestUsedZValueList(
+      this->mc_UndoManager.DoAddSnapshot(c_UniqueIds, *pc_SnapShot, *pc_Rails, c_TotalOffset, this->GetHighestUsedZetValueList(
                                             this->items()));
    }
 }
@@ -704,20 +703,20 @@ bool C_SyvDaDashboardScene::IsItemMovable(const QGraphicsItem * const opc_Item) 
 
    // no restrictions for moving elements
    // list all items (invalid items should have unknown type)
-   const sintn sn_Type = opc_Item->type();
+   const int32_t s32_Type = opc_Item->type();
 
-   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
+   if ((s32_Type == ms32_GRAPHICS_ITEM_DB_LABEL) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SLIDER) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TABLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PARAM) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_LINE_ARROW) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_BOUNDARY) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -747,20 +746,20 @@ bool C_SyvDaDashboardScene::IsItemSelectable(const QGraphicsItem * const opc_Ite
 
    // no restrictions for selecting elements
    // list all items (invalid items should have unknown type)
-   const sintn sn_Type = opc_Item->type();
+   const int32_t s32_Type = opc_Item->type();
 
-   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
+   if ((s32_Type == ms32_GRAPHICS_ITEM_DB_LABEL) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SLIDER) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TABLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PARAM) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_LINE_ARROW) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_BOUNDARY) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -790,20 +789,20 @@ bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item
 
    // no restrictions for deleting elements
    // list all items (invalid items should have unknown type)
-   const sintn sn_Type = opc_Item->type();
+   const int32_t s32_Type = opc_Item->type();
 
-   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
+   if ((s32_Type == ms32_GRAPHICS_ITEM_DB_LABEL) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SLIDER) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TABLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PARAM) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_LINE_ARROW) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_BOUNDARY) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -827,26 +826,26 @@ bool C_SyvDaDashboardScene::IsItemDeletable(const QGraphicsItem * const opc_Item
    false    Z order is not changeable
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaDashboardScene::IsZOrderChangeable(const QGraphicsItem * const opc_Item) const
+bool C_SyvDaDashboardScene::IsZetOrderChangeable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return;
 
    // no restrictions for using z order
    // list all items (invalid items should have unknown type)
-   const sintn sn_Type = opc_Item->type();
+   const int32_t s32_Type = opc_Item->type();
 
-   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
+   if ((s32_Type == ms32_GRAPHICS_ITEM_DB_LABEL) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SLIDER) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TABLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PARAM) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_LINE_ARROW) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_BOUNDARY) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -876,20 +875,20 @@ bool C_SyvDaDashboardScene::IsAlignmentUsable(const QGraphicsItem * const opc_It
 
    // no restrictions for using alignment
    // list all items (invalid items should have unknown type)
-   const sintn sn_Type = opc_Item->type();
+   const int32_t s32_Type = opc_Item->type();
 
-   if ((sn_Type == msn_GRAPHICS_ITEM_DB_LABEL) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SPIN_BOX) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_SLIDER) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TOGGLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PIE_CHART) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_TABLE) ||
-       (sn_Type == msn_GRAPHICS_ITEM_DB_PARAM) ||
-       (sn_Type == msn_GRAPHICS_ITEM_TEXTELEMENT) ||
-       (sn_Type == msn_GRAPHICS_ITEM_LINE_ARROW) ||
-       (sn_Type == msn_GRAPHICS_ITEM_BOUNDARY) ||
-       (sn_Type == msn_GRAPHICS_ITEM_IMAGE))
+   if ((s32_Type == ms32_GRAPHICS_ITEM_DB_LABEL) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SPIN_BOX) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PROGRESS_BAR) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_SLIDER) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TOGGLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PIE_CHART) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_TABLE) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_DB_PARAM) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_TEXTELEMENT) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_LINE_ARROW) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_BOUNDARY) ||
+       (s32_Type == ms32_GRAPHICS_ITEM_IMAGE))
    {
       //If correct item type use the edit mode flag
       q_Return = this->mq_EditMode;
@@ -923,7 +922,7 @@ bool C_SyvDaDashboardScene::IsSceneRubberBandAvailable(void) const
    Current dashboard index
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_SyvDaDashboardScene::GetDashboardIndex(void) const
+uint32_t C_SyvDaDashboardScene::GetDashboardIndex(void) const
 {
    return this->mu32_DashboardIndex;
 }
@@ -948,7 +947,7 @@ void C_SyvDaDashboardScene::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver) 
 
       if (pc_Item != NULL)
       {
-         uint32 u32_Counter;
+         uint32_t u32_Counter;
 
          // Registration of datapool elements
          for (u32_Counter = 0U; u32_Counter < rc_AllDataDealer.size(); ++u32_Counter)
@@ -1045,10 +1044,10 @@ void C_SyvDaDashboardScene::UpdateTransmissionConfiguration(void) const
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
+void C_SyvDaDashboardScene::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) const
 {
    const QList<QGraphicsItem *> & rc_Items = this->items();
 
@@ -1058,7 +1057,7 @@ void C_SyvDaDashboardScene::HandleManualOperationFinished(const sint32 os32_Resu
       C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
       if (pc_Item != NULL)
       {
-         pc_Item->HandleManualOperationFinished(os32_Result, ou8_NRC);
+         pc_Item->HandleManualOperationFinished(os32_Result, ou8_Nrc);
       }
    }
 }
@@ -1079,13 +1078,13 @@ void C_SyvDaDashboardScene::TriggerErrorCheck(void) const
    Current view index
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_SyvDaDashboardScene::GetViewIndex(void) const
+uint32_t C_SyvDaDashboardScene::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_SebUnoBaseManager * C_SyvDaDashboardScene::m_GetUndoManager(void)
+stw::opensyde_gui_logic::C_SebUnoBaseManager * C_SyvDaDashboardScene::m_GetUndoManager(void)
 {
    return &this->mc_UndoManager;
 }
@@ -1104,7 +1103,7 @@ C_SebBaseContextMenuManager * C_SyvDaDashboardScene::m_GetContextMenuManager(voi
    Else Valid copy paste manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManager(void)
+stw::opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManager(void)
 {
    return &this->mc_CopyPasteManager;
 }
@@ -1117,7 +1116,7 @@ stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_Get
    Else Valid copy paste manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManagerConst(void) const
+const stw::opensyde_gui_logic::C_SebBaseCopyPasteManager * C_SyvDaDashboardScene::m_GetCopyPasteManagerConst(void) const
 {
    return &this->mc_CopyPasteManager;
 }
@@ -1136,7 +1135,7 @@ void C_SyvDaDashboardScene::m_AddImage(const QString & orc_Path, const QPointF &
    if (pc_View != NULL)
    {
       this->mc_UndoManager.DoAddGeneric(C_PuiSvDbDataElement::eIMAGE,
-                                        m_GetNewUniqueID(), orc_Position, this->GetHighestUsedZValueList(
+                                        m_GetNewUniqueId(), orc_Position, this->GetHighestUsedZetValueList(
                                            this->items()) + 1.0, pc_View->GetDarkModeActive(), orc_Path);
    }
 }
@@ -1274,8 +1273,8 @@ bool C_SyvDaDashboardScene::m_AddOfMime(const QMimeData * const opc_MimeData, co
 
          if (pc_View != NULL)
          {
-            this->mc_UndoManager.DoAddGeneric(e_Type, m_GetNewUniqueID(), orc_Position,
-                                              this->GetHighestUsedZValueList(this->items()) + 1.0,
+            this->mc_UndoManager.DoAddGeneric(e_Type, m_GetNewUniqueId(), orc_Position,
+                                              this->GetHighestUsedZetValueList(this->items()) + 1.0,
                                               pc_View->GetDarkModeActive(), c_Text);
          }
       }
@@ -1369,8 +1368,8 @@ bool C_SyvDaDashboardScene::m_HandleDeleteUserConfirmation(const QList<QGraphics
          C_OgeWiCustomMessage c_MessageBox(pc_View, C_OgeWiCustomMessage::E_Type::eQUESTION);
          c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to delete the selected item(s)?"));
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Items delete"));
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+         c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
          c_MessageBox.SetCustomMinHeight(180, 180);
          e_ReturnMessageBox = c_MessageBox.Execute();
 
@@ -1413,7 +1412,7 @@ void C_SyvDaDashboardScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
             // to the original keyPressEvent which will forward the signal to the selected element
             q_SkipSceneSpecific = true;
          }
-         else if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F2)) &&
+         else if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F2)) &&
                   (this->mq_EditMode == true))
          {
             pc_Widget->EnableEditContent();
@@ -1769,7 +1768,7 @@ void C_SyvDaDashboardScene::m_RemoveLineArrowOfScene(const C_GiSvDaArrow * const
    \param[in]  ore_Action     Type of action
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore_Type, const sint32 & ors32_Index,
+void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore_Type, const int32_t & ors32_Index,
                                         const C_PuiBsDataElement::E_Action & ore_Action) const
 {
    QList<QGraphicsItem *> c_Items = this->items();
@@ -1805,11 +1804,11 @@ void C_SyvDaDashboardScene::m_SyncIndex(const C_PuiSvDbDataElement::E_Type & ore
                                        10: Table
                                        11: Param
    \param[in]  orq_Selection           False: Ignore selection
-   \param[in]  opc_IDMap               Optional map for IDs to use
+   \param[in]  opc_IdMap               Optional map for IDs to use
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartIndices, const bool & orq_Selection,
-                                         const QMap<C_PuiBsTemporaryDataID, uint64> * const opc_IDMap)
+void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32_t> & orc_OtherStartIndices, const bool & orq_Selection,
+                                         const QMap<C_PuiBsTemporaryDataId, uint64_t> * const opc_IdMap)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -1820,7 +1819,7 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
       if (pc_Dashboard != NULL)
       {
          //Load
-         uint64 u64_CurUniqueID;
+         uint64_t u64_CurUniqueId;
          const std::vector<C_PuiSvDbLabel> & rc_Labels = pc_Dashboard->GetLabels();
          const std::vector<C_PuiSvDbParam> & rc_Params = pc_Dashboard->GetParams();
          const std::vector<C_PuiSvDbPieChart> & rc_PieCharts = pc_Dashboard->GetPieCharts();
@@ -1837,17 +1836,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
 
          //Create
          //Labels
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[4]; u32_ItWidget < rc_Labels.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[4]; u32_ItWidget < rc_Labels.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_Labels[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eLABEL),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eLABEL),
                                                u32_ItWidget - orc_OtherStartIndices[4]);
 
             pc_Item = new C_GiSvDaLabelBase(this->mu32_ViewIndex,
-                                            this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                            u64_CurUniqueID);
+                                            this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                            u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1859,16 +1858,16 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Param widgets
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[11]; u32_ItWidget < rc_Params.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[11]; u32_ItWidget < rc_Params.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_Params[u32_ItWidget];
             C_GiSvDaParam * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::ePARAM),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::ePARAM),
                                                u32_ItWidget - orc_OtherStartIndices[11]);
 
             pc_Item = new C_GiSvDaParam(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                        static_cast<sint32>(u32_ItWidget), u64_CurUniqueID);
+                                        static_cast<int32_t>(u32_ItWidget), u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1880,17 +1879,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Pie charts
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[9]; u32_ItWidget < rc_PieCharts.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[9]; u32_ItWidget < rc_PieCharts.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_PieCharts[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::ePIE_CHART),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::ePIE_CHART),
                                                u32_ItWidget - orc_OtherStartIndices[9]);
 
             pc_Item = new C_GiSvDaPieChartBase(this->mu32_ViewIndex,
-                                               this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                               u64_CurUniqueID);
+                                               this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                               u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1902,17 +1901,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Spin boxes
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[5]; u32_ItWidget < rc_SpinBoxes.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[5]; u32_ItWidget < rc_SpinBoxes.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_SpinBoxes[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eSPIN_BOX),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eSPIN_BOX),
                                                u32_ItWidget - orc_OtherStartIndices[5]);
 
             pc_Item = new C_GiSvDaSpinBoxBase(this->mu32_ViewIndex,
-                                              this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                              u64_CurUniqueID);
+                                              this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                              u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1924,17 +1923,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Sliders
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[6]; u32_ItWidget < rc_Sliders.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[6]; u32_ItWidget < rc_Sliders.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_Sliders[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eSLIDER),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eSLIDER),
                                                u32_ItWidget - orc_OtherStartIndices[6]);
 
             pc_Item = new C_GiSvDaSliderBase(this->mu32_ViewIndex,
-                                             this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                             u64_CurUniqueID);
+                                             this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                             u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1946,17 +1945,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Tables
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[10]; u32_ItWidget < rc_Tables.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[10]; u32_ItWidget < rc_Tables.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_Tables[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eTABLE),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eTABLE),
                                                u32_ItWidget - orc_OtherStartIndices[10]);
 
             pc_Item = new C_GiSvDaTableBase(this->mu32_ViewIndex,
-                                            this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                            u64_CurUniqueID);
+                                            this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                            u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1968,17 +1967,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Progress bars
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[7]; u32_ItWidget < rc_ProgressBars.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[7]; u32_ItWidget < rc_ProgressBars.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_ProgressBars[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::ePROGRESS_BAR),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::ePROGRESS_BAR),
                                                u32_ItWidget - orc_OtherStartIndices[7]);
 
             pc_Item = new C_GiSvDaProgressBarBase(this->mu32_ViewIndex,
-                                                  this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                                  u64_CurUniqueID);
+                                                  this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                                  u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -1990,17 +1989,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          //Toggles
-         for (uint32 u32_ItWidget = orc_OtherStartIndices[8]; u32_ItWidget < rc_Toggles.size(); ++u32_ItWidget)
+         for (uint32_t u32_ItWidget = orc_OtherStartIndices[8]; u32_ItWidget < rc_Toggles.size(); ++u32_ItWidget)
          {
             const C_PuiSvDbWidgetBase & rc_WidgetBase = rc_Toggles[u32_ItWidget];
             C_GiSvDaRectBaseGroup * pc_Item;
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eTOGGLE),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eTOGGLE),
                                                u32_ItWidget - orc_OtherStartIndices[8]);
 
             pc_Item = new C_GiSvDaToggleBase(this->mu32_ViewIndex,
-                                             this->mu32_DashboardIndex, static_cast<sint32>(u32_ItWidget),
-                                             u64_CurUniqueID);
+                                             this->mu32_DashboardIndex, static_cast<int32_t>(u32_ItWidget),
+                                             u64_CurUniqueId);
             pc_Item->LoadData();
             pc_Item->SetDisplayStyle(rc_WidgetBase.e_DisplayStyle, pc_View->GetDarkModeActive());
 
@@ -2012,19 +2011,19 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          // Boundary
-         for (uint32 u32_Item = orc_OtherStartIndices[0];
+         for (uint32_t u32_Item = orc_OtherStartIndices[0];
               u32_Item < pc_Dashboard->c_Boundaries.size();
               ++u32_Item)
          {
-            const C_PuiBsBoundary * const pc_UIBoundaryData = &pc_Dashboard->c_Boundaries[u32_Item];
+            const C_PuiBsBoundary * const pc_UiBoundaryData = &pc_Dashboard->c_Boundaries[u32_Item];
             C_GiSvDaBoundary * pc_Item;
 
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eBOUNDARY),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eBOUNDARY),
                                                u32_Item - orc_OtherStartIndices[0]);
 
-            pc_Item = new C_GiSvDaBoundary(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item, u64_CurUniqueID,
-                                           pc_UIBoundaryData->f64_Width, pc_UIBoundaryData->f64_Height);
+            pc_Item = new C_GiSvDaBoundary(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item, u64_CurUniqueId,
+                                           pc_UiBoundaryData->f64_Width, pc_UiBoundaryData->f64_Height);
             pc_Item->LoadData();
 
             this->m_AddBoundaryToScene(pc_Item);
@@ -2035,18 +2034,18 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          // Text Element
-         for (uint32 u32_Item = orc_OtherStartIndices[1];
+         for (uint32_t u32_Item = orc_OtherStartIndices[1];
               u32_Item < pc_Dashboard->c_TextElements.size();
               ++u32_Item)
          {
             C_GiSvDaTextElement * pc_Item;
 
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eTEXT_ELEMENT),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eTEXT_ELEMENT),
                                                u32_Item - orc_OtherStartIndices[1]);
 
             pc_Item =
-               new C_GiSvDaTextElement(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item, u64_CurUniqueID);
+               new C_GiSvDaTextElement(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item, u64_CurUniqueId);
             pc_Item->LoadData();
 
             this->m_AddTextElementToScene(pc_Item);
@@ -2061,17 +2060,17 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          // Line arrow
-         for (uint32 u32_Item = orc_OtherStartIndices[2];
+         for (uint32_t u32_Item = orc_OtherStartIndices[2];
               u32_Item < pc_Dashboard->c_LineArrows.size();
               ++u32_Item)
          {
             C_GiSvDaArrow * pc_Item;
 
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eLINE_ARROW),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eLINE_ARROW),
                                                u32_Item - orc_OtherStartIndices[2]);
 
-            pc_Item = new C_GiSvDaArrow(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item, u64_CurUniqueID);
+            pc_Item = new C_GiSvDaArrow(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item, u64_CurUniqueId);
             this->m_AddLineArrowToScene(pc_Item);
             if (orq_Selection == true)
             {
@@ -2080,20 +2079,20 @@ void C_SyvDaDashboardScene::m_LoadSubset(const QVector<uint32> & orc_OtherStartI
          }
 
          // Image
-         for (uint32 u32_Item = orc_OtherStartIndices[3];
+         for (uint32_t u32_Item = orc_OtherStartIndices[3];
               u32_Item < pc_Dashboard->c_Images.size();
               ++u32_Item)
          {
-            const C_PuiBsImage * const pc_UIImageData = &pc_Dashboard->c_Images[u32_Item];
+            const C_PuiBsImage * const pc_UiImageData = &pc_Dashboard->c_Images[u32_Item];
             C_GiSvDaImageGroup * pc_Item;
 
             //ID
-            u64_CurUniqueID = m_GetNewUniqueID(opc_IDMap, static_cast<sint32>(C_PuiSvDbDataElement::eIMAGE),
+            u64_CurUniqueId = m_GetNewUniqueId(opc_IdMap, static_cast<int32_t>(C_PuiSvDbDataElement::eIMAGE),
                                                u32_Item - orc_OtherStartIndices[3]);
 
             pc_Item = new C_GiSvDaImageGroup(this->mu32_ViewIndex, this->mu32_DashboardIndex, u32_Item,
-                                             u64_CurUniqueID, pc_UIImageData->f64_Width,
-                                             pc_UIImageData->f64_Height, pc_UIImageData->c_UIImagePixmap);
+                                             u64_CurUniqueId, pc_UiImageData->f64_Width,
+                                             pc_UiImageData->f64_Height, pc_UiImageData->c_UiImagePixmap);
             pc_Item->LoadData();
 
             this->m_AddImageGroupToScene(pc_Item);

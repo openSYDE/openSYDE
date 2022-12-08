@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "C_OgePubTreeWidgetRoot.h"
+#include "C_OgePubTreeWidgetRoot.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +39,7 @@ using namespace stw_opensyde_gui_elements;
 //----------------------------------------------------------------------------------------------------------------------
 C_OgePubTreeWidgetRoot::C_OgePubTreeWidgetRoot(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent),
-   msn_IconSize(16)
+   ms32_IconSize(16)
 {
 }
 
@@ -54,7 +54,7 @@ C_OgePubTreeWidgetRoot::C_OgePubTreeWidgetRoot(QWidget * const opc_Parent) :
 void C_OgePubTreeWidgetRoot::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
-   const QPixmap c_Pixmap = this->icon().pixmap(this->msn_IconSize, this->msn_IconSize);
+   const QPixmap c_Pixmap = this->icon().pixmap(this->ms32_IconSize, this->ms32_IconSize);
 
    Q_UNUSED(opc_Event)
 
@@ -62,7 +62,7 @@ void C_OgePubTreeWidgetRoot::paintEvent(QPaintEvent * const opc_Event)
 
    //this->m_SetPenColorForFont(&c_Painter);
 
-   c_Painter.drawText(QPoint(this->msn_IconSize + 5, 19), this->text());
+   c_Painter.drawText(QPoint(this->ms32_IconSize + 5, 19), this->text());
 
    // draw the icon
    c_Painter.drawPixmap(0, 7, c_Pixmap);

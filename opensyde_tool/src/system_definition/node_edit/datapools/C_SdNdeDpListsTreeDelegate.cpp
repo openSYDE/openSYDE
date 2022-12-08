@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeDpListsTreeDelegate.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SdNdeDpListsTreeDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,7 +44,7 @@ C_SdNdeDpListsTreeDelegate::C_SdNdeDpListsTreeDelegate(QObject * const opc_Paren
    QStyledItemDelegate(opc_Parent),
    mu32_NodeIndex(0UL),
    mu32_DataPoolIndex(0UL),
-   msn_MaximumHeight(500)
+   ms32_MaximumHeight(500)
 {
 }
 
@@ -56,8 +55,7 @@ C_SdNdeDpListsTreeDelegate::C_SdNdeDpListsTreeDelegate(QObject * const opc_Paren
    \param[in] ou32_DataPoolIndex Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsTreeDelegate::SetDataPool(const stw_types::uint32 ou32_NodeIndex,
-                                             const stw_types::uint32 ou32_DataPoolIndex)
+void C_SdNdeDpListsTreeDelegate::SetDataPool(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu32_DataPoolIndex = ou32_DataPoolIndex;
@@ -83,11 +81,11 @@ QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Opti
       if (orc_Index.parent().isValid() == true)
       {
          //dynamic
-         const stw_types::sint32 s32_Height = C_SdNdeDpUtil::h_GetTableSize(this->mu32_NodeIndex,
-                                                                            this->mu32_DataPoolIndex,
-                                                                            static_cast<uint32>(orc_Index.parent()
-                                                                                                .row()),
-                                                                            this->msn_MaximumHeight);
+         const int32_t s32_Height = C_SdNdeDpUtil::h_GetTableSize(this->mu32_NodeIndex,
+                                                                  this->mu32_DataPoolIndex,
+                                                                  static_cast<uint32_t>(orc_Index.parent()
+                                                                                        .row()),
+                                                                  this->ms32_MaximumHeight);
          c_Retval.setHeight(s32_Height);
       }
    }
@@ -98,10 +96,10 @@ QSize C_SdNdeDpListsTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Opti
 /*!
    \brief   Sets the maximum height for the calculation of the table size in sizeHint
 
-   \param[in]     osn_Height       Maximum height of entire tree widget
+   \param[in]     os32_Height       Maximum height of entire tree widget
 */
 //-----------------------------------------------------------------------------
-void C_SdNdeDpListsTreeDelegate::SetMaximumHeight(const sintn osn_Height)
+void C_SdNdeDpListsTreeDelegate::SetMaximumHeight(const int32_t os32_Height)
 {
-   this->msn_MaximumHeight = osn_Height;
+   this->ms32_MaximumHeight = os32_Height;
 }

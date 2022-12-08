@@ -10,29 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QListWidgetItem>
 
-#include "C_CamMosFilterWidget.h"
+#include "C_CamMosFilterWidget.hpp"
 #include "ui_C_CamMosFilterWidget.h"
 
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_CamMosFilterPopup.h"
-#include "C_CamProHandler.h"
-#include "C_Uti.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_CamMosFilterPopup.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_Uti.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -121,7 +120,7 @@ void C_CamMosFilterWidget::Clear(void)
    Q_EMIT (this->SigRemoveAllFilters());
    Q_EMIT (this->SigFilterNumberChanged(0));
 
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       // delete widget from GUI
       this->m_RemoveFilterWidget(this->mc_Entries[u32_ItEntry]);
@@ -191,7 +190,7 @@ void C_CamMosFilterWidget::m_LoadConfig(void)
    // initialize filter widgets
    std::vector<C_CamProFilterData> c_Filters = C_CamProHandler::h_GetInstance()->GetFilters();
 
-   for (uint32 u32_ItFilter = 0UL; u32_ItFilter < c_Filters.size(); ++u32_ItFilter)
+   for (uint32_t u32_ItFilter = 0UL; u32_ItFilter < c_Filters.size(); ++u32_ItFilter)
    {
       this->m_AddFilterWidget(c_Filters[u32_ItFilter]);
    }
@@ -247,7 +246,7 @@ void C_CamMosFilterWidget::m_EnableFilters(const bool & orq_Enabled)
       const std::vector<C_CamProFilterData> c_Filters = C_CamProHandler::h_GetInstance()->GetFilters();
 
       // check all filter (packages)
-      for (uint32 u32_PosFilter = 0; u32_PosFilter < c_Filters.size(); u32_PosFilter++)
+      for (uint32_t u32_PosFilter = 0; u32_PosFilter < c_Filters.size(); u32_PosFilter++)
       {
          if (c_Filters[u32_PosFilter].q_Enabled == true)
          {
@@ -281,16 +280,16 @@ void C_CamMosFilterWidget::m_EnableFilters(const bool & orq_Enabled)
 void C_CamMosFilterWidget::m_OnAddClicked()
 {
    // Create unique name
-   std::map<stw_scl::C_SCLString, bool> c_Names;
+   std::map<stw::scl::C_SclString, bool> c_Names;
    std::vector<C_CamProFilterData> c_Filters = C_CamProHandler::h_GetInstance()->GetFilters();
    const QString c_ProposedName = "NewFilter";
    C_CamProFilterData c_FilterData;
 
-   for (uint32 u32_ItFilter = 0UL; u32_ItFilter < c_Filters.size(); ++u32_ItFilter)
+   for (uint32_t u32_ItFilter = 0UL; u32_ItFilter < c_Filters.size(); ++u32_ItFilter)
    {
       c_Names[c_Filters[u32_ItFilter].c_Name.toStdString().c_str()] = true;
    }
-   c_FilterData.c_Name = C_Uti::h_GetUniqueNameQ(c_Names, c_ProposedName);
+   c_FilterData.c_Name = C_Uti::h_GetUniqueNameQt(c_Names, c_ProposedName);
 
    // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
@@ -303,7 +302,7 @@ void C_CamMosFilterWidget::m_OnAddClicked()
    c_New->SetSize(QSize(700, 820));
 
    // Update settings on accept
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       QList<C_CamProFilterItemData> c_TempItems;
       c_FilterData = pc_Dialog->GetFilterData();
@@ -322,8 +321,8 @@ void C_CamMosFilterWidget::m_OnAddClicked()
          c_Message.SetHeading(C_GtGetText::h_GetText("Receive Filter Disabled"));
          c_Message.SetDescription(C_GtGetText::h_GetText("Filters are not applied as long as receive filter setting is "
                                                          "disabled. Do you want to enable it now?"));
-         c_Message.SetOKButtonText("Enable");
-         c_Message.SetNOButtonText("Keep Disabled");
+         c_Message.SetOkButtonText("Enable");
+         c_Message.SetNoButtonText("Keep Disabled");
          if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
          {
             C_CamProHandler::h_GetInstance()->SetFilterWidgetEnabled(true);
@@ -395,14 +394,14 @@ void C_CamMosFilterWidget::m_RemoveFilter(C_CamMosFilterItemWidget * const opc_I
 
    c_Message.SetHeading(C_GtGetText::h_GetText("Filter Delete"));
    c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to delete this filter?"));
-   c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-   c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+   c_Message.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
 
    if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
    {
       if (opc_ItemWidget != NULL)
       {
-         sint32 s32_IndexToRemove = 0;
+         int32_t s32_IndexToRemove = 0;
 
          // remove widget from list
          for (std::vector<C_CamMosFilterItemWidget *>::iterator c_It = mc_Entries.begin(); c_It != mc_Entries.end();
@@ -420,7 +419,7 @@ void C_CamMosFilterWidget::m_RemoveFilter(C_CamMosFilterItemWidget * const opc_I
          this->m_RemoveFilterWidget(opc_ItemWidget);
 
          // update data handling
-         tgl_assert(C_CamProHandler::h_GetInstance()->DeleteFilter(s32_IndexToRemove) == stw_errors::C_NO_ERR);
+         tgl_assert(C_CamProHandler::h_GetInstance()->DeleteFilter(s32_IndexToRemove) == stw::errors::C_NO_ERR);
 
          // remove filter items if filter widget is enabled
          if (C_CamProHandler::h_GetInstance()->GetFilterWidgetEnabled() == true)
@@ -460,7 +459,7 @@ void C_CamMosFilterWidget::m_RemoveFilter(C_CamMosFilterItemWidget * const opc_I
 void C_CamMosFilterWidget::m_ActivateFilter(const C_CamMosFilterItemWidget * const opc_ItemWidget,
                                             const bool & orq_Enable)
 {
-   const sint32 s32_IndexToActivate = this->m_GetIndexFromWidget(opc_ItemWidget);
+   const int32_t s32_IndexToActivate = this->m_GetIndexFromWidget(opc_ItemWidget);
 
    // index is -1 if item widget is NULL which can not happen
    tgl_assert(s32_IndexToActivate >= 0);
@@ -507,7 +506,7 @@ void C_CamMosFilterWidget::m_UpdateFilterConfiguration(const C_CamMosFilterItemW
                                                        const C_CamProFilterData & orc_FilterNew)
 {
    QList<C_CamProFilterItemData> c_FilterItems;
-   const sint32 s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
+   const int32_t s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
 
    // index is -1 if item widget is NULL which can not happen
    tgl_assert(s32_Index >= 0);
@@ -544,12 +543,12 @@ void C_CamMosFilterWidget::m_UpdateFilterConfiguration(const C_CamMosFilterItemW
    number of active filters
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMosFilterWidget::m_CountActiveFilterPackages() const
+int32_t C_CamMosFilterWidget::m_CountActiveFilterPackages() const
 {
-   sint32 s32_Return = 0;
+   int32_t s32_Return = 0;
    const std::vector<C_CamProFilterData> c_Filters = C_CamProHandler::h_GetInstance()->GetFilters();
 
-   for (uint32 u32_Pos = 0; u32_Pos < c_Filters.size(); u32_Pos++)
+   for (uint32_t u32_Pos = 0; u32_Pos < c_Filters.size(); u32_Pos++)
    {
       if (c_Filters[u32_Pos].q_Enabled == true)
       {
@@ -569,9 +568,9 @@ sint32 C_CamMosFilterWidget::m_CountActiveFilterPackages() const
    index of filter in data handling
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMosFilterWidget::m_GetIndexFromWidget(const C_CamMosFilterItemWidget * const opc_ItemWidget)
+int32_t C_CamMosFilterWidget::m_GetIndexFromWidget(const C_CamMosFilterItemWidget * const opc_ItemWidget)
 {
-   sint32 s32_Return = 0;
+   int32_t s32_Return = 0;
 
    if (opc_ItemWidget != NULL)
    {
@@ -606,7 +605,7 @@ sint32 C_CamMosFilterWidget::m_GetIndexFromWidget(const C_CamMosFilterItemWidget
 void C_CamMosFilterWidget::m_GetActiveFilterItems(QList<C_CamProFilterItemData> & orc_ActiveFilterItems) const
 {
    QList<C_CamProFilterItemData> c_TempItems;
-   for (sint32 s32_PosItem = 0; s32_PosItem < orc_ActiveFilterItems.size(); s32_PosItem++)
+   for (int32_t s32_PosItem = 0; s32_PosItem < orc_ActiveFilterItems.size(); s32_PosItem++)
    {
       if (orc_ActiveFilterItems[s32_PosItem].q_Enabled == true)
       {

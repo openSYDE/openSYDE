@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GiSvDaImageGroup.h"
-#include "C_PuiSvHandler.h"
+#include "stwtypes.hpp"
+#include "C_GiSvDaImageGroup.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,18 +37,18 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex      Index of system view
-   \param[in]     oru32_DashboardIndex Index of dashboard in system view
-   \param[in]     ors32_DataIndex      Index of connected data item
-   \param[in]     oru64_ID             Unique ID
-   \param[in]     orc_ImagePath        File path of image
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of connected data item
+   \param[in]      oru64_Id               Unique ID
+   \param[in]      orc_ImagePath          File path of image
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                       const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                       const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                        const QString & orc_ImagePath, QGraphicsItem * const opc_Parent) :
-   C_GiBiImageGroup(oru64_ID, orc_ImagePath, opc_Parent),
+   C_GiBiImageGroup(oru64_Id, orc_ImagePath, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eIMAGE)
 {
 }
@@ -59,22 +58,21 @@ C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32 & oru32_ViewIndex, const uin
 
    Set up GUI with all elements.
 
-   \param[in]     oru32_ViewIndex      Index of system view
-   \param[in]     oru32_DashboardIndex Index of dashboard in system view
-   \param[in]     ors32_DataIndex      Index of connected data item
-   \param[in]     oru64_ID             Unique ID
-   \param[in]     orc_Image            Image
-   \param[in]     orf64_Width          Width of image view
-   \param[in]     orf64_Height          Height of image view
-   \param[in]     orc_ImagePath        Filepath to the image
-   \param[in,out] opc_Parent           Optional pointer to parent
+   \param[in]      oru32_ViewIndex        Index of system view
+   \param[in]      oru32_DashboardIndex   Index of dashboard in system view
+   \param[in]      ors32_DataIndex        Index of connected data item
+   \param[in]      oru64_Id               Unique ID
+   \param[in]      of64_Width             Width of image view
+   \param[in]      of64_Height            Height of image view
+   \param[in]      orc_Image              Image
+   \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                       const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
-                                       const float64 of64_Width, const float64 of64_Height, const QPixmap & orc_Image,
-                                       QGraphicsItem * const opc_Parent) :
-   C_GiBiImageGroup(oru64_ID, of64_Width, of64_Height, orc_Image, opc_Parent),
+C_GiSvDaImageGroup::C_GiSvDaImageGroup(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                       const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
+                                       const float64_t of64_Width, const float64_t of64_Height,
+                                       const QPixmap & orc_Image, QGraphicsItem * const opc_Parent) :
+   C_GiBiImageGroup(oru64_Id, of64_Width, of64_Height, orc_Image, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eIMAGE)
 {
 }
@@ -94,7 +92,7 @@ void C_GiSvDaImageGroup::LoadData(void)
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiBsImage * const pc_Item = pc_Dashboard->GetImage(static_cast<uint32>(this->ms32_Index));
+            const C_PuiBsImage * const pc_Item = pc_Dashboard->GetImage(static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                this->LoadBasicData(*pc_Item);
@@ -115,7 +113,7 @@ void C_GiSvDaImageGroup::UpdateData(void)
       C_PuiBsImage c_Item;
       m_UpdateData(c_Item);
       C_PuiSvHandler::h_GetInstance()->SetDashboardImage(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                         static_cast<uint32>(this->ms32_Index), c_Item);
+                                                         static_cast<uint32_t>(this->ms32_Index), c_Item);
    }
 }
 
@@ -128,6 +126,6 @@ void C_GiSvDaImageGroup::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       C_PuiSvHandler::h_GetInstance()->DeleteDashboardImage(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                            static_cast<uint32>(this->ms32_Index));
+                                                            static_cast<uint32_t>(this->ms32_Index));
    }
 }

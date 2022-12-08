@@ -10,33 +10,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QKeyEvent>
 #include <QTextCursor>
 #include <QGraphicsView>
 
-#include "C_GiBiTextElement.h"
-#include "C_GiCustomFunctions.h"
-#include "C_OgePopUpDialog.h"
-#include "C_GtGetText.h"
-#include "C_GiSyBaseWidget.h"
-#include "C_GiSyTextElementWidget.h"
-#include "C_PuiSdDataElement.h"
-#include "gitypes.h"
-#include "constants.h"
+#include "C_GiBiTextElement.hpp"
+#include "C_GiCustomFunctions.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSyBaseWidget.hpp"
+#include "C_GiSyTextElementWidget.hpp"
+#include "C_PuiSdDataElement.hpp"
+#include "gitypes.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 mf64_ACTION_POINT_OFFSET_BOUNDARY = 10.0;
+const float64_t mf64_ACTION_POINT_OFFSET_BOUNDARY = 10.0;
 
-const float64 C_GiBiTextElement::mhf64_MIN_WIDTH_TEXT_ELEMENT = 70.0;
-const float64 C_GiBiTextElement::mhf64_MIN_HEIGHT_TEXT_ELEMENT = 20.0;
+const float64_t C_GiBiTextElement::mhf64_MIN_WIDTH_TEXT_ELEMENT = 70.0;
+const float64_t C_GiBiTextElement::mhf64_MIN_HEIGHT_TEXT_ELEMENT = 20.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -53,15 +52,15 @@ const float64 C_GiBiTextElement::mhf64_MIN_HEIGHT_TEXT_ELEMENT = 20.0;
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID    Unique ID
+   \param[in]     oru64_Id    Unique ID
    \param[in]     oq_Editable Flag for editing the content of the text element
    \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const bool oq_Editable,
+C_GiBiTextElement::C_GiBiTextElement(const uint64_t & oru64_Id, const bool oq_Editable,
                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_TEXT_ELEMENT, mhf64_MIN_HEIGHT_TEXT_ELEMENT,
+   C_GiBiRectBaseGroup(oru64_Id, mhf64_MIN_WIDTH_TEXT_ELEMENT, mhf64_MIN_HEIGHT_TEXT_ELEMENT,
                        mf64_ACTION_POINT_OFFSET_BOUNDARY,
                        false, opc_Parent),
    mpc_TextItem(NULL),
@@ -76,13 +75,13 @@ C_GiBiTextElement::C_GiBiTextElement(const stw_types::uint64 & oru64_ID, const b
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID   Unique ID
+   \param[in]     oru64_Id   Unique ID
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiTextElement::C_GiBiTextElement(const uint64 & oru64_ID, QGraphicsItem * const opc_Parent) :
+C_GiBiTextElement::C_GiBiTextElement(const uint64_t & oru64_Id, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_TEXT_ELEMENT, mhf64_MIN_HEIGHT_TEXT_ELEMENT,
+   C_GiBiRectBaseGroup(oru64_Id, mhf64_MIN_WIDTH_TEXT_ELEMENT, mhf64_MIN_HEIGHT_TEXT_ELEMENT,
                        mf64_ACTION_POINT_OFFSET_BOUNDARY,
                        false, opc_Parent),
    mpc_TextItem(NULL),
@@ -144,9 +143,9 @@ C_GiBiTextElement::~C_GiBiTextElement()
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiBiTextElement::type() const
+int32_t C_GiBiTextElement::type() const
 {
-   return msn_GRAPHICS_ITEM_TEXTELEMENT;
+   return ms32_GRAPHICS_ITEM_TEXTELEMENT;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,7 +164,7 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
 
    QGraphicsView * const pc_View = this->scene()->views().at(0);
 
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
    C_GiSyBaseWidget * const pc_Dialog =
       new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Text Element"), oq_DarkMode);
    C_GiSyTextElementWidget * const pc_SettingsWidget = new C_GiSyTextElementWidget(*pc_Dialog);
@@ -173,7 +172,7 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
    pc_SettingsWidget->SetFontColor(this->GetFontColor());
    pc_SettingsWidget->SetFontStyle(this->GetFontStyle());
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       ApplyStyle(pc_SettingsWidget->GetFontStyle(), pc_SettingsWidget->GetFontColor());
       q_Retval = true;
@@ -341,15 +340,15 @@ void C_GiBiTextElement::m_LoadTextElementData(const C_PuiBsTextElement * const o
 
    if (oq_DarkMode == true)
    {
-      this->SetFontColor(opc_Data->c_UIFontColorDark);
+      this->SetFontColor(opc_Data->c_UiFontColorDark);
    }
    else
    {
-      this->SetFontColor(opc_Data->c_UIFontColorBright);
+      this->SetFontColor(opc_Data->c_UiFontColorBright);
    }
-   this->SetFontStyle(opc_Data->c_UIFontStyle);
-   this->SetText(opc_Data->c_UIText);
-   this->ApplySizeChange(opc_Data->c_UIPosition, QSizeF(opc_Data->f64_Width, opc_Data->f64_Height));
+   this->SetFontStyle(opc_Data->c_UiFontStyle);
+   this->SetText(opc_Data->c_UiText);
+   this->ApplySizeChange(opc_Data->c_UiPosition, QSizeF(opc_Data->f64_Width, opc_Data->f64_Height));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -365,19 +364,19 @@ void C_GiBiTextElement::m_UpdateTextElementData(C_PuiBsTextElement * const opc_D
 
    if (oq_DarkMode == true)
    {
-      opc_Data->c_UIFontColorDark = this->GetFontColor();
+      opc_Data->c_UiFontColorDark = this->GetFontColor();
    }
    else
    {
-      opc_Data->c_UIFontColorBright = this->GetFontColor();
+      opc_Data->c_UiFontColorBright = this->GetFontColor();
    }
-   opc_Data->c_UIFontStyle = this->GetFontStyle();
-   opc_Data->c_UIText = this->GetText();
+   opc_Data->c_UiFontStyle = this->GetFontStyle();
+   opc_Data->c_UiText = this->GetText();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_GiBiTextElement::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+void C_GiBiTextElement::m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
    Q_UNUSED(of64_DiffHeight)
@@ -391,7 +390,7 @@ void C_GiBiTextElement::m_ResizeUpdateItems(const float64 of64_DiffWidth, const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiTextElement::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_F2)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_F2)) &&
        (this->mq_Editable == true))
    {
       QTextCursor c_Cursor = this->mpc_TextItem->textCursor();

@@ -11,17 +11,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "constants.h"
-#include "C_SdNdeHalcChannelTreeDelegate.h"
-#include "C_Uti.h"
+#include "constants.hpp"
+#include "C_SdNdeHalcChannelTreeDelegate.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +43,7 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeHalcChannelTreeDelegate::C_SdNdeHalcChannelTreeDelegate(QObject * const opc_Parent) :
    QStyledItemDelegate(opc_Parent),
-   msn_CurrentIndexParentRow(-1)
+   ms32_CurrentIndexParentRow(-1)
 {
 }
 
@@ -89,7 +89,7 @@ void C_SdNdeHalcChannelTreeDelegate::paint(QPainter * const opc_Painter, const Q
       // paint parent of current item in selected style
       QStyleOptionViewItem c_Option = orc_Option;
 
-      if (orc_Index.row() == this->msn_CurrentIndexParentRow)
+      if (orc_Index.row() == this->ms32_CurrentIndexParentRow)
       {
          c_Option.state.setFlag(QStyle::State_Selected, true);
          c_Option.state.setFlag(QStyle::State_Enabled, true);
@@ -103,10 +103,10 @@ void C_SdNdeHalcChannelTreeDelegate::paint(QPainter * const opc_Painter, const Q
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Remember parent row of current index.
 
-   \param[in]  osn_ParentRow  Parent row
+   \param[in]  os32_ParentRow  Parent row
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelTreeDelegate::SetCurrentIndexParentRow(const stw_types::sintn osn_ParentRow)
+void C_SdNdeHalcChannelTreeDelegate::SetCurrentIndexParentRow(const int32_t os32_ParentRow)
 {
-   this->msn_CurrentIndexParentRow = osn_ParentRow;
+   this->ms32_CurrentIndexParentRow = os32_ParentRow;
 }

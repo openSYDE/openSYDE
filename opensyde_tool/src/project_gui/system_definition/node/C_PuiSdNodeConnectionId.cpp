@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdNodeConnectionId.h"
+#include "C_PuiSdNodeConnectionId.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdNodeConnectionId::C_PuiSdNodeConnectionId() :
-   e_InterfaceType(stw_opensyde_core::C_OSCSystemBus::E_Type::eCAN),
+   e_InterfaceType(stw::opensyde_core::C_OscSystemBus::E_Type::eCAN),
    u8_InterfaceNumber(0)
 {
 }
@@ -76,8 +75,8 @@ bool C_PuiSdNodeConnectionId::operator ==(const C_PuiSdNodeConnectionId & orc_Re
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdNodeConnectionId::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSdNodeConnectionId::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_InterfaceType, sizeof(this->e_InterfaceType), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_InterfaceNumber, sizeof(this->u8_InterfaceNumber), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_InterfaceType, sizeof(this->e_InterfaceType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_InterfaceNumber, sizeof(this->u8_InterfaceNumber), oru32_HashValue);
 }

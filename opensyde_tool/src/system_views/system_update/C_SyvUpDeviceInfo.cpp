@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvUpDeviceInfo.h"
+#include "C_SyvUpDeviceInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpDeviceInfo::C_SyvUpDeviceInfo(void) :
-   pc_STWDevice(NULL),
-   pc_OSYDevice(NULL)
+   pc_StwDevice(NULL),
+   pc_OpenSydeDevice(NULL)
 {
 }

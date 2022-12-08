@@ -11,17 +11,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgePubPathVariables.h"
-#include "C_OgeLabGenericNoPaddingNoMargins.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgePubPathVariables.hpp"
+#include "C_OgeLabGenericNoPaddingNoMargins.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,9 +50,9 @@ C_OgePubPathVariables::C_OgePubPathVariables(QWidget * const opc_Parent) :
    // first section: openSYDE actions
    this->mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("openSYDE"));
    this->mpc_Menu->addAction(C_GtGetText::h_GetText("openSYDE Binary"),
-                             this, &C_OgePubPathVariables::m_OpenSYDEExeTriggered);
+                             this, &C_OgePubPathVariables::m_OpenSydeExeTriggered);
    this->mpc_Menu->addAction(C_GtGetText::h_GetText("openSYDE Project"),
-                             this, &C_OgePubPathVariables::m_OpenSYDEProjTriggered);
+                             this, &C_OgePubPathVariables::m_OpenSydeProjTriggered);
 
    // second section: system actions
    this->mpc_Menu->AddCustomSection(C_GtGetText::h_GetText("System"));
@@ -94,7 +94,7 @@ void C_OgePubPathVariables::AddDatablockSection(void)
    Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubPathVariables::m_OpenSYDEExeTriggered(void)
+void C_OgePubPathVariables::m_OpenSydeExeTriggered(void)
 {
    Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_OPENSYDE_BIN));
 }
@@ -105,7 +105,7 @@ void C_OgePubPathVariables::m_OpenSYDEExeTriggered(void)
    Emit signal with variable as string.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubPathVariables::m_OpenSYDEProjTriggered(void)
+void C_OgePubPathVariables::m_OpenSydeProjTriggered(void)
 {
    Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_OPENSYDE_PROJ));
 }

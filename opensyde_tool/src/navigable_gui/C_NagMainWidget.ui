@@ -70,28 +70,28 @@
         <number>16</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnNewProj">
+        <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnNewProj">
          <property name="text">
           <string>New Proj</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnOpenProj">
+        <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnOpenProj">
          <property name="text">
           <string>Open Proj</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnSaveProjAs">
+        <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnSaveProjAs">
          <property name="text">
           <string>Save Proj as</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnCreateServiceProj">
+        <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnCreateServiceProj">
          <property name="text">
           <string>Create Service</string>
          </property>
@@ -111,7 +111,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnAbout">
+        <widget class="stw::opensyde_gui_elements::C_OgePubProjAction" name="pc_BtnAbout">
          <property name="focusPolicy">
           <enum>Qt::NoFocus</enum>
          </property>
@@ -170,7 +170,7 @@
             <number>9</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCurProjTitle">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCurProjTitle">
              <property name="text">
               <string>Current Proj</string>
              </property>
@@ -181,7 +181,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameCurrProj">
+            <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameCurrProj">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -224,7 +224,7 @@
               <number>8</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCurProjName">
+              <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelCurProjName">
                <property name="maximumSize">
                 <size>
                  <width>650</width>
@@ -287,17 +287,17 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabDoubleClick" name="pc_LabelVersion">
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabDoubleClick" name="pc_LabelVersion">
                   <property name="text">
                    <string>Version of Project</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLeDark" name="pc_LineEditVersion"/>
+                 <widget class="stw::opensyde_gui_elements::C_OgeLeDark" name="pc_LineEditVersion"/>
                 </item>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnEdit">
+                 <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnEdit">
                   <property name="minimumSize">
                    <size>
                     <width>24</width>
@@ -321,7 +321,7 @@
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameVersion">
+                <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameVersion">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -370,7 +370,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubUseCase" name="pc_BtnSysDef">
+            <widget class="stw::opensyde_gui_elements::C_OgePubUseCase" name="pc_BtnSysDef">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -433,7 +433,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubUseCase" name="pc_BtnSysView">
+            <widget class="stw::opensyde_gui_elements::C_OgePubUseCase" name="pc_BtnSysView">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -499,14 +499,14 @@
             <number>9</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabRecentProjects">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabRecentProjects">
              <property name="text">
               <string>Recent Projs</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnClear">
+            <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnClear">
              <property name="minimumSize">
               <size>
                <width>24</width>
@@ -529,7 +529,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameRecentProjects">
+            <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameRecentProjects">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -555,7 +555,7 @@
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,1">
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoRecentProj">
+            <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoRecentProj">
              <property name="title">
               <string>Empty</string>
              </property>
@@ -576,7 +576,7 @@
                  </spacer>
                 </item>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNoRecentProj">
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNoRecentProj">
                   <property name="text">
                    <string>Nothing to show</string>
                   </property>
@@ -614,7 +614,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_logic::C_PopFileTableView" name="pc_TableView">
+            <widget class="stw::opensyde_gui_logic::C_PopFileTableView" name="pc_TableView">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -681,51 +681,51 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
+   <header>C_OgePubIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubProjAction</class>
+   <class>stw::opensyde_gui_elements::C_OgePubProjAction</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubProjAction.h</header>
+   <header>C_OgePubProjAction.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_logic::C_PopFileTableView</class>
+   <class>stw::opensyde_gui_logic::C_PopFileTableView</class>
    <extends>QTableView</extends>
-   <header>C_PopFileTableView.h</header>
+   <header>C_PopFileTableView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubUseCase</class>
+   <class>stw::opensyde_gui_elements::C_OgePubUseCase</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubUseCase.h</header>
+   <header>C_OgePubUseCase.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeDark</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeDark</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeDark.h</header>
+   <header>C_OgeLeDark.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDoubleClick</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDoubleClick</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDoubleClick.h</header>
+   <header>C_OgeLabDoubleClick.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

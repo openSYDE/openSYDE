@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdBueUnoManager.h"
-#include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.h"
-#include "C_SdBueUnoBusProtNodeConnectCommand.h"
-#include "C_SdBueUnoBusProtNodeDisconnectCommand.h"
-#include "C_SdBueMessageSelectorTreeWidget.h"
-#include "C_SdBueUnoMessageAddCommand.h"
-#include "C_SdBueUnoMessageDeleteCommand.h"
-#include "C_SdBueUnoSignalAddCommand.h"
-#include "C_SdBueUnoSignalDeleteCommand.h"
-#include "C_SdBueUnoSignalMoveCommand.h"
+#include "stwtypes.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdBueUnoManager.hpp"
+#include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.hpp"
+#include "C_SdBueUnoBusProtNodeConnectCommand.hpp"
+#include "C_SdBueUnoBusProtNodeDisconnectCommand.hpp"
+#include "C_SdBueMessageSelectorTreeWidget.hpp"
+#include "C_SdBueUnoMessageAddCommand.hpp"
+#include "C_SdBueUnoMessageDeleteCommand.hpp"
+#include "C_SdBueUnoSignalAddCommand.hpp"
+#include "C_SdBueUnoSignalDeleteCommand.hpp"
+#include "C_SdBueUnoSignalMoveCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -76,8 +75,8 @@ C_SdBueUnoManager::~C_SdBueUnoManager(void)
    \param[in,out]  opc_Widget             Widget to notify for changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoConnectNodeToProt(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                            const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
+void C_SdBueUnoManager::DoConnectNodeToProt(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                            const C_OscCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
 {
    this->DoPush(new C_SdBueUnoBusProtNodeConnectCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol, opc_Widget));
 }
@@ -91,8 +90,9 @@ void C_SdBueUnoManager::DoConnectNodeToProt(const uint32 ou32_NodeIndex, const u
    \param[in,out]  opc_Widget             Widget to notify for changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoConnectNodeToProtAndAddDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                                          const C_OSCCanProtocol::E_Type oe_Protocol,
+void C_SdBueUnoManager::DoConnectNodeToProtAndAddDataPool(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_InterfaceIndex,
+                                                          const C_OscCanProtocol::E_Type oe_Protocol,
                                                           QWidget * const opc_Widget)
 {
    this->DoPush(new C_SdBueUnoBusProtNodeConnectAndCreateCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol,
@@ -108,8 +108,8 @@ void C_SdBueUnoManager::DoConnectNodeToProtAndAddDataPool(const uint32 ou32_Node
    \param[in,out]  opc_Widget             Widget to notify for changes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoDisconnectNodeFromProt(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                                 const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
+void C_SdBueUnoManager::DoDisconnectNodeFromProt(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                                 const C_OscCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget)
 {
    this->DoPush(new C_SdBueUnoBusProtNodeDisconnectCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol,
                                                            opc_Widget));
@@ -123,14 +123,14 @@ void C_SdBueUnoManager::DoDisconnectNodeFromProt(const uint32 ou32_NodeIndex, co
    \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+void C_SdBueUnoManager::DoAddMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId,
                                      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                      QTreeWidget * const opc_MessageTreeWidget)
 {
-   const std::vector<C_OSCCanMessageIdentificationIndices> c_MessageIds = {orc_MessageId};
+   const std::vector<C_OscCanMessageIdentificationIndices> c_MessageIds = {orc_MessageId};
 
-   std::vector<C_OSCCanMessage> c_Messages;
-   C_OSCCanMessage c_Message;
+   std::vector<C_OscCanMessage> c_Messages;
+   C_OscCanMessage c_Message;
 
    C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
       dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
@@ -141,11 +141,11 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
 
    mh_PatchMessageId(opc_MessageSyncManager, c_Message);
    c_Messages.push_back(c_Message);
-   pc_UndoCommand->SetInitialData(c_Messages, std::vector<std::vector<C_OSCNodeDataPoolListElement> >(),
+   pc_UndoCommand->SetInitialData(c_Messages, std::vector<std::vector<C_OscNodeDataPoolListElement> >(),
                                   std::vector<std::vector<C_PuiSdNodeDataPoolListElement> >(),
                                   std::vector<std::vector<C_PuiSdNodeCanSignal> >(),
                                   std::vector<std::vector<QString> >(),
-                                  std::vector<std::vector<uint32> >(), std::vector<std::vector<uint32> >(),
+                                  std::vector<std::vector<uint32_t> >(), std::vector<std::vector<uint32_t> >(),
                                   std::vector<std::vector<bool> >());
 
    this->DoPush(pc_UndoCommand);
@@ -156,9 +156,9 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
 
    \param[in]      orc_MessageId                Message identification indices
    \param[in]      orc_Messages                 Message data
-   \param[in]      orc_OSCSignalCommons         Signal common osc data
-   \param[in]      orc_UISignalCommons          Signal common ui data
-   \param[in]      orc_UISignals                Signal ui data
+   \param[in]      orc_OscSignalCommons         Signal common osc data
+   \param[in]      orc_UiSignalCommons          Signal common ui data
+   \param[in]      orc_UiSignals                Signal ui data
    \param[in]      orc_OwnerNodeName            Owner node names
    \param[in]      orc_OwnerNodeInterfaceIndex  Owner node interface index
    \param[in]      orc_OwnerNodeDatapoolIndex   Owner node Datapool index
@@ -168,26 +168,26 @@ void C_SdBueUnoManager::DoAddMessage(const C_OSCCanMessageIdentificationIndices 
    \param[out]     orc_NewIds                   New pasted message IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                        const std::vector<C_OSCCanMessage> & orc_Messages,
-                                        const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
-                                        std::vector<C_OSCCanMessageIdentificationIndices> & orc_NewIds)
+void C_SdBueUnoManager::DoPasteMessages(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                        const std::vector<C_OscCanMessage> & orc_Messages,
+                                        const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget,
+                                        std::vector<C_OscCanMessageIdentificationIndices> & orc_NewIds)
 {
    //Check if consistent size
-   if (((((((orc_Messages.size() == orc_OSCSignalCommons.size()) &&
-            (orc_Messages.size() == orc_UISignalCommons.size()))) && (orc_Messages.size() == orc_UISignals.size())) &&
+   if (((((((orc_Messages.size() == orc_OscSignalCommons.size()) &&
+            (orc_Messages.size() == orc_UiSignalCommons.size()))) && (orc_Messages.size() == orc_UiSignals.size())) &&
          (orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size())) &&
         (orc_OwnerNodeName.size() == orc_OwnerNodeDatapoolIndex.size())) &&
        (orc_OwnerNodeName.size() == orc_OwnerIsTxFlag.size()))
    {
       if (orc_Messages.size() > 0)
       {
-         std::vector<C_OSCCanMessageIdentificationIndices > c_Ids;
+         std::vector<C_OscCanMessageIdentificationIndices > c_Ids;
          std::vector<std::vector<QString> > c_OwnerNodeName;
-         std::vector<std::vector<uint32> > c_OwnerNodeInterfaceIndex;
-         std::vector<std::vector<uint32> > c_OwnerNodeDatapoolIndex;
+         std::vector<std::vector<uint32_t> > c_OwnerNodeInterfaceIndex;
+         std::vector<std::vector<uint32_t> > c_OwnerNodeDatapoolIndex;
          std::vector<std::vector<bool> > c_OwnerIsTxFlag;
-         C_OSCCanMessageIdentificationIndices c_CurrentMessageId = orc_MessageId;
+         C_OscCanMessageIdentificationIndices c_CurrentMessageId = orc_MessageId;
 
          //Reserve
          c_Ids.reserve(orc_Messages.size());
@@ -202,7 +202,7 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
                                                           c_OwnerIsTxFlag);
 
          //Create add command for each new message (for paste multiple can be added at once)
-         for (uint32 u32_ItMessage = 0; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
+         for (uint32_t u32_ItMessage = 0; u32_ItMessage < orc_Messages.size(); ++u32_ItMessage)
          {
             //The message index increment might be highly inaccurate but it should never be used anyways
             ++c_CurrentMessageId.u32_MessageIndex;
@@ -216,9 +216,9 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
                                                                                                 pc_MessageTreeWidget,
                                                                                                 "Paste Message(s)");
             //If vector are empty default behavior is used instead
-            pc_AddCommand->SetInitialData(orc_Messages, orc_OSCSignalCommons,
-                                          orc_UISignalCommons,
-                                          orc_UISignals,
+            pc_AddCommand->SetInitialData(orc_Messages, orc_OscSignalCommons,
+                                          orc_UiSignalCommons,
+                                          orc_UiSignals,
                                           c_OwnerNodeName, c_OwnerNodeInterfaceIndex,
                                           c_OwnerNodeDatapoolIndex,
                                           c_OwnerIsTxFlag);
@@ -240,36 +240,36 @@ void C_SdBueUnoManager::DoPasteMessages(const C_OSCCanMessageIdentificationIndic
    \param[in]      orc_MessageId             Message identification indices
    \param[in]      ou32_SignalIndex          Signal index
    \param[in]      orc_Signals               Signals data
-   \param[in]      orc_OSCSignalCommons      Signal common osc data
-   \param[in]      orc_UISignalCommons       Signal common ui data
-   \param[in]      orc_UISignals             Signal ui data
+   \param[in]      orc_OscSignalCommons      Signal common osc data
+   \param[in]      orc_UiSignalCommons       Signal common ui data
+   \param[in]      orc_UiSignals             Signal ui data
    \param[in,out]  opc_MessageSyncManager    Message sync manager to perform actions on
    \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
    \param[in]      oe_ProtocolType           Current active protocol to handle necessary adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                       const uint32 ou32_SignalIndex, const std::vector<C_OSCCanSignal> & orc_Signals,
-                                       const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
-                                       const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                       const std::vector<C_PuiSdNodeCanSignal> & orc_UISignals,
+void C_SdBueUnoManager::DoPasteSignals(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                       const uint32_t ou32_SignalIndex, const std::vector<C_OscCanSignal> & orc_Signals,
+                                       const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
+                                       const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
+                                       const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
                                        C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                        QTreeWidget * const opc_MessageTreeWidget,
-                                       const C_OSCCanProtocol::E_Type oe_ProtocolType)
+                                       const C_OscCanProtocol::E_Type oe_ProtocolType)
 {
    //Check if consistent size
-   if ((((orc_Signals.size() == orc_OSCSignalCommons.size()) &&
-         (orc_Signals.size() == orc_UISignalCommons.size()))) && (orc_Signals.size() == orc_UISignals.size()))
+   if ((((orc_Signals.size() == orc_OscSignalCommons.size()) &&
+         (orc_Signals.size() == orc_UiSignalCommons.size()))) && (orc_Signals.size() == orc_UiSignals.size()))
    {
       if (orc_Signals.size() > 0)
       {
-         std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> c_MessageId;
-         std::vector<stw_types::uint32> c_SignalIndex;
-         std::vector<stw_types::uint16> c_StartBit;
-         std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType> c_MultiplexerType;
-         std::vector<stw_types::uint16> c_MultiplexerValue;
-         std::vector<C_OSCCanProtocol::E_Type> c_ProtocolType;
-         uint32 u32_CurrentSignalIndex = ou32_SignalIndex;
+         std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> c_MessageId;
+         std::vector<uint32_t> c_SignalIndex;
+         std::vector<uint16_t> c_StartBit;
+         std::vector<stw::opensyde_core::C_OscCanSignal::E_MultiplexerType> c_MultiplexerType;
+         std::vector<uint16_t> c_MultiplexerValue;
+         std::vector<C_OscCanProtocol::E_Type> c_ProtocolType;
+         uint32_t u32_CurrentSignalIndex = ou32_SignalIndex;
          //Reserve
          c_MessageId.reserve(orc_Signals.size());
          c_SignalIndex.reserve(orc_Signals.size());
@@ -277,12 +277,12 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
          c_MultiplexerType.reserve(orc_Signals.size());
          c_MultiplexerValue.reserve(orc_Signals.size());
          c_ProtocolType.reserve(orc_Signals.size());
-         for (uint32 u32_ItSignal = 0; u32_ItSignal < orc_Signals.size(); ++u32_ItSignal)
+         for (uint32_t u32_ItSignal = 0; u32_ItSignal < orc_Signals.size(); ++u32_ItSignal)
          {
             c_MessageId.push_back(orc_MessageId);
             c_SignalIndex.push_back(u32_CurrentSignalIndex);
             c_StartBit.push_back(orc_Signals[u32_ItSignal].u16_ComBitStart);
-            c_MultiplexerType.push_back(C_OSCCanSignal::eMUX_DEFAULT);
+            c_MultiplexerType.push_back(C_OscCanSignal::eMUX_DEFAULT);
             c_MultiplexerValue.push_back(0);
             c_ProtocolType.push_back(oe_ProtocolType);
             ++u32_CurrentSignalIndex;
@@ -298,8 +298,8 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
                                                                                               opc_MessageSyncManager,
                                                                                               pc_MessageTreeWidget,
                                                                                               "Paste Signal(s)");
-            pc_AddCommand->SetInitialData(orc_Signals, orc_OSCSignalCommons,
-                                          orc_UISignalCommons, orc_UISignals,
+            pc_AddCommand->SetInitialData(orc_Signals, orc_OscSignalCommons,
+                                          orc_UiSignalCommons, orc_UiSignals,
                                           c_ProtocolType);
             this->DoPush(pc_AddCommand);
             //lint -e429 Qt command stack will take care of it
@@ -317,21 +317,21 @@ void C_SdBueUnoManager::DoPasteSignals(const C_OSCCanMessageIdentificationIndice
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::DoDeleteMessages(
-   const std::vector<std::vector<C_OSCCanMessageIdentificationIndices> > & orc_SortedAscendingMessageGroups,
+   const std::vector<std::vector<C_OscCanMessageIdentificationIndices> > & orc_SortedAscendingMessageGroups,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager, QTreeWidget * const opc_MessageTreeWidget)
 {
    QUndoCommand * const pc_Parent = this->m_GetDeleteCommand();
 
    if (pc_Parent != NULL)
    {
-      std::vector<C_OSCCanMessageIdentificationIndices> c_AllMessages;
+      std::vector<C_OscCanMessageIdentificationIndices> c_AllMessages;
       //Consolidate
-      for (uint32 u32_ItGroup = 0UL; u32_ItGroup < orc_SortedAscendingMessageGroups.size(); ++u32_ItGroup)
+      for (uint32_t u32_ItGroup = 0UL; u32_ItGroup < orc_SortedAscendingMessageGroups.size(); ++u32_ItGroup)
       {
-         const std::vector<C_OSCCanMessageIdentificationIndices> & rc_Messages =
+         const std::vector<C_OscCanMessageIdentificationIndices> & rc_Messages =
             orc_SortedAscendingMessageGroups[u32_ItGroup];
          c_AllMessages.reserve(c_AllMessages.size() + rc_Messages.size());
-         for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Messages.size(); ++u32_ItMessage)
+         for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < rc_Messages.size(); ++u32_ItMessage)
          {
             c_AllMessages.push_back(rc_Messages[u32_ItMessage]);
          }
@@ -357,18 +357,18 @@ void C_SdBueUnoManager::DoDeleteMessages(
    \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                    const uint32 ou32_SignalIndex, const uint16 ou16_StartBit,
-                                    const C_OSCCanSignal::E_MultiplexerType oe_MultiplexerType,
-                                    const uint16 ou16_MultiplexerValue,
+void C_SdBueUnoManager::DoAddSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                    const uint32_t ou32_SignalIndex, const uint16_t ou16_StartBit,
+                                    const C_OscCanSignal::E_MultiplexerType oe_MultiplexerType,
+                                    const uint16_t ou16_MultiplexerValue,
                                     C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                     QTreeWidget * const opc_MessageTreeWidget)
 {
-   const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> c_MessageId = {orc_MessageId};
-   const std::vector<stw_types::uint32> c_SignalIndex = {ou32_SignalIndex};
-   const std::vector<stw_types::uint16> c_StartBit = {ou16_StartBit};
-   const std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType> c_MultiplexerType = {oe_MultiplexerType};
-   const std::vector<stw_types::uint16> c_MultiplexerValue = {ou16_MultiplexerValue};
+   const std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> c_MessageId = {orc_MessageId};
+   const std::vector<uint32_t> c_SignalIndex = {ou32_SignalIndex};
+   const std::vector<uint16_t> c_StartBit = {ou16_StartBit};
+   const std::vector<stw::opensyde_core::C_OscCanSignal::E_MultiplexerType> c_MultiplexerType = {oe_MultiplexerType};
+   const std::vector<uint16_t> c_MultiplexerValue = {ou16_MultiplexerValue};
 
    C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
       dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
@@ -390,49 +390,49 @@ void C_SdBueUnoManager::DoAddSignal(const C_OSCCanMessageIdentificationIndices &
    \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                      const uint32 ou32_SignalIndex, const uint16 ou16_StartBit,
-                                      const std::vector<C_OSCCanOpenManagerMappableSignal> & orc_NewSignalInfo,
+void C_SdBueUnoManager::DoAddCoSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                      const uint32_t ou32_SignalIndex, const uint16_t ou16_StartBit,
+                                      const std::vector<C_OscCanOpenManagerMappableSignal> & orc_NewSignalInfo,
                                       C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                       QTreeWidget * const opc_MessageTreeWidget)
 {
-   const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> c_MessageId =
-      std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices>(orc_NewSignalInfo.size(), orc_MessageId);
+   const std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> c_MessageId =
+      std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices>(orc_NewSignalInfo.size(), orc_MessageId);
 
-   std::vector<stw_types::uint32> c_SignalIndex;
-   std::vector<stw_types::uint16> c_StartBit;
-   const std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType> c_MultiplexerType =
-      std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType>(
-         orc_NewSignalInfo.size(), C_OSCCanSignal::eMUX_DEFAULT);
-   const std::vector<stw_types::uint16> c_MultiplexerValue =
-      std::vector<stw_types::uint16>(orc_NewSignalInfo.size(), 0U);
+   std::vector<uint32_t> c_SignalIndex;
+   std::vector<uint16_t> c_StartBit;
+   const std::vector<stw::opensyde_core::C_OscCanSignal::E_MultiplexerType> c_MultiplexerType =
+      std::vector<stw::opensyde_core::C_OscCanSignal::E_MultiplexerType>(
+         orc_NewSignalInfo.size(), C_OscCanSignal::eMUX_DEFAULT);
+   const std::vector<uint16_t> c_MultiplexerValue =
+      std::vector<uint16_t>(orc_NewSignalInfo.size(), 0U);
 
-   std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommon;
-   const std::vector<C_PuiSdNodeCanSignal> c_UISignal = std::vector<C_PuiSdNodeCanSignal>(
+   std::vector<C_PuiSdNodeDataPoolListElement> c_UiSignalCommon;
+   const std::vector<C_PuiSdNodeCanSignal> c_UiSignal = std::vector<C_PuiSdNodeCanSignal>(
       orc_NewSignalInfo.size(), C_PuiSdNodeCanSignal());
-   const std::vector<C_OSCCanProtocol::E_Type> c_ProtocolType = std::vector<C_OSCCanProtocol::E_Type>(
-      orc_NewSignalInfo.size(), C_OSCCanProtocol::eCAN_OPEN);
+   const std::vector<C_OscCanProtocol::E_Type> c_ProtocolType = std::vector<C_OscCanProtocol::E_Type>(
+      orc_NewSignalInfo.size(), C_OscCanProtocol::eCAN_OPEN);
 
-   std::vector<C_OSCCanSignal> c_Signal;
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> c_OSCSignalCommon;
+   std::vector<C_OscCanSignal> c_Signal;
+   std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> c_OscSignalCommon;
 
    C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
       dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
    bool q_EndReached = false;
-   uint16 u16_StartBit = ou16_StartBit;
+   uint16_t u16_StartBit = ou16_StartBit;
 
    c_SignalIndex.reserve(orc_NewSignalInfo.size());
    c_StartBit.reserve(orc_NewSignalInfo.size());
    c_Signal.reserve(orc_NewSignalInfo.size());
-   c_OSCSignalCommon.reserve(orc_NewSignalInfo.size());
-   c_UISignalCommon.reserve(orc_NewSignalInfo.size());
+   c_OscSignalCommon.reserve(orc_NewSignalInfo.size());
+   c_UiSignalCommon.reserve(orc_NewSignalInfo.size());
 
-   for (uint32 u32_SignalCounter = 0; u32_SignalCounter < orc_NewSignalInfo.size(); ++u32_SignalCounter)
+   for (uint32_t u32_SignalCounter = 0; u32_SignalCounter < orc_NewSignalInfo.size(); ++u32_SignalCounter)
    {
-      const C_OSCCanOpenManagerMappableSignal & rc_Result = orc_NewSignalInfo[u32_SignalCounter];
-      C_OSCCanSignal c_SignalData = rc_Result.c_SignalData;
-      C_OSCNodeDataPoolListElement c_SignalCommonData = rc_Result.c_DatapoolData;
-      C_PuiSdNodeDataPoolListElement c_UISignalCommonData;
+      const C_OscCanOpenManagerMappableSignal & rc_Result = orc_NewSignalInfo[u32_SignalCounter];
+      C_OscCanSignal c_SignalData = rc_Result.c_SignalData;
+      C_OscNodeDataPoolListElement c_SignalCommonData = rc_Result.c_DatapoolData;
+      C_PuiSdNodeDataPoolListElement c_UiSignalCommonData;
 
       if (c_SignalCommonData.c_DataSetValues.size() != 1)
       {
@@ -445,13 +445,13 @@ void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices
       c_SignalData.u16_ComBitStart = u16_StartBit;
 
       // Change the default values
-      c_UISignalCommonData.q_AutoMinMaxActive = rc_Result.q_AutoMinMaxUsed;
+      c_UiSignalCommonData.q_AutoMinMaxActive = rc_Result.q_AutoMinMaxUsed;
 
       c_SignalIndex.push_back(ou32_SignalIndex + u32_SignalCounter);
       c_StartBit.push_back(u16_StartBit);
       c_Signal.push_back(c_SignalData);
-      c_OSCSignalCommon.push_back(c_SignalCommonData);
-      c_UISignalCommon.push_back(c_UISignalCommonData);
+      c_OscSignalCommon.push_back(c_SignalCommonData);
+      c_UiSignalCommon.push_back(c_UiSignalCommonData);
 
       if (q_EndReached == false)
       {
@@ -474,7 +474,7 @@ void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices
                                                                                         "Add CANopen Signal");
 
       // Set the CANopen specific adapted signal configuration
-      pc_AddCommand->SetInitialData(c_Signal, c_OSCSignalCommon, c_UISignalCommon, c_UISignal, c_ProtocolType);
+      pc_AddCommand->SetInitialData(c_Signal, c_OscSignalCommon, c_UiSignalCommon, c_UiSignal, c_ProtocolType);
 
       this->DoPush(pc_AddCommand);
    }
@@ -490,8 +490,8 @@ void C_SdBueUnoManager::DoAddCoSignal(const C_OSCCanMessageIdentificationIndices
    \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoDeleteSignals(const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageId,
-                                        const std::vector<uint32> & orc_SignalIndex,
+void C_SdBueUnoManager::DoDeleteSignals(const std::vector<C_OscCanMessageIdentificationIndices> & orc_MessageId,
+                                        const std::vector<uint32_t> & orc_SignalIndex,
                                         C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                         QTreeWidget * const opc_MessageTreeWidget)
 {
@@ -520,10 +520,10 @@ void C_SdBueUnoManager::DoDeleteSignals(const std::vector<C_OSCCanMessageIdentif
    \param[in,out]  opc_MessageTreeWidget     Message tree widget to perform actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::DoMoveSignal(const std::vector<C_OSCCanMessageIdentificationIndices> & orc_SourceMessageIds,
-                                     const std::vector<uint32> & orc_SourceSignalIndices,
-                                     const std::vector<C_OSCCanMessageIdentificationIndices> & orc_TargetMessageIds,
-                                     const std::vector<uint32> & orc_TargetSignalIndices,
+void C_SdBueUnoManager::DoMoveSignal(const std::vector<C_OscCanMessageIdentificationIndices> & orc_SourceMessageIds,
+                                     const std::vector<uint32_t> & orc_SourceSignalIndices,
+                                     const std::vector<C_OscCanMessageIdentificationIndices> & orc_TargetMessageIds,
+                                     const std::vector<uint32_t> & orc_TargetSignalIndices,
                                      C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
                                      QTreeWidget * const opc_MessageTreeWidget)
 {
@@ -533,15 +533,15 @@ void C_SdBueUnoManager::DoMoveSignal(const std::vector<C_OSCCanMessageIdentifica
            (orc_SourceMessageIds.size() == orc_TargetMessageIds.size())) &&
           (orc_SourceMessageIds.size() == orc_TargetSignalIndices.size()))
       {
-         std::vector<uint32> c_AdaptedSourceSignalIndices;
+         std::vector<uint32_t> c_AdaptedSourceSignalIndices;
 
          C_SdBueMessageSelectorTreeWidget * const pc_MessageTreeWidget =
             dynamic_cast<C_SdBueMessageSelectorTreeWidget * const>(opc_MessageTreeWidget);
-         for (uint32 u32_ItMove = 0; u32_ItMove < orc_SourceMessageIds.size(); ++u32_ItMove)
+         for (uint32_t u32_ItMove = 0; u32_ItMove < orc_SourceMessageIds.size(); ++u32_ItMove)
          {
-            uint32 u32_CurSourceSignalIndex = orc_SourceSignalIndices[u32_ItMove];
+            uint32_t u32_CurSourceSignalIndex = orc_SourceSignalIndices[u32_ItMove];
             //Adapt index to previously moved signals
-            for (uint32 u32_ItAdapted = 0; u32_ItAdapted < c_AdaptedSourceSignalIndices.size(); ++u32_ItAdapted)
+            for (uint32_t u32_ItAdapted = 0; u32_ItAdapted < c_AdaptedSourceSignalIndices.size(); ++u32_ItAdapted)
             {
                if (c_AdaptedSourceSignalIndices[u32_ItAdapted] <= orc_SourceSignalIndices[u32_ItMove])
                {
@@ -598,7 +598,7 @@ QUndoCommand * C_SdBueUnoManager::m_GetDeleteCommand(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
-                                          C_OSCCanMessage & orc_Message)
+                                          C_OscCanMessage & orc_Message)
 {
    if (opc_MessageSyncManager != NULL)
    {
@@ -620,19 +620,19 @@ void C_SdBueUnoManager::mh_PatchMessageId(const C_PuiSdNodeCanMessageSyncManager
    \param[out]  orc_NewOwnerIsTxFlag               New/valid owners Tx flags (empty if no matches found)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OscCanMessageIdentificationIndices & orc_MessageId,
                                                       const std::vector<std::vector<QString> > & orc_LastOwnerNodeName,
-                                                      const std::vector<std::vector<uint32> > & orc_LastOwnerNodeInterfaceIndex, const std::vector<std::vector<uint32> > & orc_LastOwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_LastOwnerIsTxFlag, std::vector<std::vector<QString> > & orc_NewOwnerNodeName, std::vector<std::vector<uint32> > & orc_NewOwnerNodeInterfaceIndex, std::vector<std::vector<uint32> > & orc_NewOwnerNodeDatapoolIndex,
+                                                      const std::vector<std::vector<uint32_t> > & orc_LastOwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_LastOwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_LastOwnerIsTxFlag, std::vector<std::vector<QString> > & orc_NewOwnerNodeName, std::vector<std::vector<uint32_t> > & orc_NewOwnerNodeInterfaceIndex, std::vector<std::vector<uint32_t> > & orc_NewOwnerNodeDatapoolIndex,
                                                       std::vector<std::vector<bool> > & orc_NewOwnerIsTxFlag)
 {
    //Confirm connected to bus state part 1 (container)
-   const C_OSCCanMessageContainer * const pc_Container =
+   const C_OscCanMessageContainer * const pc_Container =
       C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageId.u32_NodeIndex,
                                                                       orc_MessageId.e_ComProtocol,
                                                                       orc_MessageId.u32_InterfaceIndex,
                                                                       orc_MessageId.u32_DatapoolIndex);
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       orc_MessageId.u32_NodeIndex);
 
    //Reserve
@@ -646,18 +646,18 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
    {
       if (orc_MessageId.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size())
       {
-         const C_OSCNodeComInterfaceSettings & rc_Interface =
+         const C_OscNodeComInterfaceSettings & rc_Interface =
             pc_Node->c_Properties.c_ComInterfaces[orc_MessageId.u32_InterfaceIndex];
 
          //Confirm connected to bus state part 2 (interface) -> Bus mode
          if ((rc_Interface.GetBusConnected() == true) &&
              (pc_Container->q_IsComProtocolUsedByInterface == true))
          {
-            std::vector<uint32> c_NodeIndexes;
-            std::vector<uint32> c_InterfaceIndexes;
-            std::vector<uint32> c_DatapoolIndexes;
+            std::vector<uint32_t> c_NodeIndexes;
+            std::vector<uint32_t> c_InterfaceIndexes;
+            std::vector<uint32_t> c_DatapoolIndexes;
 
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
+            C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
                rc_Interface.u32_BusIndex, orc_MessageId.e_ComProtocol, c_NodeIndexes, c_InterfaceIndexes,
                c_DatapoolIndexes);
 
@@ -666,11 +666,11 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                 (c_NodeIndexes.size() == c_DatapoolIndexes.size()))
             {
                //Confirm last owners still valid
-               for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_LastOwnerNodeName.size(); ++u32_ItMessage)
+               for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < orc_LastOwnerNodeName.size(); ++u32_ItMessage)
                {
                   std::vector<QString> c_NewOwnerNodeName;
-                  std::vector<stw_types::uint32> c_NewOwnerNodeInterfaceIndex;
-                  std::vector<stw_types::uint32> c_NewOwnerNodeDatapoolIndex;
+                  std::vector<uint32_t> c_NewOwnerNodeInterfaceIndex;
+                  std::vector<uint32_t> c_NewOwnerNodeDatapoolIndex;
                   std::vector<bool> c_NewOwnerIsTxFlag;
 
                   //Reserve
@@ -679,17 +679,17 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                   c_NewOwnerNodeDatapoolIndex.reserve(orc_LastOwnerNodeName[u32_ItMessage].size());
                   c_NewOwnerIsTxFlag.reserve(orc_LastOwnerNodeName[u32_ItMessage].size());
 
-                  for (uint32 u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName[u32_ItMessage].size();
+                  for (uint32_t u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName[u32_ItMessage].size();
                        ++u32_ItLastOwner)
                   {
                      const QString & rc_CurName = orc_LastOwnerNodeName[u32_ItMessage][u32_ItLastOwner];
                      //Iterate over all connected nodes
-                     for (uint32 u32_ItConnectedNode = 0UL;
+                     for (uint32_t u32_ItConnectedNode = 0UL;
                           u32_ItConnectedNode < c_NodeIndexes.size();
                           ++u32_ItConnectedNode)
                      {
-                        const C_OSCNode * const pc_ConnectedNode =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItConnectedNode]);
+                        const C_OscNode * const pc_ConnectedNode =
+                           C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndexes[u32_ItConnectedNode]);
                         if (pc_ConnectedNode != NULL)
                         {
                            if (rc_CurName.compare(pc_ConnectedNode->c_Properties.c_Name.c_str()) == 0)
@@ -700,7 +700,7 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                               if (orc_LastOwnerNodeInterfaceIndex[u32_ItMessage][u32_ItLastOwner] <
                                   pc_ConnectedNode->c_Properties.c_ComInterfaces.size())
                               {
-                                 const C_OSCNodeComInterfaceSettings & rc_LastInterface =
+                                 const C_OscNodeComInterfaceSettings & rc_LastInterface =
                                     pc_Node->c_Properties.c_ComInterfaces[orc_LastOwnerNodeInterfaceIndex[u32_ItMessage]
                                                                           [
                                                                              u32_ItLastOwner]];
@@ -708,7 +708,7 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                                  if ((rc_LastInterface.GetBusConnected() == true) &&
                                      (rc_LastInterface.u32_BusIndex == rc_Interface.u32_BusIndex))
                                  {
-                                    const C_OSCCanProtocol * const pc_Protocol =
+                                    const C_OscCanProtocol * const pc_Protocol =
                                        C_PuiSdHandler::h_GetInstance()->GetCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                                        orc_MessageId.e_ComProtocol,
                                                                                        orc_LastOwnerNodeDatapoolIndex[
@@ -770,11 +770,11 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
          {
             // Node mode
             //Confirm last owners still valid
-            for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_LastOwnerNodeName.size(); ++u32_ItMessage)
+            for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < orc_LastOwnerNodeName.size(); ++u32_ItMessage)
             {
                std::vector<QString> c_NewOwnerNodeName;
-               std::vector<stw_types::uint32> c_NewOwnerNodeInterfaceIndex;
-               std::vector<stw_types::uint32> c_NewOwnerNodeDatapoolIndex;
+               std::vector<uint32_t> c_NewOwnerNodeInterfaceIndex;
+               std::vector<uint32_t> c_NewOwnerNodeDatapoolIndex;
                std::vector<bool> c_NewOwnerIsTxFlag;
 
                //Reserve
@@ -783,7 +783,7 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                c_NewOwnerNodeDatapoolIndex.reserve(orc_LastOwnerNodeName[u32_ItMessage].size());
                c_NewOwnerIsTxFlag.reserve(orc_LastOwnerNodeName[u32_ItMessage].size());
 
-               for (uint32 u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName[u32_ItMessage].size();
+               for (uint32_t u32_ItLastOwner = 0UL; u32_ItLastOwner < orc_LastOwnerNodeName[u32_ItMessage].size();
                     ++u32_ItLastOwner)
                {
                   const QString & rc_CurName = orc_LastOwnerNodeName[u32_ItMessage][u32_ItLastOwner];
@@ -791,7 +791,7 @@ void C_SdBueUnoManager::mh_HandleLastOwnersValidation(const C_OSCCanMessageIdent
                   if (rc_CurName.compare(pc_Node->c_Properties.c_Name.c_str()) == 0)
                   {
                      bool q_ExactMatch = false;
-                     const C_OSCCanProtocol * const pc_Protocol =
+                     const C_OscCanProtocol * const pc_Protocol =
                         C_PuiSdHandler::h_GetInstance()->GetCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                         orc_MessageId.e_ComProtocol,
                                                                         orc_LastOwnerNodeDatapoolIndex[u32_ItMessage][

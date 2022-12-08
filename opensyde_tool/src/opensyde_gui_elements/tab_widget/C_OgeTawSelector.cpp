@@ -8,17 +8,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QTabBar>
 #include <QVariant>
 
-#include "C_OgeTawSelector.h"
+#include "C_OgeTawSelector.hpp"
 
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,5 +45,5 @@ C_OgeTawSelector::C_OgeTawSelector(QWidget * const opc_Parent) :
 {
    //This property holds when expanding is true QTabBar will expand the tabs to use the empty space.
    this->tabBar()->setExpanding(false);
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->tabBar(), "C_OgeTawSelector", true);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->tabBar(), "C_OgeTawSelector", true);
 }

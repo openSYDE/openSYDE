@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h" //pre-compiled headers
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCChecksummedXML.h"
+#include "precomp_headers.hpp" //pre-compiled headers
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscChecksummedXml.hpp"
 
-#include "CSCLString.h"
-#include "CSCLChecksums.h"
+#include "C_SclString.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-static const C_SCLString mc_NAME_CRC_ATTRIBUTE = "file_crc";
+static const C_SclString mc_NAME_CRC_ATTRIBUTE = "file_crc";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -43,9 +43,9 @@ static const C_SCLString mc_NAME_CRC_ATTRIBUTE = "file_crc";
    Set up class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCChecksummedXML::C_OSCChecksummedXML(void) :
-   C_OSCXMLParser(),
-   mu16_CRCDepth(0U)
+C_OscChecksummedXml::C_OscChecksummedXml(void) :
+   C_OscXmlParser(),
+   mu16_CrcDepth(0U)
 {
 }
 
@@ -67,17 +67,14 @@ C_OSCChecksummedXML::C_OSCChecksummedXML(void) :
    C_CHECKSUM  data was read but CRC is not correct
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCChecksummedXML::LoadFromFile(const C_SCLString & orc_FileName)
+int32_t C_OscChecksummedXml::LoadFromFile(const C_SclString & orc_FileName)
 {
-   sint32 s32_Return;
-   C_SCLString c_Text;
-   uint16 u16_CRCCalc;
-   uint16 u16_CRCFromFile;
+   int32_t s32_Return;
 
-   s32_Return = C_OSCXMLParser::LoadFromFile(orc_FileName);
+   s32_Return = C_OscXmlParser::LoadFromFile(orc_FileName);
    if (s32_Return == C_NO_ERR)
    {
-      c_Text = this->SelectRoot();
+      const C_SclString c_Text = this->SelectRoot();
       if (c_Text == "")
       {
          s32_Return = C_RD_WR;
@@ -90,11 +87,11 @@ sint32 C_OSCChecksummedXML::LoadFromFile(const C_SCLString & orc_FileName)
          }
          else
          {
-            u16_CRCFromFile = static_cast<uint16>(this->GetAttributeUint32(mc_NAME_CRC_ATTRIBUTE));
-            u16_CRCCalc = this->m_CalcXMLCRC();
+            const uint16_t u16_CrcFromFile = static_cast<uint16_t>(this->GetAttributeUint32(mc_NAME_CRC_ATTRIBUTE));
+            const uint16_t u16_CrcCalc = this->m_CalcXmlCrc();
 
             this->SelectRoot(); //be defensive: set defined start state
-            s32_Return = (u16_CRCCalc == u16_CRCFromFile) ? C_NO_ERR : C_CHECKSUM;
+            s32_Return = (u16_CrcCalc == u16_CrcFromFile) ? C_NO_ERR : C_CHECKSUM;
          }
       }
    }
@@ -118,10 +115,10 @@ sint32 C_OSCChecksummedXML::LoadFromFile(const C_SCLString & orc_FileName)
    C_NOACT    could not write data from file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCChecksummedXML::SaveToFile(const C_SCLString & orc_FileName)
+int32_t C_OscChecksummedXml::SaveToFile(const C_SclString & orc_FileName)
 {
-   sint32 s32_Return;
-   const uint16 u16_CRCCalc = this->m_CalcXMLCRC();
+   int32_t s32_Return;
+   const uint16_t u16_CrcCalc = this->m_CalcXmlCrc();
 
    if (this->SelectRoot() == "")
    {
@@ -129,40 +126,40 @@ sint32 C_OSCChecksummedXML::SaveToFile(const C_SCLString & orc_FileName)
    }
    else
    {
-      this->SetAttributeString(mc_NAME_CRC_ATTRIBUTE, "0x" + C_SCLString::IntToHex(u16_CRCCalc, 4));
+      this->SetAttributeString(mc_NAME_CRC_ATTRIBUTE, "0x" + C_SclString::IntToHex(u16_CrcCalc, 4));
 
-      s32_Return = C_OSCXMLParser::SaveToFile(orc_FileName);
+      s32_Return = C_OscXmlParser::SaveToFile(orc_FileName);
    }
    return s32_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_OSCChecksummedXML::m_CalcXMLCRCNode(uint16 & oru16_CRC)
+void C_OscChecksummedXml::m_CalcXmlCrcNode(uint16_t & oru16_Crc)
 {
-   std::vector<C_OSCXMLAttribute> c_Attributes;
-   C_SCLString c_NodeLv1;
-   C_SCLString c_Text;
+   std::vector<C_OscXmlAttribute> c_Attributes;
+   C_SclString c_NodeLv1;
+   C_SclString c_Text;
    c_NodeLv1 = this->SelectNodeChild();
 
-   mu16_CRCDepth++;
-   C_SCLChecksums::CalcCRC16(&mu16_CRCDepth, 2U, oru16_CRC);
+   mu16_CrcDepth++;
+   C_SclChecksums::CalcCRC16(&mu16_CrcDepth, 2U, oru16_Crc);
    while (c_NodeLv1 != "")
    {
-      C_SCLChecksums::CalcCRC16(c_NodeLv1.c_str(), c_NodeLv1.Length(), oru16_CRC);
+      C_SclChecksums::CalcCRC16(c_NodeLv1.c_str(), c_NodeLv1.Length(), oru16_Crc);
       c_Attributes = this->GetAttributes();
-      for (uint32 u32_Index = 0U; u32_Index < c_Attributes.size(); u32_Index++)
+      for (uint32_t u32_Index = 0U; u32_Index < c_Attributes.size(); u32_Index++)
       {
-         C_SCLChecksums::CalcCRC16(c_Attributes[u32_Index].c_Name.c_str(),
-                                   c_Attributes[u32_Index].c_Name.Length(), oru16_CRC);
-         C_SCLChecksums::CalcCRC16(c_Attributes[u32_Index].c_Value.c_str(),
-                                   c_Attributes[u32_Index].c_Value.Length(), oru16_CRC);
+         C_SclChecksums::CalcCRC16(c_Attributes[u32_Index].c_Name.c_str(),
+                                   c_Attributes[u32_Index].c_Name.Length(), oru16_Crc);
+         C_SclChecksums::CalcCRC16(c_Attributes[u32_Index].c_Value.c_str(),
+                                   c_Attributes[u32_Index].c_Value.Length(), oru16_Crc);
       }
       c_Text = this->GetNodeContent();
-      C_SCLChecksums::CalcCRC16(c_Text.c_str(), c_Text.Length(), oru16_CRC);
+      C_SclChecksums::CalcCRC16(c_Text.c_str(), c_Text.Length(), oru16_Crc);
 
       //sub-nodes ?
-      m_CalcXMLCRCNode(oru16_CRC);
+      m_CalcXmlCrcNode(oru16_Crc);
 
       c_NodeLv1 = this->SelectNodeNext();
       if (c_NodeLv1 == "")
@@ -175,36 +172,36 @@ void C_OSCChecksummedXML::m_CalcXMLCRCNode(uint16 & oru16_CRC)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-uint16 C_OSCChecksummedXML::m_CalcXMLCRC(void)
+uint16_t C_OscChecksummedXml::m_CalcXmlCrc(void)
 {
-   std::vector<C_OSCXMLAttribute> c_Attributes;
-   C_SCLString c_Text;
-   uint16 u16_CRC = 0x1D0FU; //set CCITT25 start value
+   std::vector<C_OscXmlAttribute> c_Attributes;
+   C_SclString c_Text;
+   uint16_t u16_Crc = 0x1D0FU; //set CCITT25 start value
 
    c_Text = this->SelectRoot();
 
-   C_SCLChecksums::CalcCRC16(c_Text.c_str(), c_Text.Length(), u16_CRC);
+   C_SclChecksums::CalcCRC16(c_Text.c_str(), c_Text.Length(), u16_Crc);
    c_Attributes = this->GetAttributes();
-   for (uint32 u32_Index = 0U; u32_Index < c_Attributes.size(); u32_Index++)
+   for (uint32_t u32_Index = 0U; u32_Index < c_Attributes.size(); u32_Index++)
    {
       if (c_Attributes[u32_Index].c_Name != mc_NAME_CRC_ATTRIBUTE) //skip CRC value
       {
-         C_SCLChecksums::CalcCRC16(c_Attributes[u32_Index].c_Name.c_str(),
-                                   c_Attributes[u32_Index].c_Name.Length(), u16_CRC);
-         C_SCLChecksums::CalcCRC16(c_Attributes[u32_Index].c_Value.c_str(),
-                                   c_Attributes[u32_Index].c_Value.Length(), u16_CRC);
+         C_SclChecksums::CalcCRC16(c_Attributes[u32_Index].c_Name.c_str(),
+                                   c_Attributes[u32_Index].c_Name.Length(), u16_Crc);
+         C_SclChecksums::CalcCRC16(c_Attributes[u32_Index].c_Value.c_str(),
+                                   c_Attributes[u32_Index].c_Value.Length(), u16_Crc);
       }
    }
 
-   mu16_CRCDepth = 1U;
+   mu16_CrcDepth = 1U;
    c_Text = this->GetNodeContent();
-   C_SCLChecksums::CalcCRC16(c_Text.c_str(), c_Text.Length(), u16_CRC);
-   C_SCLChecksums::CalcCRC16(&mu16_CRCDepth, 2U, u16_CRC);
+   C_SclChecksums::CalcCRC16(c_Text.c_str(), c_Text.Length(), u16_Crc);
+   C_SclChecksums::CalcCRC16(&mu16_CrcDepth, 2U, u16_Crc);
 
    //subnodes:
-   m_CalcXMLCRCNode(u16_CRC);
+   m_CalcXmlCrcNode(u16_Crc);
 
-   return u16_CRC;
+   return u16_Crc;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -10,18 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_CamProHandler.h"
+#include "C_GtGetText.hpp"
+#include "C_CamProHandler.hpp"
 
-#include "C_CamGenMessagesWidget.h"
+#include "C_CamGenMessagesWidget.hpp"
 #include "ui_C_CamGenMessagesWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -73,8 +73,8 @@ C_CamGenMessagesWidget::C_CamGenMessagesWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigSelected, this, &C_CamGenMessagesWidget::SigSelected);
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigItemCountChanged, this,
            &C_CamGenMessagesWidget::m_OnItemCountChanged);
-   connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigUpdateMessageDLC, this,
-           &C_CamGenMessagesWidget::SigUpdateMessageDLC);
+   connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigUpdateMessageDlc, this,
+           &C_CamGenMessagesWidget::SigUpdateMessageDlc);
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigSendMessage, this,
            &C_CamGenMessagesWidget::SigSendMessage);
    connect(this->mpc_Ui->pc_TableView, &C_CamGenTableView::SigRegisterCyclicMessage, this,
@@ -140,7 +140,7 @@ void C_CamGenMessagesWidget::LoadUserSettings(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenMessagesWidget::RemoveMessagesForFile(const QString & orc_File,
-                                                   const std::vector<stw_types::uint32> * const opc_Indices) const
+                                                   const std::vector<uint32_t> * const opc_Indices) const
 {
    this->mpc_Ui->pc_TableView->RemoveMessagesForFile(orc_File, opc_Indices);
 }
@@ -177,7 +177,7 @@ bool C_CamGenMessagesWidget::CheckAndHandleKey(const QString & orc_Input) const
    \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenMessagesWidget::UpdateMessageData(const stw_types::uint32 ou32_MessageIndex) const
+void C_CamGenMessagesWidget::UpdateMessageData(const uint32_t ou32_MessageIndex) const
 {
    this->mpc_Ui->pc_TableView->UpdateMessageData(ou32_MessageIndex);
 }
@@ -191,7 +191,7 @@ void C_CamGenMessagesWidget::UpdateMessageData(const stw_types::uint32 ou32_Mess
    \param[in]  oq_Active            Change of cyclic message state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const stw_types::uint32 ou32_MessageIndex,
+void C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage(const uint32_t ou32_MessageIndex,
                                                              const bool oq_Active) const
 {
    this->mpc_Ui->pc_TableView->TriggerModelUpdateCyclicMessage(ou32_MessageIndex, oq_Active);
@@ -305,7 +305,7 @@ void C_CamGenMessagesWidget::m_LoadConfig(void) const
    \param[in]  ou32_NewItemCount    New item count
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenMessagesWidget::m_OnItemCountChanged(const stw_types::uint32 ou32_NewItemCount) const
+void C_CamGenMessagesWidget::m_OnItemCountChanged(const uint32_t ou32_NewItemCount) const
 {
    m_UpdateHeading();
    if (ou32_NewItemCount > 0UL)

@@ -1,6 +1,6 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeFraFrame,
-stw_opensyde_gui_elements--C_OgeFraGeneric
+stw--opensyde_gui_elements--C_OgeFraFrame,
+stw--opensyde_gui_elements--C_OgeFraGeneric
 {
 border-width: 1px;
 border-style: solid;
@@ -13,12 +13,12 @@ border-style: solid;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeFraFrame[OpenRight="true"]
+stw--opensyde_gui_elements--C_OgeFraFrame[OpenRight="true"]
 {
 border-right-width: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeFraFrame[NoBorder="true"]
+stw--opensyde_gui_elements--C_OgeFraFrame[NoBorder="true"]
 {
 border-width: 0px;
 }

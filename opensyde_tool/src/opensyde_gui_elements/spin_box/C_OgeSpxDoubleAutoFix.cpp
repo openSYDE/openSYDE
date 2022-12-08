@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <QLineEdit>
-#include "C_Uti.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "C_OgeSpxInt64.h"
-#include "C_OgeSpxDoubleAutoFix.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "C_Uti.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeSpxInt64.hpp"
+#include "C_OgeSpxDoubleAutoFix.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -69,7 +68,7 @@ C_OgeSpxDoubleAutoFix::C_OgeSpxDoubleAutoFix(QWidget * const opc_Parent) :
    Current line edit width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeSpxDoubleAutoFix::GetLineEditWidth(void) const
+int32_t C_OgeSpxDoubleAutoFix::GetLineEditWidth(void) const
 {
    return this->lineEdit()->width();
 }
@@ -82,18 +81,18 @@ sintn C_OgeSpxDoubleAutoFix::GetLineEditWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
 {
-   sintn sn_Pos = 0;
+   int32_t s32_Pos = 0;
 
-   if ((validate(orc_String, sn_Pos) == QValidator::Intermediate) && (this->mu64_NumberOfStepsAvailable > 0))
+   if ((validate(orc_String, s32_Pos) == QValidator::Intermediate) && (this->mu64_NumberOfStepsAvailable > 0))
    {
-      float64 f64_Value;
+      float64_t f64_Value;
       const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_String);
       if (C_OgeSpxDoubleAutoFix::mh_GetValue(c_ValueOnly, f64_Value) == C_NO_ERR)
       {
          //Get the value in the data type range
-         const float64 f64_RangeValue = f64_Value - this->mf64_ScaledMin;
+         const float64_t f64_RangeValue = f64_Value - this->mf64_ScaledMin;
          //Check if the value fits in the step width and round if necessary
-         const float64 f64_Steps = std::round(f64_RangeValue / this->mf64_StepWidth);
+         const float64_t f64_Steps = std::round(f64_RangeValue / this->mf64_StepWidth);
          //Apply improved value
          orc_String =
             this->m_PrepareSpinBoxValue(this->textFromValue(this->mf64_ScaledMin + (f64_Steps * this->mf64_StepWidth)));
@@ -108,14 +107,14 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
       C_OgeSpxDoubleToolTipBase::fixup(orc_String);
    }
 
-   Q_UNUSED(sn_Pos) // last value is irrelevant
+   Q_UNUSED(s32_Pos) // last value is irrelevant
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Validate current input string
 
    \param[in,out]  orc_Input  Input string
-   \param[in,out]  orsn_Pos   Position
+   \param[in,out]  ors32_Pos   Position
 
    \return
    Invalid      Unusable
@@ -123,17 +122,17 @@ void C_OgeSpxDoubleAutoFix::fixup(QString & orc_String) const
    Acceptable   Completely valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & orsn_Pos) const
+QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, int32_t & ors32_Pos) const
 {
-   QValidator::State e_Retval = C_OgeSpxDoubleToolTipBase::validate(orc_Input, orsn_Pos);
+   QValidator::State e_Retval = C_OgeSpxDoubleToolTipBase::validate(orc_Input, ors32_Pos);
    if ((e_Retval == QValidator::Acceptable) && (this->mu64_NumberOfStepsAvailable > 0))
    {
-      float64 f64_Value;
+      float64_t f64_Value;
       const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
       if (C_OgeSpxDoubleAutoFix::mh_GetValue(c_ValueOnly, f64_Value) == C_NO_ERR)
       {
-         const float64 f64_RangeValue = f64_Value - this->mf64_ScaledMin;
-         const float64 f64_Steps = f64_RangeValue / this->mf64_StepWidth;
+         const float64_t f64_RangeValue = f64_Value - this->mf64_ScaledMin;
+         const float64_t f64_Steps = f64_RangeValue / this->mf64_StepWidth;
          if (C_Uti::h_CheckFloatHasNoFractionPart(f64_Steps) == true)
          {
             e_Retval = QValidator::Acceptable;
@@ -157,14 +156,14 @@ QValidator::State C_OgeSpxDoubleAutoFix::validate(QString & orc_Input, sintn & o
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeSpxDoubleAutoFix::m_Init(void)
 {
-   std::vector<float64> c_Tmp;
-   sint32 s32_DecimalsFactor;
-   sint32 s32_DecimalsOffset;
+   std::vector<float64_t> c_Tmp;
+   int32_t s32_DecimalsFactor;
+   int32_t s32_DecimalsOffset;
 
    C_SdNdeDpContentUtil::h_GetValuesAsFloat64(this->mc_UnscaledMin, c_Tmp);
    if (this->mu32_Index < c_Tmp.size())
    {
-      this->mf64_ScaledMin = C_OSCUtils::h_GetValueScaled(c_Tmp[this->mu32_Index], this->mf64_Factor,
+      this->mf64_ScaledMin = C_OscUtils::h_GetValueScaled(c_Tmp[this->mu32_Index], this->mf64_Factor,
                                                           this->mf64_Offset);
    }
    else
@@ -175,7 +174,7 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    C_SdNdeDpContentUtil::h_GetValuesAsFloat64(this->mc_UnscaledMax, c_Tmp);
    if (this->mu32_Index < c_Tmp.size())
    {
-      this->mf64_ScaledMax = C_OSCUtils::h_GetValueScaled(c_Tmp[this->mu32_Index], this->mf64_Factor,
+      this->mf64_ScaledMax = C_OscUtils::h_GetValueScaled(c_Tmp[this->mu32_Index], this->mf64_Factor,
                                                           this->mf64_Offset);
    }
    else
@@ -198,17 +197,17 @@ void C_OgeSpxDoubleAutoFix::m_Init(void)
    s32_DecimalsOffset = C_Uti::h_GetNumberOfDecimals(this->mf64_Offset);
    if (((s32_DecimalsFactor < 0) || (s32_DecimalsOffset < 0)) || (this->mu64_NumberOfStepsAvailable == 0ULL))
    {
-      this->setDecimals(msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
+      this->setDecimals(ms32_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
    }
    else
    {
-      this->setDecimals(std::max(std::max(s32_DecimalsFactor, s32_DecimalsOffset), static_cast<sint32>(1L)));
+      this->setDecimals(std::max(std::max(s32_DecimalsFactor, s32_DecimalsOffset), static_cast<int32_t>(1L)));
    }
    //Step width
    if (this->mu64_NumberOfStepsAvailable > 0)
    {
       this->mf64_StepWidth = (this->mf64_ScaledMax - this->mf64_ScaledMin) /
-                             static_cast<float64>(this->mu64_NumberOfStepsAvailable);
+                             static_cast<float64_t>(this->mu64_NumberOfStepsAvailable);
       if (this->mf64_StepWidth > 0.0)
       {
          //Fine
@@ -277,9 +276,9 @@ QString C_OgeSpxDoubleAutoFix::m_ExtractSpinBoxValue(const QString & orc_Text) c
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OgeSpxDoubleAutoFix::mh_GetValue(const QString & orc_Input, float64 & orf64_Output)
+int32_t C_OgeSpxDoubleAutoFix::mh_GetValue(const QString & orc_Input, float64_t & orf64_Output)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    bool q_Ok;
 
    orf64_Output = orc_Input.toDouble(&q_Ok);

@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMouseEvent>
 #include <QHeaderView>
 #include <QApplication>
 
-#include "constants.h"
-#include "C_TblViewInteraction.h"
+#include "constants.hpp"
+#include "C_TblViewInteraction.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -155,7 +154,7 @@ void C_TblViewInteraction::m_HandleGlobalMousePos(const QPoint & orc_GlobalPos)
          c_Index = this->indexAt(this->viewport()->mapFromGlobal(orc_GlobalPos));
          if (c_Index.isValid())
          {
-            if ((this->model()->data(c_Index, msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true) &&
+            if ((this->model()->data(c_Index, ms32_USER_ROLE_INTERACTION_IS_LINK).toBool() == true) &&
                 this->model()->flags(c_Index).testFlag(Qt::ItemIsEnabled))
             {
                this->setCursor(Qt::PointingHandCursor);
@@ -181,7 +180,7 @@ void C_TblViewInteraction::m_HandleGlobalMousePos(const QPoint & orc_GlobalPos)
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblViewInteraction::m_CheckItemClicked(const QModelIndex & orc_Index) const
 {
-   if (orc_Index.data(msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
+   if (orc_Index.data(ms32_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
    {
       Q_EMIT this->SigLinkClicked(orc_Index);
    }

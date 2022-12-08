@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "gitypes.h"
-#include "C_GtGetText.h"
-#include "C_GiLiLineGroup.h"
-#include "C_SebTopologyBaseContextMenuManager.h"
+#include "gitypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiLiLineGroup.hpp"
+#include "C_SebTopologyBaseContextMenuManager.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -92,12 +92,12 @@ bool C_SebTopologyBaseContextMenuManager::m_ActivateSpecificActions(void)
    switch (this->mpc_ActiveItem->type())
    {
    // check for bus
-   case msn_GRAPHICS_ITEM_BUS:           // buses have the same functionality
-   case msn_GRAPHICS_ITEM_CANBUS:        // buses have the same functionality
-   case msn_GRAPHICS_ITEM_ETHERNETBUS:   // buses have the same functionality
-   case msn_GRAPHICS_ITEM_BUS_CONNECT:   // connector have the same functionality
-   case msn_GRAPHICS_ITEM_LINE_ARROW:    // connector have the same functionality
-   case msn_GRAPHICS_ITEM_PC_CONNECTION: // connector have the same functionality
+   case ms32_GRAPHICS_ITEM_BUS:           // buses have the same functionality
+   case ms32_GRAPHICS_ITEM_CANBUS:        // buses have the same functionality
+   case ms32_GRAPHICS_ITEM_ETHERNETBUS:   // buses have the same functionality
+   case ms32_GRAPHICS_ITEM_BUS_CONNECT:   // connector have the same functionality
+   case ms32_GRAPHICS_ITEM_LINE_ARROW:    // connector have the same functionality
+   case ms32_GRAPHICS_ITEM_PC_CONNECTION: // connector have the same functionality
       this->mpc_ActionBendLine->setVisible(true);
       q_Return = true;
       break;

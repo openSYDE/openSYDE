@@ -11,13 +11,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QResizeEvent>
-#include "C_OgeChxTristateBase.h"
+#include "C_OgeChxTristateBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,7 +54,7 @@ C_OgeChxTristateBase::C_OgeChxTristateBase(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeChxTristateBase::resizeEvent(QResizeEvent * const opc_Event)
 {
-   const QString c_StyleSheet = "stw_opensyde_gui_elements--C_OgeChxTristateBase::indicator {"
+   const QString c_StyleSheet = "stw--opensyde_gui_elements--C_OgeChxTristateBase::indicator {"
                                 "width:" + QString::number(opc_Event->size().width()) + "px;"
                                 "height:" + QString::number(opc_Event->size().height()) + "px;"
                                 "}";

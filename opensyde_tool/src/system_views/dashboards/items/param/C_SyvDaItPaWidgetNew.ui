@@ -54,7 +54,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconWithText" name="pc_PushButtonAdd">
+      <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconWithText" name="pc_PushButtonAdd">
        <property name="minimumSize">
         <size>
          <width>125</width>
@@ -78,7 +78,7 @@
     </layout>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxTreeEmpty">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxTreeEmpty">
      <property name="title">
       <string>Empty</string>
      </property>
@@ -117,7 +117,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTreeEmpty">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelTreeEmpty">
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -155,7 +155,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxTree">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxTree">
      <property name="title">
       <string>Not empty</string>
      </property>
@@ -176,7 +176,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui::C_SyvDaItPaTreeView" name="pc_TreeView"/>
+       <widget class="stw::opensyde_gui::C_SyvDaItPaTreeView" name="pc_TreeView"/>
       </item>
      </layout>
     </widget>
@@ -185,25 +185,25 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SyvDaItPaTreeView</class>
+   <class>stw::opensyde_gui::C_SyvDaItPaTreeView</class>
    <extends>QTreeView</extends>
-   <header>C_SyvDaItPaTreeView.h</header>
+   <header>C_SyvDaItPaTreeView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconWithText</class>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconWithText</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconWithText.h</header>
+   <header>C_OgePubSvgIconWithText.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -1,11 +1,11 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabDashboardTab
+stw--opensyde_gui_elements--C_OgeLabDashboardTab
 {
 border-style: none;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabPopUpTitle
+stw--opensyde_gui_elements--C_OgeLabPopUpTitle
 {
 padding-left: 20px;
 padding-top: 15px;
@@ -13,7 +13,7 @@ padding-right: 0px;
 padding-bottom: 15px;
 }
 
-stw_opensyde_gui_elements--C_OgeLabPopUpSubTitle
+stw--opensyde_gui_elements--C_OgeLabPopUpSubTitle
 {
 padding-left: 0px;
 padding-top: 15px;
@@ -22,33 +22,33 @@ padding-bottom: 15px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBig,
-stw_opensyde_gui_elements--C_OgeLabToolboxHeadingGroup
+stw--opensyde_gui_elements--C_OgeLabToolboxHeadingGroupBig,
+stw--opensyde_gui_elements--C_OgeLabToolboxHeadingGroup
 {
 padding-top: 10px;
 padding-left: 10px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabNodePropComIfTable[COMIF_TableCell_Hyperlink="true"]:enabled
+stw--opensyde_gui_elements--C_OgeLabNodePropComIfTable[COMIF_TableCell_Hyperlink="true"]:enabled
 {
 text-decoration: underline;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabDashboardLabelCaption
+stw--opensyde_gui_elements--C_OgeLabDashboardLabelCaption
 {
 padding: 4px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeMuSections QLabel
+stw--opensyde_gui_elements--C_OgeMuSections QLabel
 {
 padding: 5px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabGenericBubble
+stw--opensyde_gui_elements--C_OgeLabGenericBubble
 {
 margin-top: 1px;
 padding-left: 2px;
@@ -59,7 +59,7 @@ border-radius: 2px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLabColorOnly
+stw--opensyde_gui_elements--C_OgeLabColorOnly
 {
 border-radius: 9px;
 }

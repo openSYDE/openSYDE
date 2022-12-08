@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
+    <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -52,7 +52,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeFraGeneric" name="pc_FrameLeft">
+        <widget class="stw::opensyde_gui_elements::C_OgeFraGeneric" name="pc_FrameLeft">
          <property name="lineWidth">
           <number>0</number>
          </property>
@@ -76,7 +76,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetTitle" native="true">
+           <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WidgetTitle" native="true">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -97,7 +97,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelTitle">
+              <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelTitle">
                <property name="text">
                 <string>All Signals (n)</string>
                </property>
@@ -117,7 +117,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonManualRead">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonManualRead">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -136,7 +136,7 @@
               </widget>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonManualAbort">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonManualAbort">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -174,7 +174,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="stw_opensyde_gui::C_SyvDaChaDataSelectorWidget" name="pc_ChartSelectorWidget" native="true">
+           <widget class="stw::opensyde_gui::C_SyvDaChaDataSelectorWidget" name="pc_ChartSelectorWidget" native="true">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -190,7 +190,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubAddChartDataElement" name="pc_ButtonAddData">
+              <widget class="stw::opensyde_gui_elements::C_OgePubAddChartDataElement" name="pc_ButtonAddData">
                <property name="minimumSize">
                 <size>
                  <width>150</width>
@@ -261,7 +261,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameSeperatorTop">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameSeperatorTop">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -283,7 +283,7 @@
               </widget>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiInfoTitle" native="true">
+              <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiInfoTitle" native="true">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -307,7 +307,7 @@
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelTitleMeas">
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelTitleMeas">
                   <property name="text">
                    <string>Measurement</string>
                   </property>
@@ -317,7 +317,7 @@
               </widget>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameSeperatorBottom">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FrameSeperatorBottom">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -339,24 +339,24 @@
               </widget>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiInfoContent" native="true">
+              <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiInfoContent" native="true">
                <layout class="QVBoxLayout" name="verticalLayout_6">
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelMeasCursor1">
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelMeasCursor1">
                   <property name="text">
                    <string>t0 =</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelMeasCursor2">
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelMeasCursor2">
                   <property name="text">
                    <string>t1 =</string>
                   </property>
                  </widget>
                 </item>
                 <item>
-                 <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelMeasDiff">
+                 <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelMeasDiff">
                   <property name="text">
                    <string>dt =</string>
                   </property>
@@ -404,7 +404,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeFraGeneric" name="pc_FrameRight">
+        <widget class="stw::opensyde_gui_elements::C_OgeFraGeneric" name="pc_FrameRight">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="spacing">
            <number>0</number>
@@ -422,7 +422,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ControlWidget" native="true">
+           <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ControlWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -465,7 +465,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonPause">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonPause">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -503,7 +503,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator1">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator1">
                <property name="minimumSize">
                 <size>
                  <width>1</width>
@@ -541,7 +541,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomMode">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomMode">
                <property name="minimumSize">
                 <size>
                  <width>34</width>
@@ -576,7 +576,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomOut">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomOut">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -611,7 +611,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomIn">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomIn">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -646,7 +646,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomVsDragMode">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonZoomVsDragMode">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -684,7 +684,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator2">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator2">
                <property name="minimumSize">
                 <size>
                  <width>1</width>
@@ -722,7 +722,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonFitXY">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonFitXY">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -757,7 +757,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonFitY">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonFitY">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -792,7 +792,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonFitX">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonFitX">
                <property name="minimumSize">
                 <size>
                  <width>24</width>
@@ -827,7 +827,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator3">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator3">
                <property name="minimumSize">
                 <size>
                  <width>1</width>
@@ -865,7 +865,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonCursor">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonCursor">
                <property name="minimumSize">
                 <size>
                  <width>34</width>
@@ -900,7 +900,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator4">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_Seperator4">
                <property name="minimumSize">
                 <size>
                  <width>1</width>
@@ -938,7 +938,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonOptions">
+              <widget class="stw::opensyde_gui_elements::C_OgePubIconChart" name="pc_PushButtonOptions">
                <property name="minimumSize">
                 <size>
                  <width>34</width>
@@ -973,7 +973,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui::C_SyvDaChaPlot" name="pc_Plot" native="true">
+           <widget class="stw::opensyde_gui::C_SyvDaChaPlot" name="pc_Plot" native="true">
             <property name="minimumSize">
              <size>
               <width>250</width>
@@ -993,60 +993,60 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDashboardChart</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDashboardChart</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDashboardChart.h</header>
+   <header>C_OgeLabDashboardChart.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
-   <header>C_OgeSpiStandard.h</header>
+   <header>C_OgeSpiStandard.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SyvDaChaDataSelectorWidget</class>
+   <class>stw::opensyde_gui::C_SyvDaChaDataSelectorWidget</class>
    <extends>QWidget</extends>
-   <header>C_SyvDaChaDataSelectorWidget.h</header>
+   <header>C_SyvDaChaDataSelectorWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SyvDaChaPlot</class>
+   <class>stw::opensyde_gui::C_SyvDaChaPlot</class>
    <extends>QWidget</extends>
-   <header>C_SyvDaChaPlot.h</header>
+   <header>C_SyvDaChaPlot.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubAddChartDataElement</class>
+   <class>stw::opensyde_gui_elements::C_OgePubAddChartDataElement</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubAddChartDataElement.h</header>
+   <header>C_OgePubAddChartDataElement.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraGeneric</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraGeneric</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraGeneric.h</header>
+   <header>C_OgeFraGeneric.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconChart</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconChart</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconChart.h</header>
+   <header>C_OgePubIconChart.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "constants.h"
-#include "C_OgeCbxIconDelegate.h"
-#include "stwtypes.h"
-#include "C_Uti.h"
+#include "constants.hpp"
+#include "C_OgeCbxIconDelegate.hpp"
+#include "stwtypes.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ C_OgeCbxIconDelegate::C_OgeCbxIconDelegate(void) :
    \param[in] os16_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeCbxIconDelegate::SetPaddingLeft(const stw_types::sint16 os16_Value)
+void C_OgeCbxIconDelegate::SetPaddingLeft(const int16_t os16_Value)
 {
    this->ms16_PaddingLeft = os16_Value;
 }
@@ -96,7 +95,7 @@ void C_OgeCbxIconDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
        (C_Uti::h_CheckStyleState(orc_Option.state, QStyle::State_Selected) == true))
    {
       opc_Painter->save();
-      opc_Painter->setBrush(stw_opensyde_gui::mc_STYLE_GUIDE_COLOR_25); //selection color
+      opc_Painter->setBrush(stw::opensyde_gui::mc_STYLE_GUIDE_COLOR_25); //selection color
 
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->drawRect(c_Rect);

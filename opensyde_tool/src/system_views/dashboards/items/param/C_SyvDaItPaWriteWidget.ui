@@ -72,7 +72,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleWrite" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleWrite" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -94,7 +94,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressWrite" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressWrite" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -158,7 +158,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleReadBack" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleReadBack" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -180,7 +180,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressRead" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressRead" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -244,7 +244,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleConfirm" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleConfirm" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -266,7 +266,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressConfirm" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressConfirm" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -330,7 +330,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleCrc" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleCrc" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -352,7 +352,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressCrc" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBar" name="pc_ProgressCrc" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -440,7 +440,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleFinished" native="true">
+                <widget class="stw::opensyde_gui_elements::C_OgeWiProgressBopperle" name="pc_BopperleFinished" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -501,7 +501,7 @@
       <number>10</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelWrite">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelWrite">
        <property name="text">
         <string>Write</string>
        </property>
@@ -521,7 +521,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelRead">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelRead">
        <property name="text">
         <string>Read back</string>
        </property>
@@ -541,7 +541,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelConfirm">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelConfirm">
        <property name="text">
         <string>Confirm</string>
        </property>
@@ -561,7 +561,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelCrc">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelCrc">
        <property name="text">
         <string>Write CRC</string>
        </property>
@@ -581,7 +581,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelFinished">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabProgressText" name="pc_LabelFinished">
        <property name="text">
         <string>Finished</string>
        </property>
@@ -606,7 +606,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBox">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBox">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
        <number>9</number>
@@ -628,7 +628,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingSteps">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingSteps">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -679,7 +679,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_6">
+           <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame_6">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -705,7 +705,7 @@
        </layout>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelStepDescription">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelStepDescription">
         <property name="text">
          <string>StepDescription</string>
         </property>
@@ -733,7 +733,7 @@
           <number>3</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeTedPropertiesComment" name="pc_TextEditConfirm">
+          <widget class="stw::opensyde_gui_elements::C_OgeTedPropertiesComment" name="pc_TextEditConfirm">
            <property name="readOnly">
             <bool>true</bool>
            </property>
@@ -742,7 +742,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_12">
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeChxProperties" name="pc_CbConfirm">
+            <widget class="stw::opensyde_gui_elements::C_OgeChxProperties" name="pc_CbConfirm">
              <property name="text">
               <string>Parameters are valid</string>
              </property>
@@ -795,7 +795,7 @@
               <number>6</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingNotification">
+              <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingNotification">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -846,7 +846,7 @@
               <number>0</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_5">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame_5">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -872,7 +872,7 @@
           </layout>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeChxProperties" name="pc_CbNotifiction">
+          <widget class="stw::opensyde_gui_elements::C_OgeChxProperties" name="pc_CbNotifiction">
            <property name="text">
             <string>Trigger Application Notification</string>
            </property>
@@ -932,7 +932,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
+      <widget class="stw::opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -957,7 +957,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PbConfirm">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_PbConfirm">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -982,7 +982,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -1028,63 +1028,63 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiProgressBopperle</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiProgressBopperle</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiProgressBopperle.h</header>
+   <header>C_OgeWiProgressBopperle.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiProgressBar</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiProgressBar</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiProgressBar.h</header>
+   <header>C_OgeWiProgressBar.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabProgressText</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabProgressText</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabProgressText.h</header>
+   <header>C_OgeLabProgressText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <class>stw::opensyde_gui_elements::C_OgeTedPropertiesComment</class>
    <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
+   <header>C_OgeTedPropertiesComment.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeChxProperties</class>
    <extends>QCheckBox</extends>
-   <header>C_OgeChxProperties.h</header>
+   <header>C_OgeChxProperties.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

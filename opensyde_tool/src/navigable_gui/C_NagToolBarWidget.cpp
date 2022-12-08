@@ -11,32 +11,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QFontMetrics>
 #include <QKeyEvent>
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_NagToolBarWidget.h"
+#include "C_NagToolBarWidget.hpp"
 #include "ui_C_NagToolBarWidget.h"
 
-#include "C_GtGetText.h"
-#include "C_HeHandler.h"
-#include "C_OgeWiUtil.h"
-#include "constants.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_GtGetText.hpp"
+#include "C_HeHandler.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "constants.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_NagToolBarWidget::mhsn_SPACER_SIZE = 24;
+const int32_t C_NagToolBarWidget::mhs32_SPACER_SIZE = 24;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -127,11 +126,11 @@ void C_NagToolBarWidget::InitText(void) const
    \param[in]  opc_UseCaseWidget    Current use case widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget * const opc_UseCaseWidget)
+void stw::opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget * const opc_UseCaseWidget)
 {
    QVector<C_NagToolBarButtonProperties> c_VecFuncs;
    QVector<C_NagToolBarButtonProperties>::const_iterator pc_ItFuncName;
-   sintn sn_LayoutIndex  = 0;
+   int32_t s32_LayoutIndex  = 0;
 
    this->ResetButtons();
 
@@ -157,10 +156,10 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
       // create all necessary elements
       C_OgeGbxTransparent * const pc_GroupBox = new C_OgeGbxTransparent(this);
       QHBoxLayout * const pc_GroupBoxLayout = new QHBoxLayout();
-      C_OgePubToolBar * const pc_Button = new C_OgePubToolBar(NULL, static_cast<uint32>(this->mc_VecButtons.count()));
+      C_OgePubToolBar * const pc_Button = new C_OgePubToolBar(NULL, static_cast<uint32_t>(this->mc_VecButtons.count()));
 
       // configure the button
-      pc_Button->setMinimumSize(77 + static_cast<sintn>(mh_GetButtonStringWidth((*pc_ItFuncName).c_ButtonText)), 40);
+      pc_Button->setMinimumSize(77 + static_cast<int32_t>(mh_GetButtonStringWidth((*pc_ItFuncName).c_ButtonText)), 40);
       //Add space because of spacing issue between icon and text
       pc_Button->setText(static_cast<QString>(' ') + (*pc_ItFuncName).c_ButtonText);
       pc_Button->SetToolTipInformation((*pc_ItFuncName).c_ToolTipHeading, (*pc_ItFuncName).c_ToolTipContent);
@@ -173,7 +172,7 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
 
       // add all elements to the layout
       pc_GroupBoxLayout->insertWidget(0, pc_Button);
-      pc_GroupBoxLayout->insertSpacing(1, mhsn_SPACER_SIZE);
+      pc_GroupBoxLayout->insertSpacing(1, mhs32_SPACER_SIZE);
 
       // configure the layout
       pc_GroupBoxLayout->setSpacing(0);
@@ -184,8 +183,8 @@ void stw_opensyde_gui::C_NagToolBarWidget::ConfigureButtons(C_NagUseCaseWidget *
       pc_GroupBox->setLayout(pc_GroupBoxLayout);
 
       // add the groupbox to the main layout
-      this->mpc_Ui->pc_HorizontalLayout->insertWidget(sn_LayoutIndex, pc_GroupBox);
-      ++sn_LayoutIndex;
+      this->mpc_Ui->pc_HorizontalLayout->insertWidget(s32_LayoutIndex, pc_GroupBox);
+      ++s32_LayoutIndex;
    } //lint !e429  //no memory leak because of parent of pc_GroupBox and pc_GroupBoxLayout and the Qt memory management
 }
 
@@ -260,10 +259,10 @@ void C_NagToolBarWidget::RestoreAllButtonsVisibility(void)
 {
    if (this->mc_VecGroupBox.size() == this->mc_VecGroupBoxVisible.size())
    {
-      sintn sn_Counter;
-      for (sn_Counter = 0; sn_Counter < this->mc_VecGroupBox.size(); ++sn_Counter)
+      int32_t s32_Counter;
+      for (s32_Counter = 0; s32_Counter < this->mc_VecGroupBox.size(); ++s32_Counter)
       {
-         this->mc_VecGroupBox[sn_Counter]->setVisible(this->mc_VecGroupBoxVisible[sn_Counter]);
+         this->mc_VecGroupBox[s32_Counter]->setVisible(this->mc_VecGroupBoxVisible[s32_Counter]);
       }
    }
 }
@@ -333,7 +332,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
             QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
             if (pc_KeyEvent != NULL)
             {
-               if (pc_KeyEvent->key() != static_cast<sintn>(Qt::Key_Escape))
+               if (pc_KeyEvent->key() != static_cast<int32_t>(Qt::Key_Escape))
                {
                   if (this->mpc_Ui->pc_LineEditSearch->text() == "openSYDE")
                   {
@@ -342,7 +341,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
 
                      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Do not do this!"));
                      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Never type openSYDE into openSYDE! ;-)"));
-                     c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Sorry, I'll never do this again"));
+                     c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Sorry, I'll never do this again"));
                      c_MessageBox.SetCustomMinHeight(180, 180);
                      c_MessageBox.Execute();
                   }
@@ -363,7 +362,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
          QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
          if (pc_KeyEvent != NULL)
          {
-            if (pc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape))
+            if (pc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape))
             {
                if (this->mc_SearchResultWidget.isVisible() == true)
                {
@@ -378,7 +377,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
                //Accept to not accidentally trigger something else
                q_FilterEvent = true;
             }
-            else if (pc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Down))
+            else if (pc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Down))
             {
                if ((this->mc_SearchResultWidget.isVisible() == true) &&
                    (this->mc_SearchResultWidget.HasResults() == true))
@@ -445,7 +444,7 @@ bool C_NagToolBarWidget::eventFilter(QObject * const opc_Object, QEvent * const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }
@@ -456,7 +455,7 @@ void C_NagToolBarWidget::paintEvent(QPaintEvent * const opc_Event)
    \param[in]  ou32_Index  Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
+void C_NagToolBarWidget::m_BtnClicked(const uint32_t ou32_Index)
 {
    if (this->mpc_ActUseCaseWidget != NULL)
    {
@@ -470,41 +469,41 @@ void C_NagToolBarWidget::m_BtnClicked(const uint32 ou32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagToolBarWidget::m_TriggerHelp(void)
 {
-   stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
+   stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->metaObject()->className());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_ShowBtn(const uint32 ou32_Index, const bool oq_Show) const
+void C_NagToolBarWidget::m_ShowBtn(const uint32_t ou32_Index, const bool oq_Show) const
 {
-   const sintn sn_Index = static_cast<sintn>(ou32_Index);
+   const int32_t s32_Index = static_cast<int32_t>(ou32_Index);
 
-   if (this->mc_VecGroupBox.size() > sn_Index)
+   if (this->mc_VecGroupBox.size() > s32_Index)
    {
       // change the state of the button
-      this->mc_VecGroupBox.at(sn_Index)->setVisible(oq_Show);
+      this->mc_VecGroupBox.at(s32_Index)->setVisible(oq_Show);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_EnableBtn(const uint32 ou32_Index, const bool oq_Enable) const
+void C_NagToolBarWidget::m_EnableBtn(const uint32_t ou32_Index, const bool oq_Enable) const
 {
-   const sintn sn_Index = static_cast<sintn>(ou32_Index);
+   const int32_t s32_Index = static_cast<int32_t>(ou32_Index);
 
-   if (this->mc_VecButtons.size() > sn_Index)
+   if (this->mc_VecButtons.size() > s32_Index)
    {
       // hide the button
-      this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->setEnabled(oq_Enable);
+      this->mc_VecButtons.at(static_cast<int32_t>(s32_Index))->setEnabled(oq_Enable);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_ShowBackgroundOfBtn(const uint32 ou32_Index, const bool oq_Enable) const
+void C_NagToolBarWidget::m_ShowBackgroundOfBtn(const uint32_t ou32_Index, const bool oq_Enable) const
 {
-   const sintn sn_Index = static_cast<sintn>(ou32_Index);
+   const int32_t s32_Index = static_cast<int32_t>(ou32_Index);
 
-   if (this->mc_VecButtons.size() > sn_Index)
+   if (this->mc_VecButtons.size() > s32_Index)
    {
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mc_VecButtons.at(static_cast<sintn>(sn_Index)), "Background",
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mc_VecButtons.at(static_cast<int32_t>(s32_Index)), "Background",
                                              oq_Enable);
    }
    if ((oq_Enable == false) && (ou32_Index == 1U))
@@ -516,15 +515,15 @@ void C_NagToolBarWidget::m_ShowBackgroundOfBtn(const uint32 ou32_Index, const bo
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_SetIconForBtn(const uint32 ou32_Index, const QIcon & orc_Icon) const
+void C_NagToolBarWidget::m_SetIconForBtn(const uint32_t ou32_Index, const QIcon & orc_Icon) const
 {
-   const sintn sn_Index = static_cast<sintn>(ou32_Index);
+   const int32_t s32_Index = static_cast<int32_t>(ou32_Index);
 
-   if (this->mc_VecButtons.size() > sn_Index)
+   if (this->mc_VecButtons.size() > s32_Index)
    {
       // set the new icon
-      this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->setIcon(orc_Icon);
-      this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->setIconSize(mc_ICON_SIZE_24);
+      this->mc_VecButtons.at(static_cast<int32_t>(s32_Index))->setIcon(orc_Icon);
+      this->mc_VecButtons.at(static_cast<int32_t>(s32_Index))->setIconSize(mc_ICON_SIZE_24);
    }
 }
 
@@ -536,16 +535,16 @@ void C_NagToolBarWidget::m_SetIconForBtn(const uint32 ou32_Index, const QIcon & 
    \param[in]  orc_ToolTipContent   New tool tip content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_SetToolTipForBtn(const uint32 ou32_Index, const QString & orc_ToolTipHeading,
+void C_NagToolBarWidget::m_SetToolTipForBtn(const uint32_t ou32_Index, const QString & orc_ToolTipHeading,
                                             const QString & orc_ToolTipContent) const
 {
-   const sintn sn_Index = static_cast<sintn>(ou32_Index);
+   const int32_t s32_Index = static_cast<int32_t>(ou32_Index);
 
-   if (this->mc_VecButtons.size() > sn_Index)
+   if (this->mc_VecButtons.size() > s32_Index)
    {
       // set the new icon
-      this->mc_VecButtons.at(static_cast<sintn>(sn_Index))->SetToolTipInformation(orc_ToolTipHeading,
-                                                                                  orc_ToolTipContent);
+      this->mc_VecButtons.at(static_cast<int32_t>(s32_Index))->SetToolTipInformation(orc_ToolTipHeading,
+                                                                                     orc_ToolTipContent);
    }
 }
 
@@ -578,9 +577,9 @@ void C_NagToolBarWidget::m_CancelSearch(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagToolBarWidget::m_ChangeMode(const sint32 os32_Mode, const sint32 os32_SubMode, const uint32 ou32_Index,
+void C_NagToolBarWidget::m_ChangeMode(const int32_t os32_Mode, const int32_t os32_SubMode, const uint32_t ou32_Index,
                                       const QString & orc_Name, const QString & orc_SubSubItemName,
-                                      const uint32 ou32_Flag)
+                                      const uint32_t ou32_Flag)
 {
    this->mc_SearchResultWidget.hide();
    Q_EMIT this->SigChangeMode(os32_Mode, os32_SubMode, ou32_Index, orc_Name, orc_SubSubItemName, ou32_Flag);
@@ -613,9 +612,9 @@ void C_NagToolBarWidget::m_FocusOut(void)
    Button string width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_NagToolBarWidget::mh_GetButtonStringWidth(const QString & orc_Text)
+int32_t C_NagToolBarWidget::mh_GetButtonStringWidth(const QString & orc_Text)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
    QFont c_Font("Segoe UI Semibold");
 
    c_Font.setPixelSize(13);

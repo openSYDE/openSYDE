@@ -86,7 +86,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparentToolBarSearch" name="pc_GroupBoxSearch">
+      <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparentToolBarSearch" name="pc_GroupBoxSearch">
        <property name="minimumSize">
         <size>
          <width>350</width>
@@ -116,7 +116,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelSearchImg">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelSearchImg">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -144,7 +144,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLeToolBarSearch" name="pc_LineEditSearch">
+         <widget class="stw::opensyde_gui_elements::C_OgeLeToolBarSearch" name="pc_LineEditSearch">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -187,7 +187,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnCancelSearch">
+         <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnCancelSearch">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -250,7 +250,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnHelp">
+      <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_BtnHelp">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -286,25 +286,25 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
+   <header>C_OgePubIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparentToolBarSearch</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparentToolBarSearch</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparentToolBarSearch.h</header>
+   <header>C_OgeGbxTransparentToolBarSearch.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeToolBarSearch</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeToolBarSearch</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeToolBarSearch.h</header>
+   <header>C_OgeLeToolBarSearch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

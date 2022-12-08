@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_SdBueMlvBorderItem.h"
+#include "C_SdBueMlvBorderItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,7 +40,7 @@ using namespace stw_opensyde_gui;
    \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueMlvBorderItem::C_SdBueMlvBorderItem(const QString & orc_Title, const stw_types::uint8 ou8_Index,
+C_SdBueMlvBorderItem::C_SdBueMlvBorderItem(const QString & orc_Title, const uint8_t ou8_Index,
                                            QGraphicsItem * const opc_Parent) :
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(mc_STYLE_GUIDE_COLOR_10, mc_STYLE_GUIDE_COLOR_6, mc_STYLE_GUIDE_FONT_SEMIBOLD_16, "", true,
@@ -72,7 +71,7 @@ C_SdBueMlvBorderItem::~C_SdBueMlvBorderItem()
    \param[in]  ou8_Index   Index number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvBorderItem::SetIndex(const stw_types::uint8 ou8_Index)
+void C_SdBueMlvBorderItem::SetIndex(const uint8_t ou8_Index)
 {
    if (this->mc_Title != "")
    {

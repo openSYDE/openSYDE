@@ -12,16 +12,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QVariant>
 
-#include "C_OgeWiEditBackground.h"
+#include "C_OgeWiEditBackground.hpp"
 
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,7 +56,7 @@ C_OgeWiEditBackground::C_OgeWiEditBackground(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiEditBackground::SetEditBackground(const bool oq_Active)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "EditMode", oq_Active);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "EditMode", oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ void C_OgeWiEditBackground::SetEditBackground(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiEditBackground::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }

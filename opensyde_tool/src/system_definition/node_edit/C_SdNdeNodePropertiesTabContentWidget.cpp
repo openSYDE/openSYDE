@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_UsHandler.h"
+#include "C_UsHandler.hpp"
 
-#include "C_SdNdeNodePropertiesTabContentWidget.h"
+#include "C_SdNdeNodePropertiesTabContentWidget.hpp"
 #include "ui_C_SdNdeNodePropertiesTabContentWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,8 +65,8 @@ C_SdNdeNodePropertiesTabContentWidget::C_SdNdeNodePropertiesTabContentWidget(QWi
            &C_SdNdeNodePropertiesTabContentWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeNodePropertiesTabContentWidget::SigOwnedDataPoolsChanged);
-   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigHalcLoadedFromTSP, this,
-           &C_SdNdeNodePropertiesTabContentWidget::SigHalcLoadedFromTSP);
+   connect(this->mpc_Ui->pc_WidgetApplications, &C_SdNdeDbViewWidget::SigHalcLoadedFromTsp, this,
+           &C_SdNdeNodePropertiesTabContentWidget::SigHalcLoadedFromTsp);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -85,7 +84,7 @@ C_SdNdeNodePropertiesTabContentWidget::~C_SdNdeNodePropertiesTabContentWidget()
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesTabContentWidget::SetNodeIndex(const uint32 ou32_NodeIndex)
+void C_SdNdeNodePropertiesTabContentWidget::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
    this->mpc_Ui->pc_WidgetApplications->SetNodeIndex(ou32_NodeIndex);
    this->mpc_Ui->pc_NodePropWidget->SetNodeId(ou32_NodeIndex);
@@ -128,18 +127,18 @@ void C_SdNdeNodePropertiesTabContentWidget::SelectName() const
    \param[in]  ou32_ApplicationIndex   Index of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesTabContentWidget::ShowApplication(const uint32 ou32_ApplicationIndex) const
+void C_SdNdeNodePropertiesTabContentWidget::ShowApplication(const uint32_t ou32_ApplicationIndex) const
 {
    this->mpc_Ui->pc_WidgetApplications->ShowApplication(ou32_ApplicationIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTSP()
+/*! \brief  Wrapper to call C_SdNdeDbViewWidget::AddFromTsp()
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeNodePropertiesTabContentWidget::AddFromTSP()
+void C_SdNdeNodePropertiesTabContentWidget::AddFromTsp()
 {
-   this->mpc_Ui->pc_WidgetApplications->AddFromTSP();
+   this->mpc_Ui->pc_WidgetApplications->AddFromTsp();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,11 +147,11 @@ void C_SdNdeNodePropertiesTabContentWidget::AddFromTSP()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesTabContentWidget::SaveUserSettings()
 {
-   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+   const QList<int32_t> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
    if (c_Sizes.size() > 0)
    {
-      C_UsHandler::h_GetInstance()->SetSdNodeEditSplitterX(c_Sizes.at(0));
+      C_UsHandler::h_GetInstance()->SetSdNodeEditSplitterHorizontal(c_Sizes.at(0));
    }
 }
 
@@ -162,7 +161,7 @@ void C_SdNdeNodePropertiesTabContentWidget::SaveUserSettings()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeNodePropertiesTabContentWidget::LoadUserSettings()
 {
-   const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdNodeEditSplitterX();
+   const int32_t s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdNodeEditSplitterHorizontal();
 
    this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
 }

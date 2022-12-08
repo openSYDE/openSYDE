@@ -10,27 +10,26 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QPainter>
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_SdNdeDpSelectorItemWidget.h"
+#include "C_SdNdeDpSelectorItemWidget.hpp"
 #include "ui_C_SdNdeDpSelectorItemWidget.h"
 
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "TGLUtils.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_OSCNode.h"
-#include "C_OSCNodeDataPool.h"
-#include "C_SdNdeDpUtil.h"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "TglUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OscNode.hpp"
+#include "C_OscNodeDataPool.hpp"
+#include "C_SdNdeDpUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,7 +54,7 @@ C_SdNdeDpSelectorItemWidget::C_SdNdeDpSelectorItemWidget(const bool oq_UsageView
    C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpSelectorItemWidget),
    mpc_UsageBar(NULL),
-   mc_DatapoolId(C_OSCNodeDataPoolId()),
+   mc_DatapoolId(C_OscNodeDataPoolId()),
    mq_StateSafety(false),
    mq_StateConflict(false),
    mq_Shared(false),
@@ -161,7 +160,7 @@ void C_SdNdeDpSelectorItemWidget::SetErrorToolTip(const QString & orc_Heading, c
    \param[in]     ou32_Number          Actual number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorItemWidget::SetNumber(const uint32 ou32_Number)
+void C_SdNdeDpSelectorItemWidget::SetNumber(const uint32_t ou32_Number)
 {
    this->mu32_Number = ou32_Number;
    this->m_UpdateName();
@@ -170,12 +169,12 @@ void C_SdNdeDpSelectorItemWidget::SetNumber(const uint32 ou32_Number)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the shown datapool data
 
-   \param[in]     orc_OSCDataPoolId        Actual datapool ID with its information
+   \param[in]     orc_OscDataPoolId        Actual datapool ID with its information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorItemWidget::SetData(const stw_opensyde_core::C_OSCNodeDataPoolId & orc_OSCDataPoolId)
+void C_SdNdeDpSelectorItemWidget::SetData(const stw::opensyde_core::C_OscNodeDataPoolId & orc_OscDataPoolId)
 {
-   this->mc_DatapoolId = orc_OSCDataPoolId;
+   this->mc_DatapoolId = orc_OscDataPoolId;
 
    this->UpdateData();
 }
@@ -192,16 +191,16 @@ void C_SdNdeDpSelectorItemWidget::SetData(const stw_opensyde_core::C_OSCNodeData
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::SetData(const QString & orc_DatapoolName, const QString & orc_DatapoolComment,
-                                          const bool oq_Safety, const uint32 ou32_Size, const uint32 ou32_Used,
-                                          const uint32 ou32_Reserved)
+                                          const bool oq_Safety, const uint32_t ou32_Size, const uint32_t ou32_Used,
+                                          const uint32_t ou32_Reserved)
 {
    this->mpc_Ui->pc_TextEditDpName->setText(orc_DatapoolName);
    this->mpc_Ui->pc_TextEditDpComment->setText(orc_DatapoolComment);
    this->mq_StateSafety = oq_Safety;
    if (this->mpc_UsageBar != NULL)
    {
-      uint32 u32_PercentageUsed;
-      uint32 u32_PercentageReserved;
+      uint32_t u32_PercentageUsed;
+      uint32_t u32_PercentageReserved;
       QString c_Label("%1% %2");
 
       this->mu32_Size = ou32_Size;
@@ -233,46 +232,46 @@ void C_SdNdeDpSelectorItemWidget::SetData(const QString & orc_DatapoolName, cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 {
-   const C_OSCNodeDataPool * const pc_OSCDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_OscDataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mc_DatapoolId.u32_NodeIndex, this->mc_DatapoolId.u32_DataPoolIndex);
 
-   tgl_assert(pc_OSCDataPool != NULL);
-   if (pc_OSCDataPool != NULL)
+   tgl_assert(pc_OscDataPool != NULL);
+   if (pc_OscDataPool != NULL)
    {
       QString c_ToolTipText;
       const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
-      uint32 u32_SharedGroup = 0U;
+      uint32_t u32_SharedGroup = 0U;
 
-      this->mc_Name = pc_OSCDataPool->c_Name.c_str();
+      this->mc_Name = pc_OscDataPool->c_Name.c_str();
       this->m_UpdateName();
-      this->mpc_Ui->pc_TextEditDpComment->setText(pc_OSCDataPool->c_Comment.c_str());
-      this->mq_StateSafety = pc_OSCDataPool->q_IsSafety;
+      this->mpc_Ui->pc_TextEditDpComment->setText(pc_OscDataPool->c_Comment.c_str());
+      this->mq_StateSafety = pc_OscDataPool->q_IsSafety;
       this->mq_Shared = rc_SharedDatapools.IsSharedDatapool(this->mc_DatapoolId, &u32_SharedGroup);
 
       // Tooltip
       c_ToolTipText = this->mpc_Ui->pc_TextEditDpComment->toPlainText();
       c_ToolTipText += C_GtGetText::h_GetText("\n\nVersion: ");
       c_ToolTipText += static_cast<QString>("v%1.%2r%3").
-                       arg(pc_OSCDataPool->au8_Version[0], 2, 10, QChar('0')).
-                       arg(pc_OSCDataPool->au8_Version[1], 2, 10, QChar('0')).
-                       arg(pc_OSCDataPool->au8_Version[2], 2, 10, QChar('0'));
+                       arg(pc_OscDataPool->au8_Version[0], 2, 10, QChar('0')).
+                       arg(pc_OscDataPool->au8_Version[1], 2, 10, QChar('0')).
+                       arg(pc_OscDataPool->au8_Version[2], 2, 10, QChar('0'));
 
       c_ToolTipText += C_GtGetText::h_GetText("\n\nConfiguration:\n");
 
       // Protocol type for COMM datapools
-      if (pc_OSCDataPool->e_Type == C_OSCNodeDataPool::eCOM)
+      if (pc_OscDataPool->e_Type == C_OscNodeDataPool::eCOM)
       {
          c_ToolTipText += C_GtGetText::h_GetText("   Communication Protocol: ");
          c_ToolTipText +=
             C_PuiSdUtil::h_ConvertProtocolTypeToString(
-               C_PuiSdUtil::h_GetRelatedCANProtocolType(this->mc_DatapoolId.u32_NodeIndex,
+               C_PuiSdUtil::h_GetRelatedCanProtocolType(this->mc_DatapoolId.u32_NodeIndex,
                                                         this->mc_DatapoolId.u32_DataPoolIndex));
          c_ToolTipText += "\n";
       }
 
       // Scope flag
       c_ToolTipText += C_GtGetText::h_GetText("   Scope of Content: ");
-      if (pc_OSCDataPool->q_ScopeIsPrivate == true)
+      if (pc_OscDataPool->q_ScopeIsPrivate == true)
       {
          c_ToolTipText += C_GtGetText::h_GetText("Private");
       }
@@ -283,7 +282,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 
       // Safety flag
       c_ToolTipText += C_GtGetText::h_GetText("\n   Safety Relevant Content: ");
-      if (pc_OSCDataPool->q_IsSafety == true)
+      if (pc_OscDataPool->q_IsSafety == true)
       {
          c_ToolTipText += C_GtGetText::h_GetText("Yes");
       }
@@ -294,18 +293,19 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 
       // Application
       c_ToolTipText += C_GtGetText::h_GetText("\n   Related Data Block: ");
-      if (pc_OSCDataPool->s32_RelatedDataBlockIndex >= 0)
+      if (pc_OscDataPool->s32_RelatedDataBlockIndex >= 0)
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
             this->mc_DatapoolId.u32_NodeIndex);
 
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
-            tgl_assert(static_cast<uint32>(pc_OSCDataPool->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size());
-            if (static_cast<uint32>(pc_OSCDataPool->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size())
+            tgl_assert(static_cast<uint32_t>(pc_OscDataPool->s32_RelatedDataBlockIndex) <
+                       pc_Node->c_Applications.size());
+            if (static_cast<uint32_t>(pc_OscDataPool->s32_RelatedDataBlockIndex) < pc_Node->c_Applications.size())
             {
-               c_ToolTipText += pc_Node->c_Applications[pc_OSCDataPool->s32_RelatedDataBlockIndex].c_Name.c_str();
+               c_ToolTipText += pc_Node->c_Applications[pc_OscDataPool->s32_RelatedDataBlockIndex].c_Name.c_str();
             }
          }
       }
@@ -319,7 +319,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
       if (this->mq_Shared == true)
       {
          std::vector<QString> c_SharedDatapoolGroup;
-         uint32 u32_DatapoolCounter;
+         uint32_t u32_DatapoolCounter;
 
          c_ToolTipText += C_GtGetText::h_GetText("Share configuration with:\n");
 
@@ -335,16 +335,16 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 
       if (this->mpc_UsageBar != NULL)
       {
-         uint32 u32_PercentageUsed;
-         uint32 u32_PercentageReserved;
+         uint32_t u32_PercentageUsed;
+         uint32_t u32_PercentageReserved;
          QString c_StartAddress;
          QString c_TextUsage;
          QString c_TextReservation;
          QString c_Label("%1% %2");
 
-         this->mu32_Size = pc_OSCDataPool->u32_NvMSize;
-         this->mu32_Used = pc_OSCDataPool->GetNumBytesUsed();
-         this->mu32_Reserved = pc_OSCDataPool->GetListsSize();
+         this->mu32_Size = pc_OscDataPool->u32_NvmSize;
+         this->mu32_Used = pc_OscDataPool->GetNumBytesUsed();
+         this->mu32_Reserved = pc_OscDataPool->GetListsSize();
 
          this->mpc_UsageBar->SetData(this->mu32_Size, this->mu32_Used, this->mu32_Reserved, u32_PercentageUsed,
                                      u32_PercentageReserved);
@@ -362,7 +362,7 @@ void C_SdNdeDpSelectorItemWidget::UpdateData(void)
 
          // udpate the tool tip
          c_StartAddress = static_cast<QString>("   %1: %2\n").arg(C_GtGetText::h_GetText("Start Address"),
-                                                                  QString::number(pc_OSCDataPool->u32_NvMStartAddress));
+                                                                  QString::number(pc_OscDataPool->u32_NvmStartAddress));
 
          c_TextUsage = "   " + static_cast<QString>("%1% %2 (%3 / %4)\n").arg(QString::number(u32_PercentageUsed),
 
@@ -437,7 +437,7 @@ void C_SdNdeDpSelectorItemWidget::SetShareDatapool(const bool oq_Shared)
    Datapool Id
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolId & C_SdNdeDpSelectorItemWidget::GetDatapoolId(void) const
+const C_OscNodeDataPoolId & C_SdNdeDpSelectorItemWidget::GetDatapoolId(void) const
 {
    return this->mc_DatapoolId;
 }
@@ -534,7 +534,7 @@ bool C_SdNdeDpSelectorItemWidget::GetUsageViewActive() const
    Size of datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolSize(void) const
+uint32_t C_SdNdeDpSelectorItemWidget::GetDataPoolSize(void) const
 {
    return this->mu32_Size;
 }
@@ -546,7 +546,7 @@ stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolSize(void) const
    Size of used datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolUsedSize(void) const
+uint32_t C_SdNdeDpSelectorItemWidget::GetDataPoolUsedSize(void) const
 {
    return this->mu32_Used;
 }
@@ -558,7 +558,7 @@ stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolUsedSize(void) const
    Size of reserved datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolReservedSize(void) const
+uint32_t C_SdNdeDpSelectorItemWidget::GetDataPoolReservedSize(void) const
 {
    return this->mu32_Reserved;
 }
@@ -573,7 +573,7 @@ stw_types::uint32 C_SdNdeDpSelectorItemWidget::GetDataPoolReservedSize(void) con
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   if (opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton))
+   if (opc_Event->buttons() == static_cast<int32_t>(Qt::LeftButton))
    {
       Q_EMIT (this->SigClicked(this->mu32_Number - 1U));
    }
@@ -591,7 +591,7 @@ void C_SdNdeDpSelectorItemWidget::mousePressEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorItemWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 {
-   if (opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton))
+   if (opc_Event->buttons() == static_cast<int32_t>(Qt::LeftButton))
    {
       Q_EMIT (this->SigDoubleClicked(this->mu32_Number - 1U));
    }

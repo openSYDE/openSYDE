@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QDir>
 #include <QStandardPaths>
-#include "C_UsFiler.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_Uti.h"
+#include "C_UsFiler.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint8 C_UsHandler::mhu8_NAX_RECENT_PROJECTS = 42;
+const uint8_t C_UsHandler::mhu8_NAX_RECENT_PROJECTS = 42;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -210,7 +209,7 @@ bool C_UsHandler::GetTraceSettingDisplayTimestampAbsoluteTimeOfDay(void) const
    Last known setting "trace buffer size" state
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_UsHandler::GetTraceSettingBufferSize(void) const
+uint32_t C_UsHandler::GetTraceSettingBufferSize(void) const
 {
    return this->mu32_TraceSettingBufferSize;
 }
@@ -222,7 +221,7 @@ uint32 C_UsHandler::GetTraceSettingBufferSize(void) const
    Last known selected protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSelectedProtocolIndex(void) const
+int32_t C_UsHandler::GetSelectedProtocolIndex(void) const
 {
    return this->ms32_SelectedProtocolIndex;
 }
@@ -234,7 +233,7 @@ sint32 C_UsHandler::GetSelectedProtocolIndex(void) const
    Maximum number of recent projects entries
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint8 C_UsHandler::h_GetMaxRecentProjects(void)
+uint8_t C_UsHandler::h_GetMaxRecentProjects(void)
 {
    return C_UsHandler::mhu8_NAX_RECENT_PROJECTS;
 }
@@ -258,9 +257,9 @@ QString C_UsHandler::GetLastKnownDatabasePath() const
    Current settings-splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSplitterSettingsX(void) const
+int32_t C_UsHandler::GetSplitterSettingsHorizontal(void) const
 {
-   return this->ms32_SplitterSettingsX;
+   return this->ms32_SplitterSettingsHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -283,9 +282,9 @@ bool C_UsHandler::GetSettingsAreExpanded(void) const
    Current message-generator-splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSplitterMessageGenY(void) const
+int32_t C_UsHandler::GetSplitterMessageGenVertical(void) const
 {
-   return this->ms32_SplitterMessageGenY;
+   return this->ms32_SplitterMessageGenVertical;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -308,9 +307,9 @@ bool C_UsHandler::GetMessageGenIsExpanded(void) const
    Current messages-signals-splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSplitterMesSigX() const
+int32_t C_UsHandler::GetSplitterMesSigHorizontal() const
 {
-   return this->ms32_SplitterMesSigX;
+   return this->ms32_SplitterMesSigHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -320,7 +319,7 @@ sint32 C_UsHandler::GetSplitterMesSigX() const
    Last known selected message indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<sint32> & C_UsHandler::GetSelectedMessages(void) const
+const std::vector<int32_t> & C_UsHandler::GetSelectedMessages(void) const
 {
    return this->mc_SelectedMessages;
 }
@@ -332,7 +331,7 @@ const std::vector<sint32> & C_UsHandler::GetSelectedMessages(void) const
    Last known trace tree column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<sint32> & C_UsHandler::GetTraceColWidths(void) const
+const std::vector<int32_t> & C_UsHandler::GetTraceColWidths(void) const
 {
    return this->mc_TraceColWidth;
 }
@@ -344,7 +343,7 @@ const std::vector<sint32> & C_UsHandler::GetTraceColWidths(void) const
    Last known trace tree column positions
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<sint32> & C_UsHandler::GetTraceColPositions(void) const
+const std::vector<int32_t> & C_UsHandler::GetTraceColPositions(void) const
 {
    return this->mc_TraceColPosition;
 }
@@ -356,7 +355,7 @@ const std::vector<sint32> & C_UsHandler::GetTraceColPositions(void) const
    Last known message generator table column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<sint32> & C_UsHandler::GetMessageColWidths(void) const
+const std::vector<int32_t> & C_UsHandler::GetMessageColWidths(void) const
 {
    return this->mc_MessageGenColWidth;
 }
@@ -368,7 +367,7 @@ const std::vector<sint32> & C_UsHandler::GetMessageColWidths(void) const
    Last known message generator signals table column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<sint32> & C_UsHandler::GetSignalsColWidths(void) const
+const std::vector<int32_t> & C_UsHandler::GetSignalsColWidths(void) const
 {
    return this->mc_SignalsColWidth;
 }
@@ -486,7 +485,7 @@ void C_UsHandler::GetRecentFolders(QStringList & orc_Folders) const
    bool q_Exists;
 
    orc_Folders.clear();
-   for (uint8 u8_It = 0; u8_It < this->mc_RecentProjects.size(); ++u8_It)
+   for (uint8_t u8_It = 0; u8_It < this->mc_RecentProjects.size(); ++u8_It)
    {
       c_Cur = this->mc_RecentProjects.at(u8_It);
       //Extract parent
@@ -494,7 +493,7 @@ void C_UsHandler::GetRecentFolders(QStringList & orc_Folders) const
       {
          //Check if parent already in list
          q_Exists = false;
-         for (uint8 u8_It2 = 0; u8_It2 < orc_Folders.size(); ++u8_It2)
+         for (uint8_t u8_It2 = 0; u8_It2 < orc_Folders.size(); ++u8_It2)
          {
             c_Cur = orc_Folders.at(u8_It2);
             if (c_Cur.compare(c_CurFolder) == 0)
@@ -609,7 +608,7 @@ void C_UsHandler::SetTraceSettingDisplayTimestampAbsoluteTimeOfDay(const bool oq
    \param[in] ou32_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetTraceSettingBufferSize(const uint32 ou32_New)
+void C_UsHandler::SetTraceSettingBufferSize(const uint32_t ou32_New)
 {
    this->mu32_TraceSettingBufferSize = ou32_New;
 }
@@ -620,7 +619,7 @@ void C_UsHandler::SetTraceSettingBufferSize(const uint32 ou32_New)
    \param[in] os32_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSelectedProtocolIndex(const sint32 os32_New)
+void C_UsHandler::SetSelectedProtocolIndex(const int32_t os32_New)
 {
    this->ms32_SelectedProtocolIndex = os32_New;
 }
@@ -653,9 +652,9 @@ void C_UsHandler::SetLastKnownDatabasePath(const QString & orc_Value)
    \param[in]   os32_New     New settings-splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSplitterSettingsX(const sint32 os32_New)
+void C_UsHandler::SetSplitterSettingsHorizontal(const int32_t os32_New)
 {
-   this->ms32_SplitterSettingsX = os32_New;
+   this->ms32_SplitterSettingsHorizontal = os32_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -675,9 +674,9 @@ void C_UsHandler::SetSettingsAreExpanded(const bool oq_New)
    \param[in]   os32_New     New message-generator-splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSplitterMessageGenY(const sint32 os32_New)
+void C_UsHandler::SetSplitterMessageGenVertical(const int32_t os32_New)
 {
-   this->ms32_SplitterMessageGenY = os32_New;
+   this->ms32_SplitterMessageGenVertical = os32_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -697,9 +696,9 @@ void C_UsHandler::SetMessageGenIsExpanded(const bool oq_New)
    \param[in]   os32_New     New messages-signals-splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSplitterMesSigX(const sint32 os32_New)
+void C_UsHandler::SetSplitterMesSigHorizontal(const int32_t os32_New)
 {
-   this->ms32_SplitterMesSigX = os32_New;
+   this->ms32_SplitterMesSigHorizontal = os32_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -708,7 +707,7 @@ void C_UsHandler::SetSplitterMesSigX(const sint32 os32_New)
    \param[in] orc_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSelectedMessages(const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetSelectedMessages(const std::vector<int32_t> & orc_Value)
 {
    this->mc_SelectedMessages = orc_Value;
 }
@@ -719,7 +718,7 @@ void C_UsHandler::SetSelectedMessages(const std::vector<sint32> & orc_Value)
    \param[in] orc_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetTraceColWidths(const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetTraceColWidths(const std::vector<int32_t> & orc_Value)
 {
    this->mc_TraceColWidth = orc_Value;
 }
@@ -730,7 +729,7 @@ void C_UsHandler::SetTraceColWidths(const std::vector<sint32> & orc_Value)
    \param[in] orc_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetTraceColPositions(const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetTraceColPositions(const std::vector<int32_t> & orc_Value)
 {
    this->mc_TraceColPosition = orc_Value;
 }
@@ -741,7 +740,7 @@ void C_UsHandler::SetTraceColPositions(const std::vector<sint32> & orc_Value)
    \param[in] orc_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetMessageColWidths(const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetMessageColWidths(const std::vector<int32_t> & orc_Value)
 {
    this->mc_MessageGenColWidth = orc_Value;
 }
@@ -752,7 +751,7 @@ void C_UsHandler::SetMessageColWidths(const std::vector<sint32> & orc_Value)
    \param[in] orc_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSignalsColWidths(const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetSignalsColWidths(const std::vector<int32_t> & orc_Value)
 {
    this->mc_SignalsColWidth = orc_Value;
 }
@@ -879,10 +878,10 @@ void C_UsHandler::Save(void) const
                 Path does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString & orc_Parent,
-                                      const bool & orq_CompletePathContainsFile)
+int32_t C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString & orc_Parent,
+                                       const bool & orq_CompletePathContainsFile)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (orc_CompletePath.compare("") == 0)
    {
@@ -937,11 +936,11 @@ C_UsHandler::C_UsHandler(void) :
    mq_TraceSettingDisplayTimestampAbsoluteTimeOfDay(false),
    mu32_TraceSettingBufferSize(1000U),
    ms32_SelectedProtocolIndex(0),
-   ms32_SplitterSettingsX(0),
-   ms32_SplitterMessageGenY(0),
+   ms32_SplitterSettingsHorizontal(0),
+   ms32_SplitterMessageGenVertical(0),
    mq_SettingsAreExpanded(true),
    mq_MessageGenIsExpanded(true),
-   ms32_SplitterMesSigX(0),
+   ms32_SplitterMesSigHorizontal(0),
    mq_WiDatabaseExpanded(true),
    mq_WiDllConfigExpanded(true),
    mq_WiFilterExpanded(true),

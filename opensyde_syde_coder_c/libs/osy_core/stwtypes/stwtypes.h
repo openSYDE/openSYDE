@@ -3,7 +3,7 @@
    \file
    \brief      STW specific standard defines and types
 
-   Standard typedefs in compliance with STW C++ Coding Rules.
+   Standard typedefs in compliance with STW C Coding Rules.
 
    Suitable for 32bit Windows applications compiled with:
    - Embarcadero C++ Builder
@@ -19,19 +19,10 @@
 #define STWTYPESH
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-//This header file is intended for 32bit compilation. If it is used with 64bit compilers the sized of the types will
-// not be correct. This can result in undefined behavior in the application which might be hard to debug.
-//So for convenience create a compilation fail on some commonly used 64bit compilers:
-#if defined _WIN64 || defined __x86_64__ || defined __ppc64__
-//If compilation fails here make sure a 32bit compiler is used
-extern T_use_a_32bit_compiler gt_YesIWill; //portable compiler fail
-#endif
+//Do *not* add a check to prevent building with a C++ compiler.
+//C sources can be used in C++ application (but not the other way around).
+//So we might have a scenario where a C++ application needs to include the header of a C module
 
-/* -- Namespace ----------------------------------------------------------------------------------------------------- */
-#ifdef __cplusplus
-namespace stw_types
-{
-#endif
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -51,11 +42,4 @@ typedef double float64;            ///< data type IEEE 64bit float
 typedef unsigned int uintn; ///< data type native unsigned int
 typedef signed int sintn;   ///< data type native signed int
 typedef char charn;         ///< data type native char
-
-/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

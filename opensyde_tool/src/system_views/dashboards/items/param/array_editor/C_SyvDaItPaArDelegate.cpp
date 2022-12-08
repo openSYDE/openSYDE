@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SyvDaItPaArDelegate.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SyvDaItPaArDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -140,13 +139,13 @@ QWidget * C_SyvDaItPaArDelegate::m_CreateEditor(QWidget * const opc_Parent, cons
       if (this->mpc_Model != NULL)
       {
          //Core data
-         const C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOSCElement();
+         const C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOscElement();
          if (pc_Element != NULL)
          {
             pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
                                                              pc_Element->c_MaxValue, pc_Element->f64_Factor,
                                                              pc_Element->f64_Offset,
-                                                             static_cast<uint32>(orc_Index.column()), false);
+                                                             static_cast<uint32_t>(orc_Index.column()), false);
          }
       }
    }

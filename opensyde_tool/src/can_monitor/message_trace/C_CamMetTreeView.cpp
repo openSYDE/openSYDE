@@ -10,42 +10,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QApplication>
 #include <algorithm> //for std::sort
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "cam_constants.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "cam_constants.hpp"
 
-#include "C_OgeWiUtil.h"
-#include "C_UsHandler.h"
-#include "C_CamProHandler.h"
-#include "C_CamMetTreeView.h"
-#include "C_CamMetClipBoardHelper.h"
-#include "C_GtGetText.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamMetTreeView.hpp"
+#include "C_CamMetClipBoardHelper.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //lint -emacro(*,Q_DECLARE_METATYPE)   //macro provided by Qt library; nothing we can do about messages
 Q_DECLARE_METATYPE(C_CamMetTreeLoggerData)
 
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_TIME_STAMP = 150;
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_ID = 81;
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_NAME = 317;
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_DIR = 44;
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_DLC = 44;
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_DATA = 247;
-const stw_types::sintn C_CamMetTreeView::mhsn_COL_WIDTH_CAN_COUNTER = 97;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_TIME_STAMP = 150;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_ID = 81;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_NAME = 317;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_DIR = 44;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_DLC = 44;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_DATA = 247;
+const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_COUNTER = 97;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -75,7 +74,7 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(msn_USER_ROLE_SORT);
+   this->mc_SortProxyModel.setSortRole(ms32_USER_ROLE_SORT);
    this->C_CamMetTreeView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -121,11 +120,11 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
    //Model
    this->mc_TimerHandleMessages.setInterval(90);
    this->setItemDelegate(&this->mc_Delegate);
-   this->mc_GUIBuffer.moveToThread(&mc_ThreadGUIBuffer);
-   this->mc_ThreadGUIBuffer.start();
+   this->mc_GuiBuffer.moveToThread(&mc_ThreadGuiBuffer);
+   this->mc_ThreadGuiBuffer.start();
    //lint -e{1938}  static const is guaranteed preinitialized before main
    qRegisterMetaType<std::list<C_CamMetTreeLoggerData> >();
-   connect(&this->mc_GUIBuffer, &C_CamMetTreeGUIBuffer::SigUpdateUi, this, &C_CamMetTreeView::m_UpdateUi);
+   connect(&this->mc_GuiBuffer, &C_CamMetTreeGuiBuffer::SigUpdateUi, this, &C_CamMetTreeView::m_UpdateUi);
    connect(&this->mc_Delegate, &C_CamMetTreeDelegate::SigStartAccept, &this->mc_Model, &C_CamMetTreeModel::UnlockData);
    connect(&this->mc_Delegate, &C_CamMetTreeDelegate::SigEndAccept, &this->mc_Model, &C_CamMetTreeModel::LockData);
 
@@ -148,12 +147,12 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540} never took ownership of any context menu item or button
-C_CamMetTreeView::~C_CamMetTreeView()
+C_CamMetTreeView::~C_CamMetTreeView() noexcept
 {
    try
    {
-      mc_ThreadGUIBuffer.quit();
-      mc_ThreadGUIBuffer.wait();
+      mc_ThreadGuiBuffer.quit();
+      mc_ThreadGuiBuffer.wait();
    }
    catch (...)
    {
@@ -227,7 +226,7 @@ void C_CamMetTreeView::Start(void)
 void C_CamMetTreeView::ActionClearData(void)
 {
    this->m_HandleMessages();
-   this->mc_GUIBuffer.ClearBuffer();
+   this->mc_GuiBuffer.ClearBuffer();
    this->mc_Model.ActionClearData();
    this->ResetCounter();
 }
@@ -238,13 +237,13 @@ void C_CamMetTreeView::ActionClearData(void)
    \param[in]  oe_Protocol    Set protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::SetProtocol(const stw_cmon_protocol::e_CMONL7Protocols oe_Protocol)
+void C_CamMetTreeView::SetProtocol(const stw::cmon_protocol::e_CanMonL7Protocols oe_Protocol)
 {
    std::vector<C_CamMetTreeLoggerData *> c_Messages;
    C_SyvComMessageMonitor::SetProtocol(oe_Protocol);
    //Change all existing messages
    c_Messages = this->mc_Model.GetAllMessagesForProtocolChange();
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < c_Messages.size(); ++u32_ItMessage)
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < c_Messages.size(); ++u32_ItMessage)
    {
       this->m_UpdateProtocolString(*c_Messages[u32_ItMessage]);
    }
@@ -332,7 +331,7 @@ void C_CamMetTreeView::SetDisplayTimestampAbsoluteTimeOfDay(const bool oq_Value)
    \param[in]  ou32_Value  New size of trace buffer
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::SetTraceBufferSize(const uint32 ou32_Value)
+void C_CamMetTreeView::SetTraceBufferSize(const uint32_t ou32_Value)
 {
    this->mc_Model.SetTraceBufferSize(ou32_Value);
 }
@@ -375,28 +374,28 @@ bool C_CamMetTreeView::GetDisplayTimestampRelative() const
 void C_CamMetTreeView::SearchTrace(const QString & orc_SearchString, const bool oq_Next)
 {
    QItemSelection c_Selection;
-   sintn sn_RowSignal;
-   sintn sn_RowMultiplexedSignal;
-   const sintn sn_Row = this->mc_Model.SearchMessageData(orc_SearchString, oq_Next, sn_RowSignal,
-                                                         sn_RowMultiplexedSignal);
+   int32_t s32_RowSignal;
+   int32_t s32_RowMultiplexedSignal;
+   const int32_t s32_Row = this->mc_Model.SearchMessageData(orc_SearchString, oq_Next, s32_RowSignal,
+                                                            s32_RowMultiplexedSignal);
 
-   if (sn_Row >= 0)
+   if (s32_Row >= 0)
    {
       // Select the result
-      if (sn_RowSignal < 0)
+      if (s32_RowSignal < 0)
       {
          // Message only
-         c_Selection.select(this->mc_Model.index(sn_Row, 0),
-                            this->mc_Model.index(sn_Row, this->mc_Model.columnCount() - 1));
-         this->scrollTo(this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_Row, 0)));
+         c_Selection.select(this->mc_Model.index(s32_Row, 0),
+                            this->mc_Model.index(s32_Row, this->mc_Model.columnCount() - 1));
+         this->scrollTo(this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_Row, 0)));
       }
       else
       {
          // Signal of message
          const QModelIndex c_ParentIndex =
-            this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_Row, 0));
+            this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_Row, 0));
          const QModelIndex c_ChildIndex =
-            this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_RowSignal, 0,
+            this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_RowSignal, 0,
                                                                        this->mc_SortProxyModel.mapToSource(
                                                                           c_ParentIndex)));
          QModelIndex c_SelectIndex = c_ChildIndex;
@@ -405,10 +404,10 @@ void C_CamMetTreeView::SearchTrace(const QString & orc_SearchString, const bool 
          this->expand(c_ParentIndex);
 
          // Check for a multiplexed signal as result
-         if (sn_RowMultiplexedSignal >= 0)
+         if (s32_RowMultiplexedSignal >= 0)
          {
             c_SelectIndex =
-               this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(sn_RowMultiplexedSignal, 0,
+               this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_RowMultiplexedSignal, 0,
                                                                           this->mc_SortProxyModel.mapToSource(
                                                                              c_ChildIndex)));
             this->expand(c_ChildIndex);
@@ -440,27 +439,27 @@ void C_CamMetTreeView::SaveUserSettings(void) const
    \param[in]  orc_ColumnWidths  Stored column widths (Restores default values if empty)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+void C_CamMetTreeView::SetCurrentColumnWidths(const std::vector<int32_t> & orc_ColumnWidths)
 {
    if (orc_ColumnWidths.size() > 0)
    {
-      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
       {
-         this->setColumnWidth(static_cast<sintn>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+         this->setColumnWidth(static_cast<int32_t>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
       }
    }
    else
    {
       //Default
       this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eTIME_STAMP),
-                           mhsn_COL_WIDTH_TIME_STAMP);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_ID), mhsn_COL_WIDTH_CAN_ID);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_NAME), mhsn_COL_WIDTH_CAN_NAME);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DIR), mhsn_COL_WIDTH_CAN_DIR);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DLC), mhsn_COL_WIDTH_CAN_DLC);
-      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DATA), mhsn_COL_WIDTH_CAN_DATA);
+                           mhs32_COL_WIDTH_TIME_STAMP);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_ID), mhs32_COL_WIDTH_CAN_ID);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_NAME), mhs32_COL_WIDTH_CAN_NAME);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DIR), mhs32_COL_WIDTH_CAN_DIR);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DLC), mhs32_COL_WIDTH_CAN_DLC);
+      this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_DATA), mhs32_COL_WIDTH_CAN_DATA);
       this->setColumnWidth(C_CamMetTreeModel::h_EnumToColumn(C_CamMetTreeModel::eCAN_COUNTER),
-                           mhsn_COL_WIDTH_CAN_COUNTER);
+                           mhs32_COL_WIDTH_CAN_COUNTER);
    }
 }
 
@@ -471,11 +470,11 @@ void C_CamMetTreeView::SetCurrentColumnWidths(const std::vector<sint32> & orc_Co
    Current column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamMetTreeView::GetCurrentColumnWidths() const
+std::vector<int32_t> C_CamMetTreeView::GetCurrentColumnWidths() const
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(this->model()->columnCount());
-   for (sint32 s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
+   for (int32_t s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
    {
       c_Retval.push_back(this->columnWidth(s32_ItCol));
    }
@@ -538,8 +537,8 @@ void C_CamMetTreeView::selectionChanged(const QItemSelection & orc_Selected, con
          {
             this->mc_Model.SetSelection(
                c_CurIndex.parent().parent().isValid() ?
-               static_cast<sint32>(c_CurIndex.parent().parent().row()) : static_cast<sint32>(c_CurIndex.parent().row()),
-               static_cast<sint32>(this->mc_Model.TranslateTreeRowsToSignalIndex(c_CurIndex)));
+               static_cast<int32_t>(c_CurIndex.parent().parent().row()) : static_cast<int32_t>(c_CurIndex.parent().row()),
+               static_cast<int32_t>(this->mc_Model.TranslateTreeRowsToSignalIndex(c_CurIndex)));
          }
          else
          {
@@ -563,7 +562,7 @@ void C_CamMetTreeView::selectionChanged(const QItemSelection & orc_Selected, con
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_C)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_C)) &&
        (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       this->m_CopySelection();
@@ -588,9 +587,9 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
    // Adapt the color
    QPen c_Pen = opc_Painter->pen();
    const QPoint c_TopLeft = orc_Rect.topLeft();
-   const sintn sn_OFFSET_L1 = 10;
-   const sintn sn_OFFSET_L2 = 30;
-   const sintn sn_OFFSET_L3 = 50;
+   const int32_t s32_OFFSET_L1 = 10;
+   const int32_t s32_OFFSET_L2 = 30;
+   const int32_t s32_OFFSET_L3 = 50;
 
    c_Pen.setColor(mc_STYLE_GUIDE_COLOR_10);
    c_Pen.setWidth(1);
@@ -610,12 +609,12 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
          if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
          {
             //Draw +
-            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OFFSET_L1);
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, s32_OFFSET_L1);
          }
          else
          {
             //Draw L
-            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OFFSET_L1);
+            C_CamMetTreeView::mh_DrawEl(opc_Painter, c_TopLeft, s32_OFFSET_L1);
          }
       }
    }
@@ -625,7 +624,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       //Draw |
       if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
       {
-         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OFFSET_L1);
+         C_CamMetTreeView::mh_DrawVerticalLine(opc_Painter, c_TopLeft, s32_OFFSET_L1);
       }
    }
    else
@@ -634,7 +633,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       //Draw |
       if (c_MessageIndex.sibling(c_MessageIndex.row() + 1, 0).isValid())
       {
-         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OFFSET_L1);
+         C_CamMetTreeView::mh_DrawVerticalLine(opc_Painter, c_TopLeft, s32_OFFSET_L1);
       }
    }
    //Signal
@@ -644,7 +643,7 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
       //Draw |
       if (c_SignalIndex.sibling(c_SignalIndex.row() + 1, 0).isValid())
       {
-         C_CamMetTreeView::mh_DrawVLine(opc_Painter, c_TopLeft, sn_OFFSET_L2);
+         C_CamMetTreeView::mh_DrawVerticalLine(opc_Painter, c_TopLeft, s32_OFFSET_L2);
       }
    }
    else if (orc_Index.parent().isValid())
@@ -659,12 +658,12 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
          if (c_SignalIndex.sibling(c_SignalIndex.row() + 1, 0).isValid())
          {
             //Draw +
-            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OFFSET_L2);
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, s32_OFFSET_L2);
          }
          else
          {
             //Draw L
-            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OFFSET_L2);
+            C_CamMetTreeView::mh_DrawEl(opc_Painter, c_TopLeft, s32_OFFSET_L2);
          }
       }
    }
@@ -685,12 +684,12 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
          if (c_MuxIndex.sibling(c_MuxIndex.row() + 1, 0).isValid())
          {
             //Draw +
-            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, sn_OFFSET_L3);
+            C_CamMetTreeView::mh_DrawPlus(opc_Painter, c_TopLeft, s32_OFFSET_L3);
          }
          else
          {
             //Draw L
-            C_CamMetTreeView::mh_DrawL(opc_Painter, c_TopLeft, sn_OFFSET_L3);
+            C_CamMetTreeView::mh_DrawEl(opc_Painter, c_TopLeft, s32_OFFSET_L3);
          }
       }
    }
@@ -705,36 +704,36 @@ void C_CamMetTreeView::drawBranches(QPainter * const opc_Painter, const QRect & 
    Will be used when resizeColumnToContents is used for the specific column.
    resizeColumnToContents is used by double click on the separator in the header too.
 
-   \param[in]  osn_Column  Index of column
+   \param[in]  os32_Column  Index of column
 
    \return
    Width of column in pixel
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMetTreeView::sizeHintForColumn(const sintn osn_Column) const
+int32_t C_CamMetTreeView::sizeHintForColumn(const int32_t os32_Column) const
 {
-   sintn sn_Size;
-   static const sintn hasn_SIZES[static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER) + 1] =
+   int32_t s32_Size;
+   static const int32_t has32_SIZES[static_cast<int32_t>(C_CamMetTreeModel::eCAN_COUNTER) + 1] =
    {
-      mhsn_COL_WIDTH_TIME_STAMP,
-      mhsn_COL_WIDTH_CAN_ID,
-      mhsn_COL_WIDTH_CAN_NAME,
-      mhsn_COL_WIDTH_CAN_DIR,
-      mhsn_COL_WIDTH_CAN_DLC,
-      mhsn_COL_WIDTH_CAN_DATA,
-      mhsn_COL_WIDTH_CAN_COUNTER
+      mhs32_COL_WIDTH_TIME_STAMP,
+      mhs32_COL_WIDTH_CAN_ID,
+      mhs32_COL_WIDTH_CAN_NAME,
+      mhs32_COL_WIDTH_CAN_DIR,
+      mhs32_COL_WIDTH_CAN_DLC,
+      mhs32_COL_WIDTH_CAN_DATA,
+      mhs32_COL_WIDTH_CAN_COUNTER
    };
 
-   if ((osn_Column <= static_cast<sintn>(C_CamMetTreeModel::eCAN_COUNTER)) && (osn_Column >= 0))
+   if ((os32_Column <= static_cast<int32_t>(C_CamMetTreeModel::eCAN_COUNTER)) && (os32_Column >= 0))
    {
-      sn_Size = hasn_SIZES[osn_Column];
+      s32_Size = has32_SIZES[os32_Column];
    }
    else
    {
-      sn_Size = C_OgeTreeViewToolTipBase::sizeHintForColumn(osn_Column);
+      s32_Size = C_OgeTreeViewToolTipBase::sizeHintForColumn(os32_Column);
    }
 
-   return sn_Size;
+   return s32_Size;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -746,8 +745,8 @@ void C_CamMetTreeView::m_SetupContextMenu(void)
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
    this->mpc_ActionCopy = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                               "Copy as Text"), this, &C_CamMetTreeView::m_CopySelection,
-                                                           static_cast<sintn>(Qt::CTRL) +
-                                                           static_cast<sintn>(Qt::Key_C));
+                                                           static_cast<int32_t>(Qt::CTRL) +
+                                                           static_cast<int32_t>(Qt::Key_C));
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -794,17 +793,17 @@ void C_CamMetTreeView::m_CopySelection(void)
    c_SelectedItems = this->selectedIndexes();
 
    //selectedIndexes returns a list of all selected indexes, but the indexes are NOT sorted
-   //we need to sort them due to we want same row order as displyed in the trace
+   //we need to sort them due to we want same row order as displayed in the trace
    std::sort(c_SelectedItems.begin(), c_SelectedItems.end(),
-             [] (const QModelIndex & orc_ItA, const QModelIndex & orc_ItB)
+             [] (const QModelIndex & orc_It1, const QModelIndex & orc_It2)
    {
-      return orc_ItA.row() < orc_ItB.row();
+      return orc_It1.row() < orc_It2.row();
    }
              );
 
    if (c_SelectedItems.size() > 0L)
    {
-      std::vector<sintn> c_AddedTopLevelRows;
+      std::vector<int32_t> c_AddedTopLevelRows;
       std::vector<C_CamMetClipBoardHelperCanMessageData> c_CanMessagesData;
 
       for (QModelIndexList::ConstIterator c_It = c_SelectedItems.begin(); c_It != c_SelectedItems.end(); ++c_It)
@@ -842,11 +841,11 @@ void C_CamMetTreeView::m_CopySelection(void)
             {
                bool q_Add = true;
                //Look up message already added
-               const sintn sn_NewRow = this->mc_SortProxyModel.mapToSource(c_TopLevelIndex).row();
-               for (uint32 u32_AlreadyAdded = 0UL; (u32_AlreadyAdded < c_AddedTopLevelRows.size()) && (q_Add);
+               const int32_t s32_NewRow = this->mc_SortProxyModel.mapToSource(c_TopLevelIndex).row();
+               for (uint32_t u32_AlreadyAdded = 0UL; (u32_AlreadyAdded < c_AddedTopLevelRows.size()) && (q_Add);
                     ++u32_AlreadyAdded)
                {
-                  if (sn_NewRow == c_AddedTopLevelRows[u32_AlreadyAdded])
+                  if (s32_NewRow == c_AddedTopLevelRows[u32_AlreadyAdded])
                   {
                      q_Add = false;
                   }
@@ -854,24 +853,24 @@ void C_CamMetTreeView::m_CopySelection(void)
                if (q_Add)
                {
                   //Handle expanded children
-                  for (sintn sn_ItChild = 0; sn_ItChild < this->mc_SortProxyModel.rowCount(c_TopLevelIndex);
-                       ++sn_ItChild)
+                  for (int32_t s32_ItChild = 0; s32_ItChild < this->mc_SortProxyModel.rowCount(c_TopLevelIndex);
+                       ++s32_ItChild)
                   {
-                     const QModelIndex c_Index = this->mc_SortProxyModel.index(sn_ItChild, 0, c_TopLevelIndex);
+                     const QModelIndex c_Index = this->mc_SortProxyModel.index(s32_ItChild, 0, c_TopLevelIndex);
                      if (this->isExpanded(c_Index))
                      {
-                        c_CanMessageData.c_ExpandedIndices.push_back(sn_ItChild);
+                        c_CanMessageData.c_ExpandedIndices.push_back(s32_ItChild);
                      }
                   }
 
                   // Save the info for this message data
                   c_CanMessageData.pc_MessageData =
-                     this->mc_Model.GetMessageData(sn_NewRow);
+                     this->mc_Model.GetMessageData(s32_NewRow);
 
                   c_CanMessagesData.push_back(c_CanMessageData);
 
                   //We always will remember
-                  c_AddedTopLevelRows.push_back(sn_NewRow);
+                  c_AddedTopLevelRows.push_back(s32_NewRow);
                }
             }
          }
@@ -899,7 +898,7 @@ void C_CamMetTreeView::m_HandleMessages(void)
 
    while (this->m_GetCanMessage(c_Msg) == C_NO_ERR)
    {
-      this->mc_GUIBuffer.HandleData(c_Msg);
+      this->mc_GuiBuffer.HandleData(c_Msg);
    }
 }
 
@@ -911,9 +910,9 @@ void C_CamMetTreeView::m_HandleMessages(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_Data)
 {
-   std::vector<sint32> c_Rows;
+   std::vector<int32_t> c_Rows;
    // Get the maximum of the scroll bar before adding new data
-   const sintn sn_ScrollBarValMax = this->verticalScrollBar()->maximum();
+   const int32_t s32_ScrollBarValMax = this->verticalScrollBar()->maximum();
 
    //Don't allow multiple concurrent add row steps
    this->mc_MutexUpdate.lock();
@@ -924,7 +923,7 @@ void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_
       m_SetChildColumns(c_Rows);
 
       // Scroll only in case of continuous mode and when the user has not scrolled up manually
-      if (this->verticalScrollBar()->value() == sn_ScrollBarValMax)
+      if (this->verticalScrollBar()->value() == s32_ScrollBarValMax)
       {
          this->scrollTo(this->mc_SortProxyModel.index(this->mc_SortProxyModel.rowCount() - 1, 0));
       }
@@ -948,11 +947,11 @@ void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_
    \param[in]  orc_Indices    Rows to stretch all child items for
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::m_SetChildColumns(const std::vector<stw_types::sint32> & orc_Indices)
+void C_CamMetTreeView::m_SetChildColumns(const std::vector<int32_t> & orc_Indices)
 {
-   for (uint32 u32_It = 0; u32_It < orc_Indices.size(); ++u32_It)
+   for (uint32_t u32_It = 0; u32_It < orc_Indices.size(); ++u32_It)
    {
-      const sint32 s32_ParentRow = orc_Indices[u32_It];
+      const int32_t s32_ParentRow = orc_Indices[u32_It];
       const QModelIndex c_ParentIndex = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_ParentRow, 0));
       m_SetChildColumns(c_ParentIndex);
    }
@@ -968,7 +967,7 @@ void C_CamMetTreeView::m_SetChildColumns(const QModelIndex & orc_ModelIndex)
 {
    if (orc_ModelIndex.isValid() == true)
    {
-      for (sint32 s32_ItRow = 0; s32_ItRow < this->mc_SortProxyModel.rowCount(orc_ModelIndex); ++s32_ItRow)
+      for (int32_t s32_ItRow = 0; s32_ItRow < this->mc_SortProxyModel.rowCount(orc_ModelIndex); ++s32_ItRow)
       {
          const QModelIndex c_Child = this->mc_SortProxyModel.index(s32_ItRow, 0, orc_ModelIndex);
          if (this->mc_SortProxyModel.rowCount(c_Child) > 0)
@@ -987,7 +986,7 @@ void C_CamMetTreeView::m_SetChildColumns(const QModelIndex & orc_ModelIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeView::m_SetAllChildren(void)
 {
-   for (sint32 s32_It = 0; s32_It < this->mc_SortProxyModel.rowCount(); ++s32_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_SortProxyModel.rowCount(); ++s32_It)
    {
       const QModelIndex c_ParentIndex = this->mc_SortProxyModel.index(s32_It, 0);
       m_SetChildColumns(c_ParentIndex);
@@ -1070,7 +1069,7 @@ void C_CamMetTreeView::m_OnCollapse(const QModelIndex & orc_Index)
 {
    bool q_ChildSelected = false;
 
-   for (sint32 s32_ItChild = 0L; s32_ItChild < this->mc_SortProxyModel.rowCount(orc_Index); ++s32_ItChild)
+   for (int32_t s32_ItChild = 0L; s32_ItChild < this->mc_SortProxyModel.rowCount(orc_Index); ++s32_ItChild)
    {
       const QModelIndex c_Index = this->mc_SortProxyModel.index(s32_ItChild, 0, orc_Index);
       //Search for selected items and deselect them if necessary
@@ -1106,11 +1105,11 @@ void C_CamMetTreeView::m_OnCollapse(const QModelIndex & orc_Index)
    Current column position indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamMetTreeView::m_GetCurrentColumnPositionIndices(void) const
+std::vector<int32_t> C_CamMetTreeView::m_GetCurrentColumnPositionIndices(void) const
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(this->mc_Model.columnCount());
-   for (sint32 s32_ItCol = 0L; s32_ItCol < this->mc_Model.columnCount(); ++s32_ItCol)
+   for (int32_t s32_ItCol = 0L; s32_ItCol < this->mc_Model.columnCount(); ++s32_ItCol)
    {
       c_Retval.push_back(this->header()->visualIndex(s32_ItCol));
    }
@@ -1123,24 +1122,24 @@ std::vector<sint32> C_CamMetTreeView::m_GetCurrentColumnPositionIndices(void) co
    \param[in]  orc_NewColPositionIndices  New column position indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::m_SetColumnPositionIndices(const std::vector<sint32> & orc_NewColPositionIndices)
+void C_CamMetTreeView::m_SetColumnPositionIndices(const std::vector<int32_t> & orc_NewColPositionIndices)
 {
-   if (orc_NewColPositionIndices.size() == static_cast<uint32>(this->mc_Model.columnCount()))
+   if (orc_NewColPositionIndices.size() == static_cast<uint32_t>(this->mc_Model.columnCount()))
    {
       //Use new spec as sorting specification
       while (this->m_ColumnsSortedAsExpected(orc_NewColPositionIndices) == false)
       {
          //If not sorted
-         for (sint32 s32_ItCol = 0L; s32_ItCol < this->mc_Model.columnCount(); ++s32_ItCol)
+         for (int32_t s32_ItCol = 0L; s32_ItCol < this->mc_Model.columnCount(); ++s32_ItCol)
          {
             //Find first invalid element
-            if (this->header()->visualIndex(s32_ItCol) != orc_NewColPositionIndices[static_cast<uint32>(s32_ItCol)])
+            if (this->header()->visualIndex(s32_ItCol) != orc_NewColPositionIndices[static_cast<uint32_t>(s32_ItCol)])
             {
                //Find element which should be at this position
-               for (sint32 s32_ItCol2 = 0L; s32_ItCol2 < this->mc_Model.columnCount(); ++s32_ItCol2)
+               for (int32_t s32_ItCol2 = 0L; s32_ItCol2 < this->mc_Model.columnCount(); ++s32_ItCol2)
                {
                   if (this->header()->visualIndex(s32_ItCol2) ==
-                      orc_NewColPositionIndices[static_cast<uint32>(s32_ItCol)])
+                      orc_NewColPositionIndices[static_cast<uint32_t>(s32_ItCol)])
                   {
                      //Swap expected index to current position
                      this->header()->moveSection(this->header()->visualIndex(s32_ItCol2),
@@ -1171,15 +1170,15 @@ void C_CamMetTreeView::m_SetColumnPositionIndices(const std::vector<sint32> & or
    False Unsorted
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMetTreeView::m_ColumnsSortedAsExpected(const std::vector<sint32> & orc_NewColPositionIndices) const
+bool C_CamMetTreeView::m_ColumnsSortedAsExpected(const std::vector<int32_t> & orc_NewColPositionIndices) const
 {
    bool q_Retval = true;
 
-   if (orc_NewColPositionIndices.size() == static_cast<uint32>(this->mc_Model.columnCount()))
+   if (orc_NewColPositionIndices.size() == static_cast<uint32_t>(this->mc_Model.columnCount()))
    {
-      for (sint32 s32_ItCol = 0L; s32_ItCol < this->mc_Model.columnCount(); ++s32_ItCol)
+      for (int32_t s32_ItCol = 0L; s32_ItCol < this->mc_Model.columnCount(); ++s32_ItCol)
       {
-         if (this->header()->visualIndex(s32_ItCol) != orc_NewColPositionIndices[static_cast<uint32>(s32_ItCol)])
+         if (this->header()->visualIndex(s32_ItCol) != orc_NewColPositionIndices[static_cast<uint32_t>(s32_ItCol)])
          {
             q_Retval = false;
          }
@@ -1227,7 +1226,7 @@ void C_CamMetTreeView::m_HandleSorting(void)
    \param[in]      os32_Offset   Offset to paint at
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::mh_DrawL(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
+void C_CamMetTreeView::mh_DrawEl(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const int32_t os32_Offset)
 {
    //Down
    opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y()));
@@ -1250,10 +1249,10 @@ void C_CamMetTreeView::mh_DrawL(QPainter * const opc_Painter, const QPoint & orc
    \param[in]      os32_Offset   Offset to paint at
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::mh_DrawPlus(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
+void C_CamMetTreeView::mh_DrawPlus(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const int32_t os32_Offset)
 {
    //Down
-   mh_DrawVLine(opc_Painter, orc_TopLeft, os32_Offset);
+   mh_DrawVerticalLine(opc_Painter, orc_TopLeft, os32_Offset);
    //Right
    opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 2, orc_TopLeft.y() + 8));
    opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset + 4, orc_TopLeft.y() + 8));
@@ -1269,7 +1268,8 @@ void C_CamMetTreeView::mh_DrawPlus(QPainter * const opc_Painter, const QPoint & 
    \param[in]      os32_Offset   Offset to paint at
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeView::mh_DrawVLine(QPainter * const opc_Painter, const QPoint & orc_TopLeft, const sint32 os32_Offset)
+void C_CamMetTreeView::mh_DrawVerticalLine(QPainter * const opc_Painter, const QPoint & orc_TopLeft,
+                                           const int32_t os32_Offset)
 {
    //Down
    opc_Painter->drawPoint(QPoint(orc_TopLeft.x() + os32_Offset, orc_TopLeft.y()));

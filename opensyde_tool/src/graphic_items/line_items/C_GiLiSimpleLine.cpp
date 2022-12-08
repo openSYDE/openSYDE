@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
-#include "C_GiLiSimpleLine.h"
-#include "gitypes.h"
-#include "C_OSCUtils.h"
+#include "C_GiLiSimpleLine.hpp"
+#include "gitypes.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -64,9 +63,9 @@ C_GiLiSimpleLine::~C_GiLiSimpleLine()
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiLiSimpleLine::type() const
+int32_t C_GiLiSimpleLine::type() const
 {
-   return msn_GRAPHICS_ITEM_SIMPLELINE;
+   return ms32_GRAPHICS_ITEM_SIMPLELINE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,7 +74,7 @@ sintn C_GiLiSimpleLine::type() const
    \param[in] ors32_Width New line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiSimpleLine::SetWidth(const stw_types::sint32 & ors32_Width)
+void C_GiLiSimpleLine::SetWidth(const int32_t & ors32_Width)
 {
    QPen c_Pen = this->pen();
 
@@ -104,7 +103,7 @@ void C_GiLiSimpleLine::SetColor(const QColor & orc_Color)
    Width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiSimpleLine::GetWidth() const
+int32_t C_GiLiSimpleLine::GetWidth() const
 {
    const QPen c_Pen = this->pen();
 

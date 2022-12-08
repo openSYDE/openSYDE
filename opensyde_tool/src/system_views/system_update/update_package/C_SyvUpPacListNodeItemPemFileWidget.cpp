@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OgePopUpDialog.h"
-#include "C_SyvUpPacListNodeItemPemFileWidget.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SyvUpPacListNodeItemPemFileWidget.hpp"
 #include "ui_C_SyvUpPacListNodeItemWidget.h"
-#include "C_SyvUpPacPemFileInfoPopUp.h"
-#include "C_OSCSecurityPem.h"
+#include "C_SyvUpPacPemFileInfoPopUp.hpp"
+#include "C_OscSecurityPem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,8 +52,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacListNodeItemPemFileWidget::C_SyvUpPacListNodeItemPemFileWidget(const uint32 ou32_ViewIndex,
-                                                                         const uint32 ou32_NodeIndex,
+C_SyvUpPacListNodeItemPemFileWidget::C_SyvUpPacListNodeItemPemFileWidget(const uint32_t ou32_ViewIndex,
+                                                                         const uint32_t ou32_NodeIndex,
                                                                          const QString & orc_DeviceName,
                                                                          const bool oq_FileBased,
                                                                          const bool oq_StwFlashloader,
@@ -84,7 +83,7 @@ C_SyvUpPacListNodeItemPemFileWidget::C_SyvUpPacListNodeItemPemFileWidget(const u
    Type of return values, e.g. STW error codes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacListNodeItemPemFileWidget::GetType(void) const
+uint32_t C_SyvUpPacListNodeItemPemFileWidget::GetType(void) const
 {
    return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM;
 }
@@ -99,7 +98,7 @@ void C_SyvUpPacListNodeItemPemFileWidget::ViewFileInfo(void)
 {
    if (this->GetAppFilePath().compare("") != 0)
    {
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpPacPemFileInfoPopUp * const pc_InfoDialog =
          new C_SyvUpPacPemFileInfoPopUp(*c_New,
                                         this->GetAppAbsoluteFilePath());
@@ -109,7 +108,7 @@ void C_SyvUpPacListNodeItemPemFileWidget::ViewFileInfo(void)
       //Resize
       c_New->SetSize(QSize(1000, 761));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          //No confirmation
       }
@@ -219,9 +218,9 @@ void C_SyvUpPacListNodeItemPemFileWidget::m_LoadFileInformation(bool & orq_FileE
    if (orq_FileExists == true)
    {
       std::string c_ErrorMessage;
-      std::vector<stw_types::uint8> c_Modulus;
-      std::vector<stw_types::uint8> c_Exponent;
-      sint32 s32_Result = stw_opensyde_core::C_OSCSecurityPem::h_ExtractModulusAndExponentFromFile(
+      std::vector<uint8_t> c_Modulus;
+      std::vector<uint8_t> c_Exponent;
+      int32_t s32_Result = stw::opensyde_core::C_OscSecurityPem::h_ExtractModulusAndExponentFromFile(
          this->GetAppAbsoluteFilePath().toStdString(), c_Modulus, c_Exponent, c_ErrorMessage);
 
       if (s32_Result == C_NO_ERR)

@@ -12,23 +12,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSpacerItem>
 #include <QPalette>
 
-#include "C_NagUseCaseViewWidget.h"
-#include "C_GtGetText.h"
+#include "C_NagUseCaseViewWidget.hpp"
+#include "C_GtGetText.hpp"
 #include "ui_C_NagUseCaseViewWidget.h"
 
-#include "constants.h"
-#include "stwtypes.h"
+#include "constants.hpp"
+#include "stwtypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_NagUseCaseViewWidget::mhc_SVG_ICON_PATH = "://images/IconNavigationArrow.svg";
@@ -199,15 +198,14 @@ void C_NagUseCaseViewWidget::m_HandleSubSections(void) const
    \param[in]   oq_CombineItemAndSubSubName Flag if sub sub item name and item name should be combined to one label
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Widget, const sint32 os32_Mode,
-                                              const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
+void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Widget, const int32_t os32_Mode,
+                                              const int32_t os32_SubMode, const QString & orc_ItemName,
                                               const QString & orc_ItemSubSubName,
                                               const bool oq_CombineItemAndSubSubName)
 {
-   sintn sn_Index;
-
    if (opc_Widget != NULL)
    {
+      int32_t s32_Index;
       // remove the old widget
       if (this->mpc_Widget != NULL)
       {
@@ -218,11 +216,11 @@ void C_NagUseCaseViewWidget::SetUseCaseWidget(C_NagUseCaseWidget * const opc_Wid
 
       // set the new widget
       this->mpc_Widget = opc_Widget;
-      //sn_Index = this->mpc_Ui->pc_verticalLayout->indexOf(this->mpc_Ui->pc_horizontalLayout);
+      //s32_Index = this->mpc_Ui->pc_verticalLayout->indexOf(this->mpc_Ui->pc_horizontalLayout);
       //this->mpc_Ui->pc_VerticalLayout->addSpacing(40);
       this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_Widget);
-      sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Widget);
-      this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+      s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Widget);
+      this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
 
       // Use specific set parent function. The widgets can react on the parent change if necessary.
 
@@ -271,7 +269,7 @@ void C_NagUseCaseViewWidget::RemoveUseCaseWidget(void)
    \param[in]   oq_CombineItemAndSubSubName Flag if sub sub item name and item name should be combined to one label
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagUseCaseViewWidget::UpdateUseCaseWidget(const stw_types::sint32 os32_SubMode, const QString & orc_ItemName,
+void C_NagUseCaseViewWidget::UpdateUseCaseWidget(const int32_t os32_SubMode, const QString & orc_ItemName,
                                                  const QString & orc_ItemSubName,
                                                  const bool oq_CombineItemAndSubSubName)
 {

@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeSpiBase.h"
+#include "C_OgeSpiBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,21 +48,21 @@ C_OgeSpiBase::C_OgeSpiBase(QWidget * const opc_Parent) :
    \param[in] os32_Width Desired width of first segment
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpiBase::SetFirstSegment(const sint32 os32_Width)
+void C_OgeSpiBase::SetFirstSegment(const int32_t os32_Width)
 {
-   const QList<sintn> & rc_CurList = this->sizes();
+   const QList<int32_t> & rc_CurList = this->sizes();
 
    if (rc_CurList.size() == 2)
    {
-      QList<sintn> c_Segments;
+      QList<int32_t> c_Segments;
 
       // Adapt the size of both sides
-      c_Segments.push_back(static_cast<sintn>(os32_Width));
+      c_Segments.push_back(static_cast<int32_t>(os32_Width));
       // calculation:
       // new size of second segment =
       //     = total size of both segments - new size of first segment =
       //     = (old size of second segment + old size of first segment) - new size of second segment
-      c_Segments.push_back(static_cast<sintn>((rc_CurList.at(1) + rc_CurList.at(0)) - c_Segments.at(0)));
+      c_Segments.push_back(static_cast<int32_t>((rc_CurList.at(1) + rc_CurList.at(0)) - c_Segments.at(0)));
 
       this->setSizes(c_Segments);
    }
@@ -75,21 +74,21 @@ void C_OgeSpiBase::SetFirstSegment(const sint32 os32_Width)
    \param[in] os32_Width Desired width of second segment
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpiBase::SetSecondSegment(const sint32 os32_Width)
+void C_OgeSpiBase::SetSecondSegment(const int32_t os32_Width)
 {
-   const QList<sintn> & rc_CurList = this->sizes();
+   const QList<int32_t> & rc_CurList = this->sizes();
 
    if (rc_CurList.size() == 2)
    {
-      QList<sintn> c_Segments;
+      QList<int32_t> c_Segments;
 
       // Adapt the size of both sides
-      c_Segments.push_front(static_cast<sintn>(os32_Width));
+      c_Segments.push_front(static_cast<int32_t>(os32_Width));
       // calculation:
       // new size of first segment =
       //     = total size of both segments - new size of second segment =
       //     = (old size of second segment + old size of first segment) - new size of second segment
-      c_Segments.push_front(static_cast<sintn>((rc_CurList.at(1) + rc_CurList.at(0)) - c_Segments.at(0)));
+      c_Segments.push_front(static_cast<int32_t>((rc_CurList.at(1) + rc_CurList.at(0)) - c_Segments.at(0)));
 
       this->setSizes(c_Segments);
    }

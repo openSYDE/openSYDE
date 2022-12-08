@@ -12,14 +12,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeLeListHeader.h"
-#include "constants.h"
+#include "C_OgeLeListHeader.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,7 +57,7 @@ C_OgeLeListHeader::C_OgeLeListHeader(QWidget * const opc_Parent) :
    \param[in]  ou32_Counter   Counter
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeLeListHeader::SetCounter(const stw_types::uint32 ou32_Counter)
+void C_OgeLeListHeader::SetCounter(const uint32_t ou32_Counter)
 {
    this->mu32_Counter = ou32_Counter;
    this->m_UpdateText();
@@ -141,12 +141,12 @@ void C_OgeLeListHeader::m_UpdateText(void)
 {
    if (this->hasFocus() == false)
    {
-      this->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT + 10); // " (1234567)" should definitely be enough
+      this->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT + 10); // " (1234567)" should definitely be enough
       this->setText(static_cast<QString>("%1 (%2)").arg(this->mc_Name).arg(this->mu32_Counter));
    }
    else
    {
-      this->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+      this->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
       this->setText(this->mc_Name);
    }
 }

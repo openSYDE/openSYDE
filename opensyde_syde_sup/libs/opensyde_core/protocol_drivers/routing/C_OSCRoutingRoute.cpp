@@ -8,13 +8,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCRoutingRoute.h"
+#include "C_OscRoutingRoute.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -32,16 +32,16 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCRoutingRoutePoint::C_OSCRoutingRoutePoint(void) :
+C_OscRoutingRoutePoint::C_OscRoutingRoutePoint(void) :
    u32_NodeIndex(0U),
    u32_InBusIndex(0U),
-   u8_InNodeID(0U),
+   u8_InNodeId(0U),
    u8_InInterfaceNumber(0U),
-   e_InInterfaceType(C_OSCSystemBus::eCAN),
+   e_InInterfaceType(C_OscSystemBus::eCAN),
    u32_OutBusIndex(0U),
-   u8_OutNodeID(0U),
+   u8_OutNodeId(0U),
    u8_OutInterfaceNumber(0U),
-   e_OutInterfaceType(C_OSCSystemBus::eCAN)
+   e_OutInterfaceType(C_OscSystemBus::eCAN)
 {
 }
 
@@ -55,17 +55,17 @@ C_OSCRoutingRoutePoint::C_OSCRoutingRoutePoint(void) :
    true      Current not equal to orc_Cmp
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCRoutingRoutePoint::operator !=(const C_OSCRoutingRoutePoint & orc_Cmp) const
+bool C_OscRoutingRoutePoint::operator !=(const C_OscRoutingRoutePoint & orc_Cmp) const
 {
    bool q_Return = false;
 
    if ((this->u32_NodeIndex != orc_Cmp.u32_NodeIndex) ||
        (this->u32_InBusIndex != orc_Cmp.u32_InBusIndex) ||
-       (this->u8_InNodeID != orc_Cmp.u8_InNodeID) ||
+       (this->u8_InNodeId != orc_Cmp.u8_InNodeId) ||
        (this->u8_InInterfaceNumber != orc_Cmp.u8_InInterfaceNumber) ||
        (this->e_InInterfaceType != orc_Cmp.e_InInterfaceType) ||
        (this->u32_OutBusIndex != orc_Cmp.u32_OutBusIndex) ||
-       (this->u8_OutNodeID != orc_Cmp.u8_OutNodeID) ||
+       (this->u8_OutNodeId != orc_Cmp.u8_OutNodeId) ||
        (this->u8_OutInterfaceNumber != orc_Cmp.u8_OutInterfaceNumber) ||
        (this->e_OutInterfaceType != orc_Cmp.e_OutInterfaceType))
    {
@@ -85,17 +85,17 @@ bool C_OSCRoutingRoutePoint::operator !=(const C_OSCRoutingRoutePoint & orc_Cmp)
    false     Current not equal to orc_Cmp
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCRoutingRoutePoint::operator ==(const C_OSCRoutingRoutePoint & orc_Cmp) const
+bool C_OscRoutingRoutePoint::operator ==(const C_OscRoutingRoutePoint & orc_Cmp) const
 {
    bool q_Return = false;
 
    if ((this->u32_NodeIndex == orc_Cmp.u32_NodeIndex) &&
        (this->u32_InBusIndex == orc_Cmp.u32_InBusIndex) &&
-       (this->u8_InNodeID == orc_Cmp.u8_InNodeID) &&
+       (this->u8_InNodeId == orc_Cmp.u8_InNodeId) &&
        (this->u8_InInterfaceNumber == orc_Cmp.u8_InInterfaceNumber) &&
        (this->e_InInterfaceType == orc_Cmp.e_InInterfaceType) &&
        (this->u32_OutBusIndex == orc_Cmp.u32_OutBusIndex) &&
-       (this->u8_OutNodeID == orc_Cmp.u8_OutNodeID) &&
+       (this->u8_OutNodeId == orc_Cmp.u8_OutNodeId) &&
        (this->u8_OutInterfaceNumber == orc_Cmp.u8_OutInterfaceNumber) &&
        (this->e_OutInterfaceType == orc_Cmp.e_OutInterfaceType))
    {
@@ -105,7 +105,7 @@ bool C_OSCRoutingRoutePoint::operator ==(const C_OSCRoutingRoutePoint & orc_Cmp)
    return q_Return;
 }
 
-C_OSCRoutingRoute::C_OSCRoutingRoute(const uint32 ou32_TargetNodeIndex) :
+C_OscRoutingRoute::C_OscRoutingRoute(const uint32_t ou32_TargetNodeIndex) :
    u32_TargetNodeIndex(ou32_TargetNodeIndex)
 {
 }
@@ -120,14 +120,14 @@ C_OSCRoutingRoute::C_OSCRoutingRoute(const uint32 ou32_TargetNodeIndex) :
    false    Current not equal to orc_Cmp
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCRoutingRoute::operator ==(const C_OSCRoutingRoute & orc_Cmp) const
+bool C_OscRoutingRoute::operator ==(const C_OscRoutingRoute & orc_Cmp) const
 {
    bool q_Return = false;
 
    if ((this->u32_TargetNodeIndex == orc_Cmp.u32_TargetNodeIndex) &&
        (this->c_VecRoutePoints.size() == orc_Cmp.c_VecRoutePoints.size()))
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
       q_Return = true;
 
       // compare the content of the vector

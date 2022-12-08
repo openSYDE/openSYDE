@@ -27,14 +27,14 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardDefault" name="pc_LabelMin">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardDefault" name="pc_LabelMin">
      <property name="text">
       <string>TextLabel</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeSliDashboard" name="pc_HorizontalSlider">
+    <widget class="stw::opensyde_gui_elements::C_OgeSliDashboard" name="pc_HorizontalSlider">
      <property name="value">
       <number>50</number>
      </property>
@@ -44,7 +44,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardDefault" name="pc_LabelMax">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardDefault" name="pc_LabelMax">
      <property name="text">
       <string>TextLabel</string>
      </property>
@@ -54,14 +54,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSliDashboard</class>
+   <class>stw::opensyde_gui_elements::C_OgeSliDashboard</class>
    <extends>QSlider</extends>
-   <header>C_OgeSliDashboard.h</header>
+   <header>C_OgeSliDashboard.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDashboardDefault</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDashboardDefault</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDashboardDefault.h</header>
+   <header>C_OgeLabDashboardDefault.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

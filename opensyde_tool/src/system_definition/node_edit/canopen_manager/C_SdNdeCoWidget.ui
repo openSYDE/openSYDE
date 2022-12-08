@@ -64,7 +64,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintToManagerLabel">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintToManagerLabel">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -74,7 +74,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LinkToManagerLabel">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LinkToManagerLabel">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -118,7 +118,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
+       <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -143,7 +143,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
+           <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
             <property name="minimumSize">
              <size>
               <width>300</width>
@@ -162,7 +162,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui::C_SdNdeCoConfigTreeView" name="pc_CoConfigTree"/>
+           <widget class="stw::opensyde_gui::C_SdNdeCoConfigTreeView" name="pc_CoConfigTree"/>
           </item>
          </layout>
         </widget>
@@ -181,13 +181,13 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui::C_SdNdeCoOverviewWidget" name="pc_OverviewWidget" native="true"/>
+           <widget class="stw::opensyde_gui::C_SdNdeCoOverviewWidget" name="pc_OverviewWidget" native="true"/>
           </item>
           <item>
-           <widget class="stw_opensyde_gui::C_SdNdeCoManagerIntfWidget" name="pc_IntfSettingsWidget" native="true"/>
+           <widget class="stw::opensyde_gui::C_SdNdeCoManagerIntfWidget" name="pc_IntfSettingsWidget" native="true"/>
           </item>
           <item>
-           <widget class="stw_opensyde_gui::C_SdNdeCoDeviceWidget" name="pc_DeviceWidget" native="true"/>
+           <widget class="stw::opensyde_gui::C_SdNdeCoDeviceWidget" name="pc_DeviceWidget" native="true"/>
           </item>
          </layout>
         </widget>
@@ -200,43 +200,43 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
-   <header>C_OgeSpiStandard.h</header>
+   <header>C_OgeSpiStandard.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoOverviewWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeCoOverviewWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeCoOverviewWidget.h</header>
+   <header>C_SdNdeCoOverviewWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoManagerIntfWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeCoManagerIntfWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeCoManagerIntfWidget.h</header>
+   <header>C_SdNdeCoManagerIntfWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoDeviceWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeCoDeviceWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeCoDeviceWidget.h</header>
+   <header>C_SdNdeCoDeviceWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoConfigTreeView</class>
+   <class>stw::opensyde_gui::C_SdNdeCoConfigTreeView</class>
    <extends>QTreeView</extends>
-   <header>C_SdNdeCoConfigTreeView.h</header>
+   <header>C_SdNdeCoConfigTreeView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubHalcOverview</class>
+   <class>stw::opensyde_gui_elements::C_OgePubHalcOverview</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubHalcOverview.h</header>
+   <header>C_OgePubHalcOverview.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

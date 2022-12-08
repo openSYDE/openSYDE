@@ -8,53 +8,52 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QFileInfo>
-#include "C_PopErrorHandling.h"
-#include "C_PuiProject.h"
-#include "C_SdHandlerWidget.h"
+#include "C_PopErrorHandling.hpp"
+#include "C_PuiProject.hpp"
+#include "C_SdHandlerWidget.hpp"
 #include "ui_C_SdHandlerWidget.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OSCNode.h"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OscNode.hpp"
 
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_HeHandler.h"
-#include "C_UsHandler.h"
-#include "C_ImpUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_CieUtil.h"
-#include "C_OSCCanProtocol.h"
-#include "C_CieDataPoolListAdapter.h"
-#include "C_SdBueBusEditWidget.h"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_HeHandler.hpp"
+#include "C_UsHandler.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_CieUtil.hpp"
+#include "C_OscCanProtocol.hpp"
+#include "C_CieDataPoolListAdapter.hpp"
+#include "C_SdBueBusEditWidget.hpp"
 #include "ui_C_SdBueBusEditWidget.h"
-#include "stwerrors.h"
-#include "C_RtfExportWidget.h"
-#include "C_PopUtil.h"
-#include "C_PuiUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SdCodeGenerationDialog.h"
+#include "stwerrors.hpp"
+#include "C_RtfExportWidget.hpp"
+#include "C_PopUtil.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SdCodeGenerationDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_GENERATE_CODE = 1U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_IMPORT = 2U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_EXPORT = 3U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 4U;
-const uint32 C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_TSP_IMPORT = 5U;
+const uint32_t C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
+const uint32_t C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_GENERATE_CODE = 1U;
+const uint32_t C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_IMPORT = 2U;
+const uint32_t C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_EXPORT = 3U;
+const uint32_t C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_RTF_EXPORT = 4U;
+const uint32_t C_SdHandlerWidget::mhu32_USER_INPUT_FUNC_TSP_IMPORT = 5U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -80,8 +79,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    mpc_Topology(NULL),
    mpc_ActNodeEdit(NULL),
    mpc_ActBusEdit(NULL),
-   msn_NodeEditTabIndex(0),
-   msn_BusEditTabIndex(0),
+   ms32_NodeEditTabIndex(0),
+   ms32_BusEditTabIndex(0),
    ms32_SubMode(-1),
    mu32_Index(0U),
    mq_DataChanged(false),
@@ -107,7 +106,7 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
                                         "\n - NVM-based Hardware Configuration"
                                         "\n   Generate parameter set image file(s) for hardware configuration of current openSYDE node."))
 {
-   sintn sn_Index;
+   int32_t s32_Index;
 
    mpc_Ui->setupUi(this);
 
@@ -122,11 +121,11 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Topology, &C_SdTopologyWidget::SigErrorChange, this,
            &C_SdHandlerWidget::m_ErrorChange);
 
-   sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Topology);
-   this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+   s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Topology);
+   this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
 
-   this->msn_NodeEditTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex();
-   this->msn_BusEditTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefBusTabIndex();
+   this->ms32_NodeEditTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefNodeTabIndex();
+   this->ms32_BusEditTabIndex = C_UsHandler::h_GetInstance()->GetProjLastSysDefBusTabIndex();
 
    // configure toolbar functions
    // the order of adding the function is very important
@@ -181,8 +180,8 @@ C_SdHandlerWidget::C_SdHandlerWidget(QWidget * const opc_Parent) :
 //lint -e{1540}  no memory leak because of the parent all elements and the Qt memory management
 C_SdHandlerWidget::~C_SdHandlerWidget()
 {
-   C_UsHandler::h_GetInstance()->SetProjLastSysDefNodeTabIndex(this->msn_NodeEditTabIndex);
-   C_UsHandler::h_GetInstance()->SetProjLastSysDefBusTabIndex(this->msn_BusEditTabIndex);
+   C_UsHandler::h_GetInstance()->SetProjLastSysDefNodeTabIndex(this->ms32_NodeEditTabIndex);
+   C_UsHandler::h_GetInstance()->SetProjLastSysDefBusTabIndex(this->ms32_BusEditTabIndex);
 
    delete mpc_Ui;
 }
@@ -211,7 +210,7 @@ void C_SdHandlerWidget::SetParentHook(QWidget * const opc_Parent)
    \param[in]  ou32_FuncNumber   Number of function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
+void C_SdHandlerWidget::UserInputFunc(const uint32_t ou32_FuncNumber)
 {
    switch (ou32_FuncNumber)
    {
@@ -256,7 +255,7 @@ void C_SdHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::Save(void)
 {
-   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+   const uint16_t u16_Timer = osc_write_log_performance_start();
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -310,8 +309,9 @@ void C_SdHandlerWidget::Save(void)
    \param[in]  os32_Flag            Optional flag for further information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
-                                   const sint32 os32_SubSubSubIndex, const sint32 os32_Flag)
+void C_SdHandlerWidget::OpenDetail(const int32_t os32_Index, const int32_t os32_SubIndex,
+                                   const int32_t os32_SubSubIndex, const int32_t os32_SubSubSubIndex,
+                                   const int32_t os32_Flag)
 {
    if ((this->ms32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT) &&
        (this->mpc_ActNodeEdit != NULL))
@@ -348,13 +348,13 @@ bool C_SdHandlerWidget::PrepareToClose(void)
    if (this->mpc_ActNodeEdit != NULL)
    {
       // save the tab index
-      this->msn_NodeEditTabIndex = this->mpc_ActNodeEdit->GetTabIndex();
+      this->ms32_NodeEditTabIndex = this->mpc_ActNodeEdit->GetTabIndex();
       this->mpc_ActNodeEdit->Save();
    }
    if (this->mpc_ActBusEdit != NULL)
    {
       // save the tab index
-      this->msn_BusEditTabIndex = this->mpc_ActBusEdit->GetTabIndex();
+      this->ms32_BusEditTabIndex = this->mpc_ActBusEdit->GetTabIndex();
       this->mpc_ActBusEdit->Save();
    }
    if (this->mpc_Topology != NULL)
@@ -376,7 +376,7 @@ bool C_SdHandlerWidget::PrepareToClose(void)
    \param[in]  ou32_Flag      Flag for special functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
+void C_SdHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou32_Index, const uint32_t ou32_Flag)
 {
    const QIcon c_IconSave(":images/IconSave.svg");
    const QIcon c_IconCompile("://images/system_definition/IconGenerateCode.svg");
@@ -410,7 +410,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
             this->mpc_ActNodeEdit->Save();
          }
          // save the tab index
-         this->msn_NodeEditTabIndex = this->mpc_ActNodeEdit->GetTabIndex();
+         this->ms32_NodeEditTabIndex = this->mpc_ActNodeEdit->GetTabIndex();
 
          // remove widget
          disconnect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigChanged, this,
@@ -438,8 +438,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
       }
       if (this->mpc_ActBusEdit != NULL)
       {
-         const stw_opensyde_core::C_OSCSystemBus * const pc_Bus =
-            C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_Index);
+         const stw::opensyde_core::C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_Index);
 
          this->mpc_Ui->pc_VerticalLayout->removeWidget(this->mpc_ActBusEdit);
 
@@ -449,10 +449,10 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
             this->mpc_ActBusEdit->Save();
          }
          // save the tab index
-         this->msn_BusEditTabIndex = this->mpc_ActBusEdit->GetTabIndex();
+         this->ms32_BusEditTabIndex = this->mpc_ActBusEdit->GetTabIndex();
 
          // show button for DBC file export and messages import
-         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // Ethernet is not supported yet
+         if (pc_Bus->e_Type == C_OscSystemBus::E_Type::eCAN) // Ethernet is not supported yet
          {
             Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, true));
             Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true));
@@ -507,7 +507,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
             this->mpc_Topology->HideAll(true);
          }
 
-         this->mpc_ActNodeEdit = new C_SdNdeNodeEditWidget(ou32_Index, this->msn_NodeEditTabIndex, this);
+         this->mpc_ActNodeEdit = new C_SdNdeNodeEditWidget(ou32_Index, this->ms32_NodeEditTabIndex, this);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
          connect(this->mpc_ActNodeEdit, &C_SdNdeNodeEditWidget::SigErrorChange, this,
                  &C_SdHandlerWidget::m_ErrorChange);
@@ -544,8 +544,8 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
       }
       else if (os32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
       {
-         const stw_opensyde_core::C_OSCSystemBus * const pc_Bus =
-            C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_Index);
+         const stw::opensyde_core::C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(ou32_Index);
 
          // show the bus edit widget
          if (this->mpc_Topology != NULL)
@@ -553,7 +553,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
             this->mpc_Topology->HideAll(true);
          }
 
-         this->mpc_ActBusEdit = new C_SdBueBusEditWidget(ou32_Index, this->msn_BusEditTabIndex, this);
+         this->mpc_ActBusEdit = new C_SdBueBusEditWidget(ou32_Index, this->ms32_BusEditTabIndex, this);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigChanged, this, &C_SdHandlerWidget::m_DataChanged);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigErrorChange, this, &C_SdHandlerWidget::m_ErrorChange);
          connect(this->mpc_ActBusEdit, &C_SdBueBusEditWidget::SigNameChanged, this, &C_SdHandlerWidget::SigNameChanged);
@@ -567,7 +567,7 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
                                                      this->mc_TooltipGenerateCodeContentNode));
 
          // show button for DBC file export and messages import
-         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // Ethernet is not supported yet
+         if (pc_Bus->e_Type == C_OscSystemBus::E_Type::eCAN) // Ethernet is not supported yet
          {
             Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_IMPORT, true));
             Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_EXPORT, true));
@@ -600,22 +600,22 @@ void C_SdHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
 {
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_S)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_S)) &&
        (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       this->Save();
    }
-   else if ((opc_Event->key() == static_cast<sintn>(Qt::Key_F)) &&
+   else if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_F)) &&
             (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       Q_EMIT this->SigSearch();
    }
-   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F12))
+   else if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F12))
    {
       // open project save
       this->SaveAs();
    }
-   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
+   else if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F8))
    {
       // open color picker
       this->OpenColorPicker();
@@ -637,7 +637,7 @@ void C_SdHandlerWidget::m_DataChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_NodeChanged(const uint32 ou32_Index)
+void C_SdHandlerWidget::m_NodeChanged(const uint32_t ou32_Index)
 {
    this->mq_DataChanged = true;
 
@@ -645,7 +645,7 @@ void C_SdHandlerWidget::m_NodeChanged(const uint32 ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_BusChanged(const uint32 ou32_Index)
+void C_SdHandlerWidget::m_BusChanged(const uint32_t ou32_Index)
 {
    this->mq_DataChanged = true;
 
@@ -659,7 +659,7 @@ void C_SdHandlerWidget::m_BusChanged(const uint32 ou32_Index)
    \param[in]  orc_BusName    Bus name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SwitchToBus(const uint32 ou32_Index, const QString & orc_BusName)
+void C_SdHandlerWidget::m_SwitchToBus(const uint32_t ou32_Index, const QString & orc_BusName)
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
                               mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR);
@@ -673,11 +673,11 @@ void C_SdHandlerWidget::m_SwitchToBus(const uint32 ou32_Index, const QString & o
    \param[in]  oe_ProtocolType    Protocol type to switch to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SwitchToBusProtocol(const uint32 ou32_Index, const QString & orc_BusName,
-                                              const C_OSCCanProtocol::E_Type oe_ProtocolType)
+void C_SdHandlerWidget::m_SwitchToBusProtocol(const uint32_t ou32_Index, const QString & orc_BusName,
+                                              const C_OscCanProtocol::E_Type oe_ProtocolType)
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
-                              mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL + static_cast<uint32>(oe_ProtocolType));
+                              mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL + static_cast<uint32_t>(oe_ProtocolType));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -688,18 +688,18 @@ void C_SdHandlerWidget::m_SwitchToBusProtocol(const uint32 ou32_Index, const QSt
    \param[in]  orc_MessageId      Message id to jump to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SwitchToBusProtocolMessage(const uint32 ou32_Index, const QString & orc_BusName,
-                                                     const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdHandlerWidget::m_SwitchToBusProtocolMessage(const uint32_t ou32_Index, const QString & orc_BusName,
+                                                     const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
                                mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR));
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_MessageId.u32_NodeIndex);
    if ((pc_Node != NULL) &&
        (orc_MessageId.u32_DatapoolIndex < pc_Node->c_DataPools.size()))
    {
-      uint32 u32_ListIndex;
-      if (C_OSCCanProtocol::h_GetComListIndex(pc_Node->c_DataPools[orc_MessageId.u32_DatapoolIndex],
+      uint32_t u32_ListIndex;
+      if (C_OscCanProtocol::h_GetComListIndex(pc_Node->c_DataPools[orc_MessageId.u32_DatapoolIndex],
                                               orc_MessageId.u32_InterfaceIndex, orc_MessageId.q_MessageIsTx,
                                               u32_ListIndex) == C_NO_ERR)
       {
@@ -716,7 +716,7 @@ void C_SdHandlerWidget::m_SwitchToBusProtocolMessage(const uint32 ou32_Index, co
    \param[in]  orc_BusName    Bus name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SwitchToBusProperties(const uint32 ou32_Index, const QString & orc_BusName)
+void C_SdHandlerWidget::m_SwitchToBusProperties(const uint32_t ou32_Index, const QString & orc_BusName)
 {
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, ou32_Index, orc_BusName, "",
                               mu32_FLAG_OPEN_PROPERTIES);
@@ -730,12 +730,12 @@ void C_SdHandlerWidget::m_SwitchToBusProperties(const uint32 ou32_Index, const Q
    \param[in]  ou8_InterfaceNumber       Manager Node interface number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SwitchToCoManager(const uint32 ou32_ManagerNodeIndex, const QString & orc_ManagerNodeName,
-                                            const uint8 ou8_InterfaceNumber)
+void C_SdHandlerWidget::m_SwitchToCoManager(const uint32_t ou32_ManagerNodeIndex, const QString & orc_ManagerNodeName,
+                                            const uint8_t ou8_InterfaceNumber)
 {
    Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, ou32_ManagerNodeIndex,
                                orc_ManagerNodeName, "",
-                               mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER + static_cast<uint32>(ou8_InterfaceNumber)));
+                               mu32_FLAG_OPEN_SYSDEF_CANOPENMANAGER + static_cast<uint32_t>(ou8_InterfaceNumber)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -746,9 +746,9 @@ void C_SdHandlerWidget::m_SwitchToCoManager(const uint32 ou32_ManagerNodeIndex, 
    \param[in]  ou32_DeviceNodeIndex      Device Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SwitchToDeviceNodeInCoManager(const uint32 ou32_ManagerNodeIndex,
+void C_SdHandlerWidget::m_SwitchToDeviceNodeInCoManager(const uint32_t ou32_ManagerNodeIndex,
                                                         const QString & orc_ManagerNodeName,
-                                                        const uint32 ou32_DeviceNodeIndex)
+                                                        const uint32_t ou32_DeviceNodeIndex)
 {
    Q_EMIT (this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, ou32_ManagerNodeIndex,
                                orc_ManagerNodeName, "",
@@ -756,7 +756,7 @@ void C_SdHandlerWidget::m_SwitchToDeviceNodeInCoManager(const uint32 ou32_Manage
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdHandlerWidget::m_SetFlag(const uint32 ou32_Flag) const
+void C_SdHandlerWidget::m_SetFlag(const uint32_t ou32_Flag) const
 {
    if (ou32_Flag != mu32_FLAG_DEFAULT)
    {
@@ -796,15 +796,15 @@ void C_SdHandlerWidget::m_GenerateCode(void) const
    //Check for changes
    if (C_ImpUtil::h_CheckProjForCodeGeneration(this->parentWidget()) == true)
    {
-      QPointer<C_OgePopUpDialog> const c_PopUpDialog = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+      const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
       C_SdCodeGenerationDialog * const pc_CodeGenerationDialog = new C_SdCodeGenerationDialog(*c_PopUpDialog);
       // Resize
       c_PopUpDialog->SetSize(QSize(1000, 700));
       if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_TOPOLOGY)
       {
-         std::vector<uint32> c_Indices;
-         c_Indices.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
-         for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+         std::vector<uint32_t> c_Indices;
+         c_Indices.reserve(C_PuiSdHandler::h_GetInstance()->GetOscNodesSize());
+         for (uint32_t u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
          {
             c_Indices.push_back(u32_ItNode);
          }
@@ -812,23 +812,23 @@ void C_SdHandlerWidget::m_GenerateCode(void) const
       }
       else if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
       {
-         std::vector<uint32> c_Indices;
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Index);
+         std::vector<uint32_t> c_Indices;
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Index);
          tgl_assert(pc_Node != NULL);
          c_Indices.push_back(this->mu32_Index);
          pc_CodeGenerationDialog->PrepareDialog(c_Indices);
       }
       else if (this->ms32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
       {
-         std::vector<uint32> c_Indices;
-         std::vector<uint32> c_NodeIndexes;
-         std::vector<uint32> c_InterfaceIndexes;
-         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_Index,
+         std::vector<uint32_t> c_Indices;
+         std::vector<uint32_t> c_NodeIndexes;
+         std::vector<uint32_t> c_InterfaceIndexes;
+         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_Index,
                                                                                             c_NodeIndexes,
                                                                                             c_InterfaceIndexes);
-         for (uint32 u32_Counter = 0; u32_Counter < c_NodeIndexes.size(); u32_Counter++)
+         for (uint32_t u32_Counter = 0; u32_Counter < c_NodeIndexes.size(); u32_Counter++)
          {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes
+            const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndexes
                                                                                                .at(u32_Counter));
             tgl_assert(pc_Node != NULL);
             c_Indices.push_back(c_NodeIndexes.at(u32_Counter));
@@ -841,10 +841,10 @@ void C_SdHandlerWidget::m_GenerateCode(void) const
          tgl_assert(false);
       }
 
-      if (c_PopUpDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
-         std::vector<uint32> c_NodeIndices;
-         std::vector< std::vector<uint32> > c_AppIndicesPerNode;
+         std::vector<uint32_t> c_NodeIndices;
+         std::vector< std::vector<uint32_t> > c_AppIndicesPerNode;
          pc_CodeGenerationDialog->GetCheckedItems(c_NodeIndices, c_AppIndicesPerNode);
          C_ImpUtil::h_ExportCode(c_NodeIndices, c_AppIndicesPerNode, this->parentWidget());
       }
@@ -862,9 +862,8 @@ void C_SdHandlerWidget::m_GenerateCode(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdHandlerWidget::m_Export(void)
 {
-   std::set<uint32> c_CanMessageIds; // to count CAN messages
-   std::set<C_OSCCanMessageUniqueId> c_CanMessageIdsWithExtended;
-   uint32 u32_NumOfInputSignals = 0;
+   std::set<uint32_t> c_CanMessageIds; // to count CAN messages
+   std::set<C_OscCanMessageUniqueId> c_CanMessageIdsWithExtended;
 
    tgl_assert(this->mpc_ActBusEdit != NULL);
    if (this->mpc_ActBusEdit != NULL)
@@ -872,7 +871,7 @@ void C_SdHandlerWidget::m_Export(void)
       // Is it Possible to Use a dbc for Ethernet Configuration?
       // answer: yes (see https://kb.vector.com/entry/798/)
       // but currently only CAN networks are supported!
-      const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+      const stw::opensyde_core::C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
          this->mu32_Index);
 
       // check if we have problems for export
@@ -880,8 +879,8 @@ void C_SdHandlerWidget::m_Export(void)
       if (q_BusConflict == true)
       {
          // display error
-         const stw_scl::C_SCLString c_Message = "Bus \"" + pc_Bus->c_Name + "\" has invalid content. "
-                                                "DBC file export cannot be performed.";
+         const stw::scl::C_SclString c_Message = "Bus \"" + pc_Bus->c_Name + "\" has invalid content. "
+                                                 "DBC file export cannot be performed.";
          C_OgeWiCustomMessage c_ExportWarnings(this, C_OgeWiCustomMessage::E_Type::eERROR);
          c_ExportWarnings.SetHeading(C_GtGetText::h_GetText("DBC file export"));
          c_ExportWarnings.SetDescription(C_GtGetText::h_GetText(c_Message.c_str()));
@@ -891,16 +890,17 @@ void C_SdHandlerWidget::m_Export(void)
       else
       {
          // network OK, ready to export
-         if (pc_Bus->e_Type == C_OSCSystemBus::E_Type::eCAN) // defensive style: normally else case can't occur because
+         if (pc_Bus->e_Type == C_OscSystemBus::E_Type::eCAN) // defensive style: normally else case can't occur because
                                                              // then the export button is not displayed.
          {
-            std::vector<uint32> c_NodeIndexes;
-            std::vector<uint32> c_InterfaceIndexes;
-            std::vector<uint32> c_DatapoolIndexes;
-            std::set<uint32> c_UniqueNodeIndexes;
-            uint32 u32_NumOfInputMessages = 0;
+            uint32_t u32_NumOfInputSignals = 0;
+            std::vector<uint32_t> c_NodeIndexes;
+            std::vector<uint32_t> c_InterfaceIndexes;
+            std::vector<uint32_t> c_DatapoolIndexes;
+            std::set<uint32_t> c_UniqueNodeIndexes;
+            uint32_t u32_NumOfInputMessages = 0;
 
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
+            C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeAndComDpIndexesOfBus(
                this->mu32_Index,
                c_NodeIndexes,
                c_InterfaceIndexes,
@@ -910,21 +910,21 @@ void C_SdHandlerWidget::m_Export(void)
             tgl_assert(c_NodeIndexes.size() == c_InterfaceIndexes.size());
             tgl_assert(c_NodeIndexes.size() == c_DatapoolIndexes.size());
 
-            C_CieConverter::C_CIECommDefinition c_CommDef; // data structure for DBC file export
+            C_CieConverter::C_CieCommDefinition c_CommDef; // data structure for DBC file export
             c_CommDef.c_Bus.c_Name = pc_Bus->c_Name;
             c_CommDef.c_Bus.c_Comment = pc_Bus->c_Comment;
 
-            for (uint32 u32_Pos = 0; u32_Pos < c_NodeIndexes.size(); u32_Pos++)
+            for (uint32_t u32_Pos = 0; u32_Pos < c_NodeIndexes.size(); u32_Pos++)
             {
-               const uint32 u32_NodeIndex = c_NodeIndexes[u32_Pos];
-               const uint32 u32_InterfaceIndex = c_InterfaceIndexes[u32_Pos];
-               const uint32 u32_DatapoolIndex = c_DatapoolIndexes[u32_Pos];
-               C_OSCCanProtocol::E_Type e_ComType;
+               const uint32_t u32_NodeIndex = c_NodeIndexes[u32_Pos];
+               const uint32_t u32_InterfaceIndex = c_InterfaceIndexes[u32_Pos];
+               const uint32_t u32_DatapoolIndex = c_DatapoolIndexes[u32_Pos];
+               C_OscCanProtocol::E_Type e_ComType;
 
                tgl_assert(C_PuiSdHandler::h_GetInstance()->GetCanProtocolType(u32_NodeIndex,
                                                                               u32_DatapoolIndex,
                                                                               e_ComType) == C_NO_ERR);
-               const C_OSCCanMessageContainer * const pc_CanMessageContainer =
+               const C_OscCanMessageContainer * const pc_CanMessageContainer =
                   C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
                      u32_NodeIndex,
                      e_ComType,
@@ -934,32 +934,32 @@ void C_SdHandlerWidget::m_Export(void)
                // only export active devices
                if ((pc_CanMessageContainer != NULL) && (pc_CanMessageContainer->q_IsComProtocolUsedByInterface == true))
                {
-                  sint32 s32_Error = C_NO_ERR;
-                  stw_scl::C_SCLStringList c_Warnings;
-                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
-                  C_CieConverter::C_CIENode c_CurrentCIENode;
+                  int32_t s32_Error = C_NO_ERR;
+                  stw::scl::C_SclStringList c_Warnings;
+                  const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
+                  C_CieConverter::C_CieNode c_CurrentCieNode;
 
                   // The number of nodes is necessary.
                   c_UniqueNodeIndexes.insert(u32_NodeIndex);
 
-                  c_CurrentCIENode.c_Properties.c_Name = pc_Node->c_Properties.c_Name;
-                  c_CurrentCIENode.c_Properties.c_Comment = pc_Node->c_Properties.c_Comment;
+                  c_CurrentCieNode.c_Properties.c_Name = pc_Node->c_Properties.c_Name;
+                  c_CurrentCieNode.c_Properties.c_Comment = pc_Node->c_Properties.c_Comment;
 
                   // get Tx can messages
-                  const std::vector<C_OSCCanMessage> c_TxMsgs = pc_CanMessageContainer->GetMessagesConst(true);
-                  std::vector<C_OSCCanMessage>::const_iterator c_TxIter;
+                  const std::vector<C_OscCanMessage> c_TxMsgs = pc_CanMessageContainer->GetMessagesConst(true);
+                  std::vector<C_OscCanMessage>::const_iterator c_TxIter;
                   for (c_TxIter = c_TxMsgs.begin(); c_TxIter != c_TxMsgs.end(); ++c_TxIter)
                   {
-                     C_CieConverter::C_CIENodeMessage c_CurrentMessage;
-                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(this->mu32_Index, e_ComType,
+                     C_CieConverter::C_CieNodeMessage c_CurrentMessage;
+                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(this->mu32_Index, e_ComType,
                                                                                         *c_TxIter, c_CurrentMessage,
                                                                                         c_Warnings);
-                     c_CurrentCIENode.c_TxMessages.push_back(c_CurrentMessage);
+                     c_CurrentCieNode.c_TxMessages.push_back(c_CurrentMessage);
                      // for counting messages and signals
-                     const std::set<uint32>::const_iterator c_Iter = c_CanMessageIds.find(c_TxIter->u32_CanId);
+                     const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_TxIter->u32_CanId);
                      if (c_Iter == c_CanMessageIds.end())
                      {
-                        c_CanMessageIdsWithExtended.insert(C_OSCCanMessageUniqueId(c_TxIter->u32_CanId,
+                        c_CanMessageIdsWithExtended.insert(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
                                                                                    c_TxIter->q_IsExtended));
                         c_CanMessageIds.insert(c_TxIter->u32_CanId);
                         // count signals
@@ -967,16 +967,16 @@ void C_SdHandlerWidget::m_Export(void)
                      }
                      else
                      {
-                        const std::set<C_OSCCanMessageUniqueId>::const_iterator c_IterWithExtended =
-                           c_CanMessageIdsWithExtended.find(C_OSCCanMessageUniqueId(c_TxIter->u32_CanId,
+                        const std::set<C_OscCanMessageUniqueId>::const_iterator c_IterWithExtended =
+                           c_CanMessageIdsWithExtended.find(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
                                                                                     c_TxIter
                                                                                     ->q_IsExtended));
                         if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
                         {
-                           const stw_scl::C_SCLString c_Message = "Can't export message \"" +
-                                                                  c_TxIter->c_Name + "\" in bus \"" +
-                                                                  stw_scl::C_SCLString::IntToStr(this->mu32_Index) +
-                                                                  "\" because message ID is not unique.";
+                           const stw::scl::C_SclString c_Message = "Can't export message \"" +
+                                                                   c_TxIter->c_Name + "\" in bus \"" +
+                                                                   stw::scl::C_SclString::IntToStr(this->mu32_Index) +
+                                                                   "\" because message ID is not unique.";
                            c_Warnings.Append(c_Message);
                            osc_write_log_warning("DBC Export", c_Message);
                            s32_Error += C_WARN;
@@ -985,20 +985,20 @@ void C_SdHandlerWidget::m_Export(void)
                   }
 
                   // get Rx can messages
-                  const std::vector<C_OSCCanMessage> & rc_RxMsgs = pc_CanMessageContainer->GetMessagesConst(false);
-                  std::vector<C_OSCCanMessage>::const_iterator c_RxIter;
+                  const std::vector<C_OscCanMessage> & rc_RxMsgs = pc_CanMessageContainer->GetMessagesConst(false);
+                  std::vector<C_OscCanMessage>::const_iterator c_RxIter;
                   for (c_RxIter = rc_RxMsgs.begin(); c_RxIter != rc_RxMsgs.end(); ++c_RxIter)
                   {
-                     C_CieConverter::C_CIENodeMessage c_CurrentMessage;
-                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage(this->mu32_Index, e_ComType,
+                     C_CieConverter::C_CieNodeMessage c_CurrentMessage;
+                     s32_Error += C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(this->mu32_Index, e_ComType,
                                                                                         *c_RxIter, c_CurrentMessage,
                                                                                         c_Warnings);
-                     c_CurrentCIENode.c_RxMessages.push_back(c_CurrentMessage);
+                     c_CurrentCieNode.c_RxMessages.push_back(c_CurrentMessage);
                      // for counting messages and signals
-                     const std::set<uint32>::const_iterator c_Iter = c_CanMessageIds.find(c_RxIter->u32_CanId);
+                     const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_RxIter->u32_CanId);
                      if (c_Iter == c_CanMessageIds.end())
                      {
-                        c_CanMessageIdsWithExtended.insert(C_OSCCanMessageUniqueId(c_RxIter->u32_CanId,
+                        c_CanMessageIdsWithExtended.insert(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
                                                                                    c_RxIter->q_IsExtended));
                         c_CanMessageIds.insert(c_RxIter->u32_CanId);
                         // count signals
@@ -1006,16 +1006,16 @@ void C_SdHandlerWidget::m_Export(void)
                      }
                      else
                      {
-                        const std::set<C_OSCCanMessageUniqueId>::const_iterator c_IterWithExtended =
-                           c_CanMessageIdsWithExtended.find(C_OSCCanMessageUniqueId(c_RxIter->u32_CanId,
+                        const std::set<C_OscCanMessageUniqueId>::const_iterator c_IterWithExtended =
+                           c_CanMessageIdsWithExtended.find(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
                                                                                     c_RxIter
                                                                                     ->q_IsExtended));
                         if (c_IterWithExtended == c_CanMessageIdsWithExtended.end())
                         {
-                           const stw_scl::C_SCLString c_Message = "Can't export message \"" +
-                                                                  c_RxIter->c_Name + "\" in bus \"" +
-                                                                  stw_scl::C_SCLString::IntToStr(this->mu32_Index) +
-                                                                  "\" because message ID is not unique. Message is ignored.";
+                           const stw::scl::C_SclString c_Message = "Can't export message \"" +
+                                                                   c_RxIter->c_Name + "\" in bus \"" +
+                                                                   stw::scl::C_SclString::IntToStr(this->mu32_Index) +
+                                                                   "\" because message ID is not unique. Message is ignored.";
                            c_Warnings.Append(c_Message);
                            osc_write_log_warning("DBC Export", c_Message);
                            s32_Error += C_WARN;
@@ -1023,7 +1023,7 @@ void C_SdHandlerWidget::m_Export(void)
                      }
                   }
                   // save current node
-                  c_CommDef.c_Nodes.push_back(c_CurrentCIENode);
+                  c_CommDef.c_Nodes.push_back(c_CurrentCieNode);
 
                   u32_NumOfInputMessages = c_CanMessageIds.size();
 
@@ -1087,7 +1087,7 @@ void C_SdHandlerWidget::m_RtfExport(void)
       else
       {
          // export dialog
-         QPointer<C_OgePopUpDialog> const c_PopUpDialog = new C_OgePopUpDialog(this, this);
+         const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
          C_RtfExportWidget * const pc_DialogExportReport = new C_RtfExportWidget(*c_PopUpDialog);
 
          // resize
@@ -1095,11 +1095,11 @@ void C_SdHandlerWidget::m_RtfExport(void)
 
          c_PopUpDialog->SetSize(c_SIZE_IMPORT_REPORT);
 
-         stw_scl::C_SCLString c_RtfPath = static_cast<stw_scl::C_SCLString>(
+         stw::scl::C_SclString c_RtfPath = static_cast<stw::scl::C_SclString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfPath().toStdString().c_str());
-         stw_scl::C_SCLString c_CompanyName = static_cast<stw_scl::C_SCLString>(
+         stw::scl::C_SclString c_CompanyName = static_cast<stw::scl::C_SclString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfCompanyName().toStdString().c_str());
-         stw_scl::C_SCLString c_CompanyLogoPath = static_cast<stw_scl::C_SCLString>(
+         stw::scl::C_SclString c_CompanyLogoPath = static_cast<stw::scl::C_SclString>(
             C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownRtfCompanyLogoPath().toStdString().c_str());
 
          if (c_RtfPath == "")
@@ -1124,7 +1124,7 @@ void C_SdHandlerWidget::m_RtfExport(void)
          }
 
          // display message report
-         if (c_PopUpDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             // save inputs as user settings
             pc_DialogExportReport->GetRtfPath(c_RtfPath);
@@ -1138,10 +1138,10 @@ void C_SdHandlerWidget::m_RtfExport(void)
             C_UsHandler::h_GetInstance()->Save();
 
             // export to RTF file
-            stw_scl::C_SCLStringList c_Warnings;
-            stw_scl::C_SCLString c_Error;
-            const sint32 s32_Return = pc_DialogExportReport->ExportToRtf(c_RtfPath, c_CompanyName, c_CompanyLogoPath,
-                                                                         this->mpc_Topology, c_Warnings, c_Error);
+            stw::scl::C_SclStringList c_Warnings;
+            stw::scl::C_SclString c_Error;
+            const int32_t s32_Return = pc_DialogExportReport->ExportToRtf(c_RtfPath, c_CompanyName, c_CompanyLogoPath,
+                                                                          this->mpc_Topology, c_Warnings, c_Error);
             if (s32_Return == C_NO_ERR)
             {
                const QString c_Details =
@@ -1159,7 +1159,7 @@ void C_SdHandlerWidget::m_RtfExport(void)
             }
             else if (s32_Return == C_WARN)
             {
-               const stw_scl::C_SCLString c_Details = "Warnings: \r\n" + c_Warnings.GetText();
+               const stw::scl::C_SclString c_Details = "Warnings: \r\n" + c_Warnings.GetText();
                C_OgeWiCustomMessage c_MessageResult(this, C_OgeWiCustomMessage::E_Type::eWARNING);
                c_MessageResult.SetHeading(C_GtGetText::h_GetText("RTF File Export"));
                c_MessageResult.SetDescription(C_GtGetText::h_GetText("Warnings occurred on RTF File Export."));
@@ -1204,14 +1204,14 @@ void C_SdHandlerWidget::m_TspImport()
                                      "problems with file or directory paths."));
       c_MessageBox.SetDetails(C_GtGetText::h_GetText(
                                  "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
       c_MessageBox.SetCustomMinHeight(230, 270);
       c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eOK)
       {
          if (mpc_ActNodeEdit != NULL)
          {
-            mpc_ActNodeEdit->AddFromTSP();
+            mpc_ActNodeEdit->AddFromTsp();
          }
       }
    }
@@ -1219,7 +1219,7 @@ void C_SdHandlerWidget::m_TspImport()
    {
       if (mpc_ActNodeEdit != NULL)
       {
-         mpc_ActNodeEdit->AddFromTSP();
+         mpc_ActNodeEdit->AddFromTsp();
       }
    }
 }
@@ -1232,7 +1232,7 @@ void C_SdHandlerWidget::m_GenerateHalcDatapools(void) const
 {
    if (this->mpc_ActNodeEdit != NULL)
    {
-      const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_Index);
+      const int32_t s32_Result = C_PuiSdHandler::h_GetInstance()->HalcGenerateDatapools(this->mu32_Index);
 
       tgl_assert((s32_Result == C_NO_ERR) || (s32_Result == C_NOACT));
    }
@@ -1246,30 +1246,30 @@ void C_SdHandlerWidget::CallHelp(void)
 {
    if (this->mpc_ActNodeEdit != NULL)
    {
-      const sintn sn_TabIndex = this->mpc_ActNodeEdit->GetTabIndex();
-      if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TAB_INDEX_DATA_POOL)
+      const int32_t s32_TabIndex = this->mpc_ActNodeEdit->GetTabIndex();
+      if (s32_TabIndex == C_SdNdeNodeEditWidget::hs32_TAB_INDEX_DATA_POOL)
       {
          //TabIndex == Datapools
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-            "stw_opensyde_gui::C_SdNdeDbViewWidget");
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw::opensyde_gui::C_SdNdeDbViewWidget");
       }
-      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TAB_INDEX_COMM)
+      else if (s32_TabIndex == C_SdNdeNodeEditWidget::hs32_TAB_INDEX_COMM)
       {
          //TabIndex == COMM
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-            "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw::opensyde_gui::C_SdBueComIfDescriptionWidget");
       }
-      else if (sn_TabIndex == C_SdNdeNodeEditWidget::hsn_TAB_INDEX_HALC)
+      else if (s32_TabIndex == C_SdNdeNodeEditWidget::hs32_TAB_INDEX_HALC)
       {
          // TabIndex == HALC
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-            "stw_opensyde_gui::C_SdNdeHalcChannelWidget");
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw::opensyde_gui::C_SdNdeHalcChannelWidget");
       }
       else
       {
          // Properties
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-            "stw_opensyde_gui::C_SdNdeNodeEditWidget");
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw::opensyde_gui::C_SdNdeNodeEditWidget");
       }
    }
    else if (this->mpc_ActBusEdit != NULL)
@@ -1277,19 +1277,19 @@ void C_SdHandlerWidget::CallHelp(void)
       //TabIndex == COMM
       if (this->mpc_ActBusEdit->GetTabIndex() == 1)
       {
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-            "stw_opensyde_gui::C_SdBueComIfDescriptionWidget");
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw::opensyde_gui::C_SdBueComIfDescriptionWidget");
       }
       else //properties
       {
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-            "stw_opensyde_gui::C_SdBueBusEditWidget");
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+            "stw::opensyde_gui::C_SdBueBusEditWidget");
       }
    }
    else
    {
-      //ms32_SUBMODE_SYSDEF_TOPOLOGY and others call stw_opensyde_gui::C_SdHandlerWidget
-      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-         "stw_opensyde_gui::C_SdHandlerWidget");
+      //ms32_SUBMODE_SYSDEF_TOPOLOGY and others call stw::opensyde_gui::C_SdHandlerWidget
+      stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+         "stw::opensyde_gui::C_SdHandlerWidget");
    }
 }

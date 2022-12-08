@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <widget class="stw_opensyde_gui::C_SebGraphicsView" name="pc_GraphicsView">
+    <widget class="stw::opensyde_gui::C_SebGraphicsView" name="pc_GraphicsView">
      <property name="palette">
       <palette>
        <active>
@@ -164,9 +164,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_SebGraphicsView</class>
+   <class>stw::opensyde_gui::C_SebGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>C_SebGraphicsView.h</header>
+   <header>C_SebGraphicsView.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

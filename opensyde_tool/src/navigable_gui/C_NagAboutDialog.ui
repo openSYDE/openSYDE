@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral_5">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral_5">
      <property name="minimumSize">
       <size>
        <width>500</width>
@@ -148,7 +148,7 @@
                    <number>6</number>
                   </property>
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValOpenSYDEVersion">
+                   <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValOpenSYDEVersion">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -193,7 +193,7 @@
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout">
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelValOpenSYDEHash">
+                   <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelValOpenSYDEHash">
                     <property name="text">
                      <string>Hash</string>
                     </property>
@@ -220,7 +220,7 @@
                    <number>2</number>
                   </property>
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelValCopyright">
+                   <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItemValue" name="pc_LabelValCopyright">
                     <property name="text">
                      <string>Copyright Text</string>
                     </property>
@@ -305,7 +305,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -351,25 +351,25 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItemValue</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItemValue</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItemValue.h</header>
+   <header>C_OgeLabGroupItemValue.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

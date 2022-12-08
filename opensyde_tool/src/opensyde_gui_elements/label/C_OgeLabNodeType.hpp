@@ -1,0 +1,40 @@
+//----------------------------------------------------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Label for node type (header)
+
+   Label for node type (note: main module description should be in .cpp file)
+
+   \copyright   Copyright 2016 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//----------------------------------------------------------------------------------------------------------------------
+#ifndef C_OGELABNODETYPE_H
+#define C_OGELABNODETYPE_H
+
+/* -- Includes ------------------------------------------------------------------------------------------------------ */
+
+#include <QLabel>
+
+/* -- Namespace ----------------------------------------------------------------------------------------------------- */
+namespace stw
+{
+namespace opensyde_gui_elements
+{
+/* -- Global Constants ---------------------------------------------------------------------------------------------- */
+
+/* -- Types --------------------------------------------------------------------------------------------------------- */
+
+class C_OgeLabNodeType :
+   public QLabel
+{
+   Q_OBJECT
+
+public:
+   C_OgeLabNodeType(QWidget * const opc_Parent = NULL);
+};
+
+/* -- Extern Global Variables --------------------------------------------------------------------------------------- */
+}
+} //end of namespace
+
+#endif

@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
-#include "version_config.h"
+#include "precomp_headers.hpp"
+#include "version_config.hpp"
 
-#include "stwerrors.h"
-#include "C_SYDEsupLinux.h"
+#include "stwerrors.hpp"
+#include "C_SydeSupLinux.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,8 +37,10 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsupLinux::C_SYDEsupLinux(void) :
-   C_SYDEsup(),
+C_SydeSupLinux::C_SydeSupLinux(void) :
+   C_SydeSup(),
+   mx_UpdateTaskHandle(0),
+   me_UpdateTaskResult(),
    mq_CanDllLoaded(false)
 {
 }
@@ -48,7 +49,7 @@ C_SYDEsupLinux::C_SYDEsupLinux(void) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsupLinux::~C_SYDEsupLinux(void)
+C_SydeSupLinux::~C_SydeSupLinux(void)
 {
 }
 
@@ -67,19 +68,19 @@ C_SYDEsupLinux::~C_SYDEsupLinux(void)
    \retval eERR_PARSE_COMMAND_LINE   Update package file not specified or unzip folder invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupLinux::InitParameters(const stw_scl::C_SCLString & orc_SupFilePath,
-                                                   const stw_scl::C_SCLString & orc_CanInterface,
-                                                   const stw_scl::C_SCLString & orc_LogPath,
-                                                   const stw_scl::C_SCLString & orc_UnzipPath)
+C_SydeSup::E_Result C_SydeSupLinux::InitParameters(const stw::scl::C_SclString & orc_SupFilePath,
+                                                   const stw::scl::C_SclString & orc_CanInterface,
+                                                   const stw::scl::C_SclString & orc_LogPath,
+                                                   const stw::scl::C_SclString & orc_UnzipPath)
 {
    E_Result e_Return;
 
-   mc_SUPFilePath = orc_SupFilePath;
+   mc_SupFilePath = orc_SupFilePath;
    mc_CanDriver = orc_CanInterface;
    mc_LogPath = orc_LogPath;
    mc_UnzipPath = orc_UnzipPath;
 
-   if (mc_SUPFilePath == "")
+   if (mc_SupFilePath == "")
    {
       e_Return = eERR_PARSE_COMMAND_LINE;
    }
@@ -102,9 +103,9 @@ C_SYDEsup::E_Result C_SYDEsupLinux::InitParameters(const stw_scl::C_SCLString & 
    \param[in]   orc_SupFilePath     Path and filename of the update package
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SYDEsupLinux::SetUpdateFilePath(const stw_scl::C_SCLString & orc_SupFilePath)
+void C_SydeSupLinux::SetUpdateFilePath(const stw::scl::C_SclString & orc_SupFilePath)
 {
-   mc_SUPFilePath = orc_SupFilePath;
+   mc_SupFilePath = orc_SupFilePath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -112,7 +113,7 @@ void C_SYDEsupLinux::SetUpdateFilePath(const stw_scl::C_SCLString & orc_SupFileP
    \brief   Start a update process.
 
    This function creates a thread in which the update process is executed and starts the update process
-   (call C_SYDEsup::Update()).
+   (call C_SydeSup::Update()).
    Use UpdateTaskCheckResult() to check for progress.
 
    \retval eOK                              Success
@@ -120,10 +121,10 @@ void C_SYDEsupLinux::SetUpdateFilePath(const stw_scl::C_SCLString & orc_SupFileP
    \retval eERR_THREAD_UPDATE_INIT_FAILED   Could not create new thread (no resources)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskStart(void)
+C_SydeSup::E_Result C_SydeSupLinux::UpdateTaskStart(void)
 {
    E_Result e_Result = eERR_THREAD_UPDATE_IN_PROGRESS;
-   sintn sn_Ret;
+   int32_t s32_Ret;
 
    if (mq_UpdateTaskRunning == false)
    {
@@ -132,11 +133,11 @@ C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskStart(void)
       me_UpdateTaskResult = eERR_THREAD_UPDATE_IN_PROGRESS;
 
       // Prepare info text variable
-      mun_InfoIndex = 0u;
-      mac_UpdateInfo.SetLength(0u);
+      mu32_InfoIndex = 0U;
+      mac_UpdateInfo.SetLength(0U);
 
-      sn_Ret = pthread_create(&mt_UpdateTaskHandle, NULL, &mh_UpdateTask, this);
-      if (sn_Ret == 0)
+      s32_Ret = pthread_create(&mx_UpdateTaskHandle, NULL, &mh_UpdateTask, this);
+      if (s32_Ret == 0)
       {
          e_Result = eOK;
          mq_UpdateTaskRunning = true;
@@ -161,10 +162,10 @@ C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskStart(void)
 
    \retval eERR_THREAD_UPDATE_IN_PROGRESS  Update process still in progress
    \retval eOK                      Update process finished successfully
-   \retval other                    Update process finished with error, see C_SYDEsup::Update()
+   \retval other                    Update process finished with error, see C_SydeSup::Update()
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskCheckResult(stw_types::uint8 & oru8_Progress)
+C_SydeSup::E_Result C_SydeSupLinux::UpdateTaskCheckResult(uint8_t & oru8_Progress)
 {
    E_Result e_Result = eERR_UPDATE_C_NOACT;
 
@@ -177,7 +178,7 @@ C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskCheckResult(stw_types::uint8 & oru
       else
       {
          // Update task has finished
-         (void)pthread_join(mt_UpdateTaskHandle, NULL);
+         (void)pthread_join(mx_UpdateTaskHandle, NULL);
          mq_UpdateTaskRunning = false;
          e_Result = me_UpdateTaskResult;
       }
@@ -185,7 +186,7 @@ C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskCheckResult(stw_types::uint8 & oru
    }
    else
    {
-      oru8_Progress = 0u;
+      oru8_Progress = 0U;
    }
 
    return e_Result;
@@ -201,15 +202,15 @@ C_SYDEsup::E_Result C_SYDEsupLinux::UpdateTaskCheckResult(stw_types::uint8 & oru
    \retval eOK                      One line read
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupLinux::GetNextInfoText(stw_scl::C_SCLString & orc_Info)
+C_SydeSup::E_Result C_SydeSupLinux::GetNextInfoText(stw::scl::C_SclString & orc_Info)
 {
    E_Result e_Result = eERR_UPDATE_C_NOACT;
-   uintn un_InfoLen = mac_UpdateInfo.GetLength();
+   const uint32_t u32_InfoLen = mac_UpdateInfo.GetLength();
 
-   if (mun_InfoIndex < un_InfoLen)
+   if (mu32_InfoIndex < u32_InfoLen)
    {
-      orc_Info = mac_UpdateInfo[mun_InfoIndex];
-      mun_InfoIndex++;
+      orc_Info = mac_UpdateInfo[mu32_InfoIndex];
+      mu32_InfoIndex++;
       e_Result = eOK;
    }
 
@@ -217,17 +218,18 @@ C_SYDEsup::E_Result C_SYDEsupLinux::GetNextInfoText(stw_scl::C_SCLString & orc_I
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*!
-   \brief   Pthread wrapper for C_SYDEsup::Update() function.
+   \brief   Pthread wrapper for C_SydeSup::Update() function.
 
    This function is installed as the update process thread by UpdateTaskStart().
    The result of the update process is written to variable me_UpdateTaskResult.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void * C_SYDEsupLinux::mh_UpdateTask(void * opv_Arg)
+void * C_SydeSupLinux::mh_UpdateTask(void * const opv_Arg)
 {
-   C_SYDEsupLinux * pt_This = (C_SYDEsupLinux *)opv_Arg;
+   //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
+   C_SydeSupLinux * const pc_This = reinterpret_cast<C_SydeSupLinux *> (opv_Arg); 
 
-   pt_This->me_UpdateTaskResult = pt_This->Update();
+   pc_This->me_UpdateTaskResult = pc_This->Update();
 
    return NULL;
 }
@@ -248,10 +250,10 @@ void * C_SYDEsupLinux::mh_UpdateTask(void * opv_Arg)
    eERR_CAN_IF_LOAD_FAILED    driver already open
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupLinux::m_OpenCan(const C_SCLString & orc_CanDriver, const uint64 ou64_BitrateBps)
+C_SydeSup::E_Result C_SydeSupLinux::m_OpenCan(const C_SclString & orc_CanDriver, const uint64_t ou64_BitrateBps)
 {
-   C_SYDEsup::E_Result e_Result = eOK;
-   sint32 s32_Return = C_NO_ERR;
+   C_SydeSup::E_Result e_Result = eOK;
+   int32_t s32_Return;
 
    (void)ou64_BitrateBps; // Bitrate is set by interface settings outside
 
@@ -276,7 +278,7 @@ C_SYDEsup::E_Result C_SYDEsupLinux::m_OpenCan(const C_SCLString & orc_CanDriver,
    Disconnect from CAN bus and CAN driver
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SYDEsupLinux::m_CloseCan(void)
+void C_SydeSupLinux::m_CloseCan(void)
 {
    (void)mc_CanDispatcher.CAN_Exit();
 
@@ -302,14 +304,14 @@ void C_SYDEsupLinux::m_CloseCan(void)
    eERR_ETH_IF_LOAD_FAILED    driver load failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupLinux::m_OpenEthernet(void)
+C_SydeSup::E_Result C_SydeSupLinux::m_OpenEthernet(void)
 {
    mpc_EthDispatcher = &mc_EthDispatcher;
    return eOK;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get name of application as an C_SCLString
+/*! \brief   Get name of application as an C_SclString
 
    Return the version number of the running application
     in the commonly used STW format: "Vx.yyrz".
@@ -322,9 +324,9 @@ C_SYDEsup::E_Result C_SYDEsupLinux::m_OpenEthernet(void)
    string with version information
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsupLinux::m_GetApplicationVersion(const C_SCLString & orc_ApplicationFileName) const
+C_SclString C_SydeSupLinux::m_GetApplicationVersion(const C_SclString & orc_ApplicationFileName) const
 {
-   C_SCLString c_Version;
+   C_SclString c_Version;
 
    (void)orc_ApplicationFileName;
 
@@ -341,7 +343,7 @@ C_SCLString C_SYDEsupLinux::m_GetApplicationVersion(const C_SCLString & orc_Appl
    Default log location
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsupLinux::m_GetDefaultLogLocation(void) const
+C_SclString C_SydeSupLinux::m_GetDefaultLogLocation(void) const
 {
    return "/var/log";
 }
@@ -353,7 +355,7 @@ C_SCLString C_SYDEsupLinux::m_GetDefaultLogLocation(void) const
    usage example
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsupLinux::m_GetCanInterfaceUsageExample(void) const
+C_SclString C_SydeSupLinux::m_GetCanInterfaceUsageExample(void) const
 {
    return "-i can0";
 }

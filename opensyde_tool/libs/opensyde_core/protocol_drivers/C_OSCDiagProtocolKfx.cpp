@@ -10,20 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCDiagProtocolKfx.h"
-#include "CSCLString.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscDiagProtocolKfx.hpp"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,17 +37,18 @@ using namespace stw_scl;
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
-uint16 C_OSCDiagProtocolKfx::mh_PackDataPoolIndex(const uint16 ou16_List, const uint16 ou16_Variable)
+uint16_t C_OscDiagProtocolKfx::mh_PackDataPoolIndex(const uint16_t ou16_List, const uint16_t ou16_Variable)
 {
-   return ((static_cast<uint16>(ou16_List << 10U)) | (ou16_Variable & 0x03FFU));
+   return ((static_cast<uint16_t>(ou16_List << 10U)) | (ou16_Variable & 0x03FFU));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_OSCDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16 ou16_Index, uint16 & oru16_List, uint16 & oru16_Variable)
+void C_OscDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16_t ou16_Index, uint16_t & oru16_List,
+                                                  uint16_t & oru16_Variable)
 {
-   oru16_List    = static_cast<uint16>((ou16_Index & 0xFC00U) >> 10U);
-   oru16_Variable = static_cast<uint16>(ou16_Index & 0x03FFU);
+   oru16_List    = static_cast<uint16_t>((ou16_Index & 0xFC00U) >> 10U);
+   oru16_Variable = static_cast<uint16_t>(ou16_Index & 0x03FFU);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ void C_OSCDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16 ou16_Index, uint1
    Called by KEFEX protocol implementation when a response to a
    previously requested ECRR or TCRR request was received.
 
-   \param[in]     opv_Instance         Pointer to the instance of C_OSCDiagProtocolKfx that we installed in constructor
+   \param[in]     opv_Instance         Pointer to the instance of C_OscDiagProtocolKfx that we installed in constructor
    \param[in]     ou32_Index           packed variable index
    \param[in]     os64_Value           reported variable value (if oq_Error is true this contains the error code)
    \param[in]     ou32_TimeStamp       timestamp of reported value
@@ -64,17 +65,17 @@ void C_OSCDiagProtocolKfx::mh_UnpackDataPoolIndex(const uint16 ou16_Index, uint1
    \param[in]     oq_Error             true: error response; false: data response
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, const uint32 ou32_Index,
-                                                     const sint64 os64_Value, const uint32 ou32_TimeStamp,
+void C_OscDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, const uint32_t ou32_Index,
+                                                     const int64_t os64_Value, const uint32_t ou32_TimeStamp,
                                                      const bool oq_IsTimeStamped, const bool oq_Error)
 {
    //lint -e{9079}  We know that we registered; this cannot fail
-   C_OSCDiagProtocolKfx * const pc_MeMyselfAndI = reinterpret_cast<C_OSCDiagProtocolKfx *>(opv_Instance);
+   C_OscDiagProtocolKfx * const pc_This = reinterpret_cast<C_OscDiagProtocolKfx *>(opv_Instance);
 
-   tgl_assert(pc_MeMyselfAndI != NULL);
-   if (pc_MeMyselfAndI != NULL)
+   tgl_assert(pc_This != NULL);
+   if (pc_This != NULL)
    {
-      pc_MeMyselfAndI->m_CyclicResponseReceived(ou32_Index, os64_Value, ou32_TimeStamp, oq_IsTimeStamped, oq_Error);
+      pc_This->m_CyclicResponseReceived(ou32_Index, os64_Value, ou32_TimeStamp, oq_IsTimeStamped, oq_Error);
    }
 }
 
@@ -93,31 +94,31 @@ void C_OSCDiagProtocolKfx::mh_CyclicResponseReceived(void * const opv_Instance, 
    \param[in]     oq_Error             true: error response; false: data response
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDiagProtocolKfx::m_CyclicResponseReceived(const uint32 ou32_Index, const sint64 os64_Value,
-                                                    const uint32 ou32_TimeStamp, const bool oq_IsTimeStamped,
+void C_OscDiagProtocolKfx::m_CyclicResponseReceived(const uint32_t ou32_Index, const int64_t os64_Value,
+                                                    const uint32_t ou32_TimeStamp, const bool oq_IsTimeStamped,
                                                     const bool oq_Error)
 {
-   uint16 u16_List;
-   uint16 u16_Variable;
+   uint16_t u16_List;
+   uint16_t u16_Variable;
 
    (void)oq_IsTimeStamped;
    (void)ou32_TimeStamp;
 
    tgl_assert(ou32_Index <= 0xFFFF); //this should be true for any KEFEX transmission
 
-   mh_UnpackDataPoolIndex(static_cast<uint16>(ou32_Index), u16_List, u16_Variable);
+   mh_UnpackDataPoolIndex(static_cast<uint16_t>(ou32_Index), u16_List, u16_Variable);
 
    if (oq_Error == true)
    {
       if (mpr_OnDataPoolReadEventErrorReceived != NULL)
       {
          mpr_OnDataPoolReadEventErrorReceived(mpv_OnAsyncInstance, 0U, u16_List, u16_Variable,
-                                              static_cast<uint8>(os64_Value));
+                                              static_cast<uint8_t>(os64_Value));
       }
       else
       {
          osc_write_log_warning("Asynchronous communication",
-                               "C_OSCDiagProtocolKfx: Cyclic error response received but no handler installed !");
+                               "C_OscDiagProtocolKfx: Cyclic error response received but no handler installed !");
       }
    }
    else
@@ -125,19 +126,19 @@ void C_OSCDiagProtocolKfx::m_CyclicResponseReceived(const uint32 ou32_Index, con
       if (mpr_OnDataPoolReadEventReceived != NULL)
       {
          //convert value; we don't know the size of the element; we know the maximum is 32bits so always return those
-         const uint32 u32_Value = static_cast<uint32>(os64_Value);
-         std::vector<uint8> c_Value;
+         const uint32_t u32_Value = static_cast<uint32_t>(os64_Value);
+         std::vector<uint8_t> c_Value;
          c_Value.resize(4);
-         c_Value[0] = static_cast<uint8>(u32_Value);
-         c_Value[1] = static_cast<uint8>(u32_Value >> 8U);
-         c_Value[2] = static_cast<uint8>(u32_Value >> 16U);
-         c_Value[3] = static_cast<uint8>(u32_Value >> 24U);
+         c_Value[0] = static_cast<uint8_t>(u32_Value);
+         c_Value[1] = static_cast<uint8_t>(u32_Value >> 8U);
+         c_Value[2] = static_cast<uint8_t>(u32_Value >> 16U);
+         c_Value[3] = static_cast<uint8_t>(u32_Value >> 24U);
          mpr_OnDataPoolReadEventReceived(mpv_OnAsyncInstance, 0U, u16_List, u16_Variable, c_Value);
       }
       else
       {
          osc_write_log_warning("Asynchronous communication",
-                               "C_OSCDiagProtocolKfx: Cyclic data response received but no handler installed !");
+                               "C_OscDiagProtocolKfx: Cyclic data response received but no handler installed !");
       }
    }
 }
@@ -148,8 +149,8 @@ void C_OSCDiagProtocolKfx::m_CyclicResponseReceived(const uint32 ou32_Index, con
    Set up class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDiagProtocolKfx::C_OSCDiagProtocolKfx(void) :
-   C_OSCDiagProtocolBase(),
+C_OscDiagProtocolKfx::C_OscDiagProtocolKfx(void) :
+   C_OscDiagProtocolBase(),
    mq_HasDispatcher(false),
    mq_NvmValidFlagIsUsed(false),
    mu16_CommTimeoutMs(1000)
@@ -158,7 +159,7 @@ C_OSCDiagProtocolKfx::C_OSCDiagProtocolKfx(void) :
    mau16_EventRailIntervalsMs[1] = 500U;
    mau16_EventRailIntervalsMs[2] = 1000U;
 
-   mpc_CommKefex = new stw_diag_lib::C_KFXCommunicationKEFEX(true);
+   mpc_CommKefex = new stw::diag_lib::C_KFXCommunicationKEFEX(true);
    //register us as recipient of cyclic transmission callbacks:
    mpc_CommKefex->InstallCyclicTransmissionCallback(&mh_CyclicResponseReceived, this);
 }
@@ -169,7 +170,7 @@ C_OSCDiagProtocolKfx::C_OSCDiagProtocolKfx(void) :
    Tear down class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDiagProtocolKfx::~C_OSCDiagProtocolKfx(void)
+C_OscDiagProtocolKfx::~C_OscDiagProtocolKfx(void)
 {
    delete mpc_CommKefex;
    mpc_CommKefex = NULL;
@@ -183,9 +184,9 @@ C_OSCDiagProtocolKfx::~C_OSCDiagProtocolKfx(void)
    \param[in]    opc_Dispatcher  CAN dispatcher to use for communication
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDiagProtocolKfx::SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_Dispatcher)
+void C_OscDiagProtocolKfx::SetDispatcher(stw::can::C_CanDispatcher * const opc_Dispatcher)
 {
-   stw_diag_lib::C_KFXCommConfiguration c_Config;
+   stw::diag_lib::C_KFXCommConfiguration c_Config;
    this->mpc_CommKefex->SetCommDispatcher(opc_Dispatcher);
    //the protocol driver does not automatically apply the Rx filters when setting a new dispatcher
    //-> trigger manually by "re-setting" parameters
@@ -210,7 +211,7 @@ void C_OSCDiagProtocolKfx::SetDispatcher(stw_can::C_CAN_Dispatcher * const opc_D
    \param[in]    orc_Config   communication parameters
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDiagProtocolKfx::SetCommunicationParameters(const stw_diag_lib::C_KFXCommConfiguration & orc_Config)
+void C_OscDiagProtocolKfx::SetCommunicationParameters(const stw::diag_lib::C_KFXCommConfiguration & orc_Config)
 {
    //returned errors are only checking for valid pointer
    (void)this->mpc_CommKefex->SetConfig(&orc_Config);
@@ -232,7 +233,7 @@ void C_OSCDiagProtocolKfx::SetCommunicationParameters(const stw_diag_lib::C_KFXC
    \param[in]    oq_IsUsed   on/off (see function description)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDiagProtocolKfx::SetNvmValidFlagUsed(const bool oq_IsUsed)
+void C_OscDiagProtocolKfx::SetNvmValidFlagUsed(const bool oq_IsUsed)
 {
    mq_NvmValidFlagIsUsed = oq_IsUsed;
 }
@@ -246,7 +247,7 @@ void C_OSCDiagProtocolKfx::SetNvmValidFlagUsed(const bool oq_IsUsed)
    mhu8_ENDIANNESS_LITTLE
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_OSCDiagProtocolKfx::GetEndianness(void) const
+uint8_t C_OscDiagProtocolKfx::GetEndianness(void) const
 {
    return mhu8_ENDIANNESS_LITTLE;
 }
@@ -263,9 +264,9 @@ uint8 C_OSCDiagProtocolKfx::GetEndianness(void) const
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::Cycle(void)
+int32_t C_OscDiagProtocolKfx::Cycle(void)
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (mq_HasDispatcher == true)
    {
@@ -304,11 +305,11 @@ sint32 C_OSCDiagProtocolKfx::Cycle(void)
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                 const uint16 ou16_ElementIndex, std::vector<uint8> & orc_ReadData,
-                                                 uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolReadNumeric(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                  const uint16_t ou16_ElementIndex, std::vector<uint8_t> & orc_ReadData,
+                                                  uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -321,11 +322,11 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
           ((orc_ReadData.size() == 1U) || (orc_ReadData.size() == 2U) || (orc_ReadData.size() == 4U) ||
            (orc_ReadData.size() == 8U)))
       {
-         const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
-         sint64 s64_Value;
+         const uint16_t u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
+         int64_t s64_Value;
 
          s32_Return = this->mpc_CommKefex->ReadNumericVariable(u16_Index,
-                                                               static_cast<uint8>(orc_ReadData.size()), s64_Value);
+                                                               static_cast<uint8_t>(orc_ReadData.size()), s64_Value);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
          {
@@ -334,27 +335,27 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
             switch (orc_ReadData.size())
             {
             case 1:
-               orc_ReadData[0] = static_cast<uint8>(s64_Value);
+               orc_ReadData[0] = static_cast<uint8_t>(s64_Value);
                break;
             case 2:
-               orc_ReadData[0] = static_cast<uint8>(s64_Value);
-               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8U);
+               orc_ReadData[0] = static_cast<uint8_t>(s64_Value);
+               orc_ReadData[1] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 8U);
                break;
             case 4:
-               orc_ReadData[0] = static_cast<uint8>(s64_Value);
-               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8U);
-               orc_ReadData[2] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 16U);
-               orc_ReadData[3] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 24U);
+               orc_ReadData[0] = static_cast<uint8_t>(s64_Value);
+               orc_ReadData[1] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 8U);
+               orc_ReadData[2] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 16U);
+               orc_ReadData[3] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 24U);
                break;
             case 8:
-               orc_ReadData[0] = static_cast<uint8>(s64_Value);
-               orc_ReadData[1] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 8U);
-               orc_ReadData[2] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 16U);
-               orc_ReadData[3] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 24U);
-               orc_ReadData[4] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 32U);
-               orc_ReadData[5] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 40U);
-               orc_ReadData[6] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 48U);
-               orc_ReadData[7] = static_cast<uint8>(static_cast<uint64>(s64_Value) >> 56U);
+               orc_ReadData[0] = static_cast<uint8_t>(s64_Value);
+               orc_ReadData[1] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 8U);
+               orc_ReadData[2] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 16U);
+               orc_ReadData[3] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 24U);
+               orc_ReadData[4] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 32U);
+               orc_ReadData[5] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 40U);
+               orc_ReadData[6] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 48U);
+               orc_ReadData[7] = static_cast<uint8_t>(static_cast<uint64_t>(s64_Value) >> 56U);
                break;
             default:
                break; //checked at beginning of function
@@ -421,11 +422,11 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadNumeric(const uint8 ou8_DataPoolIndex, 
    C_RD_WR    malformed protocol response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolReadArray(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                               const uint16 ou16_ElementIndex, std::vector<uint8> & orc_ReadData,
-                                               uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolReadArray(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                const uint16_t ou16_ElementIndex, std::vector<uint8_t> & orc_ReadData,
+                                                uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -437,9 +438,11 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
           (ou16_ElementIndex < mhu16_KFX_RAM_MAX_NUM_ELEMENTS) &&
           (orc_ReadData.size() > 0) && (orc_ReadData.size() <= 0xFFFFFFU))
       {
-         const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
+         const uint16_t u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
 
-         s32_Return = this->mpc_CommKefex->ReadAggregateVariable(u16_Index, orc_ReadData.size(), &orc_ReadData[0]);
+         s32_Return = this->mpc_CommKefex->ReadAggregateVariable(u16_Index,
+                                                                 static_cast<uint32_t>(orc_ReadData.size()),
+                                                                 &orc_ReadData[0]);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
          {
@@ -501,11 +504,12 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadArray(const uint8 ou8_DataPoolIndex, co
    C_RD_WR    malformed protocol response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                  const uint16 ou16_ElementIndex,
-                                                  const std::vector<uint8> & orc_DataToWrite, uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolWriteNumeric(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                   const uint16_t ou16_ElementIndex,
+                                                   const std::vector<uint8_t> & orc_DataToWrite,
+                                                   uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -518,8 +522,8 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
           ((orc_DataToWrite.size() == 1U) || (orc_DataToWrite.size() == 2U) || (orc_DataToWrite.size() == 4U) ||
            (orc_DataToWrite.size() == 8U)))
       {
-         const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
-         uint64 u64_Value;
+         const uint16_t u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
+         uint64_t u64_Value;
 
          //sigh... the KEFEX protocol takes a sint64 parameter; convert back to numeric value :-)
          switch (orc_DataToWrite.size())
@@ -528,32 +532,32 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
             u64_Value = orc_DataToWrite[0];
             break;
          case 2:
-            u64_Value = static_cast<uint64>(orc_DataToWrite[0] +
-                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8U));
+            u64_Value = static_cast<uint64_t>(orc_DataToWrite[0] +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[1])) << 8U));
             break;
          case 4:
-            u64_Value = static_cast<uint64>(orc_DataToWrite[0] +
-                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[2])) << 16U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[3])) << 24U));
+            u64_Value = static_cast<uint64_t>(orc_DataToWrite[0] +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[1])) << 8U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[2])) << 16U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[3])) << 24U));
             break;
          case 8:
-            u64_Value = static_cast<uint64>(orc_DataToWrite[0] +
-                                            ((static_cast<uint64>(orc_DataToWrite[1])) << 8U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[2])) << 16U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[3])) << 24U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[4])) << 32U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[5])) << 40U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[6])) << 48U) +
-                                            ((static_cast<uint64>(orc_DataToWrite[7])) << 56U));
+            u64_Value = static_cast<uint64_t>(orc_DataToWrite[0] +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[1])) << 8U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[2])) << 16U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[3])) << 24U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[4])) << 32U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[5])) << 40U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[6])) << 48U) +
+                                              ((static_cast<uint64_t>(orc_DataToWrite[7])) << 56U));
             break;
          default:
             u64_Value = 0U;
             break; //checked at beginning of function
          }
 
-         s32_Return = this->mpc_CommKefex->WriteNumericVariable(u16_Index, static_cast<uint8>(orc_DataToWrite.size()),
-                                                                static_cast<sint64>(u64_Value));
+         s32_Return = this->mpc_CommKefex->WriteNumericVariable(u16_Index, static_cast<uint8_t>(orc_DataToWrite.size()),
+                                                                static_cast<int64_t>(u64_Value));
 
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
@@ -616,11 +620,12 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteNumeric(const uint8 ou8_DataPoolIndex,
    C_RD_WR    malformed protocol response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                const uint16 ou16_ElementIndex,
-                                                const std::vector<uint8> & orc_DataToWrite, uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolWriteArray(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                 const uint16_t ou16_ElementIndex,
+                                                 const std::vector<uint8_t> & orc_DataToWrite,
+                                                 uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -632,10 +637,11 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
           (ou16_ElementIndex < mhu16_KFX_RAM_MAX_NUM_ELEMENTS) &&
           ((orc_DataToWrite.size() > 0U) && (orc_DataToWrite.size() <= 0xFFFFFFU)))
       {
-         const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
+         const uint16_t u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
 
-         s32_Return =
-            this->mpc_CommKefex->WriteAggregateVariable(u16_Index, orc_DataToWrite.size(), &orc_DataToWrite[0]);
+         s32_Return = this->mpc_CommKefex->WriteAggregateVariable(u16_Index,
+                                                                  static_cast<uint32_t>(orc_DataToWrite.size()),
+                                                                  &orc_DataToWrite[0]);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
          {
@@ -687,9 +693,9 @@ sint32 C_OSCDiagProtocolKfx::DataPoolWriteArray(const uint8 ou8_DataPoolIndex, c
    C_RANGE    invalid rail index or interval value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolSetEventDataRate(const uint8 ou8_Rail, const uint16 ou16_IntervalMs)
+int32_t C_OscDiagProtocolKfx::DataPoolSetEventDataRate(const uint8_t ou8_Rail, const uint16_t ou16_IntervalMs)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((ou8_Rail > 2U) || (ou16_IntervalMs == 0U))
    {
@@ -726,11 +732,11 @@ sint32 C_OSCDiagProtocolKfx::DataPoolSetEventDataRate(const uint8 ou8_Rail, cons
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                const uint16 ou16_ElementIndex, const uint8 ou8_Rail,
-                                                uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolReadCyclic(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                 const uint16_t ou16_ElementIndex, const uint8_t ou8_Rail,
+                                                 uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -740,7 +746,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    {
       if ((ou8_DataPoolIndex == 0U) && (ou16_ListIndex < 64U) && (ou16_ElementIndex < 1024U) && (ou8_Rail < 3U))
       {
-         const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
+         const uint16_t u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
          s32_Return =
             this->mpc_CommKefex->RequestTimeTriggeredTransmission(u16_Index, false,
                                                                   mau16_EventRailIntervalsMs[ou8_Rail]);
@@ -785,11 +791,11 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadCyclic(const uint8 ou8_DataPoolIndex, c
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                      const uint16 ou16_ElementIndex, const uint8 ou8_Rail,
-                                                      const uint32 ou32_Threshold, uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolReadChangeDriven(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                       const uint16_t ou16_ElementIndex, const uint8_t ou8_Rail,
+                                                       const uint32_t ou32_Threshold, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -799,7 +805,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    {
       if ((ou8_DataPoolIndex == 0U) && (ou16_ListIndex < 64U) && (ou16_ElementIndex < 1024U) && (ou8_Rail < 3U))
       {
-         const uint16 u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
+         const uint16_t u16_Index = mh_PackDataPoolIndex(ou16_ListIndex, ou16_ElementIndex);
          s32_Return =
             this->mpc_CommKefex->RequestChangeTriggeredTransmission(u16_Index, mau16_EventRailIntervalsMs[ou8_Rail],
                                                                     ou32_Threshold, ou32_Threshold);
@@ -832,9 +838,9 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadChangeDriven(const uint8 ou8_DataPoolIn
    C_WARN     error response (none specified in protocol; but who knows ...)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolStopEventDriven(void)
+int32_t C_OscDiagProtocolKfx::DataPoolStopEventDriven(void)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (mq_HasDispatcher == false)
    {
@@ -882,10 +888,10 @@ sint32 C_OSCDiagProtocolKfx::DataPoolStopEventDriven(void)
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vector<uint8> & orc_DataRecord,
-                                     uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::NvmRead(const uint32_t ou32_MemoryAddress, std::vector<uint8_t> & orc_DataRecord,
+                                      uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -895,7 +901,8 @@ sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    {
       if ((ou32_MemoryAddress <= 0xFFFFFFU) && (orc_DataRecord.size() > 0))
       {
-         s32_Return = this->mpc_CommKefex->ReadEEPROM(ou32_MemoryAddress, orc_DataRecord.size(), &orc_DataRecord[0]);
+         s32_Return = this->mpc_CommKefex->ReadEEPROM(ou32_MemoryAddress,
+                                                      static_cast<uint32_t>(orc_DataRecord.size()), &orc_DataRecord[0]);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
          {
@@ -930,7 +937,7 @@ sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    So the function checks a configurable flag and returns "OK" if the service is marked as not available.
 
    \param[in]  ou8_DataPoolIndex    Accessed data pool index
-   \param[in]  ou16_NVMAccessCount  Expected number of subsequent executions of service to write to NVM
+   \param[in]  ou16_NvmAccessCount  Expected number of subsequent executions of service to write to NVM
 
    \return
    C_NO_ERR   request sent, positive response received; or: no action required
@@ -941,9 +948,10 @@ sint32 C_OSCDiagProtocolKfx::NvmRead(const uint32 ou32_MemoryAddress, std::vecto
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::NvmWriteStartTransaction(const uint8 ou8_DataPoolIndex, const uint16 ou16_NVMAccessCount)
+int32_t C_OscDiagProtocolKfx::NvmWriteStartTransaction(const uint8_t ou8_DataPoolIndex,
+                                                       const uint16_t ou16_NvmAccessCount)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mq_NvmValidFlagIsUsed != false)
    {
@@ -955,9 +963,9 @@ sint32 C_OSCDiagProtocolKfx::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
       }
       else
       {
-         if ((ou8_DataPoolIndex == 0U) && (ou16_NVMAccessCount > 0U))
+         if ((ou8_DataPoolIndex == 0U) && (ou16_NvmAccessCount > 0U))
          {
-            s32_Return = this->mpc_CommKefex->WriteEEPROMSSLStart(static_cast<uint32>(ou16_NVMAccessCount) * 2U);
+            s32_Return = this->mpc_CommKefex->WriteEEPROMSSLStart(static_cast<uint32_t>(ou16_NvmAccessCount) * 2U);
             //map KEFEX to openSYDE error codes as good as possible:
             switch (s32_Return)
             {
@@ -1003,10 +1011,10 @@ sint32 C_OSCDiagProtocolKfx::NvmWriteStartTransaction(const uint8 ou8_DataPoolIn
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::NvmWrite(const uint32 ou32_MemoryAddress, const std::vector<uint8> & orc_DataRecord,
-                                      uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::NvmWrite(const uint32_t ou32_MemoryAddress, const std::vector<uint8_t> & orc_DataRecord,
+                                       uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -1016,7 +1024,9 @@ sint32 C_OSCDiagProtocolKfx::NvmWrite(const uint32 ou32_MemoryAddress, const std
    {
       if ((ou32_MemoryAddress <= 0xFFFFFFU) && (orc_DataRecord.size() > 0))
       {
-         s32_Return = this->mpc_CommKefex->WriteEEPROM(ou32_MemoryAddress, orc_DataRecord.size(), &orc_DataRecord[0]);
+         s32_Return = this->mpc_CommKefex->WriteEEPROM(ou32_MemoryAddress,
+                                                       static_cast<uint32_t>(orc_DataRecord.size()),
+                                                       &orc_DataRecord[0]);
          //map KEFEX to openSYDE error codes as good as possible:
          switch (s32_Return)
          {
@@ -1055,9 +1065,9 @@ sint32 C_OSCDiagProtocolKfx::NvmWrite(const uint32 ou32_MemoryAddress, const std
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::NvmWriteFinalizeTransaction(void)
+int32_t C_OscDiagProtocolKfx::NvmWriteFinalizeTransaction(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mq_NvmValidFlagIsUsed != false)
    {
@@ -1110,11 +1120,11 @@ sint32 C_OSCDiagProtocolKfx::NvmWriteFinalizeTransaction(void)
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
-                                                 uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolReadVersion(const uint8_t ou8_DataPoolIndex, uint8_t (&orau8_Version)[3],
+                                                  uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
-   static const uint16 hu16_KFX_SERVICE_PROJECT_VERSION = 16U;
+   int32_t s32_Return = C_RANGE;
+   static const uint16_t hu16_KFX_SERVICE_PROJECT_VERSION = 16U;
 
    if (mq_HasDispatcher == false)
    {
@@ -1124,15 +1134,15 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
    {
       if (ou8_DataPoolIndex == 0U)
       {
-         uint32 u32_Result;
+         uint32_t u32_Result;
          s32_Return = this->mpc_CommKefex->ReadService(hu16_KFX_SERVICE_PROJECT_VERSION, u32_Result);
          switch (s32_Return)
          {
          case C_NO_ERR:
             //KEFEX format: 0xMmmr  -> convert
-            orau8_Version[0] = static_cast<uint8>((u32_Result & 0xF000U) >> 12U);
-            orau8_Version[1] = static_cast<uint8>((u32_Result & 0x0FF0U) >> 4U);
-            orau8_Version[2] = static_cast<uint8>(u32_Result & 0x000FU);
+            orau8_Version[0] = static_cast<uint8_t>((u32_Result & 0xF000U) >> 12U);
+            orau8_Version[1] = static_cast<uint8_t>((u32_Result & 0x0FF0U) >> 4U);
+            orau8_Version[2] = static_cast<uint8_t>(u32_Result & 0x000FU);
             break;
          case C_WARN: //error response
             //TODO: Convert to OSY response codes
@@ -1178,8 +1188,8 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadVersion(const uint8 ou8_DataPoolIndex, 
    C_WARN     error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolReadMetaData(const uint8 ou8_DataPoolIndex, stw_types::uint8 (&orau8_Version)[3],
-                                                  stw_scl::C_SCLString & orc_Name, uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::DataPoolReadMetaData(const uint8_t ou8_DataPoolIndex, uint8_t (&orau8_Version)[3],
+                                                   stw::scl::C_SclString & orc_Name, uint8_t * const opu8_NrCode)
 {
    // KEFEX protocol does not support reading the Datapool name
    orc_Name = "";
@@ -1204,10 +1214,10 @@ sint32 C_OSCDiagProtocolKfx::DataPoolReadMetaData(const uint8 ou8_DataPoolIndex,
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, const uint8 ou8_ListIndex,
-                                                bool & orq_ApplicationAcknowledge, uint8 * const opu8_NrCode)
+int32_t C_OscDiagProtocolKfx::NvmNotifyOfChanges(const uint8_t ou8_DataPoolIndex, const uint8_t ou8_ListIndex,
+                                                 bool & orq_ApplicationAcknowledge, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -1268,11 +1278,12 @@ sint32 C_OSCDiagProtocolKfx::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, c
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::DataPoolVerify(const uint8 ou8_DataPoolIndex, const uint16 ou16_NumberOfDataPoolElements,
-                                            const uint16 ou16_DataPoolVersion, const uint32 ou32_DataPoolChecksum,
-                                            bool & orq_Match)
+int32_t C_OscDiagProtocolKfx::DataPoolVerify(const uint8_t ou8_DataPoolIndex,
+                                             const uint16_t ou16_NumberOfDataPoolElements,
+                                             const uint16_t ou16_DataPoolVersion, const uint32_t ou32_DataPoolChecksum,
+                                             bool & orq_Match)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (mq_HasDispatcher == false)
    {
@@ -1282,7 +1293,7 @@ sint32 C_OSCDiagProtocolKfx::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
    {
       if ((ou8_DataPoolIndex == 0U) && (ou32_DataPoolChecksum <= 0xFFFFU))
       {
-         s32_Return = this->mpc_CommKefex->Logon(static_cast<uint64>(ou32_DataPoolChecksum), ou16_DataPoolVersion,
+         s32_Return = this->mpc_CommKefex->Logon(static_cast<uint64_t>(ou32_DataPoolChecksum), ou16_DataPoolVersion,
                                                  ou16_NumberOfDataPoolElements, 0U);
          switch (s32_Return)
          {
@@ -1326,9 +1337,9 @@ sint32 C_OSCDiagProtocolKfx::DataPoolVerify(const uint8 ou8_DataPoolIndex, const
    C_CONFIG   CAN dispatcher not installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDiagProtocolKfx::Logoff(const bool oq_WaitForHandshake)
+int32_t C_OscDiagProtocolKfx::Logoff(const bool oq_WaitForHandshake)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (mq_HasDispatcher == false)
    {

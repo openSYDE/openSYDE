@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeWiSettingSubSection" name="pc_WiHeader" native="true"/>
+    <widget class="stw::opensyde_gui_elements::C_CamOgeWiSettingSubSection" name="pc_WiHeader" native="true"/>
    </item>
    <item>
     <widget class="QWidget" name="pc_WiContent" native="true">
@@ -50,7 +50,7 @@
          <number>10</number>
         </property>
         <item row="0" column="4">
-         <widget class="stw_opensyde_gui_elements::C_CamOgePubDarkBrowse" name="pc_PubBrowse">
+         <widget class="stw::opensyde_gui_elements::C_CamOgePubDarkBrowse" name="pc_PubBrowse">
           <property name="minimumSize">
            <size>
             <width>30</width>
@@ -69,14 +69,14 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFile">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFile">
           <property name="text">
            <string>File TR</string>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="stw_opensyde_gui_elements::C_CamOgeLeFilePath" name="pc_LeFolder">
+         <widget class="stw::opensyde_gui_elements::C_CamOgeLeFilePath" name="pc_LeFolder">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -92,7 +92,7 @@
          </widget>
         </item>
         <item row="3" column="2" colspan="3">
-         <widget class="stw_opensyde_gui_elements::C_CamOgeCbxDark" name="pc_CbxFormat">
+         <widget class="stw::opensyde_gui_elements::C_CamOgeCbxDark" name="pc_CbxFormat">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -108,7 +108,7 @@
          </widget>
         </item>
         <item row="2" column="2" colspan="3">
-         <widget class="stw_opensyde_gui_elements::C_CamOgeCbxDark" name="pc_CbxOverwrite">
+         <widget class="stw::opensyde_gui_elements::C_CamOgeCbxDark" name="pc_CbxOverwrite">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -124,7 +124,7 @@
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFolder">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFolder">
           <property name="text">
            <string>Folder TR</string>
           </property>
@@ -147,21 +147,21 @@
          </spacer>
         </item>
         <item row="2" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOverwrite">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOverwrite">
           <property name="text">
            <string>Overwrite Mode TR</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFormat">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFormat">
           <property name="text">
            <string>Format TR</string>
           </property>
          </widget>
         </item>
         <item row="1" column="2" colspan="3">
-         <widget class="stw_opensyde_gui_elements::C_OgeLeDark" name="pc_LeFile">
+         <widget class="stw::opensyde_gui_elements::C_OgeLeDark" name="pc_LeFile">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -177,7 +177,7 @@
          </widget>
         </item>
         <item row="0" column="3">
-         <widget class="stw_opensyde_gui_elements::C_CamOgePubPathVariables" name="pc_PubVariables">
+         <widget class="stw::opensyde_gui_elements::C_CamOgePubPathVariables" name="pc_PubVariables">
           <property name="minimumSize">
            <size>
             <width>30</width>
@@ -204,40 +204,40 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeWiSettingSubSection</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeWiSettingSubSection</class>
    <extends>QWidget</extends>
-   <header>C_CamOgeWiSettingSubSection.h</header>
+   <header>C_CamOgeWiSettingSubSection.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubDarkBrowse</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubDarkBrowse.h</header>
+   <header>C_CamOgePubDarkBrowse.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeDark</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeDark</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeDark.h</header>
+   <header>C_OgeLeDark.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeCbxDark</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeCbxDark</class>
    <extends>QComboBox</extends>
-   <header>C_CamOgeCbxDark.h</header>
+   <header>C_CamOgeCbxDark.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubPathVariables</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubPathVariables</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubPathVariables.h</header>
+   <header>C_CamOgePubPathVariables.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeLeFilePath</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeLeFilePath</class>
    <extends>QLineEdit</extends>
-   <header>C_CamOgeLeFilePath.h</header>
+   <header>C_CamOgeLeFilePath.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

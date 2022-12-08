@@ -8,45 +8,44 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileDialog>
 #include <QPainter>
 #include <QProcess>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
 
-#include "C_SyvUpPacListWidget.h"
+#include "C_SyvUpPacListWidget.hpp"
 
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiProject.h"
-#include "C_OSCNode.h"
-#include "C_GtGetText.h"
-#include "C_SyvUpPacConfig.h"
-#include "C_SyvUpPacConfigFiler.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCSuServiceUpdatePackage.h"
-#include "TGLFile.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_ImpUtil.h"
-#include "C_UsHandler.h"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_OscNode.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvUpPacConfig.hpp"
+#include "C_SyvUpPacConfigFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscSuServiceUpdatePackage.hpp"
+#include "TglFile.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::tgl;
 using namespace std;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpPacListWidget::mhc_CONFIG_FILE_TYPE = ".syde_up";
@@ -119,12 +118,12 @@ C_SyvUpPacListWidget::~C_SyvUpPacListWidget()
    \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
+void C_SyvUpPacListWidget::SetViewIndex(const uint32_t ou32_ViewIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
-   std::vector<uint8> c_NodeActiveFlags;
-   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+   std::vector<uint8_t> c_NodeActiveFlags;
+   const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
       ou32_ViewIndex,
       c_NodeActiveFlags);
 
@@ -134,9 +133,9 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
        (s32_Retval == C_NO_ERR))
    {
       const std::vector<C_PuiSvNodeUpdate> & rc_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
-      uint32 u32_CurrentPosition = 0U;
-      uint32 u32_FoundNodes = 0U;
-      uint32 u32_NodeUpdateCounter;
+      uint32_t u32_CurrentPosition = 0U;
+      uint32_t u32_FoundNodes = 0U;
+      uint32_t u32_NodeUpdateCounter;
 
       this->mu32_ViewIndex = ou32_ViewIndex;
 
@@ -153,7 +152,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
             {
                if (c_NodeActiveFlags[u32_NodeUpdateCounter] == true)
                {
-                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                  const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                      u32_NodeUpdateCounter);
 
                   if (pc_Node != NULL)
@@ -162,7 +161,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
                      tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
                      tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
                      if (((pc_Node->c_Applications.size() > 0) ||
-                          (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)) ||
+                          (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_OPEN_SYDE)) ||
                          (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
                           q_FlashloaderOpenSydeIsFileBased == true))
                      {
@@ -183,23 +182,23 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
       // Maximum 3 nodes shall be visible in the list at the same time
       if (this->count() == 2)
       {
-         this->msn_ItemsPerLine = 2;
+         this->ms32_ItemsPerLine = 2;
       }
       else if (this->count() >= 3)
       {
-         this->msn_ItemsPerLine = 3;
+         this->ms32_ItemsPerLine = 3;
       }
       else
       {
-         this->msn_ItemsPerLine = 1;
+         this->ms32_ItemsPerLine = 1;
       }
 
       // Get the line count
-      this->msn_CountLines = this->count() / this->msn_ItemsPerLine;
+      this->ms32_CountLines = this->count() / this->ms32_ItemsPerLine;
       // Correct rounding error
-      if ((this->count() % this->msn_ItemsPerLine) > 0)
+      if ((this->count() % this->ms32_ItemsPerLine) > 0)
       {
-         ++this->msn_CountLines;
+         ++this->ms32_CountLines;
       }
 
       // load view specific user settings
@@ -216,15 +215,15 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32 ou32_ViewIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::SetConnected(void)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    this->mq_Connected = true;
    this->setDragEnabled(false);
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -242,12 +241,12 @@ void C_SyvUpPacListWidget::SetConnected(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::SetUpdateStarted(void) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       const C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -265,14 +264,14 @@ void C_SyvUpPacListWidget::SetUpdateStarted(void) const
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::SetUpdateApplicationStarted(const uint32 ou32_NodeIndex)
+void C_SyvUpPacListWidget::SetUpdateApplicationStarted(const uint32_t ou32_NodeIndex)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       const C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -282,7 +281,7 @@ void C_SyvUpPacListWidget::SetUpdateApplicationStarted(const uint32 ou32_NodeInd
          {
             // Adapt size of the widget
             pc_WidgetItem->SetUpdateApplicationStarted();
-            this->ScrollToItem(sn_Counter);
+            this->ScrollToItem(s32_Counter);
             break;
          }
       }
@@ -295,14 +294,14 @@ void C_SyvUpPacListWidget::SetUpdateApplicationStarted(const uint32 ou32_NodeInd
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::SetUpdateApplicationFinished(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacListWidget::SetUpdateApplicationFinished(const uint32_t ou32_NodeIndex) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -324,14 +323,14 @@ void C_SyvUpPacListWidget::SetUpdateApplicationFinished(const uint32 ou32_NodeIn
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::SetUpdateApplicationError(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacListWidget::SetUpdateApplicationError(const uint32_t ou32_NodeIndex) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       const C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -353,14 +352,14 @@ void C_SyvUpPacListWidget::SetUpdateApplicationError(const uint32 ou32_NodeIndex
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::DiscardApplicationStatus(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacListWidget::DiscardApplicationStatus(const uint32_t ou32_NodeIndex) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // Search for match
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -382,12 +381,12 @@ void C_SyvUpPacListWidget::DiscardApplicationStatus(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::SetUpdateFinished(void) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -405,12 +404,12 @@ void C_SyvUpPacListWidget::SetUpdateFinished(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::SetDisconnected(void)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -432,25 +431,25 @@ void C_SyvUpPacListWidget::SetDisconnected(void)
    \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeIndexes,
+void C_SyvUpPacListWidget::UpdateDeviceInformation(const std::vector<uint32_t> & orc_NodeIndexes,
                                                    const std::vector<C_SyvUpDeviceInfo> & orc_DeviceInformation)
 const
 {
    tgl_assert(orc_NodeIndexes.size() == orc_DeviceInformation.size());
    if (orc_NodeIndexes.size() == orc_DeviceInformation.size())
    {
-      sintn sn_NodeWidgetCounter;
+      int32_t s32_NodeWidgetCounter;
 
-      for (sn_NodeWidgetCounter = 0; sn_NodeWidgetCounter < this->count(); ++sn_NodeWidgetCounter)
+      for (s32_NodeWidgetCounter = 0; s32_NodeWidgetCounter < this->count(); ++s32_NodeWidgetCounter)
       {
          // activate the first item and deactivate all other items
-         QListWidgetItem * const pc_Item = this->item(sn_NodeWidgetCounter);
+         QListWidgetItem * const pc_Item = this->item(s32_NodeWidgetCounter);
 
          C_SyvUpPacNodeWidget * const pc_WidgetItem =
             dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
          if (pc_WidgetItem != NULL)
          {
-            uint32 u32_NodeIndexCounter;
+            uint32_t u32_NodeIndexCounter;
 
             for (u32_NodeIndexCounter = 0; u32_NodeIndexCounter < orc_NodeIndexes.size(); ++u32_NodeIndexCounter)
             {
@@ -473,14 +472,14 @@ const
    \param[in]  ou8_Progress      Entire progress of node of update process
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::SetNodeProgress(const uint32 ou32_NodeIndex, const uint8 ou8_Progress) const
+void C_SyvUpPacListWidget::SetNodeProgress(const uint32_t ou32_NodeIndex, const uint8_t ou8_Progress) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       const C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<const C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -499,12 +498,12 @@ void C_SyvUpPacListWidget::SetNodeProgress(const uint32 ou32_NodeIndex, const ui
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::RemoveAllFiles(void) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -534,9 +533,9 @@ void C_SyvUpPacListWidget::ExportConfig(void)
       // Check if file exists already
       QFile c_File;
       bool q_Continue = true;
-      sint32 s32_Result;
+      int32_t s32_Result;
 
-      this->mc_LastPath = TGL_ExtractFilePath(c_FileName.toStdString().c_str()).c_str();
+      this->mc_LastPath = TglExtractFilePath(c_FileName.toStdString().c_str()).c_str();
 
       // Remove old file
       c_File.setFileName(c_FileName);
@@ -547,16 +546,16 @@ void C_SyvUpPacListWidget::ExportConfig(void)
 
       if (q_Continue == true)
       {
-         sintn sn_Counter;
+         int32_t s32_Counter;
          C_SyvUpPacConfig c_Config;
 
          c_Config.c_NodeConfigs.reserve(this->count());
 
          // Prepare configuration
-         for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+         for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
          {
             // Check all paths from all nodes
-            QListWidgetItem * const pc_Item = this->item(sn_Counter);
+            QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
             C_SyvUpPacNodeWidget * const pc_WidgetItem =
                dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -609,18 +608,18 @@ void C_SyvUpPacListWidget::ImportConfig(void)
 
    if (c_FileName != "")
    {
-      sint32 s32_Result;
+      int32_t s32_Result;
       C_SyvUpPacConfig c_Config;
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
 
-      this->mc_LastPath = TGL_ExtractFilePath(c_FileName.toStdString().c_str()).c_str();
+      this->mc_LastPath = TglExtractFilePath(c_FileName.toStdString().c_str()).c_str();
 
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package configuration import"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to overwrite the current Update "
                                                          "Package configuration?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Import"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Import"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
       c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
@@ -631,16 +630,16 @@ void C_SyvUpPacListWidget::ImportConfig(void)
 
          if (s32_Result == C_NO_ERR)
          {
-            sintn sn_Counter;
+            int32_t s32_Counter;
 
             // Clear previous configuration first
             this->RemoveAllFiles();
 
             // Load configuration
-            for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+            for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
             {
                // Check all paths from all nodes
-               QListWidgetItem * const pc_Item = this->item(sn_Counter);
+               QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
                C_SyvUpPacNodeWidget * const pc_WidgetItem =
                   dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -708,11 +707,11 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
       c_FilterName =
          static_cast<QString>(C_GtGetText::h_GetText("openSYDE Service Update Package File")) +
          " (*" +
-         static_cast<QString>(C_GtGetText::h_GetText(C_OSCSuServiceUpdatePackage::
+         static_cast<QString>(C_GtGetText::h_GetText(C_OscSuServiceUpdatePackage::
                                                      h_GetPackageExtension().
                                                      c_str())) + ")";
       c_DefaultFilename += "_ServiceUpdatePackage" +
-                           static_cast<QString>(C_OSCSuServiceUpdatePackage::h_GetPackageExtension().c_str());
+                           static_cast<QString>(C_OscSuServiceUpdatePackage::h_GetPackageExtension().c_str());
    }
    else
    {
@@ -728,12 +727,12 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
    // check for user abort (empty string)
    if (c_FullPackagePath != "")
    {
-      sint32 s32_Return = C_NO_ERR;
+      int32_t s32_Return = C_NO_ERR;
 
-      this->mc_LastPath = TGL_ExtractFilePath(c_FullPackagePath.toStdString().c_str()).c_str();
+      this->mc_LastPath = TglExtractFilePath(c_FullPackagePath.toStdString().c_str()).c_str();
 
       // check for old zip archive
-      if (TGL_FileExists(c_FullPackagePath.toStdString().c_str()) == true)
+      if (TglFileExists(c_FullPackagePath.toStdString().c_str()) == true)
       {
          // delete old zip archive
          if (remove(c_FullPackagePath.toStdString().c_str()) != 0)
@@ -752,35 +751,35 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
       if (s32_Return == C_NO_ERR)
       {
          // system definition
-         const stw_opensyde_core::C_OSCSystemDefinition & rc_SystemDefinition =
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst();
+         const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefinition =
+            C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
 
          // active bus index
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          //No check for connected because error check passed
-         const stw_types::uint32 u32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
+         const uint32_t u32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
 
          // active nodes
-         std::vector<uint8> c_NodeActiveFlags;
-         const sint32 s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+         std::vector<uint8_t> c_NodeActiveFlags;
+         const int32_t s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
             this->mu32_ViewIndex,
             c_NodeActiveFlags);
 
          tgl_assert(s32_FuncRetval == C_NO_ERR);
 
          // update applications of nodes, update position of nodes,
-         std::vector<C_OSCSuSequences::C_DoFlash> c_ApplicationsToWrite;
-         vector<uint32> c_NodesUpdateOrder;
+         std::vector<C_OscSuSequences::C_DoFlash> c_ApplicationsToWrite;
+         vector<uint32_t> c_NodesUpdateOrder;
 
          s32_Return = this->GetUpdatePackage(c_ApplicationsToWrite, c_NodesUpdateOrder);
          tgl_assert(s32_Return == C_NO_ERR);
 
-         C_SCLStringList c_Warnings;
-         C_SCLString c_Error;
+         C_SclStringList c_Warnings;
+         C_SclString c_Error;
          if (s32_Return == C_NO_ERR)
          {
             // In case of skipped files, check if some nodes does not need to be active for the package anymore
-            uint32 u32_NodeCounter;
+            uint32_t u32_NodeCounter;
 
             tgl_assert(c_NodeActiveFlags.size() == c_ApplicationsToWrite.size());
             for (u32_NodeCounter = 0; u32_NodeCounter < c_ApplicationsToWrite.size(); ++u32_NodeCounter)
@@ -793,7 +792,7 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
                }
             }
 
-            s32_Return = C_OSCSuServiceUpdatePackage::h_CreatePackage(c_FullPackagePath.toStdString().c_str(),
+            s32_Return = C_OscSuServiceUpdatePackage::h_CreatePackage(c_FullPackagePath.toStdString().c_str(),
                                                                       rc_SystemDefinition,
                                                                       u32_ActiveBusIndex,
                                                                       c_NodeActiveFlags,
@@ -857,24 +856,24 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
    C_CONFIG    Minimum one file was not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacListWidget::CheckAllPaths(uint32 & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
-                                           QStringList * const opc_MissingDataBlocks,
-                                           QStringList * const opc_MissingParamFiles,
-                                           QStringList * const opc_MissingFiles) const
+int32_t C_SyvUpPacListWidget::CheckAllPaths(uint32_t & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
+                                            QStringList * const opc_MissingDataBlocks,
+                                            QStringList * const opc_MissingParamFiles,
+                                            QStringList * const opc_MissingFiles) const
 {
-   sintn sn_Counter;
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Counter;
+   int32_t s32_Return = C_NO_ERR;
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // Check all paths from all nodes
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
-         uint32 u32_CountNodeFiles = 0U;
+         uint32_t u32_CountNodeFiles = 0U;
 
          // Check the node paths
          if (pc_WidgetItem->CheckAllFiles(u32_CountNodeFiles, opc_FlashwareWarningsApps, opc_MissingDataBlocks,
@@ -905,13 +904,13 @@ sint32 C_SyvUpPacListWidget::CheckAllPaths(uint32 & oru32_CountFiles, QStringLis
    C_RD_WR     At least one file does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacListWidget::GetUpdatePackage(std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-                                              std::vector<uint32> & orc_NodesOrder,
-                                              std::vector<C_OSCSuSequences::C_DoFlash> * const opc_AllApplications)
+int32_t C_SyvUpPacListWidget::GetUpdatePackage(std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+                                               std::vector<uint32_t> & orc_NodesOrder,
+                                               std::vector<C_OscSuSequences::C_DoFlash> * const opc_AllApplications)
 const
 {
-   sint32 s32_Return = C_NOACT;
-   sintn sn_Counter;
+   int32_t s32_Return = C_NOACT;
+   int32_t s32_Counter;
    bool q_AtLeastOneApplication = false;
 
    // Count of nodes in system definition must match with the size of c_NodesToFlash
@@ -919,7 +918,7 @@ const
    orc_ApplicationsToWrite.clear();
    orc_NodesOrder.clear();
 
-   orc_ApplicationsToWrite.resize(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(), C_OSCSuSequences::C_DoFlash());
+   orc_ApplicationsToWrite.resize(C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(), C_OscSuSequences::C_DoFlash());
    // The order position of inactive nodes is not used. Initial value is -1 to differentiate to the active nodes
    orc_NodesOrder.reserve(this->count());
 
@@ -928,22 +927,22 @@ const
       *opc_AllApplications = orc_ApplicationsToWrite;
    }
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
-         const uint32 u32_NodeIndex = pc_WidgetItem->GetNodeIndex();
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+         const uint32_t u32_NodeIndex = pc_WidgetItem->GetNodeIndex();
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
 
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
-            C_OSCSuSequences::C_DoFlash & rc_Flash = orc_ApplicationsToWrite[u32_NodeIndex];
-            C_OSCSuSequences::C_DoFlash * pc_AllApplications = NULL;
+            C_OscSuSequences::C_DoFlash & rc_Flash = orc_ApplicationsToWrite[u32_NodeIndex];
+            C_OscSuSequences::C_DoFlash * pc_AllApplications = NULL;
 
             if (opc_AllApplications != NULL)
             {
@@ -1032,21 +1031,21 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    QListWidget::resizeEvent(opc_Event);
 
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
          // Adapt size of the widget
-         pc_WidgetItem->resize(((this->width() - 1) / this->msn_ItemsPerLine), this->height());
+         pc_WidgetItem->resize(((this->width() - 1) / this->ms32_ItemsPerLine), this->height());
 
          pc_Item->setSizeHint(pc_WidgetItem->size());
       }
@@ -1082,7 +1081,7 @@ void C_SyvUpPacListWidget::paintEvent(QPaintEvent * const opc_Event)
       c_Font.setPixelSize(c_Font.pointSize());
       c_Painter.setFont(c_Font);
 
-      c_Painter.drawText(this->rect(), static_cast<sintn>(Qt::AlignCenter), c_Text);
+      c_Painter.drawText(this->rect(), static_cast<int32_t>(Qt::AlignCenter), c_Text);
 
       c_Pen.setColor(mc_STYLE_GUIDE_COLOR_10);
       c_Painter.setPen(c_Pen);
@@ -1132,30 +1131,30 @@ void C_SyvUpPacListWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::m_MoveItem(const sintn osn_SourceIndex, const sintn osn_TargetIndex)
+void C_SyvUpPacListWidget::m_MoveItem(const int32_t os32_SourceIndex, const int32_t os32_TargetIndex)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-   Q_UNUSED(osn_SourceIndex)
-   Q_UNUSED(osn_TargetIndex)
+   Q_UNUSED(os32_SourceIndex)
+   Q_UNUSED(os32_TargetIndex)
 
    // Update all position numbers in the node update information
    // The numbers in the widgets must be updated before
    if (pc_View != NULL)
    {
       std::vector<C_PuiSvNodeUpdate> c_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
-      sintn sn_Counter;
+      int32_t s32_Counter;
 
-      for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+      for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
       {
          // activate the first item and deactivate all other items
-         QListWidgetItem * const pc_Item = this->item(sn_Counter);
+         QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
          C_SyvUpPacNodeWidget * const pc_WidgetItem =
             dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
          if (pc_WidgetItem != NULL)
          {
-            const uint32 u32_NodeIndex = pc_WidgetItem->GetNodeIndex();
+            const uint32_t u32_NodeIndex = pc_WidgetItem->GetNodeIndex();
 
             tgl_assert(u32_NodeIndex < c_NodeUpdate.size());
             if (u32_NodeIndex < c_NodeUpdate.size())
@@ -1175,18 +1174,18 @@ void C_SyvUpPacListWidget::m_MoveItem(const sintn osn_SourceIndex, const sintn o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::m_UpdateNumbers(void) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    // Update all visible numbers of the concrete widgets
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
       if (pc_WidgetItem != NULL)
       {
-         pc_WidgetItem->UpdatePositionNumber(static_cast<uint32>(sn_Counter));
+         pc_WidgetItem->UpdatePositionNumber(static_cast<uint32_t>(s32_Counter));
       }
    }
 }
@@ -1213,9 +1212,10 @@ void C_SyvUpPacListWidget::m_DelegateStopPaint(void)
    \param[in]  orc_NodeName      Name of the node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListWidget::m_AddNodeWidget(const uint32 ou32_NodeIndex, const QString & orc_NodeName)
+void C_SyvUpPacListWidget::m_AddNodeWidget(const uint32_t ou32_NodeIndex, const QString & orc_NodeName)
 {
-   QListWidgetItem * const pc_Item = new QListWidgetItem(NULL, static_cast<sintn>(QListWidgetItem::ItemType::UserType));
+   QListWidgetItem * const pc_Item =
+      new QListWidgetItem(NULL, static_cast<int32_t>(QListWidgetItem::ItemType::UserType));
    C_SyvUpPacNodeWidget * const pc_ItemWidget = new C_SyvUpPacNodeWidget(this->mu32_ViewIndex,
                                                                          this->count(),
                                                                          ou32_NodeIndex,
@@ -1330,7 +1330,7 @@ void C_SyvUpPacListWidget::m_OnCustomContextMenuHide(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::m_SetupContextMenu(void)
 {
-   mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu(this);
+   mpc_ContextMenu = new stw::opensyde_gui_elements::C_OgeContextMenu(this);
 
    this->mpc_SelectFileAction = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText("Select File"), this,  &C_SyvUpPacListWidget::m_SelectFile);
@@ -1380,7 +1380,7 @@ void C_SyvUpPacListWidget::m_SetupContextMenu(void)
 
    connect(this, &C_SyvUpPacListWidget::customContextMenuRequested, this,
            &C_SyvUpPacListWidget::m_OnCustomContextMenuRequested);
-   connect(this->mpc_ContextMenu, &stw_opensyde_gui_elements::C_OgeContextMenu::aboutToHide, this,
+   connect(this->mpc_ContextMenu, &stw::opensyde_gui_elements::C_OgeContextMenu::aboutToHide, this,
            &C_SyvUpPacListWidget::m_OnCustomContextMenuHide);
 }
 
@@ -1439,7 +1439,7 @@ void C_SyvUpPacListWidget::m_AddNewFile(const QString & orc_DialogCaption, const
 
          if (c_Files.isEmpty() == false)
          {
-            for (sint32 s32_Pos = 0; s32_Pos < c_Files.size(); ++s32_Pos)
+            for (int32_t s32_Pos = 0; s32_Pos < c_Files.size(); ++s32_Pos)
             {
                const QFileInfo c_File(c_Files[s32_Pos]);
                const bool q_ParamsetFile = c_File.completeSuffix().toLower() == "syde_psi";
@@ -1450,7 +1450,7 @@ void C_SyvUpPacListWidget::m_AddNewFile(const QString & orc_DialogCaption, const
             }
 
             // remember last path
-            this->mc_LastPath = TGL_ExtractFilePath(c_Files.last().toStdString().c_str()).c_str();
+            this->mc_LastPath = TglExtractFilePath(c_Files.last().toStdString().c_str()).c_str();
          }
       }
    }
@@ -1511,7 +1511,7 @@ void C_SyvUpPacListWidget::m_SelectFile(void)
             if (c_File != "")
             {
                // remember path
-               this->mc_LastPath = TGL_ExtractFilePath(c_File.toStdString().c_str()).c_str();
+               this->mc_LastPath = TglExtractFilePath(c_File.toStdString().c_str()).c_str();
 
                // check if relative path is possible and appreciated
                c_File = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_File,
@@ -1546,8 +1546,8 @@ void C_SyvUpPacListWidget::m_RemoveFile(void)
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove ") +
                                   this->mpc_SelectedApp->GetAppFilePath() +
                                   C_GtGetText::h_GetText(" from the Update Package?"));
-      c_MessageBox.SetOKButtonText("Remove");
-      c_MessageBox.SetNOButtonText("Keep");
+      c_MessageBox.SetOkButtonText("Remove");
+      c_MessageBox.SetNoButtonText("Keep");
       c_MessageBox.SetCustomMinHeight(180, 180);
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
       {
@@ -1595,8 +1595,8 @@ void C_SyvUpPacListWidget::m_RemoveAllSectionFiles(void)
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Remove files"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to remove all files of section \"") +
                                   c_Section + C_GtGetText::h_GetText("\" from the Update Package?"));
-      c_MessageBox.SetOKButtonText("Remove");
-      c_MessageBox.SetNOButtonText("Keep");
+      c_MessageBox.SetOkButtonText("Remove");
+      c_MessageBox.SetNoButtonText("Keep");
       c_MessageBox.SetCustomMinHeight(180, 180);
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
       {
@@ -1624,8 +1624,8 @@ void C_SyvUpPacListWidget::m_RemoveAllNodeFiles(void)
       c_MessageBox.SetDescription(
          C_GtGetText::h_GetText("Do you really want to remove all files of node \"") +
          this->mpc_SelectedNode->GetNodeName() + C_GtGetText::h_GetText("\" from the Update Package?"));
-      c_MessageBox.SetOKButtonText("Remove");
-      c_MessageBox.SetNOButtonText("Keep");
+      c_MessageBox.SetOkButtonText("Remove");
+      c_MessageBox.SetNoButtonText("Keep");
       c_MessageBox.SetCustomMinHeight(180, 180);
       if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
       {
@@ -1640,7 +1640,7 @@ void C_SyvUpPacListWidget::m_RemoveAllNodeFiles(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListWidget::m_HideShowOptionalSections(void)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
    QString c_Help;
 
    // toggle state
@@ -1658,10 +1658,10 @@ void C_SyvUpPacListWidget::m_HideShowOptionalSections(void)
    this->mpc_HideShowOptionalSectionsAction->setText(c_Help + C_GtGetText::h_GetText("Empty Optional Sections"));
 
    // adapt all node widgets
-   for (sn_Counter = 0; sn_Counter < this->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)
    {
       // activate the first item and deactivate all other items
-      QListWidgetItem * const pc_Item = this->item(sn_Counter);
+      QListWidgetItem * const pc_Item = this->item(s32_Counter);
 
       C_SyvUpPacNodeWidget * const pc_WidgetItem =
          dynamic_cast<C_SyvUpPacNodeWidget *>(this->itemWidget(pc_Item));
@@ -1744,7 +1744,7 @@ QString C_SyvUpPacListWidget::m_GetDialogPath(void)
    if (this->mpc_SelectedApp != NULL)
    {
       this->mc_LastPath =
-         TGL_ExtractFilePath(this->mpc_SelectedApp->GetAppAbsoluteFilePath().toStdString().c_str()).c_str();
+         TglExtractFilePath(this->mpc_SelectedApp->GetAppAbsoluteFilePath().toStdString().c_str()).c_str();
    }
 
    c_File.setFile(this->mc_LastPath);

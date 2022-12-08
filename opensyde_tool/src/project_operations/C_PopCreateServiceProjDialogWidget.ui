@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="horizontalGroupBox">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="horizontalGroupBox">
      <property name="minimumSize">
       <size>
        <width>800</width>
@@ -52,7 +52,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingPreview">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeadingPreview">
             <property name="font">
              <font>
               <family>Segoe UI</family>
@@ -85,7 +85,7 @@
            <number>1</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame">
+           <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -108,7 +108,7 @@
            <number>0</number>
           </property>
           <item row="0" column="2">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditPassword">
+           <widget class="stw::opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditPassword">
             <property name="minimumSize">
              <size>
               <width>350</width>
@@ -124,7 +124,7 @@
            </widget>
           </item>
           <item row="0" column="3">
-           <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PubTogglePwd">
+           <widget class="stw::opensyde_gui_elements::C_OgePubOpen" name="pc_PubTogglePwd">
             <property name="minimumSize">
              <size>
               <width>33</width>
@@ -143,14 +143,14 @@
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabPath">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabPath">
             <property name="text">
              <string>Path</string>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabPassword">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabPassword">
             <property name="text">
              <string>Passwd</string>
             </property>
@@ -189,7 +189,7 @@
            </spacer>
           </item>
           <item row="1" column="2">
-           <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditPath">
+           <widget class="stw::opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditPath">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -199,7 +199,7 @@
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PubSpPath">
+           <widget class="stw::opensyde_gui_elements::C_OgePubOpen" name="pc_PubSpPath">
             <property name="minimumSize">
              <size>
               <width>33</width>
@@ -254,7 +254,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxViewSettings">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxViewSettings">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -279,7 +279,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabPermissions">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabPermissions">
             <property name="font">
              <font>
               <family>Segoe UI</family>
@@ -309,7 +309,7 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_2">
+           <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame_2">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -327,7 +327,7 @@
          </layout>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeTreeViewCheckable" name="pc_TreeView">
+         <widget class="stw::opensyde_gui_elements::C_OgeTreeViewCheckable" name="pc_TreeView">
           <property name="minimumSize">
            <size>
             <width>740</width>
@@ -373,7 +373,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_PushButtonCancel">
+      <widget class="stw::opensyde_gui_elements::C_OgePubCancel" name="pc_PushButtonCancel">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -408,7 +408,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -454,56 +454,56 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeFilePath</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeFilePath.h</header>
+   <header>C_OgeLeFilePath.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
+   <header>C_OgeLeProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
+   <class>stw::opensyde_gui_elements::C_OgePubOpen</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubOpen.h</header>
+   <header>C_OgePubOpen.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTreeViewCheckable</class>
+   <class>stw::opensyde_gui_elements::C_OgeTreeViewCheckable</class>
    <extends>QTreeView</extends>
-   <header>C_OgeTreeViewCheckable.h</header>
+   <header>C_OgeTreeViewCheckable.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

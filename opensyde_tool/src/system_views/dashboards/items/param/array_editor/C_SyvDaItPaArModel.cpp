@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_GiSvDaParam.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDaItPaArModel.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "C_Uti.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDaItPaArModel.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,14 +65,14 @@ C_SyvDaItPaArModel::C_SyvDaItPaArModel(QObject * const opc_Parent) :
 
    \param[in]  ou32_ElementIndex    Element index
    \param[in]  opc_DataWidget       Data widget
-   \param[in]  oq_ECUValues         Optional flag if the shown values are ECU values
+   \param[in]  oq_EcuValues         Optional flag if the shown values are ECU values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaArModel::SetElement(const uint32 ou32_ElementIndex, C_PuiSvDbDataElementHandler * const opc_DataWidget,
-                                    const bool oq_ECUValues)
+void C_SyvDaItPaArModel::SetElement(const uint32_t ou32_ElementIndex,
+                                    C_PuiSvDbDataElementHandler * const opc_DataWidget, const bool oq_EcuValues)
 {
    beginResetModel();
-   this->mq_ECUValues = oq_ECUValues;
+   this->mq_ECUValues = oq_EcuValues;
    this->mu32_ElementIndex = ou32_ElementIndex;
    this->mpc_DataWidget = opc_DataWidget;
    endResetModel();
@@ -82,26 +81,26 @@ void C_SyvDaItPaArModel::SetElement(const uint32 ou32_ElementIndex, C_PuiSvDbDat
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                        const sintn osn_Role) const
+QVariant C_SyvDaItPaArModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                        const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Vertical)
    {
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          c_Retval = C_GtGetText::h_GetText("Value");
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -112,11 +111,11 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
    }
    else
    {
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
-         c_Retval = QString::number(osn_Section);
+         c_Retval = QString::number(os32_Section);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
@@ -137,16 +136,16 @@ QVariant C_SyvDaItPaArModel::headerData(const sintn osn_Section, const Qt::Orien
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItPaArModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SyvDaItPaArModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 1;
+      s32_Retval = 1;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,42 +157,43 @@ sintn C_SyvDaItPaArModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItPaArModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SyvDaItPaArModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      const C_OSCNodeDataPoolContent * const pc_Element = this->GetElementData();
+      const C_OscNodeDataPoolContent * const pc_Element = this->GetElementData();
       if (pc_Element != NULL)
       {
          //For table parent should always be invalid
-         sn_Retval = pc_Element->GetArraySize();
+         s32_Retval = pc_Element->GetArraySize();
       }
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          if (orc_Index.column() >= 0)
          {
-            const C_OSCNodeDataPoolListElement * const pc_Element = this->GetOSCElement();
+            const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscElement();
             if (pc_Element != NULL)
             {
                if (this->mq_ECUValues == true)
@@ -201,19 +201,19 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
                   c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
                                                                                    pc_Element->f64_Factor,
                                                                                    pc_Element->f64_Offset,
-                                                                                   static_cast<uint32>(orc_Index.
-                                                                                                       column()),
+                                                                                   static_cast<uint32_t>(orc_Index.
+                                                                                                         column()),
                                                                                    false);
                }
                else
                {
-                  const C_OSCNodeDataPoolContent * const pc_Data = this->GetElementData();
+                  const C_OscNodeDataPoolContent * const pc_Data = this->GetElementData();
                   if (pc_Data != NULL)
                   {
                      c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(*pc_Data,
                                                                                       pc_Element->f64_Factor,
                                                                                       pc_Element->f64_Offset,
-                                                                                      static_cast<uint32>(
+                                                                                      static_cast<uint32_t>(
                                                                                          orc_Index.
                                                                                          column()), false);
                   }
@@ -221,11 +221,11 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
       {
          QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
          if (this->m_CheckError(orc_Index))
@@ -234,7 +234,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
          }
          c_Retval = c_Font;
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          //Default
          c_Retval = mc_STYLE_GUIDE_COLOR_6;
@@ -256,20 +256,20 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const sintn osn
 
    \param[in]  orc_Index   Index
    \param[in]  orc_Value   New data
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
+bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const int32_t os32_Role)
 {
    bool q_Retval = false;
 
-   if (data(orc_Index, osn_Role) != orc_Value)
+   if (data(orc_Index, os32_Role) != orc_Value)
    {
-      if (osn_Role == static_cast<sintn>(Qt::EditRole))
+      if (os32_Role == static_cast<int32_t>(Qt::EditRole))
       {
          if (orc_Index.column() >= 0)
          {
@@ -281,15 +281,15 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
                const C_PuiSvDbParam * const pc_Param = pc_ParamWidget->GetParamItem();
                if (pc_Param != NULL)
                {
-                  const C_OSCNodeDataPoolListElement * const pc_OSCElement = this->GetOSCElement();
+                  const C_OscNodeDataPoolListElement * const pc_OscElement = this->GetOscElement();
                   C_PuiSvDbParam c_Copy = *pc_Param;
-                  if ((this->mu32_ElementIndex < c_Copy.c_ListValues.size()) && (pc_OSCElement != NULL))
+                  if ((this->mu32_ElementIndex < c_Copy.c_ListValues.size()) && (pc_OscElement != NULL))
                   {
-                     const uint32 u32_Index = static_cast<uint32>(orc_Index.column());
-                     C_OSCNodeDataPoolContent & rc_Content = c_Copy.c_ListValues[this->mu32_ElementIndex];
+                     const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.column());
+                     C_OscNodeDataPoolContent & rc_Content = c_Copy.c_ListValues[this->mu32_ElementIndex];
                      C_SdNdeDpContentUtil::h_SetDataVariableFromGenericWithScaling(orc_Value, rc_Content,
-                                                                                   pc_OSCElement->f64_Factor,
-                                                                                   pc_OSCElement->f64_Offset,
+                                                                                   pc_OscElement->f64_Factor,
+                                                                                   pc_OscElement->f64_Offset,
                                                                                    u32_Index);
                      tgl_assert(pc_ParamWidget->SetParamItem(c_Copy) == C_NO_ERR);
                      q_Retval = true;
@@ -297,7 +297,7 @@ bool C_SyvDaItPaArModel::setData(const QModelIndex & orc_Index, const QVariant &
                }
             }
 
-            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<int32_t>() << os32_Role);
          }
       }
    }
@@ -339,7 +339,7 @@ Qt::ItemFlags C_SyvDaItPaArModel::flags(const QModelIndex & orc_Index) const
    \param[in]  oru32_Column   Changed column
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaArModel::HandleDataChange(const uint32 & oru32_Column)
+void C_SyvDaItPaArModel::HandleDataChange(const uint32_t & oru32_Column)
 {
    Q_EMIT this->dataChanged(this->index(0, oru32_Column), this->index(0, oru32_Column));
 }
@@ -351,20 +351,20 @@ void C_SyvDaItPaArModel::HandleDataChange(const uint32 & oru32_Column)
    Type of current data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent::E_Type C_SyvDaItPaArModel::GetType(void) const
+C_OscNodeDataPoolContent::E_Type C_SyvDaItPaArModel::GetType(void) const
 {
-   C_OSCNodeDataPoolContent::E_Type e_Retval = C_OSCNodeDataPoolContent::eUINT8;
+   C_OscNodeDataPoolContent::E_Type e_Retval = C_OscNodeDataPoolContent::eUINT8;
    const C_PuiSvDbNodeDataPoolListElementId * const pc_Id = this->m_GetElementId();
    if (pc_Id != NULL)
    {
-      const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(pc_Id->u32_NodeIndex,
+      const C_OscNodeDataPoolListElement * const pc_OscElement =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(pc_Id->u32_NodeIndex,
                                                                     pc_Id->u32_DataPoolIndex,
                                                                     pc_Id->u32_ListIndex,
                                                                     pc_Id->u32_ElementIndex);
-      if (pc_OSCElement != NULL)
+      if (pc_OscElement != NULL)
       {
-         e_Retval = pc_OSCElement->GetType();
+         e_Retval = pc_OscElement->GetType();
       }
    }
    return e_Retval;
@@ -378,14 +378,14 @@ C_OSCNodeDataPoolContent::E_Type C_SyvDaItPaArModel::GetType(void) const
    Else NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_SyvDaItPaArModel::GetOSCElement(void) const
+const C_OscNodeDataPoolListElement * C_SyvDaItPaArModel::GetOscElement(void) const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
    const C_PuiSvDbNodeDataPoolListElementId * const pc_Id = this->m_GetElementId();
 
    if (pc_Id != NULL)
    {
-      pc_Retval = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(pc_Id->u32_NodeIndex,
+      pc_Retval = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(pc_Id->u32_NodeIndex,
                                                                              pc_Id->u32_DataPoolIndex,
                                                                              pc_Id->u32_ListIndex,
                                                                              pc_Id->u32_ElementIndex);
@@ -401,9 +401,9 @@ const C_OSCNodeDataPoolListElement * C_SyvDaItPaArModel::GetOSCElement(void) con
    Else NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolContent * C_SyvDaItPaArModel::GetElementData(void) const
+const C_OscNodeDataPoolContent * C_SyvDaItPaArModel::GetElementData(void) const
 {
-   const C_OSCNodeDataPoolContent * pc_Retval = NULL;
+   const C_OscNodeDataPoolContent * pc_Retval = NULL;
 
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
@@ -471,9 +471,9 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItPaArModel::m_GetElementId(vo
    False Not editable
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItPaArModel::m_GetDataSetIndex(void) const
+int32_t C_SyvDaItPaArModel::m_GetDataSetIndex(void) const
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    const C_GiSvDaParam * const pc_ParamWidget =
       dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
@@ -503,14 +503,14 @@ sint32 C_SyvDaItPaArModel::m_GetDataSetIndex(void) const
 bool C_SyvDaItPaArModel::m_CheckError(const QModelIndex & orc_Index) const
 {
    bool q_Error;
-   const C_OSCNodeDataPoolListElement * const pc_Element = this->GetOSCElement();
-   const C_OSCNodeDataPoolContent * const pc_Data = this->GetElementData();
+   const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscElement();
+   const C_OscNodeDataPoolContent * const pc_Data = this->GetElementData();
 
    if (this->mq_ECUValues == false)
    {
       if ((pc_Element != NULL) && (pc_Data != NULL))
       {
-         const uint32 u32_Index = static_cast<uint32>(orc_Index.column());
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.column());
          //Check error min
          q_Error = pc_Element->c_MinValue.CompareArrayGreater(*pc_Data, u32_Index);
          //Check error max (don't disable min error)

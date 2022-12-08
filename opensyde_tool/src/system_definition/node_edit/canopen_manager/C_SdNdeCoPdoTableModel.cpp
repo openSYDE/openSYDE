@@ -9,24 +9,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 #include <QAbstractTableModel>
-#include "C_SdNdeCoPdoTableModel.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandlerBusLogic.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCCanMessage.h"
+#include "C_SdNdeCoPdoTableModel.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandlerBusLogic.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscCanMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -71,7 +70,7 @@ void C_SdNdeCoPdoTableModel::UpdateData()
    Device node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeCoPdoTableModel::GetDeviceNodeIndex(void) const
+uint32_t C_SdNdeCoPdoTableModel::GetDeviceNodeIndex(void) const
 {
    return this->mc_DeviceNodeInterfaceId.u32_NodeIndex;
 }
@@ -84,8 +83,8 @@ uint32 C_SdNdeCoPdoTableModel::GetDeviceNodeIndex(void) const
    \param[out]  orc_CanNodeInterfaceId     CAN node interface id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoPdoTableModel::GetNodeIndexAndInterfaceId(uint32 & oru32_NodeIndex, uint8 & oru8_InterfaceId,
-                                                        C_OSCCanInterfaceId & orc_CanNodeInterfaceId)
+void C_SdNdeCoPdoTableModel::GetNodeIndexAndInterfaceId(uint32_t & oru32_NodeIndex, uint8_t & oru8_InterfaceId,
+                                                        C_OscCanInterfaceId & orc_CanNodeInterfaceId)
 {
    oru32_NodeIndex = this->mu32_ManagerNodeIndex;
    oru8_InterfaceId = this->mu8_ManagerInterfaceId;
@@ -100,9 +99,9 @@ void C_SdNdeCoPdoTableModel::GetNodeIndexAndInterfaceId(uint32 & oru32_NodeIndex
    \param[in]  orc_DeviceNodeInterfaceId          CAN node interface id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoPdoTableModel::SetNodeIndexAndInterfaceId(const uint32 ou32_ManagerNodeIndex,
-                                                        const uint8 ou8_ManagerInterfaceId,
-                                                        const C_OSCCanInterfaceId & orc_DeviceNodeInterfaceId)
+void C_SdNdeCoPdoTableModel::SetNodeIndexAndInterfaceId(const uint32_t ou32_ManagerNodeIndex,
+                                                        const uint8_t ou8_ManagerInterfaceId,
+                                                        const C_OscCanInterfaceId & orc_DeviceNodeInterfaceId)
 {
    this->beginResetModel();
    this->mu32_ManagerNodeIndex = ou32_ManagerNodeIndex;
@@ -122,13 +121,13 @@ void C_SdNdeCoPdoTableModel::SetNodeIndexAndInterfaceId(const uint32 ou32_Manage
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeCoPdoTableModel::MapRowToMsgId(const sint32 os32_Index,
-                                             C_OSCCanMessageIdentificationIndices & orc_MsgId) const
+int32_t C_SdNdeCoPdoTableModel::MapRowToMsgId(const int32_t os32_Index,
+                                              C_OscCanMessageIdentificationIndices & orc_MsgId) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if ((os32_Index >= 0L) &&
-       (static_cast<uint32>(os32_Index) < this->mc_PdoTableData.size()))
+       (static_cast<uint32_t>(os32_Index) < this->mc_PdoTableData.size()))
    {
       s32_Retval = C_NO_ERR;
       orc_MsgId = this->mc_PdoTableData[os32_Index].c_MsgId;
@@ -140,23 +139,23 @@ sint32 C_SdNdeCoPdoTableModel::MapRowToMsgId(const sint32 os32_Index,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeCoPdoTableModel::headerData(const stw_types::sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                            const stw_types::sintn osn_Role) const
+QVariant C_SdNdeCoPdoTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                            const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const E_Columns e_Col = static_cast<E_Columns>(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const E_Columns e_Col = static_cast<E_Columns>(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -197,7 +196,7 @@ QVariant C_SdNdeCoPdoTableModel::headerData(const stw_types::sintn osn_Section, 
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          switch (e_Col)
          {
@@ -238,7 +237,7 @@ QVariant C_SdNdeCoPdoTableModel::headerData(const stw_types::sintn osn_Section, 
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
@@ -283,7 +282,7 @@ QVariant C_SdNdeCoPdoTableModel::headerData(const stw_types::sintn osn_Section, 
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -304,15 +303,15 @@ QVariant C_SdNdeCoPdoTableModel::headerData(const stw_types::sintn osn_Section, 
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeCoPdoTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeCoPdoTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
-      sn_Retval = this->mc_PdoTableData.size();
+      s32_Retval = this->mc_PdoTableData.size();
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -324,36 +323,36 @@ sintn C_SdNdeCoPdoTableModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeCoPdoTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeCoPdoTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 11;
+      s32_Retval = 11;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeCoPdoTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdNdeCoPdoTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
       const E_Columns e_Col = static_cast<E_Columns>(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          switch (e_Col)
          {
@@ -392,35 +391,35 @@ QVariant C_SdNdeCoPdoTableModel::data(const QModelIndex & orc_Index, const sintn
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
          if (e_Col == eEXTENDED)
          {
             if (this->mc_PdoTableData.at(orc_Index.row()).q_Extended == true)
             {
-               c_Retval = static_cast<sintn>(Qt::Checked);
+               c_Retval = static_cast<int32_t>(Qt::Checked);
             }
             else
             {
-               c_Retval = static_cast<sintn>(Qt::Unchecked);
+               c_Retval = static_cast<int32_t>(Qt::Unchecked);
             }
          }
          else if (e_Col == eENABLED)
          {
             if (this->mc_PdoTableData.at(orc_Index.row()).q_Enabled == true)
             {
-               c_Retval = static_cast<sintn>(Qt::Checked);
+               c_Retval = static_cast<int32_t>(Qt::Checked);
             }
             else
             {
-               c_Retval = static_cast<sintn>(Qt::Unchecked);
+               c_Retval = static_cast<int32_t>(Qt::Unchecked);
             }
          }
          else
          {
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -477,8 +476,8 @@ Qt::ItemFlags C_SdNdeCoPdoTableModel::flags(const QModelIndex & orc_Index) const
    \retval   C_PdoTableData   Detailed description of 1st return value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeCoPdoTableModel::C_PdoTableData C_SdNdeCoPdoTableModel::m_GetPdoMessageInfo(const C_OSCCanMessage & orc_Message,
-                                                                                   const C_OSCCanMessageIdentificationIndices & orc_MessagegId,
+C_SdNdeCoPdoTableModel::C_PdoTableData C_SdNdeCoPdoTableModel::m_GetPdoMessageInfo(const C_OscCanMessage & orc_Message,
+                                                                                   const C_OscCanMessageIdentificationIndices & orc_MessagegId,
                                                                                    const E_PdoType oe_PdoType)
 const
 {
@@ -506,7 +505,7 @@ const
 
    // calculate cob id
    QString c_CobId;
-   if (orc_Message.q_CanOpenManagerCobIdIncludesNodeID)
+   if (orc_Message.q_CanOpenManagerCobIdIncludesNodeId)
    {
       c_CobId = "0x" + QString::number(orc_Message.u32_CanId, 16).toUpper() +
                 " (NodeID+0x" + QString::number(orc_Message.u32_CanOpenManagerCobIdOffset, 16).toUpper() + ")";
@@ -519,13 +518,22 @@ const
 
    c_CurrentPdo.c_Dlc = QString::number(orc_Message.u16_Dlc);
 
-   if (orc_Message.e_TxMethod == C_OSCCanMessage::E_TxMethodType::eTX_METHOD_CAN_OPEN_TYPE_254)
+   if (orc_Message.e_TxMethod == C_OscCanMessage::E_TxMethodType::eTX_METHOD_CAN_OPEN_TYPE_254)
    {
-      c_CurrentPdo.c_TxMethod = "254 - async manufacturer specific";
+      c_CurrentPdo.c_TxMethod = C_GtGetText::h_GetText("254 - async manufacturer specific");
+   }
+   else if (orc_Message.e_TxMethod == C_OscCanMessage::E_TxMethodType::eTX_METHOD_CAN_OPEN_TYPE_255)
+   {
+      c_CurrentPdo.c_TxMethod = C_GtGetText::h_GetText("255 - async device specific");
+   }
+   else if (orc_Message.e_TxMethod == C_OscCanMessage::E_TxMethodType::eTX_METHOD_CAN_OPEN_TYPE_0)
+   {
+      c_CurrentPdo.c_TxMethod = C_GtGetText::h_GetText("0 - synchronous transmission after next SYNC and change");
    }
    else
    {
-      c_CurrentPdo.c_TxMethod = "255 - async device specific";
+      c_CurrentPdo.c_TxMethod = C_GtGetText::h_GetText(
+         "1 to 240 - synchronous transmission after 1st to 240th SYNC");
    }
 
    c_CurrentPdo.c_InhibitTime = QString::number(orc_Message.u16_DelayTimeMs);
@@ -543,21 +551,21 @@ void C_SdNdeCoPdoTableModel::m_FillPdoInfo(void)
 {
    this->mc_PdoTableData.clear();
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       this->mu32_ManagerNodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
-      uint32 u32_InterfaceIndex = 0U;
+      uint32_t u32_InterfaceIndex = 0U;
       bool q_IntfFound = false;
-      uint32 u32_InterfaceCounter;
+      uint32_t u32_InterfaceCounter;
 
       // Search the interface index
       for (u32_InterfaceCounter = 0U; u32_InterfaceCounter < pc_Node->c_Properties.c_ComInterfaces.size();
            ++u32_InterfaceCounter)
       {
-         if ((pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceCounter].e_InterfaceType == C_OSCSystemBus::eCAN) &&
+         if ((pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceCounter].e_InterfaceType == C_OscSystemBus::eCAN) &&
              (pc_Node->c_Properties.c_ComInterfaces[u32_InterfaceCounter].u8_InterfaceNumber ==
               this->mu8_ManagerInterfaceId))
          {
@@ -572,33 +580,33 @@ void C_SdNdeCoPdoTableModel::m_FillPdoInfo(void)
       if (q_IntfFound == true)
       {
          // get message container of CANopen protocol
-         std::vector<C_OSCCanProtocol>::const_iterator c_IterComProtocols;
+         std::vector<C_OscCanProtocol>::const_iterator c_IterComProtocols;
 
          for (c_IterComProtocols = pc_Node->c_ComProtocols.begin();
               c_IterComProtocols != pc_Node->c_ComProtocols.end();
               ++c_IterComProtocols)
          {
-            if (c_IterComProtocols->e_Type == C_OSCCanProtocol::E_Type::eCAN_OPEN)
+            if (c_IterComProtocols->e_Type == C_OscCanProtocol::E_Type::eCAN_OPEN)
             {
-               const C_OSCCanMessageContainer * const pc_MsgContainer =
+               const C_OscCanMessageContainer * const pc_MsgContainer =
                   C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
-                     this->mu32_ManagerNodeIndex, C_OSCCanProtocol::E_Type::eCAN_OPEN,
+                     this->mu32_ManagerNodeIndex, C_OscCanProtocol::E_Type::eCAN_OPEN,
                      u32_InterfaceIndex, c_IterComProtocols->u32_DataPoolIndex);
-               C_OSCCanMessageIdentificationIndices c_CurMsgId;
+               C_OscCanMessageIdentificationIndices c_CurMsgId;
 
                // Constant id members
                c_CurMsgId.u32_NodeIndex = this->mu32_ManagerNodeIndex;
-               c_CurMsgId.e_ComProtocol = C_OSCCanProtocol::eCAN_OPEN;
+               c_CurMsgId.e_ComProtocol = C_OscCanProtocol::eCAN_OPEN;
                c_CurMsgId.u32_InterfaceIndex = u32_InterfaceIndex;
                c_CurMsgId.u32_DatapoolIndex = c_IterComProtocols->u32_DataPoolIndex;
 
                // Tx
-               uint32 u32_MsgCounter;
+               uint32_t u32_MsgCounter;
                for (u32_MsgCounter = 0U;
                     u32_MsgCounter < pc_MsgContainer->c_TxMessages.size();
                     ++u32_MsgCounter)
                {
-                  const C_OSCCanMessage & rc_Msg = pc_MsgContainer->c_TxMessages[u32_MsgCounter];
+                  const C_OscCanMessage & rc_Msg = pc_MsgContainer->c_TxMessages[u32_MsgCounter];
                   if (rc_Msg.c_CanOpenManagerOwnerNodeIndex == this->mc_DeviceNodeInterfaceId)
                   {
                      c_CurMsgId.u32_MessageIndex = u32_MsgCounter;
@@ -617,7 +625,7 @@ void C_SdNdeCoPdoTableModel::m_FillPdoInfo(void)
                     u32_MsgCounter < pc_MsgContainer->c_RxMessages.size();
                     ++u32_MsgCounter)
                {
-                  const C_OSCCanMessage & rc_Msg = pc_MsgContainer->c_RxMessages[u32_MsgCounter];
+                  const C_OscCanMessage & rc_Msg = pc_MsgContainer->c_RxMessages[u32_MsgCounter];
                   if (rc_Msg.c_CanOpenManagerOwnerNodeIndex == this->mc_DeviceNodeInterfaceId)
                   {
                      c_CurMsgId.u32_MessageIndex = u32_MsgCounter;

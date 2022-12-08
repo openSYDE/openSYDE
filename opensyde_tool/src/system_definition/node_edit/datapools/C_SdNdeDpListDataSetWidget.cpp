@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SdNdeDpListDataSetWidget.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SdNdeDpListDataSetWidget.hpp"
 #include "ui_C_SdNdeDpListDataSetWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdClipBoardHelper.h"
-#include "constants.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdClipBoardHelper.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -49,10 +48,10 @@ using namespace stw_opensyde_core;
    \param[in]     oru32_ListIndex     List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                       const uint32 & oru32_NodeIndex,
-                                                       const uint32 & oru32_DataPoolIndex,
-                                                       const uint32 & oru32_ListIndex) :
+C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                       const uint32_t & oru32_NodeIndex,
+                                                       const uint32_t & oru32_DataPoolIndex,
+                                                       const uint32_t & oru32_ListIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListDataSetWidget),
    mpc_ContextMenu(NULL),
@@ -68,8 +67,8 @@ C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements
    mu32_DataPoolIndex(oru32_DataPoolIndex),
    mu32_ListIndex(oru32_ListIndex)
 {
-   const stw_opensyde_core::C_OSCNodeDataPoolList * const pc_List =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(oru32_NodeIndex,
+   const stw::opensyde_core::C_OscNodeDataPoolList * const pc_List =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(oru32_NodeIndex,
                                                           oru32_DataPoolIndex,
                                                           oru32_ListIndex);
 
@@ -95,9 +94,9 @@ C_SdNdeDpListDataSetWidget::C_SdNdeDpListDataSetWidget(stw_opensyde_gui_elements
    m_OnDataSetSelectionChange(0);
 
    //Connects
-   connect(this->mpc_Ui->pc_BushButtonOk, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_BushButtonOk, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SdNdeDpListDataSetWidget::m_OkClicked);
-   connect(this->mpc_Ui->pc_BushButtonCancel, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_BushButtonCancel, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SdNdeDpListDataSetWidget::m_CancelClicked);
    connect(this->mpc_Ui->pc_TableView, &C_SdNdeDpListDataSetView::SigColumnCountChange, this,
            &C_SdNdeDpListDataSetWidget::m_OnDataSetCountChange);
@@ -140,7 +139,7 @@ C_SdNdeDpListDataSetWidget::~C_SdNdeDpListDataSetWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetWidget::InitStaticNames(void) const
 {
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
    if (pc_List != NULL)
@@ -205,8 +204,8 @@ void C_SdNdeDpListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
    bool q_CallOrig = true;
 
    //Handle all enter key cases manually
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_Event->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_Event->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_Event->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_Event->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -223,8 +222,8 @@ void C_SdNdeDpListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
    {
       if (this->mpc_Ui->pc_GroupBoxGeneral->isAncestorOf(this->focusWidget()) == true)
       {
-         const sintn sn_Key = opc_Event->key();
-         switch (sn_Key)
+         const int32_t s32_Key = opc_Event->key();
+         switch (s32_Key)
          {
          case Qt::Key_C:
             if (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true)
@@ -304,11 +303,11 @@ void C_SdNdeDpListDataSetWidget::keyPressEvent(QKeyEvent * const opc_Event)
    false:  not enough space for additional data sets
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListDataSetWidget::m_IsThereStillSpaceForDataSets(const uint32 ou32_NumberOfNewDataSets)
+bool C_SdNdeDpListDataSetWidget::m_IsThereStillSpaceForDataSets(const uint32_t ou32_NumberOfNewDataSets)
 {
    bool q_Return = true;
 
-   if (((static_cast<uint32>(this->mpc_Ui->pc_TableView->model()->columnCount()) + ou32_NumberOfNewDataSets)) >
+   if (((static_cast<uint32_t>(this->mpc_Ui->pc_TableView->model()->columnCount()) + ou32_NumberOfNewDataSets)) >
        mu32_NODE_DATA_SET_PER_LIST_MAX)
    {
       C_OgeWiCustomMessage c_MessageBox(this);
@@ -438,7 +437,7 @@ void C_SdNdeDpListDataSetWidget::m_HandleButtonChange(const bool & orq_AddActive
    \param[in] ors32_NewColumnCount New column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetWidget::m_OnDataSetCountChange(const sint32 & ors32_NewColumnCount) const
+void C_SdNdeDpListDataSetWidget::m_OnDataSetCountChange(const int32_t & ors32_NewColumnCount) const
 {
    if (ors32_NewColumnCount > 0)
    {
@@ -458,7 +457,7 @@ void C_SdNdeDpListDataSetWidget::m_OnDataSetCountChange(const sint32 & ors32_New
    \param[in] oru32_SelectionCount Selected item count
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListDataSetWidget::m_OnDataSetSelectionChange(const uint32 & oru32_SelectionCount) const
+void C_SdNdeDpListDataSetWidget::m_OnDataSetSelectionChange(const uint32_t & oru32_SelectionCount) const
 {
    QString c_Text;
 
@@ -484,50 +483,50 @@ void C_SdNdeDpListDataSetWidget::m_OnDataSetSelectionChange(const uint32 & oru32
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetWidget::m_SetupContextMenu(void)
 {
-   this->mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu(this);
+   this->mpc_ContextMenu = new stw::opensyde_gui_elements::C_OgeContextMenu(this);
 
    this->mpc_ActionAdd = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText(
          "Add new Dataset"), this, &C_SdNdeDpListDataSetWidget::m_DoInsert,
-      static_cast<sintn>(Qt::CTRL) +
-      static_cast<sintn>(Qt::Key_Plus));
+      static_cast<int32_t>(Qt::CTRL) +
+      static_cast<int32_t>(Qt::Key_Plus));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionCut = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText(
          "Cut"), this->mpc_Ui->pc_TableView, &C_SdNdeDpListDataSetView::Cut,
-      static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_X));
+      static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_X));
    this->mpc_ActionCopy = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText(
          "Copy"), this->mpc_Ui->pc_TableView, &C_SdNdeDpListDataSetView::Copy,
-      static_cast<sintn>(Qt::CTRL) +
-      static_cast<sintn>(Qt::Key_C));
+      static_cast<int32_t>(Qt::CTRL) +
+      static_cast<int32_t>(Qt::Key_C));
    this->mpc_ActionPaste = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText(
          "Paste"), this, &C_SdNdeDpListDataSetWidget::m_DoPaste,
-      static_cast<sintn>(Qt::CTRL) +
-      static_cast<sintn>(Qt::Key_V));
+      static_cast<int32_t>(Qt::CTRL) +
+      static_cast<int32_t>(Qt::Key_V));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionMoveLeft = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                   "Move Left"), this->mpc_Ui->pc_TableView,
                                                                &C_SdNdeDpListDataSetView::DoMoveLeft,
-                                                               static_cast<sintn>(Qt::CTRL) +
-                                                               static_cast<sintn>(Qt::Key_Left));
+                                                               static_cast<int32_t>(Qt::CTRL) +
+                                                               static_cast<int32_t>(Qt::Key_Left));
    this->mpc_ActionMoveRight = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                    "Move Right"), this->mpc_Ui->pc_TableView,
                                                                 &C_SdNdeDpListDataSetView::DoMoveRight,
-                                                                static_cast<sintn>(Qt::CTRL) +
-                                                                static_cast<sintn>(Qt::Key_Right));
+                                                                static_cast<int32_t>(Qt::CTRL) +
+                                                                static_cast<int32_t>(Qt::Key_Right));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionDelete = this->mpc_ContextMenu->addAction(
       C_GtGetText::h_GetText(
          "Delete"), this->mpc_Ui->pc_TableView, &C_SdNdeDpListDataSetView::Delete,
-      static_cast<sintn>(Qt::Key_Delete));
+      static_cast<int32_t>(Qt::Key_Delete));
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(this, &C_SdNdeDpListDataSetWidget::customContextMenuRequested, this,
@@ -569,14 +568,14 @@ void C_SdNdeDpListDataSetWidget::m_DoInsert(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListDataSetWidget::m_DoPaste(void)
 {
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> c_OSCNames;
-   std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > c_OSCDataSetValues;
+   std::vector<stw::opensyde_core::C_OscNodeDataPoolDataSet> c_OscNames;
+   std::vector<std::vector<stw::opensyde_core::C_OscNodeDataPoolContent> > c_OscDataSetValues;
 
    //how many items does the user want to paste ?
-   if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OSCNames,
-                                                                      c_OSCDataSetValues) == stw_errors::C_NO_ERR)
+   if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OscNames,
+                                                                      c_OscDataSetValues) == stw::errors::C_NO_ERR)
    {
-      if (m_IsThereStillSpaceForDataSets(c_OSCNames.size()) == true)
+      if (m_IsThereStillSpaceForDataSets(c_OscNames.size()) == true)
       {
          this->mpc_Ui->pc_TableView->Paste();
       }

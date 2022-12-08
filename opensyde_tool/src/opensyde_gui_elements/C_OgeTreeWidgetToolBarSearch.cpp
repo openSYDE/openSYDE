@@ -13,15 +13,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 #include <QScrollBar>
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_OgeTreeWidgetToolBarSearch.h"
+#include "C_OgeTreeWidgetToolBarSearch.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -79,9 +78,9 @@ bool C_OgeTreeWidgetToolBarSearch::HasResults(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeWidgetToolBarSearch::m_MarkResultString(QString & orc_ResultString) const
 {
-   const sintn sn_Pos = orc_ResultString.indexOf(this->mc_SearchString, 0, Qt::CaseInsensitive);
+   const int32_t s32_Pos = orc_ResultString.indexOf(this->mc_SearchString, 0, Qt::CaseInsensitive);
 
    // mark the search string in the result
-   orc_ResultString.insert(sn_Pos + this->mc_SearchString.length(), "</b>");
-   orc_ResultString.insert(sn_Pos, "<b>");
+   orc_ResultString.insert(s32_Pos + this->mc_SearchString.length(), "</b>");
+   orc_ResultString.insert(s32_Pos, "<b>");
 }

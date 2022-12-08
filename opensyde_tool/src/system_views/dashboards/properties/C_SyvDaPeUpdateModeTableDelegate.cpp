@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeCbxTable.h"
-#include "C_PuiSvHandler.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_OgeSpxFactorTable.h"
-#include "C_TblTreDelegateUtil.h"
-#include "C_OgeSpxInt64FactorTable.h"
-#include "C_SyvDaPeUpdateModeTableModel.h"
-#include "C_SyvDaPeUpdateModeTableDelegate.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeCbxTable.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_OgeSpxFactorTable.hpp"
+#include "C_TblTreDelegateUtil.hpp"
+#include "C_OgeSpxInt64FactorTable.hpp"
+#include "C_SyvDaPeUpdateModeTableModel.hpp"
+#include "C_SyvDaPeUpdateModeTableDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +46,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in]  ou32_ViewIndex   View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaPeUpdateModeTableDelegate::C_SyvDaPeUpdateModeTableDelegate(const uint32 ou32_ViewIndex) :
+C_SyvDaPeUpdateModeTableDelegate::C_SyvDaPeUpdateModeTableDelegate(const uint32_t ou32_ViewIndex) :
    mu32_ViewIndex(ou32_ViewIndex)
 {
 }
@@ -107,8 +106,8 @@ QWidget * C_SyvDaPeUpdateModeTableDelegate::createEditor(QWidget * const opc_Par
          break;
       case C_SyvDaPeUpdateModeTableModel::eTHRESHOLD:
          {
-            const QVariant c_Data = orc_Index.data(static_cast<sintn>(Qt::EditRole));
-            const QVariant c_Max = orc_Index.data(msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE);
+            const QVariant c_Data = orc_Index.data(static_cast<int32_t>(Qt::EditRole));
+            const QVariant c_Max = orc_Index.data(ms32_USER_ROLE_INTERACTION_MAXIMUM_VALUE);
             if (c_Data.type() == QVariant::Type::Double)
             {
                C_OgeSpxFactorTable * const pc_SpinBox = new C_OgeSpxFactorTable(opc_Parent);
@@ -181,29 +180,29 @@ void C_SyvDaPeUpdateModeTableDelegate::setEditorData(QWidget * const opc_Editor,
       case C_SyvDaPeUpdateModeTableModel::eCYCLIC_INTERVAL:
          if (pc_ComboBox != NULL)
          {
-            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt());
          }
          break;
       case C_SyvDaPeUpdateModeTableModel::eTHRESHOLD:
          if (pc_DoubleSpinBox != NULL)
          {
-            const QVariant c_Data = orc_Index.data(static_cast<sintn>(Qt::EditRole));
+            const QVariant c_Data = orc_Index.data(static_cast<int32_t>(Qt::EditRole));
             switch (c_Data.type()) //lint !e788 //not all types required
             {
             case QVariant::Double:
                pc_DoubleSpinBox->setValue(c_Data.toDouble());
                break;
             case QVariant::Int:
-               pc_DoubleSpinBox->setValue(static_cast<float64>(c_Data.toInt()));
+               pc_DoubleSpinBox->setValue(static_cast<float64_t>(c_Data.toInt()));
                break;
             case QVariant::UInt:
-               pc_DoubleSpinBox->setValue(static_cast<float64>(c_Data.toUInt()));
+               pc_DoubleSpinBox->setValue(static_cast<float64_t>(c_Data.toUInt()));
                break;
             case QVariant::LongLong:
-               pc_DoubleSpinBox->setValue(static_cast<float64>(c_Data.toLongLong()));
+               pc_DoubleSpinBox->setValue(static_cast<float64_t>(c_Data.toLongLong()));
                break;
             case QVariant::ULongLong:
-               pc_DoubleSpinBox->setValue(static_cast<float64>(c_Data.toULongLong()));
+               pc_DoubleSpinBox->setValue(static_cast<float64_t>(c_Data.toULongLong()));
                break;
             default:
                //No handling possible
@@ -212,7 +211,7 @@ void C_SyvDaPeUpdateModeTableDelegate::setEditorData(QWidget * const opc_Editor,
          }
          if (pc_Int64SpinBox != NULL)
          {
-            pc_Int64SpinBox->SetValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)), false);
+            pc_Int64SpinBox->SetValue(orc_Index.data(static_cast<int32_t>(Qt::EditRole)), false);
          }
          break;
       default:
@@ -249,8 +248,8 @@ void C_SyvDaPeUpdateModeTableDelegate::setModelData(QWidget * const opc_Editor, 
       case C_SyvDaPeUpdateModeTableModel::eCYCLIC_INTERVAL:
          if (pc_ComboBox != NULL)
          {
-            const sintn sn_NewValue = pc_ComboBox->currentIndex();
-            opc_Model->setData(orc_Index, sn_NewValue);
+            const int32_t s32_NewValue = pc_ComboBox->currentIndex();
+            opc_Model->setData(orc_Index, s32_NewValue);
          }
          break;
       case C_SyvDaPeUpdateModeTableModel::eTHRESHOLD:

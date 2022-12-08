@@ -11,18 +11,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCDataDealer.h"
-#include "TGLUtils.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscDataDealer.hpp"
+#include "TglUtils.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,7 +42,7 @@ using namespace stw_opensyde_core;
    Initializes class elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDataDealer::C_OSCDataDealer(void) :
+C_OscDataDealer::C_OscDataDealer(void) :
    mpc_Node(NULL),
    mu32_NodeIndex(0U),
    mpc_DiagProtocol(NULL)
@@ -59,8 +59,8 @@ C_OSCDataDealer::C_OSCDataDealer(void) :
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDataDealer::C_OSCDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
-                                 C_OSCDiagProtocolBase * const opc_DiagProtocol) :
+C_OscDataDealer::C_OscDataDealer(C_OscNode * const opc_Node, const uint32_t ou32_NodeIndex,
+                                 C_OscDiagProtocolBase * const opc_DiagProtocol) :
    mpc_Node(opc_Node),
    mu32_NodeIndex(ou32_NodeIndex),
    mpc_DiagProtocol(opc_DiagProtocol)
@@ -72,7 +72,7 @@ C_OSCDataDealer::C_OSCDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_N
 /*! \brief   Clean up class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDataDealer::~C_OSCDataDealer(void)
+C_OscDataDealer::~C_OscDataDealer(void)
 {
    mpc_Node = NULL;
    mpc_DiagProtocol = NULL;
@@ -86,8 +86,8 @@ C_OSCDataDealer::~C_OSCDataDealer(void)
    \param[in]     opc_DiagProtocol              Pointer to used diagnostic protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::Initialize(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
-                                 C_OSCDiagProtocolBase * const opc_DiagProtocol)
+void C_OscDataDealer::Initialize(C_OscNode * const opc_Node, const uint32_t ou32_NodeIndex,
+                                 C_OscDiagProtocolBase * const opc_DiagProtocol)
 {
    this->mpc_Node = opc_Node;
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -102,7 +102,7 @@ void C_OSCDataDealer::Initialize(C_OSCNode * const opc_Node, const uint32 ou32_N
    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCDataDealer::GetNodeIndex(void) const
+uint32_t C_OscDataDealer::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
@@ -132,10 +132,10 @@ uint32 C_OSCDataDealer::GetNodeIndex(void) const
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                     const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
+int32_t C_OscDataDealer::DataPoolRead(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                      const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((mpc_Node == NULL) || (mpc_DiagProtocol == NULL))
    {
@@ -144,7 +144,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
    else
    {
       //get list element
-      C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
+      C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
                                                                                                ou16_ListIndex,
                                                                                                ou16_ElementIndex);
       //does the specified element exist ?
@@ -154,7 +154,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
       }
       else
       {
-         std::vector<uint8> c_Data;
+         std::vector<uint8_t> c_Data;
          // Set the expected size. It will be checked in the read functions.
          c_Data.resize(pc_Element->GetSizeByte());
          //use communication function matching the element type
@@ -180,7 +180,7 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
                //size OK
                //convert to native endianness depending on the type ...
                //no possible problem we did not check for already ...
-               if (mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+               if (mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
                {
                   (void)pc_Element->c_Value.SetValueFromBigEndianBlob(c_Data);
                }
@@ -222,10 +222,10 @@ sint32 C_OSCDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                      const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
+int32_t C_OscDataDealer::DataPoolWrite(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                       const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((mpc_Node == NULL) || (mpc_DiagProtocol == NULL))
    {
@@ -234,7 +234,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    else
    {
       //get list element
-      const C_OSCNodeDataPoolListElement * const pc_Element =
+      const C_OscNodeDataPoolListElement * const pc_Element =
          this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex);
       //does the specified element exist ?
       if (pc_Element == NULL)
@@ -243,7 +243,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
       }
       else
       {
-         std::vector<uint8> c_Data;
+         std::vector<uint8_t> c_Data;
 
          //is the value within the defines min/max ranges ?
          s32_Return = pc_Element->CheckValueRange();
@@ -254,7 +254,7 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
          else
          {
             //convert native to protocol endianness depending on the type ...
-            if (mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+            if (mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
             {
                pc_Element->c_Value.GetValueAsBigEndianBlob(c_Data);
             }
@@ -308,10 +308,10 @@ sint32 C_OSCDataDealer::DataPoolWrite(const uint8 ou8_DataPoolIndex, const uint1
    C_COM       expected server response not received because of communication error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
+int32_t C_OscDataDealer::NvmRead(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                 const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((mpc_Node == NULL) || (mpc_DiagProtocol == NULL))
    {
@@ -320,7 +320,7 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
    else
    {
       //get list element
-      C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
+      C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
                                                                                                ou16_ListIndex,
                                                                                                ou16_ElementIndex);
       //does the specified element exist ?
@@ -330,17 +330,17 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
       }
       else
       {
-         std::vector<uint8> c_Data;
+         std::vector<uint8_t> c_Data;
 
          c_Data.resize(pc_Element->GetSizeByte());
          //request data from server
-         s32_Return = mpc_DiagProtocol->NvmRead(pc_Element->u32_NvMStartAddress, c_Data, opu8_NrCode);
+         s32_Return = mpc_DiagProtocol->NvmRead(pc_Element->u32_NvmStartAddress, c_Data, opu8_NrCode);
          if (s32_Return == C_NO_ERR)
          {
             //we have data
             //convert to native endianness depending on the type ...
             //no possible problem we did not check for already ...
-            if (mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+            if (mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
             {
                (void)pc_Element->c_NvmValue.SetValueFromBigEndianBlob(c_Data);
             }
@@ -388,10 +388,10 @@ sint32 C_OSCDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16
    C_COM       expected server response not received because of communication error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                 const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
+int32_t C_OscDataDealer::NvmWrite(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                  const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((mpc_Node == NULL) || (mpc_DiagProtocol == NULL))
    {
@@ -400,7 +400,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
    else
    {
       //get list element
-      const C_OSCNodeDataPoolListElement * const pc_Element =
+      const C_OscNodeDataPoolListElement * const pc_Element =
          this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex);
       //does the specified element exist ?
       if (pc_Element == NULL)
@@ -409,7 +409,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
       }
       else
       {
-         std::vector<uint8> c_Data;
+         std::vector<uint8_t> c_Data;
 
          //is the value within the defined min/max ranges ?
          s32_Return = pc_Element->CheckNvmValueRange();
@@ -420,7 +420,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
          else
          {
             //convert native to protocol endianness depending on the type ...
-            if (mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+            if (mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
             {
                pc_Element->c_NvmValue.GetValueAsBigEndianBlob(c_Data);
             }
@@ -430,7 +430,7 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
             }
 
             //write data to server:
-            s32_Return = mpc_DiagProtocol->NvmWrite(pc_Element->u32_NvMStartAddress, c_Data, opu8_NrCode);
+            s32_Return = mpc_DiagProtocol->NvmWrite(pc_Element->u32_NvmStartAddress, c_Data, opu8_NrCode);
          }
       }
    }
@@ -450,11 +450,11 @@ sint32 C_OSCDataDealer::NvmWrite(const uint8 ou8_DataPoolIndex, const uint16 ou1
    \param[in]  ou16_ElementIndex   element index that data was received for
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                    const uint16 ou16_ElementIndex)
+void C_OscDataDealer::m_OnReadDataPoolEventReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                    const uint16_t ou16_ElementIndex)
 {
-   stw_scl::C_SCLString c_Info;
-   c_Info.PrintFormatted("C_OSCDataDealer: ReadDataPool event received but no notification handler implemented. " \
+   stw::scl::C_SclString c_Info;
+   c_Info.PrintFormatted("C_OscDataDealer: ReadDataPool event received but no notification handler implemented. " \
                          "Element (dp: %d list: %d element: %d) !", ou8_DataPoolIndex, ou16_ListIndex,
                          ou16_ElementIndex);
    osc_write_log_warning("Asynchronous communication", c_Info);
@@ -473,11 +473,11 @@ void C_OSCDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolInde
    \param[in]  ou8_ErrorCode       received error code
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                         const uint16 ou16_ElementIndex, const uint8 ou8_ErrorCode)
+void C_OscDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                         const uint16_t ou16_ElementIndex, const uint8_t ou8_ErrorCode)
 {
-   stw_scl::C_SCLString c_Info;
-   c_Info.PrintFormatted("C_OSCDataDealer: ReadDataPool error event received but no notification handler " \
+   stw::scl::C_SclString c_Info;
+   c_Info.PrintFormatted("C_OscDataDealer: ReadDataPool error event received but no notification handler " \
                          "implemented. Element (dp: %d list: %d element: %d) Code: %d !", ou8_DataPoolIndex,
                          ou16_ListIndex, ou16_ElementIndex, ou8_ErrorCode);
    osc_write_log_warning("Asynchronous communication", c_Info);
@@ -496,11 +496,11 @@ void C_OSCDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoo
    \param[in]  ou16_ElementIndex   element index that data was received for
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                       const uint16 ou16_ElementIndex)
+void C_OscDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                       const uint16_t ou16_ElementIndex)
 {
-   stw_scl::C_SCLString c_Info;
-   c_Info.PrintFormatted("C_OSCDataDealer: NvmRead event received but no notification handler implemented. " \
+   stw::scl::C_SclString c_Info;
+   c_Info.PrintFormatted("C_OscDataDealer: NvmRead event received but no notification handler implemented. " \
                          "Element (dp: %d list: %d element: %d) !", ou8_DataPoolIndex, ou16_ListIndex,
                          ou16_ElementIndex);
    osc_write_log_warning("Asynchronous communication", c_Info);
@@ -510,19 +510,19 @@ void C_OSCDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolI
 /*! \brief   Initialization of the data dealer
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::m_Init(void)
+void C_OscDataDealer::m_Init(void)
 {
    if (this->mpc_DiagProtocol != NULL)
    {
-      this->mpc_DiagProtocol->Initialize(&C_OSCDataDealer::mh_ReadDataPoolDataEventReceived,
-                                         &C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived, this);
+      this->mpc_DiagProtocol->Initialize(&C_OscDataDealer::mh_ReadDataPoolDataEventReceived,
+                                         &C_OscDataDealer::mh_ReadDataPoolDataEventErrorReceived, this);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received read datapool data event
 
-   Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventReceived.
+   Target of C_OscDiagProtocolBase::PR_DataPoolReadEventReceived.
 
    Called by specific protocol implementation when a response to a
    previously requested event driven transmission was received.
@@ -530,19 +530,19 @@ void C_OSCDataDealer::m_Init(void)
    Here:
    Extract data and store in data pool.
 
-   \param[in]     opv_Instance         Pointer to the instance of C_OSCDataDealerOsy
+   \param[in]     opv_Instance         Pointer to the instance of C_OscDataDealerOsy
    \param[in]     ou8_DataPoolIndex    Datapool index
    \param[in]     ou8_ListIndex        List index
    \param[in]     ou8_ElementIndex     Element index
    \param[in]     orc_Value            Value of element stored in uint8 vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance, const uint8 ou8_DataPoolIndex,
-                                                       const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex,
-                                                       const std::vector<uint8> & orc_Value)
+void C_OscDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance, const uint8_t ou8_DataPoolIndex,
+                                                       const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex,
+                                                       const std::vector<uint8_t> & orc_Value)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer *>(opv_Instance);
+   C_OscDataDealer * const pc_Dealer = reinterpret_cast<C_OscDataDealer *>(opv_Instance);
 
    tgl_assert(pc_Dealer != NULL);
    if (pc_Dealer != NULL)
@@ -554,7 +554,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received read datapool data event
 
-   Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventReceived.
+   Target of C_OscDiagProtocolBase::PR_DataPoolReadEventReceived.
 
    Called by specific protocol implementation when a response to a
    previously requested event driven transmission was received.
@@ -568,25 +568,25 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventReceived(void * const opv_Instance
    \param[in]     orc_Value            Value of element stored in uint8 vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                      const uint16 ou16_ElementIndex,
-                                                      const std::vector<uint8> & orc_Value)
+void C_OscDataDealer::m_ReadDataPoolDataEventReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                      const uint16_t ou16_ElementIndex,
+                                                      const std::vector<uint8_t> & orc_Value)
 {
    //check for weird misconfiguration:
    if ((this->mpc_Node == NULL) || (this->mpc_DiagProtocol == NULL))
    {
       osc_write_log_warning("Asynchronous communication",
-                            "C_OSCDataDealer: ReadDataPool event received but no node or diagnostic protocol known!");
+                            "C_OscDataDealer: ReadDataPool event received but no node or diagnostic protocol known!");
    }
    else
    {
-      C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
+      C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
                                                                                                ou16_ListIndex,
                                                                                                ou16_ElementIndex);
       if (pc_Element == NULL)
       {
-         stw_scl::C_SCLString c_Error;
-         c_Error.PrintFormatted("C_OSCDataDealer: ReadDataPool event received but referenced Datapool element (" \
+         stw::scl::C_SclString c_Error;
+         c_Error.PrintFormatted("C_OscDataDealer: ReadDataPool event received but referenced Datapool element (" \
                                 "dp: %d list: %d element: %d) not known!", ou8_DataPoolIndex, ou16_ListIndex,
                                 ou16_ElementIndex);
          osc_write_log_warning("Asynchronous communication", c_Error);
@@ -600,8 +600,8 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
          //So we do not check for an exact match but for "do we have enough ?"
          if (orc_Value.size() < pc_Element->GetSizeByte())
          {
-            stw_scl::C_SCLString c_Error;
-            c_Error.PrintFormatted("C_OSCDataDealer: ReadDataPool event received but size does not match Datapool " \
+            stw::scl::C_SclString c_Error;
+            c_Error.PrintFormatted("C_OscDataDealer: ReadDataPool event received but size does not match Datapool " \
                                    "element (dp: %d list: %d element: %d)!", ou8_DataPoolIndex, ou16_ListIndex,
                                    ou16_ElementIndex);
             osc_write_log_warning("Asynchronous communication", c_Error);
@@ -609,12 +609,12 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
          else
          {
             //size OK; cut off potential cruft
-            std::vector<uint8> c_Data = orc_Value;
+            std::vector<uint8_t> c_Data = orc_Value;
             c_Data.resize(pc_Element->GetSizeByte());
 
             //convert to native endianness depending on the type ...
             //no possible problem we did not check for already ...
-            if (mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+            if (mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
             {
                (void)pc_Element->c_Value.SetValueFromBigEndianBlob(c_Data);
             }
@@ -632,7 +632,7 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received negative read datapool data event
 
-   Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
+   Target of C_OscDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
 
    Called by specific protocol implementation when a negative message response to a
    event driven transmission was received.
@@ -640,18 +640,18 @@ void C_OSCDataDealer::m_ReadDataPoolDataEventReceived(const uint8 ou8_DataPoolIn
    Here:
    Error handling
 
-   \param[in]     opv_Instance   Pointer to the instance of C_OSCDataDealerOsy
+   \param[in]     opv_Instance   Pointer to the instance of C_OscDataDealerOsy
    \param[in]     ou8_DataPoolIndex    Datapool index
    \param[in]     ou8_ListIndex        List index
    \param[in]     ou8_ElementIndex     Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Instance, const uint8 ou8_DataPoolIndex,
-                                                            const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex,
-                                                            const uint8 ou8_NrCode)
+void C_OscDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Instance, const uint8_t ou8_DataPoolIndex,
+                                                            const uint16_t ou16_ListIndex,
+                                                            const uint16_t ou16_ElementIndex, const uint8_t ou8_NrCode)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCDataDealer * const pc_Dealer = reinterpret_cast<C_OSCDataDealer *>(opv_Instance);
+   C_OscDataDealer * const pc_Dealer = reinterpret_cast<C_OscDataDealer *>(opv_Instance);
 
    tgl_assert(pc_Dealer != NULL);
    if (pc_Dealer != NULL)
@@ -663,7 +663,7 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handling an async received negative read datapool data event
 
-   Target of C_OSCDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
+   Target of C_OscDiagProtocolBase::PR_DataPoolReadEventErrorReceived.
 
    Called by specific protocol implementation when a negative message response to a
    event driven transmission was received.
@@ -672,24 +672,25 @@ void C_OSCDataDealer::mh_ReadDataPoolDataEventErrorReceived(void * const opv_Ins
    Check whether this is something we know about and inform application.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDataDealer::m_ReadDataPoolDataEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                           const uint16 ou16_ElementIndex, const uint8 ou8_NrCode)
+void C_OscDataDealer::m_ReadDataPoolDataEventErrorReceived(const uint8_t ou8_DataPoolIndex,
+                                                           const uint16_t ou16_ListIndex,
+                                                           const uint16_t ou16_ElementIndex, const uint8_t ou8_NrCode)
 {
    //check for weird misconfiguration:
    if ((this->mpc_Node == NULL) || (this->mpc_DiagProtocol == NULL))
    {
       osc_write_log_warning("Asynchronous communication",
-                            "C_OSCDataDealer: ReadDataPool error event received but no node or diagnostic protocol known!");
+                            "C_OscDataDealer: ReadDataPool error event received but no node or diagnostic protocol known!");
    }
    else
    {
-      C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
+      C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex,
                                                                                                ou16_ListIndex,
                                                                                                ou16_ElementIndex);
       if (pc_Element == NULL)
       {
-         stw_scl::C_SCLString c_Error;
-         c_Error.PrintFormatted("C_OSCDataDealer: ReadDataPool error event received but referenced Datapool element " \
+         stw::scl::C_SclString c_Error;
+         c_Error.PrintFormatted("C_OscDataDealer: ReadDataPool error event received but referenced Datapool element " \
                                 "(dp: %d list: %d element: %d) not known!", ou8_DataPoolIndex, ou16_ListIndex,
                                 ou16_ElementIndex);
          osc_write_log_warning("Asynchronous communication", c_Error);

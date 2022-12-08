@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdManTopologyBusConnectorReconnectManager.h"
+#include "stwtypes.hpp"
+#include "C_SdManTopologyBusConnectorReconnectManager.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -104,7 +103,7 @@ void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAboutToClose(void)
    \param[in]  orc_Properties    Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAccepted(const sint32 & ors32_Interface,
+void C_SdManTopologyBusConnectorReconnectManager::ContextMenuAccepted(const int32_t & ors32_Interface,
                                                                       const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    this->ms32_NewInterface = ors32_Interface;

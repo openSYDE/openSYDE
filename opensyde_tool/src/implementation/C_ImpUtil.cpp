@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <windows.h> //tlhelp32 does not do this by itself ...
 #include <tlhelp32.h>
@@ -19,33 +19,32 @@
 #include <QTextStream>
 #include <QApplication>
 
-#include "C_ImpUtil.h"
-#include "TGLUtils.h"
-#include "TGLFile.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OgeWiUtil.h"
-#include "C_Uti.h"
-#include "C_PopUtil.h"
-#include "C_OSCUtils.h"
-#include "C_PuiUtil.h"
-#include "C_SdCodeGenerationDialog.h"
+#include "C_ImpUtil.hpp"
+#include "TglUtils.hpp"
+#include "TglFile.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_Uti.hpp"
+#include "C_PopUtil.hpp"
+#include "C_OscUtils.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_SdCodeGenerationDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -77,9 +76,9 @@ C_ImpUtil::C_ImpUtil(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_ImpUtil::h_ExportCodeAll(QWidget * const opc_Parent)
 {
-   std::vector<uint32> c_Indices;
-   c_Indices.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
-   for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+   std::vector<uint32_t> c_Indices;
+   c_Indices.reserve(C_PuiSdHandler::h_GetInstance()->GetOscNodesSize());
+   for (uint32_t u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
    {
       c_Indices.push_back(u32_ItNode);
    }
@@ -96,11 +95,11 @@ void C_ImpUtil::h_ExportCodeAll(QWidget * const opc_Parent)
    \param[in]  opc_Parent              parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
-                             const std::vector< std::vector<uint32> > & orc_AppIndicesPerNode,
+void C_ImpUtil::h_ExportCode(const std::vector<uint32_t> & orc_NodeIndices,
+                             const std::vector< std::vector<uint32_t> > & orc_AppIndicesPerNode,
                              QWidget * const opc_Parent)
 {
-   sint32 s32_Result = C_NO_ERR;
+   int32_t s32_Result = C_NO_ERR;
    bool q_Continue = true;
    C_OgeWiCustomMessage c_Message(opc_Parent);
 
@@ -116,18 +115,18 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    {
       QString c_DataPoolErrorMessage;
       //Check data pools
-      for (uint32 u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
+      for (uint32_t u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
             orc_NodeIndices[u32_ItInNode]);
          if (pc_Node != NULL)
          {
             //Only check nodes that really have programmable applications (assignment not mandatory for PSI generation)
             if (C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(orc_NodeIndices[u32_ItInNode]).size() > 0)
             {
-               for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+               for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
                {
-                  const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+                  const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
                   if (rc_DataPool.s32_RelatedDataBlockIndex < 0L)
                   {
                      q_Continue = false;
@@ -160,7 +159,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    {
       bool q_SysDefInvalid = false;
       //Node error
-      for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize();
+      for (uint32_t u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize();
            ++u32_ItNode)
       {
          if (C_PuiSdHandler::h_GetInstance()->CheckNodeConflict(u32_ItNode) == true)
@@ -170,7 +169,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          }
       }
       //Bus error
-      for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+      for (uint32_t u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_ItBus)
       {
          if (C_PuiSdHandler::h_GetInstance()->CheckBusConflict(u32_ItBus) == true)
          {
@@ -185,8 +184,8 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_Question.SetHeading("CONFIRM FILE GENERATION");
          c_Question.SetDescription(C_GtGetText::h_GetText("There are SYSTEM DEFINITION errors. "
                                                           "Do you really want to generate files?"));
-         c_Question.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
-         c_Question.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+         c_Question.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+         c_Question.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
          c_Question.SetCustomMinHeight(180, 180);
          if (c_Question.Execute() == C_OgeWiCustomMessage::eYES)
          {
@@ -208,16 +207,16 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       bool q_CodeGeneratorMissing = false;
 
       c_DataBlockInfoMessage += C_GtGetText::h_GetText("There will be files generated for the following node(s):<br>");
-      for (uint32 u32_ItNode = 0; u32_ItNode < orc_NodeIndices.size(); ++u32_ItNode)
+      for (uint32_t u32_ItNode = 0; u32_ItNode < orc_NodeIndices.size(); ++u32_ItNode)
       {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_NodeIndices[u32_ItNode]);
+         const C_OscNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_NodeIndices[u32_ItNode]);
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
-            for (uint32 u32_ItApp = 0; u32_ItApp < orc_AppIndicesPerNode[u32_ItNode].size(); ++u32_ItApp)
+            for (uint32_t u32_ItApp = 0; u32_ItApp < orc_AppIndicesPerNode[u32_ItNode].size(); ++u32_ItApp)
             {
-               const C_OSCNodeApplication * const pc_Application =
+               const C_OscNodeApplication * const pc_Application =
                   C_PuiSdHandler::h_GetInstance()->GetApplication(orc_NodeIndices[u32_ItNode],
                                                                   orc_AppIndicesPerNode[u32_ItNode][u32_ItApp]);
                tgl_assert(pc_Application != NULL);
@@ -266,8 +265,8 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
             c_Message.SetType(C_OgeWiCustomMessage::E_Type::eQUESTION);
             c_Message.SetHeading(C_GtGetText::h_GetText("Erase target directories"));
             c_Message.SetDescription(c_Description);
-            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Generate Files"));
-            c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_Message.SetOkButtonText(C_GtGetText::h_GetText("Generate Files"));
+            c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
             c_Message.SetDetails("<a/>" + c_EraseInfoMessage + c_DataBlockInfoMessage);
             c_Message.SetCustomMinHeight(200, 400);
             c_Message.SetCustomMinWidth(650);
@@ -300,7 +299,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
 
       // export files for each node
       QApplication::setOverrideCursor(Qt::WaitCursor);
-      for (uint32 u32_ItNode = 0; (u32_ItNode < orc_NodeIndices.size()) && (s32_Result == C_NO_ERR); ++u32_ItNode)
+      for (uint32_t u32_ItNode = 0; (u32_ItNode < orc_NodeIndices.size()) && (s32_Result == C_NO_ERR); ++u32_ItNode)
       {
          // Maybe once replace "true" flag with user-confirmed value
          s32_Result = C_ImpUtil::mh_ExportCodeNode(orc_NodeIndices[u32_ItNode], orc_AppIndicesPerNode[u32_ItNode],
@@ -311,7 +310,7 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
       // give user detailed feedback about success or fail
       if (s32_Result == C_NO_ERR) // inform about success with file generation report
       {
-         QPointer<C_OgePopUpDialog> const c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent, opc_Parent);
+         const QPointer<C_OgePopUpDialog> c_PopUpDialogReportDialog = new C_OgePopUpDialog(opc_Parent, opc_Parent);
          C_ImpCodeGenerationReportWidget * const pc_DialogExportReport =  new C_ImpCodeGenerationReportWidget(
             *c_PopUpDialogReportDialog);
 
@@ -334,10 +333,10 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
          c_MessageResult.SetHeading(C_GtGetText::h_GetText("File generation"));
          c_MessageResult.SetDescription(C_GtGetText::h_GetText("File generation failed."));
          //Update log file
-         C_OSCLoggingHandler::h_Flush();
+         C_OscLoggingHandler::h_Flush();
          const QString c_Details = C_GtGetText::h_GetText("For details see ") +
                                    C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                    C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
+                                                    C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
                                    C_GtGetText::h_GetText(" or log file(s) of file generator(s).");
          c_MessageResult.SetDetails(c_Details);
          c_MessageResult.SetCustomMinHeight(180, 250);
@@ -356,18 +355,18 @@ void C_ImpUtil::h_ExportCode(const std::vector<uint32> & orc_NodeIndices,
    \param[in]  opc_Parent        parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, QWidget * const opc_Parent)
+void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32_t> & orc_NodeIndices, QWidget * const opc_Parent)
 {
-   std::vector<uint32> c_ValidNodeIndices;
-   std::vector<uint32> c_ProgAppsNodeIndices;
-   std::vector<std::vector<uint32> > c_AllProgApps;
+   std::vector<uint32_t> c_ValidNodeIndices;
+   std::vector<uint32_t> c_ProgAppsNodeIndices;
+   std::vector<std::vector<uint32_t> > c_AllProgApps;
    C_OgeWiCustomMessage c_Message(opc_Parent);
 
    // get valid nodes (i.e. ones with file generation Data Blocks)
-   for (uint32 u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
+   for (uint32_t u32_ItInNode = 0; u32_ItInNode < orc_NodeIndices.size(); ++u32_ItInNode)
    {
       c_ProgAppsNodeIndices.clear();
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_NodeIndices[u32_ItInNode]);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_NodeIndices[u32_ItInNode]);
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
@@ -426,22 +425,22 @@ void C_ImpUtil::h_ExportCodeNodes(const std::vector<uint32> & orc_NodeIndices, Q
    see C_ImpUtil::mh_ExecuteCodeGenerator for further errors
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vector<stw_types::uint32> & orc_AppIndices,
-                                    std::vector<C_ImpCodeGenerationReportWidget::C_ReportData> & orc_ExportInfo,
-                                    const bool & orq_Erase)
+int32_t C_ImpUtil::mh_ExportCodeNode(const uint32_t ou32_NodeIndex, const std::vector<uint32_t> & orc_AppIndices,
+                                     std::vector<C_ImpCodeGenerationReportWidget::C_ReportData> & orc_ExportInfo,
+                                     const bool & orq_Erase)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_OSCNode c_Node;
+   int32_t s32_Retval = C_NO_ERR;
+   C_OscNode c_Node;
 
-   if (C_PuiSdHandler::h_GetInstance()->GetSortedOSCNodeConst(ou32_NodeIndex, c_Node) == C_NO_ERR)
+   if (C_PuiSdHandler::h_GetInstance()->GetSortedOscNodeConst(ou32_NodeIndex, c_Node) == C_NO_ERR)
    {
       // call file generator for each application
-      for (uint32 u32_Pos = 0; (u32_Pos < orc_AppIndices.size()) && (s32_Retval == C_NO_ERR); u32_Pos++)
+      for (uint32_t u32_Pos = 0; (u32_Pos < orc_AppIndices.size()) && (s32_Retval == C_NO_ERR); u32_Pos++)
       {
          // check if valid application index
          if (orc_AppIndices[u32_Pos] < c_Node.c_Applications.size())
          {
-            const C_OSCNodeApplication * const pc_Application =
+            const C_OscNodeApplication * const pc_Application =
                C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, orc_AppIndices[u32_Pos]);
             tgl_assert(pc_Application != NULL);
             if (pc_Application != NULL)
@@ -496,9 +495,9 @@ sint32 C_ImpUtil::mh_ExportCodeNode(const uint32 ou32_NodeIndex, const std::vect
    C_CONFIG Operation failure: cannot find IDE
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
+int32_t C_ImpUtil::h_OpenIde(const QString & orc_IdeExeCall)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_IdeExeCall.compare("") != 0)
    {
@@ -540,7 +539,7 @@ sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
          C_ImpUtil::mh_GetExistingApplicationHandle(c_ExeOnly.toStdWString().c_str(), c_Windows);
          if (c_Windows.size() > 0)
          {
-            for (uint32 u32_ItWindow = 0; u32_ItWindow < c_Windows.size(); ++u32_ItWindow)
+            for (uint32_t u32_ItWindow = 0; u32_ItWindow < c_Windows.size(); ++u32_ItWindow)
             {
                // bring window to top
                BringWindowToTop(c_Windows[u32_ItWindow]);
@@ -592,7 +591,7 @@ sint32 C_ImpUtil::h_OpenIDE(const QString & orc_IdeExeCall)
    Connectors directory location
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_ImpUtil::h_GetSydeCoderCPath()
+QString C_ImpUtil::h_GetSydeCoderCePath()
 {
    return "../connectors/syde_coder_c/osy_syde_coder_c.exe";
 }
@@ -610,14 +609,14 @@ QString C_ImpUtil::h_GetSydeCoderCPath()
    Absolute path to location of generated files.
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication & orc_Application,
-                                             const C_SCLString & orc_NodeName)
+QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OscNodeApplication & orc_Application,
+                                             const C_SclString & orc_NodeName)
 {
    QString c_Return;
    QString c_GenerateDir = orc_Application.c_GeneratePath.c_str();
 
    // check generate path: empty? --> use default relative path
-   if ((c_GenerateDir.isEmpty() == true) && (orc_Application.e_Type != C_OSCNodeApplication::ePARAMETER_SET_HALC))
+   if ((c_GenerateDir.isEmpty() == true) && (orc_Application.e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC))
    {
       c_GenerateDir = h_GetDefaultGeneratedDir(orc_Application.c_Name, orc_NodeName);
    }
@@ -638,13 +637,13 @@ QString C_ImpUtil::h_GetAbsoluteGeneratedDir(const C_OSCNodeApplication & orc_Ap
    Default directory for generated files
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_ImpUtil::h_GetDefaultGeneratedDir(const C_SCLString & orc_ApplicationName, const C_SCLString & orc_NodeName)
+QString C_ImpUtil::h_GetDefaultGeneratedDir(const C_SclString & orc_ApplicationName, const C_SclString & orc_NodeName)
 {
-   C_SCLString c_Return = "./opensyde_generated/";
+   C_SclString c_Return = "./opensyde_generated/";
 
-   c_Return += C_OSCUtils::h_NiceifyStringForFileName(orc_NodeName);
+   c_Return += C_OscUtils::h_NiceifyStringForFileName(orc_NodeName);
    c_Return += "/";
-   c_Return += C_OSCUtils::h_NiceifyStringForFileName(orc_ApplicationName);
+   c_Return += C_OscUtils::h_NiceifyStringForFileName(orc_ApplicationName);
    return c_Return.c_str();
 }
 
@@ -695,7 +694,7 @@ bool C_ImpUtil::h_CheckProjForCodeGeneration(QWidget * const opc_Parent)
 
    Check if path could be made relative and ask user if she wants to save the path
    relative or absolute.
-   The function checks orc_Path for valid characters. See C_OSCUtils::h_IsStringNiceifiedForFilePath for
+   The function checks orc_Path for valid characters. See C_OscUtils::h_IsStringNiceifiedForFilePath for
    details of the check. If the check fails an empty string will be returned.
 
    Note: If one of the paths is empty this simply returns the given path.
@@ -720,7 +719,7 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
    QString c_PathAbsolute;
 
    // Check first if path is a valid path with no unwanted characters
-   if (C_OSCUtils::h_CheckValidFilePath(orc_Path.toStdString().c_str()) == false)
+   if (C_OscUtils::h_CheckValidFilePath(orc_Path.toStdString().c_str()) == false)
    {
       C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, orc_Path);
       c_Return = "";
@@ -733,8 +732,8 @@ QString C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you want to save the selected path relative or absolute?"));
       c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
                            arg(c_PathRelative).arg(c_PathAbsolute));
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Absolute"));
       c_Message.SetCustomMinHeight(230, 250);
 
       if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
@@ -787,7 +786,7 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
    }
    else if (orc_Paths.isEmpty() == false)
    {
-      sint32 s32_Pos;
+      int32_t s32_Pos;
       QStringList c_PathsRelative;
       QStringList c_PathsAbsolute;
       QString c_InvalidPaths = "";
@@ -797,7 +796,7 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
       // Check first if all paths are valid paths with no unwanted characters
       for (s32_Pos = 0; s32_Pos < c_Return.size(); ++s32_Pos)
       {
-         if (C_OSCUtils::h_CheckValidFilePath(c_Return[s32_Pos].toStdString().c_str()) == false)
+         if (C_OscUtils::h_CheckValidFilePath(c_Return[s32_Pos].toStdString().c_str()) == false)
          {
             c_InvalidPaths += "- " + c_Return[s32_Pos] + "\n";
          }
@@ -837,8 +836,8 @@ QStringList C_ImpUtil::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, c
          c_Details += "\n   ";
          c_Details += c_PathsAbsolute.join("\n   ");
          c_Message.SetDetails(c_Details);
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
-         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));
+         c_Message.SetNoButtonText(C_GtGetText::h_GetText("Absolute"));
          c_Message.SetCustomMinHeight(230, 400);
 
          if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
@@ -914,7 +913,7 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
    PROCESSENTRY32 c_Entry;
    bool q_Exists = false;
    HANDLE pv_Snapshot;
-   uint32 u32_ProcessID = 0;
+   uint32_t u32_ProcessId = 0;
 
    //Get process ID
    c_Entry.dwSize = sizeof(PROCESSENTRY32);
@@ -928,7 +927,7 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
       {
          if (std::wcscmp(c_Entry.szExeFile, orc_ExeName.c_str()) == 0) //lint !e64 //Windows library interface
          {
-            u32_ProcessID = c_Entry.th32ProcessID;
+            u32_ProcessId = c_Entry.th32ProcessID;
             q_Exists = true;
          }
       }
@@ -940,8 +939,8 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
    {
       // get main window from process ID
       // https://stackoverflow.com/questions/221730/bat-file-to-run-a-exe-at-the-command-prompt
-      C_ImpUtil::T_HandleData c_Data;
-      c_Data.u32_ProcessId = u32_ProcessID;
+      C_ImpUtil::C_HandleData c_Data;
+      c_Data.u32_ProcessId = u32_ProcessId;
       c_Data.pc_WindowHandle = NULL;
       //lint -e{9091} required by EnumWindows
       EnumWindows(&C_ImpUtil::mh_EnumWindowsCallback, reinterpret_cast<LPARAM>(&c_Data));
@@ -955,21 +954,22 @@ void C_ImpUtil::mh_GetExistingApplicationHandle(const std::wstring & orc_ExeName
    Adopted from here: https://stackoverflow.com/questions/221730/bat-file-to-run-a-exe-at-the-command-prompt
 
    \param[in]  opc_Handle     Handle
-   \param[in]  os32_LParam    Parameter
+   \param[in]  ox_LoParam     Parameter
 
    \return
    TRUE, FALSE
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8080} //using type expected by the library for compatibility
-WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM os32_LParam)
+WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM ox_LoParam)
 {
    //lint -e{9010} //interface defined by Windows API
-   T_HandleData & rc_Data = *reinterpret_cast<T_HandleData *>(os32_LParam);
-   DWORD u32_ProcessId = 0;
+   C_HandleData & rc_Data = *reinterpret_cast<C_HandleData *>(ox_LoParam);
+   DWORD x_ProcessId = 0;
    bool q_IsMainWindow = false;
+   WINBOOL x_Result = FALSE;
 
-   GetWindowThreadProcessId(opc_Handle, &u32_ProcessId);
+   GetWindowThreadProcessId(opc_Handle, &x_ProcessId);
 
    //lint -e{9010} //interface defined by Windows API
    if (GetWindow(opc_Handle, GW_OWNER) == reinterpret_cast<HWND>(NULL))
@@ -979,12 +979,15 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
          q_IsMainWindow = true;
       }
    }
-   if ((rc_Data.u32_ProcessId != u32_ProcessId) || (q_IsMainWindow == false))
+   if ((rc_Data.u32_ProcessId != x_ProcessId) || (q_IsMainWindow == false))
    {
-      return TRUE;
+      x_Result = TRUE;
    }
-   rc_Data.pc_WindowHandle = opc_Handle;
-   return FALSE;
+   else
+   {
+      rc_Data.pc_WindowHandle = opc_Handle;
+   }
+   return x_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1019,15 +1022,15 @@ WINBOOL CALLBACK C_ImpUtil::mh_EnumWindowsCallback(HWND opc_Handle, const LPARAM
    C_TIMEOUT      Timeout for file generator call.
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
-                                          const QString & orc_ExportFolder, QStringList & orc_ExportedFiles,
-                                          const QString & orc_CodeGenerator, const bool & orq_Erase)
+int32_t C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QString & orc_AppName,
+                                           const QString & orc_ExportFolder, QStringList & orc_ExportedFiles,
+                                           const QString & orc_CodeGenerator, const bool & orq_Erase)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    QStringList c_Arguments;
    QProcess * const pc_Process = new QProcess(new QObject());
    QFile c_FileListFile;
-   C_SCLString c_ErrorText;
+   C_SclString c_ErrorText;
    QString c_SysDefPath;
 
    // get system definition path (always absolute because pui project get path is always absolute)
@@ -1063,9 +1066,9 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
       q_Tmp = pc_Process->waitForFinished(); // 30 seconds (default)
       if (q_Tmp == true)
       {
-         const sintn sn_ProcessExitCode = pc_Process->exitCode();
+         const int32_t s32_ProcessExitCode = pc_Process->exitCode();
 
-         switch (sn_ProcessExitCode)
+         switch (s32_ProcessExitCode)
          {
          case 0: // eRESULT_OK
             // everything ok
@@ -1151,7 +1154,7 @@ sint32 C_ImpUtil::mh_ExecuteCodeGenerator(const QString & orc_NodeName, const QS
             break;
          case 10: // eRESULT_HELPING --> we do not call help option, so why should this error occur? --> unknown
          default:
-            c_ErrorText = "Unknown error occurred. Exit code: " + C_SCLString::IntToStr(sn_ProcessExitCode);
+            c_ErrorText = "Unknown error occurred. Exit code: " + C_SclString::IntToStr(s32_ProcessExitCode);
             s32_Return = C_UNKNOWN_ERR;
             break;
          }

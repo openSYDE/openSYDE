@@ -94,14 +94,14 @@
            <number>5</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabName">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabName">
             <property name="text">
              <string>#1 - DataBlock</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabToolTipBase" name="pc_LabErrorIcon">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabToolTipBase" name="pc_LabErrorIcon">
             <property name="text">
              <string>Error</string>
             </property>
@@ -121,7 +121,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PubOpenIde">
+           <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PubOpenIde">
             <property name="minimumSize">
              <size>
               <width>16</width>
@@ -140,7 +140,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FraSeperatorButtons">
+           <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FraSeperatorButtons">
             <property name="minimumSize">
              <size>
               <width>1</width>
@@ -162,7 +162,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PubEdit">
+           <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PubEdit">
             <property name="minimumSize">
              <size>
               <width>16</width>
@@ -181,7 +181,7 @@
            </widget>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PubDelete">
+           <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PubDelete">
             <property name="minimumSize">
              <size>
               <width>16</width>
@@ -202,7 +202,7 @@
          </layout>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FraSperatorTitle">
+         <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FraSperatorTitle">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -240,7 +240,7 @@
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabFileGenIcon">
+             <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabFileGenIcon">
               <property name="minimumSize">
                <size>
                 <width>16</width>
@@ -259,7 +259,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileGenActive">
+             <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileGenActive">
               <property name="text">
                <string>File Generation: Active</string>
               </property>
@@ -296,7 +296,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiOwned" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiOwned" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0,0,1">
                <property name="spacing">
                 <number>0</number>
@@ -314,7 +314,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabOwnedIcon">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabOwnedIcon">
                  <property name="minimumSize">
                   <size>
                    <width>16</width>
@@ -349,7 +349,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOwnedCount">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOwnedCount">
                  <property name="text">
                   <string>12</string>
                  </property>
@@ -375,7 +375,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOwned">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOwned">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -404,7 +404,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiOutput" native="true">
+             <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiOutput" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,0,0,1">
                <property name="spacing">
                 <number>0</number>
@@ -422,7 +422,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabOutputIcon">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabOutputIcon">
                  <property name="minimumSize">
                   <size>
                    <width>18</width>
@@ -454,7 +454,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOutputCount">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOutputCount">
                  <property name="text">
                   <string>12</string>
                  </property>
@@ -480,7 +480,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOutput">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabOutput">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -509,7 +509,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PubComment">
+             <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PubComment">
               <property name="minimumSize">
                <size>
                 <width>32</width>
@@ -537,7 +537,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeTedDbComment" name="pc_TedComment">
+    <widget class="stw::opensyde_gui_elements::C_OgeTedDbComment" name="pc_TedComment">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -569,46 +569,46 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.h</header>
+   <header>C_OgePubSvgIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
+   <header>C_OgePubIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabToolTipBase</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabToolTipBase</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabToolTipBase.h</header>
+   <header>C_OgeLabToolTipBase.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedDbComment</class>
+   <class>stw::opensyde_gui_elements::C_OgeTedDbComment</class>
    <extends>QTextEdit</extends>
-   <header>C_OgeTedDbComment.h</header>
+   <header>C_OgeTedDbComment.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

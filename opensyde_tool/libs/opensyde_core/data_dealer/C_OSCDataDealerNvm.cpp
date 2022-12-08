@@ -8,19 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstring>
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "stwerrors.h"
-#include "C_OSCDataDealerNvm.h"
-#include "CSCLChecksums.h"
+#include "stwerrors.hpp"
+#include "C_OscDataDealerNvm.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,8 +40,8 @@ using namespace stw_opensyde_core;
    Initializes class elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDataDealerNvm::C_OSCDataDealerNvm(void) :
-   C_OSCDataDealer()
+C_OscDataDealerNvm::C_OscDataDealerNvm(void) :
+   C_OscDataDealer()
 {
 }
 
@@ -55,9 +55,9 @@ C_OSCDataDealerNvm::C_OSCDataDealerNvm(void) :
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDataDealerNvm::C_OSCDataDealerNvm(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
-                                       C_OSCDiagProtocolBase * const opc_DiagProtocol) :
-   C_OSCDataDealer(opc_Node, ou32_NodeIndex, opc_DiagProtocol)
+C_OscDataDealerNvm::C_OscDataDealerNvm(C_OscNode * const opc_Node, const uint32_t ou32_NodeIndex,
+                                       C_OscDiagProtocolBase * const opc_DiagProtocol) :
+   C_OscDataDealer(opc_Node, ou32_NodeIndex, opc_DiagProtocol)
 {
 }
 
@@ -65,7 +65,7 @@ C_OSCDataDealerNvm::C_OSCDataDealerNvm(C_OSCNode * const opc_Node, const uint32 
 /*! \brief   Clean up class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDataDealerNvm::~C_OSCDataDealerNvm(void)
+C_OscDataDealerNvm::~C_OscDataDealerNvm(void)
 {
 }
 
@@ -80,23 +80,23 @@ C_OSCDataDealerNvm::~C_OSCDataDealerNvm(void)
    Calculated CRC
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) const
+uint16_t C_OscDataDealerNvm::NvmCalcCrc(const C_OscNodeDataPoolList & orc_List) const
 {
-   uint16 u16_Crc = 0x1D0FU;
+   uint16_t u16_Crc = 0x1D0FU;
 
    if (this->mpc_DiagProtocol != NULL)
    {
-      uint32 u32_Counter;
-      const uint8 u8_Endianness = this->mpc_DiagProtocol->GetEndianness();
+      uint32_t u32_Counter;
+      const uint8_t u8_Endianness = this->mpc_DiagProtocol->GetEndianness();
 
       for (u32_Counter = 0U; u32_Counter < orc_List.c_Elements.size(); ++u32_Counter)
       {
-         const C_OSCNodeDataPoolListElement * const pc_Element = &orc_List.c_Elements[u32_Counter];
-         std::vector<uint8> c_Data;
+         const C_OscNodeDataPoolListElement * const pc_Element = &orc_List.c_Elements[u32_Counter];
+         std::vector<uint8_t> c_Data;
 
          //convert to native endianness depending on the type ...
          //no possible problem we did not check for already ...
-         if (u8_Endianness == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+         if (u8_Endianness == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
          {
             pc_Element->c_NvmValue.GetValueAsBigEndianBlob(c_Data);
          }
@@ -104,7 +104,7 @@ uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) co
          {
             pc_Element->c_NvmValue.GetValueAsLittleEndianBlob(c_Data);
          }
-         stw_scl::C_SCLChecksums::CalcCRC16(&c_Data[0], c_Data.size(), u16_Crc);
+         stw::scl::C_SclChecksums::CalcCRC16(&c_Data[0], static_cast<uint32_t>(c_Data.size()), u16_Crc);
       }
    }
 
@@ -135,10 +135,10 @@ uint16 C_OSCDataDealerNvm::NvmCalcCrc(const C_OSCNodeDataPoolList & orc_List) co
                parameter out of range (checked by client side)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
-                                       uint8 * const opu8_NrCode)
+int32_t C_OscDataDealerNvm::NvmReadList(const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+                                        uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((mpc_Node == NULL) || (mpc_DiagProtocol == NULL))
    {
@@ -147,8 +147,8 @@ sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
    else if ((this->mpc_Node->c_DataPools.size() > ou32_DataPoolIndex) &&
             (this->mpc_Node->c_DataPools[ou32_DataPoolIndex].c_Lists.size() > ou32_ListIndex))
    {
-      std::vector<uint8> c_Values;
-      C_OSCNodeDataPoolList & rc_List = this->mpc_Node->c_DataPools[ou32_DataPoolIndex].c_Lists[ou32_ListIndex];
+      std::vector<uint8_t> c_Values;
+      C_OscNodeDataPoolList & rc_List = this->mpc_Node->c_DataPools[ou32_DataPoolIndex].c_Lists[ou32_ListIndex];
 
       s32_Return = this->m_NvmReadListRaw(rc_List, c_Values, opu8_NrCode);
 
@@ -185,10 +185,10 @@ sint32 C_OSCDataDealerNvm::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvm::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, const uint8 ou8_ListIndex,
-                                              bool & orq_ApplicationAcknowledge, uint8 * const opu8_NrCode)
+int32_t C_OscDataDealerNvm::NvmNotifyOfChanges(const uint8_t ou8_DataPoolIndex, const uint8_t ou8_ListIndex,
+                                               bool & orq_ApplicationAcknowledge, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((mpc_Node == NULL) || (mpc_DiagProtocol == NULL))
    {
@@ -221,26 +221,26 @@ sint32 C_OSCDataDealerNvm::NvmNotifyOfChanges(const uint8 ou8_DataPoolIndex, con
    C_COM      expected server response not received because of communication error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvm::m_NvmReadListRaw(const C_OSCNodeDataPoolList & orc_List, std::vector<uint8> & orc_Values,
-                                            uint8 * const opu8_NrCode)
+int32_t C_OscDataDealerNvm::m_NvmReadListRaw(const C_OscNodeDataPoolList & orc_List, std::vector<uint8_t> & orc_Values,
+                                             uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    // If CRC is active, at least 2 byte are necessary for the CRC
-   if ((orc_List.u32_NvMSize > 2U) ||
-       ((orc_List.u32_NvMSize > 0U) && (orc_List.q_NvMCRCActive == false)))
+   if ((orc_List.u32_NvmSize > 2U) ||
+       ((orc_List.u32_NvmSize > 0U) && (orc_List.q_NvmCrcActive == false)))
    {
       // Size is input parameter for NvmRead
-      const uint32 u32_NumBytesToRead = orc_List.GetNumBytesUsed();
+      const uint32_t u32_NumBytesToRead = orc_List.GetNumBytesUsed();
       orc_Values.resize(u32_NumBytesToRead);
 
       // Read the entire list
       // TODO: KEFEX Protocol dependent count of calls necessary and problems with fragmented lists im NVM memory
       // TODO: KEFEX Protocol dependent position of CRC!
-      s32_Return = this->mpc_DiagProtocol->NvmRead(orc_List.u32_NvMStartAddress, orc_Values, opu8_NrCode);
+      s32_Return = this->mpc_DiagProtocol->NvmRead(orc_List.u32_NvmStartAddress, orc_Values, opu8_NrCode);
 
       // Adapt return value
-      s32_Return = this->m_AdaptProtocolReturnValue(s32_Return);
+      s32_Return = C_OscDataDealerNvm::mh_AdaptProtocolReturnValue(s32_Return);
    }
    else
    {
@@ -264,34 +264,34 @@ sint32 C_OSCDataDealerNvm::m_NvmReadListRaw(const C_OSCNodeDataPoolList & orc_Li
    C_CHECKSUM  Checksum of read datapool list is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvm::m_SaveDumpToList(std::vector<uint8> & orc_Values, C_OSCNodeDataPoolList & orc_List) const
+int32_t C_OscDataDealerNvm::m_SaveDumpToList(std::vector<uint8_t> & orc_Values, C_OscNodeDataPoolList & orc_List) const
 {
-   sint32 s32_Return = this->m_SaveDumpValuesToListValues(orc_Values, orc_List);
+   int32_t s32_Return = this->m_SaveDumpValuesToListValues(orc_Values, orc_List);
 
-   if ((orc_List.q_NvMCRCActive == true) && (s32_Return == C_NO_ERR))
+   if ((orc_List.q_NvmCrcActive == true) && (s32_Return == C_NO_ERR))
    {
       if (orc_Values.size() >= 2)
       {
          // Update CRC
-         std::vector<uint8> c_CrcData;
-         uint16 u16_CalcCrc;
+         std::vector<uint8_t> c_CrcData;
+         uint16_t u16_CalcCrc;
 
          c_CrcData.resize(2);
          // TODO: KEFEX position of CRC can be different
          (void)std::memcpy(&c_CrcData[0], &orc_Values[0], 2);
 
-         if (this->mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+         if (this->mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
          {
-            orc_List.SetCRCFromBigEndianBlob(c_CrcData);
+            orc_List.SetCrcFromBigEndianBlob(c_CrcData);
          }
          else
          {
-            orc_List.SetCRCFromLittleEndianBlob(c_CrcData);
+            orc_List.SetCrcFromLittleEndianBlob(c_CrcData);
          }
 
          // Check CRC
          u16_CalcCrc = this->NvmCalcCrc(orc_List);
-         if (u16_CalcCrc != orc_List.u32_NvMCRC)
+         if (u16_CalcCrc != orc_List.u32_NvmCrc)
          {
             s32_Return = C_CHECKSUM;
          }
@@ -319,22 +319,22 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpToList(std::vector<uint8> & orc_Values, C_O
    C_RD_WR     Datapool element size configuration does not match with count of read bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc_Values,
-                                                        C_OSCNodeDataPoolList & orc_List) const
+int32_t C_OscDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8_t> & orc_Values,
+                                                         C_OscNodeDataPoolList & orc_List) const
 {
-   sint32 s32_Return = C_NO_ERR;
-   uint32 u32_Counter;
+   int32_t s32_Return = C_NO_ERR;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < orc_List.c_Elements.size(); ++u32_Counter)
    {
-      C_OSCNodeDataPoolListElement * const pc_Element = &orc_List.c_Elements[u32_Counter];
+      C_OscNodeDataPoolListElement * const pc_Element = &orc_List.c_Elements[u32_Counter];
       // Index of data container
-      const uint32 u32_SizeElement = pc_Element->GetSizeByte();
-      const uint32 u32_Index = pc_Element->u32_NvMStartAddress - orc_List.u32_NvMStartAddress;
+      const uint32_t u32_SizeElement = pc_Element->GetSizeByte();
+      const uint32_t u32_Index = pc_Element->u32_NvmStartAddress - orc_List.u32_NvmStartAddress;
 
-      if (orc_Values.size() >= static_cast<size_t>(u32_Index + u32_SizeElement))
+      if (orc_Values.size() >= (static_cast<size_t>(u32_Index) + u32_SizeElement))
       {
-         std::vector<uint8> c_ElementData;
+         std::vector<uint8_t> c_ElementData;
 
          // Get the relevant data for this element
          c_ElementData.resize(u32_SizeElement);
@@ -343,7 +343,7 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
          //we have data
          //convert to native endianness depending on the type ...
          //no possible problem we did not check for already ...
-         if (this->mpc_DiagProtocol->GetEndianness() == C_OSCDiagProtocolBase::mhu8_ENDIANNESS_BIG)
+         if (this->mpc_DiagProtocol->GetEndianness() == C_OscDiagProtocolBase::mhu8_ENDIANNESS_BIG)
          {
             (void)pc_Element->c_NvmValue.SetValueFromBigEndianBlob(c_ElementData);
          }
@@ -378,9 +378,9 @@ sint32 C_OSCDataDealerNvm::m_SaveDumpValuesToListValues(std::vector<uint8> & orc
               parameter out of range (checked by client side)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDataDealerNvm::m_AdaptProtocolReturnValue(const sint32 os32_ProtReturnValue) const
+int32_t C_OscDataDealerNvm::mh_AdaptProtocolReturnValue(const int32_t os32_ProtReturnValue)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    switch (os32_ProtReturnValue)
    {

@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSvgRenderer>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_SyvDaItTaModel.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SyvDaItTaDelegate.h"
-#include "C_TblTreDelegateUtil.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_SyvDaItTaModel.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SyvDaItTaDelegate.hpp"
+#include "C_TblTreDelegateUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -164,17 +163,17 @@ void C_SyvDaItTaDelegate::paint(QPainter * const opc_Painter, const QStyleOption
    if (orc_Index.column() == C_SyvDaItTaModel::h_EnumToColumn(C_SyvDaItTaModel::eBAR))
    {
       //Padding
-      const sintn sn_OFFSET_X = 7;
-      const sintn sn_OFFSET_Y = 1;
+      const int32_t s32_OFFSET_X = 7;
+      const int32_t s32_OFFSET_Y = 1;
       //Expected progress [0;1]
-      const float32 f32_Progress = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toFloat();
+      const float32_t f32_Progress = orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toFloat();
       //Complete rectangle with padding
-      const QRect c_RectBarBase = orc_Option.rect.adjusted(sn_OFFSET_X, sn_OFFSET_Y, -sn_OFFSET_X, -sn_OFFSET_Y);
-      const float32 f32_RectBarBaseWidth = static_cast<float32>(c_RectBarBase.width());
-      const float32 f32_RectBarWidth = f32_Progress * f32_RectBarBaseWidth;
+      const QRect c_RectBarBase = orc_Option.rect.adjusted(s32_OFFSET_X, s32_OFFSET_Y, -s32_OFFSET_X, -s32_OFFSET_Y);
+      const float32_t f32_RectBarBaseWidth = static_cast<float32_t>(c_RectBarBase.width());
+      const float32_t f32_RectBarWidth = f32_Progress * f32_RectBarBaseWidth;
       //Progress rectangle
       const QRect c_RectBar(c_RectBarBase.topLeft(),
-                            QSize(static_cast<sintn>(f32_RectBarWidth), c_RectBarBase.height()));
+                            QSize(static_cast<int32_t>(f32_RectBarWidth), c_RectBarBase.height()));
       opc_Painter->save();
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->setBrush(static_cast<QBrush>(this->mc_BarColor));

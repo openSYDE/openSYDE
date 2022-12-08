@@ -8,40 +8,39 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
 #include <QFileInfo>
 
-#include "C_SyvUpPacNodeWidget.h"
+#include "C_SyvUpPacNodeWidget.hpp"
 #include "ui_C_SyvUpPacNodeWidget.h"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiProject.h"
-#include "C_PuiUtil.h"
-#include "C_ImpUtil.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_UsHandler.h"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sint32 C_SyvUpPacNodeWidget::mhs32_LAYOUT_THRESHOLD = 100; // Keep synced with update
+const int32_t C_SyvUpPacNodeWidget::mhs32_LAYOUT_THRESHOLD = 100; // Keep synced with update
 // summary widget
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -66,8 +65,8 @@ const stw_types::sint32 C_SyvUpPacNodeWidget::mhs32_LAYOUT_THRESHOLD = 100; // K
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32 ou32_ViewIndex, const uint32 ou32_PositionNumber,
-                                           const uint32 ou32_NodeIndex, const QString & orc_NodeName,
+C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_PositionNumber,
+                                           const uint32_t ou32_NodeIndex, const QString & orc_NodeName,
                                            QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpPacNodeWidget),
@@ -86,8 +85,8 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32 ou32_ViewIndex, const ui
 {
    this->mpc_Ui->setupUi(this);
 
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FrameSepTop,
-                                                                  "HasColor9Background", true);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FrameSepTop,
+                                                                   "HasColor9Background", true);
    this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(0);
 
    this->m_UpdateTitle();
@@ -120,24 +119,24 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32 ou32_ViewIndex, const ui
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    if (pc_View != NULL)
    {
-      sintn sn_ExpectedSections;
+      int32_t s32_ExpectedSections;
       QVector<bool> c_Flags = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName()).
                               GetSvNode(orc_NodeName).GetSectionsExpanded();
 
-      sn_ExpectedSections = this->mc_DatablockWidgets.size();
+      s32_ExpectedSections = this->mc_DatablockWidgets.size();
       if (this->mpc_FilesWidget != NULL)
       {
-         ++sn_ExpectedSections;
+         ++s32_ExpectedSections;
       }
 
-      if (c_Flags.size() == sn_ExpectedSections)
+      if (c_Flags.size() == s32_ExpectedSections)
       {
          // The user settings still match, use it
-         sintn sn_DatablockCounter;
+         int32_t s32_DatablockCounter;
 
-         for (sn_DatablockCounter = 0; sn_DatablockCounter < this->mc_DatablockWidgets.size(); ++sn_DatablockCounter)
+         for (s32_DatablockCounter = 0; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
          {
-            this->mc_DatablockWidgets[sn_DatablockCounter]->Expand(c_Flags[sn_DatablockCounter]);
+            this->mc_DatablockWidgets[s32_DatablockCounter]->Expand(c_Flags[s32_DatablockCounter]);
          }
 
          if (this->mpc_FilesWidget != NULL)
@@ -167,13 +166,13 @@ C_SyvUpPacNodeWidget::~C_SyvUpPacNodeWidget()
    if (pc_View != NULL)
    {
       QVector<bool> c_Flags;
-      sintn sn_DatablockCounter;
+      int32_t s32_DatablockCounter;
 
       c_Flags.resize(this->mc_DatablockWidgets.size());
 
-      for (sn_DatablockCounter = 0; sn_DatablockCounter < this->mc_DatablockWidgets.size(); ++sn_DatablockCounter)
+      for (s32_DatablockCounter = 0; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
       {
-         c_Flags[sn_DatablockCounter] = this->mc_DatablockWidgets[sn_DatablockCounter]->IsExpanded();
+         c_Flags[s32_DatablockCounter] = this->mc_DatablockWidgets[s32_DatablockCounter]->IsExpanded();
       }
 
       if (this->mpc_FilesWidget != NULL)
@@ -194,7 +193,7 @@ C_SyvUpPacNodeWidget::~C_SyvUpPacNodeWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::SetConnected(void)
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    this->mq_Connected = true;
 
@@ -220,7 +219,7 @@ void C_SyvUpPacNodeWidget::SetConnected(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::SetUpdateStarted(void) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
    bool q_ApplicationUpdateNecessary = false;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
@@ -268,7 +267,7 @@ void C_SyvUpPacNodeWidget::SetUpdateApplicationStarted(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::SetUpdateApplicationFinished(void)
 {
-   const uint32 u32_FileCount = this->m_GetFileCount();
+   const uint32_t u32_FileCount = this->m_GetFileCount();
    // Call before increase
    C_SyvUpPacSectionNodeWidget * const pc_List = this->m_GetNextListInUpdateOrder();
 
@@ -311,7 +310,7 @@ void C_SyvUpPacNodeWidget::SetUpdateApplicationError(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::SetUpdateFinished(void) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -330,7 +329,7 @@ void C_SyvUpPacNodeWidget::SetUpdateFinished(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::DiscardApplicationStatus(void) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -351,7 +350,7 @@ void C_SyvUpPacNodeWidget::DiscardApplicationStatus(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::SetDisconnected(void)
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    this->mu32_FilesUpdated = 0U;
    this->SetProgress(0U);
@@ -378,7 +377,7 @@ void C_SyvUpPacNodeWidget::SetDisconnected(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::UpdateDeviceInformation(const C_SyvUpDeviceInfo & orc_DeviceInformation) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -397,13 +396,13 @@ void C_SyvUpPacNodeWidget::UpdateDeviceInformation(const C_SyvUpDeviceInfo & orc
    \param[in]  ou32_Percentage   Percentage of progress
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacNodeWidget::SetProgress(const uint32 ou32_Percentage) const
+void C_SyvUpPacNodeWidget::SetProgress(const uint32_t ou32_Percentage) const
 {
-   const uint32 u32_FileCount = this->m_GetFileCount();
+   const uint32_t u32_FileCount = this->m_GetFileCount();
 
    if (u32_FileCount > 0U)
    {
-      const uint32 u32_FinishedNodesPercentage = (this->mu32_FilesUpdated * 100U) / u32_FileCount;
+      const uint32_t u32_FinishedNodesPercentage = (this->mu32_FilesUpdated * 100U) / u32_FileCount;
       this->mpc_Ui->pc_WidgetTitle->SetProgress(u32_FinishedNodesPercentage + (ou32_Percentage / u32_FileCount));
    }
    else
@@ -418,9 +417,9 @@ void C_SyvUpPacNodeWidget::SetProgress(const uint32 ou32_Percentage) const
    \param[in]  ou32_PositionNumber  New position number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacNodeWidget::UpdatePositionNumber(const uint32 ou32_PositionNumber)
+void C_SyvUpPacNodeWidget::UpdatePositionNumber(const uint32_t ou32_PositionNumber)
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    this->mu32_PositionNumber = ou32_PositionNumber;
    this->m_UpdateTitle();
@@ -533,7 +532,7 @@ void C_SyvUpPacNodeWidget::RemoveFile(C_SyvUpPacListNodeItemWidget * const opc_A
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::RemoveAllFiles(void) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -570,7 +569,7 @@ void C_SyvUpPacNodeWidget::RemoveAllFiles(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::PrepareExportConfig(C_SyvUpPacConfigNode & orc_NodeConfig) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    orc_NodeConfig.c_Name = this->mc_NodeName;
    orc_NodeConfig.c_DeviceType = this->mc_DeviceType;
@@ -594,7 +593,7 @@ void C_SyvUpPacNodeWidget::PrepareExportConfig(C_SyvUpPacConfigNode & orc_NodeCo
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::LoadImportConfig(const C_SyvUpPacConfig & orc_Config) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -621,15 +620,14 @@ void C_SyvUpPacNodeWidget::LoadImportConfig(const C_SyvUpPacConfig & orc_Config)
    C_CONFIG    Minimum one file was not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacNodeWidget::CheckAllFiles(stw_types::uint32 & oru32_CountFiles,
-                                           QStringList * const opc_FlashwareWarningsApps,
-                                           QStringList * const opc_MissingApps,
-                                           QStringList * const opc_MissingParamFiles,
-                                           QStringList * const opc_MissingFiles) const
+int32_t C_SyvUpPacNodeWidget::CheckAllFiles(uint32_t & oru32_CountFiles, QStringList * const opc_FlashwareWarningsApps,
+                                            QStringList * const opc_MissingApps,
+                                            QStringList * const opc_MissingParamFiles,
+                                            QStringList * const opc_MissingFiles) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -669,7 +667,7 @@ C_SyvUpPacSectionNodeWidget * C_SyvUpPacNodeWidget::GetSectionList(const QPoint 
    C_SyvUpPacSectionNodeWidget * pc_Return = NULL;
    const QPoint c_AdaptedPosScrollArea = this->mpc_Ui->pc_ScrollAreaWidget->mapFrom(this->parentWidget(), orc_Pos);
 
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -714,7 +712,7 @@ const
    C_SyvUpPacListNodeItemWidget * pc_App = NULL;
    const QPoint c_AdaptedPos = this->mpc_Ui->pc_ScrollAreaWidget->mapFrom(this->parentWidget(), orc_Pos);
 
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -747,13 +745,14 @@ const
    NULL if no application was at the position
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacListNodeItemWidget * C_SyvUpPacNodeWidget::GetApplication(const QPoint & orc_Pos, uint32 * const opu32_Number)
+C_SyvUpPacListNodeItemWidget * C_SyvUpPacNodeWidget::GetApplication(const QPoint & orc_Pos,
+                                                                    uint32_t * const opu32_Number)
 const
 {
    C_SyvUpPacListNodeItemWidget * pc_App = NULL;
    const QPoint c_AdaptedPos = this->mpc_Ui->pc_ScrollAreaWidget->mapFrom(this->parentWidget(), orc_Pos);
 
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -784,7 +783,7 @@ const
    Current node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacNodeWidget::GetNodeIndex(void) const
+uint32_t C_SyvUpPacNodeWidget::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
@@ -796,7 +795,7 @@ uint32 C_SyvUpPacNodeWidget::GetNodeIndex(void) const
    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacNodeWidget::GetViewIndex(void) const
+uint32_t C_SyvUpPacNodeWidget::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
@@ -822,7 +821,7 @@ QString C_SyvUpPacNodeWidget::GetNodeName(void) const
    Current position number
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacNodeWidget::GetPositionNumber(void) const
+uint32_t C_SyvUpPacNodeWidget::GetPositionNumber(void) const
 {
    return this->mu32_PositionNumber;
 }
@@ -865,12 +864,12 @@ bool C_SyvUpPacNodeWidget::IsStwFlashloader(void) const
    C_NOACT     No files for applications to write added
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
-                                              C_OSCSuSequences::C_DoFlash * const opc_AllApplications)
+int32_t C_SyvUpPacNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                               C_OscSuSequences::C_DoFlash * const opc_AllApplications)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
    bool q_NoErr = false;
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    this->mu32_FilesUpdated = 0U;
 
@@ -920,7 +919,7 @@ sint32 C_SyvUpPacNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash & orc_
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::CollapseAll(void) const
 {
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    this->mpc_Ui->pc_ScrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
@@ -1090,7 +1089,7 @@ void C_SyvUpPacNodeWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
 void C_SyvUpPacNodeWidget::dragLeaveEvent(QDragLeaveEvent * const opc_Event)
 {
    const QSize c_SIZE(24, 24);
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    this->mpc_Ui->pc_LabIconLock->setMinimumSize(c_SIZE);
    this->mpc_Ui->pc_LabIconLock->setMaximumSize(c_SIZE);
@@ -1207,22 +1206,22 @@ void C_SyvUpPacNodeWidget::dropEvent(QDropEvent * const opc_Event)
                }
                else
                {
-                  sintn sn_FileCounter;
+                  int32_t s32_FileCounter;
                   // Add all files as new
-                  for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsFileBased.size(); ++sn_FileCounter)
+                  for (s32_FileCounter = 0; s32_FileCounter < c_FilePathsFileBased.size(); ++s32_FileCounter)
                   {
                      // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsFileBased[sn_FileCounter], false, false);
+                     this->AddNewFile(c_FilePathsFileBased[s32_FileCounter], false, false);
                   }
-                  for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsParamsetFiles.size(); ++sn_FileCounter)
+                  for (s32_FileCounter = 0; s32_FileCounter < c_FilePathsParamsetFiles.size(); ++s32_FileCounter)
                   {
                      // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsParamsetFiles[sn_FileCounter], true, false);
+                     this->AddNewFile(c_FilePathsParamsetFiles[s32_FileCounter], true, false);
                   }
-                  for (sn_FileCounter = 0; sn_FileCounter < c_FilePathsPemFiles.size(); ++sn_FileCounter)
+                  for (s32_FileCounter = 0; s32_FileCounter < c_FilePathsPemFiles.size(); ++s32_FileCounter)
                   {
                      // Add new file. If list does not support adding new files, nothing will happen
-                     this->AddNewFile(c_FilePathsPemFiles[sn_FileCounter], false, true);
+                     this->AddNewFile(c_FilePathsPemFiles[s32_FileCounter], false, true);
                   }
                }
             }
@@ -1244,21 +1243,21 @@ void C_SyvUpPacNodeWidget::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::m_Init(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    QSpacerItem * const pc_Spacer = new QSpacerItem(0, 3, QSizePolicy::Minimum, QSizePolicy::Expanding);
-   uint32 u32_DatablockParamSetFiles = 0U;
+   uint32_t u32_DatablockParamSetFiles = 0U;
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
-      uint32 u32_DatablockCounter;
-      uint32 u32_ViewDataBlockPathNumber = 0;
+      uint32_t u32_DatablockCounter;
+      uint32_t u32_ViewDataBlockPathNumber = 0;
 
       tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
       tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
       this->mq_FileBased =
          pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased;
-      this->mq_StwFlashloader = (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW);
+      this->mq_StwFlashloader = (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW);
       this->mc_DeviceType = pc_Node->c_DeviceType.c_str();
 
       // Only relevant if the node has datablocks
@@ -1278,7 +1277,7 @@ void C_SyvUpPacNodeWidget::m_Init(void)
          u32_DatablockParamSetFiles += pc_Datablock->GetParamSetFileCount();
 
          if (pc_Node->c_Applications[u32_DatablockCounter].e_Type ==
-             stw_opensyde_core::C_OSCNodeApplication::ePARAMETER_SET_HALC)
+             stw::opensyde_core::C_OscNodeApplication::ePARAMETER_SET_HALC)
          {
             // Special case: A HALC NVM node
             this->mq_NvmHalcBased = true;
@@ -1290,10 +1289,10 @@ void C_SyvUpPacNodeWidget::m_Init(void)
          }
 
          // Add separator as long it is not the last widget
-         if ((static_cast<uintn>(u32_DatablockCounter) < (pc_Node->c_Applications.size() - 1U)) ||
+         if ((static_cast<uint32_t>(u32_DatablockCounter) < (pc_Node->c_Applications.size() - 1U)) ||
              ((this->mq_StwFlashloader == false) && (this->mq_NvmHalcBased == false)))
          {
-            this->m_AddSeparatorToScrollArea(static_cast<uintn>(u32_DatablockCounter) ==
+            this->m_AddSeparatorToScrollArea(static_cast<uint32_t>(u32_DatablockCounter) ==
                                              (pc_Node->c_Applications.size() - 1U));
          }
       } //lint !e429  //no memory leak because of the parent of pc_Datablock and the Qt memory management
@@ -1327,14 +1326,14 @@ void C_SyvUpPacNodeWidget::m_Init(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacNodeWidget::m_AddSeparatorToScrollArea(const bool oq_FilesWidgetSeparator)
 {
-   stw_opensyde_gui_elements::C_OgeFraSeparator * const pc_Separator =
-      new stw_opensyde_gui_elements::C_OgeFraSeparator(this);
+   stw::opensyde_gui_elements::C_OgeFraSeparator * const pc_Separator =
+      new stw::opensyde_gui_elements::C_OgeFraSeparator(this);
    QSizePolicy c_SizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
    c_SizePolicy.setHorizontalStretch(0);
    c_SizePolicy.setVerticalStretch(0);
    c_SizePolicy.setHeightForWidth(pc_Separator->sizePolicy().hasHeightForWidth());
 
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Separator, "HasColor9Background", true);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Separator, "HasColor9Background", true);
    pc_Separator->setSizePolicy(c_SizePolicy);
    pc_Separator->setMinimumSize(QSize(0, 1));
    pc_Separator->setMaximumSize(QSize(16777215, 1));
@@ -1367,11 +1366,11 @@ void C_SyvUpPacNodeWidget::m_UpdateTitle(void) const
    Number of files
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacNodeWidget::m_GetFileCount(void) const
+uint32_t C_SyvUpPacNodeWidget::m_GetFileCount(void) const
 {
-   uint32 u32_Count = 0U;
+   uint32_t u32_Count = 0U;
 
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0U; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -1401,7 +1400,7 @@ C_SyvUpPacSectionNodeWidget * C_SyvUpPacNodeWidget::m_GetNextListInUpdateOrder(v
    C_SyvUpPacSectionNodeWidget * pc_List = NULL;
    bool q_ListFound = false;
 
-   sint32 s32_DatablockCounter;
+   int32_t s32_DatablockCounter;
 
    for (s32_DatablockCounter = 0; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
    {
@@ -1470,7 +1469,7 @@ C_SyvUpPacSectionNodeWidget * C_SyvUpPacNodeWidget::m_GetNextListInUpdateOrder(v
 void C_SyvUpPacNodeWidget::m_SetApplicationsUnselected(const C_SyvUpPacSectionNodeWidget * const opc_List)
 const
 {
-   uint32 u32_AppCounter;
+   uint32_t u32_AppCounter;
 
    for (u32_AppCounter = 0U; u32_AppCounter < opc_List->GetFileCount(); ++u32_AppCounter)
    {
@@ -1516,7 +1515,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpPacNodeWidget::m_CheckFileAlreadyContained(const QString & orc_File)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
    bool q_Retval = false;
 
@@ -1606,19 +1605,19 @@ bool C_SyvUpPacNodeWidget::m_CheckMime(const QMimeData * const opc_Mime, const Q
       QStringList c_PathList;
       const QList<QUrl> c_UrlList = opc_Mime->urls();
       QFileInfo c_File;
-      sintn sn_FileCounter;
+      int32_t s32_FileCounter;
       bool q_FilesValid = true;
 
       // extract the local paths of the files
-      for (sintn sn_It = 0; sn_It < c_UrlList.size(); ++sn_It)
+      for (int32_t s32_It = 0; s32_It < c_UrlList.size(); ++s32_It)
       {
-         c_PathList.append(c_UrlList.at(sn_It).toLocalFile());
+         c_PathList.append(c_UrlList.at(s32_It).toLocalFile());
       }
 
       // Check all paths
-      for (sn_FileCounter = 0U; sn_FileCounter < c_PathList.size(); ++sn_FileCounter)
+      for (s32_FileCounter = 0U; s32_FileCounter < c_PathList.size(); ++s32_FileCounter)
       {
-         c_File.setFile(c_PathList[sn_FileCounter]);
+         c_File.setFile(c_PathList[s32_FileCounter]);
          if ((c_File.exists() == false) || (c_File.isFile() == false))
          {
             q_FilesValid = false;
@@ -1628,16 +1627,16 @@ bool C_SyvUpPacNodeWidget::m_CheckMime(const QMimeData * const opc_Mime, const Q
 
       if (q_FilesValid == true)
       {
-         sintn sn_DatablockCounter;
+         int32_t s32_DatablockCounter;
 
          // Check all possible types
-         for (sn_DatablockCounter = 0; sn_DatablockCounter < this->mc_DatablockWidgets.size(); ++sn_DatablockCounter)
+         for (s32_DatablockCounter = 0; s32_DatablockCounter < this->mc_DatablockWidgets.size(); ++s32_DatablockCounter)
          {
-            q_Retval = this->mc_DatablockWidgets[sn_DatablockCounter]->CheckMime(c_PathList, orc_Pos,
-                                                                                 opc_FilePathsDatablocks,
-                                                                                 opc_FilePathsParamsets,
-                                                                                 NULL,
-                                                                                 oppc_App);
+            q_Retval = this->mc_DatablockWidgets[s32_DatablockCounter]->CheckMime(c_PathList, orc_Pos,
+                                                                                  opc_FilePathsDatablocks,
+                                                                                  opc_FilePathsParamsets,
+                                                                                  NULL,
+                                                                                  oppc_App);
 
             if (q_Retval == true)
             {

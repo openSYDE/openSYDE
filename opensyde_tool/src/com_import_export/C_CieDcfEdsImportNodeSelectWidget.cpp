@@ -8,26 +8,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdUtil.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdUtil.hpp"
 
-#include "C_CieDcfEdsImportNodeSelectWidget.h"
+#include "C_CieDcfEdsImportNodeSelectWidget.hpp"
 #include "ui_C_CieDcfEdsImportNodeSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieDcfEdsImportNodeSelectWidget::C_CieDcfEdsImportNodeSelectWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QString & orc_FilePath, const uint32 ou32_BusIndex) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QString & orc_FilePath,
+   const uint32_t ou32_BusIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieDcfEdsImportNodeSelectWidget),
    mrc_ParentDialog(orc_Parent)
@@ -75,9 +75,9 @@ C_CieDcfEdsImportNodeSelectWidget::C_CieDcfEdsImportNodeSelectWidget(
    this->m_FillUpComboBox(ou32_BusIndex);
 
    //Connects
-   connect(this->mpc_Ui->pc_PushButtonOK, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonOk, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_CieDcfEdsImportNodeSelectWidget::m_OkClicked);
-   connect(this->mpc_Ui->pc_PushButtonCancel, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonCancel, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_CieDcfEdsImportNodeSelectWidget::m_CancelClicked);
 }
 
@@ -112,7 +112,7 @@ void C_CieDcfEdsImportNodeSelectWidget::InitStaticNames(void)
 
    // buttons
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
-   this->mpc_Ui->pc_PushButtonOK->setText(C_GtGetText::h_GetText("Continue"));
+   this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("Continue"));
 }
 
 //-------------------------------------------------------------------------------------------f---------------------------
@@ -126,15 +126,15 @@ void C_CieDcfEdsImportNodeSelectWidget::InitStaticNames(void)
    C_RANGE     something went wrong
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CieDcfEdsImportNodeSelectWidget::GetNodeSelection(uint32 & oru32_NodeIndex,
-                                                           uint32 & oru32_InterfaceIndex) const
+int32_t C_CieDcfEdsImportNodeSelectWidget::GetNodeSelection(uint32_t & oru32_NodeIndex,
+                                                            uint32_t & oru32_InterfaceIndex) const
 {
-   sint32 s32_Return = C_RANGE;
-   const sint32 s32_CurrentIndex = this->mpc_Ui->pc_CbxNode->currentIndex();
+   int32_t s32_Return = C_RANGE;
+   const int32_t s32_CurrentIndex = this->mpc_Ui->pc_CbxNode->currentIndex();
 
    if ((s32_CurrentIndex >= 0) && (this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size()))
    {
-      if (s32_CurrentIndex < static_cast<sint32>(this->mc_NodeIndexes.size()))
+      if (s32_CurrentIndex < static_cast<int32_t>(this->mc_NodeIndexes.size()))
       {
          oru32_NodeIndex = this->mc_NodeIndexes[s32_CurrentIndex];
          oru32_InterfaceIndex = this->mc_InterfaceIndexes[s32_CurrentIndex];
@@ -158,8 +158,8 @@ void C_CieDcfEdsImportNodeSelectWidget::keyPressEvent(QKeyEvent * const opc_KeyE
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -200,7 +200,7 @@ void C_CieDcfEdsImportNodeSelectWidget::m_CancelClicked(void) const
 /*! \brief   Initialize ComboBox for node selection.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDcfEdsImportNodeSelectWidget::m_FillUpComboBox(const uint32 ou32_BusIndex)
+void C_CieDcfEdsImportNodeSelectWidget::m_FillUpComboBox(const uint32_t ou32_BusIndex)
 {
    std::vector<QString> c_Names;
 
@@ -208,7 +208,7 @@ void C_CieDcfEdsImportNodeSelectWidget::m_FillUpComboBox(const uint32 ou32_BusIn
    this->mpc_Ui->pc_CbxNode->clear();
 
    // get node and interface names
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
                                                                                       this->mc_NodeIndexes,
                                                                                       this->mc_InterfaceIndexes);
 

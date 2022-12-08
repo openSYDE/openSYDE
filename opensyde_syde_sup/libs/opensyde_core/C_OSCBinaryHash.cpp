@@ -11,21 +11,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCBinaryHash.h"
-#include "TGLFile.h"
-#include "CMD5Checksum.h"
+#include "C_OscBinaryHash.hpp"
+#include "TglFile.hpp"
+#include "C_Md5Checksum.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_tgl;
-using namespace stw_md5;
+using namespace stw::opensyde_core;
+using namespace stw::tgl;
+using namespace stw::md5;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-bool C_OSCBinaryHash::mhq_HashCompleted = false;
-stw_scl::C_SCLString C_OSCBinaryHash::mhc_BinaryHash = "";
+bool C_OscBinaryHash::mhq_HashCompleted = false;
+stw::scl::C_SclString C_OscBinaryHash::mhc_BinaryHash = "";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -41,7 +41,7 @@ stw_scl::C_SCLString C_OSCBinaryHash::mhc_BinaryHash = "";
 /*! \brief  Default constructor. Set to private
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCBinaryHash::C_OSCBinaryHash(void)
+C_OscBinaryHash::C_OscBinaryHash(void)
 {
 }
 
@@ -51,13 +51,13 @@ C_OSCBinaryHash::C_OSCBinaryHash(void)
    \return  void
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCBinaryHash::h_CreateBinaryHash(void)
+stw::scl::C_SclString C_OscBinaryHash::h_CreateBinaryHash(void)
 {
-   const stw_scl::C_SCLString c_ExePath = stw_tgl::TGL_GetExePath();
+   const stw::scl::C_SclString c_ExePath = stw::tgl::TglGetExePath();
 
    if (h_GetHashBool() == false)
    {
-      mhc_BinaryHash = stw_md5::CMD5Checksum::GetMD5(c_ExePath).UpperCase();
+      mhc_BinaryHash = stw::md5::C_Md5Checksum::GetMD5(c_ExePath).UpperCase();
       h_SetHashBool(true);
    }
    return mhc_BinaryHash;
@@ -69,7 +69,7 @@ stw_scl::C_SCLString C_OSCBinaryHash::h_CreateBinaryHash(void)
    \param[in]       oq_State   represents if checksum has already been created.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCBinaryHash::h_SetHashBool(bool const oq_State)
+void C_OscBinaryHash::h_SetHashBool(const bool oq_State)
 {
    mhq_HashCompleted = oq_State;
 }
@@ -81,7 +81,7 @@ void C_OSCBinaryHash::h_SetHashBool(bool const oq_State)
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCBinaryHash::h_GetHashBool(void)
+bool C_OscBinaryHash::h_GetHashBool(void)
 {
    return mhq_HashCompleted;
 }

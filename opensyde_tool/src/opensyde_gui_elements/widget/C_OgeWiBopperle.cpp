@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "C_OgeWiBopperle.h"
+#include "stwtypes.hpp"
+#include "C_OgeWiBopperle.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_OgeWiBopperle::mhsn_POINT_SIZE = 5;
-const stw_types::sintn C_OgeWiBopperle::mhsn_POINT_DISTANCE = 10;
+const int32_t C_OgeWiBopperle::mhs32_POINT_SIZE = 5;
+const int32_t C_OgeWiBopperle::mhs32_POINT_DISTANCE = 10;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -53,7 +52,7 @@ C_OgeWiBopperle::C_OgeWiBopperle(QWidget * const opc_Parent) :
    \param[in]  os32_Count  Maximum count of index points
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiBopperle::SetCountIndex(const sint32 os32_Count)
+void C_OgeWiBopperle::SetCountIndex(const int32_t os32_Count)
 {
    this->ms32_CountIndex = os32_Count;
    this->m_AdaptSize();
@@ -65,7 +64,7 @@ void C_OgeWiBopperle::SetCountIndex(const sint32 os32_Count)
    \param[in]  os32_Index  Current index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiBopperle::SetCurrentIndex(const sint32 os32_Index)
+void C_OgeWiBopperle::SetCurrentIndex(const int32_t os32_Index)
 {
    this->ms32_CurrentIndex = os32_Index;
 }
@@ -94,8 +93,8 @@ void C_OgeWiBopperle::SetColor(const QColor & orc_ColorActive, const QColor & or
 void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
 {
    QPainter c_Painter(this);
-   sint32 s32_Counter;
-   sintn sn_CoordX = mhsn_POINT_DISTANCE;
+   int32_t s32_Counter;
+   int32_t s32_CoordHorizontal = mhs32_POINT_DISTANCE;
 
    // set the initial color
    c_Painter.setPen(Qt::transparent);
@@ -110,8 +109,8 @@ void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
       }
 
       // draw the circle
-      c_Painter.drawEllipse(sn_CoordX, (mhsn_POINT_SIZE / 2), mhsn_POINT_SIZE, mhsn_POINT_SIZE);
-      sn_CoordX += (mhsn_POINT_DISTANCE + mhsn_POINT_SIZE);
+      c_Painter.drawEllipse(s32_CoordHorizontal, (mhs32_POINT_SIZE / 2), mhs32_POINT_SIZE, mhs32_POINT_SIZE);
+      s32_CoordHorizontal += (mhs32_POINT_DISTANCE + mhs32_POINT_SIZE);
 
       if (s32_Counter == this->ms32_CurrentIndex)
       {
@@ -126,10 +125,10 @@ void C_OgeWiBopperle::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBopperle::m_AdaptSize()
 {
-   const sintn sn_CountIndex = this->ms32_CountIndex;
+   const int32_t s32_CountIndex = this->ms32_CountIndex;
 
-   this->setMinimumSize(((mhsn_POINT_SIZE * sn_CountIndex) + (mhsn_POINT_DISTANCE * (sn_CountIndex + 1))),
-                        (mhsn_POINT_SIZE * 2));
-   this->setMaximumSize(((mhsn_POINT_SIZE * sn_CountIndex) + (mhsn_POINT_DISTANCE * (sn_CountIndex + 1))),
-                        (mhsn_POINT_SIZE * 2));
+   this->setMinimumSize(((mhs32_POINT_SIZE * s32_CountIndex) + (mhs32_POINT_DISTANCE * (s32_CountIndex + 1))),
+                        (mhs32_POINT_SIZE * 2));
+   this->setMaximumSize(((mhs32_POINT_SIZE * s32_CountIndex) + (mhs32_POINT_DISTANCE * (s32_CountIndex + 1))),
+                        (mhs32_POINT_SIZE * 2));
 }

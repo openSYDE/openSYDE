@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdBueUnoBusProtNodeConnectAndCreateCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,10 +41,9 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueUnoBusProtNodeConnectAndCreateCommand::C_SdBueUnoBusProtNodeConnectAndCreateCommand(const uint32 ou32_NodeIndex,
-                                                                                           const uint32 ou32_InterfaceIndex, const C_OSCCanProtocol::E_Type oe_Protocol, QWidget * const opc_Widget,
-                                                                                           QUndoCommand * const opc_Parent)
-   :
+C_SdBueUnoBusProtNodeConnectAndCreateCommand::C_SdBueUnoBusProtNodeConnectAndCreateCommand(
+   const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex, const C_OscCanProtocol::E_Type oe_Protocol,
+   QWidget * const opc_Widget, QUndoCommand * const opc_Parent) :
    C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand(ou32_NodeIndex, ou32_InterfaceIndex, oe_Protocol, opc_Widget,
                                                      "Connect node to protocol and create Datapool", opc_Parent)
 {

@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_SdNdeCoOverviewWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_SdNdeCoOverviewWidget.hpp"
 #include "ui_C_SdNdeCoOverviewWidget.h"
-#include "C_SdNdeCoOverviewTableView.h"
+#include "C_SdNdeCoOverviewTableView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -113,7 +112,7 @@ void C_SdNdeCoOverviewWidget::UpdateData(void)
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoOverviewWidget::SetNodeIndex(const uint32 ou32_NodeIndex)
+void C_SdNdeCoOverviewWidget::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
    this->mpc_Ui->pc_TableView->SetNodeIndex(ou32_NodeIndex);
    this->UpdateData();

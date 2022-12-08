@@ -10,19 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h" //pre-compiled headers
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include <fstream>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCXMLParser.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscXmlParser.hpp"
 #include "tinyxml2.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::scl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +43,7 @@ using namespace stw_opensyde_core;
    Will throw on error.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParserBase::C_OSCXMLParserBase(void)
+C_OscXmlParserBase::C_OscXmlParserBase(void)
 {
    mpc_CurrentNode = NULL;
    m_Init();
@@ -53,7 +53,7 @@ C_OSCXMLParserBase::C_OSCXMLParserBase(void)
 /*! \brief   Init of common xml structure
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::m_Init(void)
+void C_OscXmlParserBase::m_Init(void)
 {
    //empty file ?
    if (mc_Document.RootElement() == NULL)
@@ -71,7 +71,7 @@ void C_OSCXMLParserBase::m_Init(void)
    Will try to save the XML file and will throw on error.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParserBase::~C_OSCXMLParserBase(void)
+C_OscXmlParserBase::~C_OscXmlParserBase(void)
 {
    mpc_CurrentNode = NULL;
 }
@@ -85,8 +85,8 @@ C_OSCXMLParserBase::~C_OSCXMLParserBase(void)
    Will throw on error.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParser::C_OSCXMLParser(void) :
-   C_OSCXMLParserBase()
+C_OscXmlParser::C_OscXmlParser(void) :
+   C_OscXmlParserBase()
 {
 }
 
@@ -96,7 +96,7 @@ C_OSCXMLParser::C_OSCXMLParser(void) :
    Clean up ...
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCXMLParser::~C_OSCXMLParser(void)
+C_OscXmlParser::~C_OscXmlParser(void)
 {
 }
 
@@ -113,10 +113,10 @@ C_OSCXMLParser::~C_OSCXMLParser(void)
    C_NOACT    could not read data from file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParser::LoadFromFile(const C_SCLString & orc_FileName)
+int32_t C_OscXmlParser::LoadFromFile(const C_SclString & orc_FileName)
 {
    tinyxml2::XMLError e_Error;
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    mc_Document.Clear();
 
    e_Error = mc_Document.LoadFile(orc_FileName.c_str());
@@ -141,9 +141,9 @@ sint32 C_OSCXMLParser::LoadFromFile(const C_SCLString & orc_FileName)
    C_NOACT    could not write data to file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParser::SaveToFile(const C_SCLString & orc_FileName)
+int32_t C_OscXmlParser::SaveToFile(const C_SclString & orc_FileName)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    const tinyxml2::XMLError e_Error = mc_Document.SaveFile(orc_FileName.c_str());
 
@@ -163,9 +163,9 @@ sint32 C_OSCXMLParser::SaveToFile(const C_SCLString & orc_FileName)
    name of root element ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::SelectRoot(void)
+C_SclString C_OscXmlParserBase::SelectRoot(void)
 {
-   C_SCLString c_RootName;
+   C_SclString c_RootName;
 
    mpc_CurrentNode = mc_Document.RootElement();
    if (mpc_CurrentNode != NULL)
@@ -189,9 +189,9 @@ C_SCLString C_OSCXMLParserBase::SelectRoot(void)
    \retval   C_CONFIG   Root not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::SelectRootError(const C_SCLString & orc_Name)
+int32_t C_OscXmlParserBase::SelectRootError(const C_SclString & orc_Name)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->SelectRoot() != orc_Name)
    {
@@ -212,9 +212,9 @@ sint32 C_OSCXMLParserBase::SelectRootError(const C_SCLString & orc_Name)
    name of selected element ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
+C_SclString C_OscXmlParserBase::SelectNodeNext(const C_SclString & orc_Name)
 {
-   C_SCLString c_Name;
+   C_SclString c_Name;
 
    tinyxml2::XMLElement * const pc_Save = mpc_CurrentNode;
 
@@ -253,9 +253,9 @@ C_SCLString C_OSCXMLParserBase::SelectNodeNext(const C_SCLString & orc_Name)
    name of selected element ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::SelectNodeChild(const C_SCLString & orc_Name)
+C_SclString C_OscXmlParserBase::SelectNodeChild(const C_SclString & orc_Name)
 {
-   C_SCLString c_Name;
+   C_SclString c_Name;
 
    tinyxml2::XMLElement * pc_Element = NULL;
 
@@ -302,9 +302,9 @@ C_SCLString C_OSCXMLParserBase::SelectNodeChild(const C_SCLString & orc_Name)
    \retval   C_CONFIG   Node switch failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::SelectNodeChildError(const C_SCLString & orc_Name)
+int32_t C_OscXmlParserBase::SelectNodeChildError(const C_SclString & orc_Name)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->SelectNodeChild(orc_Name) != orc_Name)
    {
@@ -322,9 +322,9 @@ sint32 C_OSCXMLParserBase::SelectNodeChildError(const C_SCLString & orc_Name)
    name of selected element ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::SelectNodeParent(void)
+C_SclString C_OscXmlParserBase::SelectNodeParent(void)
 {
-   C_SCLString c_Name;
+   C_SclString c_Name;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -349,13 +349,13 @@ C_SCLString C_OSCXMLParserBase::SelectNodeParent(void)
    Content of selected element ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::GetNodeContent(void) const
+C_SclString C_OscXmlParserBase::GetNodeContent(void) const
 {
-   C_SCLString c_Content;
+   C_SclString c_Content;
 
    if (mpc_CurrentNode != NULL)
    {
-      const charn * const pcn_Content = mpc_CurrentNode->GetText();
+      const char_t * const pcn_Content = mpc_CurrentNode->GetText();
       if (pcn_Content != NULL)
       {
          c_Content = pcn_Content;
@@ -377,13 +377,13 @@ C_SCLString C_OSCXMLParserBase::GetNodeContent(void) const
    false  attribute does not exists (or: no element selected)
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
+bool C_OscXmlParserBase::AttributeExists(const C_SclString & orc_Name) const
 {
    bool q_Return = false;
 
    if (mpc_CurrentNode != NULL)
    {
-      const charn * const pcn_Text = mpc_CurrentNode->Attribute(orc_Name.c_str());
+      const char_t * const pcn_Text = mpc_CurrentNode->Attribute(orc_Name.c_str());
       if (pcn_Text != NULL)
       {
          q_Return = true;
@@ -399,7 +399,7 @@ bool C_OSCXMLParserBase::AttributeExists(const C_SCLString & orc_Name) const
    Current node name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::GetCurrentNodeName(void) const
+C_SclString C_OscXmlParserBase::GetCurrentNodeName(void) const
 {
    return (mpc_CurrentNode == NULL) ? "" : mpc_CurrentNode->Name();
 }
@@ -411,9 +411,9 @@ C_SCLString C_OSCXMLParserBase::GetCurrentNodeName(void) const
    File line for current node
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OSCXMLParserBase::GetFileLineForCurrentNode(void) const
+uint32_t C_OscXmlParserBase::GetFileLineForCurrentNode(void) const
 {
-   return (mpc_CurrentNode == NULL) ? 0 : mpc_CurrentNode->GetLineNum();
+   return (mpc_CurrentNode == NULL) ? 0U : static_cast<uint32_t>(mpc_CurrentNode->GetLineNum());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -428,13 +428,13 @@ sintn C_OSCXMLParserBase::GetFileLineForCurrentNode(void) const
    Content of selected attribute ("" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name, const C_SCLString & orc_Default) const
+C_SclString C_OscXmlParserBase::GetAttributeString(const C_SclString & orc_Name, const C_SclString & orc_Default) const
 {
-   C_SCLString c_Value = orc_Default;
+   C_SclString c_Value = orc_Default;
 
    if (mpc_CurrentNode != NULL)
    {
-      const charn * const pcn_Text = mpc_CurrentNode->Attribute(orc_Name.c_str());
+      const char_t * const pcn_Text = mpc_CurrentNode->Attribute(orc_Name.c_str());
       if (pcn_Text != NULL)
       {
          c_Value = pcn_Text;
@@ -456,10 +456,10 @@ C_SCLString C_OSCXMLParserBase::GetAttributeString(const C_SCLString & orc_Name,
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name, const sint32 os32_Default) const
+int32_t C_OscXmlParserBase::GetAttributeSint32(const C_SclString & orc_Name, const int32_t os32_Default) const
 {
-   sintn sn_Value = os32_Default;
-   C_SCLString c_Text;
+   int32_t s32_Value = os32_Default;
+   C_SclString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
    c_Text = this->GetAttributeString(orc_Name);
@@ -467,13 +467,13 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name, cons
    {
       try
       {
-         sn_Value = static_cast<sintn>(c_Text.ToInt());
+         s32_Value = c_Text.ToInt();
       }
       catch (...)
       {
       }
    }
-   return sn_Value;
+   return s32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -489,10 +489,10 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32(const C_SCLString & orc_Name, cons
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name, const uint32 ou32_Default) const
+uint32_t C_OscXmlParserBase::GetAttributeUint32(const C_SclString & orc_Name, const uint32_t ou32_Default) const
 {
-   uintn un_Value = ou32_Default;
-   C_SCLString c_Text;
+   uint32_t u32_Value = ou32_Default;
+   C_SclString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
    c_Text = this->GetAttributeString(orc_Name);
@@ -500,13 +500,13 @@ uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name, cons
    {
       try
       {
-         un_Value = static_cast<uintn>(c_Text.ToInt());
+         u32_Value = static_cast<uint32_t>(c_Text.ToInt());
       }
       catch (...)
       {
       }
    }
-   return un_Value;
+   return u32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -522,10 +522,10 @@ uint32 C_OSCXMLParserBase::GetAttributeUint32(const C_SCLString & orc_Name, cons
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name, const sint64 os64_Default) const
+int64_t C_OscXmlParserBase::GetAttributeSint64(const C_SclString & orc_Name, const int64_t os64_Default) const
 {
-   sint64 s64_Value = os64_Default;
-   C_SCLString c_Text;
+   int64_t s64_Value = os64_Default;
+   C_SclString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
    c_Text = this->GetAttributeString(orc_Name);
@@ -555,10 +555,10 @@ sint64 C_OSCXMLParserBase::GetAttributeSint64(const C_SCLString & orc_Name, cons
    value (zero on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64 C_OSCXMLParserBase::GetAttributeUint64(const C_SCLString & orc_Name, const uint64 ou64_Default) const
+uint64_t C_OscXmlParserBase::GetAttributeUint64(const C_SclString & orc_Name, const uint64_t ou64_Default) const
 {
-   uint64 u64_Value = ou64_Default;
-   C_SCLString c_Text;
+   uint64_t u64_Value = ou64_Default;
+   C_SclString c_Text;
 
    //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
    c_Text = this->GetAttributeString(orc_Name);
@@ -600,7 +600,7 @@ uint64 C_OSCXMLParserBase::GetAttributeUint64(const C_SCLString & orc_Name, cons
    false  attribute value is false (also returned on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name, const bool oq_Default) const
+bool C_OscXmlParserBase::GetAttributeBool(const C_SclString & orc_Name, const bool oq_Default) const
 {
    bool q_Value = oq_Default;
 
@@ -627,9 +627,9 @@ bool C_OSCXMLParserBase::GetAttributeBool(const C_SCLString & orc_Name, const bo
    value (0.0F on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name, const float32 of32_Default) const
+float32_t C_OscXmlParserBase::GetAttributeFloat32(const C_SclString & orc_Name, const float32_t of32_Default) const
 {
-   float32 f32_Value = of32_Default;
+   float32_t f32_Value = of32_Default;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -654,10 +654,9 @@ float32 C_OSCXMLParserBase::GetAttributeFloat32(const C_SCLString & orc_Name, co
    value (0.0 on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name,
-                                                const stw_types::float64 of64_Default) const
+float64_t C_OscXmlParserBase::GetAttributeFloat64(const C_SclString & orc_Name, const float64_t of64_Default) const
 {
-   float64 f64_Value = of64_Default;
+   float64_t f64_Value = of64_Default;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -685,9 +684,9 @@ float64 C_OSCXMLParserBase::GetAttributeFloat64(const C_SCLString & orc_Name,
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeStringError(const C_SCLString & orc_Name, C_SCLString & orc_Value) const
+int32_t C_OscXmlParserBase::GetAttributeStringError(const C_SclString & orc_Name, C_SclString & orc_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -717,9 +716,9 @@ sint32 C_OSCXMLParserBase::GetAttributeStringError(const C_SCLString & orc_Name,
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeSint32Error(const C_SCLString & orc_Name, sint32 & ors32_Value) const
+int32_t C_OscXmlParserBase::GetAttributeSint32Error(const C_SclString & orc_Name, int32_t & ors32_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -749,9 +748,9 @@ sint32 C_OSCXMLParserBase::GetAttributeSint32Error(const C_SCLString & orc_Name,
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeUint32Error(const C_SCLString & orc_Name, uint32 & oru32_Value) const
+int32_t C_OscXmlParserBase::GetAttributeUint32Error(const C_SclString & orc_Name, uint32_t & oru32_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -781,9 +780,9 @@ sint32 C_OSCXMLParserBase::GetAttributeUint32Error(const C_SCLString & orc_Name,
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeSint64Error(const C_SCLString & orc_Name, sint64 & ors64_Value) const
+int32_t C_OscXmlParserBase::GetAttributeSint64Error(const C_SclString & orc_Name, int64_t & ors64_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -813,9 +812,9 @@ sint32 C_OSCXMLParserBase::GetAttributeSint64Error(const C_SCLString & orc_Name,
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeUint64Error(const C_SCLString & orc_Name, uint64 & oru64_Value) const
+int32_t C_OscXmlParserBase::GetAttributeUint64Error(const C_SclString & orc_Name, uint64_t & oru64_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -845,9 +844,9 @@ sint32 C_OSCXMLParserBase::GetAttributeUint64Error(const C_SCLString & orc_Name,
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeBoolError(const C_SCLString & orc_Name, bool & orq_Value) const
+int32_t C_OscXmlParserBase::GetAttributeBoolError(const C_SclString & orc_Name, bool & orq_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -876,9 +875,9 @@ sint32 C_OSCXMLParserBase::GetAttributeBoolError(const C_SCLString & orc_Name, b
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeFloat32Error(const C_SCLString & orc_Name, float32 & orf32_Value) const
+int32_t C_OscXmlParserBase::GetAttributeFloat32Error(const C_SclString & orc_Name, float32_t & orf32_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -907,9 +906,9 @@ sint32 C_OSCXMLParserBase::GetAttributeFloat32Error(const C_SCLString & orc_Name
    \retval   C_CONFIG   Attribute missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParserBase::GetAttributeFloat64Error(const C_SCLString & orc_Name, float64 & orf64_Value) const
+int32_t C_OscXmlParserBase::GetAttributeFloat64Error(const C_SclString & orc_Name, float64_t & orf64_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->AttributeExists(orc_Name))
    {
@@ -930,7 +929,7 @@ sint32 C_OSCXMLParserBase::GetAttributeFloat64Error(const C_SCLString & orc_Name
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175} intentionally no functionality in default implementation
-void C_OSCXMLParserBase::ReportErrorForNodeContentAppendXMLContext(const C_SCLString & orc_ErrorMessage)
+void C_OscXmlParserBase::ReportErrorForNodeContentAppendXmlContext(const C_SclString & orc_ErrorMessage)
 const
 {
    //Does not report in the base implementation as base class does not handle error reporting
@@ -946,8 +945,8 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175} intentionally no functionality in default implementation
-void C_OSCXMLParserBase::ReportErrorForAttributeContentAppendXMLContext(const C_SCLString & orc_Attribute,
-                                                                        const C_SCLString & orc_ErrorMessage)
+void C_OscXmlParserBase::ReportErrorForAttributeContentAppendXmlContext(const C_SclString & orc_Attribute,
+                                                                        const C_SclString & orc_ErrorMessage)
 const
 {
    //Does not report in the base implementation as base class does not handle error reporting
@@ -963,7 +962,7 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175} intentionally no functionality in default implementation
-void C_OSCXMLParserBase::ReportErrorForNodeContentStartingWithXMLContext(const C_SCLString & orc_ErrorMessage)
+void C_OscXmlParserBase::ReportErrorForNodeContentStartingWithXmlContext(const C_SclString & orc_ErrorMessage)
 const
 {
    //Does not report in the base implementation as base class does not handle error reporting
@@ -979,8 +978,8 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175} intentionally no functionality in default implementation
-void C_OSCXMLParserBase::ReportErrorForAttributeContentStartingWithXMLContext(const C_SCLString & orc_Attribute,
-                                                                              const C_SCLString & orc_ErrorMessage)
+void C_OscXmlParserBase::ReportErrorForAttributeContentStartingWithXmlContext(const C_SclString & orc_Attribute,
+                                                                              const C_SclString & orc_ErrorMessage)
 const
 {
    //Does not report in the base implementation as base class does not handle error reporting
@@ -996,7 +995,7 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175} intentionally no functionality in default implementation
-void C_OSCXMLParserBase::ReportErrorForNodeMissing(const C_SCLString & orc_MissingNodeName) const
+void C_OscXmlParserBase::ReportErrorForNodeMissing(const C_SclString & orc_MissingNodeName) const
 {
    //Does not report in the base implementation as base class does not handle error reporting
    //Also e.g in ParseFromString case errors in log file might be misleading
@@ -1006,21 +1005,21 @@ void C_OSCXMLParserBase::ReportErrorForNodeMissing(const C_SCLString & orc_Missi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get all attribute values of selected node
 
-   Return all attribute values of selected node as vector of C_OSCXMLAttribute.
+   Return all attribute values of selected node as vector of C_OscXMLAttribute.
 
    \return
    Content of selected attributes (empty vector on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCXMLAttribute> C_OSCXMLParserBase::GetAttributes(void) const
+std::vector<C_OscXmlAttribute> C_OscXmlParserBase::GetAttributes(void) const
 {
-   std::vector<C_OSCXMLAttribute> c_AttributeList;
+   std::vector<C_OscXmlAttribute> c_AttributeList;
    if (mpc_CurrentNode != NULL)
    {
       const tinyxml2::XMLAttribute * pc_Attribute = mpc_CurrentNode->FirstAttribute();
       while (pc_Attribute != NULL)
       {
-         C_OSCXMLAttribute c_Data;
+         C_OscXmlAttribute c_Data;
          c_Data.c_Name = pc_Attribute->Name();
          c_Data.c_Value = pc_Attribute->Value();
          c_AttributeList.push_back(c_Data);
@@ -1043,7 +1042,7 @@ std::vector<C_OSCXMLAttribute> C_OSCXMLParserBase::GetAttributes(void) const
    \param[in]  orc_Content    content of new node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_SCLString & orc_Content)
+void C_OscXmlParserBase::CreateNodeChild(const C_SclString & orc_Name, const C_SclString & orc_Content)
 {
    tinyxml2::XMLElement * const pc_Node = mc_Document.NewElement("");
    if (orc_Content != "")
@@ -1073,9 +1072,9 @@ void C_OSCXMLParserBase::CreateNodeChild(const C_SCLString & orc_Name, const C_S
    \return   name of the new node
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::CreateAndSelectNodeChild(const C_SCLString & orc_Name)
+C_SclString C_OscXmlParserBase::CreateAndSelectNodeChild(const C_SclString & orc_Name)
 {
-   C_SCLString c_Name;
+   C_SclString c_Name;
 
    this->CreateNodeChild(orc_Name);
    if (mpc_CurrentNode != NULL)
@@ -1104,9 +1103,9 @@ C_SCLString C_OSCXMLParserBase::CreateAndSelectNodeChild(const C_SCLString & orc
    \return  if a node was selected: name of deleted node (otherwise "")
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCXMLParserBase::DeleteNode(void)
+C_SclString C_OscXmlParserBase::DeleteNode(void)
 {
-   C_SCLString c_Name;
+   C_SclString c_Name;
 
    if (mpc_CurrentNode != NULL)
    {
@@ -1126,7 +1125,7 @@ C_SCLString C_OSCXMLParserBase::DeleteNode(void)
    \param[in]  orc_Content    new content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetNodeContent(const C_SCLString & orc_Content)
+void C_OscXmlParserBase::SetNodeContent(const C_SclString & orc_Content)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1143,7 +1142,7 @@ void C_OSCXMLParserBase::SetNodeContent(const C_SCLString & orc_Content)
    \param[in]  orc_Value   new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeString(const C_SCLString & orc_Name, const C_SCLString & orc_Value)
+void C_OscXmlParserBase::SetAttributeString(const C_SclString & orc_Name, const C_SclString & orc_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1160,11 +1159,11 @@ void C_OSCXMLParserBase::SetAttributeString(const C_SCLString & orc_Name, const 
    \param[in]  os32_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeSint32(const C_SCLString & orc_Name, const sint32 os32_Value)
+void C_OscXmlParserBase::SetAttributeSint32(const C_SclString & orc_Name, const int32_t os32_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
-      mpc_CurrentNode->SetAttribute(orc_Name.c_str(), static_cast<sintn>(os32_Value));
+      mpc_CurrentNode->SetAttribute(orc_Name.c_str(), os32_Value);
    }
 }
 
@@ -1177,11 +1176,11 @@ void C_OSCXMLParserBase::SetAttributeSint32(const C_SCLString & orc_Name, const 
    \param[in]  ou32_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeUint32(const C_SCLString & orc_Name, const uint32 ou32_Value)
+void C_OscXmlParserBase::SetAttributeUint32(const C_SclString & orc_Name, const uint32_t ou32_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
-      mpc_CurrentNode->SetAttribute(orc_Name.c_str(), static_cast<uintn>(ou32_Value));
+      mpc_CurrentNode->SetAttribute(orc_Name.c_str(), ou32_Value);
    }
 }
 
@@ -1194,7 +1193,7 @@ void C_OSCXMLParserBase::SetAttributeUint32(const C_SCLString & orc_Name, const 
    \param[in]  os64_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const sint64 os64_Value)
+void C_OscXmlParserBase::SetAttributeSint64(const C_SclString & orc_Name, const int64_t os64_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1211,7 +1210,7 @@ void C_OSCXMLParserBase::SetAttributeSint64(const C_SCLString & orc_Name, const 
    \param[in]  ou64_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeUint64(const C_SCLString & orc_Name, const uint64 ou64_Value)
+void C_OscXmlParserBase::SetAttributeUint64(const C_SclString & orc_Name, const uint64_t ou64_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1230,7 +1229,7 @@ void C_OSCXMLParserBase::SetAttributeUint64(const C_SCLString & orc_Name, const 
    \param[in]  oq_Value    new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeBool(const C_SCLString & orc_Name, const bool oq_Value)
+void C_OscXmlParserBase::SetAttributeBool(const C_SclString & orc_Name, const bool oq_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1247,7 +1246,7 @@ void C_OSCXMLParserBase::SetAttributeBool(const C_SCLString & orc_Name, const bo
    \param[in]  of32_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeFloat32(const C_SCLString & orc_Name, const float32 of32_Value)
+void C_OscXmlParserBase::SetAttributeFloat32(const C_SclString & orc_Name, const float32_t of32_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1264,7 +1263,7 @@ void C_OSCXMLParserBase::SetAttributeFloat32(const C_SCLString & orc_Name, const
    \param[in]  of64_Value  new value of attribute
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParserBase::SetAttributeFloat64(const C_SCLString & orc_Name, const float64 of64_Value)
+void C_OscXmlParserBase::SetAttributeFloat64(const C_SclString & orc_Name, const float64_t of64_Value)
 {
    if (mpc_CurrentNode != NULL)
    {
@@ -1285,10 +1284,10 @@ void C_OSCXMLParserBase::SetAttributeFloat64(const C_SCLString & orc_Name, const
    C_NOACT    could not parse data from string
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCXMLParser::LoadFromString(const C_SCLString & orc_String)
+int32_t C_OscXmlParser::LoadFromString(const C_SclString & orc_String)
 {
    tinyxml2::XMLError e_Error;
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    mc_Document.Clear();
 
    e_Error = this->mc_Document.Parse(orc_String.c_str(), orc_String.Length());
@@ -1309,9 +1308,9 @@ sint32 C_OSCXMLParser::LoadFromString(const C_SCLString & orc_String)
    \param[out]  orc_String    Resulting XML data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCXMLParser::SaveToString(C_SCLString & orc_String) const
+void C_OscXmlParser::SaveToString(C_SclString & orc_String) const
 {
    tinyxml2::XMLPrinter c_Printer;
    this->mc_Document.Print(&c_Printer);
-   orc_String = static_cast<C_SCLString>(c_Printer.CStr());
+   orc_String = static_cast<C_SclString>(c_Printer.CStr());
 }

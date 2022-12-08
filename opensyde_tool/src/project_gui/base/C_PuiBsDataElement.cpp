@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_PuiBsDataElement.h"
+#include "stwtypes.hpp"
+#include "C_PuiBsDataElement.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +36,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in]  ors32_Index    Index of connected data item
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsDataElement::C_PuiBsDataElement(const sint32 & ors32_Index) :
+C_PuiBsDataElement::C_PuiBsDataElement(const int32_t & ors32_Index) :
    ms32_Index(ors32_Index)
 {
 }
@@ -59,7 +58,7 @@ C_PuiBsDataElement::~C_PuiBsDataElement(void)
    Index of data item in specific data array
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_PuiBsDataElement::GetIndex(void) const
+int32_t C_PuiBsDataElement::GetIndex(void) const
 {
    return this->ms32_Index;
 }

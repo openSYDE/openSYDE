@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SdNdeDpSelectorWidget.h"
+#include "C_SdNdeDpSelectorWidget.hpp"
 
-#include "constants.h"
+#include "constants.hpp"
 
 #include "ui_C_SdNdeDpSelectorWidget.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiUtil.hpp"
 
-#include "C_PuiSdHandler.h"
-#include "C_OSCNode.h"
-#include "C_OSCDeviceDefinition.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_SdUtil.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNode.hpp"
+#include "C_OscDeviceDefinition.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,7 +50,7 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
    mpc_Ui(new Ui::C_SdNdeDpSelectorWidget),
    mq_UsageViewActive(false),
    mu32_NodeIndex(0),
-   me_DataPoolType(stw_opensyde_core::C_OSCNodeDataPool::eDIAG),
+   me_DataPoolType(stw::opensyde_core::C_OscNodeDataPool::eDIAG),
    mc_InstanceName(""),
    mq_Selected(false)
 {
@@ -100,9 +99,9 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
 
    this->m_SetupContextMenu();
 
-   connect(this->mpc_Ui->pc_PushButtonScrollLeft, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
+   connect(this->mpc_Ui->pc_PushButtonScrollLeft, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SdNdeDpSelectorWidget::m_ButtonLeftClicked);
-   connect(this->mpc_Ui->pc_PushButtonScrollRight, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
+   connect(this->mpc_Ui->pc_PushButtonScrollRight, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SdNdeDpSelectorWidget::m_ButtonRightClicked);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigListChanged,
            this, &C_SdNdeDpSelectorWidget::m_UpdateWidget);
@@ -119,7 +118,7 @@ C_SdNdeDpSelectorWidget::C_SdNdeDpSelectorWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigDataPoolHoverStateChanged,
            this, &C_SdNdeDpSelectorWidget::SigDataPoolHoverStateChanged);
 
-   connect(this->mpc_Ui->pc_PushButtonAdd, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
+   connect(this->mpc_Ui->pc_PushButtonAdd, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SdNdeDpSelectorWidget::m_AddNewDatapool);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDpSelectorListWidget::SigHideOtherToolTips, this,
            &C_SdNdeDpSelectorWidget::HideToolTip);
@@ -186,7 +185,7 @@ void C_SdNdeDpSelectorWidget::SetSelected(const bool oq_Selected)
    if (this->mq_Selected == true)
    {
       // adapt the styling with the stylesheet
-      this->setStyleSheet("stw_opensyde_gui--C_SdNdeDpSelectorWidget#" + this->mc_InstanceName + " {"
+      this->setStyleSheet("stw--opensyde_gui--C_SdNdeDpSelectorWidget#" + this->mc_InstanceName + " {"
                           "background-color: " + mc_STYLESHEET_GUIDE_COLOR_10 + ";"
                           "}"
                           "QFrame#pc_FrameSdNdeDpSelectorItem {"
@@ -229,8 +228,8 @@ bool C_SdNdeDpSelectorWidget::IsActive(void) const
    false  no datapool added
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpSelectorWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_Type,
-                                             const uint32 ou32_NodeIndex, const bool oq_UsageViewActive,
+bool C_SdNdeDpSelectorWidget::SetTypeAndNode(const stw::opensyde_core::C_OscNodeDataPool::E_Type oe_Type,
+                                             const uint32_t ou32_NodeIndex, const bool oq_UsageViewActive,
                                              const bool oq_AddBtnVisible)
 {
    bool q_Return;
@@ -269,7 +268,7 @@ bool C_SdNdeDpSelectorWidget::SetTypeAndNode(const stw_opensyde_core::C_OSCNodeD
    \param[in]       ou32_Index     Index of Datapool item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorWidget::SetSelectedDataPool(const uint32 ou32_Index) const
+void C_SdNdeDpSelectorWidget::SetSelectedDataPool(const uint32_t ou32_Index) const
 {
    this->mpc_Ui->pc_ListWidget->SetSelectedItem(ou32_Index);
 }
@@ -277,13 +276,13 @@ void C_SdNdeDpSelectorWidget::SetSelectedDataPool(const uint32 ou32_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the conflict state of the active datapool
 
-   \param[in] osn_DataPoolWidgetIndex  Datapool type index of Datapool which is affected
-   \param[in] oq_Active                Flag if conflict is active or not
+   \param[in] os32_DataPoolWidgetIndex  Datapool type index of Datapool which is affected
+   \param[in] oq_Active                 Flag if conflict is active or not
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorWidget::SetCurrentDataPoolConflict(const sintn osn_DataPoolWidgetIndex, const bool oq_Active)
+void C_SdNdeDpSelectorWidget::SetCurrentDataPoolConflict(const int32_t os32_DataPoolWidgetIndex, const bool oq_Active)
 {
-   const bool q_Return = this->mpc_Ui->pc_ListWidget->SetActualDataPoolConflict(osn_DataPoolWidgetIndex, oq_Active);
+   const bool q_Return = this->mpc_Ui->pc_ListWidget->SetActualDataPoolConflict(os32_DataPoolWidgetIndex, oq_Active);
 
    if (q_Return == true)
    {
@@ -333,13 +332,13 @@ void C_SdNdeDpSelectorWidget::ErrorCheck(void)
    QString c_Heading;
    QString c_Content;
 
-   std::vector<uint32> c_InvalidDatapoolIndices;
+   std::vector<uint32_t> c_InvalidDatapoolIndices;
    bool q_DatapoolNvmSizeConflict = false;
    bool q_DatapoolNvmOverlapConflict = false;
    bool q_Error = this->mpc_Ui->pc_ListWidget->CheckDataPoolsForConflict(&c_InvalidDatapoolIndices);
 
-   if ((this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eNVM) ||
-       (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
+   if ((this->me_DataPoolType == stw::opensyde_core::C_OscNodeDataPool::eNVM) ||
+       (this->me_DataPoolType == stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM))
    {
       // check the entire NVM size
       if (C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(this->mu32_NodeIndex,
@@ -394,7 +393,7 @@ void C_SdNdeDpSelectorWidget::focusInEvent(QFocusEvent * const opc_Event)
 void C_SdNdeDpSelectorWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    //draw background
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }
@@ -425,8 +424,8 @@ void C_SdNdeDpSelectorWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
    bool q_CallOrig = true;
 
-   if ((this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC) &&
-       (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM) &&
+   if ((this->me_DataPoolType != stw::opensyde_core::C_OscNodeDataPool::eHALC) &&
+       (this->me_DataPoolType != stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM) &&
        (C_Uti::h_CheckKeyModifier(opc_Event->modifiers(), Qt::ControlModifier) == true))
    {
       switch (opc_Event->key())
@@ -522,9 +521,9 @@ void C_SdNdeDpSelectorWidget::m_ListFocused(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorWidget::m_OpenDataPoolItemContent(const sintn osn_DataPoolWidgetIndex)
+void C_SdNdeDpSelectorWidget::m_OpenDataPoolItemContent(const int32_t os32_DataPoolWidgetIndex)
 {
-   Q_EMIT (this->SigOpenDataPoolContent(this->me_DataPoolType, osn_DataPoolWidgetIndex));
+   Q_EMIT (this->SigOpenDataPoolContent(this->me_DataPoolType, os32_DataPoolWidgetIndex));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -554,8 +553,8 @@ void C_SdNdeDpSelectorWidget::m_OnErrorCheck(void)
 void C_SdNdeDpSelectorWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
    // For HAL Datapools no context menu is necessary
-   if ((this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC) &&
-       (this->me_DataPoolType != stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
+   if ((this->me_DataPoolType != stw::opensyde_core::C_OscNodeDataPool::eHALC) &&
+       (this->me_DataPoolType != stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM))
    {
       this->mpc_ContextMenu->popup(this->mapToGlobal(orc_Pos));
    }
@@ -564,17 +563,17 @@ void C_SdNdeDpSelectorWidget::m_OnCustomContextMenuRequested(const QPoint & orc_
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorWidget::m_SetupContextMenu(void)
 {
-   this->mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu(this);
+   this->mpc_ContextMenu = new stw::opensyde_gui_elements::C_OgeContextMenu(this);
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new Datapool"), this,
                                     &C_SdNdeDpSelectorWidget::m_AddNewDatapool,
-                                    static_cast<sintn>(Qt::CTRL) +
-                                    static_cast<sintn>(Qt::Key_Plus));
+                                    static_cast<int32_t>(Qt::CTRL) +
+                                    static_cast<int32_t>(Qt::Key_Plus));
    this->mpc_ContextMenu->addSeparator();
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Paste"), this,
                                     &C_SdNdeDpSelectorWidget::m_PasteDatapool,
-                                    static_cast<sintn>(Qt::CTRL) +
-                                    static_cast<sintn>(Qt::Key_V));
+                                    static_cast<int32_t>(Qt::CTRL) +
+                                    static_cast<int32_t>(Qt::Key_V));
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -605,7 +604,7 @@ void C_SdNdeDpSelectorWidget::m_PasteDatapool(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
 {
-   const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const stw::opensyde_core::C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
@@ -615,32 +614,32 @@ void C_SdNdeDpSelectorWidget::m_UpdateErrorToolTip(void)
       bool q_Error = false;
       bool q_DatapoolNvmSizeConflict = false;
       bool q_DatapoolNvmOverlapConflict = false;
-      std::vector<uint32> c_InvalidDataPoolIndices;
+      std::vector<uint32_t> c_InvalidDataPoolIndices;
 
-      for (sintn sn_ItDp = 0; sn_ItDp < this->mpc_Ui->pc_ListWidget->GetItemCount(); ++sn_ItDp)
+      for (int32_t s32_ItDp = 0; s32_ItDp < this->mpc_Ui->pc_ListWidget->GetItemCount(); ++s32_ItDp)
       {
-         const sint32 s32_Index = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
-                                                                                    this->me_DataPoolType,
-                                                                                    static_cast<uint32>(sn_ItDp));
+         const int32_t s32_Index = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex,
+                                                                                     this->me_DataPoolType,
+                                                                                     static_cast<uint32_t>(s32_ItDp));
          if (s32_Index >= 0)
          {
             bool q_NameConflict;
             bool q_NameInvalid;
             bool q_IsErrorInListOrMessage;
             bool q_IsErrorInListOrElementLength;
-            pc_Node->CheckErrorDataPool(static_cast<uint32>(s32_Index), &q_NameConflict, &q_NameInvalid,
+            pc_Node->CheckErrorDataPool(static_cast<uint32_t>(s32_Index), &q_NameConflict, &q_NameInvalid,
                                         &q_IsErrorInListOrMessage, &q_IsErrorInListOrElementLength, NULL);
             if (((q_NameConflict == true) || (q_NameInvalid == true)) || (q_IsErrorInListOrMessage == true) ||
                 (q_IsErrorInListOrElementLength == true))
             {
                q_Error = true;
-               c_InvalidDataPoolIndices.push_back(static_cast<uint32>(s32_Index));
+               c_InvalidDataPoolIndices.push_back(static_cast<uint32_t>(s32_Index));
             }
          }
       }
 
-      if ((this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eNVM) ||
-          (this->me_DataPoolType == stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM))
+      if ((this->me_DataPoolType == stw::opensyde_core::C_OscNodeDataPool::eNVM) ||
+          (this->me_DataPoolType == stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM))
       {
          // check the entire NVM size
          if (C_PuiSdHandler::h_GetInstance()->CheckNodeNvmDataPoolsSizeConflict(this->mu32_NodeIndex,

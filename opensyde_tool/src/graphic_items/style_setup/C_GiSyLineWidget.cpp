@@ -8,27 +8,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsView>
 
-#include "C_GiSyLineWidget.h"
+#include "C_GiSyLineWidget.hpp"
 #include "ui_C_GiSyLineWidget.h"
 
-#include "C_HeHandler.h"
-#include "C_GtGetText.h"
-#include "C_OgePubColorOnly.h"
-#include "C_UtiStyleSheets.h"
-#include "C_GiLiLine.h"
-#include "C_SdTopologyScene.h"
-#include "C_GiSyColorSelectWidget.h"
+#include "C_HeHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgePubColorOnly.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_GiLiLine.hpp"
+#include "C_SdTopologyScene.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBackground.png";
@@ -134,17 +133,19 @@ C_GiSyLineWidget::C_GiSyLineWidget(const E_Type oe_Mode, C_GiSyBaseWidget & orc_
    connect(this->mpc_Ui->pc_BushButtonColorInner, &C_OgePubColorOnly::clicked,
            this, &C_GiSyLineWidget::m_ColorInnerClicked);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxWidth, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged),
+   connect(this->mpc_Ui->pc_SpinBoxWidth, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
            this, &C_GiSyLineWidget::m_ValueChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxLineStyle, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_ComboBoxLineStyle,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_GiSyLineWidget::m_ValueChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxStartArrow,
-           static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_GiSyLineWidget::m_ValueChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxEndArrow, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_ComboBoxEndArrow,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_GiSyLineWidget::m_ValueChanged);
 
    mh_InitArrow(this->mpc_Ui->pc_ComboBoxStartArrow, true);
@@ -202,7 +203,7 @@ void C_GiSyLineWidget::showEvent(QShowEvent * const opc_Event)
    \return  Actual line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sintn C_GiSyLineWidget::GetLineWidth(void) const
+int32_t C_GiSyLineWidget::GetLineWidth(void) const
 {
    return this->mpc_Ui->pc_SpinBoxWidth->value();
 }
@@ -210,12 +211,12 @@ stw_types::sintn C_GiSyLineWidget::GetLineWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set line width
 
-   \param[in]  osn_Value   New line width
+   \param[in]  os32_Value   New line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyLineWidget::SetLineWidth(const stw_types::sintn osn_Value)
+void C_GiSyLineWidget::SetLineWidth(const int32_t os32_Value)
 {
-   this->mpc_Ui->pc_SpinBoxWidth->setValue(osn_Value);
+   this->mpc_Ui->pc_SpinBoxWidth->setValue(os32_Value);
    m_UpdatePreview();
 }
 
@@ -283,9 +284,9 @@ void C_GiSyLineWidget::SetInnerLineColor(const QColor & orc_Value)
    \return  Actual style of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiSyLineWidget::GetLineStyle(void) const
+stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiSyLineWidget::GetLineStyle(void) const
 {
-   return static_cast<stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType>(
+   return static_cast<stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType>(
       this->mpc_Ui->pc_ComboBoxLineStyle->currentIndex());
 }
 
@@ -295,10 +296,10 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType C_GiSyLineWidget::GetLineSt
    \param[in]  oe_Value   New style of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyLineWidget::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_Value)
+void C_GiSyLineWidget::SetLineStyle(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType oe_Value)
 {
    // set the state of the combo box
-   this->mpc_Ui->pc_ComboBoxLineStyle->setCurrentIndex(static_cast<sintn>(oe_Value));
+   this->mpc_Ui->pc_ComboBoxLineStyle->setCurrentIndex(static_cast<int32_t>(oe_Value));
 
    m_UpdatePreview();
 }
@@ -309,9 +310,9 @@ void C_GiSyLineWidget::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArr
    \return  Actual start arrow of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetStartArrow(void) const
+stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetStartArrow(void) const
 {
-   return static_cast<stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType>(
+   return static_cast<stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType>(
       this->mpc_Ui->pc_ComboBoxStartArrow->currentIndex());
 }
 
@@ -321,10 +322,10 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetS
    \param[in]  oe_Value   New start arrow of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyLineWidget::SetStartArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
+void C_GiSyLineWidget::SetStartArrow(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
 {
    // set the state of the combo box
-   this->mpc_Ui->pc_ComboBoxStartArrow->setCurrentIndex(static_cast<sintn>(oe_Value));
+   this->mpc_Ui->pc_ComboBoxStartArrow->setCurrentIndex(static_cast<int32_t>(oe_Value));
 
    m_UpdatePreview();
 }
@@ -335,9 +336,9 @@ void C_GiSyLineWidget::SetStartArrow(const stw_opensyde_gui_logic::C_PuiBsLineAr
    \return  Actual end arrow of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetEndArrow(void) const
+stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetEndArrow(void) const
 {
-   return static_cast<stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType>(
+   return static_cast<stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType>(
       this->mpc_Ui->pc_ComboBoxEndArrow->currentIndex());
 }
 
@@ -347,10 +348,10 @@ stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType C_GiSyLineWidget::GetE
    \param[in]  oe_Value   New end arrow of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyLineWidget::SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
+void C_GiSyLineWidget::SetEndArrow(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_ArrowHeadType oe_Value)
 {
    // set the state of the combo box
-   this->mpc_Ui->pc_ComboBoxEndArrow->setCurrentIndex(static_cast<sintn>(oe_Value));
+   this->mpc_Ui->pc_ComboBoxEndArrow->setCurrentIndex(static_cast<int32_t>(oe_Value));
 
    m_UpdatePreview();
 }
@@ -362,7 +363,7 @@ void C_GiSyLineWidget::SetEndArrow(const stw_opensyde_gui_logic::C_PuiBsLineArro
 void C_GiSyLineWidget::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_GiSyBaseWidget::h_GetSceneViewSize();
-   const float64 f64_PLACEMENT_OFFSET = 25.0;
+   const float64_t f64_PLACEMENT_OFFSET = 25.0;
 
    std::vector<QPointF> c_Points;
 
@@ -375,8 +376,8 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
       C_GiLiLine * pc_Item;
 
       // Main line
-      c_Points.push_back(QPointF(f64_PLACEMENT_OFFSET, 70.0));
-      c_Points.push_back(QPointF(static_cast<float64>(c_ViewSize.width()) - f64_PLACEMENT_OFFSET, 70.0));
+      c_Points.emplace_back(QPointF(f64_PLACEMENT_OFFSET, 70.0));
+      c_Points.emplace_back(QPointF(static_cast<float64_t>(c_ViewSize.width()) - f64_PLACEMENT_OFFSET, 70.0));
 
       if (me_Mode == eETHERNET_BUS)
       {
@@ -395,8 +396,8 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
 
       // Connection line 1
       c_Points.clear();
-      c_Points.push_back(QPointF(142.0, 71.0));
-      c_Points.push_back(QPointF(142.0, 110.0));
+      c_Points.emplace_back(QPointF(142.0, 71.0));
+      c_Points.emplace_back(QPointF(142.0, 110.0));
       if (me_Mode == eETHERNET_BUS)
       {
          //lint -e{423}  no memory leak because of adding the item to the scene and the Qt memory management
@@ -408,7 +409,7 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
          pc_Item = new C_GiLiLine(&c_Points);
       }
       pc_Item->SetColor(this->mc_Color);
-      pc_Item->SetWidth(static_cast<sint32>(this->mpc_Ui->pc_SpinBoxWidth->value() / 2));
+      pc_Item->SetWidth(static_cast<int32_t>(this->mpc_Ui->pc_SpinBoxWidth->value() / 2));
       pc_Item->SetMiddleLineColor(this->mc_InnerLineColor);
       pc_Item->setFlag(QGraphicsItem::ItemStacksBehindParent);
       this->mpc_ParentDialog->GetPreviewScene()->addItem(pc_Item);
@@ -417,20 +418,22 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
    {
       C_GiBiArrow * pc_Arrow;
       C_PuiBsLineArrow::E_ArrowHeadType e_ArrowHeadType = this->GetStartArrow();
-      float64 f64_XOffset = 0.0;
+      float64_t f64_HorizontalOffset = 0.0;
       if (C_GiBiArrow::h_HasOffsetInteractionPoint(e_ArrowHeadType) == true)
       {
-         f64_XOffset = static_cast<float64>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
+         f64_HorizontalOffset = static_cast<float64_t>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
 
-      c_Points.push_back(QPointF(f64_PLACEMENT_OFFSET + f64_XOffset, static_cast<float64>(c_ViewSize.height()) / 2.0));
+      c_Points.push_back(QPointF(f64_PLACEMENT_OFFSET + f64_HorizontalOffset,
+                                 static_cast<float64_t>(c_ViewSize.height()) / 2.0));
       e_ArrowHeadType = this->GetEndArrow();
       if (C_GiBiArrow::h_HasOffsetInteractionPoint(e_ArrowHeadType) == true)
       {
-         f64_XOffset = static_cast<float64>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
+         f64_HorizontalOffset = static_cast<float64_t>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
-      c_Points.push_back(QPointF((static_cast<float64>(c_ViewSize.width()) - f64_PLACEMENT_OFFSET) - f64_XOffset,
-                                 static_cast<float64>(c_ViewSize.height()) / 2.0));
+      c_Points.emplace_back(QPointF((static_cast<float64_t>(c_ViewSize.width()) - f64_PLACEMENT_OFFSET) -
+                                    f64_HorizontalOffset,
+                                    static_cast<float64_t>(c_ViewSize.height()) / 2.0));
 
       pc_Arrow = new C_GiBiArrow(0ULL, &c_Points);
 
@@ -465,13 +468,13 @@ void C_GiSyLineWidget::m_ColorClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(* c_Popup, c_Color);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Color = pc_ColorWidget->ChooseSelectedColor();
 
@@ -507,13 +510,13 @@ void C_GiSyLineWidget::m_ColorInnerClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Color = pc_ColorWidget->ChooseSelectedColor();
 

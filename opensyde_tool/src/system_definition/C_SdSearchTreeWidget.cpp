@@ -8,41 +8,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <vector>
 #include <QKeyEvent>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_SdSearchTreeWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeTreeWidgetToolBarSearchItemDelegate.h"
-#include "C_PuiSdUtil.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_SdSearchTreeWidget.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeTreeWidgetToolBarSearchItemDelegate.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_TITLE = static_cast<sintn>(Qt::DisplayRole);
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_SUBTITLE = static_cast<sintn>(Qt::UserRole) + 1;
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_NAME = static_cast<sintn>(Qt::UserRole) + 2;
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_INDEX_1 = static_cast<sintn>(Qt::UserRole) + 3;
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_INDEX_2 = static_cast<sintn>(Qt::UserRole) + 4;
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_INDEX_3 = static_cast<sintn>(Qt::UserRole) + 5;
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_INDEX_4 = static_cast<sintn>(Qt::UserRole) + 6;
-const sintn C_SdSearchTreeWidget::mhsn_DATAROLE_INDEX_5 = static_cast<sintn>(Qt::UserRole) + 7;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_TITLE = static_cast<int32_t>(Qt::DisplayRole);
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_SUBTITLE = static_cast<int32_t>(Qt::UserRole) + 1;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_NAME = static_cast<int32_t>(Qt::UserRole) + 2;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_INDEX_1 = static_cast<int32_t>(Qt::UserRole) + 3;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_INDEX_2 = static_cast<int32_t>(Qt::UserRole) + 4;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_INDEX_3 = static_cast<int32_t>(Qt::UserRole) + 5;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_INDEX_4 = static_cast<int32_t>(Qt::UserRole) + 6;
+const int32_t C_SdSearchTreeWidget::mhs32_DATAROLE_INDEX_5 = static_cast<int32_t>(Qt::UserRole) + 7;
 
-const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_PARAMETER = 0U;
-const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_VARIABLE = 1U;
-const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_SIGNAL = 2U;
-const uint8 C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_HALC = 3U;
+const uint8_t C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_PARAMETER = 0U;
+const uint8_t C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_VARIABLE = 1U;
+const uint8_t C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_SIGNAL = 2U;
+const uint8_t C_SdSearchTreeWidget::mhu8_DATAELEMENT_TYPE_HALC = 3U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -271,11 +270,11 @@ void C_SdSearchTreeWidget::SetSearchResultFocus(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return))
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return))
    {
       this->m_ItemClicked();
    }
-   else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape))
+   else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       Q_EMIT this->SigHide();
    }
@@ -311,10 +310,10 @@ void C_SdSearchTreeWidget::focusOutEvent(QFocusEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_StartSearch(void)
 {
-   const std::vector<C_OSCNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes;
-   const std::vector<C_OSCSystemBus> & rc_Busses =
-      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Buses;
-   uint32 u32_Counter;
+   const std::vector<C_OscNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_Nodes;
+   const std::vector<C_OscSystemBus> & rc_Busses =
+      C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_Buses;
+   uint32_t u32_Counter;
 
    // search nodes and the content of nodes
    for (u32_Counter = 0U; u32_Counter < rc_Nodes.size(); ++u32_Counter)
@@ -330,9 +329,9 @@ void C_SdSearchTreeWidget::m_StartSearch(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OSCNode & orc_Node, const uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OscNode & orc_Node, const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
    QString c_Name;
    QString c_DataBlockName;
 
@@ -367,16 +366,16 @@ void C_SdSearchTreeWidget::m_SearchNodeContent(const C_OSCNode & orc_Node, const
    }
 
    // search HALC elements
-   this->m_SearchHalcConfigurationContent(orc_Node.c_HALCConfig, c_Name, ou32_NodeIndex);
+   this->m_SearchHalcConfigurationContent(orc_Node.c_HalcConfig, c_Name, ou32_NodeIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc_DataPool,
-                                                   const uint32 ou32_DataPoolIndex, const QString & orc_NodeName,
-                                                   const uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OscNodeDataPool & orc_DataPool,
+                                                   const uint32_t ou32_DataPoolIndex, const QString & orc_NodeName,
+                                                   const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_ListCounter;
-   uint32 u32_DataElementCounter;
+   uint32_t u32_ListCounter;
+   uint32_t u32_DataElementCounter;
    QString c_DataPoolName;
    QString c_ListName;
    QString c_DataElementName;
@@ -409,21 +408,21 @@ void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc
 
          if (c_DataElementName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
          {
-            uint8 u8_Type = mhu8_DATAELEMENT_TYPE_VARIABLE;
+            uint8_t u8_Type = mhu8_DATAELEMENT_TYPE_VARIABLE;
 
             switch (orc_DataPool.e_Type)
             {
-            case C_OSCNodeDataPool::eDIAG:
+            case C_OscNodeDataPool::eDIAG:
                u8_Type = mhu8_DATAELEMENT_TYPE_VARIABLE;
                break;
-            case C_OSCNodeDataPool::eNVM:
+            case C_OscNodeDataPool::eNVM:
                u8_Type = mhu8_DATAELEMENT_TYPE_PARAMETER;
                break;
-            case C_OSCNodeDataPool::eCOM:
+            case C_OscNodeDataPool::eCOM:
                u8_Type = mhu8_DATAELEMENT_TYPE_SIGNAL;
                break;
-            case C_OSCNodeDataPool::eHALC:
-            case C_OSCNodeDataPool::eHALC_NVM:
+            case C_OscNodeDataPool::eHALC:
+            case C_OscNodeDataPool::eHALC_NVM:
                u8_Type = mhu8_DATAELEMENT_TYPE_HALC;
                break;
             default:
@@ -439,31 +438,31 @@ void C_SdSearchTreeWidget::m_SearchDataPoolContent(const C_OSCNodeDataPool & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & orc_CanProtocol,
-                                                      const QString & orc_NodeName, const uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OscCanProtocol & orc_CanProtocol,
+                                                      const QString & orc_NodeName, const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_MessageContainerCounter;
-   uint32 u32_MessageCounter;
    QString c_MessageName;
    const QString c_ProtocolName = C_PuiSdUtil::h_ConvertProtocolTypeToString(orc_CanProtocol.e_Type);
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       ou32_NodeIndex, orc_CanProtocol.u32_DataPoolIndex);
 
    if (pc_DataPool != NULL)
    {
+      uint32_t u32_MessageContainerCounter;
       // Search CAN messages
       for (u32_MessageContainerCounter = 0U;
            u32_MessageContainerCounter < orc_CanProtocol.c_ComMessages.size();
            ++u32_MessageContainerCounter)
       {
-         const std::vector<C_OSCCanMessage> & rc_TxMessages =
+         const std::vector<C_OscCanMessage> & rc_TxMessages =
             orc_CanProtocol.c_ComMessages[u32_MessageContainerCounter].c_TxMessages;
-         const std::vector<C_OSCCanMessage> & rc_RxMessages =
+         const std::vector<C_OscCanMessage> & rc_RxMessages =
             orc_CanProtocol.c_ComMessages[u32_MessageContainerCounter].c_RxMessages;
-         const sint32 s32_ListIndexTx =
-            C_OSCCanProtocol::h_GetListIndex(*pc_DataPool, u32_MessageContainerCounter, true);
-         const sint32 s32_ListIndexRx =
-            C_OSCCanProtocol::h_GetListIndex(*pc_DataPool, u32_MessageContainerCounter, false);
+         const int32_t s32_ListIndexTx =
+            C_OscCanProtocol::h_GetListIndex(*pc_DataPool, u32_MessageContainerCounter, true);
+         const int32_t s32_ListIndexRx =
+            C_OscCanProtocol::h_GetListIndex(*pc_DataPool, u32_MessageContainerCounter, false);
+         uint32_t u32_MessageCounter;
 
          // search the Tx messages
          for (u32_MessageCounter = 0U; u32_MessageCounter < rc_TxMessages.size(); ++u32_MessageCounter)
@@ -472,7 +471,7 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
 
             if (c_MessageName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
             {
-               this->m_AddMessageResult(c_MessageName, u32_MessageCounter, true, static_cast<uint32>(s32_ListIndexTx),
+               this->m_AddMessageResult(c_MessageName, u32_MessageCounter, true, static_cast<uint32_t>(s32_ListIndexTx),
                                         c_ProtocolName, orc_CanProtocol.u32_DataPoolIndex, orc_NodeName,
                                         ou32_NodeIndex);
             }
@@ -485,7 +484,8 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
 
             if (c_MessageName.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
             {
-               this->m_AddMessageResult(c_MessageName, u32_MessageCounter, false, static_cast<uint32>(s32_ListIndexRx),
+               this->m_AddMessageResult(c_MessageName, u32_MessageCounter, false,
+                                        static_cast<uint32_t>(s32_ListIndexRx),
                                         c_ProtocolName, orc_CanProtocol.u32_DataPoolIndex, orc_NodeName,
                                         ou32_NodeIndex);
             }
@@ -501,16 +501,15 @@ void C_SdSearchTreeWidget::m_SearchCanProtocolContent(const C_OSCCanProtocol & o
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw_opensyde_core::C_OSCHalcConfig & orc_HalcConfig,
-                                                            const QString & orc_NodeName,
-                                                            const stw_types::uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw::opensyde_core::C_OscHalcConfig & orc_HalcConfig,
+                                                            const QString & orc_NodeName, const uint32_t ou32_NodeIndex)
 {
-   const uint32 u32_DomainCount = orc_HalcConfig.GetDomainSize();
-   uint32 u32_DomainCounter;
+   const uint32_t u32_DomainCount = orc_HalcConfig.GetDomainSize();
+   uint32_t u32_DomainCounter;
 
    for (u32_DomainCounter = 0U; u32_DomainCounter < u32_DomainCount; ++u32_DomainCounter)
    {
-      const C_OSCHalcDefDomain * const pc_HalcDef = orc_HalcConfig.GetDomainDefDataConst(u32_DomainCounter);
+      const C_OscHalcDefDomain * const pc_HalcDef = orc_HalcConfig.GetDomainDefDataConst(u32_DomainCounter);
 
       if (pc_HalcDef != NULL)
       {
@@ -530,12 +529,12 @@ void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw_opensyde_c
          {
             // Handling domains with channels
             // Search for domain name is not possible in this case
-            const C_OSCHalcConfigDomain * const pc_HalcConf =
+            const C_OscHalcConfigDomain * const pc_HalcConf =
                orc_HalcConfig.GetDomainConfigDataConst(u32_DomainCounter);
 
             if (pc_HalcConf != NULL)
             {
-               uint32 u32_ChannelCounter;
+               uint32_t u32_ChannelCounter;
                tgl_assert(pc_HalcDef->c_Channels.size() == pc_HalcConf->c_ChannelConfigs.size());
 
                for (u32_ChannelCounter = 0U; u32_ChannelCounter < pc_HalcDef->c_Channels.size(); ++u32_ChannelCounter)
@@ -558,7 +557,7 @@ void C_SdSearchTreeWidget::m_SearchHalcConfigurationContent(const stw_opensyde_c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, const uint32 ou32_BusIndex)
+void C_SdSearchTreeWidget::m_SearchBusContent(const C_OscSystemBus & orc_Bus, const uint32_t ou32_BusIndex)
 {
    QString c_Name;
 
@@ -566,7 +565,7 @@ void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, co
 
    if (c_Name.contains(this->mc_SearchString, Qt::CaseInsensitive) == true)
    {
-      if (orc_Bus.e_Type == C_OSCSystemBus::eETHERNET)
+      if (orc_Bus.e_Type == C_OscSystemBus::eETHERNET)
       {
          this->m_AddBusResult(c_Name, ou32_BusIndex, true);
       }
@@ -579,33 +578,34 @@ void C_SdSearchTreeWidget::m_SearchBusContent(const C_OSCSystemBus & orc_Bus, co
 
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdSearchTreeWidget::m_CheckWhereToJumpCan(const QTreeWidgetItem * const opc_Item,
-                                                 uint32 & oru32_InterfaceIndex) const
+                                                 uint32_t & oru32_InterfaceIndex) const
 {
    // default case is open node
    bool q_Return = false;
-   const sintn sn_NodeIndex = opc_Item->data(0, mhsn_DATAROLE_INDEX_1).toInt();
-   const sint32 s32_DataPoolIndex = opc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
-      sn_NodeIndex, s32_DataPoolIndex);
+   const int32_t s32_NodeIndex = opc_Item->data(0, mhs32_DATAROLE_INDEX_1).toInt();
+   const int32_t s32_DataPoolIndex = opc_Item->data(0, mhs32_DATAROLE_INDEX_2).toInt();
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
+      s32_NodeIndex, s32_DataPoolIndex);
 
    if (pc_DataPool != NULL)
    {
       // the datapool must be a COM datapool ...
-      if (pc_DataPool->e_Type == C_OSCNodeDataPool::eCOM)
+      if (pc_DataPool->e_Type == C_OscNodeDataPool::eCOM)
       {
          // the node protocol must be "connected" to a bus
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(sn_NodeIndex);
-         const uint32 u32_InterfaceIndex = static_cast<uint32>(opc_Item->data(0, mhsn_DATAROLE_INDEX_3).toInt()) / 2;
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(s32_NodeIndex);
+         const uint32_t u32_InterfaceIndex =
+            static_cast<uint32_t>(opc_Item->data(0, mhs32_DATAROLE_INDEX_3).toInt()) / 2;
 
          if (pc_Node != NULL)
          {
-            uint32 u32_Counter;
+            uint32_t u32_Counter;
 
             // search the correct protocol
             for (u32_Counter = 0U; u32_Counter < pc_Node->c_ComProtocols.size(); ++u32_Counter)
             {
-               const C_OSCCanProtocol & rc_Protocol = pc_Node->c_ComProtocols[u32_Counter];
-               if (rc_Protocol.u32_DataPoolIndex == static_cast<uint32>(s32_DataPoolIndex))
+               const C_OscCanProtocol & rc_Protocol = pc_Node->c_ComProtocols[u32_Counter];
+               if (rc_Protocol.u32_DataPoolIndex == static_cast<uint32_t>(s32_DataPoolIndex))
                {
                   if (u32_InterfaceIndex < rc_Protocol.c_ComMessages.size())
                   {
@@ -649,16 +649,16 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
       }
       else
       {
-         QString c_Text = pc_Item->data(0, mhsn_DATAROLE_NAME).toString();
-         const sintn sn_Type = pc_Item->data(0, mhsn_DATAROLE_INDEX_5).toInt();
-         uint32 u32_Index;
-         uint32 u32_BusIndex = 0U;
-         sint32 s32_Flag;
+         QString c_Text = pc_Item->data(0, mhs32_DATAROLE_NAME).toString();
+         const int32_t s32_Type = pc_Item->data(0, mhs32_DATAROLE_INDEX_5).toInt();
+         uint32_t u32_Index;
+         uint32_t u32_BusIndex = 0U;
+         int32_t s32_Flag;
          bool q_OpenBus = false;
          bool q_OpenHalc = false;
 
          // special cases: check where to jump, node or bus if a not clear case was clicked
-         if ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) && (sn_Type == mhu8_DATAELEMENT_TYPE_SIGNAL))
+         if ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) && (s32_Type == mhu8_DATAELEMENT_TYPE_SIGNAL))
          {
             q_OpenBus = this->m_CheckWhereToJumpCan(pc_Item, u32_BusIndex);
             // flag for handling CAN signals
@@ -677,7 +677,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
          }
          else if ((pc_Item->parent() == this->mpc_TreeItemRootHalcChannels) ||
                   ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) &&
-                   (sn_Type == mhu8_DATAELEMENT_TYPE_HALC)))
+                   (s32_Type == mhu8_DATAELEMENT_TYPE_HALC)))
          {
             q_OpenHalc = true;
             // flag for handling HALC view, but no specific channel
@@ -698,7 +698,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
          else
          {
             // normal case: decision by category
-            u32_Index = static_cast<uint32>(pc_Item->data(0, mhsn_DATAROLE_INDEX_1).toInt());
+            u32_Index = static_cast<uint32_t>(pc_Item->data(0, mhs32_DATAROLE_INDEX_1).toInt());
          }
 
          if ((pc_Item->parent() == this->mpc_TreeItemRootNodes) ||
@@ -718,21 +718,21 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                 (pc_Item->parent() == this->mpc_TreeItemRootMessages))
             {
                // Datapool or application index
-               const sint32 s32_MainIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
+               const int32_t s32_MainIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_2).toInt();
                // to make a difference between only datapool, list or dataelement
-               sint32 s32_ListIndex = -1;
-               sint32 s32_DataElementIndex = -1;
+               int32_t s32_ListIndex = -1;
+               int32_t s32_DataElementIndex = -1;
 
                if ((pc_Item->parent() == this->mpc_TreeItemRootLists) ||
                    (pc_Item->parent() == this->mpc_TreeItemRootDataElements) ||
                    (pc_Item->parent() == this->mpc_TreeItemRootMessages))
                {
-                  s32_ListIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_3).toInt();
+                  s32_ListIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_3).toInt();
 
                   if ((pc_Item->parent() == this->mpc_TreeItemRootDataElements) ||
                       (pc_Item->parent() == this->mpc_TreeItemRootMessages))
                   {
-                     s32_DataElementIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_4).toInt();
+                     s32_DataElementIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_4).toInt();
                   }
                }
 
@@ -743,19 +743,19 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                      (pc_Item->parent() == this->mpc_TreeItemRootHalcChannels))
             {
                // Open the HALC configuration
-               sint32 s32_DomainIndex = -1;
-               sint32 s32_ChannelIndex = -1;
+               int32_t s32_DomainIndex = -1;
+               int32_t s32_ChannelIndex = -1;
 
                // In case of a selection in section data elements, no concrete domain or channel will be selected
                // Only in case of a selection of an element of the section channels
                if (pc_Item->parent() == this->mpc_TreeItemRootHalcChannels)
                {
-                  const bool q_UseChannelIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_4).toBool();
-                  s32_DomainIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
+                  const bool q_UseChannelIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_4).toBool();
+                  s32_DomainIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_2).toInt();
 
                   if (q_UseChannelIndex == true)
                   {
-                     s32_ChannelIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_3).toInt();
+                     s32_ChannelIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_3).toInt();
                   }
                }
 
@@ -775,7 +775,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
                 (pc_Item->parent() == this->mpc_TreeItemRootDataElements))
             {
                // Special case: Search result showed as a part of node, but the bus edit will be opened.
-               const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_BusIndex);
+               const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_BusIndex);
 
                if (pc_Bus != NULL)
                {
@@ -788,10 +788,10 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
             if ((pc_Item->parent() == this->mpc_TreeItemRootMessages) ||
                 (pc_Item->parent() == this->mpc_TreeItemRootDataElements))
             {
-               const sint32 s32_NodeIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_1).toInt();
-               const sint32 s32_DataPoolIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_2).toInt();
-               const sint32 s32_ListIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_3).toInt();
-               const sint32 s32_DataElementIndex = pc_Item->data(0, mhsn_DATAROLE_INDEX_4).toInt();
+               const int32_t s32_NodeIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_1).toInt();
+               const int32_t s32_DataPoolIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_2).toInt();
+               const int32_t s32_ListIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_3).toInt();
+               const int32_t s32_DataElementIndex = pc_Item->data(0, mhs32_DATAROLE_INDEX_4).toInt();
 
                // open the signal or message
                Q_EMIT (this->SigOpenDetail(s32_NodeIndex, s32_DataPoolIndex, s32_ListIndex, s32_DataElementIndex,
@@ -807,7 +807,7 @@ void C_SdSearchTreeWidget::m_ItemClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const uint32 ou32_NodeIndex,
+void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const uint32_t ou32_NodeIndex,
                                            const QString & orc_DeviceType)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootNodes);
@@ -816,11 +816,11 @@ void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const u
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconNode);
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconNode);
 
    ++this->mu32_NodesFound;
    this->mq_ResultsFound = true;
@@ -830,7 +830,7 @@ void C_SdSearchTreeWidget::m_AddNodeResult(const QString & orc_NodeName, const u
 } //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uint32 ou32_BusIndex,
+void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uint32_t ou32_BusIndex,
                                           const bool oq_Ethernet)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootBusses);
@@ -839,20 +839,20 @@ void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uin
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_BusName);
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_BusName);
 
    if (oq_Ethernet == true)
    {
-      pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle + "Ethernet");
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconBusEthernet);
+      pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle + "Ethernet");
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconBusEthernet);
    }
    else
    {
-      pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle + "CAN");
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconBusCan);
+      pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle + "CAN");
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconBusCan);
    }
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_BusIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_BusIndex));
 
    ++this->mu32_BussesFound;
    this->mq_ResultsFound = true;
@@ -862,8 +862,8 @@ void C_SdSearchTreeWidget::m_AddBusResult(const QString & orc_BusName, const uin
 } //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
-                                               const QString & orc_NodeName, const uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName, const uint32_t ou32_DataPoolIndex,
+                                               const QString & orc_NodeName, const uint32_t ou32_NodeIndex)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootDataPools);
    QString c_ResultString = orc_DataPoolName;
@@ -871,12 +871,12 @@ void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName,
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_DataPoolIndex));
-   pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconDataPool);
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_2, static_cast<int32_t>(ou32_DataPoolIndex));
+   pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconDataPool);
 
    ++this->mu32_DataPoolsFound;
    this->mq_ResultsFound = true;
@@ -886,9 +886,9 @@ void C_SdSearchTreeWidget::m_AddDataPoolResult(const QString & orc_DataPoolName,
 } //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const uint32 ou32_ListIndex,
-                                           const QString & orc_DataPoolName, const uint32 ou32_DataPoolIndex,
-                                           const QString & orc_NodeName, const uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const uint32_t ou32_ListIndex,
+                                           const QString & orc_DataPoolName, const uint32_t ou32_DataPoolIndex,
+                                           const QString & orc_NodeName, const uint32_t ou32_NodeIndex)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootLists);
    QString c_ResultString = orc_ListName;
@@ -896,13 +896,13 @@ void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const u
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_DataPoolIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_3, static_cast<sintn>(ou32_ListIndex));
-   pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconList);
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_2, static_cast<int32_t>(ou32_DataPoolIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_3, static_cast<int32_t>(ou32_ListIndex));
+   pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconList);
 
    ++this->mu32_ListsFound;
    this->mq_ResultsFound = true;
@@ -912,10 +912,10 @@ void C_SdSearchTreeWidget::m_AddListResult(const QString & orc_ListName, const u
 } //lint !e429  //no memory leak because of the parent of pc_Item and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, const uint32 ou32_MessageIndex,
-                                              const bool oq_IsTx, const uint32 ou32_ListIndex,
-                                              const QString & orc_ProtocolName, const uint32 ou32_DataPoolIndex,
-                                              const QString & orc_NodeName, const uint32 ou32_NodeIndex)
+void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, const uint32_t ou32_MessageIndex,
+                                              const bool oq_IsTx, const uint32_t ou32_ListIndex,
+                                              const QString & orc_ProtocolName, const uint32_t ou32_DataPoolIndex,
+                                              const QString & orc_NodeName, const uint32_t ou32_NodeIndex)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootMessages);
    QString c_ResultString = orc_MessageName;
@@ -933,14 +933,14 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_DataPoolIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_3, static_cast<sintn>(ou32_ListIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_4, static_cast<sintn>(ou32_MessageIndex));
-   pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconMessage);
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_2, static_cast<int32_t>(ou32_DataPoolIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_3, static_cast<int32_t>(ou32_ListIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_4, static_cast<int32_t>(ou32_MessageIndex));
+   pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconMessage);
 
    ++this->mu32_MessagesFound;
    this->mq_ResultsFound = true;
@@ -951,10 +951,10 @@ void C_SdSearchTreeWidget::m_AddMessageResult(const QString & orc_MessageName, c
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataElementName,
-                                                   const uint32 ou32_DataElementIndex, const QString & orc_ListName,
-                                                   const uint32 ou32_ListIndex, const QString & orc_DataPoolName,
-                                                   const uint32 ou32_DataPoolIndex, const QString & orc_NodeName,
-                                                   const uint32 ou32_NodeIndex, const uint8 ou8_Type)
+                                                   const uint32_t ou32_DataElementIndex, const QString & orc_ListName,
+                                                   const uint32_t ou32_ListIndex, const QString & orc_DataPoolName,
+                                                   const uint32_t ou32_DataPoolIndex, const QString & orc_NodeName,
+                                                   const uint32_t ou32_NodeIndex, const uint8_t ou8_Type)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootDataElements);
    QString c_ResultString = orc_DataElementName;
@@ -962,30 +962,30 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_DataPoolIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_3, static_cast<sintn>(ou32_ListIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_4, static_cast<sintn>(ou32_DataElementIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_5, static_cast<sintn>(ou8_Type));
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_2, static_cast<int32_t>(ou32_DataPoolIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_3, static_cast<int32_t>(ou32_ListIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_4, static_cast<int32_t>(ou32_DataElementIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_5, static_cast<int32_t>(ou8_Type));
 
    if (ou8_Type == mhu8_DATAELEMENT_TYPE_VARIABLE)
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconVariable);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconVariable);
    }
    else if (ou8_Type == mhu8_DATAELEMENT_TYPE_PARAMETER)
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconParameter);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconParameter);
    }
    else if (ou8_Type == mhu8_DATAELEMENT_TYPE_SIGNAL)
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconSignal);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconSignal);
    }
    else
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconVariable);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconVariable);
    }
 
    ++this->mu32_DataElementsFound;
@@ -997,8 +997,8 @@ void C_SdSearchTreeWidget::m_AddDataElementsResult(const QString & orc_DataEleme
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_ApplicationName,
-                                                  const uint32 ou32_ApplicationIndex, const QString & orc_NodeName,
-                                                  const uint32 ou32_NodeIndex)
+                                                  const uint32_t ou32_ApplicationIndex, const QString & orc_NodeName,
+                                                  const uint32_t ou32_NodeIndex)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootApplications);
    QString c_ResultString = orc_ApplicationName;
@@ -1006,12 +1006,12 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_ApplicationIndex));
-   pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconApplication);
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_2, static_cast<int32_t>(ou32_ApplicationIndex));
+   pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconApplication);
 
    ++this->mu32_ApplicationsFound;
    this->mq_ResultsFound = true;
@@ -1033,11 +1033,12 @@ void C_SdSearchTreeWidget::m_AddApplicationResult(const QString & orc_Applicatio
    \param[in]  oe_Category             Category of domain (output, input, other)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomainName, const uint32 ou32_HalcDomainIndex,
+void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomainName,
+                                                  const uint32_t ou32_HalcDomainIndex,
                                                   const QString & orc_HalcChannelName,
-                                                  const uint32 ou32_HalcChannelIndex, const bool oq_UseChannelIndex,
-                                                  const QString & orc_NodeName, const uint32 ou32_NodeIndex,
-                                                  const C_OSCHalcDefDomain::E_Category oe_Category)
+                                                  const uint32_t ou32_HalcChannelIndex, const bool oq_UseChannelIndex,
+                                                  const QString & orc_NodeName, const uint32_t ou32_NodeIndex,
+                                                  const C_OscHalcDefDomain::E_Category oe_Category)
 {
    QTreeWidgetItem * const pc_Item = new QTreeWidgetItem(this->mpc_TreeItemRootHalcChannels);
    QString c_ResultString;
@@ -1056,24 +1057,24 @@ void C_SdSearchTreeWidget::m_AddHalcChannelResult(const QString & orc_HalcDomain
 
    this->m_MarkResultString(c_ResultString);
 
-   pc_Item->setData(0, mhsn_DATAROLE_TITLE, c_ResultString);
-   pc_Item->setData(0, mhsn_DATAROLE_SUBTITLE, c_Subtitle);
-   pc_Item->setData(0, mhsn_DATAROLE_NAME, orc_NodeName);
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_1, static_cast<sintn>(ou32_NodeIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_2, static_cast<sintn>(ou32_HalcDomainIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_3, static_cast<sintn>(ou32_HalcChannelIndex));
-   pc_Item->setData(0, mhsn_DATAROLE_INDEX_4, static_cast<sintn>(oq_UseChannelIndex));
-   if (oe_Category == C_OSCHalcDefDomain::eCA_INPUT)
+   pc_Item->setData(0, mhs32_DATAROLE_TITLE, c_ResultString);
+   pc_Item->setData(0, mhs32_DATAROLE_SUBTITLE, c_Subtitle);
+   pc_Item->setData(0, mhs32_DATAROLE_NAME, orc_NodeName);
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_1, static_cast<int32_t>(ou32_NodeIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_2, static_cast<int32_t>(ou32_HalcDomainIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_3, static_cast<int32_t>(ou32_HalcChannelIndex));
+   pc_Item->setData(0, mhs32_DATAROLE_INDEX_4, static_cast<int32_t>(oq_UseChannelIndex));
+   if (oe_Category == C_OscHalcDefDomain::eCA_INPUT)
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconHalcInputChannel);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconHalcInputChannel);
    }
-   else if (oe_Category == C_OSCHalcDefDomain::eCA_OUTPUT)
+   else if (oe_Category == C_OscHalcDefDomain::eCA_OUTPUT)
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconHalcOutputChannel);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconHalcOutputChannel);
    }
    else
    {
-      pc_Item->setData(0, static_cast<sintn>(Qt::DecorationRole), this->mc_IconHalcChannel);
+      pc_Item->setData(0, static_cast<int32_t>(Qt::DecorationRole), this->mc_IconHalcChannel);
    }
 
    ++this->mu32_HalcChannelsFound;

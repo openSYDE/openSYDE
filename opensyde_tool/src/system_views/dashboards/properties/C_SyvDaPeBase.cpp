@@ -8,40 +8,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <climits>
 #include <QVBoxLayout>
 
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_SyvUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_SyvDaPeBase.h"
-#include "C_GiSvDaRectBaseGroup.h"
-#include "C_SyvDaPeUpdateModeConfiguration.h"
-#include "C_SyvDaPeDataElementBrowse.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaPeBase.hpp"
+#include "C_GiSvDaRectBaseGroup.hpp"
+#include "C_SyvDaPeUpdateModeConfiguration.hpp"
+#include "C_SyvDaPeDataElementBrowse.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 #include "ui_C_SyvDaPeBase.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeBase::mhsn_INDEX_MANUAL = 0;
-const sintn C_SyvDaPeBase::mhsn_INDEX_ON_CHANGE = 1;
-const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE = 0;
-const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE_2 = 1;
-const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_FLAT = 2;
-const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
+const int32_t C_SyvDaPeBase::mhs32_INDEX_MANUAL = 0;
+const int32_t C_SyvDaPeBase::mhs32_INDEX_ON_CHANGE = 1;
+const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE = 0;
+const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE_2 = 1;
+const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_FLAT = 2;
+const int32_t C_SyvDaPeBase::mhs32_INDEX_THEME_SKEUMORPH = 3;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -64,6 +64,8 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
    \param[in]      orc_Name                     Name of the item for the title
    \param[in]      orc_Id                       Element id to use for default initialization (only used if not invalid)
    \param[in]      orc_Scaling                  Scaling information for default initialization
+   \param[in]      oq_UseFormatterConfig        Flag if display formatter is available for the user
+   \param[in]      orc_FormatterConfig          Formatter information for default initialization
    \param[in]      oq_ReadElement               Optional flag if dialog for read element
    \param[in]      oq_DarkMode                  Optional flag if dark mode active
    \param[in]      oq_ShowWidgetSpecificPart    Optional flag if widget specific part is visible
@@ -71,11 +73,12 @@ const sintn C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH = 3;
    \param[in]      orc_DisplayName              Optional display name (only used if element name cannot be changed)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
-                             const uint32 ou32_DashboardIndex, const QString & orc_Name,
+C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_ViewIndex,
+                             const uint32_t ou32_DashboardIndex, const QString & orc_Name,
                              const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
-                             const C_PuiSvDbDataElementScaling & orc_Scaling, const bool oq_ReadElement,
-                             const bool oq_DarkMode, const bool oq_ShowWidgetSpecificPart,
+                             const C_PuiSvDbDataElementScaling & orc_Scaling, const bool oq_UseFormatterConfig,
+                             const C_PuiSvDbDataElementDisplayFormatter & orc_FormatterConfig,
+                             const bool oq_ReadElement, const bool oq_DarkMode, const bool oq_ShowWidgetSpecificPart,
                              const bool oq_AllowChangeOfDataElement, const QString & orc_DisplayName) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaPeBase),
@@ -127,13 +130,16 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
       this->mpc_Ui->pc_GroupBoxRead->setVisible(false);
    }
 
+   // Display formatter
+   this->mpc_Ui->pc_WidgetFormatter->setVisible(oq_UseFormatterConfig);
+
    //Deactivate certain fields
    this->mpc_Ui->pc_LineEditDataElement->setReadOnly(true);
 
    //Init date element fields
    if (orc_Id.GetIsValid() == true)
    {
-      m_InitDataElement(orc_Id, orc_Scaling);
+      m_InitDataElement(orc_Id, orc_Scaling, orc_FormatterConfig);
    }
    else
    {
@@ -145,8 +151,8 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
 
    // configure background drawing
    this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                 static_cast<float64>(c_Size.width()),
-                                 static_cast<float64>(c_Size.height()));
+                                 static_cast<float64_t>(c_Size.width()),
+                                 static_cast<float64_t>(c_Size.height()));
    this->mpc_Ui->pc_GraphicsView->setScene(this->mpc_Scene);
    this->mpc_Ui->pc_GraphicsView->setEnabled(false);
    this->mpc_Ui->pc_GraphicsView->SetSubtleSurroundGradient(true);
@@ -169,8 +175,8 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
    }
 
    //Spin box
-   this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
-   this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64>::max());
+   this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64_t>::lowest());
+   this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64_t>::max());
 
    // connects
    connect(this->mpc_Ui->pc_BushButtonOk, &QPushButton::clicked, this, &C_SyvDaPeBase::m_OkClicked);
@@ -182,8 +188,11 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32 ou32_Vi
            &C_SyvDaPeBase::m_Configuration);
    connect(this->mpc_Ui->pc_CheckBoxDefaultScaling, &C_OgeChxProperties::toggled, this,
            &C_SyvDaPeBase::m_OnUseDefaultScalingChange);
+   connect(this->mpc_Ui->pc_CheckBoxFormatterActive, &C_OgeChxProperties::toggled, this,
+           &C_SyvDaPeBase::m_OnFormatterActiveChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_ComboBoxTheme, static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged),
+   connect(this->mpc_Ui->pc_ComboBoxTheme,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged),
            this, &C_SyvDaPeBase::SigRefresh);
 }
 
@@ -217,6 +226,12 @@ void C_SyvDaPeBase::InitStaticNames(void)
    this->mpc_Ui->pc_LabelFactor->setText(C_GtGetText::h_GetText("Factor"));
    this->mpc_Ui->pc_LabelOffset->setText(C_GtGetText::h_GetText("Offset"));
    this->mpc_Ui->pc_LabelUnit->setText(C_GtGetText::h_GetText("Unit"));
+   this->mpc_Ui->pc_LabelFormatter->setText(C_GtGetText::h_GetText("Display Formatter"));
+   this->mpc_Ui->pc_LabelFormatterString->setText(C_GtGetText::h_GetText("Printf Formatter String"));
+   this->mpc_Ui->pc_CheckBoxFormatterActive->setText(C_GtGetText::h_GetText(
+                                                        "Enable Display Formatter"));
+   this->mpc_Ui->pc_LineEditFormatterString->setPlaceholderText(C_GtGetText::h_GetText("e.g.: \"%.2f\", "
+                                                                                       "\"0x%x\", ..."));
    this->mpc_Ui->pc_LabelNamespaceDescription->setText(C_GtGetText::h_GetText("Source"));
    this->mpc_Ui->pc_CheckBoxDefaultScaling->setText(C_GtGetText::h_GetText(
                                                        "Use the default values of SYSTEM DEFINITION"));
@@ -241,10 +256,17 @@ void C_SyvDaPeBase::InitStaticNames(void)
       C_GtGetText::h_GetText("Update Mode"),
       C_GtGetText::h_GetText("The rate at which the data element value is requested,"
                              " once the dashboard is connected"));
+   this->mpc_Ui->pc_LabelFormatterString->SetToolTipInformation(
+      C_GtGetText::h_GetText("Printf Formatter String"),
+      C_GtGetText::h_GetText("Configuration of the Display Formatter. The printf syntax can be used."));
    this->mpc_Ui->pc_CheckBoxDefaultScaling->SetToolTipInformation(
       C_GtGetText::h_GetText("Use the default values of SYSTEM DEFINITION"),
       C_GtGetText::h_GetText("Option to either use the scaling defined in the SYSTEM DEFINITION\n"
                              "or define a custom scaling just for this occurrence of this data element"));
+   this->mpc_Ui->pc_CheckBoxFormatterActive->SetToolTipInformation(
+      C_GtGetText::h_GetText("Activate the Display Formatter"),
+      C_GtGetText::h_GetText("Option to either use the formatting style defined in the printf formatter string below\n"
+                             "or use the standard formatting of the Dashboard"));
    this->mpc_Ui->pc_PushButtonClearDataElement->SetToolTipInformation(
       C_GtGetText::h_GetText("Clear Data Element"),
       C_GtGetText::h_GetText("Remove currently selected data element."));
@@ -302,19 +324,19 @@ void C_SyvDaPeBase::SetWriteMode(const C_PuiSvDbWidgetBase::E_WriteMode oe_Write
       switch (oe_WriteMode)
       {
       case C_PuiSvDbWidgetBase::eWM_MANUAL:
-         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_MANUAL);
          break;
       case C_PuiSvDbWidgetBase::eWM_ON_CHANGE:
-         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_ON_CHANGE);
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_ON_CHANGE);
          break;
       default:
-         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+         this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_MANUAL);
          break;
       }
    }
    else
    {
-      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_MANUAL);
    }
 }
 
@@ -329,16 +351,16 @@ void C_SyvDaPeBase::SetTheme(const C_PuiSvDbWidgetBase::E_Style oe_Style) const
    switch (oe_Style)
    {
    case C_PuiSvDbWidgetBase::eOPENSYDE:
-      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE);
+      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE);
       break;
    case C_PuiSvDbWidgetBase::eOPENSYDE_2:
-      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE_2);
+      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE_2);
       break;
    case C_PuiSvDbWidgetBase::eSKEUOMORPH:
-      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH);
+      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_THEME_SKEUMORPH);
       break;
    case C_PuiSvDbWidgetBase::eFLAT:
-      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_THEME_FLAT);
+      this->mpc_Ui->pc_ComboBoxTheme->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_THEME_FLAT);
       break;
    default:
       break;
@@ -375,7 +397,7 @@ QSize C_SyvDaPeBase::h_GetSceneViewSize(void)
    Offset for icon placement
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_SyvDaPeBase::h_GetFixIconOffset(void)
+float64_t C_SyvDaPeBase::h_GetFixIconOffset(void)
 {
    return 25.0;
 }
@@ -397,16 +419,16 @@ void C_SyvDaPeBase::h_GetIdealItemRect(QPointF & orc_ItemPos, QSizeF & orc_ItemS
    {
       const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
       //To be really centered we also have to include the borders into the size
-      const float64 f64_DoubleInteractionPointOffset =
+      const float64_t f64_DoubleInteractionPointOffset =
          (pc_GiItem->boundingRect().width() - pc_GiItem->GetVisibleBoundingRect().width());
       //Also include the fix offset to the right
-      const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
+      const float64_t f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
       orc_ItemSize = QSizeF(
-         ((static_cast<float64>(c_ViewSize.width()) / 1.5) + f64_IconOffset) + f64_DoubleInteractionPointOffset,
-         (static_cast<float64>(c_ViewSize.height()) / 1.5) + f64_DoubleInteractionPointOffset);
+         ((static_cast<float64_t>(c_ViewSize.width()) / 1.5) + f64_IconOffset) + f64_DoubleInteractionPointOffset,
+         (static_cast<float64_t>(c_ViewSize.height()) / 1.5) + f64_DoubleInteractionPointOffset);
       orc_ItemPos = QPointF(
-         ((static_cast<float64>(c_ViewSize.width()) - orc_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
-         (static_cast<float64>(c_ViewSize.height()) - orc_ItemSize.height()) / 2.0);
+         ((static_cast<float64_t>(c_ViewSize.width()) - orc_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
+         (static_cast<float64_t>(c_ViewSize.height()) - orc_ItemSize.height()) / 2.0);
    }
 }
 
@@ -441,6 +463,23 @@ C_PuiSvDbDataElementScaling C_SyvDaPeBase::GetScalingInformation() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get current formatter information
+
+   \return
+   Current formatter information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_PuiSvDbDataElementDisplayFormatter C_SyvDaPeBase::GetFormatterInformation(void) const
+{
+   C_PuiSvDbDataElementDisplayFormatter c_Retval;
+
+   c_Retval.q_IsActive = this->mpc_Ui->pc_CheckBoxFormatterActive->isChecked();
+   c_Retval.c_FormatterString = this->mpc_Ui->pc_LineEditFormatterString->text();
+
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get current write mode
 
    \return
@@ -452,10 +491,10 @@ C_PuiSvDbWidgetBase::E_WriteMode C_SyvDaPeBase::GetWriteMode(void) const
    C_PuiSvDbWidgetBase::E_WriteMode e_Retval;
    switch (this->mpc_Ui->pc_ComboBoxTransmissionMode->currentIndex())
    {
-   case C_SyvDaPeBase::mhsn_INDEX_MANUAL:
+   case C_SyvDaPeBase::mhs32_INDEX_MANUAL:
       e_Retval = C_PuiSvDbWidgetBase::eWM_MANUAL;
       break;
-   case C_SyvDaPeBase::mhsn_INDEX_ON_CHANGE:
+   case C_SyvDaPeBase::mhs32_INDEX_ON_CHANGE:
       e_Retval = C_PuiSvDbWidgetBase::eWM_ON_CHANGE;
       break;
    default:
@@ -477,16 +516,16 @@ C_PuiSvDbWidgetBase::E_Style C_SyvDaPeBase::GetTheme(void) const
    C_PuiSvDbWidgetBase::E_Style e_Retval;
    switch (this->mpc_Ui->pc_ComboBoxTheme->currentIndex())
    {
-   case C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE:
+   case C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE:
       e_Retval = C_PuiSvDbWidgetBase::eOPENSYDE;
       break;
-   case C_SyvDaPeBase::mhsn_INDEX_THEME_OPENSYDE_2:
+   case C_SyvDaPeBase::mhs32_INDEX_THEME_OPENSYDE_2:
       e_Retval = C_PuiSvDbWidgetBase::eOPENSYDE_2;
       break;
-   case C_SyvDaPeBase::mhsn_INDEX_THEME_FLAT:
+   case C_SyvDaPeBase::mhs32_INDEX_THEME_FLAT:
       e_Retval = C_PuiSvDbWidgetBase::eFLAT;
       break;
-   case C_SyvDaPeBase::mhsn_INDEX_THEME_SKEUMORPH:
+   case C_SyvDaPeBase::mhs32_INDEX_THEME_SKEUMORPH:
       e_Retval = C_PuiSvDbWidgetBase::eSKEUOMORPH;
       break;
    default:
@@ -531,8 +570,8 @@ void C_SyvDaPeBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -560,7 +599,54 @@ void C_SyvDaPeBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_OkClicked(void)
 {
-   if (this->mpc_ParentDialog != NULL)
+   bool q_Continue = true;
+   const C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig = this->GetFormatterInformation();
+
+   // Check formatter first
+   if ((c_FormatterConfig.q_IsActive == true) &&
+       (this->mc_DataElement.GetIsValid() == true))
+   {
+      const C_PuiSvDbDataElementScaling c_Scaling = this->GetScalingInformation();
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                    this->mc_DataElement.u32_DataPoolIndex,
+                                                                    this->mc_DataElement.u32_ListIndex,
+                                                                    this->mc_DataElement.u32_ElementIndex);
+      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
+         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                   this->mc_DataElement.u32_DataPoolIndex,
+                                                                   this->mc_DataElement.u32_ListIndex,
+                                                                   this->mc_DataElement.u32_ElementIndex);
+
+      tgl_assert(pc_UiElement != NULL);
+      tgl_assert(pc_Element != NULL);
+      if ((pc_UiElement != NULL) &&
+          (pc_Element != NULL))
+      {
+         if (c_FormatterConfig.IsFormatterCompatible(
+                C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(pc_Element->c_MinValue,
+                                                                        c_Scaling,
+                                                                        pc_UiElement->q_InterpretAsString)) == false)
+         {
+            // Error
+            C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
+            c_MessageBox.SetHeading(C_GtGetText::h_GetText("Display Formatter"));
+            c_MessageBox.SetDescription(
+               C_GtGetText::h_GetText(
+                  "The configured printf formatter string is invalid or not compatible to the selected data element. \n"
+                  "Check user documentation for more information about supported printf parameters.\n\n"
+                  "Adapt the printf formatter string or disable the display formatter option."));
+            c_MessageBox.SetCustomMinHeight(250, 250);
+            c_MessageBox.SetCustomMinWidth(730);
+            c_MessageBox.Execute();
+
+            q_Continue = false;
+         }
+      }
+   }
+
+   if ((this->mpc_ParentDialog != NULL) &&
+       (q_Continue == true))
    {
       this->mpc_ParentDialog->accept();
    }
@@ -597,7 +683,7 @@ void C_SyvDaPeBase::m_CancelClicked(void)
 void C_SyvDaPeBase::m_Browse(void)
 {
    //Set parent for better hierarchy handling via window manager
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, false,
                                                                                  !this->mq_ReadElement, false,
                                                                                  this->mq_ReadElement, true,
@@ -606,7 +692,7 @@ void C_SyvDaPeBase::m_Browse(void)
    //Resize
    c_New->SetSize(QSize(800, 800));
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       const std::vector<C_PuiSvDbNodeDataPoolListElementId> c_DataElements = pc_Dialog->GetSelectedDataElements();
       //Only accept valid selection (assumed if any elements
@@ -621,8 +707,8 @@ void C_SyvDaPeBase::m_Browse(void)
               (this->mq_ReadElement == true)) &&
              (this->mc_DataElement.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT))
          {
-            const C_OSCNodeDataPoolListElement * const pc_Element =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+            const C_OscNodeDataPoolListElement * const pc_Element =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
                                                                           this->mc_DataElement.u32_DataPoolIndex,
                                                                           this->mc_DataElement.u32_ListIndex,
                                                                           this->mc_DataElement.u32_ElementIndex);
@@ -632,9 +718,9 @@ void C_SyvDaPeBase::m_Browse(void)
                {
                   C_PuiSvReadDataConfiguration c_Config;
                   c_Config.u8_RailIndex = 1;
-                  if (((pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64) ||
-                       (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
-                      (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64))
+                  if (((pc_Element->GetType() == C_OscNodeDataPoolContent::eFLOAT64) ||
+                       (pc_Element->GetType() == C_OscNodeDataPoolContent::eSINT64)) ||
+                      (pc_Element->GetType() == C_OscNodeDataPoolContent::eUINT64))
                   {
                      c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
                   }
@@ -667,7 +753,8 @@ void C_SyvDaPeBase::m_Browse(void)
             }
          }
 
-         this->m_InitDataElement(this->mc_DataElement, C_PuiSvDbDataElementScaling());
+         this->m_InitDataElement(this->mc_DataElement,
+                                 C_PuiSvDbDataElementScaling(), C_PuiSvDbDataElementDisplayFormatter());
       }
    }
    //Hide overlay after dialog is not relevant anymore
@@ -687,7 +774,7 @@ void C_SyvDaPeBase::m_Browse(void)
 void C_SyvDaPeBase::m_Clear(void)
 {
    m_ClearDataElement();
-   this->mc_DataElement.MarkInvalid(stw_opensyde_core::C_OSCNodeDataPool::eDIAG, "");
+   this->mc_DataElement.MarkInvalid(stw::opensyde_core::C_OscNodeDataPool::eDIAG, "");
    m_InitNoDataElement();
 }
 
@@ -718,14 +805,14 @@ void C_SyvDaPeBase::m_ClearDataElement()
             tgl_assert(pc_View != NULL);
             if (pc_View != NULL)
             {
-               const QMap<C_OSCNodeDataPoolListElementId,
+               const QMap<C_OscNodeDataPoolListElementId,
                           C_PuiSvReadDataConfiguration>::const_iterator c_ItResult =
                   pc_View->GetReadRailAssignments().find(this->mc_OriginalConfigId);
                tgl_assert(c_ItResult != pc_View->GetReadRailAssignments().end());
                if (c_ItResult != pc_View->GetReadRailAssignments().end())
                {
                   this->mc_OriginalConfigData = c_ItResult.value();
-                  const uint32 u32_Usages = pc_View->CountReadUsage(this->mc_DataElement);
+                  const uint32_t u32_Usages = pc_View->CountReadUsage(this->mc_DataElement);
                   //Allow delete if either no usages
                   // or only usage is by this element (assumed based on initial ID)
                   if ((u32_Usages == 0) ||
@@ -756,7 +843,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
    QPointer<C_OgePopUpDialog> c_New;
    C_SyvDaPeUpdateModeConfiguration * pc_Dialog;
 
-   stw_types::uint32 u32_LabelIndex = 0;
+   uint32_t u32_LabelIndex = 0;
    const C_PuiSvDbDataElement::E_Type e_TYPE = C_PuiSvDbDataElement::eLABEL;
 
    //Before opening the dialog we may need to add the new data element manually so the configuration sees a usage
@@ -777,7 +864,7 @@ void C_SyvDaPeBase::m_Configuration(void) const
             if (pc_Dashboard != NULL)
             {
                tgl_assert(pc_Dashboard->GetLabels().size() > 0UL);
-               u32_LabelIndex = static_cast<uint32>(pc_Dashboard->GetLabels().size()) - 1UL;
+               u32_LabelIndex = static_cast<uint32_t>(pc_Dashboard->GetLabels().size()) - 1UL;
             }
          }
       }
@@ -802,9 +889,9 @@ void C_SyvDaPeBase::m_Configuration(void) const
 
    Q_UNUSED(pc_Dialog)
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
-      this->m_InitDataElement(this->mc_DataElement, this->GetScalingInformation());
+      this->m_InitDataElement(this->mc_DataElement, this->GetScalingInformation(), this->GetFormatterInformation());
    }
 
    //Clean up
@@ -837,20 +924,20 @@ QString C_SyvDaPeBase::m_GetDefaultDisplayName(const C_PuiSvDbNodeDataPoolListEl
 
    if (orc_Id.GetIsValid() == true)
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
                                                                     this->mc_DataElement.u32_DataPoolIndex,
                                                                     this->mc_DataElement.u32_ListIndex,
                                                                     this->mc_DataElement.u32_ElementIndex);
-      const C_OSCNodeDataPool * const pc_Datapool =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
+      const C_OscNodeDataPool * const pc_Datapool =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_Id.u32_NodeIndex,
                                                          orc_Id.u32_DataPoolIndex);
       if (pc_Element != NULL)
       {
          if (pc_Datapool != NULL)
          {
-            if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
-                (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
+            if ((pc_Datapool->e_Type == C_OscNodeDataPool::eHALC) ||
+                (pc_Datapool->e_Type == C_OscNodeDataPool::eHALC_NVM))
             {
                c_Retval = C_PuiSvHandler::h_GetShortNamespace(orc_Id);
             }
@@ -886,8 +973,8 @@ void C_SyvDaPeBase::m_OnUseDefaultScalingChange(void) const
       //Load default values
       if (this->mc_DataElement.GetIsValid() == true)
       {
-         const C_OSCNodeDataPoolListElement * const pc_Element =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+         const C_OscNodeDataPoolListElement * const pc_Element =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
                                                                        this->mc_DataElement.u32_DataPoolIndex,
                                                                        this->mc_DataElement.u32_ListIndex,
                                                                        this->mc_DataElement.u32_ElementIndex);
@@ -921,6 +1008,17 @@ void C_SyvDaPeBase::m_OnUseDefaultScalingChange(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Register change of active display formatter property
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_OnFormatterActiveChange(void) const
+{
+   const bool q_Active = this->mpc_Ui->pc_CheckBoxFormatterActive->isChecked();
+
+   this->mpc_Ui->pc_LineEditFormatterString->setEnabled(q_Active);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize no data element state
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -935,10 +1033,15 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
    this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setVisible(true);
    m_OnUseDefaultScalingChange();
 
+   //Formatter
+   this->mpc_Ui->pc_CheckBoxFormatterActive->setChecked(false);
+   this->mpc_Ui->pc_LineEditFormatterString->setText("");
+   this->m_OnFormatterActiveChange();
+
    //Write mode
    if (this->mq_ReadElement == false)
    {
-      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhsn_INDEX_MANUAL);
+      this->mpc_Ui->pc_ComboBoxTransmissionMode->setCurrentIndex(C_SyvDaPeBase::mhs32_INDEX_MANUAL);
       this->mpc_Ui->pc_ComboBoxTransmissionMode->setEnabled(false);
    }
    else
@@ -950,12 +1053,14 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initialize valid data element state
 
-   \param[in]  orc_Id         Element id to use for default initialization (only used if not invalid)
-   \param[in]  orc_Scaling    Scaling information for default initialization
+   \param[in]  orc_Id               Element id to use for default initialization (only used if not invalid)
+   \param[in]  orc_Scaling          Scaling information for default initialization
+   \param[in]  orc_FormatterConfig  Formatter information for default initialization
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId & orc_Id,
-                                      const C_PuiSvDbDataElementScaling & orc_Scaling) const
+                                      const C_PuiSvDbDataElementScaling & orc_Scaling,
+                                      const C_PuiSvDbDataElementDisplayFormatter & orc_FormatterConfig) const
 {
    if (orc_Id.GetIsValid() == true)
    {
@@ -978,6 +1083,10 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
       this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(orc_Scaling.f64_Factor);
       this->mpc_Ui->pc_LineEditUnit->setText(orc_Scaling.c_Unit);
       m_OnUseDefaultScalingChange();
+
+      this->mpc_Ui->pc_CheckBoxFormatterActive->setChecked(orc_FormatterConfig.q_IsActive);
+      this->mpc_Ui->pc_LineEditFormatterString->setText(orc_FormatterConfig.c_FormatterString);
+      this->m_OnFormatterActiveChange();
 
       //Update mode
       this->mpc_Ui->pc_LabelUpdateMode->setText(c_UpdateModeInfo);

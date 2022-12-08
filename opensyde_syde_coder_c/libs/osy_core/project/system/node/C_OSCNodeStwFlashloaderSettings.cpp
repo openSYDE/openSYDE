@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCNodeStwFlashloaderSettings.h"
+#include "C_OscNodeStwFlashloaderSettings.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +36,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeStwFlashloaderSettings::C_OSCNodeStwFlashloaderSettings(void)
+C_OscNodeStwFlashloaderSettings::C_OscNodeStwFlashloaderSettings(void)
 {
    this->Initialize();
 }
@@ -47,7 +47,7 @@ C_OSCNodeStwFlashloaderSettings::C_OSCNodeStwFlashloaderSettings(void)
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeStwFlashloaderSettings::Initialize(void)
+void C_OscNodeStwFlashloaderSettings::Initialize(void)
 {
    q_ResetMessageActive = false;
    q_ResetMessageExtendedId = false;
@@ -64,12 +64,13 @@ void C_OSCNodeStwFlashloaderSettings::Initialize(void)
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeStwFlashloaderSettings::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeStwFlashloaderSettings::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_ResetMessageActive, sizeof(this->q_ResetMessageActive), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_ResetMessageExtendedId, sizeof(this->q_ResetMessageExtendedId),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ResetMessageId, sizeof(this->u32_ResetMessageId), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_ResetMessageDlc, sizeof(this->u8_ResetMessageDlc), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->c_Data[0], static_cast<uint32>(this->c_Data.size()), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_ResetMessageActive, sizeof(this->q_ResetMessageActive),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_ResetMessageExtendedId, sizeof(this->q_ResetMessageExtendedId),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_ResetMessageId, sizeof(this->u32_ResetMessageId), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_ResetMessageDlc, sizeof(this->u8_ResetMessageDlc), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->c_Data[0], static_cast<uint32_t>(this->c_Data.size()), oru32_HashValue);
 }

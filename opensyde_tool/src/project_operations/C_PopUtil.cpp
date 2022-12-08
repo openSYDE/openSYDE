@@ -8,26 +8,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QFileInfo>
 
-#include "C_PopErrorHandling.h"
-#include "C_PopUtil.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OgePopUpDialog.h"
-#include "C_PopSaveAsDialogWidget.h"
+#include "C_PopErrorHandling.hpp"
+#include "C_PopUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_PopSaveAsDialogWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,15 +65,15 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Unsaved changes"));
       if (oq_AllowContinueWithoutSaving == true)
       {
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Save"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Don't Save"));
+         c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Save"));
+         c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Don't Save"));
          c_MessageBox.ShowCancelButton();
       }
       else
       {
          c_Description = C_GtGetText::h_GetText("To continue the current project changes have to be saved. ");
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Save and Continue"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+         c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Save and Continue"));
+         c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
       }
       c_Description +=
          static_cast<QString>(C_GtGetText::h_GetText("Do you want to save the changes of the current project"));
@@ -96,10 +95,10 @@ bool C_PopUtil::h_AskUserToContinue(QWidget * const opc_Parent, const bool oq_Al
          if (C_PuiProject::h_GetInstance()->IsEmptyProject() == true)
          {
             // open save as dialog
-            QPointer<stw_opensyde_gui_elements::C_OgePopUpDialog> const c_New =
-               new stw_opensyde_gui_elements::C_OgePopUpDialog(opc_Parent, opc_Parent);
+            const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> c_New =
+               new stw::opensyde_gui_elements::C_OgePopUpDialog(opc_Parent, opc_Parent);
             C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
-            if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+            if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
             {
                q_Return = true;
                // TODO trigger update of window title...
@@ -176,7 +175,7 @@ bool C_PopUtil::h_CheckCriticalNamingConflict(QWidget * const opc_Parent, const 
       if (c_CriticalNodeNames.size() > 0UL)
       {
          c_Details.append(C_GtGetText::h_GetText("Conflicting node names:\n"));
-         for (uint32 u32_ItName = 0UL; u32_ItName < c_CriticalNodeNames.size(); ++u32_ItName)
+         for (uint32_t u32_ItName = 0UL; u32_ItName < c_CriticalNodeNames.size(); ++u32_ItName)
          {
             c_Details.append(static_cast<QString>("\"%1\"\n").arg(c_CriticalNodeNames[u32_ItName]));
          }
@@ -184,7 +183,7 @@ bool C_PopUtil::h_CheckCriticalNamingConflict(QWidget * const opc_Parent, const 
       if (c_CriticalBusNames.size() > 0UL)
       {
          c_Details.append(C_GtGetText::h_GetText("Conflicting bus names:\n"));
-         for (uint32 u32_ItName = 0UL; u32_ItName < c_CriticalBusNames.size(); ++u32_ItName)
+         for (uint32_t u32_ItName = 0UL; u32_ItName < c_CriticalBusNames.size(); ++u32_ItName)
          {
             c_Details.append(static_cast<QString>("\"%1\"\n").arg(c_CriticalBusNames[u32_ItName]));
          }
@@ -192,7 +191,7 @@ bool C_PopUtil::h_CheckCriticalNamingConflict(QWidget * const opc_Parent, const 
       if (c_CriticalDatapoolNamespaceNames.size() > 0UL)
       {
          c_Details.append(C_GtGetText::h_GetText("Conflicting datapool names:\n"));
-         for (uint32 u32_ItName = 0UL; u32_ItName < c_CriticalDatapoolNamespaceNames.size(); ++u32_ItName)
+         for (uint32_t u32_ItName = 0UL; u32_ItName < c_CriticalDatapoolNamespaceNames.size(); ++u32_ItName)
          {
             c_Details.append(static_cast<QString>("%1\n").arg(c_CriticalDatapoolNamespaceNames[u32_ItName]));
          }

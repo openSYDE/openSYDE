@@ -10,29 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileDialog>
 
-#include "C_CamMosDatabaseItemWidget.h"
+#include "C_CamMosDatabaseItemWidget.hpp"
 #include "ui_C_CamMosDatabaseItemWidget.h"
 
-#include "C_OgePopUpDialog.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "constants.h"
-#include "C_CamMosDatabaseBusSelectionPopup.h"
-#include "C_UsHandler.h"
-#include "C_CamProHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_CamUti.h"
+#include "C_OgePopUpDialog.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "C_CamMosDatabaseBusSelectionPopup.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_CamUti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,7 +56,7 @@ using namespace stw_types;
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseItemWidget::C_CamMosDatabaseItemWidget(const C_CamProDatabaseData & orc_Database,
                                                        QWidget * const opc_Parent) :
-   stw_opensyde_gui_elements::C_OgeWiOnlyBackground(opc_Parent),
+   stw::opensyde_gui_elements::C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosDatabaseItemWidget),
    me_State(eLOADING),
    mq_AlreadyAskedUserReload(true),
@@ -230,9 +229,9 @@ void C_CamMosDatabaseItemWidget::SetState(const C_CamMosDatabaseItemWidget::E_Lo
    \param[in]  ou32_BusIndex  bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32 ou32_BusIndex)
+void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32_t ou32_BusIndex)
 {
-   this->mc_Database.s32_BusIndex = static_cast<sint32>(ou32_BusIndex);
+   this->mc_Database.s32_BusIndex = static_cast<int32_t>(ou32_BusIndex);
    this->UpdateTooltip();
 }
 
@@ -242,7 +241,7 @@ void C_CamMosDatabaseItemWidget::SetBusIndex(const uint32 ou32_BusIndex)
    \param[in]  orc_Busses  buses
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseItemWidget::SetBusses(const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses)
+void C_CamMosDatabaseItemWidget::SetBusses(const std::vector<stw::opensyde_core::C_OscSystemBus> & orc_Busses)
 {
    this->mc_Busses = orc_Busses;
 }
@@ -263,7 +262,7 @@ void C_CamMosDatabaseItemWidget::UpdateTooltip(void) const
    }
 
    if ((this->mc_Database.s32_BusIndex > -1) &&
-       (this->mc_Database.s32_BusIndex < static_cast<sint32>(this->mc_Busses.size())) &&
+       (this->mc_Database.s32_BusIndex < static_cast<int32_t>(this->mc_Busses.size())) &&
        (static_cast<QFileInfo>(c_AbsolutePath).suffix().compare("syde_sysdef", Qt::CaseInsensitive) == 0))
    {
       c_ToolTipContent += "\n\n";
@@ -324,8 +323,8 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
                   static_cast<QString>(C_GtGetText::h_GetText(
                                           "Database %1 changed on disk. Do you want to reload this database?")).
                   arg(c_File.absoluteFilePath()));
-               c_Message.SetOKButtonText(C_GtGetText::h_GetText("Reload"));
-               c_Message.SetNOButtonText(C_GtGetText::h_GetText("Don't reload!"));
+               c_Message.SetOkButtonText(C_GtGetText::h_GetText("Reload"));
+               c_Message.SetNoButtonText(C_GtGetText::h_GetText("Don't reload!"));
 
                if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
                {
@@ -362,7 +361,7 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
             c_Message.SetHeading(C_GtGetText::h_GetText("File not found"));
             c_Message.SetDescription(c_Description);
             c_Message.SetDetails(c_Details);
-            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
+            c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
             c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Keep"));
             if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
             {
@@ -450,7 +449,7 @@ QString C_CamMosDatabaseItemWidget::h_BrowseForDatabasePath(QWidget * const opc_
    c_Dialog.setDefaultSuffix(".syde_sysdef");
    c_Dialog.setFileMode(QFileDialog::ExistingFile);
 
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Dialog.exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Return = c_Dialog.selectedFiles().at(0); // always absolute so no problems
       // "" is returned if user canceled
@@ -530,7 +529,7 @@ bool C_CamMosDatabaseItemWidget::h_IsDatabaseAlreadyUsed(const QString & orc_Abs
    bool q_Return = false;
 
    // check if database already exists
-   for (uint32 u32_Pos = 0; u32_Pos < C_CamProHandler::h_GetInstance()->GetDatabases().size(); u32_Pos++)
+   for (uint32_t u32_Pos = 0; u32_Pos < C_CamProHandler::h_GetInstance()->GetDatabases().size(); u32_Pos++)
    {
       if (C_CamUti::h_GetAbsPathFromProj(C_CamProHandler::h_GetInstance()->GetDatabases()[u32_Pos].c_Name) ==
           orc_AbsolutePath) // compare absolute paths
@@ -598,7 +597,7 @@ void C_CamMosDatabaseItemWidget::m_OnSelectBus()
    c_New->SetSize(QSize(700, 400));
 
    // Update settings on accept
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       // remember selected bus and update data handling later on success (signal handled by database widget)
       this->mc_Database.s32_BusIndex = pc_Dialog->GetSelectedBus();
@@ -640,7 +639,7 @@ void C_CamMosDatabaseItemWidget::m_OnBrowse()
          c_Message.SetHeading(C_GtGetText::h_GetText("Database replace"));
          c_Message.SetDescription(c_Description);
          c_Message.SetDetails(c_Details);
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Replace"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Replace"));
          c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Keep"));
          if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
          {

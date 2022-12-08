@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QEvent>
 #include <QHelpEvent>
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_SdNdeDpListHeaderUsageWidget.h"
+#include "C_SdNdeDpListHeaderUsageWidget.hpp"
 
-#include "C_Uti.h"
-#include "C_GtGetText.h"
+#include "C_Uti.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,7 +56,7 @@ C_SdNdeDpListHeaderUsageWidget::C_SdNdeDpListHeaderUsageWidget(QWidget * const o
    mq_ErrorToolTip(false)
 {
    // set default inactive color
-   this->SetColorFree(stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 20));
+   this->SetColorFree(stw::opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 20));
    this->SetColorReserved(mc_STYLE_GUIDE_COLOR_7);
    this->SetColorTooMuch(mc_STYLE_GUIDE_COLOR_24);
 
@@ -85,9 +84,9 @@ C_SdNdeDpListHeaderUsageWidget::~C_SdNdeDpListHeaderUsageWidget()
    Calculated percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDpListHeaderUsageWidget::SetUsage(const uint32 ou32_Size, const uint32 ou32_Used)
+uint32_t C_SdNdeDpListHeaderUsageWidget::SetUsage(const uint32_t ou32_Size, const uint32_t ou32_Used)
 {
-   uint32 u32_Percentage;
+   uint32_t u32_Percentage;
    bool q_Full = false;
 
    // Calculate the percentage
@@ -132,6 +131,8 @@ uint32 C_SdNdeDpListHeaderUsageWidget::SetUsage(const uint32 ou32_Size, const ui
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListHeaderUsageWidget::event(QEvent * const opc_Event)
 {
+   bool q_Result;
+
    if ((opc_Event->type() == QEvent::ToolTip) && (this->mq_ActivateToolTip == true))
    {
       //show tooltip
@@ -169,7 +170,7 @@ bool C_SdNdeDpListHeaderUsageWidget::event(QEvent * const opc_Event)
       }
 
       opc_Event->accept();
-      return true;
+      q_Result = true;
    }
    else if (opc_Event->type() == QEvent::Leave)
    {
@@ -180,12 +181,13 @@ bool C_SdNdeDpListHeaderUsageWidget::event(QEvent * const opc_Event)
       }
 
       opc_Event->accept();
-      return true;
+      q_Result = true;
    }
    else
    {
-      return QWidget::event(opc_Event);
+      q_Result = QWidget::event(opc_Event);
    }
+   return q_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

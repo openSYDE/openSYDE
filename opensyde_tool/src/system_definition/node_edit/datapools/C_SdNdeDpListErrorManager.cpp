@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeDpListErrorManager.h"
-#include "C_PuiSdHandler.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeDpListErrorManager.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,13 +51,13 @@ C_SdNdeDpListErrorManager::C_SdNdeDpListErrorManager(void) :
    \param[in] oru32_DataPoolIndex Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListErrorManager::Init(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex)
+void C_SdNdeDpListErrorManager::Init(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex)
 {
-   const C_OSCNode * pc_Node;
+   const C_OscNode * pc_Node;
 
    this->mu32_NodeIndex = oru32_NodeIndex;
    this->mu32_DataPoolIndex = oru32_DataPoolIndex;
-   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    if (pc_Node != NULL)
    {
       pc_Node->CheckErrorDataPool(this->mu32_DataPoolIndex, NULL, NULL, &this->mq_ErrorInList, NULL, NULL);
@@ -72,7 +71,7 @@ void C_SdNdeDpListErrorManager::Init(const uint32 & oru32_NodeIndex, const uint3
 void C_SdNdeDpListErrorManager::OnErrorChange(void)
 {
    const bool q_PreviousErrorState = this->mq_ErrorInList;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {

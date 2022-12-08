@@ -12,13 +12,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeWiBorder.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiBorder.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,7 +56,7 @@ C_OgeWiBorder::C_OgeWiBorder(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiBorder::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }

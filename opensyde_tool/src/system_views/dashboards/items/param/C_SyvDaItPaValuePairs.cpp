@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaItPaValuePairs.h"
+#include "C_SyvDaItPaValuePairs.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +47,7 @@ C_SyvDaItPaValuePairs::C_SyvDaItPaValuePairs(void) :
    \param[in] oq_Changed   Flag if expected value was marked as changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItPaValuePairs::C_SyvDaItPaValuePairs(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Expected,
+C_SyvDaItPaValuePairs::C_SyvDaItPaValuePairs(const stw::opensyde_core::C_OscNodeDataPoolContent & orc_Expected,
                                              const bool oq_Changed) :
    q_Changed(oq_Changed),
    c_Expected(orc_Expected),

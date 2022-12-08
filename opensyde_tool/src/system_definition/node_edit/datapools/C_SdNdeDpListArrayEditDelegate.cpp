@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QPainter>
-#include "C_SdNdeDpContentUtil.h"
-#include "C_SdNdeDpListArrayEditDelegate.h"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_SdNdeDpListArrayEditDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -143,35 +142,35 @@ QWidget * C_SdNdeDpListArrayEditDelegate::m_CreateEditor(QWidget * const opc_Par
       if (this->mpc_Model != NULL)
       {
          //Core data
-         const C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOSCElement();
+         const C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOscElement();
          if (pc_Element != NULL)
          {
             if (this->mpc_Model->GetArrayEditType() == C_SdNdeDpUtil::eARRAY_EDIT_MIN)
             {
                //Adapt min
-               C_OSCNodeDataPoolContent c_NewMin = pc_Element->c_MinValue;
+               C_OscNodeDataPoolContent c_NewMin = pc_Element->c_MinValue;
                C_SdNdeDpContentUtil::h_InitMin(c_NewMin);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, c_NewMin,
                                                                 pc_Element->c_MaxValue, pc_Element->f64_Factor,
                                                                 pc_Element->f64_Offset,
-                                                                static_cast<uint32>(orc_Index.column()), false);
+                                                                static_cast<uint32_t>(orc_Index.column()), false);
             }
             else if (this->mpc_Model->GetArrayEditType() == C_SdNdeDpUtil::eARRAY_EDIT_MAX)
             {
                //Adapt max
-               C_OSCNodeDataPoolContent c_NewMax = pc_Element->c_MaxValue;
+               C_OscNodeDataPoolContent c_NewMax = pc_Element->c_MaxValue;
                C_SdNdeDpContentUtil::h_InitMax(c_NewMax);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
                                                                 c_NewMax, pc_Element->f64_Factor,
                                                                 pc_Element->f64_Offset,
-                                                                static_cast<uint32>(orc_Index.column()), false);
+                                                                static_cast<uint32_t>(orc_Index.column()), false);
             }
             else
             {
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
                                                                 pc_Element->c_MaxValue, pc_Element->f64_Factor,
                                                                 pc_Element->f64_Offset,
-                                                                static_cast<uint32>(orc_Index.column()), false);
+                                                                static_cast<uint32_t>(orc_Index.column()), false);
             }
          }
       }

@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMetWidget.h"
+#include "C_CamMetWidget.hpp"
 #include "ui_C_CamMetWidget.h"
 
-#include "stwerrors.h"
-#include "C_Uti.h"
-#include "C_CamOgeWiSectionHeader.h"
-#include "C_GtGetText.h"
-#include "C_OSCSystemBus.h"
+#include "stwerrors.hpp"
+#include "C_Uti.hpp"
+#include "C_CamOgeWiSectionHeader.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscSystemBus.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ C_CamMetWidget::C_CamMetWidget(QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMetWidget),
    mq_OsySysDef(false),
-   ms32_CANBitrate(0)
+   ms32_CanBitrate(0)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -168,10 +167,10 @@ void C_CamMetWidget::SearchPrev(void) const
 void C_CamMetWidget::ClearData(void)
 {
    this->mpc_Ui->pc_TraceView->ActionClearData();
-   this->mpc_Ui->pc_StatusWidget->SetBusLoad(0U, this->ms32_CANBitrate);
+   this->mpc_Ui->pc_StatusWidget->SetBusLoad(0U, this->ms32_CanBitrate);
    this->mpc_Ui->pc_StatusWidget->SetFilteredMessages(0U);
 
-   // transmit information is resetted by data reset (C_OSCComDriverBase::StopLogging)
+   // transmit information is resetted by data reset (C_OscComDriverBase::StopLogging)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -221,7 +220,7 @@ void C_CamMetWidget::RemoveAllFilters(void)
    \param[in]  ou32_ActiveFilters   Count of active filters
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters) const
+void C_CamMetWidget::SetActiveFilters(const uint32_t ou32_ActiveFilters) const
 {
    this->mpc_Ui->pc_StatusWidget->SetActiveFilters(ou32_ActiveFilters);
 }
@@ -236,16 +235,16 @@ void C_CamMetWidget::SetActiveFilters(const stw_types::uint32 ou32_ActiveFilters
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddDatabaseOsySysDef(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
-                                          const sint32 os32_BusIndex)
+                                          const int32_t os32_BusIndex)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    Q_UNUSED(orc_OrgPath)
 
    if (os32_BusIndex >= 0)
    {
       s32_Return = this->mpc_Ui->pc_TraceView->StartAddOsySysDef(orc_PathSystemDefinition.toStdString().c_str(),
-                                                                 static_cast<uint32>(os32_BusIndex));
+                                                                 static_cast<uint32_t>(os32_BusIndex));
    }
    else
    {
@@ -267,7 +266,7 @@ void C_CamMetWidget::AddDatabaseOsySysDef(const QString & orc_PathSystemDefiniti
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddDatabaseDbc(const QString & orc_PathDbc)
 {
-   const sint32 s32_Return = this->mpc_Ui->pc_TraceView->StartAddDbcFile(orc_PathDbc.toStdString().c_str());
+   const int32_t s32_Return = this->mpc_Ui->pc_TraceView->StartAddDbcFile(orc_PathDbc.toStdString().c_str());
 
    if (s32_Return == C_NO_ERR)
    {
@@ -319,9 +318,9 @@ void C_CamMetWidget::ActivateDatabase(const QString & orc_PathDatabase, const QS
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefinition, const QString & orc_OrgPath,
-                                             const stw_types::uint32 ou32_BusIndex)
+                                             const uint32_t ou32_BusIndex)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    Q_UNUSED(orc_OrgPath)
 
@@ -338,7 +337,7 @@ void C_CamMetWidget::SetDatabaseOsySysDefBus(const QString & orc_PathSystemDefin
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddLogFileAsc(const QString & orc_FilePath)
 {
-   const sint32 s32_Result =
+   const int32_t s32_Result =
       this->mpc_Ui->pc_TraceView->AddLogFileAsc(orc_FilePath.toStdString().c_str(),
                                                 this->mpc_Ui->pc_TraceView->GetDisplayAsHex(),
                                                 this->mpc_Ui->pc_TraceView->GetDisplayTimestampRelative());
@@ -354,7 +353,7 @@ void C_CamMetWidget::AddLogFileAsc(const QString & orc_FilePath)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::AddLogFileBlf(const QString & orc_FilePath)
 {
-   const sint32 s32_Result = this->mpc_Ui->pc_TraceView->AddLogFileBlf(orc_FilePath.toStdString().c_str());
+   const int32_t s32_Result = this->mpc_Ui->pc_TraceView->AddLogFileBlf(orc_FilePath.toStdString().c_str());
 
    Q_EMIT (this->SigLogFileAddResult(s32_Result));
 }
@@ -375,7 +374,7 @@ void C_CamMetWidget::RemoveAllLogFiles(void) const
    Pointer to message logger
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_SyvComMessageMonitor * C_CamMetWidget::GetMessageMonitor(void) const
+stw::opensyde_gui_logic::C_SyvComMessageMonitor * C_CamMetWidget::GetMessageMonitor(void) const
 {
    return this->mpc_Ui->pc_TraceView;
 }
@@ -397,7 +396,7 @@ void C_CamMetWidget::m_StartLogging(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::m_StatusBarTimer(void)
 {
-   this->mpc_Ui->pc_StatusWidget->SetBusLoad(this->mpc_Ui->pc_TraceView->GetBusLoad(), this->ms32_CANBitrate);
+   this->mpc_Ui->pc_StatusWidget->SetBusLoad(this->mpc_Ui->pc_TraceView->GetBusLoad(), this->ms32_CanBitrate);
    this->mpc_Ui->pc_StatusWidget->SetTransmittedMessages(this->mpc_Ui->pc_TraceView->GetTxCount());
    this->mpc_Ui->pc_StatusWidget->SetTxErrors(this->mpc_Ui->pc_TraceView->GetTxErrors());
    this->mpc_Ui->pc_StatusWidget->SetFilteredMessages(this->mpc_Ui->pc_TraceView->GetFilteredMessages());
@@ -411,8 +410,8 @@ void C_CamMetWidget::m_StatusBarTimer(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetWidget::m_DatabaseTimer(void)
 {
-   sint32 s32_ThreadResult;
-   sint32 s32_Return;
+   int32_t s32_ThreadResult;
+   int32_t s32_Return;
 
    s32_Return = this->mpc_Ui->pc_TraceView->GetResults(s32_ThreadResult);
 
@@ -428,7 +427,7 @@ void C_CamMetWidget::m_DatabaseTimer(void)
       }
       else
       {
-         std::vector<stw_opensyde_core::C_OSCSystemBus> c_Busses;
+         std::vector<stw::opensyde_core::C_OscSystemBus> c_Busses;
          this->mpc_Ui->pc_TraceView->GetResultBusses(c_Busses);
 
          // openSYDE system definition
@@ -443,7 +442,7 @@ void C_CamMetWidget::m_DatabaseTimer(void)
    \param[in]  os32_Value  New bitrate
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetWidget::SetCANBitrate(const sint32 os32_Value)
+void C_CamMetWidget::SetCanBitrate(const int32_t os32_Value)
 {
-   ms32_CANBitrate = os32_Value;
+   ms32_CanBitrate = os32_Value;
 }

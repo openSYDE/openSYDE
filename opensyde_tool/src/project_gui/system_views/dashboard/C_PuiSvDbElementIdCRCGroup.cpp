@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvDbElementIdCRCGroup.h"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvDbElementIdCrcGroup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +38,7 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbElementIdCRCGroup::C_PuiSvDbElementIdCRCGroup() :
+C_PuiSvDbElementIdCrcGroup::C_PuiSvDbElementIdCrcGroup() :
    mu32_Crc(0U)
 {
 }
@@ -54,9 +53,9 @@ C_PuiSvDbElementIdCRCGroup::C_PuiSvDbElementIdCRCGroup() :
    \retval   C_CONFIG   ID not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbElementIdCRCGroup::UpdateCRC(void)
+int32_t C_PuiSvDbElementIdCrcGroup::UpdateCrc(void)
 {
-   return this->m_CalcCRC(this->mu32_Crc);
+   return this->m_CalcCrc(this->mu32_Crc);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -70,14 +69,14 @@ sint32 C_PuiSvDbElementIdCRCGroup::UpdateCRC(void)
    \retval   C_CONFIG     ID not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbElementIdCRCGroup::CheckCRC() const
+int32_t C_PuiSvDbElementIdCrcGroup::CheckCrc() const
 {
-   sint32 s32_Retval = C_NO_ERR;
-   uint32 u32_NewCRC;
+   int32_t s32_Retval = C_NO_ERR;
+   uint32_t u32_NewCrc;
 
-   if (this->m_CalcCRC(u32_NewCRC) == C_NO_ERR)
+   if (this->m_CalcCrc(u32_NewCrc) == C_NO_ERR)
    {
-      if (u32_NewCRC != this->mu32_Crc)
+      if (u32_NewCrc != this->mu32_Crc)
       {
          s32_Retval = C_CHECKSUM;
       }
@@ -96,7 +95,7 @@ sint32 C_PuiSvDbElementIdCRCGroup::CheckCRC() const
    CRC
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSvDbElementIdCRCGroup::GetCRC(void) const
+uint32_t C_PuiSvDbElementIdCrcGroup::GetCrc(void) const
 {
    return this->mu32_Crc;
 }
@@ -104,12 +103,12 @@ uint32 C_PuiSvDbElementIdCRCGroup::GetCRC(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set CRC
 
-   \param[in]  ou32_CRC    CRC
+   \param[in]  ou32_Crc    CRC
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbElementIdCRCGroup::SetCRC(const uint32 ou32_CRC)
+void C_PuiSvDbElementIdCrcGroup::SetCrc(const uint32_t ou32_Crc)
 {
-   this->mu32_Crc = ou32_CRC;
+   this->mu32_Crc = ou32_Crc;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -119,7 +118,7 @@ void C_PuiSvDbElementIdCRCGroup::SetCRC(const uint32 ou32_CRC)
    Element id
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvDbNodeDataPoolListElementId & C_PuiSvDbElementIdCRCGroup::GetElementId() const
+const C_PuiSvDbNodeDataPoolListElementId & C_PuiSvDbElementIdCrcGroup::GetElementId() const
 {
    return this->mc_ElementId;
 }
@@ -130,7 +129,7 @@ const C_PuiSvDbNodeDataPoolListElementId & C_PuiSvDbElementIdCRCGroup::GetElemen
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbElementIdCRCGroup::SetElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_Value)
+void C_PuiSvDbElementIdCrcGroup::SetElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_Value)
 {
    this->mc_ElementId = orc_Value;
 }
@@ -147,41 +146,41 @@ void C_PuiSvDbElementIdCRCGroup::SetElementId(const C_PuiSvDbNodeDataPoolListEle
    \retval   C_CONFIG   ID not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbElementIdCRCGroup::m_CalcCRC(uint32 & oru32_Result) const
+int32_t C_PuiSvDbElementIdCrcGroup::m_CalcCrc(uint32_t & oru32_Result) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    oru32_Result = 0xFFFFFFFFU;
 
    if (this->mc_ElementId.GetIsValid())
    {
-      const C_OSCNodeDataPoolListElement * const pc_OSCListElement =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_ElementId.u32_NodeIndex,
+      const C_OscNodeDataPoolListElement * const pc_OscListElement =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_ElementId.u32_NodeIndex,
                                                                     this->mc_ElementId.u32_DataPoolIndex,
                                                                     this->mc_ElementId.u32_ListIndex,
                                                                     this->mc_ElementId.u32_ElementIndex);
-      const C_PuiSdNodeDataPoolListElement * const pc_UIListElement =
-         C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(this->mc_ElementId.u32_NodeIndex,
+      const C_PuiSdNodeDataPoolListElement * const pc_UiListElement =
+         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(this->mc_ElementId.u32_NodeIndex,
                                                                    this->mc_ElementId.u32_DataPoolIndex,
                                                                    this->mc_ElementId.u32_ListIndex,
                                                                    this->mc_ElementId.u32_ElementIndex);
 
-      if ((pc_OSCListElement != NULL) && (pc_UIListElement != NULL))
+      if ((pc_OscListElement != NULL) && (pc_UiListElement != NULL))
       {
-         const uint32 u32_Val = pc_OSCListElement->GetArraySize();
+         const uint32_t u32_Val = pc_OscListElement->GetArraySize();
          //Data element core
          if (this->mc_ElementId.GetUseArrayElementIndex())
          {
-            pc_OSCListElement->CalcHashElement(oru32_Result, this->mc_ElementId.GetArrayElementIndexOrZero());
+            pc_OscListElement->CalcHashElement(oru32_Result, this->mc_ElementId.GetArrayElementIndexOrZero());
          }
          else
          {
-            pc_OSCListElement->CalcHash(oru32_Result);
+            pc_OscListElement->CalcHash(oru32_Result);
          }
          //Include array size
-         stw_scl::C_SCLChecksums::CalcCRC32(&u32_Val, sizeof(u32_Val), oru32_Result);
+         stw::scl::C_SclChecksums::CalcCRC32(&u32_Val, sizeof(u32_Val), oru32_Result);
          //Data element UI
-         pc_UIListElement->CalcHash(oru32_Result);
+         pc_UiListElement->CalcHash(oru32_Result);
       }
       else
       {
@@ -190,12 +189,12 @@ sint32 C_PuiSvDbElementIdCRCGroup::m_CalcCRC(uint32 & oru32_Result) const
       //Signal part
       if (this->mc_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)
       {
-         C_OSCCanMessageIdentificationIndices c_MessageId;
-         uint32 u32_SignalIndex;
+         C_OscCanMessageIdentificationIndices c_MessageId;
+         uint32_t u32_SignalIndex;
          C_PuiSdHandler::h_GetInstance()->ConvertElementIndexToSignalIndex(this->mc_ElementId, c_MessageId,
                                                                            u32_SignalIndex);
          {
-            const C_OSCCanSignal * const pc_Signal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(c_MessageId,
+            const C_OscCanSignal * const pc_Signal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(c_MessageId,
                                                                                                    u32_SignalIndex);
 
             if (pc_Signal != NULL)

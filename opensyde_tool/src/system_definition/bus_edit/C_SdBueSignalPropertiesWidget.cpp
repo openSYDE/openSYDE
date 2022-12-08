@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <limits>
@@ -18,40 +18,39 @@
 #include <QSpinBox>
 #include <QAbstractItemView>
 
-#include "TGLUtils.h"
-#include "C_SdUtil.h"
-#include "constants.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdTooltipUtil.h"
-#include "C_OgeSpxInt64Table.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_OSCNodeDataPoolContentUtil.h"
-#include "C_SdBueSignalPropertiesWidget.h"
+#include "TglUtils.hpp"
+#include "C_SdUtil.hpp"
+#include "constants.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdTooltipUtil.hpp"
+#include "C_OgeSpxInt64Table.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
+#include "C_SdBueSignalPropertiesWidget.hpp"
 #include "ui_C_SdBueSignalPropertiesWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 ms32_BYTE_ORDER_INDEX_INTEL = 0;
-const sint32 ms32_BYTE_ORDER_INDEX_MOTOROLA = 1;
+const int32_t ms32_BYTE_ORDER_INDEX_INTEL = 0;
+const int32_t ms32_BYTE_ORDER_INDEX_MOTOROLA = 1;
 
-const sint32 ms32_MUX_DEFAULT = 0;
-const sint32 ms32_MUX_MULTIPLEXER_SIGNAL = 1;
-const sint32 ms32_MUX_MULTIPLEXED_SIGNAL = 2;
+const int32_t ms32_MUX_DEFAULT = 0;
+const int32_t ms32_MUX_MULTIPLEXER_SIGNAL = 1;
+const int32_t ms32_MUX_MULTIPLEXED_SIGNAL = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -75,7 +74,7 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueSignalPropertiesWidget),
    mpc_MessageSyncManager(NULL),
-   me_ComProtocol(C_OSCCanProtocol::eLAYER2),
+   me_ComProtocol(C_OscCanProtocol::eLAYER2),
    mu32_SignalIndex(0U),
    me_DataType(eTY_UNSIGNED)
 {
@@ -101,7 +100,7 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540}  no memory leak because of the mpc_MessageSyncManager because of handling it on an other position
-C_SdBueSignalPropertiesWidget::~C_SdBueSignalPropertiesWidget(void)
+C_SdBueSignalPropertiesWidget::~C_SdBueSignalPropertiesWidget(void) noexcept
 {
    delete mpc_Ui;
 }
@@ -144,17 +143,17 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxType->addItem("3");
    this->mpc_Ui->pc_ComboBoxType->addItem("4");
    //Ensure the indices match the text
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_UNSIGNED),
-                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_UNSIGNED),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eUINT8));
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_SIGNED),
-                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_SIGNED),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eSINT8));
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_FLOAT32),
-                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_FLOAT32),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eFLOAT32));
-   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<sintn>(eTY_FLOAT64),
-                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OSCNodeDataPoolContent::
+   this->mpc_Ui->pc_ComboBoxType->setItemText(static_cast<int32_t>(eTY_FLOAT64),
+                                              C_SdTooltipUtil::h_ConvertTypeToNameSimplified(C_OscNodeDataPoolContent::
                                                                                              eFLOAT64));
 
    //Ensure there are two items
@@ -162,9 +161,9 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxByteOrder->addItem("2");
    //Ensure the indices match the text
    this->mpc_Ui->pc_ComboBoxByteOrder->setItemText(ms32_BYTE_ORDER_INDEX_INTEL,
-                                                   C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::eBYTE_ORDER_INTEL));
+                                                   C_SdUtil::h_ConvertByteOrderToName(C_OscCanSignal::eBYTE_ORDER_INTEL));
    this->mpc_Ui->pc_ComboBoxByteOrder->setItemText(ms32_BYTE_ORDER_INDEX_MOTOROLA,
-                                                   C_SdUtil::h_ConvertByteOrderToName(C_OSCCanSignal::
+                                                   C_SdUtil::h_ConvertByteOrderToName(C_OscCanSignal::
                                                                                       eBYTE_ORDER_MOTOROLA));
 
    //Ensure there are three items
@@ -272,7 +271,7 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::SetMessageSyncManager(
-   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
+   stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_MessageSyncManager = opc_Value;
 }
@@ -286,8 +285,8 @@ void C_SdBueSignalPropertiesWidget::SetMessageSyncManager(
    \param[in]  ou32_SignalIndex  New signal id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                const uint32 ou32_SignalIndex)
+void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                const uint32_t ou32_SignalIndex)
 {
    this->mc_MessageId = orc_MessageId;
    this->mu32_SignalIndex = ou32_SignalIndex;
@@ -302,9 +301,9 @@ void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OSCCanMessageIdentificat
    \param[in]  oe_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::SetComProtocol(const C_OSCCanProtocol::E_Type oe_Value)
+void C_SdBueSignalPropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Type oe_Value)
 {
-   const bool q_CanOpenActive = (oe_Value == C_OSCCanProtocol::eCAN_OPEN);
+   const bool q_CanOpenActive = (oe_Value == C_OscCanProtocol::eCAN_OPEN);
 
    this->me_ComProtocol = oe_Value;
 
@@ -331,7 +330,7 @@ void C_SdBueSignalPropertiesWidget::ReloadPosition(void)
    Current message id
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_core::C_OSCCanMessageIdentificationIndices C_SdBueSignalPropertiesWidget::GetMessageId(void) const
+stw::opensyde_core::C_OscCanMessageIdentificationIndices C_SdBueSignalPropertiesWidget::GetMessageId(void) const
 {
    return mc_MessageId;
 }
@@ -343,7 +342,7 @@ stw_opensyde_core::C_OSCCanMessageIdentificationIndices C_SdBueSignalPropertiesW
    Current signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdBueSignalPropertiesWidget::GetSignalIndex(void) const
+uint32_t C_SdBueSignalPropertiesWidget::GetSignalIndex(void) const
 {
    return this->mu32_SignalIndex;
 }
@@ -374,7 +373,8 @@ void C_SdBueSignalPropertiesWidget::RecheckMessagePosition(void)
    \param[in]  ou32_InterfaceIndex  Interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
+void C_SdBueSignalPropertiesWidget::OnNodeDisconnected(const uint32_t ou32_NodeIndex,
+                                                       const uint32_t ou32_InterfaceIndex)
 {
    if ((this->mpc_MessageSyncManager != NULL) &&
        (this->mc_MessageId.u32_NodeIndex == ou32_NodeIndex) &&
@@ -394,48 +394,48 @@ void C_SdBueSignalPropertiesWidget::OnNodeDisconnected(const uint32 ou32_NodeInd
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
 {
-   const C_OSCCanMessage * const pc_OSCMessage = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OscCanMessage * const pc_OscMessage = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
    const C_PuiSdNodeCanSignal * const pc_UiSignal = C_PuiSdHandler::h_GetInstance()->GetUiCanSignal(this->mc_MessageId,
                                                                                                     this->mu32_SignalIndex);
-   const C_OSCNodeDataPoolListElement * const pc_OSCSignalCommon =
-      C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(this->mc_MessageId, this->mu32_SignalIndex);
-   const C_PuiSdNodeDataPoolListElement * const pc_UISignalCommon =
+   const C_OscNodeDataPoolListElement * const pc_OscSignalCommon =
+      C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolListElement(this->mc_MessageId, this->mu32_SignalIndex);
+   const C_PuiSdNodeDataPoolListElement * const pc_UiSignalCommon =
       C_PuiSdHandler::h_GetInstance()->GetUiCanDataPoolListElement(this->mc_MessageId, this->mu32_SignalIndex);
 
    //May happen while deleting multiple signals
-   if ((((pc_OSCSignalCommon != NULL) && (pc_UISignalCommon != NULL)) && (pc_OSCMessage != NULL)) &&
+   if ((((pc_OscSignalCommon != NULL) && (pc_UiSignalCommon != NULL)) && (pc_OscMessage != NULL)) &&
        (pc_UiSignal != NULL))
    {
-      tgl_assert(this->mu32_SignalIndex < pc_OSCMessage->c_Signals.size());
-      if (this->mu32_SignalIndex < pc_OSCMessage->c_Signals.size())
+      tgl_assert(this->mu32_SignalIndex < pc_OscMessage->c_Signals.size());
+      if (this->mu32_SignalIndex < pc_OscMessage->c_Signals.size())
       {
-         const C_OSCCanSignal & rc_OSCSignal = pc_OSCMessage->c_Signals[this->mu32_SignalIndex];
+         const C_OscCanSignal & rc_OscSignal = pc_OscMessage->c_Signals[this->mu32_SignalIndex];
 
          //Copy
-         this->mc_DataOSCSignal = rc_OSCSignal;
-         this->mc_DataOSCSignalCommon = *pc_OSCSignalCommon;
+         this->mc_DataOscSignal = rc_OscSignal;
+         this->mc_DataOscSignalCommon = *pc_OscSignalCommon;
          this->mc_DataUiSignal = *pc_UiSignal;
-         this->mc_DataUiSignalCommon = *pc_UISignalCommon;
+         this->mc_DataUiSignalCommon = *pc_UiSignalCommon;
 
          //Helper
-         switch (this->mc_DataOSCSignalCommon.GetType())
+         switch (this->mc_DataOscSignalCommon.GetType())
          {
-         case C_OSCNodeDataPoolContent::eSINT8:
-         case C_OSCNodeDataPoolContent::eSINT16:
-         case C_OSCNodeDataPoolContent::eSINT32:
-         case C_OSCNodeDataPoolContent::eSINT64:
+         case C_OscNodeDataPoolContent::eSINT8:
+         case C_OscNodeDataPoolContent::eSINT16:
+         case C_OscNodeDataPoolContent::eSINT32:
+         case C_OscNodeDataPoolContent::eSINT64:
             this->me_DataType = eTY_SIGNED;
             break;
-         case C_OSCNodeDataPoolContent::eUINT8:
-         case C_OSCNodeDataPoolContent::eUINT16:
-         case C_OSCNodeDataPoolContent::eUINT32:
-         case C_OSCNodeDataPoolContent::eUINT64:
+         case C_OscNodeDataPoolContent::eUINT8:
+         case C_OscNodeDataPoolContent::eUINT16:
+         case C_OscNodeDataPoolContent::eUINT32:
+         case C_OscNodeDataPoolContent::eUINT64:
             this->me_DataType = eTY_UNSIGNED;
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT32:
+         case C_OscNodeDataPoolContent::eFLOAT32:
             this->me_DataType = eTY_FLOAT32;
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT64:
+         case C_OscNodeDataPoolContent::eFLOAT64:
             this->me_DataType = eTY_FLOAT64;
             break;
          default:
@@ -444,36 +444,36 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
 
          //One time changes
          //Multiplexer (one time)
-         this->m_InitComboBox(*pc_OSCMessage, this->mu32_SignalIndex);
+         this->m_InitComboBox(*pc_OscMessage, this->mu32_SignalIndex);
          //Set range before value
-         m_HandleMuxValueRange(*pc_OSCMessage, this->mu32_SignalIndex);
+         m_HandleMuxValueRange(*pc_OscMessage, this->mu32_SignalIndex);
 
-         if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
+         if (this->me_ComProtocol == C_OscCanProtocol::eCAN_OPEN)
          {
-            this->mpc_Ui->pc_LabelObjectDictValue->setText(C_SdUtil::h_GetCanOpenSignalObjectIndex(static_cast<uint32>(
-                                                                                                      rc_OSCSignal.
+            this->mpc_Ui->pc_LabelObjectDictValue->setText(C_SdUtil::h_GetCanOpenSignalObjectIndex(static_cast<uint32_t>(
+                                                                                                      rc_OscSignal.
                                                                                                       u16_CanOpenManagerObjectDictionaryIndex),
-                                                                                                   static_cast<uint32>(
-                                                                                                      rc_OSCSignal.
+                                                                                                   static_cast<uint32_t>(
+                                                                                                      rc_OscSignal.
                                                                                                       u8_CanOpenManagerObjectDictionarySubIndex)));
          }
 
          //Update all fields
-         m_UpdateUIForChange(eCHA_NAME);
-         m_UpdateUIForChange(eCHA_COMMENT);
-         m_UpdateUIForChange(eCHA_AUTO_MIN_MAX);
-         m_UpdateUIForChange(eCHA_MIN);
-         m_UpdateUIForChange(eCHA_MAX);
-         m_UpdateUIForChange(eCHA_FACTOR);
-         m_UpdateUIForChange(eCHA_OFFSET);
-         m_UpdateUIForChange(eCHA_INIT);
-         m_UpdateUIForChange(eCHA_UNIT);
-         m_UpdateUIForChange(eCHA_BYTE_ORDER);
-         m_UpdateUIForChange(eCHA_VALUE_TYPE);
-         m_UpdateUIForChange(eCHA_LENGTH);
-         m_UpdateUIForChange(eCHA_START_BIT);
-         m_UpdateUIForChange(eCHA_MUX_TYPE);
-         m_UpdateUIForChange(eCHA_MUX_VALUE);
+         m_UpdateUiForChange(eCHA_NAME);
+         m_UpdateUiForChange(eCHA_COMMENT);
+         m_UpdateUiForChange(eCHA_AUTO_MIN_MAX);
+         m_UpdateUiForChange(eCHA_MIN);
+         m_UpdateUiForChange(eCHA_MAX);
+         m_UpdateUiForChange(eCHA_FACTOR);
+         m_UpdateUiForChange(eCHA_OFFSET);
+         m_UpdateUiForChange(eCHA_INIT);
+         m_UpdateUiForChange(eCHA_UNIT);
+         m_UpdateUiForChange(eCHA_BYTE_ORDER);
+         m_UpdateUiForChange(eCHA_VALUE_TYPE);
+         m_UpdateUiForChange(eCHA_LENGTH);
+         m_UpdateUiForChange(eCHA_START_BIT);
+         m_UpdateUiForChange(eCHA_MUX_TYPE);
+         m_UpdateUiForChange(eCHA_MUX_VALUE);
 
          this->m_CoLoadEdsRestricitions();
       }
@@ -487,23 +487,23 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CoLoadEdsRestricitions(void)
 {
-   if (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN)
+   if (this->me_ComProtocol == C_OscCanProtocol::eCAN_OPEN)
    {
       // The manager must be the only node associated by this message
-      const C_OSCCanOpenManagerDeviceInfo * const pc_Manager =
+      const C_OscCanOpenManagerDeviceInfo * const pc_Manager =
          C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(this->mc_MessageId);
 
       tgl_assert(pc_Manager != NULL);
       if (pc_Manager != NULL)
       {
-         const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
          if (pc_Message != NULL)
          {
             bool q_RoFlag = false;
 
             // Message Tx flag is relative to the device, not the manager when using the EDS file content
             // PDO Mapping
-            pc_Manager->c_EDSFileContent.IsPDOMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+            pc_Manager->c_EdsFileContent.IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
                                                         !this->mc_MessageId.q_MessageIsTx, q_RoFlag);
 
             this->mpc_Ui->pc_SpinBoxStartBit->setEnabled(!q_RoFlag);
@@ -640,11 +640,11 @@ void C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange(void)
    \param[in,out]  orc_Content      Content to restrict
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou16_BitLength,
-                                                                C_OSCNodeDataPoolContent & orc_Content)
+void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16_t ou16_BitLength,
+                                                                C_OscNodeDataPoolContent & orc_Content)
 {
-   C_OSCNodeDataPoolContent c_Min;
-   C_OSCNodeDataPoolContent c_Max;
+   C_OscNodeDataPoolContent c_Min;
+   C_OscNodeDataPoolContent c_Max;
 
    c_Min.SetArray(false);
    c_Min.SetType(orc_Content.GetType());
@@ -680,14 +680,14 @@ void C_SdBueSignalPropertiesWidget::mh_AdaptValueToSignalLength(const uint16 ou1
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const opc_Widget,
-                                                    const C_OSCNodeDataPoolContent & orc_Content,
-                                                    const float64 of64_Factor, const float64 of64_Offset,
-                                                    const uint16 ou16_BitLength,
-                                                    const C_OSCNodeDataPoolContent * const opc_Min,
-                                                    const C_OSCNodeDataPoolContent * const opc_Max) const
+int32_t C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const opc_Widget,
+                                                     const C_OscNodeDataPoolContent & orc_Content,
+                                                     const float64_t of64_Factor, const float64_t of64_Offset,
+                                                     const uint16_t ou16_BitLength,
+                                                     const C_OscNodeDataPoolContent * const opc_Min,
+                                                     const C_OscNodeDataPoolContent * const opc_Max) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (opc_Min != NULL)
    {
@@ -709,8 +709,8 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
    }
    if ((s32_Retval == C_NO_ERR) && (opc_Widget != NULL))
    {
-      C_OSCNodeDataPoolContent c_Min;
-      C_OSCNodeDataPoolContent c_Max;
+      C_OscNodeDataPoolContent c_Min;
+      C_OscNodeDataPoolContent c_Max;
       if (opc_Min != NULL)
       {
          c_Min = *opc_Min;
@@ -755,11 +755,11 @@ sint32 C_SdBueSignalPropertiesWidget::m_LoadGeneric(C_OgeWiSpinBoxGroup * const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * const opc_Widget,
-                                                    C_OSCNodeDataPoolContent & orc_Content, const float64 of64_Factor,
-                                                    const float64 of64_Offset) const
+int32_t C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * const opc_Widget,
+                                                     C_OscNodeDataPoolContent & orc_Content,
+                                                     const float64_t of64_Factor, const float64_t of64_Offset) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (opc_Widget != NULL)
    {
@@ -780,54 +780,54 @@ sint32 C_SdBueSignalPropertiesWidget::m_SaveGeneric(const C_OgeWiSpinBoxGroup * 
    Get current type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType(void) const
+C_OscNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType(void) const
 {
-   C_OSCNodeDataPoolContent::E_Type e_Retval = C_OSCNodeDataPoolContent::eUINT8;
-   const uint16 u16_BitLength = this->mc_DataOSCSignal.u16_ComBitLength;
+   C_OscNodeDataPoolContent::E_Type e_Retval = C_OscNodeDataPoolContent::eUINT8;
+   const uint16_t u16_BitLength = this->mc_DataOscSignal.u16_ComBitLength;
 
    switch (this->me_DataType)
    {
    case eTY_UNSIGNED:
       if (u16_BitLength <= 8U)
       {
-         e_Retval = C_OSCNodeDataPoolContent::eUINT8;
+         e_Retval = C_OscNodeDataPoolContent::eUINT8;
       }
       else if ((u16_BitLength <= 16U) && (u16_BitLength > 8U))
       {
-         e_Retval = C_OSCNodeDataPoolContent::eUINT16;
+         e_Retval = C_OscNodeDataPoolContent::eUINT16;
       }
       else if ((u16_BitLength <= 32U) && (u16_BitLength > 16U))
       {
-         e_Retval = C_OSCNodeDataPoolContent::eUINT32;
+         e_Retval = C_OscNodeDataPoolContent::eUINT32;
       }
       else
       {
-         e_Retval = C_OSCNodeDataPoolContent::eUINT64;
+         e_Retval = C_OscNodeDataPoolContent::eUINT64;
       }
       break;
    case eTY_SIGNED:
       if (u16_BitLength <= 8U)
       {
-         e_Retval = C_OSCNodeDataPoolContent::eSINT8;
+         e_Retval = C_OscNodeDataPoolContent::eSINT8;
       }
       else if ((u16_BitLength <= 16U) && (u16_BitLength > 8U))
       {
-         e_Retval = C_OSCNodeDataPoolContent::eSINT16;
+         e_Retval = C_OscNodeDataPoolContent::eSINT16;
       }
       else if ((u16_BitLength <= 32U) && (u16_BitLength > 16U))
       {
-         e_Retval = C_OSCNodeDataPoolContent::eSINT32;
+         e_Retval = C_OscNodeDataPoolContent::eSINT32;
       }
       else
       {
-         e_Retval = C_OSCNodeDataPoolContent::eSINT64;
+         e_Retval = C_OscNodeDataPoolContent::eSINT64;
       }
       break;
    case eTY_FLOAT32:
-      e_Retval = C_OSCNodeDataPoolContent::eFLOAT32;
+      e_Retval = C_OscNodeDataPoolContent::eFLOAT32;
       break;
    case eTY_FLOAT64:
-      e_Retval = C_OSCNodeDataPoolContent::eFLOAT64;
+      e_Retval = C_OscNodeDataPoolContent::eFLOAT64;
       break;
    default:
       break;
@@ -843,8 +843,8 @@ C_OSCNodeDataPoolContent::E_Type C_SdBueSignalPropertiesWidget::m_GetCurrentType
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErrorChange)
 {
-   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+   const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolList(
       this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
       this->mc_MessageId.u32_DatapoolIndex, this->mc_MessageId.q_MessageIsTx);
 
@@ -858,11 +858,11 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL, NULL,
                                            &q_NameConflict, &q_NameInvalid,
                                            NULL, NULL, NULL, NULL, NULL,
-                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(this->mc_MessageId.
+                                           C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(this->mc_MessageId.
                                                                                                   e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(this->mc_MessageId.
+                                           C_OscCanProtocol::h_GetCanMessageSignalGapsValid(this->mc_MessageId.
                                                                                             e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                           C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
 
       q_Combined = (q_NameInvalid == false) && (q_NameConflict == false);
@@ -901,10 +901,10 @@ void C_SdBueSignalPropertiesWidget::m_CheckSignalName(const bool & orq_SignalErr
    \param[in]  orq_SignalErrorChange   Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorChange)
+void C_SdBueSignalPropertiesWidget::m_CheckMuxType(const bool & orq_SignalErrorChange)
 {
-   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+   const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolList(
       this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
       this->mc_MessageId.u32_DatapoolIndex, this->mc_MessageId.q_MessageIsTx);
 
@@ -915,11 +915,11 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorC
 
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL, NULL, NULL,
                                            NULL, NULL, NULL, NULL, &q_MuxTypeInvalid, NULL,
-                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(
                                               this->mc_MessageId.e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                           C_OscCanProtocol::h_GetCanMessageSignalGapsValid(
                                               this->mc_MessageId.e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                           C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_ComboBoxMuxType, "Valid", !q_MuxTypeInvalid);
@@ -950,10 +950,10 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXType(const bool & orq_SignalErrorC
    \param[in]  orq_SignalErrorChange   Optional flag to suppress error signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalErrorChange)
+void C_SdBueSignalPropertiesWidget::m_CheckMuxValue(const bool & orq_SignalErrorChange)
 {
-   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+   const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolList(
       this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
       this->mc_MessageId.u32_DatapoolIndex, this->mc_MessageId.q_MessageIsTx);
 
@@ -964,11 +964,11 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalError
 
       pc_Message->CheckErrorSignalDetailed(pc_List, this->mu32_SignalIndex, NULL, NULL, NULL, NULL, NULL, NULL,
                                            NULL, NULL, NULL, NULL, NULL, &q_MuxValueInvalid,
-                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(
                                               this->mc_MessageId.e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                           C_OscCanProtocol::h_GetCanMessageSignalGapsValid(
                                               this->mc_MessageId.e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                           C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
       //set invalid text property
       C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxMuxValue, "Valid", !q_MuxValueInvalid);
@@ -997,8 +997,8 @@ void C_SdBueSignalPropertiesWidget::m_CheckMUXValue(const bool & orq_SignalError
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_SignalErrorChange)
 {
-   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+   const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolList(
       this->mc_MessageId.u32_NodeIndex, this->mc_MessageId.e_ComProtocol, this->mc_MessageId.u32_InterfaceIndex,
       this->mc_MessageId.u32_DatapoolIndex, this->mc_MessageId.q_MessageIsTx);
 
@@ -1016,11 +1016,11 @@ void C_SdBueSignalPropertiesWidget::m_CheckMessagePosition(const bool & orq_Sign
                                            &q_LayoutConflict, &q_BorderConflict, &q_GapConflict,
                                            &q_ByteAlignmentLengthConflict, &q_ByteAlignmentStartbitConflict,
                                            NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-                                           C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                                           C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(
                                               this->mc_MessageId.e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                                           C_OscCanProtocol::h_GetCanMessageSignalGapsValid(
                                               this->mc_MessageId.e_ComProtocol),
-                                           C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                                           C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(
                                               this->mc_MessageId.e_ComProtocol));
       q_PositionValid = (q_LayoutConflict == false) && (q_BorderConflict == false);
       //set invalid text property
@@ -1121,26 +1121,26 @@ void C_SdBueSignalPropertiesWidget::m_SaveToData(const E_Change oe_Change)
 {
    if (this->mpc_MessageSyncManager != NULL)
    {
-      C_OSCCanMessageIdentificationIndices c_NewMessageId;
+      C_OscCanMessageIdentificationIndices c_NewMessageId;
       //Multiplexer
       if ((oe_Change == eCHA_MUX_TYPE) &&
-          (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL))
+          (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL))
       {
          //Adapt parent
-         const C_OSCCanMessage * const pc_Message =
+         const C_OscCanMessage * const pc_Message =
             C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-         if ((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
+         if ((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OscCanMessage::eTX_METHOD_ON_CHANGE))
          {
-            C_OSCCanMessage c_Copy = *pc_Message;
+            C_OscCanMessage c_Copy = *pc_Message;
             c_Copy.u32_CycleTimeMs = 0U;
-            c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+            c_Copy.e_TxMethod = C_OscCanMessage::eTX_METHOD_ON_EVENT;
             this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
                this->mc_MessageId, c_Copy);
          }
       }
 
-      this->mpc_MessageSyncManager->SetCanSignal(this->mc_MessageId, this->mu32_SignalIndex, this->mc_DataOSCSignal,
-                                                 this->mc_DataOSCSignalCommon, this->mc_DataUiSignalCommon,
+      this->mpc_MessageSyncManager->SetCanSignal(this->mc_MessageId, this->mu32_SignalIndex, this->mc_DataOscSignal,
+                                                 this->mc_DataOscSignalCommon, this->mc_DataUiSignalCommon,
                                                  this->mc_DataUiSignal);
 
       //Add critical message check (after change of data)
@@ -1160,22 +1160,22 @@ void C_SdBueSignalPropertiesWidget::m_SaveToData(const E_Change oe_Change)
    Current mutliplexer type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanSignal::E_MultiplexerType C_SdBueSignalPropertiesWidget::m_GetMuxType(void) const
+C_OscCanSignal::E_MultiplexerType C_SdBueSignalPropertiesWidget::m_GetMuxType(void) const
 {
-   C_OSCCanSignal::E_MultiplexerType e_Retval;
+   C_OscCanSignal::E_MultiplexerType e_Retval;
    switch (this->mpc_Ui->pc_ComboBoxMuxType->currentIndex())
    {
    case ms32_MUX_DEFAULT:
-      e_Retval = C_OSCCanSignal::eMUX_DEFAULT;
+      e_Retval = C_OscCanSignal::eMUX_DEFAULT;
       break;
    case ms32_MUX_MULTIPLEXER_SIGNAL:
-      e_Retval = C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL;
+      e_Retval = C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL;
       break;
    case ms32_MUX_MULTIPLEXED_SIGNAL:
-      e_Retval = C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL;
+      e_Retval = C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL;
       break;
    default:
-      e_Retval = C_OSCCanSignal::eMUX_DEFAULT;
+      e_Retval = C_OscCanSignal::eMUX_DEFAULT;
       break;
    }
    return e_Retval;
@@ -1188,19 +1188,19 @@ C_OSCCanSignal::E_MultiplexerType C_SdBueSignalPropertiesWidget::m_GetMuxType(vo
    \param[in]  ou32_SignalIndex  Current signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_InitComboBox(const C_OSCCanMessage & orc_Message,
-                                                   const uint32 ou32_SignalIndex) const
+void C_SdBueSignalPropertiesWidget::m_InitComboBox(const C_OscCanMessage & orc_Message,
+                                                   const uint32_t ou32_SignalIndex) const
 {
    bool q_OtherMultiplexer = false;
 
    //Handle multiplexer
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+   for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
    {
       //Only check other signals
       if (ou32_SignalIndex != u32_ItSig)
       {
-         const C_OSCCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
-         if (rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+         const C_OscCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
+         if (rc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
             q_OtherMultiplexer = true;
          }
@@ -1216,31 +1216,31 @@ void C_SdBueSignalPropertiesWidget::m_InitComboBox(const C_OSCCanMessage & orc_M
    \param[in]  ou32_SignalIndex  Current signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_HandleMuxValueRange(const C_OSCCanMessage & orc_Message,
-                                                          const uint32 ou32_SignalIndex) const
+void C_SdBueSignalPropertiesWidget::m_HandleMuxValueRange(const C_OscCanMessage & orc_Message,
+                                                          const uint32_t ou32_SignalIndex) const
 {
    bool q_Max = false;
-   sintn sn_Max = 0;
+   int32_t s32_Max = 0;
 
    this->mpc_Ui->pc_SpinBoxMuxValue->SetMinimumCustom(0);
    //Handle multiplexer
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+   for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
    {
       //Only check other signals
       if (ou32_SignalIndex != u32_ItSig)
       {
-         const C_OSCCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
-         if (rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+         const C_OscCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
+         if (rc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
-            const uint64 u64_Max = (static_cast<uint64>(1ULL) << rc_Signal.u16_ComBitLength) - 1ULL;
-            sn_Max = static_cast<sintn>(u64_Max);
+            const uint64_t u64_Max = (static_cast<uint64_t>(1ULL) << rc_Signal.u16_ComBitLength) - 1ULL;
+            s32_Max = static_cast<int32_t>(u64_Max);
             q_Max = true;
          }
       }
    }
    //Automated maximum
    this->mpc_Ui->pc_SpinBoxMuxValue->SetMaximumCustom(
-      static_cast<sintn>(std::numeric_limits<uint16>::max()), q_Max, sn_Max);
+      static_cast<int32_t>(std::numeric_limits<uint16_t>::max()), q_Max, s32_Max);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1259,7 +1259,7 @@ void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropert
    QString c_UserNotificationText;
    QString c_UserNotificationAdditionalInformation;
    //Step 1: get new value from UI
-   this->m_ApplyNewValueFromUI(oe_Change);
+   this->m_ApplyNewValueFromUi(oe_Change);
    //Step 2: change all values depending on the current value change
    this->m_AdaptOtherValues(oe_Change, c_Changes, c_ErrorChanges, c_UserNotificationText,
                             c_UserNotificationAdditionalInformation);
@@ -1277,7 +1277,7 @@ void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropert
    for (std::list<E_Change>::const_iterator c_ItChange = c_Changes.begin(); c_ItChange != c_Changes.end();
         ++c_ItChange)
    {
-      this->m_UpdateUIForChange(*c_ItChange);
+      this->m_UpdateUiForChange(*c_ItChange);
    }
    if (oq_AllowSignalsToInformOtherWidgets)
    {
@@ -1303,83 +1303,83 @@ void C_SdBueSignalPropertiesWidget::m_HandleAnyChange(const C_SdBueSignalPropert
    \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUI(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
+void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUi(const C_SdBueSignalPropertiesWidget::E_Change oe_Change)
 {
-   const C_OSCCanSignal * pc_Signal;
+   const C_OscCanSignal * pc_Signal;
 
    switch (oe_Change)
    {
    case eCHA_NAME:
-      this->mc_DataOSCSignalCommon.c_Name = this->mpc_Ui->pc_LineEditName->text().trimmed().toStdString().c_str();
+      this->mc_DataOscSignalCommon.c_Name = this->mpc_Ui->pc_LineEditName->text().trimmed().toStdString().c_str();
       break;
    case eCHA_COMMENT:
-      this->mc_DataOSCSignalCommon.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
+      this->mc_DataOscSignalCommon.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
       break;
    case eCHA_AUTO_MIN_MAX:
       this->mc_DataUiSignalCommon.q_AutoMinMaxActive = this->mpc_Ui->pc_CheckBoxAutoMinMax->isChecked();
       break;
    case eCHA_FACTOR:
-      this->mc_DataOSCSignalCommon.f64_Factor = this->mpc_Ui->pc_DoubleSpinBoxFactor->value();
+      this->mc_DataOscSignalCommon.f64_Factor = this->mpc_Ui->pc_DoubleSpinBoxFactor->value();
       break;
    case eCHA_OFFSET:
-      this->mc_DataOSCSignalCommon.f64_Offset = this->mpc_Ui->pc_DoubleSpinBoxOffset->value();
+      this->mc_DataOscSignalCommon.f64_Offset = this->mpc_Ui->pc_DoubleSpinBoxOffset->value();
       break;
    case eCHA_VALUE_TYPE:
       this->me_DataType = static_cast<E_Type>(this->mpc_Ui->pc_ComboBoxType->currentIndex());
       break;
    case eCHA_LENGTH:
-      this->mc_DataOSCSignal.u16_ComBitLength = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxLength->value());
+      this->mc_DataOscSignal.u16_ComBitLength = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxLength->value());
       break;
    case eCHA_MIN:
-      this->mc_DataOSCSignalCommon.c_MinValue.SetArray(false);
-      this->mc_DataOSCSignalCommon.c_MinValue.SetType(this->m_GetCurrentType());
+      this->mc_DataOscSignalCommon.c_MinValue.SetArray(false);
+      this->mc_DataOscSignalCommon.c_MinValue.SetType(this->m_GetCurrentType());
       //Get change from UI should only happen if user can interact
       tgl_assert(this->mc_DataUiSignalCommon.q_AutoMinMaxActive == false);
-      m_SaveGeneric(this->mpc_Ui->pc_WidgetMin, this->mc_DataOSCSignalCommon.c_MinValue,
-                    this->mc_DataOSCSignalCommon.f64_Factor,
-                    this->mc_DataOSCSignalCommon.f64_Offset);
+      m_SaveGeneric(this->mpc_Ui->pc_WidgetMin, this->mc_DataOscSignalCommon.c_MinValue,
+                    this->mc_DataOscSignalCommon.f64_Factor,
+                    this->mc_DataOscSignalCommon.f64_Offset);
       break;
    case eCHA_MAX:
-      this->mc_DataOSCSignalCommon.c_MaxValue.SetArray(false);
-      this->mc_DataOSCSignalCommon.c_MaxValue.SetType(this->m_GetCurrentType());
+      this->mc_DataOscSignalCommon.c_MaxValue.SetArray(false);
+      this->mc_DataOscSignalCommon.c_MaxValue.SetType(this->m_GetCurrentType());
       //Get change from UI should only happen if user can interact
       tgl_assert(this->mc_DataUiSignalCommon.q_AutoMinMaxActive == false);
-      m_SaveGeneric(this->mpc_Ui->pc_WidgetMax, this->mc_DataOSCSignalCommon.c_MaxValue,
-                    this->mc_DataOSCSignalCommon.f64_Factor,
-                    this->mc_DataOSCSignalCommon.f64_Offset);
+      m_SaveGeneric(this->mpc_Ui->pc_WidgetMax, this->mc_DataOscSignalCommon.c_MaxValue,
+                    this->mc_DataOscSignalCommon.f64_Factor,
+                    this->mc_DataOscSignalCommon.f64_Offset);
       break;
    case eCHA_INIT:
-      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
-      this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetArray(false);
-      this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetType(this->m_GetCurrentType());
-      m_SaveGeneric(this->mpc_Ui->pc_WidgetInit, this->mc_DataOSCSignalCommon.c_DataSetValues[0],
-                    this->mc_DataOSCSignalCommon.f64_Factor,
-                    this->mc_DataOSCSignalCommon.f64_Offset);
+      this->mc_DataOscSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOscSignalCommon.c_DataSetValues[0].SetArray(false);
+      this->mc_DataOscSignalCommon.c_DataSetValues[0].SetType(this->m_GetCurrentType());
+      m_SaveGeneric(this->mpc_Ui->pc_WidgetInit, this->mc_DataOscSignalCommon.c_DataSetValues[0],
+                    this->mc_DataOscSignalCommon.f64_Factor,
+                    this->mc_DataOscSignalCommon.f64_Offset);
       break;
    case eCHA_UNIT:
-      this->mc_DataOSCSignalCommon.c_Unit = this->mpc_Ui->pc_LineEditUnit->text().toStdString().c_str();
+      this->mc_DataOscSignalCommon.c_Unit = this->mpc_Ui->pc_LineEditUnit->text().toStdString().c_str();
       break;
    case eCHA_BYTE_ORDER:
       switch (this->mpc_Ui->pc_ComboBoxByteOrder->currentIndex())
       {
       case ms32_BYTE_ORDER_INDEX_INTEL:
-         this->mc_DataOSCSignal.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_INTEL;
+         this->mc_DataOscSignal.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
          break;
       case ms32_BYTE_ORDER_INDEX_MOTOROLA:
-         this->mc_DataOSCSignal.e_ComByteOrder = C_OSCCanSignal::eBYTE_ORDER_MOTOROLA;
+         this->mc_DataOscSignal.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_MOTOROLA;
          break;
       default:
          break;
       }
       break;
    case eCHA_MUX_TYPE:
-      this->mc_DataOSCSignal.e_MultiplexerType = this->m_GetMuxType();
+      this->mc_DataOscSignal.e_MultiplexerType = this->m_GetMuxType();
       break;
    case eCHA_MUX_VALUE:
-      this->mc_DataOSCSignal.u16_MultiplexValue = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxMuxValue->value());
+      this->mc_DataOscSignal.u16_MultiplexValue = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxMuxValue->value());
       break;
    case eCHA_START_BIT:
-      this->mc_DataOSCSignal.u16_ComBitStart = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxStartBit->value());
+      this->mc_DataOscSignal.u16_ComBitStart = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxStartBit->value());
       break;
    case eCHA_MLV:
       //Data changed outside of this widgets responsibility
@@ -1387,8 +1387,8 @@ void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUI(const C_SdBueSignalPro
       pc_Signal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(this->mc_MessageId, this->mu32_SignalIndex);
       if (pc_Signal != NULL)
       {
-         this->mc_DataOSCSignal.u16_ComBitStart = pc_Signal->u16_ComBitStart;
-         this->mc_DataOSCSignal.u16_ComBitLength = pc_Signal->u16_ComBitLength;
+         this->mc_DataOscSignal.u16_ComBitStart = pc_Signal->u16_ComBitStart;
+         this->mc_DataOscSignal.u16_ComBitLength = pc_Signal->u16_ComBitLength;
       }
       break;
    default:
@@ -1412,7 +1412,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
                                                        QString & orc_UserNotificationText,
                                                        QString & orc_UserNotificationAdditionalInformation)
 {
-   C_OSCNodeDataPoolContent::E_Type e_NewType;
+   C_OscNodeDataPoolContent::E_Type e_NewType;
    switch (oe_Change)
    {
    case eCHA_NAME:
@@ -1450,7 +1450,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
    case eCHA_MAX:
    case eCHA_AUTO_MIN_MAX:
       //Dataset resize just to be on the safe
-      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOscSignalCommon.c_DataSetValues.resize(1);
       //Min
       if (oe_Change != eCHA_MIN)
       {
@@ -1469,7 +1469,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       break;
    case eCHA_LENGTH:
       //Dataset resize just to be on the safe
-      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOscSignalCommon.c_DataSetValues.resize(1);
       //Determine new data type
       e_NewType = this->m_GetCurrentType();
       //Handle the actual new type
@@ -1493,7 +1493,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       break;
    case eCHA_MLV:
       //Dataset resize just to be on the safe
-      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOscSignalCommon.c_DataSetValues.resize(1);
       //Determine new data type
       e_NewType = this->m_GetCurrentType();
       //Handle the actual new type
@@ -1514,20 +1514,20 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       break;
    case eCHA_VALUE_TYPE:
       //Dataset resize just to be on the safe
-      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOscSignalCommon.c_DataSetValues.resize(1);
       //Determine new data type
       e_NewType = this->m_GetCurrentType();
       //This might trigger a length change
       //Length field might change in all cases (disabled/enabled)
       orc_Changes.push_back(eCHA_LENGTH);
       //Handle length adaptation
-      if (e_NewType == C_OSCNodeDataPoolContent::eFLOAT32)
+      if (e_NewType == C_OscNodeDataPoolContent::eFLOAT32)
       {
-         this->mc_DataOSCSignal.u16_ComBitLength = 32U;
+         this->mc_DataOscSignal.u16_ComBitLength = 32U;
       }
-      else if (e_NewType == C_OSCNodeDataPoolContent::eFLOAT64)
+      else if (e_NewType == C_OscNodeDataPoolContent::eFLOAT64)
       {
-         this->mc_DataOSCSignal.u16_ComBitLength = 64U;
+         this->mc_DataOscSignal.u16_ComBitLength = 64U;
       }
       else
       {
@@ -1550,7 +1550,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       break;
    case eCHA_MUX_TYPE:
       //Dataset resize just to be on the safe
-      this->mc_DataOSCSignalCommon.c_DataSetValues.resize(1);
+      this->mc_DataOscSignalCommon.c_DataSetValues.resize(1);
       //Special type handling for multiplexer signals
       //Each of MUX type might affect those fields visually even if their value stays unchanged (disabled/enabled)
       orc_Changes.push_back(eCHA_AUTO_MIN_MAX);
@@ -1563,27 +1563,28 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       //Error check change
       orc_Changes.push_back(eCHA_START_BIT);
       orc_Changes.push_back(eCHA_MUX_TYPE);
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          bool q_MessageAdapt;
-         const C_OSCCanMessage * const pc_Message =
+         const C_OscCanMessage * const pc_Message =
             C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-         float64 f64_CurrentInitVal;
+         float64_t f64_CurrentInitVal;
 
          // The init value will be set to 0.0 later than the other values
-         this->mc_DataOSCSignalCommon.c_DataSetValues[0].GetAnyValueAsFloat64(f64_CurrentInitVal, 0);
+         this->mc_DataOscSignalCommon.c_DataSetValues[0].GetAnyValueAsFloat64(f64_CurrentInitVal, 0);
 
          //Only relevant if the range gets restricted
          orc_Changes.push_back(eCHA_MIN);
          orc_Changes.push_back(eCHA_MAX);
          //Restricted values
-         //lint -e{9137} If due to rounding a inaccuracy exists, it is good that the comparison fails. It will be reset.
-         if (((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE)) ||
+         //lint -e{9252} If due to rounding an inaccuracy exists, it is good that the comparison fails. It will be
+         // reset.
+         if (((pc_Message != NULL) && (pc_Message->e_TxMethod == C_OscCanMessage::eTX_METHOD_ON_CHANGE)) ||
              (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == false) ||
-             (this->mc_DataOSCSignalCommon.f64_Factor != 1.0) ||
-             (this->mc_DataOSCSignalCommon.f64_Offset != 0.0) ||
-             (this->mc_DataOSCSignalCommon.c_Unit != "") ||
-             (this->mc_DataOSCSignal.u16_ComBitLength > 16U) ||
+             (this->mc_DataOscSignalCommon.f64_Factor != 1.0) ||
+             (this->mc_DataOscSignalCommon.f64_Offset != 0.0) ||
+             (this->mc_DataOscSignalCommon.c_Unit != "") ||
+             (this->mc_DataOscSignal.u16_ComBitLength > 16U) ||
              (this->me_DataType != eTY_UNSIGNED) ||
              (f64_CurrentInitVal != 0.0))
          {
@@ -1610,12 +1611,12 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
                                                                                "- Type: unsigned");
          }
          this->mc_DataUiSignalCommon.q_AutoMinMaxActive = true;
-         this->mc_DataOSCSignalCommon.f64_Factor = 1.0;
-         this->mc_DataOSCSignalCommon.f64_Offset = 0.0;
-         this->mc_DataOSCSignalCommon.c_Unit = "";
-         if (this->mc_DataOSCSignal.u16_ComBitLength > 16U)
+         this->mc_DataOscSignalCommon.f64_Factor = 1.0;
+         this->mc_DataOscSignalCommon.f64_Offset = 0.0;
+         this->mc_DataOscSignalCommon.c_Unit = "";
+         if (this->mc_DataOscSignal.u16_ComBitLength > 16U)
          {
-            this->mc_DataOSCSignal.u16_ComBitLength = 16U;
+            this->mc_DataOscSignal.u16_ComBitLength = 16U;
          }
          //Type
          this->me_DataType = eTY_UNSIGNED;
@@ -1635,11 +1636,11 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
       this->m_HandleInitValueRange();
       orc_Changes.push_back(eCHA_INIT);
       //Multiplexer signal init value
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          //Adapt init value for multiplexer
          // Must be set after adapting minimum and maximum
-         C_OSCNodeDataPoolContentUtil::h_SetValueInContent(0.0, this->mc_DataOSCSignalCommon.c_DataSetValues[0]);
+         C_OscNodeDataPoolContentUtil::h_SetValueInContent(0.0, this->mc_DataOscSignalCommon.c_DataSetValues[0]);
       }
       //MLV update trigger
       orc_Changes.push_back(eCHA_MLV);
@@ -1662,20 +1663,20 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
    \param[in]  oe_Type  Expected Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_InitializeDataWithPotentialNewType(const C_OSCNodeDataPoolContent::E_Type oe_Type)
+void C_SdBueSignalPropertiesWidget::m_InitializeDataWithPotentialNewType(const C_OscNodeDataPoolContent::E_Type oe_Type)
 {
-   this->mc_DataOSCSignalCommon.c_MinValue.SetArray(false);
-   this->mc_DataOSCSignalCommon.c_MinValue.SetType(oe_Type);
+   this->mc_DataOscSignalCommon.c_MinValue.SetArray(false);
+   this->mc_DataOscSignalCommon.c_MinValue.SetType(oe_Type);
 
-   this->mc_DataOSCSignalCommon.c_MaxValue.SetArray(false);
-   this->mc_DataOSCSignalCommon.c_MaxValue.SetType(oe_Type);
+   this->mc_DataOscSignalCommon.c_MaxValue.SetArray(false);
+   this->mc_DataOscSignalCommon.c_MaxValue.SetType(oe_Type);
 
-   this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetArray(false);
-   this->mc_DataOSCSignalCommon.c_DataSetValues[0].SetType(oe_Type);
+   this->mc_DataOscSignalCommon.c_DataSetValues[0].SetArray(false);
+   this->mc_DataOscSignalCommon.c_DataSetValues[0].SetType(oe_Type);
 
    //Value (Necessary for type consistency)
-   this->mc_DataOSCSignalCommon.c_Value = this->mc_DataOSCSignalCommon.c_MinValue;
-   this->mc_DataOSCSignalCommon.c_NvmValue = this->mc_DataOSCSignalCommon.c_MinValue;
+   this->mc_DataOscSignalCommon.c_Value = this->mc_DataOscSignalCommon.c_MinValue;
+   this->mc_DataOscSignalCommon.c_NvmValue = this->mc_DataOscSignalCommon.c_MinValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1686,13 +1687,13 @@ void C_SdBueSignalPropertiesWidget::m_HandleMinValueRange()
 {
    if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == true)
    {
-      C_SdNdeDpContentUtil::h_InitMinForSignal(this->mc_DataOSCSignalCommon.c_MinValue,
-                                               this->mc_DataOSCSignal.u16_ComBitLength);
+      C_SdNdeDpContentUtil::h_InitMinForSignal(this->mc_DataOscSignalCommon.c_MinValue,
+                                               this->mc_DataOscSignal.u16_ComBitLength);
    }
    else
    {
-      mh_AdaptValueToSignalLength(this->mc_DataOSCSignal.u16_ComBitLength,
-                                  this->mc_DataOSCSignalCommon.c_MinValue);
+      mh_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
+                                  this->mc_DataOscSignalCommon.c_MinValue);
    }
 }
 
@@ -1704,13 +1705,13 @@ void C_SdBueSignalPropertiesWidget::m_HandleMaxValueRange()
 {
    if (this->mc_DataUiSignalCommon.q_AutoMinMaxActive == true)
    {
-      C_SdNdeDpContentUtil::h_InitMaxForSignal(this->mc_DataOSCSignalCommon.c_MaxValue,
-                                               this->mc_DataOSCSignal.u16_ComBitLength);
+      C_SdNdeDpContentUtil::h_InitMaxForSignal(this->mc_DataOscSignalCommon.c_MaxValue,
+                                               this->mc_DataOscSignal.u16_ComBitLength);
    }
    else
    {
-      mh_AdaptValueToSignalLength(this->mc_DataOSCSignal.u16_ComBitLength,
-                                  this->mc_DataOSCSignalCommon.c_MaxValue);
+      mh_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
+                                  this->mc_DataOscSignalCommon.c_MaxValue);
    }
 }
 
@@ -1720,15 +1721,15 @@ void C_SdBueSignalPropertiesWidget::m_HandleMaxValueRange()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalPropertiesWidget::m_HandleInitValueRange(void)
 {
-   mh_AdaptValueToSignalLength(this->mc_DataOSCSignal.u16_ComBitLength,
-                               this->mc_DataOSCSignalCommon.c_DataSetValues[0]);
-   if (this->mc_DataOSCSignalCommon.c_DataSetValues[0] < this->mc_DataOSCSignalCommon.c_MinValue)
+   mh_AdaptValueToSignalLength(this->mc_DataOscSignal.u16_ComBitLength,
+                               this->mc_DataOscSignalCommon.c_DataSetValues[0]);
+   if (this->mc_DataOscSignalCommon.c_DataSetValues[0] < this->mc_DataOscSignalCommon.c_MinValue)
    {
-      this->mc_DataOSCSignalCommon.c_DataSetValues[0] = this->mc_DataOSCSignalCommon.c_MinValue;
+      this->mc_DataOscSignalCommon.c_DataSetValues[0] = this->mc_DataOscSignalCommon.c_MinValue;
    }
-   if (this->mc_DataOSCSignalCommon.c_DataSetValues[0] > this->mc_DataOSCSignalCommon.c_MaxValue)
+   if (this->mc_DataOscSignalCommon.c_DataSetValues[0] > this->mc_DataOscSignalCommon.c_MaxValue)
    {
-      this->mc_DataOSCSignalCommon.c_DataSetValues[0] = this->mc_DataOSCSignalCommon.c_MaxValue;
+      this->mc_DataOscSignalCommon.c_DataSetValues[0] = this->mc_DataOscSignalCommon.c_MaxValue;
    }
 }
 
@@ -1746,17 +1747,17 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
    case eCHA_MLV:
    case eCHA_LENGTH:
       if ((this->mpc_MessageSyncManager != NULL) &&
-          (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL))
+          (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL))
       {
          //Adapt parent
-         const C_OSCCanMessage * const pc_OSCMessage =
+         const C_OscCanMessage * const pc_OscMessage =
             C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
-         if ((pc_OSCMessage != NULL) && (pc_OSCMessage->e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE))
+         if ((pc_OscMessage != NULL) && (pc_OscMessage->e_TxMethod == C_OscCanMessage::eTX_METHOD_ON_CHANGE))
          {
-            C_OSCCanMessage c_Copy = *pc_OSCMessage;
+            C_OscCanMessage c_Copy = *pc_OscMessage;
             // On event has no cycle time
             c_Copy.u32_CycleTimeMs = 0U;
-            c_Copy.e_TxMethod = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+            c_Copy.e_TxMethod = C_OscCanMessage::eTX_METHOD_ON_EVENT;
             this->mpc_MessageSyncManager->SetCanMessagePropertiesWithoutDirectionChangeAndWithoutTimeoutChange(
                this->mc_MessageId, c_Copy);
          }
@@ -1791,9 +1792,9 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
    \param[in]  oe_Change   Detected UI change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change)
+void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change)
 {
-   const bool q_CanOpenActive = (this->me_ComProtocol == C_OSCCanProtocol::eCAN_OPEN);
+   const bool q_CanOpenActive = (this->me_ComProtocol == C_OscCanProtocol::eCAN_OPEN);
 
    //Don't trigger any new changes as all data is pulled from the internal data
    m_DisconnectAll();
@@ -1801,13 +1802,13 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
    {
    case eCHA_NAME:
       //Restrictions
-      this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+      this->mpc_Ui->pc_LineEditName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
       //Value
-      this->mpc_Ui->pc_LineEditName->setText(this->mc_DataOSCSignalCommon.c_Name.c_str());
+      this->mpc_Ui->pc_LineEditName->setText(this->mc_DataOscSignalCommon.c_Name.c_str());
       break;
    case eCHA_MUX_TYPE:
       //Restrictions
-      if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eLAYER2)
+      if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eLAYER2)
       {
          this->mpc_Ui->pc_ComboBoxMuxType->setVisible(true);
          this->mpc_Ui->pc_LabelMuxType->setVisible(true);
@@ -1818,15 +1819,15 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_LabelMuxType->setVisible(false);
       }
       //Value
-      switch (this->mc_DataOSCSignal.e_MultiplexerType)
+      switch (this->mc_DataOscSignal.e_MultiplexerType)
       {
-      case C_OSCCanSignal::eMUX_DEFAULT:
+      case C_OscCanSignal::eMUX_DEFAULT:
          this->mpc_Ui->pc_ComboBoxMuxType->setCurrentIndex(ms32_MUX_DEFAULT);
          break;
-      case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
+      case C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL:
          this->mpc_Ui->pc_ComboBoxMuxType->setCurrentIndex(ms32_MUX_MULTIPLEXER_SIGNAL);
          break;
-      case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
+      case C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL:
          this->mpc_Ui->pc_ComboBoxMuxType->setCurrentIndex(ms32_MUX_MULTIPLEXED_SIGNAL);
          break;
       default:
@@ -1835,7 +1836,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       break;
    case eCHA_VALUE_TYPE:
       //Restrictions
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_ComboBoxType->setEnabled(false);
       }
@@ -1844,11 +1845,11 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_ComboBoxType->setEnabled(!q_CanOpenActive);
       }
       //Value
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(static_cast<sintn>(this->me_DataType));
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(static_cast<int32_t>(this->me_DataType));
       break;
    case eCHA_START_BIT:
       //Restrictions
-      if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eECES)
+      if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eECES)
       {
          this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom((64 - 16) - 1);
       }
@@ -1857,12 +1858,12 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_SpinBoxStartBit->SetMaximumCustom(64 - 1);
       }
       //Value
-      this->mpc_Ui->pc_SpinBoxStartBit->setValue(this->mc_DataOSCSignal.u16_ComBitStart);
+      this->mpc_Ui->pc_SpinBoxStartBit->setValue(this->mc_DataOscSignal.u16_ComBitStart);
       break;
    case eCHA_LENGTH:
       //Restrictions
-      if ((this->mc_DataOSCSignalCommon.GetType() == C_OSCNodeDataPoolContent::eFLOAT32) ||
-          (this->mc_DataOSCSignalCommon.GetType() == C_OSCNodeDataPoolContent::eFLOAT64))
+      if ((this->mc_DataOscSignalCommon.GetType() == C_OscNodeDataPoolContent::eFLOAT32) ||
+          (this->mc_DataOscSignalCommon.GetType() == C_OscNodeDataPoolContent::eFLOAT64))
       {
          this->mpc_Ui->pc_SpinBoxLength->setEnabled(false);
       }
@@ -1871,13 +1872,13 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_SpinBoxLength->setEnabled(!q_CanOpenActive);
       }
       this->mpc_Ui->pc_SpinBoxLength->SetMinimumCustom(1);
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(16);
       }
       else
       {
-         if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eECES)
+         if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eECES)
          {
             this->mpc_Ui->pc_SpinBoxLength->SetMaximumCustom(64 - 16);
          }
@@ -1887,11 +1888,11 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          }
       }
       //Value
-      this->mpc_Ui->pc_SpinBoxLength->setValue(this->mc_DataOSCSignal.u16_ComBitLength);
+      this->mpc_Ui->pc_SpinBoxLength->setValue(this->mc_DataOscSignal.u16_ComBitLength);
       break;
    case eCHA_INIT:
       //Restrictions
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_WidgetInit->setEnabled(false);
       }
@@ -1900,15 +1901,15 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_WidgetInit->setEnabled(true);
       }
       //Value
-      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetInit, this->mc_DataOSCSignalCommon.c_DataSetValues[0],
-                               this->mc_DataOSCSignalCommon.f64_Factor, this->mc_DataOSCSignalCommon.f64_Offset,
-                               this->mc_DataOSCSignal.u16_ComBitLength,
-                               &this->mc_DataOSCSignalCommon.c_MinValue,
-                               &this->mc_DataOSCSignalCommon.c_MaxValue) == C_NO_ERR);
+      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetInit, this->mc_DataOscSignalCommon.c_DataSetValues[0],
+                               this->mc_DataOscSignalCommon.f64_Factor, this->mc_DataOscSignalCommon.f64_Offset,
+                               this->mc_DataOscSignal.u16_ComBitLength,
+                               &this->mc_DataOscSignalCommon.c_MinValue,
+                               &this->mc_DataOscSignalCommon.c_MaxValue) == C_NO_ERR);
       break;
    case eCHA_UNIT:
       //Restrictions
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_LineEditUnit->setEnabled(false);
       }
@@ -1917,18 +1918,18 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_LineEditUnit->setEnabled(true);
       }
       //Value
-      this->mpc_Ui->pc_LineEditUnit->setText(this->mc_DataOSCSignalCommon.c_Unit.c_str());
+      this->mpc_Ui->pc_LineEditUnit->setText(this->mc_DataOscSignalCommon.c_Unit.c_str());
       break;
    case eCHA_COMMENT:
       //Restrictions
       //Value
-      this->mpc_Ui->pc_TextEditComment->setText(this->mc_DataOSCSignalCommon.c_Comment.c_str());
+      this->mpc_Ui->pc_TextEditComment->setText(this->mc_DataOscSignalCommon.c_Comment.c_str());
       break;
    case eCHA_MUX_VALUE:
       //Restrictions
-      if (this->mc_MessageId.e_ComProtocol == C_OSCCanProtocol::eLAYER2)
+      if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eLAYER2)
       {
-         if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+         if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
          {
             this->mpc_Ui->pc_SpinBoxMuxValue->setEnabled(true);
          }
@@ -1945,17 +1946,17 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_LabelMuxValue->setVisible(false);
       }
       //Value
-      this->mpc_Ui->pc_SpinBoxMuxValue->setValue(this->mc_DataOSCSignal.u16_MultiplexValue);
+      this->mpc_Ui->pc_SpinBoxMuxValue->setValue(this->mc_DataOscSignal.u16_MultiplexValue);
       break;
    case eCHA_BYTE_ORDER:
       //Restrictions
       //Value
-      switch (this->mc_DataOSCSignal.e_ComByteOrder)
+      switch (this->mc_DataOscSignal.e_ComByteOrder)
       {
-      case C_OSCCanSignal::eBYTE_ORDER_INTEL:
+      case C_OscCanSignal::eBYTE_ORDER_INTEL:
          this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(ms32_BYTE_ORDER_INDEX_INTEL);
          break;
-      case C_OSCCanSignal::eBYTE_ORDER_MOTOROLA:
+      case C_OscCanSignal::eBYTE_ORDER_MOTOROLA:
          this->mpc_Ui->pc_ComboBoxByteOrder->setCurrentIndex(ms32_BYTE_ORDER_INDEX_MOTOROLA);
          break;
       default:
@@ -1974,10 +1975,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_WidgetMin->setEnabled(true);
       }
       //Value
-      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMin, this->mc_DataOSCSignalCommon.c_MinValue,
-                               this->mc_DataOSCSignalCommon.f64_Factor, this->mc_DataOSCSignalCommon.f64_Offset,
-                               this->mc_DataOSCSignal.u16_ComBitLength, NULL,
-                               &this->mc_DataOSCSignalCommon.c_MaxValue) == C_NO_ERR);
+      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMin, this->mc_DataOscSignalCommon.c_MinValue,
+                               this->mc_DataOscSignalCommon.f64_Factor, this->mc_DataOscSignalCommon.f64_Offset,
+                               this->mc_DataOscSignal.u16_ComBitLength, NULL,
+                               &this->mc_DataOscSignalCommon.c_MaxValue) == C_NO_ERR);
       break;
    case eCHA_MAX:
       //Restrictions
@@ -1990,14 +1991,14 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
          this->mpc_Ui->pc_WidgetMax->setEnabled(true);
       }
       //Value
-      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMax, this->mc_DataOSCSignalCommon.c_MaxValue,
-                               this->mc_DataOSCSignalCommon.f64_Factor, this->mc_DataOSCSignalCommon.f64_Offset,
-                               this->mc_DataOSCSignal.u16_ComBitLength, &this->mc_DataOSCSignalCommon.c_MinValue,
+      tgl_assert(m_LoadGeneric(this->mpc_Ui->pc_WidgetMax, this->mc_DataOscSignalCommon.c_MaxValue,
+                               this->mc_DataOscSignalCommon.f64_Factor, this->mc_DataOscSignalCommon.f64_Offset,
+                               this->mc_DataOscSignal.u16_ComBitLength, &this->mc_DataOscSignalCommon.c_MinValue,
                                NULL) == C_NO_ERR);
       break;
    case eCHA_AUTO_MIN_MAX:
       //Restrictions
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_CheckBoxAutoMinMax->setEnabled(false);
       }
@@ -2010,7 +2011,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       break;
    case eCHA_FACTOR:
       //Restrictions
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_DoubleSpinBoxFactor->setEnabled(false);
       }
@@ -2021,13 +2022,13 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       //Factor needs to be above zero
       //lint -e{1938}  static const is guaranteed preinitialized before main
       this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMinimumCustom(C_OgeSpxFactor::mhf64_FACTOR_MIN);
-      this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMaximumCustom(std::numeric_limits<float64>::max());
+      this->mpc_Ui->pc_DoubleSpinBoxFactor->SetMaximumCustom(std::numeric_limits<float64_t>::max());
       //Value
-      this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(this->mc_DataOSCSignalCommon.f64_Factor);
+      this->mpc_Ui->pc_DoubleSpinBoxFactor->setValue(this->mc_DataOscSignalCommon.f64_Factor);
       break;
    case eCHA_OFFSET:
       //Restrictions
-      if (this->mc_DataOSCSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(false);
       }
@@ -2035,10 +2036,10 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUIForChange(const E_Change oe_Change
       {
          this->mpc_Ui->pc_DoubleSpinBoxOffset->setEnabled(true);
       }
-      this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64>::lowest());
-      this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64>::max());
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMinimumCustom(std::numeric_limits<float64_t>::lowest());
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->SetMaximumCustom(std::numeric_limits<float64_t>::max());
       //Value
-      this->mpc_Ui->pc_DoubleSpinBoxOffset->setValue(this->mc_DataOSCSignalCommon.f64_Offset);
+      this->mpc_Ui->pc_DoubleSpinBoxOffset->setValue(this->mc_DataOscSignalCommon.f64_Offset);
       break;
    case eCHA_MLV:
       //Update UI via signal
@@ -2068,7 +2069,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPr
       break;
    case eCHA_MUX_TYPE:
       //Check
-      m_CheckMUXType(false);
+      m_CheckMuxType(false);
       break;
    case eCHA_START_BIT:
       //Check
@@ -2080,7 +2081,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPr
       break;
    case eCHA_MUX_VALUE:
       //Check
-      m_CheckMUXValue(false);
+      m_CheckMuxValue(false);
       break;
    case eCHA_VALUE_TYPE:
    case eCHA_INIT:
@@ -2171,23 +2172,23 @@ void C_SdBueSignalPropertiesWidget::m_ConnectAll(void) const
            &C_SdBueSignalPropertiesWidget::m_HandleCommentChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_DoubleSpinBoxFactor, static_cast<void (QDoubleSpinBox::*)(
-                                                                float64)>(&QDoubleSpinBox::valueChanged), this,
+                                                                float64_t)>(&QDoubleSpinBox::valueChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleFactorChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_DoubleSpinBoxOffset, static_cast<void (QDoubleSpinBox::*)(
-                                                                float64)>(&QDoubleSpinBox::valueChanged), this,
+                                                                float64_t)>(&QDoubleSpinBox::valueChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleOffsetChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxByteOrder, static_cast<void (QComboBox::*)(
-                                                              sintn)>(&QComboBox::currentIndexChanged), this,
+                                                              int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleByteOrderChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxMuxType, static_cast<void (QComboBox::*)(
-                                                            sintn)>(&QComboBox::currentIndexChanged), this,
+                                                            int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleMuxTypeChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxMuxValue, static_cast<void (QSpinBox::*)(
-                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+                                                            int32_t)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange);
    connect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
            &C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBoxChange);
@@ -2199,15 +2200,15 @@ void C_SdBueSignalPropertiesWidget::m_ConnectAll(void) const
            &C_SdBueSignalPropertiesWidget::m_HandleInitChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                         int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleValueTypeChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxLength, static_cast<void (QSpinBox::*)(
-                                                          sintn)>(&QSpinBox::valueChanged), this,
+                                                          int32_t)>(&QSpinBox::valueChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
-                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+                                                            int32_t)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleStartBitChange);
 }
 
@@ -2229,23 +2230,23 @@ void C_SdBueSignalPropertiesWidget::m_DisconnectAll(void) const
               &C_SdBueSignalPropertiesWidget::m_HandleCommentChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_DoubleSpinBoxFactor, static_cast<void (QDoubleSpinBox::*)(
-                                                                   float64)>(&QDoubleSpinBox::valueChanged), this,
+                                                                   float64_t)>(&QDoubleSpinBox::valueChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleFactorChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_DoubleSpinBoxOffset, static_cast<void (QDoubleSpinBox::*)(
-                                                                   float64)>(&QDoubleSpinBox::valueChanged), this,
+                                                                   float64_t)>(&QDoubleSpinBox::valueChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleOffsetChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxByteOrder, static_cast<void (QComboBox::*)(
-                                                                 sintn)>(&QComboBox::currentIndexChanged), this,
+                                                                 int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleByteOrderChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxMuxType, static_cast<void (QComboBox::*)(
-                                                               sintn)>(&QComboBox::currentIndexChanged), this,
+                                                               int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleMuxTypeChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxMuxValue, static_cast<void (QSpinBox::*)(
-                                                               sintn)>(&C_OgeSpxNumber::valueChanged), this,
+                                                               int32_t)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange);
    disconnect(this->mpc_Ui->pc_CheckBoxAutoMinMax, &C_OgeChxProperties::toggled, this,
               &C_SdBueSignalPropertiesWidget::m_HandleAutoMinMaxCheckBoxChange);
@@ -2257,14 +2258,14 @@ void C_SdBueSignalPropertiesWidget::m_DisconnectAll(void) const
               &C_SdBueSignalPropertiesWidget::m_HandleInitChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                            sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                            int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleValueTypeChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxLength, static_cast<void (QSpinBox::*)(
-                                                             sintn)>(&QSpinBox::valueChanged), this,
+                                                             int32_t)>(&QSpinBox::valueChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleValueLengthChange);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
-                                                               sintn)>(&C_OgeSpxNumber::valueChanged), this,
+                                                               int32_t)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleStartBitChange);
 }

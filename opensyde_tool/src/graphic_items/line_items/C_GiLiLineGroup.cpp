@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsScene>
 #include <QPainter>
 #include <limits>
 
-#include "constants.h"
-#include "C_OSCUtils.h"
-#include "C_GiLiLineGroup.h"
-#include "C_GiCustomFunctions.h"
+#include "constants.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GiLiLineGroup.hpp"
+#include "C_GiCustomFunctions.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiLiLineGroup::mhf64_MAX_DIST_TO_ALIGN = 10.0;
+const float64_t C_GiLiLineGroup::mhf64_MAX_DIST_TO_ALIGN = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -55,7 +54,7 @@ C_GiLiLineGroup::C_GiLiLineGroup(const std::vector<QPointF> * const opc_Points, 
    mpc_LinePath(new C_GiLiLine(NULL, orq_MiddleLine, opc_Parent)),
    //lint -e{1938}  static const is guaranteed preinitialized before main
    me_ActiveResizeMode(eNO_ELEMENT),
-   msn_ActiveItemIndex(0),
+   ms32_ActiveItemIndex(0),
    mc_LastKnownPosition(),
    mq_BlockChangeSignal(false)
 
@@ -91,7 +90,7 @@ C_GiLiLineGroup::~C_GiLiLineGroup(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::m_SetInteractionVisibility(const bool & orq_Visible)
 {
-   for (sint32 s32_ItPoint = 0L; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+   for (int32_t s32_ItPoint = 0L; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
    {
       mc_Points[s32_ItPoint]->setVisible(orq_Visible);
    }
@@ -105,7 +104,7 @@ void C_GiLiLineGroup::m_SetInteractionVisibility(const bool & orq_Visible)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::m_HideInteraction(const bool & orq_Invisible)
 {
-   for (sint32 s32_ItPoint = 0L; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+   for (int32_t s32_ItPoint = 0L; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
    {
       if (orq_Invisible == true)
       {
@@ -126,14 +125,14 @@ void C_GiLiLineGroup::m_CheckLineGrid(const QPointF & orc_MouseScenePos)
    this->prepareGeometryChange();
 
    //Affected lines
-   for (sint32 s32_ItPoint = std::max(0, this->msn_ActiveItemIndex - 1);
-        (s32_ItPoint <= static_cast<sint32>(this->msn_ActiveItemIndex)) &&
-        (s32_ItPoint < static_cast<sint32>(this->mc_Points.size() - 1));
+   for (int32_t s32_ItPoint = std::max(0, this->ms32_ActiveItemIndex - 1);
+        (s32_ItPoint <= static_cast<int32_t>(this->ms32_ActiveItemIndex)) &&
+        (s32_ItPoint < static_cast<int32_t>(this->mc_Points.size() - 1));
         ++s32_ItPoint)
    {
       QPointF c_LineStart = this->mc_Points[s32_ItPoint]->scenePos();
-      QPointF c_LineEnd = this->mc_Points[static_cast<sintn>(s32_ItPoint + 1L)]->scenePos();
-      if (s32_ItPoint == this->msn_ActiveItemIndex)
+      QPointF c_LineEnd = this->mc_Points[static_cast<int32_t>(s32_ItPoint + 1L)]->scenePos();
+      if (s32_ItPoint == this->ms32_ActiveItemIndex)
       {
          if (q_Adapted == false)
          {
@@ -145,36 +144,36 @@ void C_GiLiLineGroup::m_CheckLineGrid(const QPointF & orc_MouseScenePos)
          c_LineEnd = orc_MouseScenePos;
       }
       //Check already aligned
-      if ((C_OSCUtils::h_IsFloat64NearlyEqual(c_LineStart.x(), c_LineEnd.x()) == false) ||
-          (C_OSCUtils::h_IsFloat64NearlyEqual(c_LineStart.y(), c_LineEnd.y()) == false))
+      if ((C_OscUtils::h_IsFloat64NearlyEqual(c_LineStart.x(), c_LineEnd.x()) == false) ||
+          (C_OscUtils::h_IsFloat64NearlyEqual(c_LineStart.y(), c_LineEnd.y()) == false))
       {
          //Not aligned
          //Check degree
-         const float64 f64_DistX = c_LineEnd.x() - c_LineStart.x();
-         const float64 f64_DistY = c_LineEnd.y() - c_LineStart.y();
-         if (C_GiLiLineGroup::mh_Near(f64_DistY, 0.0))
+         const float64_t f64_DistHorizontal = c_LineEnd.x() - c_LineStart.x();
+         const float64_t f64_DistVertical = c_LineEnd.y() - c_LineStart.y();
+         if (C_GiLiLineGroup::mh_Near(f64_DistVertical, 0.0))
          {
             //Align y
-            if (s32_ItPoint == this->msn_ActiveItemIndex)
+            if (s32_ItPoint == this->ms32_ActiveItemIndex)
             {
-               this->UpdatePoint(this->msn_ActiveItemIndex, QPointF(c_LineStart.x(), c_LineEnd.y()), true);
+               this->UpdatePoint(this->ms32_ActiveItemIndex, QPointF(c_LineStart.x(), c_LineEnd.y()), true);
             }
             else
             {
-               this->UpdatePoint(this->msn_ActiveItemIndex, QPointF(c_LineEnd.x(), c_LineStart.y()), true);
+               this->UpdatePoint(this->ms32_ActiveItemIndex, QPointF(c_LineEnd.x(), c_LineStart.y()), true);
             }
             q_Adapted = true;
          }
-         else if (C_GiLiLineGroup::mh_Near(f64_DistX, 0.0))
+         else if (C_GiLiLineGroup::mh_Near(f64_DistHorizontal, 0.0))
          {
             //Align x
-            if (s32_ItPoint == this->msn_ActiveItemIndex)
+            if (s32_ItPoint == this->ms32_ActiveItemIndex)
             {
-               this->UpdatePoint(this->msn_ActiveItemIndex, QPointF(c_LineEnd.x(), c_LineStart.y()), true);
+               this->UpdatePoint(this->ms32_ActiveItemIndex, QPointF(c_LineEnd.x(), c_LineStart.y()), true);
             }
             else
             {
-               this->UpdatePoint(this->msn_ActiveItemIndex, QPointF(c_LineStart.x(), c_LineEnd.y()), true);
+               this->UpdatePoint(this->ms32_ActiveItemIndex, QPointF(c_LineStart.x(), c_LineEnd.y()), true);
             }
             q_Adapted = true;
          }
@@ -187,14 +186,14 @@ void C_GiLiLineGroup::m_CheckLineGrid(const QPointF & orc_MouseScenePos)
    if (q_Adapted == false)
    {
       //Do manual move to mouse position
-      this->UpdatePoint(this->msn_ActiveItemIndex, orc_MouseScenePos, true);
+      this->UpdatePoint(this->ms32_ActiveItemIndex, orc_MouseScenePos, true);
    }
    //One central change trigger
    this->TriggerSigChangedGraphic();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiLiLineGroup::mh_Near(const float64 of64_Exact, const float64 of64_Eval)
+bool C_GiLiLineGroup::mh_Near(const float64_t of64_Exact, const float64_t of64_Eval)
 {
    bool q_Retval;
 
@@ -221,11 +220,11 @@ bool C_GiLiLineGroup::mh_Near(const float64 of64_Exact, const float64 of64_Eval)
    else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * const ops32_Index)
+int32_t C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const int32_t * const ops32_Index)
 {
    const QVector<C_GiLiLineConnection *> & rc_VecLines = this->mpc_LinePath->GetLines();
 
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    //Restrict position
    const QPointF c_AdaptedPos(std::max(20.0, orc_ScenePos.x()), std::max(20.0, orc_ScenePos.y()));
@@ -235,8 +234,8 @@ sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * co
    if (ops32_Index == NULL)
    {
       QVector<C_GiLiLineConnection *>::const_iterator pc_ItLine;
-      float64 f64_ResultDist;
-      float64 f64_MinDist = 1000000.0;
+      float64_t f64_ResultDist;
+      float64_t f64_MinDist = 1000000.0;
 
       // get the next line to the point
       for (pc_ItLine = rc_VecLines.begin(); pc_ItLine != rc_VecLines.end(); ++pc_ItLine)
@@ -293,19 +292,19 @@ sint32 C_GiLiLineGroup::BendLine(const QPointF & orc_ScenePos, const sint32 * co
    else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * const ops32_Index)
+int32_t C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const int32_t * const ops32_Index)
 {
    const QVector<C_GiLiInteractionPoint *> & rc_VecPoints = this->mc_Points;
 
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    this->prepareGeometryChange();
 
    if (ops32_Index == NULL)
    {
       QVector<C_GiLiInteractionPoint *>::const_iterator pc_ItPoint;
-      float64 f64_ResultDist;
-      float64 f64_MinDist = 1000000.0;
+      float64_t f64_ResultDist;
+      float64_t f64_MinDist = 1000000.0;
 
       // get the next point to the point
       for (pc_ItPoint = rc_VecPoints.begin(); pc_ItPoint != rc_VecPoints.end(); ++pc_ItPoint)
@@ -347,7 +346,7 @@ sint32 C_GiLiLineGroup::RemoveBend(const QPointF & orc_ScenePos, const sint32 * 
    \param[in] ors32_PointIndex Index of changed point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::OnPointChange(const stw_types::sint32 & ors32_PointIndex)
+void C_GiLiLineGroup::OnPointChange(const int32_t & ors32_PointIndex)
 {
    //Line(s)
    this->mpc_LinePath->UpdatePoint(ors32_PointIndex, this->mc_Points[ors32_PointIndex]->pos());
@@ -375,13 +374,13 @@ void C_GiLiLineGroup::RestoreDefaultCursor(void)
 {
    const QVector<C_GiLiLineConnection *> & rc_Lines = this->mpc_LinePath->GetLines();
 
-   for (sintn sn_ItPoint = 0; sn_ItPoint < this->mc_Points.size(); ++sn_ItPoint)
+   for (int32_t s32_ItPoint = 0; s32_ItPoint < this->mc_Points.size(); ++s32_ItPoint)
    {
-      this->mc_Points[sn_ItPoint]->RestoreDefaultCursor();
+      this->mc_Points[s32_ItPoint]->RestoreDefaultCursor();
    }
-   for (sintn sn_ItLine = 0; sn_ItLine < rc_Lines.size(); ++sn_ItLine)
+   for (int32_t s32_ItLine = 0; s32_ItLine < rc_Lines.size(); ++s32_ItLine)
    {
-      rc_Lines[sn_ItLine]->RestoreDefaultCursor();
+      rc_Lines[s32_ItLine]->RestoreDefaultCursor();
    }
    this->setCursor(Qt::ArrowCursor);
 }
@@ -396,13 +395,13 @@ void C_GiLiLineGroup::SetTemporaryCursor(const QCursor & orc_TemporaryCursor)
 {
    const QVector<C_GiLiLineConnection *> & rc_Lines = this->mpc_LinePath->GetLines();
 
-   for (sintn sn_ItPoint = 0; sn_ItPoint < this->mc_Points.size(); ++sn_ItPoint)
+   for (int32_t s32_ItPoint = 0; s32_ItPoint < this->mc_Points.size(); ++s32_ItPoint)
    {
-      this->mc_Points[sn_ItPoint]->SetTemporaryCursor(orc_TemporaryCursor);
+      this->mc_Points[s32_ItPoint]->SetTemporaryCursor(orc_TemporaryCursor);
    }
-   for (sintn sn_ItLine = 0; sn_ItLine < rc_Lines.size(); ++sn_ItLine)
+   for (int32_t s32_ItLine = 0; s32_ItLine < rc_Lines.size(); ++s32_ItLine)
    {
-      rc_Lines[sn_ItLine]->SetTemporaryCursor(orc_TemporaryCursor);
+      rc_Lines[s32_ItLine]->SetTemporaryCursor(orc_TemporaryCursor);
    }
    this->setCursor(orc_TemporaryCursor);
 }
@@ -417,9 +416,9 @@ void C_GiLiLineGroup::SetDefaultCursor(const QCursor & orc_Value)
 {
    const QVector<C_GiLiLineConnection *> & rc_Lines = this->mpc_LinePath->GetLines();
 
-   for (sintn sn_ItLine = 0; sn_ItLine < rc_Lines.size(); ++sn_ItLine)
+   for (int32_t s32_ItLine = 0; s32_ItLine < rc_Lines.size(); ++s32_ItLine)
    {
-      rc_Lines[sn_ItLine]->SetDefaultCursor(orc_Value);
+      rc_Lines[s32_ItLine]->SetDefaultCursor(orc_Value);
    }
    this->setCursor(orc_Value);
    this->mc_DefaultCursor = orc_Value;
@@ -442,16 +441,16 @@ void C_GiLiLineGroup::CopyStyle(const QGraphicsItem * const opc_GuidelineItem)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::SetZValueCustom(const float64 of64_ZValue)
+void C_GiLiLineGroup::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   this->setZValue(of64_ZValue);
+   this->setZValue(of64_ZetValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::m_InitPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
+void C_GiLiLineGroup::m_InitPoint(const int32_t & ors32_Index, const QPointF & orc_Pos)
 {
    QPointF c_AdaptedScenePos = this->mapToScene(orc_Pos);
 
@@ -466,7 +465,7 @@ void C_GiLiLineGroup::m_InitPoint(const sint32 & ors32_Index, const QPointF & or
            &C_GiLiLineGroup::OnPointChange);
 
    //Update Point Index
-   for (sint32 s32_ItPoint = ors32_Index; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+   for (int32_t s32_ItPoint = ors32_Index; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
    {
       mc_Points[s32_ItPoint]->SetPointIndex(s32_ItPoint);
       this->addToGroup(mc_Points[s32_ItPoint]);
@@ -480,7 +479,7 @@ void C_GiLiLineGroup::m_InitPoint(const sint32 & ors32_Index, const QPointF & or
    \param[in] orc_Pos     Position of new point in scene
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::m_AddPointAt(const stw_types::sint32 & ors32_Index, const QPointF & orc_Pos)
+void C_GiLiLineGroup::m_AddPointAt(const int32_t & ors32_Index, const QPointF & orc_Pos)
 {
    if (ors32_Index >= 0L)
    {
@@ -503,7 +502,7 @@ void C_GiLiLineGroup::m_AddPointAt(const stw_types::sint32 & ors32_Index, const 
    \param[in] ors32_Index Index of point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::m_RemovePointAt(const stw_types::sint32 & ors32_Index)
+void C_GiLiLineGroup::m_RemovePointAt(const int32_t & ors32_Index)
 {
    if (ors32_Index >= 0L)
    {
@@ -518,7 +517,7 @@ void C_GiLiLineGroup::m_RemovePointAt(const stw_types::sint32 & ors32_Index)
          mc_Points[ors32_Index]->deleteLater();
          mc_Points.remove(ors32_Index);
          //Update Point Index
-         for (sint32 s32_ItPoint = ors32_Index; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+         for (int32_t s32_ItPoint = ors32_Index; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
          {
             mc_Points[s32_ItPoint]->SetPointIndex(s32_ItPoint);
          }
@@ -532,12 +531,12 @@ void C_GiLiLineGroup::m_RemovePointAt(const stw_types::sint32 & ors32_Index)
    \param[in,out] orc_Data Data element to load
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::m_LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data)
+void C_GiLiLineGroup::m_LoadBasicData(const stw::opensyde_gui_logic::C_PuiBsLineBase & orc_Data)
 {
-   this->SetWidth(orc_Data.s32_UIWidthPixels);
-   this->SetColor(orc_Data.c_UIColor);
+   this->SetWidth(orc_Data.s32_UiWidthPixels);
+   this->SetColor(orc_Data.c_UiColor);
    //Don't trigger data update at this point
-   this->setZValue(orc_Data.f64_ZOrder);
+   this->setZValue(orc_Data.f64_ZetOrder);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -546,18 +545,18 @@ void C_GiLiLineGroup::m_LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsLineB
    \param[in,out] orc_Data Data element to update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::m_UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const
+void C_GiLiLineGroup::m_UpdateBasicData(stw::opensyde_gui_logic::C_PuiBsLineBase & orc_Data) const
 {
-   orc_Data.c_UIColor = this->GetColor();
-   orc_Data.s32_UIWidthPixels = this->GetWidth();
-   orc_Data.f64_ZOrder = this->zValue();
-   orc_Data.c_UIInteractionPoints.clear();
-   orc_Data.c_UIInteractionPoints.reserve(this->mc_Points.size());
+   orc_Data.c_UiColor = this->GetColor();
+   orc_Data.s32_UiWidthPixels = this->GetWidth();
+   orc_Data.f64_ZetOrder = this->zValue();
+   orc_Data.c_UiInteractionPoints.clear();
+   orc_Data.c_UiInteractionPoints.reserve(this->mc_Points.size());
    for (QVector<C_GiLiInteractionPoint *>::const_iterator pc_ItPoint = this->mc_Points.begin();
         pc_ItPoint != this->mc_Points.end();
         ++pc_ItPoint)
    {
-      orc_Data.c_UIInteractionPoints.push_back((*pc_ItPoint)->scenePos());
+      orc_Data.c_UiInteractionPoints.push_back((*pc_ItPoint)->scenePos());
    }
 }
 
@@ -573,9 +572,9 @@ void C_GiLiLineGroup::m_Init(const std::vector<QPointF> & orc_Points)
    //Points
    mc_Points.clear();
    mc_Points.reserve(orc_Points.size());
-   for (uint32 u32_ItPoint = 0L; u32_ItPoint < orc_Points.size(); ++u32_ItPoint)
+   for (uint32_t u32_ItPoint = 0L; u32_ItPoint < orc_Points.size(); ++u32_ItPoint)
    {
-      this->m_InitPoint(static_cast<sint32>(u32_ItPoint), orc_Points[u32_ItPoint]);
+      this->m_InitPoint(static_cast<int32_t>(u32_ItPoint), orc_Points[u32_ItPoint]);
    }
 
    //Selection on creation
@@ -606,17 +605,17 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
          this->prepareGeometryChange();
 
          // move the line by reverting all other points
-         for (sint32 s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
+         for (int32_t s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
          {
-            if ((s32_Counter != this->msn_ActiveItemIndex) &&
-                (s32_Counter != static_cast<sint32>(this->msn_ActiveItemIndex + 1L)))
+            if ((s32_Counter != this->ms32_ActiveItemIndex) &&
+                (s32_Counter != static_cast<int32_t>(this->ms32_ActiveItemIndex + 1L)))
             {
                this->UpdatePoint(s32_Counter, this->mc_Points[s32_Counter]->scenePos() - c_Delta, true);
             }
          }
          if (this->mc_Points.size() == 2)
          {
-            Q_EMIT this->SigSubItemMoves(this->msn_ActiveItemIndex, c_Delta);
+            Q_EMIT this->SigSubItemMoves(this->ms32_ActiveItemIndex, c_Delta);
          }
       }
       else if (this->me_ActiveResizeMode == ePOINT)
@@ -624,9 +623,9 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
          this->prepareGeometryChange();
 
          // move the point by reverting all other points
-         for (sint32 s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
+         for (int32_t s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
          {
-            if (s32_Counter != this->msn_ActiveItemIndex)
+            if (s32_Counter != this->ms32_ActiveItemIndex)
             {
                this->UpdatePoint(s32_Counter, this->mc_Points[s32_Counter]->scenePos() - c_Delta, true);
             }
@@ -635,7 +634,7 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
       else
       {
          // Scene movement
-         Q_EMIT this->SigSubItemMoves(this->msn_ActiveItemIndex, c_Delta);
+         Q_EMIT this->SigSubItemMoves(this->ms32_ActiveItemIndex, c_Delta);
       }
    }
    //Check if the new bounding rect intersects with any border
@@ -651,10 +650,10 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
          if (this->me_ActiveResizeMode == eLINE)
          {
             // move the line by reverting all other points
-            for (sint32 s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
+            for (int32_t s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
             {
-               if ((s32_Counter != this->msn_ActiveItemIndex) &&
-                   (s32_Counter != static_cast<sint32>(this->msn_ActiveItemIndex + 1L)))
+               if ((s32_Counter != this->ms32_ActiveItemIndex) &&
+                   (s32_Counter != static_cast<int32_t>(this->ms32_ActiveItemIndex + 1L)))
                {
                   this->UpdatePoint(s32_Counter, this->mc_Points[s32_Counter]->scenePos() - c_Delta, true);
                }
@@ -663,9 +662,9 @@ QVariant C_GiLiLineGroup::itemChange(const GraphicsItemChange oe_Change, const Q
          else if (this->me_ActiveResizeMode == ePOINT)
          {
             // move the point by reverting all other points
-            for (sint32 s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
+            for (int32_t s32_Counter = 0; s32_Counter < this->mc_Points.size(); ++s32_Counter)
             {
-               if (s32_Counter != this->msn_ActiveItemIndex)
+               if (s32_Counter != this->ms32_ActiveItemIndex)
                {
                   this->UpdatePoint(s32_Counter, this->mc_Points[s32_Counter]->scenePos() - c_Delta, true);
                }
@@ -714,7 +713,7 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
       if (this->me_ActiveResizeMode != eALL)
       {
          const QPointF c_Pos = opc_Event->scenePos();
-         sint32 s32_Counter;
+         int32_t s32_Counter;
          bool q_FoundPoint = false;
 
          // check points
@@ -723,7 +722,7 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
             if (this->mc_Points[s32_Counter]->IsPointInside(c_Pos) == true)
             {
                this->me_ActiveResizeMode = ePOINT;
-               this->msn_ActiveItemIndex = s32_Counter;
+               this->ms32_ActiveItemIndex = s32_Counter;
                q_FoundPoint = true;
                break;
             }
@@ -739,7 +738,7 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
                if (rc_Lines[s32_Counter]->contains(rc_Lines[s32_Counter]->mapFromScene(c_Pos)) == true)
                {
                   this->me_ActiveResizeMode = eLINE;
-                  this->msn_ActiveItemIndex = s32_Counter;
+                  this->ms32_ActiveItemIndex = s32_Counter;
 
                   break;
                }
@@ -747,7 +746,7 @@ void C_GiLiLineGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Event
          }
          else
          {
-            this->mc_LastKnownPosition = this->mc_Points[this->msn_ActiveItemIndex]->pos();
+            this->mc_LastKnownPosition = this->mc_Points[this->ms32_ActiveItemIndex]->pos();
          }
       }
    }
@@ -782,14 +781,14 @@ void C_GiLiLineGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Eve
 {
    if (this->me_ActiveResizeMode == ePOINT)
    {
-      Q_EMIT this->SigItemWasResized(this->msn_ActiveItemIndex,
-                                     this->mc_Points[this->msn_ActiveItemIndex]->pos() - this->mc_LastKnownPosition);
+      Q_EMIT this->SigItemWasResized(this->ms32_ActiveItemIndex,
+                                     this->mc_Points[this->ms32_ActiveItemIndex]->pos() - this->mc_LastKnownPosition);
    }
    else if (this->me_ActiveResizeMode == eLINE)
    {
       if (this->pos() != this->mc_LastKnownPosition)
       {
-         Q_EMIT this->SigSubItemWasMoved(this->msn_ActiveItemIndex, this->pos() - this->mc_LastKnownPosition);
+         Q_EMIT this->SigSubItemWasMoved(this->ms32_ActiveItemIndex, this->pos() - this->mc_LastKnownPosition);
       }
    }
    else
@@ -819,7 +818,7 @@ void C_GiLiLineGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc_Eve
    \param[in] ors32_Width New width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::SetWidth(const sint32 & ors32_Width)
+void C_GiLiLineGroup::SetWidth(const int32_t & ors32_Width)
 {
    this->mpc_LinePath->SetWidth(ors32_Width);
 }
@@ -863,7 +862,7 @@ void C_GiLiLineGroup::SetMiddleLine(const bool & orq_MiddleLine)
    \return  Width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiLineGroup::GetWidth() const
+int32_t C_GiLiLineGroup::GetWidth() const
 {
    return this->mpc_LinePath->GetWidth();
 }
@@ -919,7 +918,7 @@ bool C_GiLiLineGroup::GetMiddleLine() const
    Number of used points
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiLiLineGroup::GetNumberPoints(void) const
+int32_t C_GiLiLineGroup::GetNumberPoints(void) const
 {
    return this->mc_Points.size();
 }
@@ -1017,16 +1016,16 @@ void C_GiLiLineGroup::SetResizing(const bool & orq_ResizeActive)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLineGroup::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
-   float64 f64_Best = std::numeric_limits<float64>::max();
+   float64_t f64_Best = std::numeric_limits<float64_t>::max();
 
    orc_Closest = orc_ScenePoint;
    if (mc_Points.size() > 0)
    {
       QPointF c_CurProj;
-      float64 f64_CurDist;
+      float64_t f64_CurDist;
       QPointF c_CurP2;
       QPointF c_CurP1 = mc_Points[0]->scenePos();
-      for (sint32 s32_ItPoint = 1; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+      for (int32_t s32_ItPoint = 1; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
       {
          c_CurP2 = mc_Points[s32_ItPoint]->scenePos();
          C_GiBiConnectableItem::h_DistToLine(c_CurP1, c_CurP2, orc_ScenePoint, &f64_CurDist, &c_CurProj, NULL);
@@ -1047,20 +1046,20 @@ void C_GiLiLineGroup::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF &
    \param[out] ors32_Index    Index of closest connection in shape
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, sint32 & ors32_Index) const
+void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, int32_t & ors32_Index) const
 {
    if (this->mpc_LinePath != NULL)
    {
-      float64 f64_Best = std::numeric_limits<float64>::max();
+      float64_t f64_Best = std::numeric_limits<float64_t>::max();
       const QVector<C_GiLiLineConnection *> & rc_Lines = this->mpc_LinePath->GetLines();
 
       ors32_Index = -1;
       if (mc_Points.size() > 0)
       {
-         float64 f64_CurDist;
+         float64_t f64_CurDist;
          QPointF c_CurP2;
          QPointF c_CurP1 = mc_Points[0]->scenePos();
-         for (sint32 s32_ItPoint = 1; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+         for (int32_t s32_ItPoint = 1; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
          {
             c_CurP2 = mc_Points[s32_ItPoint]->scenePos();
             C_GiBiConnectableItem::h_DistToLine(c_CurP1, c_CurP2, orc_ScenePoint, &f64_CurDist, NULL, NULL);
@@ -1068,7 +1067,7 @@ void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, sint
             if (f64_CurDist < f64_Best)
             {
                f64_Best = f64_CurDist;
-               if (static_cast<sint32>(rc_Lines.size()) > (s32_ItPoint - 1))
+               if (static_cast<int32_t>(rc_Lines.size()) > (s32_ItPoint - 1))
                {
                   ors32_Index = s32_ItPoint - 1;
                }
@@ -1088,7 +1087,7 @@ void C_GiLiLineGroup::FindClosestConnection(const QPointF & orc_ScenePoint, sint
                                              Warning: external call of TriggerSigChangedGraphic will become necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos,
+void C_GiLiLineGroup::UpdatePoint(const int32_t & ors32_Index, const QPointF & orc_Pos,
                                   const bool oq_BlockTriggerOfChangedSignal)
 {
    if (((ors32_Index >= 0) && (ors32_Index < this->mc_Points.size())) && (this->mpc_LinePath != NULL))
@@ -1124,7 +1123,7 @@ void C_GiLiLineGroup::UpdatePoint(const sint32 & ors32_Index, const QPointF & or
    Point scene position
 */
 //----------------------------------------------------------------------------------------------------------------------
-QPointF C_GiLiLineGroup::GetPointScenePos(const sint32 os32_Index) const
+QPointF C_GiLiLineGroup::GetPointScenePos(const int32_t os32_Index) const
 {
    QPointF c_Retval;
 
@@ -1139,7 +1138,7 @@ QPointF C_GiLiLineGroup::GetPointScenePos(const sint32 os32_Index) const
    \param[out] orc_Pos     Point scene position
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineGroup::GetPointPos(const sint32 & ors32_Index, QPointF & orc_Pos) const
+void C_GiLiLineGroup::GetPointPos(const int32_t & ors32_Index, QPointF & orc_Pos) const
 {
    if ((ors32_Index >= 0) && (ors32_Index < this->mc_Points.size()))
    {
@@ -1166,7 +1165,7 @@ bool C_GiLiLineGroup::CheckBendPointAt(const QPointF & orc_ScenePoint) const
    bool q_Retval = false;
 
    // check points
-   for (sint32 s32_Counter = 0; s32_Counter < mc_Points.size(); ++s32_Counter)
+   for (int32_t s32_Counter = 0; s32_Counter < mc_Points.size(); ++s32_Counter)
    {
       if (this->mc_Points[s32_Counter]->IsPointInside(orc_ScenePoint) == true)
       {
@@ -1241,7 +1240,7 @@ void C_GiLiLineGroup::UpdateTransform(const QTransform & orc_Transform)
 {
    if (this->mpc_LinePath != NULL)
    {
-      float64 f64_Width = 0.0;
+      float64_t f64_Width = 0.0;
       C_GiPointInteraction * pc_ActionPoint;
 
       this->prepareGeometryChange();

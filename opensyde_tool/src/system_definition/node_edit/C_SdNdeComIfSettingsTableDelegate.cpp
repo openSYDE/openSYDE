@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "constants.h"
-#include "C_SdNdeComIfSettingsTableDelegate.h"
-#include "C_OSCDeviceDefinition.h"
-#include "C_OSCNode.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeSpxTableComIf.h"
-#include "C_OgeWiUtil.h"
-#include "C_SdUtil.h"
+#include "constants.hpp"
+#include "C_SdNdeComIfSettingsTableDelegate.hpp"
+#include "C_OscDeviceDefinition.hpp"
+#include "C_OscNode.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeSpxTableComIf.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ using namespace stw_types;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeComIfSettingsTableDelegate::C_SdNdeComIfSettingsTableDelegate(QObject * const opc_Parent,
-                                                                     const stw_types::uint32 ou32_NodeIndex) :
+                                                                     const uint32_t ou32_NodeIndex) :
    QStyledItemDelegate(opc_Parent)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -80,7 +79,7 @@ QWidget * C_SdNdeComIfSettingsTableDelegate::createEditor(QWidget * const opc_Pa
    Q_UNUSED(orc_Option)
    QWidget * pc_Retval = NULL;
    C_OgeSpxTableComIf * pc_SpinBox = NULL;
-   const uint8 u8_Maximum = C_SdUtil::h_GetNodeIdMaximum(this->mu32_NodeIndex);
+   const uint8_t u8_Maximum = C_SdUtil::h_GetNodeIdMaximum(this->mu32_NodeIndex);
 
    if (orc_Index.isValid() == true)
    {
@@ -89,7 +88,7 @@ QWidget * C_SdNdeComIfSettingsTableDelegate::createEditor(QWidget * const opc_Pa
       case C_SdNdeComIfSettingsTableDelegate::E_Columns::eNODEID:
          pc_SpinBox = new C_OgeSpxTableComIf(opc_Parent);
          pc_SpinBox->SetMaximumCustom(u8_Maximum);
-         connect(pc_SpinBox, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged), this,
+         connect(pc_SpinBox, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged), this,
                  &C_SdNdeComIfSettingsTableDelegate::m_CheckValue);
          pc_Retval = pc_SpinBox;
          Q_EMIT this->SigEdit(orc_Index);
@@ -169,20 +168,20 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check new node id value
 
-   \param[in] orsn_Value New node id
+   \param[in] ors32_Value New node id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const sintn & orsn_Value) const
+void C_SdNdeComIfSettingsTableDelegate::m_CheckValue(const int32_t & ors32_Value) const
 {
    C_OgeSpxToolTipBase * const pc_Widget = dynamic_cast<C_OgeSpxToolTipBase * const>(this->sender());
 
    if (pc_Widget != NULL)
    {
       const bool q_IdIsValid =
-         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckInterfaceIsAvailable(this->mu32_NodeIndex,
+         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().CheckInterfaceIsAvailable(this->mu32_NodeIndex,
                                                                                                   this->mc_Edit.row(),
-                                                                                                  static_cast<uint8>(
-                                                                                                     orsn_Value));
+                                                                                                  static_cast<uint8_t>(
+                                                                                                     ors32_Value));
       C_OgeWiUtil::h_ApplyStylesheetProperty(pc_Widget, "Valid", q_IdIsValid);
    }
 }

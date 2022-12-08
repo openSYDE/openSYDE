@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCHalcConfigStandaloneDomain.h"
+#include "C_OscHalcConfigStandaloneDomain.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,22 +33,22 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigStandaloneDomain::C_OSCHalcConfigStandaloneDomain(void) :
-   C_OSCHalcConfigDomain()
+C_OscHalcConfigStandaloneDomain::C_OscHalcConfigStandaloneDomain(void) :
+   C_OscHalcConfigDomain()
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Constructor to use data of an instance of type C_OSCHalcConfigDomain
+/*! \brief  Constructor to use data of an instance of type C_OscHalcConfigDomain
 
    \param[in]   orc_ConfigDomain          Project HALC domain configuration
    \param[in]   orc_StandaloneChannels    Standalone information of all domain channels
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigStandaloneDomain::C_OSCHalcConfigStandaloneDomain(const C_OSCHalcConfigDomain & orc_ConfigDomain,
-                                                                 const std::vector<C_OSCHalcConfigStandaloneChannel> & orc_StandaloneChannels)
+C_OscHalcConfigStandaloneDomain::C_OscHalcConfigStandaloneDomain(const C_OscHalcConfigDomain & orc_ConfigDomain,
+                                                                 const std::vector<C_OscHalcConfigStandaloneChannel> & orc_StandaloneChannels)
    :
-   C_OSCHalcConfigDomain(orc_ConfigDomain),
+   C_OscHalcConfigDomain(orc_ConfigDomain),
    c_StandaloneChannels(orc_StandaloneChannels)
 {
 }

@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
-#include "C_SdManTopologyContextMenuManager.h"
-#include "C_SebUtil.h"
-#include "C_GiLiLineGroup.h"
-#include "C_GtGetText.h"
-#include "gitypes.h"
+#include "C_SdManTopologyContextMenuManager.hpp"
+#include "C_SebUtil.hpp"
+#include "C_GiLiLineGroup.hpp"
+#include "C_GtGetText.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -93,7 +92,7 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
    // specific functionality
    switch (this->mpc_ActiveItem->type())
    {
-   case msn_GRAPHICS_ITEM_NODE:
+   case ms32_GRAPHICS_ITEM_NODE:
       this->mpc_ActionEdit->setText(C_GtGetText::h_GetText("Edit Node Properties"));
       this->mpc_ActionEdit->setVisible(true);
       this->mpc_ActionCut->setVisible(true);
@@ -103,9 +102,9 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionSendToBack->setVisible(true);
       break;
    // check for bus
-   case msn_GRAPHICS_ITEM_BUS:         // buses have the same functionality
-   case msn_GRAPHICS_ITEM_CANBUS:      // buses have the same functionality
-   case msn_GRAPHICS_ITEM_ETHERNETBUS: // buses have the same functionality
+   case ms32_GRAPHICS_ITEM_BUS:         // buses have the same functionality
+   case ms32_GRAPHICS_ITEM_CANBUS:      // buses have the same functionality
+   case ms32_GRAPHICS_ITEM_ETHERNETBUS: // buses have the same functionality
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
@@ -115,26 +114,26 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
       this->mpc_ActionEdit->setVisible(true);
       break;
    // check for bus connector
-   case msn_GRAPHICS_ITEM_BUS_CONNECT:
+   case ms32_GRAPHICS_ITEM_BUS_CONNECT:
       this->mpc_ActionDelete->setVisible(true);
       this->mpc_ActionInterfaceAssignment->setVisible(true);
       break;
-   case msn_GRAPHICS_ITEM_LINE_ARROW:
+   case ms32_GRAPHICS_ITEM_LINE_ARROW:
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
       this->mpc_ActionBringToFront->setVisible(true);
       this->mpc_ActionSendToBack->setVisible(true);
       break;
-   case msn_GRAPHICS_ITEM_BOUNDARY:    // boundary and text element have the same functionality
-   case msn_GRAPHICS_ITEM_TEXTELEMENT: // boundary and text element have the same functionality
+   case ms32_GRAPHICS_ITEM_BOUNDARY:    // boundary and text element have the same functionality
+   case ms32_GRAPHICS_ITEM_TEXTELEMENT: // boundary and text element have the same functionality
       this->mpc_ActionCut->setVisible(true);
       this->mpc_ActionCopy->setVisible(true);
       this->mpc_ActionDelete->setVisible(true);
       this->mpc_ActionBringToFront->setVisible(true);
       this->mpc_ActionSendToBack->setVisible(true);
       break;
-   case msn_GRAPHICS_ITEM_TEXTELEMENT_BUS:
+   case ms32_GRAPHICS_ITEM_TEXTELEMENT_BUS:
       this->mpc_ActionBringToFront->setVisible(true);
       this->mpc_ActionSendToBack->setVisible(true);
       this->mpc_ActionEdit->setText(C_GtGetText::h_GetText("Edit Bus Properties"));
@@ -163,25 +162,25 @@ bool C_SdManTopologyContextMenuManager::m_ActivateSpecificActions(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the input item type requires a setup style in the context menu
 
-   \param[in] osn_ItemType Item type to check
+   \param[in] os32_ItemType Item type to check
 
    \retval   True    Setup style menu is required
    \retval   False   Setup style menu should stay hidden
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdManTopologyContextMenuManager::m_ItemTypeHasSetupStyle(const sintn osn_ItemType)
+bool C_SdManTopologyContextMenuManager::m_ItemTypeHasSetupStyle(const int32_t os32_ItemType)
 {
    bool q_Retval;
 
-   switch (osn_ItemType)
+   switch (os32_ItemType)
    {
-   case msn_GRAPHICS_ITEM_BUS:
-   case msn_GRAPHICS_ITEM_CANBUS:
-   case msn_GRAPHICS_ITEM_ETHERNETBUS:
-   case msn_GRAPHICS_ITEM_LINE_ARROW:
-   case msn_GRAPHICS_ITEM_BOUNDARY:
-   case msn_GRAPHICS_ITEM_TEXTELEMENT:
-   case msn_GRAPHICS_ITEM_TEXTELEMENT_BUS:
+   case ms32_GRAPHICS_ITEM_BUS:
+   case ms32_GRAPHICS_ITEM_CANBUS:
+   case ms32_GRAPHICS_ITEM_ETHERNETBUS:
+   case ms32_GRAPHICS_ITEM_LINE_ARROW:
+   case ms32_GRAPHICS_ITEM_BOUNDARY:
+   case ms32_GRAPHICS_ITEM_TEXTELEMENT:
+   case ms32_GRAPHICS_ITEM_TEXTELEMENT_BUS:
       q_Retval = true;
       break;
    default:

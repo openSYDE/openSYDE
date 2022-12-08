@@ -60,7 +60,7 @@
       <number>10</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelChartIcon">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelChartIcon">
        <property name="minimumSize">
         <size>
          <width>30</width>
@@ -82,7 +82,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardTab" name="pc_LabelName">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardTab" name="pc_LabelName">
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -128,7 +128,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubTabClose" name="pc_PushButtonClose">
+      <widget class="stw::opensyde_gui_elements::C_OgePubTabClose" name="pc_PushButtonClose">
        <property name="minimumSize">
         <size>
          <width>13</width>
@@ -152,19 +152,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDashboardTab</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDashboardTab</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDashboardTab.h</header>
+   <header>C_OgeLabDashboardTab.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubTabClose</class>
+   <class>stw::opensyde_gui_elements::C_OgePubTabClose</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubTabClose.h</header>
+   <header>C_OgePubTabClose.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

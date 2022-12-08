@@ -8,22 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstdio>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLFile.h"
-#include "C_OSCUtils.h"
-#include "C_OSCComMessageLoggerFileBase.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglFile.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscComMessageLoggerFileBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,8 +44,8 @@ using namespace stw_opensyde_core;
    \param[in]  orc_ProtocolName  Name of current set protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerFileBase::C_OSCComMessageLoggerFileBase(const stw_scl::C_SCLString & orc_FilePath,
-                                                             const C_SCLString & orc_ProtocolName) :
+C_OscComMessageLoggerFileBase::C_OscComMessageLoggerFileBase(const stw::scl::C_SclString & orc_FilePath,
+                                                             const C_SclString & orc_ProtocolName) :
    mc_FilePath(orc_FilePath),
    mc_ProtocolName(orc_ProtocolName)
 {
@@ -55,7 +55,7 @@ C_OSCComMessageLoggerFileBase::C_OSCComMessageLoggerFileBase(const stw_scl::C_SC
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerFileBase::~C_OSCComMessageLoggerFileBase(void)
+C_OscComMessageLoggerFileBase::~C_OscComMessageLoggerFileBase(void)
 {
 }
 
@@ -69,22 +69,22 @@ C_OSCComMessageLoggerFileBase::~C_OSCComMessageLoggerFileBase(void)
    C_RD_WR     Error on creating folders or deleting old file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComMessageLoggerFileBase::OpenFile(void)
+int32_t C_OscComMessageLoggerFileBase::OpenFile(void)
 {
-   sint32 s32_Return = C_NO_ERR;
-   const C_SCLString c_FolderPath = TGL_ExtractFilePath(this->mc_FilePath);
+   int32_t s32_Return = C_NO_ERR;
+   const C_SclString c_FolderPath = TglExtractFilePath(this->mc_FilePath);
 
    // Check and create folder
-   if (TGL_DirectoryExists(c_FolderPath) == false)
+   if (TglDirectoryExists(c_FolderPath) == false)
    {
-      s32_Return = C_OSCUtils::h_CreateFolderRecursively(c_FolderPath);
+      s32_Return = C_OscUtils::h_CreateFolderRecursively(c_FolderPath);
 
       if (s32_Return != C_NO_ERR)
       {
          s32_Return = C_RD_WR;
       }
    }
-   else if (TGL_FileExists(this->mc_FilePath) == true)
+   else if (TglFileExists(this->mc_FilePath) == true)
    {
       // Delete the old file
       if (remove(this->mc_FilePath.c_str()) != 0)
@@ -106,7 +106,7 @@ sint32 C_OSCComMessageLoggerFileBase::OpenFile(void)
    \param[in]     orc_ProtocolName         Current protocol name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComMessageLoggerFileBase::SetProtocolName(const C_SCLString & orc_ProtocolName)
+void C_OscComMessageLoggerFileBase::SetProtocolName(const C_SclString & orc_ProtocolName)
 {
    this->mc_ProtocolName = orc_ProtocolName;
 }

@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
-#include "constants.h"
-#include "C_TblTreDelegateUtil.h"
-#include "C_SdBueMessageSignalTableDelegate.h"
+#include "constants.hpp"
+#include "C_TblTreDelegateUtil.hpp"
+#include "C_SdBueMessageSignalTableDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -111,7 +110,7 @@ void C_SdBueMessageSignalTableDelegate::paint(QPainter * const opc_Painter, cons
    false No change
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMessageSignalTableDelegate::SetHoveredRow(const stw_types::sint32 & ors32_Value)
+bool C_SdBueMessageSignalTableDelegate::SetHoveredRow(const int32_t & ors32_Value)
 {
    bool q_Retval;
 

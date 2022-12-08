@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_OSCUtils.h"
-#include "C_OSCHalcConfigChannel.h"
+#include "C_SclChecksums.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscHalcConfigChannel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +36,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigChannel::C_OSCHalcConfigChannel(void) :
+C_OscHalcConfigChannel::C_OscHalcConfigChannel(void) :
    q_SafetyRelevant(false),
    u32_UseCaseIndex(0UL)
 {
@@ -46,7 +46,7 @@ C_OSCHalcConfigChannel::C_OSCHalcConfigChannel(void) :
 /*! \brief  Destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigChannel::~C_OSCHalcConfigChannel()
+C_OscHalcConfigChannel::~C_OscHalcConfigChannel()
 {
 }
 
@@ -59,14 +59,14 @@ C_OSCHalcConfigChannel::~C_OSCHalcConfigChannel()
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigChannel::CalcHash(uint32 & oru32_HashValue) const
+void C_OscHalcConfigChannel::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_SafetyRelevant, sizeof(this->q_SafetyRelevant), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_UseCaseIndex, sizeof(this->u32_UseCaseIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_SafetyRelevant, sizeof(this->q_SafetyRelevant), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_UseCaseIndex, sizeof(this->u32_UseCaseIndex), oru32_HashValue);
 
-   for (uint32 u32_It = 0UL; u32_It < this->c_Parameters.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_Parameters.size(); ++u32_It)
    {
       this->c_Parameters[u32_It].CalcHash(oru32_HashValue);
    }
@@ -78,11 +78,11 @@ void C_OSCHalcConfigChannel::CalcHash(uint32 & oru32_HashValue) const
    \param[out]  opq_NameInvalid  Name invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigChannel::CheckConfigValid(bool * const opq_NameInvalid) const
+void C_OscHalcConfigChannel::CheckConfigValid(bool * const opq_NameInvalid) const
 {
    if (opq_NameInvalid != NULL)
    {
-      if (C_OSCUtils::h_CheckValidCName(this->c_Name) == false)
+      if (C_OscUtils::h_CheckValidCeName(this->c_Name) == false)
       {
          *opq_NameInvalid = true;
       }
@@ -99,13 +99,13 @@ void C_OSCHalcConfigChannel::CheckConfigValid(bool * const opq_NameInvalid) cons
    \param[in]  oe_SafetyMode  Safety mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigChannel::HandleFileLoadPostProcessing(const C_OSCHalcDefBase::E_SafetyMode oe_SafetyMode)
+void C_OscHalcConfigChannel::HandleFileLoadPostProcessing(const C_OscHalcDefBase::E_SafetyMode oe_SafetyMode)
 {
-   if (oe_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+   if (oe_SafetyMode == C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE)
    {
       this->q_SafetyRelevant = true;
    }
-   else if (oe_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+   else if (oe_SafetyMode == C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
    {
       this->q_SafetyRelevant = false;
    }

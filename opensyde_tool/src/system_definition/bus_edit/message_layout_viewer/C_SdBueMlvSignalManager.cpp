@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SdBueMlvSignalManager.h"
+#include "C_SdBueMlvSignalManager.hpp"
 
-#include "C_PuiSdHandler.h"
-#include "C_GtGetText.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_SdUtil.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,8 +50,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SdBueMlvSignalManager(C_PuiSdNodeCanMessageSyncManager * const opc_SyncManager,
-                                                 const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                 const uint16 ou16_MaximumCountBits, const float64 of64_Space,
+                                                 const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                 const uint16_t ou16_MaximumCountBits, const float64_t of64_Space,
                                                  QObject * const opc_Parent) :
    QObject(opc_Parent),
    mpc_MessageSyncManager(opc_SyncManager),
@@ -90,13 +89,13 @@ C_SdBueMlvSignalManager::~C_SdBueMlvSignalManager()
    \param[in]     oq_Resizeable           Flag if signal shall be resizeable or not
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
+void C_SdBueMlvSignalManager::LoadSignal(const uint32_t ou32_SignalIndex,
                                          const C_SignalItemColors & orc_ColorConfiguration, const bool oq_Resizeable)
 {
-   const C_OSCCanSignal * const pc_Signal =
+   const C_OscCanSignal * const pc_Signal =
       C_PuiSdHandler::h_GetInstance()->GetCanSignal(this->mc_MessageId, ou32_SignalIndex);
-   const stw_opensyde_core::C_OSCNodeDataPoolListElement * const pc_DpListElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(this->mc_MessageId,
+   const stw::opensyde_core::C_OscNodeDataPoolListElement * const pc_DpListElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolListElement(this->mc_MessageId,
                                                                     ou32_SignalIndex);
 
    this->mu32_SignalIndex = ou32_SignalIndex;
@@ -115,8 +114,8 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
       // get name from datapool list element
       this->mc_Name = pc_DpListElement->c_Name.c_str();
 
-      if ((pc_DpListElement->c_Value.GetType() == stw_opensyde_core::C_OSCNodeDataPoolContent::eFLOAT32) ||
-          (pc_DpListElement->c_Value.GetType() == stw_opensyde_core::C_OSCNodeDataPoolContent::eFLOAT64))
+      if ((pc_DpListElement->c_Value.GetType() == stw::opensyde_core::C_OscNodeDataPoolContent::eFLOAT32) ||
+          (pc_DpListElement->c_Value.GetType() == stw::opensyde_core::C_OscNodeDataPoolContent::eFLOAT64))
       {
          this->mq_Resizeable = false;
       }
@@ -125,7 +124,7 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
          this->mq_Resizeable = oq_Resizeable;
       }
    }
-   this->mq_MultiplexerSignal = (this->mc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL);
+   this->mq_MultiplexerSignal = (this->mc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL);
 
    // initialize the signal manager
    this->mu16_LastBit = this->GetDataBytesBitPosOfSignalBit(this->mc_Signal.u16_ComBitLength - 1U);
@@ -141,7 +140,7 @@ void C_SdBueMlvSignalManager::LoadSignal(const uint32 ou32_SignalIndex,
 void C_SdBueMlvSignalManager::SetColorConfiguration(
    const C_SdBueMlvSignalManager::C_SignalItemColors & orc_ColorConfiguration)
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
    this->mc_ColorConfiguration = orc_ColorConfiguration;
    this->mc_UiSignal.u8_ColorIndex = orc_ColorConfiguration.u8_Index;
@@ -177,14 +176,14 @@ void C_SdBueMlvSignalManager::SetName(const QString & orc_Name)
    false Signal was not changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
+bool C_SdBueMlvSignalManager::SetStartBit(const uint16_t ou16_Position)
 {
    bool q_Return = true;
-   const sint16 s16_Diff = static_cast<sint16>(this->mc_Signal.u16_ComBitStart) - static_cast<sint16>(ou16_Position);
+   const int16_t s16_Diff = static_cast<int16_t>(this->mc_Signal.u16_ComBitStart) - static_cast<int16_t>(ou16_Position);
 
-   if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+   if (this->mc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
    {
-      const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) + s16_Diff;
+      const int16_t s16_Length = static_cast<int16_t>(this->mc_Signal.u16_ComBitLength) + s16_Diff;
       if (this->m_IsLengthValid(s16_Length) == true)
       {
          this->m_SetNewLength(s16_Length);
@@ -197,11 +196,11 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
    else
    {
       // Motorola format has an offset in the difference if more than one row is involved
-      const sint16 s16_RowOldPosition = static_cast<sint16>(this->mc_Signal.u16_ComBitStart) / 8;
-      const sint16 s16_RowNewPosition = static_cast<sint16>(ou16_Position) / 8;
-      const sint16 s16_RowDiffOffset = static_cast<sint16>((s16_RowOldPosition - s16_RowNewPosition) * 16);
-      const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) -
-                                (s16_Diff - s16_RowDiffOffset);
+      const int16_t s16_RowOldPosition = static_cast<int16_t>(this->mc_Signal.u16_ComBitStart) / 8;
+      const int16_t s16_RowNewPosition = static_cast<int16_t>(ou16_Position) / 8;
+      const int16_t s16_RowDiffOffset = static_cast<int16_t>((s16_RowOldPosition - s16_RowNewPosition) * 16);
+      const int16_t s16_Length = static_cast<int16_t>(this->mc_Signal.u16_ComBitLength) -
+                                 (s16_Diff - s16_RowDiffOffset);
 
       if (this->m_IsLengthValid(s16_Length) == true)
       {
@@ -235,14 +234,14 @@ bool C_SdBueMlvSignalManager::SetStartBit(const uint16 ou16_Position)
    false Signal was not changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
+bool C_SdBueMlvSignalManager::SetLastBit(const uint16_t ou16_Position)
 {
    bool q_Return = true;
-   const sint16 s16_Diff = static_cast<sint16>(ou16_Position) - static_cast<sint16>(this->mu16_LastBit);
+   const int16_t s16_Diff = static_cast<int16_t>(ou16_Position) - static_cast<int16_t>(this->mu16_LastBit);
 
-   if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+   if (this->mc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
    {
-      const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) + s16_Diff;
+      const int16_t s16_Length = static_cast<int16_t>(this->mc_Signal.u16_ComBitLength) + s16_Diff;
       if (this->m_IsLengthValid(s16_Length) == true)
       {
          this->m_SetNewLength(s16_Length);
@@ -255,11 +254,11 @@ bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
    else
    {
       // Motorola format has an offset in the difference if more than one row is involved
-      const sint16 s16_RowOldPosition = static_cast<sint16>(this->mu16_LastBit) / 8;
-      const sint16 s16_RowNewPosition = static_cast<sint16>(ou16_Position) / 8;
-      const sint16 s16_RowDiffOffset = static_cast<sint16>((s16_RowOldPosition - s16_RowNewPosition) * 16);
-      const sint16 s16_Length = static_cast<sint16>(this->mc_Signal.u16_ComBitLength) -
-                                (s16_Diff + s16_RowDiffOffset);
+      const int16_t s16_RowOldPosition = static_cast<int16_t>(this->mu16_LastBit) / 8;
+      const int16_t s16_RowNewPosition = static_cast<int16_t>(ou16_Position) / 8;
+      const int16_t s16_RowDiffOffset = static_cast<int16_t>((s16_RowOldPosition - s16_RowNewPosition) * 16);
+      const int16_t s16_Length = static_cast<int16_t>(this->mc_Signal.u16_ComBitLength) -
+                                 (s16_Diff + s16_RowDiffOffset);
 
       if (this->m_IsLengthValid(s16_Length) == true)
       {
@@ -284,16 +283,16 @@ bool C_SdBueMlvSignalManager::SetLastBit(const uint16 ou16_Position)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the ZOrder value for all visible items
 
-   \param[in]     of64_ZOrder      New ZOrder value
+   \param[in]     of64_ZetOrder      New ZOrder value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalManager::SetZOrder(const float64 of64_ZOrder) const
+void C_SdBueMlvSignalManager::SetZeOrder(const float64_t of64_ZetOrder) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->mc_VecSignalItems.size(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->mc_VecSignalItems.size(); ++s32_Counter)
    {
-      this->mc_VecSignalItems[sn_Counter]->setZValue(of64_ZOrder);
+      this->mc_VecSignalItems[s32_Counter]->setZValue(of64_ZetOrder);
    }
 }
 
@@ -304,9 +303,9 @@ void C_SdBueMlvSignalManager::SetZOrder(const float64 of64_ZOrder) const
    Actual ZOrder value
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_SdBueMlvSignalManager::GetZOrder(void) const
+float64_t C_SdBueMlvSignalManager::GetZeOrder(void) const
 {
-   float64 f64_Return = 0.0;
+   float64_t f64_Return = 0.0;
 
    if (this->mc_VecSignalItems.size() > 0)
    {
@@ -324,7 +323,7 @@ float64 C_SdBueMlvSignalManager::GetZOrder(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::SetSelected(const bool oq_Selected)
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
    for (s32_Counter = 0U; s32_Counter < this->mc_VecSignalItems.size(); ++s32_Counter)
    {
@@ -342,28 +341,28 @@ void C_SdBueMlvSignalManager::SetSelected(const bool oq_Selected)
    false Signal was not moved
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMlvSignalManager::MoveSignal(const sint32 os32_Offset)
+bool C_SdBueMlvSignalManager::MoveSignal(const int32_t os32_Offset)
 {
    bool q_Return = false;
-   sint32 s32_NewStartBit = static_cast<sint32>(this->mc_Signal.u16_ComBitStart) + os32_Offset;
-   const uint16 u16_NewLastBit = this->GetDataBytesBitPosOfSignalBit(static_cast<uint16>(s32_NewStartBit),
-                                                                     this->GetLength() - 1U);
+   int32_t s32_NewStartBit = static_cast<int32_t>(this->mc_Signal.u16_ComBitStart) + os32_Offset;
+   const uint16_t u16_NewLastBit = this->GetDataBytesBitPosOfSignalBit(static_cast<uint16_t>(s32_NewStartBit),
+                                                                       this->GetLength() - 1U);
 
    // special cases for Motorola byte order
-   if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_MOTOROLA)
+   if (this->mc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_MOTOROLA)
    {
       // avoid jumping of the signal
       // when the start bit is moved over the edge, it must be moved by an offset of 15 instead of 1
       if (((this->mc_Signal.u16_ComBitStart % 8U) == 0) &&
           (os32_Offset == -1))
       {
-         s32_NewStartBit = static_cast<sint32>(this->mc_Signal.u16_ComBitStart) + 15;
+         s32_NewStartBit = static_cast<int32_t>(this->mc_Signal.u16_ComBitStart) + 15;
       }
 
       if (((this->mc_Signal.u16_ComBitStart % 8U) == 7) &&
           (os32_Offset == 1))
       {
-         s32_NewStartBit = static_cast<sint32>(this->mc_Signal.u16_ComBitStart) - 15;
+         s32_NewStartBit = static_cast<int32_t>(this->mc_Signal.u16_ComBitStart) - 15;
       }
    }
 
@@ -372,7 +371,7 @@ bool C_SdBueMlvSignalManager::MoveSignal(const sint32 os32_Offset)
    {
       // new position is in valid range
       // update the item
-      this->mc_Signal.u16_ComBitStart = static_cast<uint16>(s32_NewStartBit);
+      this->mc_Signal.u16_ComBitStart = static_cast<uint16_t>(s32_NewStartBit);
       this->mu16_LastBit = u16_NewLastBit;
 
       this->m_UpdateItemConfiguration();
@@ -402,7 +401,7 @@ QString C_SdBueMlvSignalManager::GetName(void) const
    Start bit
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_SdBueMlvSignalManager::GetStartBit(void) const
+uint16_t C_SdBueMlvSignalManager::GetStartBit(void) const
 {
    return this->mc_Signal.u16_ComBitStart;
 }
@@ -414,7 +413,7 @@ uint16 C_SdBueMlvSignalManager::GetStartBit(void) const
    Last bit
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_SdBueMlvSignalManager::GetLastBit(void) const
+uint16_t C_SdBueMlvSignalManager::GetLastBit(void) const
 {
    return this->mu16_LastBit;
 }
@@ -426,7 +425,7 @@ uint16 C_SdBueMlvSignalManager::GetLastBit(void) const
    Length
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_SdBueMlvSignalManager::GetLength(void) const
+uint16_t C_SdBueMlvSignalManager::GetLength(void) const
 {
    return this->mc_Signal.u16_ComBitLength;
 }
@@ -438,7 +437,7 @@ uint16 C_SdBueMlvSignalManager::GetLength(void) const
    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdBueMlvSignalManager::GetSignalIndex(void) const
+uint32_t C_SdBueMlvSignalManager::GetSignalIndex(void) const
 {
    return this->mu32_SignalIndex;
 }
@@ -471,18 +470,18 @@ C_SdBueMlvSignalManager::E_InterActionMode C_SdBueMlvSignalManager::GetInteracti
 const
 {
    E_InterActionMode e_Return = eIAM_NONE;
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    // search the item which was clicked
-   for (sn_Counter = 0; sn_Counter < this->mc_VecSignalItems.size(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->mc_VecSignalItems.size(); ++s32_Counter)
    {
-      if (this->mc_VecSignalItems[sn_Counter]->ContainsPoint(orc_MousePos) == true)
+      if (this->mc_VecSignalItems[s32_Counter]->ContainsPoint(orc_MousePos) == true)
       {
          // check which part of the item was clicked
          if ((this->mq_Resizeable == true) &&
-             (this->mc_VecSignalItems[sn_Counter]->ContainsLeftResizeItemPoint(orc_MousePos) == true))
+             (this->mc_VecSignalItems[s32_Counter]->ContainsLeftResizeItemPoint(orc_MousePos) == true))
          {
-            if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+            if (this->mc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
             {
                e_Return = eIAM_RESIZELEFT_INTEL;
             }
@@ -492,9 +491,9 @@ const
             }
          }
          else if ((this->mq_Resizeable == true) &&
-                  (this->mc_VecSignalItems[sn_Counter]->ContainsRightResizeItemPoint(orc_MousePos) == true))
+                  (this->mc_VecSignalItems[s32_Counter]->ContainsRightResizeItemPoint(orc_MousePos) == true))
          {
-            if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+            if (this->mc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
             {
                e_Return = eIAM_RESIZERIGHT_INTEL;
             }
@@ -545,7 +544,7 @@ void C_SdBueMlvSignalManager::GenerateHint(void)
    \param[in]     of64_SingleItemHeight     New item height
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalManager::Update(const float64 of64_SingleItemWidth, const float64 of64_SingleItemHeight)
+void C_SdBueMlvSignalManager::Update(const float64_t of64_SingleItemWidth, const float64_t of64_SingleItemHeight)
 {
    QVector<C_SdBueMlvSignalItem *>::const_iterator pc_ItItem;
 
@@ -598,7 +597,7 @@ void C_SdBueMlvSignalManager::SaveSignal(void) const
    Data bytes bit position
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBitPosition) const
+uint16_t C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16_t ou16_SignalBitPosition) const
 {
    return this->mc_Signal.GetDataBytesBitPosOfSignalBit(ou16_SignalBitPosition);
 }
@@ -613,8 +612,8 @@ uint16 C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16 ou16_
    Data bytes bit position
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
-                                                              const uint16 ou16_SignalBitPosition) const
+uint16_t C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16_t ou16_StartBit,
+                                                                const uint16_t ou16_SignalBitPosition) const
 {
    return this->mc_Signal.GetDataBytesBitPosOfSignalBit(ou16_StartBit, ou16_SignalBitPosition);
 }
@@ -625,7 +624,7 @@ uint16 C_SdBueMlvSignalManager::GetDataBytesBitPosOfSignalBit(const uint16 ou16_
    \param[out]     orc_SetPositions   Signal bit positions
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalManager::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_SetPositions) const
+void C_SdBueMlvSignalManager::GetDataBytesBitPositionsOfSignal(std::set<uint16_t> & orc_SetPositions) const
 {
    this->mc_Signal.GetDataBytesBitPositionsOfSignal(orc_SetPositions);
 }
@@ -634,16 +633,12 @@ void C_SdBueMlvSignalManager::GetDataBytesBitPositionsOfSignal(std::set<uint16> 
 void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
 {
    C_SdBueMlvSignalItem * pc_Item;
-   uint16 u16_StartBitInRow;
-   uint16 u16_LastBitInRow;
-   uint16 u16_BitPosition;
-   uint16 u16_ByteRow;
-   sintn sn_Counter = 0;
+   int32_t s32_Counter = 0;
    bool q_AllRowsVisible = true;
 
-   std::set<uint16> c_SetPositions;
-   std::set<uint16>::iterator c_ItSetPosition;
-   std::set<uint16>::reverse_iterator c_ItReverseSetPosition;
+   std::set<uint16_t> c_SetPositions;
+   std::set<uint16_t>::iterator c_ItSetPosition;
+   std::set<uint16_t>::reverse_iterator c_ItReverseSetPosition;
 
    // get the positions of the signal
    this->GetDataBytesBitPositionsOfSignal(c_SetPositions);
@@ -672,10 +667,15 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
    // updating the number of items
    while (c_SetPositions.size() > 0)
    {
-      if ((sn_Counter + 1) <= this->mc_VecSignalItems.size())
+      uint16_t u16_StartBitInRow;
+      uint16_t u16_LastBitInRow;
+      uint16_t u16_BitPosition;
+      uint16_t u16_ByteRow;
+
+      if ((s32_Counter + 1) <= this->mc_VecSignalItems.size())
       {
          // reuse item
-         pc_Item = this->mc_VecSignalItems[sn_Counter];
+         pc_Item = this->mc_VecSignalItems[s32_Counter];
       }
       else
       {
@@ -735,20 +735,20 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
       pc_Item->SetBitPosition(u16_ByteRow, u16_StartBitInRow, u16_LastBitInRow);
       pc_Item->SetHovered(this->mq_Hovered);
 
-      ++sn_Counter;
+      ++s32_Counter;
    }
 
    // delete not needed obsolete items
-   while (sn_Counter < this->mc_VecSignalItems.size())
+   while (s32_Counter < this->mc_VecSignalItems.size())
    {
       // remove the item from the scene
-      Q_EMIT (this->SigRemoveItem(this->mc_VecSignalItems[sn_Counter]));
-      disconnect(this->mc_VecSignalItems[sn_Counter], &C_SdBueMlvSignalItem::SigItemHovered,
+      Q_EMIT (this->SigRemoveItem(this->mc_VecSignalItems[s32_Counter]));
+      disconnect(this->mc_VecSignalItems[s32_Counter], &C_SdBueMlvSignalItem::SigItemHovered,
                  this, &C_SdBueMlvSignalManager::m_SignalItemHovered);
-      disconnect(this->mc_VecSignalItems[sn_Counter], &C_SdBueMlvSignalItem::SigChangeCursor, this,
+      disconnect(this->mc_VecSignalItems[s32_Counter], &C_SdBueMlvSignalItem::SigChangeCursor, this,
                  &C_SdBueMlvSignalManager::SigChangeCursor);
-      delete this->mc_VecSignalItems[sn_Counter];
-      this->mc_VecSignalItems.remove(sn_Counter);
+      delete this->mc_VecSignalItems[s32_Counter];
+      this->mc_VecSignalItems.remove(s32_Counter);
    }
 
    // configure order dependent settings in the signal items
@@ -756,7 +756,7 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
        ((this->mc_VecSignalItems.size() > 0) && (q_AllRowsVisible == false)))
    {
       // items at the start and end
-      if (this->mc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+      if (this->mc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
       {
          // resize icons and configure significant bit information
          this->mc_VecSignalItems[0]->SetResizeItem(false, true, this->mq_Resizeable);
@@ -810,10 +810,10 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
       }
 
       // items in the "middle"
-      for (sn_Counter = 1; sn_Counter < (this->mc_VecSignalItems.size() - 1); ++sn_Counter)
+      for (s32_Counter = 1; s32_Counter < (this->mc_VecSignalItems.size() - 1); ++s32_Counter)
       {
-         this->mc_VecSignalItems[sn_Counter]->SetResizeItem(false, false, this->mq_Resizeable);
-         this->mc_VecSignalItems[sn_Counter]->SetShowSignificantBit(false, false);
+         this->mc_VecSignalItems[s32_Counter]->SetResizeItem(false, false, this->mq_Resizeable);
+         this->mc_VecSignalItems[s32_Counter]->SetShowSignificantBit(false, false);
       }
    }
    else if (this->mc_VecSignalItems.size() == 1)
@@ -840,7 +840,7 @@ void C_SdBueMlvSignalManager::m_UpdateItemConfiguration(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::m_SignalItemHovered(const bool oq_Hover)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    this->mq_Hovered = oq_Hover;
 
@@ -849,18 +849,18 @@ void C_SdBueMlvSignalManager::m_SignalItemHovered(const bool oq_Hover)
       Q_EMIT this->SigHideToolTip();
    }
 
-   for (sn_Counter = 0U; sn_Counter < this->mc_VecSignalItems.size(); ++sn_Counter)
+   for (s32_Counter = 0U; s32_Counter < this->mc_VecSignalItems.size(); ++s32_Counter)
    {
-      this->mc_VecSignalItems[sn_Counter]->SetHovered(oq_Hover);
+      this->mc_VecSignalItems[s32_Counter]->SetHovered(oq_Hover);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalManager::m_SetNewLength(const sint16 os16_Lenth)
+void C_SdBueMlvSignalManager::m_SetNewLength(const int16_t os16_Lenth)
 {
    if (os16_Lenth > 0)
    {
-      this->mc_Signal.u16_ComBitLength = static_cast<uint16>(os16_Lenth);
+      this->mc_Signal.u16_ComBitLength = static_cast<uint16_t>(os16_Lenth);
    }
    else
    {
@@ -871,11 +871,11 @@ void C_SdBueMlvSignalManager::m_SetNewLength(const sint16 os16_Lenth)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvSignalManager::m_SetError(const bool oq_Active)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0U; sn_Counter < this->mc_VecSignalItems.size(); ++sn_Counter)
+   for (s32_Counter = 0U; s32_Counter < this->mc_VecSignalItems.size(); ++s32_Counter)
    {
-      this->mc_VecSignalItems[sn_Counter]->SetError(oq_Active);
+      this->mc_VecSignalItems[s32_Counter]->SetError(oq_Active);
    }
 }
 
@@ -891,7 +891,7 @@ void C_SdBueMlvSignalManager::m_SetError(const bool oq_Active)
    \retval   false           Length is not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMlvSignalManager::m_IsLengthValid(const sint16 os16_Length) const
+bool C_SdBueMlvSignalManager::m_IsLengthValid(const int16_t os16_Length) const
 {
    bool q_Return = false;
 

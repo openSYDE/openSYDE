@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QIcon>
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_CamMosFilterTableModel.h"
-#include "C_GtGetText.h"
-#include "C_CamProHandler.h"
-#include "C_CamDbHandler.h"
-#include "C_Uti.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_CamMosFilterTableModel.hpp"
+#include "C_GtGetText.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,23 +53,23 @@ C_CamMosFilterTableModel::C_CamMosFilterTableModel(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                              const sintn osn_Role) const
+QVariant C_CamMosFilterTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                              const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_CamMosFilterTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING))
+      const C_CamMosFilterTableModel::E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING))
       {
          switch (e_Col)
          {
@@ -93,11 +92,11 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
@@ -137,37 +136,38 @@ QVariant C_CamMosFilterTableModel::headerData(const sintn osn_Section, const Qt:
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMosFilterTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_CamMosFilterTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 5;
+      s32_Retval = 5;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
    {
-      const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+      const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_CamProFilterItemData c_FilterItem = mc_FilterItemsData[u32_Index];
       const C_CamMosFilterTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          QString c_TempExtended = "";
          QString c_TempDatabase = "";
@@ -229,7 +229,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_INTERACTION_IS_LINK)
+      else if (os32_Role == ms32_USER_ROLE_INTERACTION_IS_LINK)
       {
          switch (e_Col)
          {
@@ -245,7 +245,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
          switch (e_Col)
          {
@@ -262,7 +262,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_ICON)
+      else if (os32_Role == ms32_USER_ROLE_ICON)
       {
          QStringList c_Icons;
          switch (e_Col)
@@ -283,7 +283,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
@@ -294,7 +294,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
             // no tooltip
             break;
          case eDETAILS:
-            c_Retval = data(orc_Index, static_cast<sintn>(Qt::DisplayRole));
+            c_Retval = data(orc_Index, static_cast<int32_t>(Qt::DisplayRole));
             break;
          default:
             break;
@@ -316,7 +316,7 @@ QVariant C_CamMosFilterTableModel::data(const QModelIndex & orc_Index, const sin
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  nothing needs to be done here
-void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
+void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32_t> & orc_SelectedIndices) const
 {
    // nothing needs to be done here
    Q_UNUSED(orc_SelectedIndices)
@@ -327,29 +327,30 @@ void C_CamMosFilterTableModel::CopySelectedItems(const std::vector<uint32> & orc
 
    \param[in]  orc_Index   Index
    \param[in]  orc_Value   New data
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
+bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
+                                       const int32_t os32_Role)
 {
    bool q_Retval = false;
 
-   if (data(orc_Index, osn_Role) != orc_Value)
+   if (data(orc_Index, os32_Role) != orc_Value)
    {
       if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
       {
-         const sint32 s32_ColumnDetails = h_EnumToColumn(eDETAILS);
-         const uint32 u32_RowIndex = static_cast<uint32>(orc_Index.row());
+         const int32_t s32_ColumnDetails = h_EnumToColumn(eDETAILS);
+         const uint32_t u32_RowIndex = static_cast<uint32_t>(orc_Index.row());
          const C_CamMosFilterTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-         if (u32_RowIndex < static_cast<uint32>(this->mc_FilterItemsData.size()))
+         if (u32_RowIndex < static_cast<uint32_t>(this->mc_FilterItemsData.size()))
          {
             C_CamProFilterItemData & rc_FilterItemData = mc_FilterItemsData[u32_RowIndex];
 
-            if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+            if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
             {
                if (orc_Value.type() == QVariant::Int)
                {
@@ -370,7 +371,7 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
                   }
                }
             }
-            else if (osn_Role ==  static_cast<sintn>(Qt::DisplayRole))
+            else if (os32_Role ==  static_cast<int32_t>(Qt::DisplayRole))
             {
                switch (e_Col)
                {
@@ -385,7 +386,7 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
                   //lint -e{1793} Qt example
                   Q_EMIT (this->dataChanged(this->index(u32_RowIndex, s32_ColumnDetails),
                                             this->index(u32_RowIndex, s32_ColumnDetails),
-                                            QVector<stw_types::sintn>() << osn_Role));
+                                            QVector<int32_t>() << os32_Role));
                   q_Retval = true; // for updating data in column "Type"
                   break;
                case eMODE:
@@ -411,7 +412,7 @@ bool C_CamMosFilterTableModel::setData(const QModelIndex & orc_Index, const QVar
             if (q_Retval == true)
             {
                //lint -e{1793} Qt example
-               Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role));
+               Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<int32_t>() << os32_Role));
             }
          }
       }
@@ -464,7 +465,7 @@ Qt::ItemFlags C_CamMosFilterTableModel::flags(const QModelIndex & orc_Index) con
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamMosFilterTableModel::E_Columns C_CamMosFilterTableModel::h_ColumnToEnum(const sint32 os32_Column)
+C_CamMosFilterTableModel::E_Columns C_CamMosFilterTableModel::h_ColumnToEnum(const int32_t os32_Column)
 {
    C_CamMosFilterTableModel::E_Columns e_Retval;
    switch (os32_Column)
@@ -501,9 +502,9 @@ C_CamMosFilterTableModel::E_Columns C_CamMosFilterTableModel::h_ColumnToEnum(con
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::E_Columns oe_Value)
+int32_t C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::E_Columns oe_Value)
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    switch (oe_Value)
    {
@@ -538,7 +539,7 @@ sint32 C_CamMosFilterTableModel::h_EnumToColumn(const C_CamMosFilterTableModel::
    string <Database>::<MessageName> (empty string if not found)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32 ou32_CanId, const bool oq_IsExtended)
+QString C_CamMosFilterTableModel::h_SearchMessageInDatabases(const uint32_t ou32_CanId, const bool oq_IsExtended)
 {
    QString c_Return = "";
    QString c_Database = "";
@@ -588,18 +589,18 @@ void C_CamMosFilterTableModel::SetFilterItemsData(const QList<C_CamProFilterItem
    \param[in]  oq_IsExtended     Is extended
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const uint32 ou32_NewStartId,
-                                                const uint32 ou32_NewEndId, const bool oq_IsExtended)
+void C_CamMosFilterTableModel::SetFilterItemIds(const uint32_t ou32_Index, const uint32_t ou32_NewStartId,
+                                                const uint32_t ou32_NewEndId, const bool oq_IsExtended)
 {
-   QVector<sintn> c_Roles;
-   const sint32 s32_Column = C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::eDETAILS);
+   QVector<int32_t> c_Roles;
+   const int32_t s32_Column = C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::eDETAILS);
 
-   if (ou32_Index < static_cast<uint32>(this->mc_FilterItemsData.size()))
+   if (ou32_Index < static_cast<uint32_t>(this->mc_FilterItemsData.size()))
    {
       C_CamProFilterItemData & rc_FilterItemData = this->mc_FilterItemsData[ou32_Index];
 
       rc_FilterItemData.u32_StartId = ou32_NewStartId;
-      rc_FilterItemData.u8_ExtendedId = static_cast<uint8>(oq_IsExtended);
+      rc_FilterItemData.u8_ExtendedId = static_cast<uint8_t>(oq_IsExtended);
 
       // force equality of start and end ID if type is "ID"
       if (rc_FilterItemData.e_Type == C_CamProFilterItemData::E_Type::eID_SINGLE)
@@ -615,7 +616,7 @@ void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const u
    }
 
    // update column "Details" of selected role (only display role necessary)
-   c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
+   c_Roles.push_back(static_cast<int32_t>(Qt::DisplayRole));
    Q_EMIT (this->dataChanged(this->index(ou32_Index, s32_Column), this->index(ou32_Index, s32_Column), c_Roles));
 }
 
@@ -626,12 +627,12 @@ void C_CamMosFilterTableModel::SetFilterItemIDs(const uint32 ou32_Index, const u
    \param[in]  oq_Extended    extended ID flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterTableModel::SetFilterItemExtended(const uint32 ou32_Index, const bool oq_Extended)
+void C_CamMosFilterTableModel::SetFilterItemExtended(const uint32_t ou32_Index, const bool oq_Extended)
 {
-   if (ou32_Index < static_cast<uint32>(this->mc_FilterItemsData.size()))
+   if (ou32_Index < static_cast<uint32_t>(this->mc_FilterItemsData.size()))
    {
       const C_CamProFilterItemData & rc_FilterItemData = this->mc_FilterItemsData[ou32_Index];
-      this->SetFilterItemIDs(ou32_Index, rc_FilterItemData.u32_StartId, rc_FilterItemData.u32_EndId, oq_Extended);
+      this->SetFilterItemIds(ou32_Index, rc_FilterItemData.u32_StartId, rc_FilterItemData.u32_EndId, oq_Extended);
    }
 }
 
@@ -644,17 +645,17 @@ void C_CamMosFilterTableModel::SetFilterItemExtended(const uint32 ou32_Index, co
    Index of new item
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamMosFilterTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
+uint32_t C_CamMosFilterTableModel::m_AddNewItem(const uint32_t ou32_SelectedIndex)
 {
    // add new filter item
    C_CamProFilterItemData c_NewFilterItem;
-   uint32 u32_Index;
+   uint32_t u32_Index;
 
    // set default type to ID range (even if default is in fact of type single ID "from 0 to 0")
    c_NewFilterItem.e_Type = C_CamProFilterItemData::eID_RANGE;
 
    // use valid index
-   if (ou32_SelectedIndex < static_cast<uint32>(mc_FilterItemsData.size()))
+   if (ou32_SelectedIndex < static_cast<uint32_t>(mc_FilterItemsData.size()))
    {
       u32_Index = ou32_SelectedIndex + 1UL;
    }
@@ -680,9 +681,9 @@ uint32 C_CamMosFilterTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    Indices of new items
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamMosFilterTableModel::m_PasteItems(const uint32 ou32_SelectedIndex)
+std::vector<uint32_t> C_CamMosFilterTableModel::m_PasteItems(const uint32_t ou32_SelectedIndex)
 {
-   const std::vector<uint32> c_Retval;
+   const std::vector<uint32_t> c_Retval;
 
    // nothing needs to be done here
    Q_UNUSED(ou32_SelectedIndex)
@@ -696,7 +697,7 @@ std::vector<uint32> C_CamMosFilterTableModel::m_PasteItems(const uint32 ou32_Sel
    Size of item container
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamMosFilterTableModel::m_GetSizeItems() const
+uint32_t C_CamMosFilterTableModel::m_GetSizeItems() const
 {
    return this->mc_FilterItemsData.size();
 }
@@ -709,7 +710,7 @@ uint32 C_CamMosFilterTableModel::m_GetSizeItems() const
    \param[in]  ou32_Index  Index to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
+void C_CamMosFilterTableModel::m_DeleteItem(const uint32_t ou32_Index)
 {
    this->mc_FilterItemsData.removeAt(ou32_Index);
 }
@@ -725,7 +726,7 @@ void C_CamMosFilterTableModel::m_DeleteItem(const uint32 ou32_Index)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  nothing needs to be done here
-void C_CamMosFilterTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
+void C_CamMosFilterTableModel::m_MoveItem(const uint32_t ou32_SourceIndex, const uint32_t ou32_TargetIndex)
 {
    // nothing needs to be done here
    Q_UNUSED(ou32_SourceIndex)

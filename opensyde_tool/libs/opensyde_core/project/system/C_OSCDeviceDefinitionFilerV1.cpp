@@ -10,27 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "TGLFile.h"
-#include "TGLUtils.h"
-#include "C_OSCDeviceDefinitionFilerV1.h"
-#include "C_OSCXMLParser.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
+#include "C_OscDeviceDefinitionFilerV1.hpp"
+#include "C_OscXmlParser.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-const uint16 C_OSCDeviceDefinitionFilerV1::mhu16_FILE_VERSION = 0x0001U;
+const uint16_t C_OscDeviceDefinitionFilerV1::mhu16_FILE_VERSION = 0x0001U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -44,7 +44,7 @@ const uint16 C_OSCDeviceDefinitionFilerV1::mhu16_FILE_VERSION = 0x0001U;
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_OSCDeviceDefinitionFilerV1::mh_ParseOpenSydeAvailability(const C_OSCXMLParser & orc_Parser,
+void C_OscDeviceDefinitionFilerV1::mh_ParseOpenSydeAvailability(const C_OscXmlParser & orc_Parser,
                                                                 bool & orq_ProtocolSupportedCan,
                                                                 bool & orq_ProtocolSupportedEthernet)
 {
@@ -71,9 +71,9 @@ void C_OSCDeviceDefinitionFilerV1::mh_ParseOpenSydeAvailability(const C_OSCXMLPa
    \param[out]  orq_IsFileBased                 Flag if file based
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDeviceDefinitionFilerV1::mh_ParseOpenSydeFlashloaderParameter(const C_OSCXMLParser & orc_Parser,
-                                                                        uint32 & oru32_RequestDownloadTimeout,
-                                                                        uint32 & oru32_TransferDataTimeout,
+void C_OscDeviceDefinitionFilerV1::mh_ParseOpenSydeFlashloaderParameter(const C_OscXmlParser & orc_Parser,
+                                                                        uint32_t & oru32_RequestDownloadTimeout,
+                                                                        uint32_t & oru32_TransferDataTimeout,
                                                                         bool & orq_IsFileBased)
 {
    if (orc_Parser.AttributeExists("requestdownloadtimeout") == true)
@@ -104,7 +104,7 @@ void C_OSCDeviceDefinitionFilerV1::mh_ParseOpenSydeFlashloaderParameter(const C_
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_OSCDeviceDefinitionFilerV1::mh_ParseSTWFlashloaderAvailability(const C_OSCXMLParser & orc_Parser,
+void C_OscDeviceDefinitionFilerV1::mh_ParseStwFlashloaderAvailability(const C_OscXmlParser & orc_Parser,
                                                                       bool & orq_ProtocolSupportedCan)
 {
    //no check for existence of entries: fall back to "not supported" in this case
@@ -130,15 +130,15 @@ void C_OSCDeviceDefinitionFilerV1::mh_ParseSTWFlashloaderAvailability(const C_OS
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDefinition, C_OSCXMLParser & orc_Parser,
-                                            const stw_scl::C_SCLString & orc_Path)
+int32_t C_OscDeviceDefinitionFilerV1::h_Load(C_OscDeviceDefinition & orc_DeviceDefinition, C_OscXmlParser & orc_Parser,
+                                             const stw::scl::C_SclString & orc_Path)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   uint32 u32_Value;
+   uint32_t u32_Value;
 
-   stw_scl::C_SCLString c_Text;
-   C_OSCSubDeviceDefinition c_SubDevice;
+   stw::scl::C_SclString c_Text;
+   C_OscSubDeviceDefinition c_SubDevice;
 
    c_Text = orc_Parser.SelectNodeChild("device-name");
    if (c_Text != "device-name")
@@ -164,7 +164,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
          {
             do
             {
-               const stw_scl::C_SCLString c_Tmp = orc_Parser.GetNodeContent();
+               const stw::scl::C_SclString c_Tmp = orc_Parser.GetNodeContent();
                c_SubDevice.c_OtherAcceptedNames.push_back(c_Tmp);
                c_Text = orc_Parser.SelectNodeNext("other-accepted-name");
             }
@@ -223,8 +223,8 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
       }
       //expand the potentially relative image path to an absolute path
       // we will need it later to open the image in the UI
-      orc_DeviceDefinition.c_ImagePath = TGL_ExpandFileName(orc_DeviceDefinition.c_ImagePath,
-                                                            TGL_ExtractFilePath(orc_Path));
+      orc_DeviceDefinition.c_ImagePath = TglExpandFileName(orc_DeviceDefinition.c_ImagePath,
+                                                           TglExtractFilePath(orc_Path));
       // also store file path
       // it is needed for creating service update package (see #24474)
       orc_DeviceDefinition.c_FilePath = orc_Path;
@@ -239,7 +239,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
       }
       if (s32_Return == C_NO_ERR)
       {
-         orc_DeviceDefinition.u8_NumCanBusses = static_cast<uint8>(u32_Value);
+         orc_DeviceDefinition.u8_NumCanBusses = static_cast<uint8_t>(u32_Value);
          u32_Value = orc_Parser.GetAttributeUint32("ethernet");
          if (u32_Value > 255)
          {
@@ -248,7 +248,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
          }
          if (s32_Return == C_NO_ERR)
          {
-            orc_DeviceDefinition.u8_NumEthernetBusses = static_cast<uint8>(u32_Value);
+            orc_DeviceDefinition.u8_NumEthernetBusses = static_cast<uint8_t>(u32_Value);
          }
       }
    }
@@ -272,7 +272,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
             {
                if (orc_Parser.AttributeExists("value") == true)
                {
-                  const uint16 u16_Bitrate = static_cast<uint16>(orc_Parser.GetAttributeUint32("value"));
+                  const uint16_t u16_Bitrate = static_cast<uint16_t>(orc_Parser.GetAttributeUint32("value"));
                   orc_DeviceDefinition.c_SupportedBitrates.push_back(u16_Bitrate);
                }
                else
@@ -309,8 +309,8 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
          }
          else
          {
-            const std::vector<C_OSCXMLAttribute> c_Attributes = orc_Parser.GetAttributes();
-            for (uint16 u16_Index = 0U; u16_Index < c_Attributes.size(); u16_Index++)
+            const std::vector<C_OscXmlAttribute> c_Attributes = orc_Parser.GetAttributes();
+            for (uint16_t u16_Index = 0U; u16_Index < c_Attributes.size(); u16_Index++)
             {
                if (c_Attributes[u16_Index].c_Name == "support")
                {
@@ -376,7 +376,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
 
                osc_write_log_info("Loading device definition",
                                   "Due to compatibility all flashloader reset wait times set to the"
-                                  " same configuration value (" + C_SCLString::IntToStr(u32_Value) +
+                                  " same configuration value (" + C_SclString::IntToStr(u32_Value) +
                                   " ms) for XML file \"" + orc_Path + "\".");
 
                c_Text = orc_Parser.SelectNodeParent(); //back to parent ...
@@ -400,7 +400,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
                   osc_write_log_info("Loading device definition",
                                      "Default value for flashloader reset wait time "
                                      "u32_FlashloaderResetWaitTimeNoChangesCan (" +
-                                     C_SCLString::IntToStr(c_SubDevice.
+                                     C_SclString::IntToStr(c_SubDevice.
                                                            u32_FlashloaderResetWaitTimeNoChangesCan) +
                                      " ms) for XML file \"" + orc_Path + "\" used.");
                }
@@ -421,7 +421,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
                   osc_write_log_info("Loading device definition",
                                      "Default value for flashloader reset wait time "
                                      "u32_FlashloaderResetWaitTimeNoChangesEthernet (" +
-                                     C_SCLString::IntToStr(c_SubDevice.
+                                     C_SclString::IntToStr(c_SubDevice.
                                                            u32_FlashloaderResetWaitTimeNoChangesEthernet) +
                                      " ms) for XML file \"" + orc_Path + "\" used.");
                }
@@ -442,7 +442,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
                   osc_write_log_info("Loading device definition",
                                      "Default value for flashloader reset wait time "
                                      "u32_FlashloaderResetWaitTimeNoFundamentalChangesCan (" +
-                                     C_SCLString::IntToStr(c_SubDevice.
+                                     C_SclString::IntToStr(c_SubDevice.
                                                            u32_FlashloaderResetWaitTimeNoFundamentalChangesCan) +
                                      " ms) for XML file \"" + orc_Path + "\" used.");
                }
@@ -463,7 +463,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
                   osc_write_log_info("Loading device definition",
                                      "Default value for flashloader reset wait time "
                                      "u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet (" +
-                                     C_SCLString::IntToStr(c_SubDevice.
+                                     C_SclString::IntToStr(c_SubDevice.
                                                            u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet) +
                                      " ms) for XML file \"" + orc_Path + "\" used.");
                }
@@ -484,7 +484,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
                   osc_write_log_info("Loading device definition",
                                      "Default value for flashloader reset wait time "
                                      "u32_FlashloaderResetWaitTimeFundamentalChangesCan (" +
-                                     C_SCLString::IntToStr(c_SubDevice.
+                                     C_SclString::IntToStr(c_SubDevice.
                                                            u32_FlashloaderResetWaitTimeFundamentalChangesCan) +
                                      " ms) for XML file \"" + orc_Path + "\" used.");
                }
@@ -505,7 +505,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
                   osc_write_log_info("Loading device definition",
                                      "Default value for flashloader reset wait time "
                                      "u32_FlashloaderResetWaitTimeFundamentalChangesEthernet (" +
-                                     C_SCLString::IntToStr(c_SubDevice.
+                                     C_SclString::IntToStr(c_SubDevice.
                                                            u32_FlashloaderResetWaitTimeFundamentalChangesEthernet) +
                                      " ms) for XML file \"" + orc_Path + "\" used.");
                }
@@ -523,7 +523,7 @@ sint32 C_OSCDeviceDefinitionFilerV1::h_Load(C_OSCDeviceDefinition & orc_DeviceDe
          }
          else
          {
-            mh_ParseSTWFlashloaderAvailability(orc_Parser, c_SubDevice.q_FlashloaderStwCan);
+            mh_ParseStwFlashloaderAvailability(orc_Parser, c_SubDevice.q_FlashloaderStwCan);
             c_Text = orc_Parser.SelectNodeParent(); //back to parent ...
             tgl_assert(c_Text == "protocols-flashloader");
          }

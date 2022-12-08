@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <winsock2.h>
 #include <winsock.h> //Windows WinSock
 #include <cstring>
 #include <iphlpapi.h> //Windows IP helper utilities
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCIpDispatcherWinSock.h"
-#include "TGLFile.h"
-#include "CSCLString.h"
-#include "CSCLIniFile.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscIpDispatcherWinSock.hpp"
+#include "TglFile.hpp"
+#include "C_SclString.hpp"
+#include "C_SclIniFile.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,13 +42,13 @@ static SOCKET m_WsInvalidSocket(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-static sint32 m_WsFionBio(void)
+static int32_t m_WsFionBio(void)
 {
    return FIONBIO; //lint !e569 !e970 !e1924 !e9105 !e9112 !e9128 !e9130 !e9136
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-static sint32 m_WsFionRead(void)
+static int32_t m_WsFionRead(void)
 {
    return FIONREAD; //lint !e970 !e1924 !e9112 !e9128 !e9130 !e9136
 }
@@ -59,9 +58,9 @@ static sint32 m_WsFionRead(void)
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-std::map<C_OSCIpDispatcherWinSock::C_BufferIdentifier,
-         std::list<std::vector<stw_types::uint8> > > C_OSCIpDispatcherWinSock::mhc_TcpBuffer;
-C_TGLCriticalSection C_OSCIpDispatcherWinSock::mhc_LockBuffer;
+std::map<C_OscIpDispatcherWinSock::C_BufferIdentifier,
+         std::list<std::vector<uint8_t> > > C_OscIpDispatcherWinSock::mhc_TcpBuffer;
+C_TglCriticalSection C_OscIpDispatcherWinSock::mhc_LockBuffer;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
 
@@ -73,9 +72,9 @@ C_TGLCriticalSection C_OSCIpDispatcherWinSock::mhc_LockBuffer;
    Initialize elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void)
+C_OscIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void)
 {
-   un_Socket = m_WsInvalidSocket();
+   x_Socket = m_WsInvalidSocket();
    (void)std::memset(&au8_IpAddress[0], 0U, 4U);
 }
 
@@ -89,8 +88,8 @@ C_OSCIpDispatcherWinSock::C_TcpConnection::C_TcpConnection(void)
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCIpDispatcherWinSock::C_BufferIdentifier::operator <(
-   const C_OSCIpDispatcherWinSock::C_BufferIdentifier & orc_Cmp) const
+bool C_OscIpDispatcherWinSock::C_BufferIdentifier::operator <(
+   const C_OscIpDispatcherWinSock::C_BufferIdentifier & orc_Cmp) const
 {
    bool q_Return;
 
@@ -145,17 +144,18 @@ bool C_OSCIpDispatcherWinSock::C_BufferIdentifier::operator <(
    Initialize class elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
-   C_OSCIpDispatcher()
+C_OscIpDispatcherWinSock::C_OscIpDispatcherWinSock(void) :
+   C_OscIpDispatcher()
 {
-   WSADATA t_Data;
-   const stw_types::sintn sn_Result = WSAStartup(0x0201U, &t_Data); //Request version 2.1
+   WSADATA c_Data;
+   const int x_Result =                               //lint !e8080 !e970 //using type to match library interface
+                        WSAStartup(0x0201U, &c_Data); //Request version 2.1
 
    this->mc_PreferredInterfaceNames.Clear();
 
-   if (sn_Result != 0)
+   if (x_Result != 0)
    {
-      throw "WSAp ?";
+      throw std::runtime_error("WSAStartup failed");
    }
 }
 
@@ -165,14 +165,14 @@ C_OSCIpDispatcherWinSock::C_OSCIpDispatcherWinSock(void) :
    Release allocated resources
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
+C_OscIpDispatcherWinSock::~C_OscIpDispatcherWinSock(void)
 {
    //make sure to release resources in case the user forgot to
-   for (uint16 u16_Index = 0U; u16_Index < this->mc_SocketsTcp.size(); u16_Index++)
+   for (uint16_t u16_Index = 0U; u16_Index < this->mc_SocketsTcp.size(); u16_Index++)
    {
-      (void)this->C_OSCIpDispatcherWinSock::CloseTcp(u16_Index);
+      (void)this->C_OscIpDispatcherWinSock::CloseTcp(u16_Index);
    }
-   (void)this->C_OSCIpDispatcherWinSock::CloseUdp();
+   (void)this->C_OscIpDispatcherWinSock::CloseUdp();
 
    (void)WSACleanup(); //spec: one call of cleanup per call of startup; final call performs actual cleanup
 }
@@ -195,14 +195,15 @@ C_OSCIpDispatcherWinSock::~C_OSCIpDispatcherWinSock(void)
    C_NO_ERR   Connection created
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & oru32_Handle)
+int32_t C_OscIpDispatcherWinSock::InitTcp(const uint8_t (&orau8_Ip)[4], uint32_t & oru32_Handle)
 {
    C_TcpConnection c_NewConnection;
 
    (void)memcpy(&c_NewConnection.au8_IpAddress[0], &orau8_Ip[0], 4U);
+   c_NewConnection.x_Socket = m_WsInvalidSocket();
 
    this->mc_SocketsTcp.push_back(c_NewConnection);
-   oru32_Handle = static_cast<uint32>(mc_SocketsTcp.size() - 1U);
+   oru32_Handle = static_cast<uint32_t>(mc_SocketsTcp.size() - 1U);
 
    return C_NO_ERR;
 }
@@ -221,53 +222,53 @@ sint32 C_OSCIpDispatcherWinSock::InitTcp(const uint8 (&orau8_Ip)[4], uint32 & or
    C_NOACT      could not get IP information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
+int32_t C_OscIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
 {
-   sint32 s32_Return = C_NOACT;
-   PIP_ADAPTER_ADDRESSES pt_Addresses;
-   uint32 u32_RetVal;
+   int32_t s32_Return = C_NOACT;
+   PIP_ADAPTER_ADDRESSES pc_Addresses;
+   uint32_t u32_RetVal;
    //lint -e{8080} //using type provided by the library for compatibility
-   ULONG u32_AddressesBufLen = 0U;
+   ULONG x_AddressesBufLen = 0U;
 
    mc_LocalInterfaceIps.resize(0);
 
    // Make an initial call to GetAdaptersAddresses to get
    // the necessary size into the u32_OutBufLen variable
-   GetAdaptersAddresses(AF_INET, 0U, NULL, NULL, &u32_AddressesBufLen);
-   pt_Addresses = new IP_ADAPTER_ADDRESSES[static_cast<uintn>(u32_AddressesBufLen)];
+   GetAdaptersAddresses(AF_INET, 0U, NULL, NULL, &x_AddressesBufLen);
+   pc_Addresses = new IP_ADAPTER_ADDRESSES[x_AddressesBufLen];
 
-   u32_RetVal = GetAdaptersAddresses(AF_INET, 0U, NULL, pt_Addresses, &u32_AddressesBufLen);
+   u32_RetVal = GetAdaptersAddresses(AF_INET, 0U, NULL, pc_Addresses, &x_AddressesBufLen);
 
    if (u32_RetVal == NO_ERROR) //lint !e620 !e9106 //constant defined by API; no problem
    {
-      PIP_ADAPTER_ADDRESSES pt_Adapter = pt_Addresses;
-      while (pt_Adapter != NULL)
+      PIP_ADAPTER_ADDRESSES pc_Adapter = pc_Addresses;
+      while (pc_Adapter != NULL)
       {
          // Only active adapters are relevant
-         if (pt_Adapter->OperStatus == IfOperStatusUp)
+         if (pc_Adapter->OperStatus == IfOperStatusUp)
          {
-            IP_ADAPTER_UNICAST_ADDRESS * pt_Address = pt_Adapter->FirstUnicastAddress;
+            IP_ADAPTER_UNICAST_ADDRESS * pc_Address = pc_Adapter->FirstUnicastAddress;
 
-            while (pt_Address != NULL)
+            while (pc_Address != NULL)
             {
                if ((this->mc_PreferredInterfaceNames.GetCount() == 0) ||
-                   (this->mc_PreferredInterfaceNames.IndexOf(pt_Adapter->FriendlyName) != -1))
+                   (this->mc_PreferredInterfaceNames.IndexOf(pc_Adapter->FriendlyName) != -1))
                {
                   // sockaddr is the generic descriptor and sockaddr_in is IPV4 specific
                   // https://stackoverflow.com/questions/21099041/why-do-we-cast-sockaddr-in-to-sockaddr-when-calling-bind/21099196
                   //lint -e{929,740,9176} // Both struct have the same size and is a kind of C style polymorphism
-                  const in_addr t_IpAddr = reinterpret_cast<sockaddr_in *>(pt_Address->Address.lpSockaddr)->sin_addr;
+                  const in_addr c_IpAddr = reinterpret_cast<sockaddr_in *>(pc_Address->Address.lpSockaddr)->sin_addr;
 
                   //ignore localhost; otherwise "locally" running servers will get requests via the localhost and
                   // a physical local interface
-                  if (ntohl(t_IpAddr.S_un.S_addr) != 0x7F000001U)
+                  if (ntohl(c_IpAddr.S_un.S_addr) != 0x7F000001U)
                   {
-                     C_SCLString c_Info;
+                     C_SclString c_Info;
 
-                     mc_LocalInterfaceIps.push_back(ntohl(t_IpAddr.S_un.S_addr)); //add to list of known interfaces
+                     mc_LocalInterfaceIps.push_back(ntohl(c_IpAddr.S_un.S_addr)); //add to list of known interfaces
 
-                     c_Info =  "Local IP interface used with IP: " + static_cast<C_SCLString>(inet_ntoa(t_IpAddr)) +
-                              ", name of adapter: \"" + pt_Adapter->FriendlyName +
+                     c_Info =  "Local IP interface used with IP: " + static_cast<C_SclString>(inet_ntoa(c_IpAddr)) +
+                              ", name of adapter: \"" + pc_Adapter->FriendlyName +
                               "\"";
 
                      osc_write_log_info("openSYDE IP-TP", c_Info);
@@ -276,19 +277,19 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
                   }
                }
 
-               pt_Address = pt_Address->Next;
+               pc_Address = pc_Address->Next;
             }
          }
-         pt_Adapter = pt_Adapter->Next;
+         pc_Adapter = pc_Adapter->Next;
       }
    }
    else
    {
       osc_write_log_error("openSYDE IP-TP", "UDP init failed. Could not get IP addresses with error: " +
-                          C_SCLString::IntToStr(u32_RetVal));
+                          C_SclString::IntToStr(u32_RetVal));
    }
 
-   delete[] pt_Addresses;
+   delete[] pc_Addresses;
 
    return s32_Return;
 }
@@ -309,15 +310,15 @@ sint32 C_OSCIpDispatcherWinSock::m_GetAllInstalledInterfaceIps(void)
    C_BUSY     connection failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) const
+int32_t C_OscIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) const
 {
    bool q_Error = false;
 
    //create TCP socket:
-   orc_Connection.un_Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-   if (orc_Connection.un_Socket == m_WsInvalidSocket())
+   orc_Connection.x_Socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+   if (orc_Connection.x_Socket == m_WsInvalidSocket())
    {
-      osc_write_log_error("openSYDE IP-TP", "Error at TCP socket(): " + C_SCLString::IntToStr(WSAGetLastError()) +
+      osc_write_log_error("openSYDE IP-TP", "Error at TCP socket(): " + C_SclString::IntToStr(WSAGetLastError()) +
                           " IP-Address: " + mh_IpToText(orc_Connection.au8_IpAddress));
       q_Error = true;
    }
@@ -329,12 +330,11 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
    if (q_Error == false)
    {
       //make socket non-blocking:
-      //lint -e{8080} //using type provided by the library for compatibility
-      u_long u32_Mode = 1U;
-      if (ioctlsocket(orc_Connection.un_Socket, m_WsFionBio(), &u32_Mode) == SOCKET_ERROR)
+      u_long x_Mode = 1U; //lint !e8080 //using type to match library interface
+      if (ioctlsocket(orc_Connection.x_Socket, m_WsFionBio(), &x_Mode) == SOCKET_ERROR)
       {
          osc_write_log_error("openSYDE IP-TP",
-                             "TCP socket ioctlsocket() failed. Error: " + C_SCLString::IntToStr(WSAGetLastError()) +
+                             "TCP socket ioctlsocket() failed. Error: " + C_SclString::IntToStr(WSAGetLastError()) +
                              "IP-Address: " + mh_IpToText(orc_Connection.au8_IpAddress));
          q_Error = true;
       }
@@ -342,7 +342,7 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
 
    if (q_Error == false)
    {
-      sintn sn_Return;
+      int x_Return; //lint !e8080 !e970 //using type to match library interface
       sockaddr_in c_TcpService;
 
       c_TcpService.sin_family = AF_INET;
@@ -353,35 +353,35 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
       c_TcpService.sin_port = htons(mhu16_UDP_TCP_PORT); //server port
 
       //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
-      sn_Return =
-         connect(orc_Connection.un_Socket, reinterpret_cast<const sockaddr *>(&c_TcpService), sizeof(c_TcpService));
+      x_Return =
+         connect(orc_Connection.x_Socket, reinterpret_cast<const sockaddr *>(&c_TcpService), sizeof(c_TcpService));
       //for this non-blocking TCP socket the function should immediately return with WSAEWOULDBLOCK:
-      if ((sn_Return == SOCKET_ERROR) && (WSAGetLastError() != WSAEWOULDBLOCK))
+      if ((x_Return == SOCKET_ERROR) && (WSAGetLastError() != WSAEWOULDBLOCK))
       {
-         osc_write_log_error("openSYDE IP-TP", "TCP connect() failed. Error: " + C_SCLString::IntToStr(
+         osc_write_log_error("openSYDE IP-TP", "TCP connect() failed. Error: " + C_SclString::IntToStr(
                                 WSAGetLastError()));
          q_Error = true;
       }
       else
       {
-         fd_set t_SocketWriteSet;                                 //monitor for connect completion
-         fd_set t_SocketErrorSet;                                 //monitor for connect error
-         timeval t_TimeOut;                                       //connection timeout
-         t_SocketWriteSet.fd_array[0] = orc_Connection.un_Socket; //watch this socket ...
-         t_SocketWriteSet.fd_count = 1;                           //only one socket
-         t_SocketErrorSet.fd_array[0] = orc_Connection.un_Socket; //watch this socket ...
-         t_SocketErrorSet.fd_count = 1;                           //only one socket
-         t_TimeOut.tv_sec = mu32_ConnectionTimeoutSeconds;
-         t_TimeOut.tv_usec = 0;
+         fd_set c_SocketWriteSet;                                //monitor for connect completion
+         fd_set c_SocketErrorSet;                                //monitor for connect error
+         timeval c_TimeOut;                                      //connection timeout
+         c_SocketWriteSet.fd_array[0] = orc_Connection.x_Socket; //watch this socket ...
+         c_SocketWriteSet.fd_count = 1;                          //only one socket
+         c_SocketErrorSet.fd_array[0] = orc_Connection.x_Socket; //watch this socket ...
+         c_SocketErrorSet.fd_count = 1;                          //only one socket
+         c_TimeOut.tv_sec = mu32_ConnectionTimeoutSeconds;
+         c_TimeOut.tv_usec = 0;
 
-         sn_Return = select(0, NULL, &t_SocketWriteSet, &t_SocketErrorSet, &t_TimeOut);
-         switch (sn_Return)
+         x_Return = select(0, NULL, &c_SocketWriteSet, &c_SocketErrorSet, &c_TimeOut);
+         switch (x_Return)
          {
          case SOCKET_ERROR:
             osc_write_log_error("openSYDE IP-TP",
                                 "TCP connect select() failed. IP-Address: " + mh_IpToText(
                                    orc_Connection.au8_IpAddress) +
-                                " Error: " + C_SCLString::IntToStr(WSAGetLastError()));
+                                " Error: " + C_SclString::IntToStr(WSAGetLastError()));
             q_Error = true;
             break;
          case 0:
@@ -393,20 +393,21 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
             q_Error = false;
             break;
          case 1:
-            //lint -e{1924,929,909,9119} //macro defined by API; no problem
-            if (FD_ISSET(orc_Connection.un_Socket, &t_SocketWriteSet))
+            //lint -e{1924,9119,9177} //macro defined by API; no problem
+            if (FD_ISSET(orc_Connection.x_Socket, &c_SocketWriteSet))
             {
                // Get port of client for logging (the byte order must be changed of the read port by ntohs)
                sockaddr_in c_SocketInfo;
-               sintn sn_Size = sizeof(c_SocketInfo);
+               int x_Size = //lint !e8080 !e970 //using type to match library interface
+                            sizeof(c_SocketInfo);
 
                //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
-               getsockname(orc_Connection.un_Socket, reinterpret_cast<sockaddr *>(&c_SocketInfo), &sn_Size);
+               getsockname(orc_Connection.x_Socket, reinterpret_cast<sockaddr *>(&c_SocketInfo), &x_Size);
 
                //event caused by write (= connect finished)
                osc_write_log_info("openSYDE IP-TP",
                                   "TCP connect select() OK. IP-Address: " + mh_IpToText(orc_Connection.au8_IpAddress) +
-                                  " on client port: " + C_SCLString::IntToStr(ntohs(c_SocketInfo.sin_port)));
+                                  " on client port: " + C_SclString::IntToStr(ntohs(c_SocketInfo.sin_port)));
             }
             else
             {
@@ -419,8 +420,8 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
             break;
          default:
             osc_write_log_error("openSYDE IP-TP",
-                                "TCP connect select() failed. Unknown problem: " + C_SCLString::IntToStr(
-                                   sn_Return) + " IP-Address: " + mh_IpToText(orc_Connection.au8_IpAddress));
+                                "TCP connect select() failed. Unknown problem: " + C_SclString::IntToStr(
+                                   x_Return) + " IP-Address: " + mh_IpToText(orc_Connection.au8_IpAddress));
             q_Error = true;
             break;
          }
@@ -435,24 +436,25 @@ sint32 C_OSCIpDispatcherWinSock::m_ConnectTcp(C_TcpConnection & orc_Connection) 
    \param[in]   oq_ServerPort    true: set up server socket
                                  false: set up client socket
    \param[in]   ou32_IpToBindTo  IP to bind the socket to
-   \param[out]  orun_Socket      Resulting socket handle
+   \param[out]  orx_Socket       Resulting socket handle
 
    \return
    C_NO_ERR   socket set up
    C_NOACT    could not set up socket
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, const uint32 ou32_IpToBindTo,
-                                                      SOCKET & orun_Socket) const
+//lint -e{8080} //using type to match library interface
+int32_t C_OscIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, const uint32_t ou32_IpToBindTo,
+                                                       SOCKET & orx_Socket) const
 {
    bool q_Error = false;
-   sintn sn_Return;
+   int x_Return; //lint !e8080 !e970 //using type to match library interface
 
    //create UDP socket:
-   orun_Socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-   if (orun_Socket == m_WsInvalidSocket())
+   orx_Socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+   if (orx_Socket == m_WsInvalidSocket())
    {
-      osc_write_log_error("openSYDE IP-TP", "Error at UDP socket(): " + C_SCLString::IntToStr(WSAGetLastError()));
+      osc_write_log_error("openSYDE IP-TP", "Error at UDP socket(): " + C_SclString::IntToStr(WSAGetLastError()));
       q_Error = true;
    }
    else
@@ -463,15 +465,15 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    if ((q_Error == false) && (oq_ServerPort == false))
    {
       //set broadcast permission for UDP client socket
-      const charn cn_BROADCAST = 'a';
-      sn_Return =
-         setsockopt(orun_Socket, SOL_SOCKET, SO_BROADCAST, &cn_BROADCAST, sizeof(cn_BROADCAST));
-      if (sn_Return == SOCKET_ERROR)
+      const char_t cn_BROADCAST = 'a';
+      x_Return =
+         setsockopt(orx_Socket, SOL_SOCKET, SO_BROADCAST, &cn_BROADCAST, sizeof(cn_BROADCAST));
+      if (x_Return == SOCKET_ERROR)
       {
          osc_write_log_error("openSYDE IP-TP",
-                             "UDP set broadcast permission failed. Error: " + C_SCLString::IntToStr(
+                             "UDP set broadcast permission failed. Error: " + C_SclString::IntToStr(
                                 WSAGetLastError()));
-         (void)closesocket(orun_Socket);
+         (void)closesocket(orx_Socket);
          q_Error = true;
       }
       else
@@ -498,12 +500,12 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
       }
 
       //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
-      sn_Return =
-         bind(orun_Socket, reinterpret_cast<const sockaddr *>(&c_UdpService), sizeof(c_UdpService));
-      if (sn_Return == SOCKET_ERROR)
+      x_Return =
+         bind(orx_Socket, reinterpret_cast<const sockaddr *>(&c_UdpService), sizeof(c_UdpService));
+      if (x_Return == SOCKET_ERROR)
       {
          osc_write_log_error("openSYDE IP-TP",
-                             "UDP bind() failed. Error: " + C_SCLString::IntToStr(WSAGetLastError()));
+                             "UDP bind() failed. Error: " + C_SclString::IntToStr(WSAGetLastError()));
          q_Error = true;
       }
       else
@@ -516,10 +518,10 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    {
       //make socket non-blocking:
       //lint -e{8080} //using type provided by the library for compatibility
-      u_long u32_Mode = 1U;
-      if (ioctlsocket(orun_Socket, m_WsFionBio(), &u32_Mode) == SOCKET_ERROR)
+      u_long x_Mode = 1U;
+      if (ioctlsocket(orx_Socket, m_WsFionBio(), &x_Mode) == SOCKET_ERROR)
       {
-         osc_write_log_error("openSYDE IP-TP", "TCP socket ioctlsocket() failed. Error: " + C_SCLString::IntToStr(
+         osc_write_log_error("openSYDE IP-TP", "TCP socket ioctlsocket() failed. Error: " + C_SclString::IntToStr(
                                 WSAGetLastError()));
          q_Error = true;
       }
@@ -540,9 +542,9 @@ sint32 C_OSCIpDispatcherWinSock::m_ConfigureUdpSocket(const bool oq_ServerPort, 
    test representation of IP
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCIpDispatcherWinSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
+C_SclString C_OscIpDispatcherWinSock::mh_IpToText(const uint8_t (&orau8_Ip)[4])
 {
-   C_SCLString c_Text;
+   C_SclString c_Text;
 
    c_Text.PrintFormatted("%d.%d.%d.%d", orau8_Ip[0], orau8_Ip[1], orau8_Ip[2], orau8_Ip[3]);
    return c_Text;
@@ -563,10 +565,10 @@ C_SCLString C_OSCIpDispatcherWinSock::mh_IpToText(const uint8 (&orau8_Ip)[4])
    C_NOACT    connection failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::InitUdp(void)
+int32_t C_OscIpDispatcherWinSock::InitUdp(void)
 {
    bool q_Error = false;
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    s32_Return = m_GetAllInstalledInterfaceIps();
    if (s32_Return != C_NO_ERR)
@@ -579,13 +581,13 @@ sint32 C_OSCIpDispatcherWinSock::InitUdp(void)
    mc_SocketsUdpClient.resize(mc_LocalInterfaceIps.size());
    mc_SocketsUdpServer.resize(mc_LocalInterfaceIps.size());
 
-   for (uint32 u32_Interface = 0U; u32_Interface < mc_LocalInterfaceIps.size(); u32_Interface++)
+   for (uint32_t u32_Interface = 0U; u32_Interface < mc_LocalInterfaceIps.size(); u32_Interface++)
    {
       mc_SocketsUdpClient[u32_Interface] = m_WsInvalidSocket();
       mc_SocketsUdpServer[u32_Interface] = m_WsInvalidSocket();
    }
 
-   for (uint32 u32_Interface = 0U; u32_Interface < mc_LocalInterfaceIps.size(); u32_Interface++)
+   for (uint32_t u32_Interface = 0U; u32_Interface < mc_LocalInterfaceIps.size(); u32_Interface++)
    {
       //create UDP socket:
       s32_Return = m_ConfigureUdpSocket(false, mc_LocalInterfaceIps[u32_Interface], mc_SocketsUdpClient[u32_Interface]);
@@ -621,44 +623,46 @@ sint32 C_OSCIpDispatcherWinSock::InitUdp(void)
    C_RANGE    invalid handle
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
+int32_t C_OscIpDispatcherWinSock::IsTcpConnected(const uint32_t ou32_Handle)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
       osc_write_log_error("openSYDE IP-TP", "IsTcpConnected called with invalid handle.");
       s32_Return = C_RANGE;
    }
-   else if (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket())
+   else if (this->mc_SocketsTcp[ou32_Handle].x_Socket == m_WsInvalidSocket())
    {
       // Socket not opened yet
       s32_Return = C_NOACT;
    }
    else
    {
-      charn cn_Byte;
+      char_t cn_Byte;
       // Dummy read to check the connection.
       // The parameter MSG_PEEK avoid that received data will removed from the queue when read
-      const sintn sn_BytesRead = recv(this->mc_SocketsTcp[ou32_Handle].un_Socket,
-                                      &cn_Byte, 1, MSG_PEEK);
+      const int x_BytesRead = //lint !e8080 !e970 //using type to match library interface
+                              recv(this->mc_SocketsTcp[ou32_Handle].x_Socket,
+                                   &cn_Byte, 1, MSG_PEEK);
 
-      if (sn_BytesRead > 0)
+      if (x_BytesRead > 0)
       {
          s32_Return = C_NO_ERR;
       }
-      else if (sn_BytesRead == 0)
+      else if (x_BytesRead == 0)
       {
          // Connection closed by remote peer
          s32_Return = C_NOACT;
       }
       else
       {
-         const sintn sn_SocketError = WSAGetLastError();
+         const int x_SocketError = //lint !e8080 !e970 //using type to match library interface
+                                   WSAGetLastError();
 
          // Resource temporarily unavailable. It means that no bytes could be read, because of an empty queue.
          // But the connection is already established.
-         if (sn_SocketError == WSAEWOULDBLOCK)
+         if (x_SocketError == WSAEWOULDBLOCK)
          {
             s32_Return = C_NO_ERR;
          }
@@ -686,9 +690,9 @@ sint32 C_OSCIpDispatcherWinSock::IsTcpConnected(const uint32 ou32_Handle)
    C_RANGE    invalid handle
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::ReConnectTcp(const uint32 ou32_Handle)
+int32_t C_OscIpDispatcherWinSock::ReConnectTcp(const uint32_t ou32_Handle)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
@@ -698,18 +702,18 @@ sint32 C_OSCIpDispatcherWinSock::ReConnectTcp(const uint32 ou32_Handle)
    else
    {
       //still connected ?
-      if (this->mc_SocketsTcp[ou32_Handle].un_Socket != m_WsInvalidSocket())
+      if (this->mc_SocketsTcp[ou32_Handle].x_Socket != m_WsInvalidSocket())
       {
          //disconnect first:
-         (void)closesocket(this->mc_SocketsTcp[ou32_Handle].un_Socket);
-         this->mc_SocketsTcp[ou32_Handle].un_Socket = m_WsInvalidSocket();
+         (void)closesocket(this->mc_SocketsTcp[ou32_Handle].x_Socket);
+         this->mc_SocketsTcp[ou32_Handle].x_Socket = m_WsInvalidSocket();
       }
       //connect:
       s32_Return = this->m_ConnectTcp(this->mc_SocketsTcp[ou32_Handle]);
       if (s32_Return != C_NO_ERR)
       {
-         (void)closesocket(this->mc_SocketsTcp[ou32_Handle].un_Socket);
-         this->mc_SocketsTcp[ou32_Handle].un_Socket = m_WsInvalidSocket();
+         (void)closesocket(this->mc_SocketsTcp[ou32_Handle].x_Socket);
+         this->mc_SocketsTcp[ou32_Handle].x_Socket = m_WsInvalidSocket();
       }
    }
    return s32_Return;
@@ -728,12 +732,12 @@ sint32 C_OSCIpDispatcherWinSock::ReConnectTcp(const uint32 ou32_Handle)
    C_RANGE    handle invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
+int32_t C_OscIpDispatcherWinSock::CloseTcp(const uint32_t ou32_Handle)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((ou32_Handle >= this->mc_SocketsTcp.size()) ||
-       (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket()))
+       (this->mc_SocketsTcp[ou32_Handle].x_Socket == m_WsInvalidSocket()))
    {
       osc_write_log_error("openSYDE IP-TP", "CloseTcp called with invalid handle.");
       s32_Return = C_RANGE;
@@ -741,20 +745,21 @@ sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
    else
    {
       sockaddr_in c_SocketInfo;
-      sintn sn_Size = sizeof(c_SocketInfo);
+      int x_Size = //lint !e8080 !e970 //using type to match library interface
+                   sizeof(c_SocketInfo);
 
       //lint -e{929,740,9176}  Side-effect of the POSIX-style API. Match is guaranteed by the API.
-      getsockname(this->mc_SocketsTcp[ou32_Handle].un_Socket, reinterpret_cast<sockaddr *>(&c_SocketInfo), &sn_Size);
+      getsockname(this->mc_SocketsTcp[ou32_Handle].x_Socket, reinterpret_cast<sockaddr *>(&c_SocketInfo), &x_Size);
 
-      shutdown(this->mc_SocketsTcp[ou32_Handle].un_Socket, SD_BOTH);
+      shutdown(this->mc_SocketsTcp[ou32_Handle].x_Socket, SD_BOTH);
 
-      s32_Return = closesocket(this->mc_SocketsTcp[ou32_Handle].un_Socket);
-      this->mc_SocketsTcp[ou32_Handle].un_Socket = m_WsInvalidSocket();
+      s32_Return = closesocket(this->mc_SocketsTcp[ou32_Handle].x_Socket);
+      this->mc_SocketsTcp[ou32_Handle].x_Socket = m_WsInvalidSocket();
 
       osc_write_log_info("openSYDE IP-TP",
                          "TCP closesocket() OK. IP-Address: " +
                          mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress) +
-                         " on client port: " + C_SCLString::IntToStr(ntohs(c_SocketInfo.sin_port)));
+                         " on client port: " + C_SclString::IntToStr(ntohs(c_SocketInfo.sin_port)));
    }
 
    return s32_Return;
@@ -770,9 +775,9 @@ sint32 C_OSCIpDispatcherWinSock::CloseTcp(const uint32 ou32_Handle)
    C_NO_ERR   disconnected ...
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::CloseUdp(void)
+int32_t C_OscIpDispatcherWinSock::CloseUdp(void)
 {
-   for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
+   for (uint32_t u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
    {
       if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
       {
@@ -804,9 +809,9 @@ sint32 C_OSCIpDispatcherWinSock::CloseUdp(void)
    C_RANGE    handle invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::vector<uint8> & orc_Data)
+int32_t C_OscIpDispatcherWinSock::SendTcp(const uint32_t ou32_Handle, const std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
@@ -817,34 +822,38 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
    {
       s32_Return = C_NO_ERR;
 
-      if (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket())
+      if (this->mc_SocketsTcp[ou32_Handle].x_Socket == m_WsInvalidSocket())
       {
          osc_write_log_error("openSYDE IP-TP", "SendTcp called with invalid socket.");
          s32_Return = C_CONFIG;
       }
       else
       {
-         //lint -e{926,9176}  //Side-effect of the "char"-based API.
          //No side effects as long as we are on the Windows platform.
-         const sintn sn_BytesSent = send(this->mc_SocketsTcp[ou32_Handle].un_Socket,
-                                         reinterpret_cast<const charn *>(&orc_Data[0]), orc_Data.size(), 0);
-         if (sn_BytesSent != static_cast<sintn>(orc_Data.size()))
+         const int x_BytesToSend = static_cast<int>(orc_Data.size()); //lint !e8080 !e970 //using type to match library
+                                                                      // interface
+         //lint -e{9176}  //Side-effect of the "char"-based API.
+         const int x_BytesSent = //lint !e8080 !e970 //using type to match library interface
+                                 send(this->mc_SocketsTcp[ou32_Handle].x_Socket,
+                                      reinterpret_cast<const char_t *>(&orc_Data[0]), x_BytesToSend, 0);
+         if (x_BytesSent != x_BytesToSend)
          {
-            if (sn_BytesSent == SOCKET_ERROR)
+            if (x_BytesSent == SOCKET_ERROR)
             {
-               const sintn sn_Error = WSAGetLastError();
+               const int x_Error = //lint !e8080 !e970 //using type to match library interface
+                                   WSAGetLastError();
 
                osc_write_log_error("openSYDE IP-TP",
                                    "SendTcp: Could not send TCP service. Data lost. Error: " +
-                                   C_SCLString::IntToStr(sn_Error) +
+                                   C_SclString::IntToStr(x_Error) +
                                    " IP-Address: " + mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
-               if ((sn_Error == WSAECONNABORTED) || (sn_Error == WSAECONNRESET))
+               if ((x_Error == WSAECONNABORTED) || (x_Error == WSAECONNRESET))
                {
                   //we got kicked out; we'll remember that ...
                   osc_write_log_warning("openSYDE IP-TP", "SendTcp: Connection aborted or reset ... IP-Address: " +
                                         mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
-                  (void)closesocket(this->mc_SocketsTcp[ou32_Handle].un_Socket);
-                  this->mc_SocketsTcp[ou32_Handle].un_Socket = m_WsInvalidSocket();
+                  (void)closesocket(this->mc_SocketsTcp[ou32_Handle].x_Socket);
+                  this->mc_SocketsTcp[ou32_Handle].x_Socket = m_WsInvalidSocket();
                   m_OnTcpConnectionDropped(ou32_Handle);
                }
             }
@@ -852,8 +861,8 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
             {
                osc_write_log_error("openSYDE IP-TP",
                                    "SendTcp: Could not send all data: tried: " +
-                                   C_SCLString::IntToStr(static_cast<sintn>(orc_Data.size())) +
-                                   "sent: " + C_SCLString::IntToStr(sn_BytesSent));
+                                   C_SclString::IntToStr(orc_Data.size()) +
+                                   "sent: " + C_SclString::IntToStr(x_BytesSent));
             }
             s32_Return = C_RD_WR;
          }
@@ -883,9 +892,9 @@ sint32 C_OSCIpDispatcherWinSock::SendTcp(const uint32 ou32_Handle, const std::ve
    C_RANGE    handle invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<uint8> & orc_Data)
+int32_t C_OscIpDispatcherWinSock::ReadTcp(const uint32_t ou32_Handle, std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (ou32_Handle >= this->mc_SocketsTcp.size())
    {
@@ -896,26 +905,29 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
    {
       s32_Return = C_NOACT;
 
-      if (this->mc_SocketsTcp[ou32_Handle].un_Socket == m_WsInvalidSocket())
+      if (this->mc_SocketsTcp[ou32_Handle].x_Socket == m_WsInvalidSocket())
       {
          osc_write_log_error("openSYDE IP-TP", "ReadTcp called with invalid socket.");
          s32_Return = C_CONFIG;
       }
       else
       {
-         sintn sn_Return;
+         int x_Return; //lint !e8080 !e970 //using type to match library interface
          //lint -e{8080} //using type provided by the library for compatibility
-         u_long u32_SizeInBuffer;
+         u_long x_SizeInBuffer;
          //do we have enough bytes in Rx buffer ?
-         sn_Return = ioctlsocket(this->mc_SocketsTcp[ou32_Handle].un_Socket, m_WsFionRead(), &u32_SizeInBuffer);
-         if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= orc_Data.size()))
+         x_Return = ioctlsocket(this->mc_SocketsTcp[ou32_Handle].x_Socket, m_WsFionRead(), &x_SizeInBuffer);
+         if ((x_Return != SOCKET_ERROR) && (x_SizeInBuffer >= orc_Data.size()))
          {
             //enough bytes: read
-            //lint -e{926,9176}  Side-effect of the "char"-based API. No side effects as long as we are on the Windows
+            const int x_BytesToRead = static_cast<int>(orc_Data.size()); //lint !e8080 !e970 //using type to match
+                                                                         // library interface
+            //lint -e{9176}  Side-effect of the "char"-based API. No side effects as long as we are on the Windows
             // platform.
-            const sintn sn_BytesRead = recv(this->mc_SocketsTcp[ou32_Handle].un_Socket,
-                                            reinterpret_cast<charn *>(&orc_Data[0]), orc_Data.size(), 0);
-            if (sn_BytesRead == static_cast<sintn>(orc_Data.size()))
+            const int x_BytesRead = //lint !e8080 !e970 //using type to match library interface
+                                    recv(this->mc_SocketsTcp[ou32_Handle].x_Socket,
+                                         reinterpret_cast<char_t *>(&orc_Data[0]), x_BytesToRead, 0);
+            if (x_BytesRead == x_BytesToRead)
             {
                s32_Return = C_NO_ERR;
             }
@@ -928,10 +940,10 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
                s32_Return = C_RD_WR;
             }
          }
-         else if (sn_Return == SOCKET_ERROR)
+         else if (x_Return == SOCKET_ERROR)
          {
             osc_write_log_error("openSYDE IP-TP", "Could not read TCP: buffer count could not be read. Error: " +
-                                C_SCLString::IntToStr(WSAGetLastError()) + " IP-Address: " +
+                                C_SclString::IntToStr(WSAGetLastError()) + " IP-Address: " +
                                 mh_IpToText(this->mc_SocketsTcp[ou32_Handle].au8_IpAddress));
          }
          else
@@ -971,11 +983,11 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, std::vector<u
    C_WARN     data is not for the server with the node identifier and bus identifier
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 ou8_ClientBusIdentifier,
-                                         const uint8 ou8_ClientNodeIdentifier, const uint8 ou8_ServerBusIdentifier,
-                                         const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
+int32_t C_OscIpDispatcherWinSock::ReadTcp(const uint32_t ou32_Handle, const uint8_t ou8_ClientBusIdentifier,
+                                          const uint8_t ou8_ClientNodeIdentifier, const uint8_t ou8_ServerBusIdentifier,
+                                          const uint8_t ou8_ServerNodeIdentifier, std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    s32_Return = this->ReadTcp(ou32_Handle, orc_Data);
 
@@ -984,14 +996,14 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
       if (orc_Data.size() > 4)
       {
          //are source and target address correct ?
-         const uint16 u16_SourceAddress =
-            (static_cast<uint16>(static_cast<uint16>(orc_Data[0]) << 8U) + orc_Data[1]) - 1U;
-         const uint16 u16_TargetAddress =
-            (static_cast<uint16>(static_cast<uint16>(orc_Data[2]) << 8U) + orc_Data[3]) - 1U;
-         const uint8 u8_SourceNodeId = static_cast<uint8>(u16_SourceAddress & 0x7FU);
-         const uint8 u8_SourceBusId = static_cast<uint8>((u16_SourceAddress >> 7U) & 0x0FU);
-         const uint8 u8_TargetNodeId = static_cast<uint8>(u16_TargetAddress & 0x7FU);
-         const uint8 u8_TargetbusId = static_cast<uint8>((u16_TargetAddress >> 7U) & 0x0FU);
+         const uint16_t u16_SourceAddress =
+            (static_cast<uint16_t>(static_cast<uint16_t>(orc_Data[0]) << 8U) + orc_Data[1]) - 1U;
+         const uint16_t u16_TargetAddress =
+            (static_cast<uint16_t>(static_cast<uint16_t>(orc_Data[2]) << 8U) + orc_Data[3]) - 1U;
+         const uint8_t u8_SourceNodeId = static_cast<uint8_t>(u16_SourceAddress & 0x7FU);
+         const uint8_t u8_SourceBusId = static_cast<uint8_t>((u16_SourceAddress >> 7U) & 0x0FU);
+         const uint8_t u8_TargetNodeId = static_cast<uint8_t>(u16_TargetAddress & 0x7FU);
+         const uint8_t u8_TargetbusId = static_cast<uint8_t>((u16_TargetAddress >> 7U) & 0x0FU);
 
          if ((u8_SourceNodeId != ou8_ServerNodeIdentifier) ||
              (u8_SourceBusId != ou8_ServerBusIdentifier) ||
@@ -999,8 +1011,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
              (u8_TargetbusId != ou8_ClientBusIdentifier))
          {
             // Save the message for other client server connections over the same IP address
-            std::map<C_BufferIdentifier, std::list<std::vector<stw_types::uint8> > >::iterator c_ItBuffer;
-            C_BufferIdentifier c_Id(u8_TargetbusId, u8_TargetNodeId, u8_SourceBusId, u8_SourceNodeId);
+            std::map<C_BufferIdentifier, std::list<std::vector<uint8_t> > >::iterator c_ItBuffer;
+            const C_BufferIdentifier c_Id(u8_TargetbusId, u8_TargetNodeId, u8_SourceBusId, u8_SourceNodeId);
 
             mhc_LockBuffer.Acquire();
 
@@ -1013,10 +1025,10 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
             }
             else
             {
-               std::list<std::vector<stw_types::uint8> > c_List;
+               std::list<std::vector<uint8_t> > c_List;
                c_List.push_back(orc_Data);
                mhc_TcpBuffer.insert(
-                  std::pair<C_BufferIdentifier, std::list<std::vector<stw_types::uint8> > >(c_Id, c_List));
+                  std::pair<C_BufferIdentifier, std::list<std::vector<uint8_t> > >(c_Id, c_List));
             }
 
             mhc_LockBuffer.Release();
@@ -1058,14 +1070,14 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcp(const uint32 ou32_Handle, const uint8 o
    C_NOACT    no data for these identifier
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifier,
-                                               const uint8 ou8_ClientNodeIdentifier,
-                                               const uint8 ou8_ServerBusIdentifier,
-                                               const uint8 ou8_ServerNodeIdentifier, std::vector<uint8> & orc_Data)
+int32_t C_OscIpDispatcherWinSock::ReadTcpBuffer(const uint8_t ou8_ClientBusIdentifier,
+                                                const uint8_t ou8_ClientNodeIdentifier,
+                                                const uint8_t ou8_ServerBusIdentifier,
+                                                const uint8_t ou8_ServerNodeIdentifier, std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
-   std::map<C_BufferIdentifier, std::list<std::vector<stw_types::uint8> > >::iterator c_ItBuffer;
+   std::map<C_BufferIdentifier, std::list<std::vector<uint8_t> > >::iterator c_ItBuffer;
    const C_BufferIdentifier c_Id(ou8_ClientBusIdentifier, ou8_ClientNodeIdentifier, ou8_ServerBusIdentifier,
                                  ou8_ServerNodeIdentifier);
 
@@ -1076,7 +1088,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifi
 
    if (c_ItBuffer != mhc_TcpBuffer.end())
    {
-      std::list<std::vector<stw_types::uint8> > & rc_List = c_ItBuffer->second;
+      std::list<std::vector<uint8_t> > & rc_List = c_ItBuffer->second;
 
       if (rc_List.size() > 0)
       {
@@ -1107,9 +1119,9 @@ sint32 C_OSCIpDispatcherWinSock::ReadTcpBuffer(const uint8 ou8_ClientBusIdentifi
    C_RD_WR    error sending data
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
+int32_t C_OscIpDispatcherWinSock::SendUdp(const std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mc_SocketsUdpClient.size() == 0)
    {
@@ -1118,24 +1130,27 @@ sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
    }
    else
    {
-      for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
+      for (uint32_t u32_Interface = 0U; u32_Interface < mc_SocketsUdpClient.size(); u32_Interface++)
       {
          if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
-            sockaddr_in t_TargetAddress;
-            t_TargetAddress.sin_family = AF_INET;
-            t_TargetAddress.sin_port = htons(mhu16_UDP_TCP_PORT);      //target port [REQ DoIp-011]
-            t_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e9105 //constant defined by API;
+            sockaddr_in c_TargetAddress;
+            c_TargetAddress.sin_family = AF_INET;
+            c_TargetAddress.sin_port = htons(mhu16_UDP_TCP_PORT);      //target port [REQ DoIp-011]
+            c_TargetAddress.sin_addr.s_addr = htonl(INADDR_BROADCAST); //lint !e9105 //constant defined by API;
             //no problem
-            //lint -e{740,926,929,9176}  //Side-effect of the POSIX-style API. Match is guaranteed by the API.
-            const sintn sn_Return = sendto(mc_SocketsUdpClient[u32_Interface],
-                                           reinterpret_cast<const charn *>(&orc_Data[0]),
-                                           orc_Data.size(), 0, reinterpret_cast<const sockaddr *>(&t_TargetAddress),
-                                           sizeof(t_TargetAddress));
-            if (sn_Return != static_cast<sintn>(orc_Data.size()))
+            const int x_NumToSend = static_cast<int>(orc_Data.size()); //lint !e8080 !e970 //using type to match library
+                                                                       // interface
+            //lint -e{9176}  //Side-effect of the POSIX-style API. Match is guaranteed by the API.
+            const int x_Return = //lint !e8080 !e970 //using type to match library interface
+                                 sendto(mc_SocketsUdpClient[u32_Interface],
+                                        reinterpret_cast<const char_t *>(&orc_Data[0]),
+                                        x_NumToSend, 0, reinterpret_cast<const sockaddr *>(&c_TargetAddress),
+                                        sizeof(c_TargetAddress));
+            if (x_Return != x_NumToSend)
             {
                osc_write_log_error("openSYDE IP-TP",
-                                   "SendUdp sendto error: " + C_SCLString::IntToStr(WSAGetLastError()));
+                                   "SendUdp sendto error: " + C_SclString::IntToStr(WSAGetLastError()));
                s32_Return = C_RD_WR;
             }
          }
@@ -1169,9 +1184,9 @@ sint32 C_OSCIpDispatcherWinSock::SendUdp(const std::vector<uint8> & orc_Data)
    C_NOACT    no data received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&orau8_Ip)[4])
+int32_t C_OscIpDispatcherWinSock::ReadUdp(std::vector<uint8_t> & orc_Data, uint8_t (&orau8_Ip)[4])
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
    if (mc_SocketsUdpServer.size() == 0)
    {
@@ -1180,40 +1195,45 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
    }
    else
    {
-      for (uint32 u32_Interface = 0U; u32_Interface < mc_SocketsUdpServer.size(); u32_Interface++)
+      for (uint32_t u32_Interface = 0U; u32_Interface < mc_SocketsUdpServer.size(); u32_Interface++)
       {
          if (mc_SocketsUdpClient[u32_Interface] != m_WsInvalidSocket())
          {
             //do we have a package in Rx buffer ?
-            //lint -e{8080} //using type provided by the library for compatibility
-            u_long u32_SizeInBuffer;
-            sintn sn_Return = ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &u32_SizeInBuffer);
-            if ((sn_Return != SOCKET_ERROR) && (u32_SizeInBuffer >= 1U))
+            u_long x_SizeInBuffer; //lint !e8080 //using type to match library interface
+            int x_Return =         //lint !e8080 !e970 //using type to match library interface
+                           ioctlsocket(mc_SocketsUdpServer[u32_Interface], m_WsFionRead(), &x_SizeInBuffer);
+            if ((x_Return != SOCKET_ERROR) && (x_SizeInBuffer >= 1U))
             {
-               sockaddr_in t_Sender;
-               sintn sn_AddressSize = sizeof(t_Sender);
+               sockaddr_in c_Sender;
+               const int x_NumToReceive = static_cast<int>(orc_Data.size()); //lint !e8080 !e970 //using type to match
+                                                                             // library interface
+               int x_AddressSize = sizeof(c_Sender);                         //lint !e8080 !e970 //using type to match
+                                                                             // library interface
+
                //enough bytes: read
-               orc_Data.resize(u32_SizeInBuffer);
+               orc_Data.resize(x_SizeInBuffer);
 
                //lint -e{926,929}  //Side-effect of the "char"-based API. No problems as long as we are on Windows.
                //lint -e{740,9176} //Side-effect of the POSIX-style API. Match is guaranteed by the API.
-               sn_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<charn *>(&orc_Data[0]),
-                                    orc_Data.size(), 0, reinterpret_cast<sockaddr *>(&t_Sender),
-                                    &sn_AddressSize);
+               x_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<char_t *>(&orc_Data[0]),
+                                   x_NumToReceive, 0, reinterpret_cast<sockaddr *>(&c_Sender),
+                                   &x_AddressSize);
 
                //there might be more than one package in the buffer; recvfrom only reads one
                //so we check whether we have more than zero bytes:
-               if (sn_Return > 0)
+               if (x_Return > 0)
                {
                   //extract sender address
-                  orau8_Ip[0] = t_Sender.sin_addr.S_un.S_un_b.s_b1;
-                  orau8_Ip[1] = t_Sender.sin_addr.S_un.S_un_b.s_b2;
-                  orau8_Ip[2] = t_Sender.sin_addr.S_un.S_un_b.s_b3;
-                  orau8_Ip[3] = t_Sender.sin_addr.S_un.S_un_b.s_b4;
+                  orau8_Ip[0] = c_Sender.sin_addr.S_un.S_un_b.s_b1;
+                  orau8_Ip[1] = c_Sender.sin_addr.S_un.S_un_b.s_b2;
+                  orau8_Ip[2] = c_Sender.sin_addr.S_un.S_un_b.s_b3;
+                  orau8_Ip[3] = c_Sender.sin_addr.S_un.S_un_b.s_b4;
 
-                  if (sn_Return != static_cast<sintn>(orc_Data.size()))
+                  if (x_Return != static_cast<int>(orc_Data.size())) //lint !e970 //using type to match library
+                                                                     // interface
                   {
-                     orc_Data.resize(sn_Return); //we only need the data we really received
+                     orc_Data.resize(x_Return); //we only need the data we really received
                   }
 
                   //filter out local reception of broadcasts we sent ourselves
@@ -1221,7 +1241,7 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
                   //Responses from real nodes are sent from Port 13400
                   //Our broadcasts are sent with dynamically assigned Port != 13400
                   //Also: we should not just accept anything that is thrown upon us ...
-                  if (t_Sender.sin_port == htons(13400))
+                  if (c_Sender.sin_port == htons(13400))
                   {
                      s32_Return = C_NO_ERR;
                   }
@@ -1236,8 +1256,8 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
                   //comm error: no data read even though it was reported by ioctl
                   osc_write_log_error("openSYDE IP-TP",
                                       "ReadUdp unexpected error: data reported as available but reading failed. Reported size: " +
-                                      C_SCLString::IntToStr(
-                                         orc_Data.size()) + " Read size: " + C_SCLString::IntToStr(sn_Return));
+                                      C_SclString::IntToStr(
+                                         orc_Data.size()) + " Read size: " + C_SclString::IntToStr(x_Return));
                   s32_Return = C_RD_WR;
                }
             }
@@ -1261,12 +1281,12 @@ sint32 C_OSCIpDispatcherWinSock::ReadUdp(std::vector<uint8> & orc_Data, uint8 (&
    \param[in] orc_FileLocation Log file location path and file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCIpDispatcherWinSock::LoadConfigFile(const C_SCLString & orc_FileLocation)
+void C_OscIpDispatcherWinSock::LoadConfigFile(const C_SclString & orc_FileLocation)
 {
-   if (TGL_FileExists(orc_FileLocation) == true)
+   if (TglFileExists(orc_FileLocation) == true)
    {
-      C_SCLIniFile c_Ini(orc_FileLocation);
-      const C_SCLString c_Help = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
+      C_SclIniFile c_Ini(orc_FileLocation);
+      const C_SclString c_Help = c_Ini.ReadString("ETH_CONFIG", "ETH_INTERFACE_NAME", "");
 
       c_Help.Tokenize(",", this->mc_PreferredInterfaceNames.Strings);
    }

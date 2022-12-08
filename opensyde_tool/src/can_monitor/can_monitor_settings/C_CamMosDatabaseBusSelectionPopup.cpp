@@ -11,25 +11,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QComboBox>
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_CamProHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_CamMosDatabaseBusSelectionPopup.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_CamMosDatabaseBusSelectionPopup.hpp"
 #include "ui_C_CamMosDatabaseBusSelectionPopup.h"
-#include "C_Uti.h"
-#include "C_CamUti.h"
+#include "C_Uti.hpp"
+#include "C_CamUti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,9 +53,9 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
-   const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses,
-   const stw_opensyde_gui_logic::C_CamProDatabaseData & orc_Database,
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+   const std::vector<stw::opensyde_core::C_OscSystemBus> & orc_Busses,
+   const stw::opensyde_gui_logic::C_CamProDatabaseData & orc_Database,
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CamMosDatabaseBusSelectionPopup),
    mrc_ParentDialog(orc_Parent),
@@ -68,7 +67,7 @@ C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
    this->m_InitStaticNames();
 
    // initialize GUI
-   this->m_InitStaticGUIElements();
+   this->m_InitStaticGuiElements();
 
    // register the widget for showing
    this->mrc_ParentDialog.SetWidget(this);
@@ -84,7 +83,7 @@ C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
    this->mpc_Ui->pc_LabelDatabaseValue->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(orc_Database.c_Name));
 
    // after combo box initialization
-   sint32 s32_IndexLastKnownBus = orc_Database.s32_BusIndex;
+   int32_t s32_IndexLastKnownBus = orc_Database.s32_BusIndex;
 
    if (s32_IndexLastKnownBus == -1)
    {
@@ -127,7 +126,7 @@ C_CamMosDatabaseBusSelectionPopup::~C_CamMosDatabaseBusSelectionPopup(void)
    selected bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamMosDatabaseBusSelectionPopup::GetSelectedBus() const
+uint32_t C_CamMosDatabaseBusSelectionPopup::GetSelectedBus() const
 {
    return this->m_ComboboxIndexToBusIndex(this->mpc_Ui->pc_CbxBus->currentIndex());
 }
@@ -145,8 +144,8 @@ void C_CamMosDatabaseBusSelectionPopup::keyPressEvent(QKeyEvent * const opc_KeyE
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -181,7 +180,7 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitStaticNames(void) const
    this->mpc_Ui->pc_LabelBus->SetToolTipInformation(C_GtGetText::h_GetText("Bus"),
                                                     C_GtGetText::h_GetText(
                                                        "Bus information from openSYDE system definition."));
-   this->mpc_Ui->pc_LabelBusID->setText(C_GtGetText::h_GetText("Bus ID:"));
+   this->mpc_Ui->pc_LabelBusId->setText(C_GtGetText::h_GetText("Bus ID:"));
    this->mpc_Ui->pc_LabelBitrate->setText(C_GtGetText::h_GetText("Bitrate:"));
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment:"));
 
@@ -193,7 +192,7 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitStaticNames(void) const
 /*! \brief   Initialize colors, fonts, ...
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseBusSelectionPopup::m_InitStaticGUIElements() const
+void C_CamMosDatabaseBusSelectionPopup::m_InitStaticGuiElements() const
 {
    // label "Select Bus"
    this->mpc_Ui->pc_LabelSelectBus->SetForegroundColor(4);
@@ -216,14 +215,14 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitStaticGUIElements() const
    this->mpc_Ui->pc_LabelBus->SetFontPixel(12);
 
    // label "Bus ID:"
-   this->mpc_Ui->pc_LabelBusID->SetForegroundColor(6);
-   this->mpc_Ui->pc_LabelBusID->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_LabelBusID->SetFontPixel(12);
+   this->mpc_Ui->pc_LabelBusId->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelBusId->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_LabelBusId->SetFontPixel(12);
 
    // label bus ID value
-   this->mpc_Ui->pc_LabelBusIDValue->SetForegroundColor(6);
-   this->mpc_Ui->pc_LabelBusIDValue->SetBackgroundColor(-1);
-   this->mpc_Ui->pc_LabelBusIDValue->SetFontPixel(12);
+   this->mpc_Ui->pc_LabelBusIdValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelBusIdValue->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_LabelBusIdValue->SetFontPixel(12);
 
    // label "Bitrate:"
    this->mpc_Ui->pc_LabelBitrate->SetForegroundColor(6);
@@ -258,16 +257,16 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitComboBox(void) const
    this->mpc_Ui->pc_CbxBus->clear();
 
    // fill up
-   for (std::vector<C_OSCSystemBus>::const_iterator c_Iter = mc_Busses.begin(); c_Iter != mc_Busses.end(); ++c_Iter)
+   for (std::vector<C_OscSystemBus>::const_iterator c_Iter = mc_Busses.begin(); c_Iter != mc_Busses.end(); ++c_Iter)
    {
       // only show can buses
-      if (c_Iter->e_Type == C_OSCSystemBus::eCAN)
+      if (c_Iter->e_Type == C_OscSystemBus::eCAN)
       {
          this->mpc_Ui->pc_CbxBus->addItem(static_cast<QString>(c_Iter->c_Name.c_str()));
       }
    }
 
-   connect(this->mpc_Ui->pc_CbxBus, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_CbxBus, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_CamMosDatabaseBusSelectionPopup::m_OnComboBoxChanged);
 }
 
@@ -275,14 +274,14 @@ void C_CamMosDatabaseBusSelectionPopup::m_InitComboBox(void) const
 /*! \brief   Slot of combo box index changed.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseBusSelectionPopup::m_OnComboBoxChanged(const sint32 os32_Index) const
+void C_CamMosDatabaseBusSelectionPopup::m_OnComboBoxChanged(const int32_t os32_Index) const
 {
-   const sint32 s32_BusIndex = this->m_ComboboxIndexToBusIndex(os32_Index);
+   const int32_t s32_BusIndex = this->m_ComboboxIndexToBusIndex(os32_Index);
 
-   if ((s32_BusIndex >= 0) && (s32_BusIndex < static_cast<sint32>(this->mc_Busses.size())))
+   if ((s32_BusIndex >= 0) && (s32_BusIndex < static_cast<int32_t>(this->mc_Busses.size())))
    {
-      const C_OSCSystemBus & rc_Bus = this->mc_Busses[s32_BusIndex];
-      this->mpc_Ui->pc_LabelBusIDValue->setText(QString::number(rc_Bus.u8_BusID));
+      const C_OscSystemBus & rc_Bus = this->mc_Busses[s32_BusIndex];
+      this->mpc_Ui->pc_LabelBusIdValue->setText(QString::number(rc_Bus.u8_BusId));
       this->mpc_Ui->pc_LabelBitrateValue->setText(QString::number(rc_Bus.u64_BitRate / 1000) + " kBit/s");
       this->mpc_Ui->pc_LabelCommentValue->setText(rc_Bus.c_Comment.c_str());
    }
@@ -347,15 +346,15 @@ void C_CamMosDatabaseBusSelectionPopup::m_OkClicked(void)
    bus index (-1 if something went wrong)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMosDatabaseBusSelectionPopup::m_ComboboxIndexToBusIndex(const sint32 os32_ComboboxIndex) const
+int32_t C_CamMosDatabaseBusSelectionPopup::m_ComboboxIndexToBusIndex(const int32_t os32_ComboboxIndex) const
 {
-   sint32 s32_Return = -1;
-   sint32 s32_PosCanOnly = 0;
+   int32_t s32_Return = -1;
+   int32_t s32_PosCanOnly = 0;
 
    // iterate over all buses and count CAN buses
-   for (sint32 s32_PosAll = 0; s32_PosAll < static_cast<sint32>(this->mc_Busses.size()); s32_PosAll++)
+   for (int32_t s32_PosAll = 0; s32_PosAll < static_cast<int32_t>(this->mc_Busses.size()); s32_PosAll++)
    {
-      if (this->mc_Busses[s32_PosAll].e_Type == C_OSCSystemBus::eCAN)
+      if (this->mc_Busses[s32_PosAll].e_Type == C_OscSystemBus::eCAN)
       {
          if (s32_PosCanOnly == os32_ComboboxIndex)
          {
@@ -381,17 +380,17 @@ sint32 C_CamMosDatabaseBusSelectionPopup::m_ComboboxIndexToBusIndex(const sint32
    Combo box index (-1 if something went wrong)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMosDatabaseBusSelectionPopup::m_BusIndexToComboboxIndex(const sint32 os32_BusIndex) const
+int32_t C_CamMosDatabaseBusSelectionPopup::m_BusIndexToComboboxIndex(const int32_t os32_BusIndex) const
 {
-   sint32 s32_Return = -1;
-   sint32 s32_EthNumber = 0;
+   int32_t s32_Return = -1;
 
-   if ((os32_BusIndex > -1) && (os32_BusIndex < static_cast<sint32>(this->mc_Busses.size())))
+   if ((os32_BusIndex > -1) && (os32_BusIndex < static_cast<int32_t>(this->mc_Busses.size())))
    {
+      int32_t s32_EthNumber = 0;
       // count Ethernet buses with index less than given index
-      for (sint32 s32_PosAll = 0; s32_PosAll < os32_BusIndex; s32_PosAll++)
+      for (int32_t s32_PosAll = 0; s32_PosAll < os32_BusIndex; s32_PosAll++)
       {
-         if (this->mc_Busses[s32_PosAll].e_Type == C_OSCSystemBus::eETHERNET)
+         if (this->mc_Busses[s32_PosAll].e_Type == C_OscSystemBus::eETHERNET)
          {
             s32_EthNumber += 1;
          }

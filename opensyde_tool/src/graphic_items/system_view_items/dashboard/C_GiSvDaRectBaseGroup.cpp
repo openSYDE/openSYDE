@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 #include <QPainter>
@@ -19,36 +19,35 @@
 #include <QStyleOptionGraphicsItem>
 #include <QGraphicsView>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
 
-#include "C_Uti.h"
-#include "C_SyvUtil.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdUtil.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_GiSvDaRectBaseGroup.h"
-#include "C_PuiSvHandler.h"
-#include "TGLUtils.h"
-#include "C_UtiStyleSheets.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_OSCNodeDataPoolListElement.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_Uti.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_GiSvDaRectBaseGroup.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_OscNodeDataPoolListElement.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiSvDaRectBaseGroup::mhf64_ACTION_POINT_OFFSET = 10.0;
-const uint8 C_GiSvDaRectBaseGroup::mhu8_START_GREY_TIMEOUT_PERCENTAGE = 20U;
+const float64_t C_GiSvDaRectBaseGroup::mhf64_ACTION_POINT_OFFSET = 10.0;
+const uint8_t C_GiSvDaRectBaseGroup::mhu8_START_GREY_TIMEOUT_PERCENTAGE = 20U;
 const QString C_GiSvDaRectBaseGroup::mhc_ICON_READ = "://images/system_views/dashboards/icons/IconUpdateValueRead.svg";
 const QString C_GiSvDaRectBaseGroup::mhc_ICON_READ_ABORT =
    "://images/system_views/dashboards/icons/IconUpdateValueReadCancel.svg";
@@ -81,12 +80,11 @@ const QString C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED =
    \param[in]     ors32_DataIndex            Index of data element in dashboard in system view
    \param[in]     ore_Type                   Type for data storage
    \param[in]     ou32_MaximumDataElements   Maximum number of shown data elements of the widget
-   \param[in]     oru64_ID                   Unique ID
+   \param[in]     oru64_Id                   Unique ID
    \param[in]     of64_MinWidth              Minimum width of widget
    \param[in]     of64_MinHeight             Minimum height of widget
    \param[in]     of64_InitWidth             Initial width of widget
    \param[in]     of64_InitHeight            Initial height of widget
-   \param[in]     of64_ActionPointOffset     Action point offset
    \param[in]     oq_KeepAspectRatio         Flag if the rectangle should always keep its initial aspect ratio
    \param[in]     oq_ReadItem                Flag if item is a read only item and needs the timeout mechanism
    \param[in,out] opc_Parent                 Optional pointer to parent
@@ -94,15 +92,15 @@ const QString C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED =
                                              Negative value deactivates the function
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                             const sint32 & ors32_DataIndex, const E_Type & ore_Type,
-                                             const uint32 ou32_MaximumDataElements, const uint64 & oru64_ID,
-                                             const float64 of64_MinWidth, const float64 of64_MinHeight,
-                                             const float64 of64_InitWidth, const float64 of64_InitHeight,
+C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                             const int32_t & ors32_DataIndex, const E_Type & ore_Type,
+                                             const uint32_t ou32_MaximumDataElements, const uint64_t & oru64_Id,
+                                             const float64_t of64_MinWidth, const float64_t of64_MinHeight,
+                                             const float64_t of64_InitWidth, const float64_t of64_InitHeight,
                                              const bool oq_KeepAspectRatio, const bool oq_ReadItem,
                                              QGraphicsItem * const opc_Parent, const QPointF & orc_PosOffset) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, of64_MinWidth, of64_MinHeight, mhf64_ACTION_POINT_OFFSET, oq_KeepAspectRatio,
+   C_GiBiRectBaseGroup(oru64_Id, of64_MinWidth, of64_MinHeight, mhf64_ACTION_POINT_OFFSET, oq_KeepAspectRatio,
                        opc_Parent, orc_PosOffset),
    C_PuiSvDbDataElementHandler(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, ore_Type,
                                ou32_MaximumDataElements, oq_ReadItem),
@@ -117,7 +115,7 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
    mc_CurrentSize(of64_InitWidth, of64_InitHeight),
    mq_ProxyWidgetInteractionActive(false),
    // No valid value received yet -> Timeout as start value
-   mc_LastTransparencyValue(msn_TRANSPARENCY_START),
+   mc_LastTransparencyValue(ms32_TRANSPARENCY_START),
    mq_ConnectionActive(false),
    mq_ShowButton(false),
    mq_AbortTriggered(false),
@@ -125,7 +123,7 @@ C_GiSvDaRectBaseGroup::C_GiSvDaRectBaseGroup(const uint32 & oru32_ViewIndex, con
 {
    this->mpc_ProxyWidget = new C_GiWiProxyBase(of64_InitWidth, of64_InitHeight, this);
    mpc_Widget = new C_SyvDaItDashboardBaseWidget();
-   this->mpc_Widget->resize(static_cast<sintn>(of64_InitWidth), static_cast<sintn>(of64_InitHeight));
+   this->mpc_Widget->resize(static_cast<int32_t>(of64_InitWidth), static_cast<int32_t>(of64_InitHeight));
    this->mpc_ProxyWidget->setWidget(this->mpc_Widget);
    this->addToGroup(this->mpc_ProxyWidget);
    this->m_SetBiggestItem(*this->mpc_ProxyWidget);
@@ -176,7 +174,7 @@ bool C_GiSvDaRectBaseGroup::IsMousePosRelevantForProxyWidgetInteraction(const QP
    \param[in] oq_DarkMode Flag if dark mode is active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
+void C_GiSvDaRectBaseGroup::SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
                                             const bool oq_DarkMode)
 {
    if (((this->mq_InitialStyleCall == true) || (this->me_Style != oe_Style)) || (this->mq_DarkMode != oq_DarkMode))
@@ -269,14 +267,15 @@ void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data
    this->me_WriteMode = orc_Data.e_ElementWriteMode;
 
    this->LoadBasicData(orc_Data);
-   this->ApplySizeChange(orc_Data.c_UIPosition, QSizeF(orc_Data.f64_Width, orc_Data.f64_Height));
+   this->ApplySizeChange(orc_Data.c_UiPosition, QSizeF(orc_Data.f64_Width, orc_Data.f64_Height));
    this->ClearDataPoolElements();
-   for (uint32 u32_It = 0; u32_It < orc_Data.c_DataPoolElementsConfig.size(); ++u32_It)
+   for (uint32_t u32_It = 0; u32_It < orc_Data.c_DataPoolElementsConfig.size(); ++u32_It)
    {
       if (orc_Data.c_DataPoolElementsConfig[u32_It].c_ElementId.GetIsValid() == true)
       {
          this->RegisterDataPoolElement(orc_Data.c_DataPoolElementsConfig[u32_It].c_ElementId,
-                                       orc_Data.c_DataPoolElementsConfig[u32_It].c_ElementScaling);
+                                       orc_Data.c_DataPoolElementsConfig[u32_It].c_ElementScaling,
+                                       orc_Data.c_DataPoolElementsConfig[u32_It].c_DisplayFormatter);
       }
    }
 }
@@ -284,8 +283,8 @@ void C_GiSvDaRectBaseGroup::LoadSvBasicData(const C_PuiSvDbWidgetBase & orc_Data
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update basic widget data
 
-   \param[in,out] orc_Data             Basic widget data
-   \param[in]     oq_SkipDataElements  Flag for skipping data elements
+   \param[in,out]  orc_Data               Basic widget data
+   \param[in]      oq_SkipDataElements    Flag for skipping data elements
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::UpdateSvBasicData(C_PuiSvDbWidgetBase & orc_Data, const bool oq_SkipDataElements) const
@@ -296,16 +295,17 @@ void C_GiSvDaRectBaseGroup::UpdateSvBasicData(C_PuiSvDbWidgetBase & orc_Data, co
    this->UpdateBasicData(orc_Data);
    if (oq_SkipDataElements == false)
    {
-      const uint32 u32_Count = GetWidgetDataPoolElementCount();
+      const uint32_t u32_Count = GetWidgetDataPoolElementCount();
 
       orc_Data.c_DataPoolElementsConfig.clear();
       orc_Data.c_DataPoolElementsConfig.reserve(u32_Count);
-      for (uint32 u32_It = 0; u32_It < u32_Count; ++u32_It)
+      for (uint32_t u32_It = 0; u32_It < u32_Count; ++u32_It)
       {
          C_PuiSvDbNodeDataElementConfig c_Tmp;
 
          tgl_assert(GetDataPoolElementIndex(u32_It, c_Tmp.c_ElementId) == C_NO_ERR);
          tgl_assert(GetDataPoolElementScaling(u32_It, c_Tmp.c_ElementScaling) == C_NO_ERR);
+         tgl_assert(GetDataPoolElementFormatter(u32_It, c_Tmp.c_DisplayFormatter) == C_NO_ERR);
          orc_Data.c_DataPoolElementsConfig.push_back(c_Tmp);
       }
    }
@@ -321,7 +321,7 @@ void C_GiSvDaRectBaseGroup::DeleteData(void)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->DeleteDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         this->me_Type) ==
                  C_NO_ERR);
    }
@@ -335,7 +335,7 @@ void C_GiSvDaRectBaseGroup::DeleteData(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
-   const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8 ou8_ErrorCode)
+   const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8_t ou8_ErrorCode)
 {
    if (this->mq_ReadItem == true)
    {
@@ -378,10 +378,10 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
       //Might happen in cases where transparency is not necessary
       if (this->GetWidgetDataPoolElementCount() == this->mc_LastTransparencyValue.size())
       {
-         uint8 u8_Percentage;
-         sintn sn_Transparency;
+         uint8_t u8_Percentage;
+         int32_t s32_Transparency;
          //lint -e{778}  Kept in case the transparency engine is reactivated in the future
-         const sintn sn_DIFF = msn_TRANSPARENCY_END - msn_TRANSPARENCY_START;
+         const int32_t s32_DIFF = ms32_TRANSPARENCY_END - ms32_TRANSPARENCY_START;
          if (this->GetWidgetDataPoolElementCount() == 1)
          {
             if (this->m_GetTimoutPercentage100(0, u8_Percentage) != C_NO_ERR)
@@ -397,27 +397,27 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
             // 0 Percentage equals value received equals no transparency -> 255
             // Tolerance percentage (mu32_DASHBOARD_TIMEOUT_TOLERANCE) till first expected receive -> 255
             // 100 Percentage equals timeout reached equals half transparency -> 127
-            sn_Transparency = msn_TRANSPARENCY_END;
+            s32_Transparency = ms32_TRANSPARENCY_END;
             //lint -e{845}  Kept in case the transparency engine is reactivated in the future
-            sn_Transparency -= ((static_cast<sintn>(u8_Percentage) * sn_DIFF) / 100);
+            s32_Transparency -= ((static_cast<int32_t>(u8_Percentage) * s32_DIFF) / 100);
 
-            if (sn_Transparency != this->mc_LastTransparencyValue[0])
+            if (s32_Transparency != this->mc_LastTransparencyValue[0])
             {
                C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Transparency",
-                                                                            QString::number(sn_Transparency));
+                                                                            QString::number(s32_Transparency));
 
                // Update the transparency of not stylesheet items
-               this->UpdateTransparency(0, sn_Transparency);
+               this->UpdateTransparency(0, s32_Transparency);
 
                // Font changed, trigger update
                this->mpc_ProxyWidget->update();
 
-               this->mc_LastTransparencyValue[0] = sn_Transparency;
+               this->mc_LastTransparencyValue[0] = s32_Transparency;
             }
          }
          else
          {
-            for (uint32 u32_It = 0; u32_It < this->GetWidgetDataPoolElementCount(); ++u32_It)
+            for (uint32_t u32_It = 0; u32_It < this->GetWidgetDataPoolElementCount(); ++u32_It)
             {
                if (this->m_GetTimoutPercentage100(u32_It, u8_Percentage) != C_NO_ERR)
                {
@@ -432,16 +432,16 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
                // 0 Percentage equals value received equals no transparency -> 255
                // Tolerance percentage (mu32_DASHBOARD_TIMEOUT_TOLERANCE) till first expected receive -> 255
                // 100 Percentage equals timeout reached equals half transparency -> 127
-               sn_Transparency = msn_TRANSPARENCY_END;
+               s32_Transparency = ms32_TRANSPARENCY_END;
                //lint -e{845}  Kept in case the transparency engine is reactivated in the future
-               sn_Transparency -= ((static_cast<sintn>(u8_Percentage) * sn_DIFF) / 100);
+               s32_Transparency -= ((static_cast<int32_t>(u8_Percentage) * s32_DIFF) / 100);
 
-               if (sn_Transparency != this->mc_LastTransparencyValue[u32_It])
+               if (s32_Transparency != this->mc_LastTransparencyValue[u32_It])
                {
                   // Update the transparency of not stylesheet items
-                  this->UpdateTransparency(u32_It, sn_Transparency);
+                  this->UpdateTransparency(u32_It, s32_Transparency);
 
-                  this->mc_LastTransparencyValue[u32_It] = sn_Transparency;
+                  this->mc_LastTransparencyValue[u32_It] = s32_Transparency;
                }
             }
          }
@@ -456,15 +456,15 @@ void C_GiSvDaRectBaseGroup::UpdateShowValue(void)
    can not be adapted by stylesheets the derived class must reimplement this function.
 
    \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparency (0..255)
+   \param[in]     os32_Value                Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_GiSvDaRectBaseGroup::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaRectBaseGroup::UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value)
 {
    // Nothing to do in the base class implementation
    Q_UNUSED(ou32_DataElementIndex)
-   Q_UNUSED(osn_Value)
+   Q_UNUSED(os32_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -487,12 +487,12 @@ void C_GiSvDaRectBaseGroup::ConnectionActiveChanged(const bool oq_Active)
       {
          // Reset the timeout coloring
          C_OgeWiUtil::h_ApplyStylesheetPropertyToItselfAndAllChildren(this->mpc_Widget, "Transparency",
-                                                                      QString::number(msn_TRANSPARENCY_START));
+                                                                      QString::number(ms32_TRANSPARENCY_START));
 
          // Update the transparency of not stylesheet items
-         for (uint32 u32_It = 0; u32_It < this->GetWidgetDataPoolElementCount(); ++u32_It)
+         for (uint32_t u32_It = 0; u32_It < this->GetWidgetDataPoolElementCount(); ++u32_It)
          {
-            this->UpdateTransparency(u32_It, msn_TRANSPARENCY_START);
+            this->UpdateTransparency(u32_It, ms32_TRANSPARENCY_START);
          }
 
          // Font changed, trigger update
@@ -588,7 +588,7 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
    {
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
       C_PuiSvDbDataElementScaling c_Scaling;
-      sint32 s32_Return;
+      int32_t s32_Return;
 
       s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex, c_ElementId);
       tgl_assert(s32_Return == C_NO_ERR);
@@ -600,7 +600,7 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
           (this->m_CheckNodeHasAnyRequiredValidDashboardRouting(c_ElementId.u32_NodeIndex) == true))
       {
          // Update the datapool
-         C_OSCNodeDataPoolListElement c_OscElement;
+         C_OscNodeDataPoolListElement c_OscElement;
          C_PuiSdNodeDataPoolListElement c_UiElement;
 
          s32_Return = C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(c_ElementId.u32_NodeIndex,
@@ -636,9 +636,9 @@ void C_GiSvDaRectBaseGroup::SendCurrentValue(void)
 
             ++this->mu32_NextManualActionIndex;
             Q_EMIT this->SigDataPoolWrite(c_ElementId.u32_NodeIndex,
-                                          static_cast<uint8>(c_ElementId.u32_DataPoolIndex),
-                                          static_cast<uint16>(c_ElementId.u32_ListIndex),
-                                          static_cast<uint16>(c_ElementId.u32_ElementIndex));
+                                          static_cast<uint8_t>(c_ElementId.u32_DataPoolIndex),
+                                          static_cast<uint16_t>(c_ElementId.u32_ListIndex),
+                                          static_cast<uint16_t>(c_ElementId.u32_ElementIndex));
          }
          else
          {
@@ -741,25 +741,25 @@ bool C_GiSvDaRectBaseGroup::IsEditContentEnabled(void) const
 /*! \brief   Handle manual user operation finished event
 
    \param[in] os32_Result Operation result
-   \param[in] ou8_NRC     Negative response code, if any
+   \param[in] ou8_Nrc     Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
+void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc)
 {
    if (this->mu32_NextManualActionIndex > 0)
    {
       QGraphicsView * const pc_View = this->scene()->views().at(0);
       C_OgeWiCustomMessage c_Message(pc_View, C_OgeWiCustomMessage::E_Type::eERROR);
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
-      const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex - 1UL, c_ElementId);
+      const int32_t s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex - 1UL, c_ElementId);
       //Response error handling
       if (os32_Result != C_NO_ERR)
       {
          QString c_Description;
          QString c_Details;
-         sint32 s32_MaxHeight = 0;
+         int32_t s32_MaxHeight = 0;
 
-         this->m_GetErrorDescriptionForManualOperation(os32_Result, ou8_NRC, c_Description, c_Details, s32_MaxHeight);
+         this->m_GetErrorDescriptionForManualOperation(os32_Result, ou8_Nrc, c_Description, c_Details, s32_MaxHeight);
 
          osc_write_log_info("Manual operation",
                             static_cast<QString>("The C_SyvComDataDealer function ended with error code \"%1\"").arg(
@@ -819,13 +819,13 @@ void C_GiSvDaRectBaseGroup::HandleManualOperationFinished(const sint32 os32_Resu
 /*! \brief   Set DLC error for specified element id
 
    \param[in] orc_ElementId Element ID
-   \param[in] ou8_DLC       DLC
+   \param[in] ou8_Dlc       DLC
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::SetErrorForInvalidDlc(const C_OSCNodeDataPoolListElementId & orc_ElementId,
-                                                  const uint8 ou8_DLC)
+void C_GiSvDaRectBaseGroup::SetErrorForInvalidDlc(const C_OscNodeDataPoolListElementId & orc_ElementId,
+                                                  const uint8_t ou8_Dlc)
 {
-   this->mc_InvalidDlcSignals.insert(orc_ElementId, ou8_DLC);
+   this->mc_InvalidDlcSignals.insert(orc_ElementId, ou8_Dlc);
    m_UpdateErrorIcon();
 }
 
@@ -914,7 +914,7 @@ C_PuiSvDbWidgetBase::E_Style C_GiSvDaRectBaseGroup::GetDisplayStyleType(void) co
       if ((pc_Dashboard != NULL) && (this->ms32_Index >= 0))
       {
          const C_PuiSvDbWidgetBase * const pc_WidgetBase =
-            pc_Dashboard->GetWidgetBase(this->GetWidgetType(), static_cast<uint32>(this->ms32_Index));
+            pc_Dashboard->GetWidgetBase(this->GetWidgetType(), static_cast<uint32_t>(this->ms32_Index));
          tgl_assert(pc_WidgetBase != NULL);
          if (pc_WidgetBase != NULL)
          {
@@ -938,12 +938,12 @@ void C_GiSvDaRectBaseGroup::GenerateHint(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
+void C_GiSvDaRectBaseGroup::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiRectBaseGroup::SetZValueCustom(of64_ZValue);
+   C_GiBiRectBaseGroup::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }
@@ -977,20 +977,13 @@ const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::m_GetSvDashboard(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the newest registered value of a specific datapool element. It can be an array too.
-
-   The vector will be cleared first.
-
-   If it is an array, the size of the vector is > 1
-   If it is no array, the size of the vector is 1
-   If an error occurred, the size of the vector is 0
+/*! \brief   Returns the newest registered value of a specific datapool element as formatted and scaled string
 
    This function is thread safe.
 
    \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[out]    orc_Values                      Vector with result value(s)
-   \param[out]    opc_StringifiedValues           Optional vector with result strings
-   \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
+   \param[out]    orc_ScaledValue                 String with result string
+   \param[out]    opf64_UnscaledValueAsFloat      Optional float with unscaled value
 
    \return
    C_NO_ERR    Value read
@@ -998,14 +991,13 @@ const C_PuiSvDashboard * C_GiSvDaRectBaseGroup::m_GetSvDashboard(void) const
    C_NOACT     No value received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex,
-                                             std::vector<float64> & orc_Values,
-                                             std::vector<QString> * const opc_StringifiedValues,
-                                             const bool oq_UseScaling)
+int32_t C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex, QString & orc_ScaledValue,
+                                              float64_t * const opf64_UnscaledValueAsFloat)
 {
    C_PuiSvDbNodeDataPoolListElementId c_Id;
-   const sint32 s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex, orc_Values,
-                                                                         opc_StringifiedValues, oq_UseScaling);
+   const int32_t s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex,
+                                                                          orc_ScaledValue,
+                                                                          opf64_UnscaledValueAsFloat);
 
    //Remove error on valid new value
    if ((s32_Retval == C_NO_ERR) && (this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_Id) == C_NO_ERR))
@@ -1019,12 +1011,59 @@ sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolEle
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Returns the newest registered value of a specific datapool element as float
+/*! \brief   Returns the newest registered value of a specific datapool element. It can be an array too.
+
+   The vector will be cleared first.
+
+   If it is an array, the size of the vector is > 1
+   If it is no array, the size of the vector is 1
+   If an error occurred, the size of the vector is 0
+
+   This function is thread safe.
+
+   \param[in]     ou32_WidgetDataPoolElementIndex     Index of shown datapool element in widget
+   \param[out]    orc_ScaledValues                   Vector with result scaled and formatted value(s)
+   \param[out]    orc_UnscaledValues                 Vector with unscaled float values
+
+   \return
+   C_NO_ERR    Value read
+   C_RANGE     Index invalid
+   C_NOACT     No value received
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex,
+                                              std::vector<QString> & orc_ScaledValues,
+                                              std::vector<float64_t> & orc_UnscaledValues)
+{
+   C_PuiSvDbNodeDataPoolListElementId c_Id;
+   const int32_t s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex,
+                                                                          orc_ScaledValues,
+                                                                          orc_UnscaledValues);
+
+   //Remove error on valid new value
+   if ((s32_Retval == C_NO_ERR) && (this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_Id) == C_NO_ERR))
+   {
+      this->mc_CommmunicationErrors.remove(c_Id);
+      this->mc_InvalidDlcSignals.remove(c_Id);
+      m_UpdateErrorIcon();
+   }
+
+   return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the newest registered value of a specific datapool element. It can be an array too.
+
+   The vector will be cleared first.
+
+   If it is an array, the size of the vector is > 1
+   If it is no array, the size of the vector is 1
+   If an error occurred, the size of the vector is 0
 
    This function is thread safe.
 
    \param[in]     ou32_WidgetDataPoolElementIndex Index of shown datapool element in widget
-   \param[out]    of64_Value                      Result value
+   \param[out]    orc_Values                      Vector with result value(s)
    \param[in]     oq_UseScaling                   Optional flag if return value should include internally stored scaling
 
    \return
@@ -1033,12 +1072,12 @@ sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolEle
    C_NOACT     No value received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex, float64 & orf64_Value,
-                                             const bool oq_UseScaling)
+int32_t C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex,
+                                              std::vector<float64_t> & orc_Values, const bool oq_UseScaling)
 {
    C_PuiSvDbNodeDataPoolListElementId c_Id;
-   const sint32 s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex, orf64_Value,
-                                                                         oq_UseScaling);
+   const int32_t s32_Retval = C_PuiSvDbDataElementHandler::m_GetLastValue(ou32_WidgetDataPoolElementIndex, orc_Values,
+                                                                          oq_UseScaling);
 
    //Remove error on valid new value
    if ((s32_Retval == C_NO_ERR) && (this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_Id) == C_NO_ERR))
@@ -1058,7 +1097,7 @@ sint32 C_GiSvDaRectBaseGroup::m_GetLastValue(const uint32 ou32_WidgetDataPoolEle
    \param[in] of64_DiffHeight Height
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaRectBaseGroup::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+void C_GiSvDaRectBaseGroup::m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight)
 {
    this->mc_CurrentSize = QSizeF(this->mc_CurrentSize.width() + of64_DiffWidth,
                                  this->mc_CurrentSize.height() + of64_DiffHeight);
@@ -1103,11 +1142,11 @@ void C_GiSvDaRectBaseGroup::m_ForceWidgetResize(const QSizeF & orc_NewSize)
    {
       //Map scene size to widget size
       const QRectF c_CurrentRect = this->mpc_ProxyWidget->subWidgetRect(this->mpc_Widget);
-      const float64 f64_WidthDiff = orc_NewSize.width() - c_CurrentRect.width();
-      const sintn sn_Width = this->mpc_Widget->width() + static_cast<sintn>(f64_WidthDiff);
-      const float64 f64_HeightDiff = orc_NewSize.height() - c_CurrentRect.height();
-      const sintn sn_Height = this->mpc_Widget->height() + static_cast<sintn>(f64_HeightDiff);
-      const QSize c_New = QSize(std::max(sn_Width, 1), std::max(sn_Height, 1));
+      const float64_t f64_WidthDiff = orc_NewSize.width() - c_CurrentRect.width();
+      const int32_t s32_Width = this->mpc_Widget->width() + static_cast<int32_t>(f64_WidthDiff);
+      const float64_t f64_HeightDiff = orc_NewSize.height() - c_CurrentRect.height();
+      const int32_t s32_Height = this->mpc_Widget->height() + static_cast<int32_t>(f64_HeightDiff);
+      const QSize c_New = QSize(std::max(s32_Width, 1), std::max(s32_Height, 1));
 
       //Force use of new size
       this->mpc_Widget->setFixedSize(c_New);
@@ -1273,7 +1312,7 @@ void C_GiSvDaRectBaseGroup::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * con
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Escape)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape)) &&
        (this->mq_EditContentModeEnabled == true))
    {
       this->DisableEditContent();
@@ -1393,7 +1432,7 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          if (pc_View != NULL)
          {
-            for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+            for (uint32_t u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
             {
                C_PuiSvDbNodeDataPoolListElementId c_Id;
                if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
@@ -1403,8 +1442,8 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
                   {
                      if (c_Config.e_TransmissionMode == C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER)
                      {
-                        const C_OSCNodeDataPoolListElement * const pc_Element =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                        const C_OscNodeDataPoolListElement * const pc_Element =
+                           C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
                         if (pc_Element != NULL)
                         {
                            //Add name
@@ -1431,13 +1470,13 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          if (pc_View != NULL)
          {
-            for (uint32 u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+            for (uint32_t u32_ItItem = 0; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
             {
                C_PuiSvDbNodeDataPoolListElementId c_Id;
                if ((this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR) && (c_Id.GetIsValid() == true))
                {
-                  const C_OSCNodeDataPoolListElement * const pc_Element =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id);
+                  const C_OscNodeDataPoolListElement * const pc_Element =
+                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id);
                   if (pc_Element != NULL)
                   {
                      //Add name
@@ -1550,10 +1589,10 @@ void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_
       {
          if (this->GetDataPoolElementIndex(0, c_Id) == C_NO_ERR)
          {
-            if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id) != NULL)
+            if (C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id) != NULL)
             {
                const QString c_ElementName =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id)->c_Name.c_str();
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id)->c_Name.c_str();
                if (c_Id.GetUseArrayElementIndex())
                {
                   c_Heading = static_cast<QString>("%1[%2]").arg(c_ElementName).arg(c_Id.GetArrayElementIndex());
@@ -1741,16 +1780,16 @@ QString C_GiSvDaRectBaseGroup::m_GetCommonToolTipContent(void) const
 void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
 {
    //Offset to have icon inside widget
-   const float64 f64_PosX =
-      (this->GetVisibleBoundingRect().width() - (static_cast<float64>(this->ms32_IconSize) * 1.8125));
-   const float64 f64_POS_Y = 0.0;
+   const float64_t f64_PosHorizontal =
+      (this->GetVisibleBoundingRect().width() - (static_cast<float64_t>(this->ms32_IconSize) * 1.8125));
+   const float64_t f64_POS_Y = 0.0;
 
    // create the conflict icon
    mpc_ConflictIcon =
-      new C_GiSvgGraphicsItem("://images/Error_iconV2.svg", static_cast<float64>(this->ms32_IconSize),
-                              static_cast<float64>(this->ms32_IconSize));
+      new C_GiSvgGraphicsItem("://images/Error_iconV2.svg", static_cast<float64_t>(this->ms32_IconSize),
+                              static_cast<float64_t>(this->ms32_IconSize));
 
-   this->mpc_ConflictIcon->moveBy(f64_PosX - this->mpc_ConflictIcon->pos().x(),
+   this->mpc_ConflictIcon->moveBy(f64_PosHorizontal - this->mpc_ConflictIcon->pos().x(),
                                   f64_POS_Y - this->mpc_ConflictIcon->pos().y());
 
    // set the position of the icon
@@ -1762,10 +1801,10 @@ void C_GiSvDaRectBaseGroup::m_InitConflictIcon(void)
    // create the warning icon
    this->mpc_WarningIcon =
       new C_GiSvgGraphicsItem("://images/system_views/IconConfigWarning.svg",
-                              static_cast<float64>(this->ms32_IconSize),
-                              static_cast<float64>(this->ms32_IconSize));
+                              static_cast<float64_t>(this->ms32_IconSize),
+                              static_cast<float64_t>(this->ms32_IconSize));
 
-   this->mpc_WarningIcon->moveBy(f64_PosX - this->mpc_WarningIcon->pos().x(),
+   this->mpc_WarningIcon->moveBy(f64_PosHorizontal - this->mpc_WarningIcon->pos().x(),
                                  f64_POS_Y - this->mpc_WarningIcon->pos().y());
 
    // set the position of the icon
@@ -1782,9 +1821,9 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
    QString c_Path;
    QGraphicsRectItem * pc_RectItem;
    //Offset to have icon inside widget
-   const float64 f64_PosX =
-      (this->GetVisibleBoundingRect().width() - (static_cast<float64>(this->ms32_IconSize) * 1.8125));
-   const float64 f64_POS_Y = 0.0;
+   const float64_t f64_PosHorizontal =
+      (this->GetVisibleBoundingRect().width() - (static_cast<float64_t>(this->ms32_IconSize) * 1.8125));
+   const float64_t f64_POS_Y = 0.0;
 
    // create 'button' with points
    mpc_ButtonGroup = new QGraphicsItemGroup();
@@ -1799,20 +1838,20 @@ void C_GiSvDaRectBaseGroup::m_InitButton(void)
       c_Path = C_GiSvDaRectBaseGroup::mhc_ICON_WRITE_DISABLED;
    }
    // create the refresh icon
-   mpc_RefreshIcon = new C_GiSvgGraphicsItem(c_Path, static_cast<float64>(this->ms32_IconSize),
-                                             static_cast<float64>(this->ms32_IconSize));
+   mpc_RefreshIcon = new C_GiSvgGraphicsItem(c_Path, static_cast<float64_t>(this->ms32_IconSize),
+                                             static_cast<float64_t>(this->ms32_IconSize));
 
-   this->mpc_RefreshIcon->moveBy(f64_PosX - this->mpc_RefreshIcon->pos().x(),
+   this->mpc_RefreshIcon->moveBy(f64_PosHorizontal - this->mpc_RefreshIcon->pos().x(),
                                  f64_POS_Y - this->mpc_RefreshIcon->pos().y());
 
    this->mpc_ButtonGroup->addToGroup(this->mpc_RefreshIcon);
 
    //Increase bounding rect
    c_Rect = this->mpc_ButtonGroup->boundingRect();
-   c_Rect.setX(f64_PosX);
+   c_Rect.setX(f64_PosHorizontal);
    c_Rect.setY(f64_POS_Y);
-   c_Rect.setWidth(static_cast<float64>(this->ms32_IconSize));
-   c_Rect.setHeight(static_cast<float64>(this->ms32_IconSize));
+   c_Rect.setWidth(static_cast<float64_t>(this->ms32_IconSize));
+   c_Rect.setHeight(static_cast<float64_t>(this->ms32_IconSize));
    pc_RectItem = new QGraphicsRectItem(c_Rect);
    pc_RectItem->setPen(static_cast<QPen>(Qt::NoPen));
    pc_RectItem->setBrush(static_cast<QBrush>(Qt::NoBrush));
@@ -1836,7 +1875,7 @@ void C_GiSvDaRectBaseGroup::m_ManualRead(void)
    {
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
 
-      const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex, c_ElementId);
+      const int32_t s32_Return = this->GetDataPoolElementIndex(this->mu32_NextManualActionIndex, c_ElementId);
       tgl_assert(s32_Return == C_NO_ERR);
       if (s32_Return == C_NO_ERR)
       {
@@ -1924,7 +1963,7 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
    if (this->mc_CommmunicationErrors.size() > 0L)
    {
       c_Content += C_GtGetText::h_GetText("Following transmissions failed:\n");
-      for (QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString>::const_iterator c_It =
+      for (QMap<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString>::const_iterator c_It =
               this->mc_CommmunicationErrors.begin();
            c_It != this->mc_CommmunicationErrors.end(); ++c_It)
       {
@@ -1945,7 +1984,7 @@ void C_GiSvDaRectBaseGroup::m_UpdateErrorIconToolTip(void)
       if (this->mc_InvalidDlcSignals.size() > 0L)
       {
          c_Heading = C_GtGetText::h_GetText("Signal error");
-         for (QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_It =
+         for (QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId, uint8_t>::const_iterator c_It =
                  this->mc_InvalidDlcSignals.begin();
               c_It != this->mc_InvalidDlcSignals.end(); ++c_It)
          {

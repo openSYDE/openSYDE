@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDrag>
 #include <QMimeData>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
-#include "constants.h"
-#include "C_NagViewList.h"
-#include "C_PuiSvHandler.h"
+#include "constants.hpp"
+#include "C_NagViewList.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -75,8 +74,8 @@ C_NagViewList::~C_NagViewList(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::Init(void)
 {
-   this->mc_Model.SetNumRows(static_cast<sintn>(C_PuiSvHandler::h_GetInstance()->GetViewCount()));
-   for (uint32 u32_ItView = 0UL; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
+   this->mc_Model.SetNumRows(static_cast<int32_t>(C_PuiSvHandler::h_GetInstance()->GetViewCount()));
+   for (uint32_t u32_ItView = 0UL; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
    {
       const QModelIndex c_Index = this->mc_Model.index(u32_ItView);
       C_NagViewItem * pc_ViewWidget = dynamic_cast<C_NagViewItem *>(this->indexWidget(c_Index));
@@ -106,9 +105,9 @@ void C_NagViewList::Init(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::LoadUserSettings(void) const
 {
-   for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+   for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+      C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
       if (pc_View != NULL)
       {
          pc_View->LoadUserSettings();
@@ -122,9 +121,9 @@ void C_NagViewList::LoadUserSettings(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::SaveUserSettings(void) const
 {
-   for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+   for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
    {
-      const C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+      const C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
       if (pc_View != NULL)
       {
          pc_View->SaveUserSettings();
@@ -138,9 +137,9 @@ void C_NagViewList::SaveUserSettings(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::UpdateNames(void) const
 {
-   for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+   for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+      C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
       if (pc_View != NULL)
       {
          pc_View->UpdateName();
@@ -155,11 +154,11 @@ void C_NagViewList::UpdateNames(void) const
    \param[in]  ou32_ViewIndex          Index to specify which view changed (only used if oq_CheckOnlyThisView set)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
+void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32_t ou32_ViewIndex) const
 {
    if (oq_CheckOnlyThisView == true)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(static_cast<sintn>(ou32_ViewIndex));
+      C_NagViewItem * const pc_View = this->GetItemAt(static_cast<int32_t>(ou32_ViewIndex));
       if (pc_View != NULL)
       {
          pc_View->UpdateDeco();
@@ -167,9 +166,9 @@ void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou3
    }
    else
    {
-      for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+      for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
       {
-         C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+         C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
          if (pc_View != NULL)
          {
             pc_View->UpdateDeco();
@@ -185,11 +184,11 @@ void C_NagViewList::UpdateDeco(const bool oq_CheckOnlyThisView, const uint32 ou3
    The maximum height required to display all items of this widget in their current state
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_NagViewList::GetMaximumRequiredHeight(void) const
+int32_t C_NagViewList::GetMaximumRequiredHeight(void) const
 {
-   sint32 s32_Retval = 0;
+   int32_t s32_Retval = 0;
 
-   for (sint32 s32_ItRow = 0; s32_ItRow < this->mc_Model.rowCount(); ++s32_ItRow)
+   for (int32_t s32_ItRow = 0; s32_ItRow < this->mc_Model.rowCount(); ++s32_ItRow)
    {
       const QStyleOptionViewItem c_Style;
       const QModelIndex c_Index = this->mc_Model.index(s32_ItRow);
@@ -206,14 +205,14 @@ sint32 C_NagViewList::GetMaximumRequiredHeight(void) const
    \param[in]  os32_SubMode      New active sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_SubMode) const
+void C_NagViewList::SetActive(const uint32_t ou32_ViewIndex, const int32_t os32_SubMode) const
 {
-   for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+   for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+      C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
       if (pc_View != NULL)
       {
-         if (ou32_ViewIndex == static_cast<uint32>(sn_ItView))
+         if (ou32_ViewIndex == static_cast<uint32_t>(s32_ItView))
          {
             pc_View->SetActive(true, os32_SubMode);
          }
@@ -228,16 +227,16 @@ void C_NagViewList::SetActive(const uint32 ou32_ViewIndex, const sint32 os32_Sub
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get item widget at index
 
-   \param[in]  osn_Index   Item index
+   \param[in]  os32_Index   Item index
 
    \return
    NULL Item not found
    Else Valid item
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagViewItem * C_NagViewList::GetItemAt(const sintn osn_Index) const
+C_NagViewItem * C_NagViewList::GetItemAt(const int32_t os32_Index) const
 {
-   return dynamic_cast<C_NagViewItem *>(this->indexWidget(this->mc_Model.index(osn_Index)));
+   return dynamic_cast<C_NagViewItem *>(this->indexWidget(this->mc_Model.index(os32_Index)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -313,13 +312,13 @@ void C_NagViewList::dropEvent(QDropEvent * const opc_Event)
       {
          bool q_Ok;
          const QString c_Content(pc_MimeData->data(c_MimeType));
-         const sintn sn_Source = c_Content.toLong(&q_Ok);
+         const int32_t s32_Source = c_Content.toLong(&q_Ok);
          if (q_Ok == true)
          {
             const QListView::DropIndicatorPosition e_DropIndicator = this->dropIndicatorPosition();
-            sint32 s32_TargetRow = this->indexAt(opc_Event->pos()).row();
+            int32_t s32_TargetRow = this->indexAt(opc_Event->pos()).row();
             //If drag below inserted adapt target row
-            if (sn_Source < s32_TargetRow)
+            if (s32_Source < s32_TargetRow)
             {
                --s32_TargetRow;
             }
@@ -335,9 +334,9 @@ void C_NagViewList::dropEvent(QDropEvent * const opc_Event)
                // special case: drop behind the last item in the free space
                s32_TargetRow = this->mc_Model.rowCount();
             }
-            if ((sn_Source >= 0) && (s32_TargetRow >= 0))
+            if ((s32_Source >= 0) && (s32_TargetRow >= 0))
             {
-               Q_EMIT this->SigMoveView(static_cast<uint32>(sn_Source), static_cast<uint32>(s32_TargetRow));
+               Q_EMIT this->SigMoveView(static_cast<uint32_t>(s32_Source), static_cast<uint32_t>(s32_TargetRow));
             }
          }
       }
@@ -369,9 +368,9 @@ void C_NagViewList::startDrag(const Qt::DropActions oc_SupportedActions)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_AfterDrag(void) const
 {
-   for (sintn sn_ItView = 0UL; sn_ItView < this->mc_Model.rowCount(); ++sn_ItView)
+   for (int32_t s32_ItView = 0UL; s32_ItView < this->mc_Model.rowCount(); ++s32_ItView)
    {
-      C_NagViewItem * const pc_View = this->GetItemAt(sn_ItView);
+      C_NagViewItem * const pc_View = this->GetItemAt(s32_ItView);
       if (pc_View != NULL)
       {
          pc_View->SetDragged(false);
@@ -411,11 +410,11 @@ void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
       {
          QImage c_Tmp = c_Screenshot.toImage();
 
-         for (uint32 u32_Row = 0; u32_Row < 3; ++u32_Row)
+         for (uint32_t u32_Row = 0; u32_Row < 3; ++u32_Row)
          {
-            for (sint32 s32_Col = 0; s32_Col < c_Tmp.size().width(); ++s32_Col)
+            for (int32_t s32_Col = 0; s32_Col < c_Tmp.size().width(); ++s32_Col)
             {
-               c_Tmp.setPixelColor(s32_Col, static_cast<sint32>(u32_Row), mc_STYLE_GUIDE_COLOR_25.rgb());
+               c_Tmp.setPixelColor(s32_Col, static_cast<int32_t>(u32_Row), mc_STYLE_GUIDE_COLOR_25.rgb());
             }
          }
          c_Screenshot.convertFromImage(c_Tmp);
@@ -439,11 +438,11 @@ void C_NagViewList::m_StartDrag(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnStartDrag(const C_NagViewItem * const opc_Sender)
 {
-   for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
    {
-      if (this->indexWidget(this->mc_Model.index(sn_It)) == opc_Sender)
+      if (this->indexWidget(this->mc_Model.index(s32_It)) == opc_Sender)
       {
-         const QModelIndex c_Index = this->model()->index(sn_It, 0);
+         const QModelIndex c_Index = this->model()->index(s32_It, 0);
          this->m_StartDrag(c_Index);
       }
    }
@@ -457,11 +456,11 @@ void C_NagViewList::m_OnStartDrag(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnExpand(const C_NagViewItem * const opc_Sender)
 {
-   for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
    {
-      if (this->indexWidget(this->mc_Model.index(sn_It)) == opc_Sender)
+      if (this->indexWidget(this->mc_Model.index(s32_It)) == opc_Sender)
       {
-         const QModelIndex c_Index = this->model()->index(sn_It, 0);
+         const QModelIndex c_Index = this->model()->index(s32_It, 0);
          this->mc_Delegate.RegisterExpand(c_Index);
          Q_EMIT this->SigSizeChange();
       }
@@ -476,11 +475,11 @@ void C_NagViewList::m_OnExpand(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnDelete(const C_NagViewItem * const opc_Sender)
 {
-   for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
    {
-      if (this->indexWidget(this->mc_Model.index(sn_It)) == opc_Sender)
+      if (this->indexWidget(this->mc_Model.index(s32_It)) == opc_Sender)
       {
-         Q_EMIT this->SigDelete(static_cast<uint32>(sn_It));
+         Q_EMIT this->SigDelete(static_cast<uint32_t>(s32_It));
          Q_EMIT this->SigSizeChange();
       }
    }
@@ -494,16 +493,16 @@ void C_NagViewList::m_OnDelete(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
 {
-   for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
    {
-      if (this->indexWidget(this->mc_Model.index(sn_It)) == opc_Sender)
+      if (this->indexWidget(this->mc_Model.index(s32_It)) == opc_Sender)
       {
-         Q_EMIT this->SigDuplicate(static_cast<uint32>(sn_It));
+         Q_EMIT this->SigDuplicate(static_cast<uint32_t>(s32_It));
          Q_EMIT this->SigSizeChange();
          // scroll to new item
-         if (this->mc_Model.index(sn_It + 1).isValid() == true)
+         if (this->mc_Model.index(s32_It + 1).isValid() == true)
          {
-            this->scrollTo(this->mc_Model.index(sn_It + 1));
+            this->scrollTo(this->mc_Model.index(s32_It + 1));
          }
       }
    }
@@ -518,11 +517,11 @@ void C_NagViewList::m_OnDuplicate(const C_NagViewItem * const opc_Sender)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewList::m_OnSetName(const C_NagViewItem * const opc_Sender, const QString & orc_Name)
 {
-   for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
    {
-      if (this->indexWidget(this->mc_Model.index(sn_It)) == opc_Sender)
+      if (this->indexWidget(this->mc_Model.index(s32_It)) == opc_Sender)
       {
-         Q_EMIT this->SigSetName(static_cast<uint32>(sn_It), orc_Name);
+         Q_EMIT this->SigSetName(static_cast<uint32_t>(s32_It), orc_Name);
       }
    }
 }
@@ -536,14 +535,14 @@ void C_NagViewList::m_OnSetName(const C_NagViewItem * const opc_Sender, const QS
    \param[in]  orc_SubSubItemName   Selected sub sub mode name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagViewList::m_OnSelect(const C_NagViewItem * const opc_Sender, const sint32 os32_SubMode,
+void C_NagViewList::m_OnSelect(const C_NagViewItem * const opc_Sender, const int32_t os32_SubMode,
                                const QString & orc_Name, const QString & orc_SubSubItemName)
 {
-   for (sintn sn_It = 0; sn_It < this->mc_Model.rowCount(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->mc_Model.rowCount(); ++s32_It)
    {
-      if (this->indexWidget(this->mc_Model.index(sn_It)) == opc_Sender)
+      if (this->indexWidget(this->mc_Model.index(s32_It)) == opc_Sender)
       {
-         const uint32 u32_ViewIndex = static_cast<uint32>(sn_It);
+         const uint32_t u32_ViewIndex = static_cast<uint32_t>(s32_It);
          Q_EMIT this->SigSelect(u32_ViewIndex, os32_SubMode, orc_Name, orc_SubSubItemName);
          Q_EMIT this->SigSizeChange();
       }

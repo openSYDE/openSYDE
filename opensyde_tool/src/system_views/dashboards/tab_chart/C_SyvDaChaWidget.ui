@@ -33,7 +33,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui::C_SyvDaChaPlotHandlerWidget" name="pc_ChartWidget" native="true"/>
+       <widget class="stw::opensyde_gui::C_SyvDaChaPlotHandlerWidget" name="pc_ChartWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -42,9 +42,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_SyvDaChaPlotHandlerWidget</class>
+   <class>stw::opensyde_gui::C_SyvDaChaPlotHandlerWidget</class>
    <extends>QWidget</extends>
-   <header>C_SyvDaChaPlotHandlerWidget.h</header>
+   <header>C_SyvDaChaPlotHandlerWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

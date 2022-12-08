@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvCANBus.h"
+#include "stwtypes.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvCanBus.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,16 +39,16 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]     ou32_ViewIndex       Index of system view
    \param[in]     ors32_Index          Index of data element in system definition
-   \param[in]     oru64_ID             Unique ID
+   \param[in]     oru64_Id             Unique ID
    \param[in]     opc_TextElementName  Pointer to text element for showing bus name
    \param[in]     opc_Points           Points for line
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvCANBus::C_GiSvCANBus(const uint32 ou32_ViewIndex, const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiSvCanBus::C_GiSvCanBus(const uint32_t ou32_ViewIndex, const int32_t & ors32_Index, const uint64_t & oru64_Id,
                            C_GiTextElementBus * const opc_TextElementName,
                            const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
-   C_GiLiCANBus(ors32_Index, oru64_ID, opc_TextElementName, false, opc_Points, opc_Parent),
+   C_GiLiCanBus(ors32_Index, oru64_Id, opc_TextElementName, false, opc_Points, opc_Parent),
    mu32_ViewIndex(ou32_ViewIndex)
 {
 }
@@ -58,12 +57,12 @@ C_GiSvCANBus::C_GiSvCANBus(const uint32 ou32_ViewIndex, const sint32 & ors32_Ind
 /*! \brief   Checking the bus data for errors and updates the conflict icon
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvCANBus::CheckBusForChanges(void)
+void C_GiSvCanBus::CheckBusForChanges(void)
 {
    if (this->mpc_TextElementName != NULL)
    {
       if (C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(this->mu32_ViewIndex,
-                                                            static_cast<uint32>(this->ms32_Index)) == false)
+                                                            static_cast<uint32_t>(this->ms32_Index)) == false)
       {
          this->mpc_TextElementName->SetErrorState(C_PuiSvHandler::h_GetInstance()->GetErrorBus(this->ms32_Index));
       }

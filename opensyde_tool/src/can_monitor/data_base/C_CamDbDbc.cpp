@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_CamDbDbc.h"
-#include "C_CamGenSigUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_CamDbDbc.hpp"
+#include "C_CamGenSigUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -61,7 +60,7 @@ void C_CamDbDbc::SetActive(const bool oq_Active)
    \param[in]  orc_Data    New data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamDbDbc::SetData(const C_CieConverter::C_CIECommDefinition & orc_Data)
+void C_CamDbDbc::SetData(const C_CieConverter::C_CieCommDefinition & orc_Data)
 {
    this->mc_Data = orc_Data;
 }
@@ -79,16 +78,16 @@ void C_CamDbDbc::FindAllMessages(void)
       C_CamDbDbcMessageId c_Id;
 
       //Each node
-      for (uint32 u32_ItNode = 0UL; u32_ItNode < this->mc_Data.c_Nodes.size();
+      for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mc_Data.c_Nodes.size();
            ++u32_ItNode)
       {
-         const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
+         const C_CieConverter::C_CieNode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
          //Id
          c_Id.u32_NodeIndex = u32_ItNode;
          //Each Rx message
-         for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_RxMessages.size(); ++u32_ItMessage)
+         for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_RxMessages.size(); ++u32_ItMessage)
          {
-            const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
+            const C_CieConverter::C_CieNodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
             //Use first occurance
             if (!this->mc_FoundMessagesNodes.contains(rc_Message.c_CanMessage.c_Name.c_str()))
             {
@@ -101,9 +100,9 @@ void C_CamDbDbc::FindAllMessages(void)
             }
          }
          //Each Tx message
-         for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_TxMessages.size(); ++u32_ItMessage)
+         for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_TxMessages.size(); ++u32_ItMessage)
          {
-            const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
+            const C_CieConverter::C_CieNodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
             //Use first occurance
             if (!this->mc_FoundMessagesNodes.contains(rc_Message.c_CanMessage.c_Name.c_str()))
             {
@@ -117,9 +116,9 @@ void C_CamDbDbc::FindAllMessages(void)
          }
       }
       //Unmapped messages
-      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
+      for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
       {
-         const C_CieConverter::C_CIENodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
+         const C_CieConverter::C_CieNodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
          //Use first occurance
          if (!this->mc_FoundMessagesUnmapped.contains(rc_Message.c_CanMessage.c_Name.c_str()))
          {
@@ -146,20 +145,20 @@ void C_CamDbDbc::FindAllMessages(void)
    C_NOACT  No matching message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtended, QString & orc_Message) const
+int32_t C_CamDbDbc::FindMessageById(const uint32_t ou32_Id, const bool oq_IsExtended, QString & orc_Message) const
 {
-   sint32 s32_Retval = C_NOACT;
+   int32_t s32_Retval = C_NOACT;
 
    //Each node
-   for (uint32 u32_ItNode = 0UL; (u32_ItNode < this->mc_Data.c_Nodes.size()) && (s32_Retval == C_NOACT);
+   for (uint32_t u32_ItNode = 0UL; (u32_ItNode < this->mc_Data.c_Nodes.size()) && (s32_Retval == C_NOACT);
         ++u32_ItNode)
    {
-      const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
+      const C_CieConverter::C_CieNode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
       //Each Rx message
-      for (uint32 u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_RxMessages.size()) && (s32_Retval == C_NOACT);
+      for (uint32_t u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_RxMessages.size()) && (s32_Retval == C_NOACT);
            ++u32_ItMessage)
       {
-         const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
+         const C_CieConverter::C_CieNodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
          if ((rc_Message.c_CanMessage.u32_CanId == ou32_Id) && (rc_Message.c_CanMessage.q_IsExtended == oq_IsExtended))
          {
             //Found match
@@ -168,10 +167,10 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtende
          }
       }
       //Each Tx message
-      for (uint32 u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_TxMessages.size()) && (s32_Retval == C_NOACT);
+      for (uint32_t u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_TxMessages.size()) && (s32_Retval == C_NOACT);
            ++u32_ItMessage)
       {
-         const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
+         const C_CieConverter::C_CieNodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
          if ((rc_Message.c_CanMessage.u32_CanId == ou32_Id) && (rc_Message.c_CanMessage.q_IsExtended == oq_IsExtended))
          {
             //Found match
@@ -181,9 +180,9 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtende
       }
    }
    //Unmapped messages
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
    {
-      const C_CieConverter::C_CIENodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
+      const C_CieConverter::C_CieNodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
       if ((rc_Message.c_CanMessage.u32_CanId == ou32_Id) && (rc_Message.c_CanMessage.q_IsExtended == oq_IsExtended))
       {
          //Found match
@@ -204,9 +203,9 @@ sint32 C_CamDbDbc::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtende
    C_NOACT  Message not found in file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbDbc::FindMessage(const QString & orc_Message)
+int32_t C_CamDbDbc::FindMessage(const QString & orc_Message)
 {
-   sint32 s32_Retval = C_NOACT;
+   int32_t s32_Retval = C_NOACT;
 
    //Check if already searched once
    if ((this->mc_FoundMessagesNodes.contains(orc_Message) == true) ||
@@ -219,16 +218,16 @@ sint32 C_CamDbDbc::FindMessage(const QString & orc_Message)
       C_CamDbDbcMessageId c_Id;
 
       //Each node
-      for (uint32 u32_ItNode = 0UL; (u32_ItNode < this->mc_Data.c_Nodes.size()) && (s32_Retval == C_NOACT);
+      for (uint32_t u32_ItNode = 0UL; (u32_ItNode < this->mc_Data.c_Nodes.size()) && (s32_Retval == C_NOACT);
            ++u32_ItNode)
       {
-         const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
+         const C_CieConverter::C_CieNode & rc_Node = this->mc_Data.c_Nodes[u32_ItNode];
          //Id
          c_Id.u32_NodeIndex = u32_ItNode;
          //Each Rx message
-         for (uint32 u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_RxMessages.size(); ++u32_ItMessage)
+         for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < rc_Node.c_RxMessages.size(); ++u32_ItMessage)
          {
-            const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
+            const C_CieConverter::C_CieNodeMessage & rc_Message = rc_Node.c_RxMessages[u32_ItMessage];
             if (orc_Message.compare(rc_Message.c_CanMessage.c_Name.c_str()) == 0)
             {
                //Found
@@ -241,10 +240,10 @@ sint32 C_CamDbDbc::FindMessage(const QString & orc_Message)
             }
          }
          //Each Tx message
-         for (uint32 u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_TxMessages.size()) && (s32_Retval == C_NOACT);
+         for (uint32_t u32_ItMessage = 0UL; (u32_ItMessage < rc_Node.c_TxMessages.size()) && (s32_Retval == C_NOACT);
               ++u32_ItMessage)
          {
-            const C_CieConverter::C_CIENodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
+            const C_CieConverter::C_CieNodeMessage & rc_Message = rc_Node.c_TxMessages[u32_ItMessage];
             if (orc_Message.compare(rc_Message.c_CanMessage.c_Name.c_str()) == 0)
             {
                //Found
@@ -265,9 +264,9 @@ sint32 C_CamDbDbc::FindMessage(const QString & orc_Message)
       else
       {
          //Unmapped messages
-         for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
+         for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Data.c_UnmappedMessages.size(); ++u32_ItMessage)
          {
-            const C_CieConverter::C_CIENodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
+            const C_CieConverter::C_CieNodeMessage & rc_Message = this->mc_Data.c_UnmappedMessages[u32_ItMessage];
             if (orc_Message.compare(rc_Message.c_CanMessage.c_Name.c_str()) == 0)
             {
                C_CamDbDbcUnmappedMessageId c_UnmappedId;
@@ -337,10 +336,10 @@ const std::vector<QString> C_CamDbDbc::GetFoundMessages(void) const
    Else Valid DBC message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_CieConverter::C_CIECanMessage * C_CamDbDbc::GetDBCMessage(const QString & orc_Message, const bool oq_UseHash,
-                                                                  const uint32 ou32_Hash) const
+const C_CieConverter::C_CieCanMessage * C_CamDbDbc::GetDbcMessage(const QString & orc_Message, const bool oq_UseHash,
+                                                                  const uint32_t ou32_Hash) const
 {
-   const C_CieConverter::C_CIECanMessage * pc_Retval = NULL;
+   const C_CieConverter::C_CieCanMessage * pc_Retval = NULL;
 
    //Don't allow access to inactive file
    if (this->mq_Active)
@@ -354,12 +353,12 @@ const C_CieConverter::C_CIECanMessage * C_CamDbDbc::GetDBCMessage(const QString 
          {
             if (c_ItMessage->u32_NodeIndex < this->mc_Data.c_Nodes.size())
             {
-               const C_CieConverter::C_CIENode & rc_Node = this->mc_Data.c_Nodes[c_ItMessage->u32_NodeIndex];
+               const C_CieConverter::C_CieNode & rc_Node = this->mc_Data.c_Nodes[c_ItMessage->u32_NodeIndex];
                if (c_ItMessage->q_MessageIsTx == false)
                {
                   if (c_ItMessage->u32_MessageIndex < rc_Node.c_RxMessages.size())
                   {
-                     const C_CieConverter::C_CIENodeMessage & rc_Message =
+                     const C_CieConverter::C_CieNodeMessage & rc_Message =
                         rc_Node.c_RxMessages[c_ItMessage->u32_MessageIndex];
                      pc_Retval = &rc_Message.c_CanMessage;
                   }
@@ -368,7 +367,7 @@ const C_CieConverter::C_CIECanMessage * C_CamDbDbc::GetDBCMessage(const QString 
                {
                   if (c_ItMessage->u32_MessageIndex < rc_Node.c_TxMessages.size())
                   {
-                     const C_CieConverter::C_CIENodeMessage & rc_Message =
+                     const C_CieConverter::C_CieNodeMessage & rc_Message =
                         rc_Node.c_TxMessages[c_ItMessage->u32_MessageIndex];
                      pc_Retval = &rc_Message.c_CanMessage;
                   }
@@ -387,7 +386,7 @@ const C_CieConverter::C_CIECanMessage * C_CamDbDbc::GetDBCMessage(const QString 
             {
                if (c_It->u32_Index < this->mc_Data.c_UnmappedMessages.size())
                {
-                  const C_CieConverter::C_CIENodeMessage & rc_Message =
+                  const C_CieConverter::C_CieNodeMessage & rc_Message =
                      this->mc_Data.c_UnmappedMessages[c_It->u32_Index];
                   pc_Retval = &rc_Message.c_CanMessage;
                }
@@ -408,7 +407,7 @@ const C_CieConverter::C_CIECanMessage * C_CamDbDbc::GetDBCMessage(const QString 
    \retval   false  Invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamDbDbc::CheckHashForMessage(const QString & orc_Message, const uint32 ou32_Hash) const
+bool C_CamDbDbc::CheckHashForMessage(const QString & orc_Message, const uint32_t ou32_Hash) const
 {
    bool q_Retval = false;
 

@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdNdeDpSelectorAddWidget.h"
+#include "C_SdNdeDpSelectorAddWidget.hpp"
 #include "ui_C_SdNdeDpSelectorAddWidget.h"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpUtil.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,17 +44,17 @@ using namespace stw_opensyde_core;
 
    \param[in,out] orc_Parent           Reference to parent
    \param[in]     ou32_NodeIndex       Node index
-   \param[in,out] opc_OSCDataPool      Reference to the actual core datapool object
+   \param[in,out] opc_OscDataPool      Reference to the actual core datapool object
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpSelectorAddWidget::C_SdNdeDpSelectorAddWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                       const uint32 ou32_NodeIndex,
-                                                       C_OSCNodeDataPool & orc_OSCDataPool) :
+C_SdNdeDpSelectorAddWidget::C_SdNdeDpSelectorAddWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                       const uint32_t ou32_NodeIndex,
+                                                       C_OscNodeDataPool & orc_OscDataPool) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpSelectorAddWidget),
    mrc_ParentDialog(orc_Parent),
    mu32_NodeIndex(ou32_NodeIndex),
-   mrc_OSCDataPool(orc_OSCDataPool)
+   mrc_OscDataPool(orc_OscDataPool)
 {
    this->mpc_Ui->setupUi(this);
 
@@ -72,14 +71,14 @@ C_SdNdeDpSelectorAddWidget::C_SdNdeDpSelectorAddWidget(stw_opensyde_gui_elements
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this,
            &C_SdNdeDpSelectorAddWidget::m_CancelClicked);
 
-   connect(this->mpc_Ui->pc_RadioButtonStandAlone, &stw_opensyde_gui_elements::C_OgeRabProperties::toggled, this,
+   connect(this->mpc_Ui->pc_RadioButtonStandAlone, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled, this,
            &C_SdNdeDpSelectorAddWidget::m_OnStandAloneChange);
-   connect(this->mpc_Ui->pc_RadioButtonShared, &stw_opensyde_gui_elements::C_OgeRabProperties::toggled, this,
+   connect(this->mpc_Ui->pc_RadioButtonShared, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled, this,
            &C_SdNdeDpSelectorAddWidget::m_OnSharedChanged);
 
    //lint -e{929}  Qt interface
    connect(this->mpc_Ui->pc_ComboBoxSharedDatapool,
-           static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdNdeDpSelectorAddWidget::m_OnSharedDataPoolChanged);
 }
 
@@ -141,13 +140,13 @@ void C_SdNdeDpSelectorAddWidget::InitStaticNames(void) const
    false    No shared datapool was selected. Stand alone datapool.
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpSelectorAddWidget::GetSelectedSharedDatapool(C_OSCNodeDataPoolId & orc_SharedDatapoolId) const
+bool C_SdNdeDpSelectorAddWidget::GetSelectedSharedDatapool(C_OscNodeDataPoolId & orc_SharedDatapoolId) const
 {
    const bool q_Return = this->mpc_Ui->pc_RadioButtonShared->isChecked();
 
    if (this->mpc_Ui->pc_ComboBoxSharedDatapool->count() > 0)
    {
-      const std::map<QString, stw_opensyde_core::C_OSCNodeDataPoolId>::const_iterator c_ItDatapool =
+      const std::map<QString, stw::opensyde_core::C_OscNodeDataPoolId>::const_iterator c_ItDatapool =
          this->mc_AvailableDatapools.find(this->mpc_Ui->pc_ComboBoxSharedDatapool->currentText());
 
       tgl_assert(c_ItDatapool != this->mc_AvailableDatapools.end());
@@ -173,8 +172,8 @@ void C_SdNdeDpSelectorAddWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -201,10 +200,10 @@ void C_SdNdeDpSelectorAddWidget::m_InitFromData(void)
 {
    // Fill the combo box with all datapools of the same type beginning with datapools
    // of the same node
-   const C_OSCNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   uint32 u32_DatapoolCounter;
-   uint32 u32_NodeCounter;
-   C_OSCNodeDataPoolId c_DatapoolId;
+   const C_OscNode * pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   uint32_t u32_DatapoolCounter;
+   uint32_t u32_NodeCounter;
+   C_OscNodeDataPoolId c_DatapoolId;
 
    // Add datapools of current node
    if (pc_Node != NULL)
@@ -213,9 +212,9 @@ void C_SdNdeDpSelectorAddWidget::m_InitFromData(void)
 
       for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < pc_Node->c_DataPools.size(); ++u32_DatapoolCounter)
       {
-         const C_OSCNodeDataPool & rc_Datapool = pc_Node->c_DataPools[u32_DatapoolCounter];
+         const C_OscNodeDataPool & rc_Datapool = pc_Node->c_DataPools[u32_DatapoolCounter];
 
-         if (rc_Datapool.e_Type == this->mrc_OSCDataPool.e_Type)
+         if (rc_Datapool.e_Type == this->mrc_OscDataPool.e_Type)
          {
             const QString c_DatapoolName = rc_Datapool.c_Name.c_str();
             this->mpc_Ui->pc_ComboBoxSharedDatapool->addItem(c_DatapoolName);
@@ -228,11 +227,11 @@ void C_SdNdeDpSelectorAddWidget::m_InitFromData(void)
    }
 
    // Add datapools of all other nodes
-   for (u32_NodeCounter = 0U; u32_NodeCounter < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_NodeCounter)
+   for (u32_NodeCounter = 0U; u32_NodeCounter < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_NodeCounter)
    {
       if (u32_NodeCounter != this->mu32_NodeIndex)
       {
-         pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeCounter);
+         pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeCounter);
 
          if (pc_Node != NULL)
          {
@@ -242,9 +241,9 @@ void C_SdNdeDpSelectorAddWidget::m_InitFromData(void)
 
             for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < pc_Node->c_DataPools.size(); ++u32_DatapoolCounter)
             {
-               const C_OSCNodeDataPool & rc_Datapool = pc_Node->c_DataPools[u32_DatapoolCounter];
+               const C_OscNodeDataPool & rc_Datapool = pc_Node->c_DataPools[u32_DatapoolCounter];
 
-               if (rc_Datapool.e_Type == this->mrc_OSCDataPool.e_Type)
+               if (rc_Datapool.e_Type == this->mrc_OscDataPool.e_Type)
                {
                   const QString c_Text = c_NodeName + static_cast<QString>(rc_Datapool.c_Name.c_str());
                   this->mpc_Ui->pc_ComboBoxSharedDatapool->addItem(c_Text);
@@ -313,8 +312,8 @@ void C_SdNdeDpSelectorAddWidget::m_OnSharedChanged(void) const
 void C_SdNdeDpSelectorAddWidget::m_OnSharedDataPoolChanged(void) const
 {
    const C_PuiSdSharedDatapools & rc_SharedDatapools = C_PuiSdHandler::h_GetInstance()->GetSharedDatapoolsConst();
-   C_OSCNodeDataPoolId c_SelectedDatapoolId;
-   uint32 u32_SharedGroup = 0U;
+   C_OscNodeDataPoolId c_SelectedDatapoolId;
+   uint32_t u32_SharedGroup = 0U;
 
    // Remove previous results
    this->mpc_Ui->pc_ListWidgetSharedDatapoolInfo->clear();
@@ -328,7 +327,7 @@ void C_SdNdeDpSelectorAddWidget::m_OnSharedDataPoolChanged(void) const
    {
       // Datapool is already shared
       std::vector<QString> c_SharedDatapoolGroup;
-      uint32 u32_DatapoolCounter;
+      uint32_t u32_DatapoolCounter;
 
       tgl_assert(C_SdNdeDpUtil::h_GetSharedDatapoolGroup(u32_SharedGroup, c_SelectedDatapoolId,
                                                          this->mu32_NodeIndex,

@@ -8,18 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCHALCMagicianUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscHalcMagicianUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil(void)
+C_OscHalcMagicianUtil::C_OscHalcMagicianUtil(void)
 {
 }
 
@@ -51,12 +51,12 @@ C_OSCHALCMagicianUtil::C_OSCHALCMagicianUtil(void)
    Datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName(const bool oq_IsSafe, const uint32 ou32_CopyIndex)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetDatapoolName(const bool oq_IsSafe, const uint32_t ou32_CopyIndex)
 {
-   stw_scl::C_SCLString c_Retval = (oq_IsSafe == true) ? "HAL_SAFE" : "HAL_NON_SAFE";
+   stw::scl::C_SclString c_Retval = (oq_IsSafe == true) ? "HAL_SAFE" : "HAL_NON_SAFE";
    if (ou32_CopyIndex > 0UL)
    {
-      c_Retval += "_COPY_" + stw_scl::C_SCLString::IntToStr(ou32_CopyIndex + 1UL);
+      c_Retval += "_COPY_" + stw::scl::C_SclString::IntToStr(ou32_CopyIndex + 1U);
    }
    return c_Retval;
 }
@@ -71,11 +71,11 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolName(const bool oq_IsSa
    Datapool comment
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolComment(const bool oq_IsSafe, const uint32 ou32_CopyIndex)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetDatapoolComment(const bool oq_IsSafe, const uint32_t ou32_CopyIndex)
 {
-   const stw_scl::C_SCLString c_Info = (oq_IsSafe == true) ? "safe" : "non safe";
+   const stw::scl::C_SclString c_Info = (oq_IsSafe == true) ? "safe" : "non safe";
 
-   stw_scl::C_SCLString c_Retval = "Automatically generated Datapool for HAL " + c_Info + " variable storage.";
+   stw::scl::C_SclString c_Retval = "Automatically generated Datapool for HAL " + c_Info + " variable storage.";
    if (ou32_CopyIndex > 0UL)
    {
       c_Retval += " This instance is a redundant copy of the original HAL datapool for backup purposes.";
@@ -92,22 +92,22 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetDatapoolComment(const bool oq_I
    List name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetListName(const C_OSCHalcDefDomain::E_VariableSelector oe_Type)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetListName(const C_OscHalcDefDomain::E_VariableSelector oe_Type)
 {
-   stw_scl::C_SCLString c_Retval;
+   stw::scl::C_SclString c_Retval;
 
    switch (oe_Type)
    {
-   case C_OSCHalcDefDomain::eVA_PARAM:
+   case C_OscHalcDefDomain::eVA_PARAM:
       c_Retval = "Configuration";
       break;
-   case C_OSCHalcDefDomain::eVA_INPUT:
+   case C_OscHalcDefDomain::eVA_INPUT:
       c_Retval = "Inputs";
       break;
-   case C_OSCHalcDefDomain::eVA_OUTPUT:
+   case C_OscHalcDefDomain::eVA_OUTPUT:
       c_Retval = "Outputs";
       break;
-   case C_OSCHalcDefDomain::eVA_STATUS:
+   case C_OscHalcDefDomain::eVA_STATUS:
       c_Retval = "Statuses";
       break;
    default:
@@ -132,23 +132,23 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetListName(const C_OSCHalcDefDoma
    C_RANGE  Invalid input
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHALCMagicianUtil::h_GetVariableName(const std::vector<C_OSCHalcDefStruct> & orc_DefinitionArray,
-                                                const uint32 ou32_ParameterIndexStruct,
-                                                const uint32 ou32_ParameterIndexElement,
-                                                const stw_scl::C_SCLString & orc_DomainSingularName,
-                                                stw_scl::C_SCLString & orc_Name)
+int32_t C_OscHalcMagicianUtil::h_GetVariableName(const std::vector<C_OscHalcDefStruct> & orc_DefinitionArray,
+                                                 const uint32_t ou32_ParameterIndexStruct,
+                                                 const uint32_t ou32_ParameterIndexElement,
+                                                 const stw::scl::C_SclString & orc_DomainSingularName,
+                                                 stw::scl::C_SclString & orc_Name)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ParameterIndexStruct < orc_DefinitionArray.size())
    {
-      const C_OSCHalcDefStruct & rc_StructDef = orc_DefinitionArray[ou32_ParameterIndexStruct];
+      const C_OscHalcDefStruct & rc_StructDef = orc_DefinitionArray[ou32_ParameterIndexStruct];
       if (rc_StructDef.c_StructElements.size() > 0UL)
       {
          if (ou32_ParameterIndexElement < rc_StructDef.c_StructElements.size())
          {
-            const C_OSCHalcDefElement & rc_DefElem = rc_StructDef.c_StructElements[ou32_ParameterIndexElement];
-            orc_Name = C_OSCHALCMagicianUtil::mh_GetElementName(rc_DefElem, orc_DomainSingularName);
+            const C_OscHalcDefElement & rc_DefElem = rc_StructDef.c_StructElements[ou32_ParameterIndexElement];
+            orc_Name = C_OscHalcMagicianUtil::mh_GetElementName(rc_DefElem, orc_DomainSingularName);
          }
          else
          {
@@ -157,7 +157,7 @@ sint32 C_OSCHALCMagicianUtil::h_GetVariableName(const std::vector<C_OSCHalcDefSt
       }
       else
       {
-         orc_Name = C_OSCHALCMagicianUtil::mh_GetElementName(rc_StructDef, orc_DomainSingularName);
+         orc_Name = C_OscHalcMagicianUtil::mh_GetElementName(rc_StructDef, orc_DomainSingularName);
       }
    }
    else
@@ -177,10 +177,10 @@ sint32 C_OSCHALCMagicianUtil::h_GetVariableName(const std::vector<C_OSCHalcDefSt
    Complete element name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_CombineVariableName(const stw_scl::C_SCLString & orc_Domain,
-                                                                  const stw_scl::C_SCLString & orc_ParameterName)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_CombineVariableName(const stw::scl::C_SclString & orc_Domain,
+                                                                   const stw::scl::C_SclString & orc_ParameterName)
 {
-   stw_scl::C_SCLString c_Retval = "";
+   stw::scl::C_SclString c_Retval = "";
 
    //Domain
    c_Retval += orc_Domain;
@@ -201,23 +201,23 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_CombineVariableName(const stw_scl:
    Channel number variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetChanNumVariable(
-   const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
+C_OscNodeDataPoolListElement C_OscHalcMagicianUtil::h_GetChanNumVariable(
+   const stw::scl::C_SclString & orc_DomainSingularName, const bool oq_IsSafe, const uint32_t ou32_NumChannels,
    const bool oq_AddDataset)
 {
-   C_OSCNodeDataPoolListElement c_Element;
+   C_OscNodeDataPoolListElement c_Element;
 
-   c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(orc_DomainSingularName);
+   c_Element.c_Name = C_OscHalcMagicianUtil::h_GetChanNumVariableName(orc_DomainSingularName);
    c_Element.c_Comment = "Zero based channel numbers";
 
    //Defined defaults
    h_SetCommonDpElementDefaults(c_Element);
 
    // Access
-   c_Element.e_Access = oq_IsSafe ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::eACCESS_RW;
+   c_Element.e_Access = oq_IsSafe ? C_OscNodeDataPoolListElement::eACCESS_RO : C_OscNodeDataPoolListElement::eACCESS_RW;
 
    //Type
-   C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, true);
+   C_OscHalcMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, true);
 
    return c_Element;
 }
@@ -231,9 +231,10 @@ C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetChanNumVariable(
    Channel number variable name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetChanNumVariableName(const stw_scl::C_SCLString & orc_DomainSingularName)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetChanNumVariableName(
+   const stw::scl::C_SclString & orc_DomainSingularName)
 {
-   return C_OSCHALCMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "ChannelNumber");
+   return C_OscHalcMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "ChannelNumber");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -248,23 +249,23 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetChanNumVariableName(const stw_s
    Use case variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
-   const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
+C_OscNodeDataPoolListElement C_OscHalcMagicianUtil::h_GetUseCaseVariable(
+   const stw::scl::C_SclString & orc_DomainSingularName, const bool oq_IsSafe, const uint32_t ou32_NumChannels,
    const bool oq_AddDataset)
 {
-   C_OSCNodeDataPoolListElement c_Element;
+   C_OscNodeDataPoolListElement c_Element;
 
-   c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(orc_DomainSingularName);
+   c_Element.c_Name = C_OscHalcMagicianUtil::h_GetUseCaseVariableName(orc_DomainSingularName);
    c_Element.c_Comment = "Selected use-case";
 
    //Defined defaults
    h_SetCommonDpElementDefaults(c_Element);
 
    // Access
-   c_Element.e_Access = oq_IsSafe ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::eACCESS_RW;
+   c_Element.e_Access = oq_IsSafe ? C_OscNodeDataPoolListElement::eACCESS_RO : C_OscNodeDataPoolListElement::eACCESS_RW;
 
    //Type
-   C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
+   C_OscHalcMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
 
    return c_Element;
 }
@@ -278,9 +279,10 @@ C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetUseCaseVariable(
    Use case variable name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(const stw_scl::C_SCLString & orc_DomainSingularName)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetUseCaseVariableName(
+   const stw::scl::C_SclString & orc_DomainSingularName)
 {
-   return C_OSCHALCMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "UseCase");
+   return C_OscHalcMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "UseCase");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -295,31 +297,31 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(const stw_s
    Safety flag variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetSafetyFlagVariable(
-   const stw_scl::C_SCLString & orc_DomainSingularName, const bool oq_IsSafe, const uint32 ou32_NumChannels,
+C_OscNodeDataPoolListElement C_OscHalcMagicianUtil::h_GetSafetyFlagVariable(
+   const stw::scl::C_SclString & orc_DomainSingularName, const bool oq_IsSafe, const uint32_t ou32_NumChannels,
    const bool oq_AddDataset)
 {
-   const uint8 u8_MAX_VALUE = 1U;
-   C_OSCNodeDataPoolListElement c_Element;
+   const uint8_t u8_MAX_VALUE = 1U;
+   C_OscNodeDataPoolListElement c_Element;
 
-   c_Element.c_Name = C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(orc_DomainSingularName);
+   c_Element.c_Name = C_OscHalcMagicianUtil::h_GetSafetyFlagVariableName(orc_DomainSingularName);
    c_Element.c_Comment = "Information about which channel is safety relevant";
 
    //Defined defaults
    h_SetCommonDpElementDefaults(c_Element);
 
    // Access
-   c_Element.e_Access = oq_IsSafe ? C_OSCNodeDataPoolListElement::eACCESS_RO : C_OSCNodeDataPoolListElement::eACCESS_RW;
+   c_Element.e_Access = oq_IsSafe ? C_OscNodeDataPoolListElement::eACCESS_RO : C_OscNodeDataPoolListElement::eACCESS_RW;
 
    //Type
-   C_OSCHALCMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
+   C_OscHalcMagicianUtil::mh_HandleGenericType(c_Element, ou32_NumChannels, oq_AddDataset, false);
 
    //Special value max
    if (ou32_NumChannels > 1UL)
    {
-      for (uint32 u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
       {
-         c_Element.c_MaxValue.SetValueAU8Element(u8_MAX_VALUE, u32_It);
+         c_Element.c_MaxValue.SetValueArrU8Element(u8_MAX_VALUE, u32_It);
       }
    }
    else
@@ -339,10 +341,10 @@ C_OSCNodeDataPoolListElement C_OSCHALCMagicianUtil::h_GetSafetyFlagVariable(
    Safety flag variable name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(
-   const stw_scl::C_SCLString & orc_DomainSingularName)
+stw::scl::C_SclString C_OscHalcMagicianUtil::h_GetSafetyFlagVariableName(
+   const stw::scl::C_SclString & orc_DomainSingularName)
 {
-   return C_OSCHALCMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "SafetyRelevant");
+   return C_OscHalcMagicianUtil::h_CombineVariableName(orc_DomainSingularName, "SafetyRelevant");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -351,14 +353,14 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(
    \param[in,out]  orc_Element   Element
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHALCMagicianUtil::h_SetCommonDpElementDefaults(C_OSCNodeDataPoolListElement & orc_Element)
+void C_OscHalcMagicianUtil::h_SetCommonDpElementDefaults(C_OscNodeDataPoolListElement & orc_Element)
 {
    orc_Element.c_Unit = "";
    orc_Element.f64_Factor = 1.0;
    orc_Element.f64_Offset = 0.0;
    orc_Element.q_DiagEventCall = false;
    orc_Element.q_NvmValueIsValid = false;
-   orc_Element.q_NvMValueChanged = false;
+   orc_Element.q_NvmValueChanged = false;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -371,10 +373,10 @@ void C_OSCHALCMagicianUtil::h_SetCommonDpElementDefaults(C_OSCNodeDataPoolListEl
    Complete element name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCHALCMagicianUtil::mh_GetElementName(const C_OSCHalcDefElement & orc_Param,
-                                                              const stw_scl::C_SCLString & orc_Domain)
+stw::scl::C_SclString C_OscHalcMagicianUtil::mh_GetElementName(const C_OscHalcDefElement & orc_Param,
+                                                               const stw::scl::C_SclString & orc_Domain)
 {
-   const stw_scl::C_SCLString c_Retval = C_OSCHALCMagicianUtil::h_CombineVariableName(orc_Domain, orc_Param.c_Display);
+   const stw::scl::C_SclString c_Retval = C_OscHalcMagicianUtil::h_CombineVariableName(orc_Domain, orc_Param.c_Display);
 
    return c_Retval;
 }
@@ -388,17 +390,17 @@ stw_scl::C_SCLString C_OSCHALCMagicianUtil::mh_GetElementName(const C_OSCHalcDef
    \param[in]      oq_UseU16           Use u16
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHALCMagicianUtil::mh_HandleGenericType(C_OSCNodeDataPoolListElement & orc_Element,
-                                                 const uint32 ou32_NumChannels, const bool oq_AddDataset,
+void C_OscHalcMagicianUtil::mh_HandleGenericType(C_OscNodeDataPoolListElement & orc_Element,
+                                                 const uint32_t ou32_NumChannels, const bool oq_AddDataset,
                                                  const bool oq_UseU16)
 {
    if (oq_UseU16)
    {
-      orc_Element.c_MinValue.SetType(C_OSCNodeDataPoolContent::eUINT16);
+      orc_Element.c_MinValue.SetType(C_OscNodeDataPoolContent::eUINT16);
    }
    else
    {
-      orc_Element.c_MinValue.SetType(C_OSCNodeDataPoolContent::eUINT8);
+      orc_Element.c_MinValue.SetType(C_OscNodeDataPoolContent::eUINT8);
    }
    if (ou32_NumChannels > 1UL)
    {
@@ -416,17 +418,17 @@ void C_OSCHALCMagicianUtil::mh_HandleGenericType(C_OSCNodeDataPoolListElement & 
    //Value
    if (ou32_NumChannels > 1UL)
    {
-      for (uint32 u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < ou32_NumChannels; ++u32_It)
       {
          if (oq_UseU16)
          {
-            orc_Element.c_MinValue.SetValueAU16Element(std::numeric_limits<uint16>::min(), u32_It);
-            orc_Element.c_MaxValue.SetValueAU16Element(std::numeric_limits<uint16>::max(), u32_It);
+            orc_Element.c_MinValue.SetValueArrU16Element(std::numeric_limits<uint16_t>::min(), u32_It);
+            orc_Element.c_MaxValue.SetValueArrU16Element(std::numeric_limits<uint16_t>::max(), u32_It);
          }
          else
          {
-            orc_Element.c_MinValue.SetValueAU8Element(std::numeric_limits<uint8>::min(), u32_It);
-            orc_Element.c_MaxValue.SetValueAU8Element(std::numeric_limits<uint8>::max(), u32_It);
+            orc_Element.c_MinValue.SetValueArrU8Element(std::numeric_limits<uint8_t>::min(), u32_It);
+            orc_Element.c_MaxValue.SetValueArrU8Element(std::numeric_limits<uint8_t>::max(), u32_It);
          }
       }
    }
@@ -434,13 +436,13 @@ void C_OSCHALCMagicianUtil::mh_HandleGenericType(C_OSCNodeDataPoolListElement & 
    {
       if (oq_UseU16)
       {
-         orc_Element.c_MinValue.SetValueU16(std::numeric_limits<uint16>::min());
-         orc_Element.c_MaxValue.SetValueU16(std::numeric_limits<uint16>::max());
+         orc_Element.c_MinValue.SetValueU16(std::numeric_limits<uint16_t>::min());
+         orc_Element.c_MaxValue.SetValueU16(std::numeric_limits<uint16_t>::max());
       }
       else
       {
-         orc_Element.c_MinValue.SetValueU8(std::numeric_limits<uint8>::min());
-         orc_Element.c_MaxValue.SetValueU8(std::numeric_limits<uint8>::max());
+         orc_Element.c_MinValue.SetValueU8(std::numeric_limits<uint8_t>::min());
+         orc_Element.c_MaxValue.SetValueU8(std::numeric_limits<uint8_t>::max());
       }
    }
 

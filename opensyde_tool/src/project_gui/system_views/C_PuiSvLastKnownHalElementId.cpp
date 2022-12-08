@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_PuiSvLastKnownHalElementId.h"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSvLastKnownHalElementId.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +46,7 @@ C_PuiSvLastKnownHalElementId::C_PuiSvLastKnownHalElementId() :
    \param[in]  orc_HalDpName  Hal datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvLastKnownHalElementId::C_PuiSvLastKnownHalElementId(const uint32 ou32_Crc, const QString & orc_HalDpName)
+C_PuiSvLastKnownHalElementId::C_PuiSvLastKnownHalElementId(const uint32_t ou32_Crc, const QString & orc_HalDpName)
 {
    this->u32_Crc = ou32_Crc;
    this->c_HalDpName = orc_HalDpName;
@@ -69,9 +68,9 @@ C_PuiSvLastKnownHalElementId::~C_PuiSvLastKnownHalElementId()
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvLastKnownHalElementId::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSvLastKnownHalElementId::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_Crc, sizeof(this->u32_Crc), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_HalDpName.toStdString().c_str(),
-                                      this->c_HalDpName.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_Crc, sizeof(this->u32_Crc), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_HalDpName.toStdString().c_str(),
+                                       this->c_HalDpName.length(), oru32_HashValue);
 }

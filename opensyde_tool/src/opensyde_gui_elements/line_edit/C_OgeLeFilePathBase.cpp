@@ -12,23 +12,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QDir>
 #include <QMimeData>
 
-#include "stwtypes.h"
-#include "C_Uti.h"
-#include "constants.h"
-#include "C_OgeLeFilePathBase.h"
-#include "C_GtGetText.h"
+#include "stwtypes.hpp"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "C_OgeLeFilePathBase.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -83,15 +82,15 @@ void C_OgeLeFilePathBase::SetPath(const QString & orc_New, const QString & orc_R
    if (this->mc_Path != "")
    {
       C_OgeLeToolTipBase::SetToolTipInformation(C_GtGetText::h_GetText("Path"), c_FileInfo.absoluteFilePath(),
-                                                stw_opensyde_gui::C_NagToolTip::eDEFAULT);
+                                                stw::opensyde_gui::C_NagToolTip::eDEFAULT);
    }
    else
    {
-      C_OgeLeToolTipBase::SetToolTipInformation("", "", stw_opensyde_gui::C_NagToolTip::eDEFAULT);
+      C_OgeLeToolTipBase::SetToolTipInformation("", "", stw::opensyde_gui::C_NagToolTip::eDEFAULT);
    }
 
    // make sure last known cursor position is not out of range
-   this->ms32_LastKnownCursorPos = std::min(static_cast<stw_types::sintn>(this->ms32_LastKnownCursorPos),
+   this->ms32_LastKnownCursorPos = std::min(static_cast<int32_t>(this->ms32_LastKnownCursorPos),
                                             this->mc_Path.size());
 }
 
@@ -233,8 +232,8 @@ void C_OgeLeFilePathBase::focusOutEvent(QFocusEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeFilePathBase::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if ((opc_KeyEvent->key() == static_cast<stw_types::sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<stw_types::sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       this->SetPath(this->text(), this->mc_RelativeTo);
    }
@@ -302,11 +301,11 @@ void C_OgeLeFilePathBase::dragEnterEvent(QDragEnterEvent * const opc_Event)
             if (c_File.isFile() == true)
             {
                // Check file extensions
-               sintn sn_Counter;
+               int32_t s32_Counter;
 
-               for (sn_Counter = 0; sn_Counter < this->mc_DragAndDropFileExtensions.size(); ++sn_Counter)
+               for (s32_Counter = 0; s32_Counter < this->mc_DragAndDropFileExtensions.size(); ++s32_Counter)
                {
-                  if (c_File.completeSuffix().toLower() == this->mc_DragAndDropFileExtensions.at(sn_Counter).toLower())
+                  if (c_File.completeSuffix().toLower() == this->mc_DragAndDropFileExtensions.at(s32_Counter).toLower())
                   {
                      q_ValidPath = true;
                      break;

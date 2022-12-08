@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMouseEvent>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_OgeTreeToolTipBase.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_OgeTreeToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -89,18 +88,18 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
             if ((this->m_Header()->isVisible() == true) &&
                 (this->m_Header()->geometry().contains(this->m_Header()->mapFromGlobal(c_GlobalPos)) == true))
             {
-               const sint32 s32_LogicalIndex =
+               const int32_t s32_LogicalIndex =
                   this->m_Header()->logicalIndexAt(this->m_Header()->mapFromGlobal(c_GlobalPos));
                //It seems the logical index is better than the visual index as it also handles moved columns
                if (s32_LogicalIndex >= 0)
                {
                   const QString c_Heading = this->m_Model()->headerData(s32_LogicalIndex, Qt::Horizontal,
-                                                                        msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                                                                        ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
                   const QString c_Content = this->m_Model()->headerData(s32_LogicalIndex, Qt::Horizontal,
-                                                                        msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                                                                        ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
                   const C_NagToolTip::E_Type e_Type =
                      static_cast<C_NagToolTip::E_Type>(this->m_Model()->headerData(s32_LogicalIndex, Qt::Horizontal,
-                                                                                   msn_USER_ROLE_TOOL_TIP_TYPE).toInt());
+                                                                                   ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
 
                   if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                   {
@@ -122,14 +121,14 @@ bool C_OgeTreeToolTipBase::m_CallForEvent(QEvent * const opc_Event)
                const QModelIndex c_Index = m_IndexAtGlobalPos(c_GlobalPos);
                if (c_Index.isValid() == true)
                {
-                  const sint32 s32_ToolTipRow = c_Index.row();
-                  const sint32 s32_ToolTipCol = c_Index.column();
+                  const int32_t s32_ToolTipRow = c_Index.row();
+                  const int32_t s32_ToolTipCol = c_Index.column();
                   if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
                   {
-                     const QString c_Heading = c_Index.data(msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
-                     const QString c_Content = c_Index.data(msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                     const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                     const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
                      const C_NagToolTip::E_Type e_Type =
-                        static_cast<C_NagToolTip::E_Type>(c_Index.data(msn_USER_ROLE_TOOL_TIP_TYPE).toInt());
+                        static_cast<C_NagToolTip::E_Type>(c_Index.data(ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
                      if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                      {
                         this->ms32_HoveredRow = s32_ToolTipRow;
@@ -250,7 +249,7 @@ void C_OgeTreeToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
    }
    if ((this->m_Header()->isVisible() == true) && (this->ms32_HoveredHorzHeader >= 0))
    {
-      const sint32 s32_LogicalIndex =
+      const int32_t s32_LogicalIndex =
          this->m_Header()->logicalIndexAt(this->m_Header()->mapFromGlobal(orc_GlobalPos));
       //It seems the logical index is better than the visual index as it also handles moved columns
       if (s32_LogicalIndex != this->ms32_HoveredHorzHeader)
@@ -278,9 +277,9 @@ void C_OgeTreeToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
    Number of parents
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OgeTreeToolTipBase::mh_CountParents(const QModelIndex & orc_Index)
+int32_t C_OgeTreeToolTipBase::mh_CountParents(const QModelIndex & orc_Index)
 {
-   sint32 s32_Retval = 0;
+   int32_t s32_Retval = 0;
    QModelIndex c_Tmp = orc_Index;
 
    while (c_Tmp.parent().isValid() == true)

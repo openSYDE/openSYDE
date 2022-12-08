@@ -8,30 +8,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMouseEvent>
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SyvDaChaDataItemWidget.h"
+#include "C_SyvDaChaDataItemWidget.hpp"
 #include "ui_C_SyvDaChaDataItemWidget.h"
 
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCNodeDataPoolListElement.h"
-#include "C_UtiStyleSheets.h"
-#include "C_OgeWiUtil.h"
-#include "C_SyvUtil.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_OSCNodeDataPoolContentUtil.h"
-#include "C_PuiSvHandler.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNodeDataPoolListElement.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,8 +53,8 @@ using namespace stw_opensyde_core;
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32 ou32_ViewIndex, QWidget * const opc_Parent) :
-   stw_opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
+C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32_t ou32_ViewIndex, QWidget * const opc_Parent) :
+   stw::opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaChaDataItemWidget),
    mu32_ViewIndex(ou32_ViewIndex),
    mu32_DataPoolElementConfigIndex(0U),
@@ -65,7 +64,7 @@ C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32 ou32_ViewIndex, 
    mq_Invalid(false),
    mc_ToolTipErrorTextHeading(""),
    mc_ToolTipErrorText(""),
-   me_PlaceholderDataPoolType(C_OSCNodeDataPool::eDIAG),
+   me_PlaceholderDataPoolType(C_OscNodeDataPool::eDIAG),
    me_MeasurementValueState(eMEASUREMENT_VAL_DEACTIVATED)
 {
    mpc_Ui->setupUi(this);
@@ -80,9 +79,9 @@ C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32 ou32_ViewIndex, 
    this->mc_IconParameter.load(":/images/system_definition/IconParameter.svg");
    this->mc_IconSignal.load(":/images/system_definition/IconSignal.svg");
    this->mc_IconVariable.load(":/images/system_definition/IconVariable.svg");
-   this->mc_IconHALInput.load(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
-   this->mc_IconHALOutput.load(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
-   this->mc_IconHALOther.load(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
+   this->mc_IconHalInput.load(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg");
+   this->mc_IconHalOutput.load(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg");
+   this->mc_IconHalOther.load(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg");
    // Inactive icon
    this->mc_IconParameterInactive.load(":/images/system_definition/IconParameterInactive.svg");
    this->mc_IconSignalInactive.load(":/images/system_definition/IconSignalInactive.svg");
@@ -94,14 +93,14 @@ C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32 ou32_ViewIndex, 
    this->mc_IconParameterWarning.load(":/images/system_definition/IconParameterWarning.svg");
    this->mc_IconSignalWarning.load(":/images/system_definition/IconSignalWarning.svg");
    this->mc_IconVariableWarning.load(":/images/system_definition/IconVariableWarning.svg");
-   this->mc_IconHALOtherWarning.load(":/images/system_definition/NodeEdit/halc/OtherSmallWarning.svg");
+   this->mc_IconHalOtherWarning.load(":/images/system_definition/NodeEdit/halc/OtherSmallWarning.svg");
    // Error icon
    this->mc_IconParameterError.load(":/images/system_definition/IconParameterError.svg");
    this->mc_IconSignalError.load(":/images/system_definition/IconSignalError.svg");
    this->mc_IconVariableError.load(":/images/system_definition/IconVariableError.svg");
-   this->mc_IconHALInputError.load(":/images/system_definition/NodeEdit/halc/InputSmallError.svg");
-   this->mc_IconHALOutputError.load(":/images/system_definition/NodeEdit/halc/OutputSmallError.svg");
-   this->mc_IconHALOtherError.load(":/images/system_definition/NodeEdit/halc/OtherSmallError.svg");
+   this->mc_IconHalInputError.load(":/images/system_definition/NodeEdit/halc/InputSmallError.svg");
+   this->mc_IconHalOutputError.load(":/images/system_definition/NodeEdit/halc/OutputSmallError.svg");
+   this->mc_IconHalOtherError.load(":/images/system_definition/NodeEdit/halc/OtherSmallError.svg");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -133,23 +132,23 @@ C_SyvDaChaDataItemWidget::~C_SyvDaChaDataItemWidget()
    \param[in]  orc_ToolTipErrorText                Text of tool tip in case of a warning
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataItemWidget::InitWidget(const uint32_t ou32_DataPoolElementConfigIndex,
                                           const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                           const QString & orc_DisplayName, const bool oq_Active,
                                           const QColor & orc_DataPoolElementColor, const QString & orc_Unit,
                                           const bool oq_Warning, const bool oq_Invalid,
-                                          const C_OSCNodeDataPool::E_Type oe_InvalidPlaceholderDataPoolType,
+                                          const C_OscNodeDataPool::E_Type oe_InvalidPlaceholderDataPoolType,
                                           const QString & orc_ToolTipErrorTextHeading,
                                           const QString & orc_ToolTipErrorText)
 {
    QString c_Name = orc_DisplayName;
-   const C_OSCNodeDataPoolListElement * const pc_OscElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
+   const C_OscNodeDataPoolListElement * const pc_OscElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
                                                                  orc_DataPoolElementId.u32_DataPoolIndex,
                                                                  orc_DataPoolElementId.u32_ListIndex,
                                                                  orc_DataPoolElementId.u32_ElementIndex);
-   const C_OSCNodeDataPool * const pc_Datapool =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_DataPoolElementId.u32_NodeIndex,
+   const C_OscNodeDataPool * const pc_Datapool =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_DataPoolElementId.u32_NodeIndex,
                                                       orc_DataPoolElementId.u32_DataPoolIndex);
 
    this->UpdateColor(orc_DataPoolElementColor);
@@ -178,8 +177,8 @@ void C_SyvDaChaDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfi
       {
          if (pc_Datapool != NULL)
          {
-            if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
-                (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
+            if ((pc_Datapool->e_Type == C_OscNodeDataPool::eHALC) ||
+                (pc_Datapool->e_Type == C_OscNodeDataPool::eHALC_NVM))
             {
                c_Name = C_PuiSvHandler::h_GetShortNamespace(orc_DataPoolElementId);
             }
@@ -204,14 +203,14 @@ void C_SyvDaChaDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfi
       if (pc_OscElement != NULL)
       {
          // Set default value
-         float64 f64_Value;
-         C_OSCNodeDataPoolContent c_Tmp = pc_OscElement->c_MinValue;
+         float64_t f64_Value;
+         C_OscNodeDataPoolContent c_Tmp = pc_OscElement->c_MinValue;
 
          c_Tmp.GetAnyValueAsFloat64(f64_Value, 0);
          if (f64_Value < 0.0)
          {
             // Do not use the minimum
-            C_OSCNodeDataPoolContentUtil::h_SetValueInContent(0.0, c_Tmp, 0UL);
+            C_OscNodeDataPoolContentUtil::h_SetValueInContent(0.0, c_Tmp, 0UL);
          }
          C_SdNdeDpContentUtil::h_GetValueAsScaledString(c_Tmp, pc_OscElement->f64_Factor,
                                                         pc_OscElement->f64_Offset, c_Value, 0UL);
@@ -239,7 +238,7 @@ void C_SyvDaChaDataItemWidget::InitWidget(const uint32 ou32_DataPoolElementConfi
    \param[in]  ou32_DataPoolElementConfigIndex  Datapool element configuration index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataItemWidget::UpdateIndex(const uint32 ou32_DataPoolElementConfigIndex)
+void C_SyvDaChaDataItemWidget::UpdateIndex(const uint32_t ou32_DataPoolElementConfigIndex)
 {
    this->mu32_DataPoolElementConfigIndex = ou32_DataPoolElementConfigIndex;
 }
@@ -347,13 +346,13 @@ void C_SyvDaChaDataItemWidget::UpdateMeasurementValue(const E_MeasurementValueSt
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update of the color transparency value configured by the actual timeout state
 
-   \param[in]  osn_Value   Value for transparency (0..255)
+   \param[in]  os32_Value   Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataItemWidget::UpdateTransparency(const sintn osn_Value) const
+void C_SyvDaChaDataItemWidget::UpdateTransparency(const int32_t os32_Value) const
 {
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LabelValue, "Transparency",
-                                          QString::number(osn_Value));
+                                          QString::number(os32_Value));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -481,7 +480,7 @@ bool C_SyvDaChaDataItemWidget::event(QEvent * const opc_Event)
    {
       QString c_ToolTip;
       QString c_ToolTipHeading = "";
-      stw_opensyde_gui::C_NagToolTip::E_Type e_Type = C_NagToolTip::eDEFAULT;
+      stw::opensyde_gui::C_NagToolTip::E_Type e_Type = C_NagToolTip::eDEFAULT;
 
       if ((this->mq_Warning == true) || (this->mq_Error == true))
       {
@@ -500,10 +499,10 @@ bool C_SyvDaChaDataItemWidget::event(QEvent * const opc_Event)
       else
       {
          //get element name as heading
-         if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataPoolElementId) != NULL)
+         if (C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataPoolElementId) != NULL)
          {
             const QString c_Name =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mc_DataPoolElementId)->c_Name.
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataPoolElementId)->c_Name.
                c_str();
             if (this->mc_DataPoolElementId.GetUseArrayElementIndex())
             {
@@ -537,7 +536,7 @@ bool C_SyvDaChaDataItemWidget::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaDataItemWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 
@@ -552,12 +551,12 @@ void C_SyvDaChaDataItemWidget::paintEvent(QPaintEvent * const opc_Event)
 void C_SyvDaChaDataItemWidget::mousePressEvent(QMouseEvent * const opc_Event)
 {
    if ((this->mq_Selected == false) &&
-       ((opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton)) ||
-        (opc_Event->buttons() == static_cast<sintn>(Qt::RightButton))))
+       ((opc_Event->buttons() == static_cast<int32_t>(Qt::LeftButton)) ||
+        (opc_Event->buttons() == static_cast<int32_t>(Qt::RightButton))))
    {
       Q_EMIT (this->SigDataItemSelected(this->mu32_DataPoolElementConfigIndex));
 
-      if (opc_Event->buttons() == static_cast<sintn>(Qt::RightButton))
+      if (opc_Event->buttons() == static_cast<int32_t>(Qt::RightButton))
       {
          // Context menu shall be available anyway
          QWidget::mousePressEvent(opc_Event);
@@ -585,13 +584,13 @@ void C_SyvDaChaDataItemWidget::m_DataItemToggled(const bool oq_Checked)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
 {
-   stw_opensyde_core::C_OSCNodeDataPool::E_Type e_Type = stw_opensyde_core::C_OSCNodeDataPool::eDIAG;
+   stw::opensyde_core::C_OscNodeDataPool::E_Type e_Type = stw::opensyde_core::C_OscNodeDataPool::eDIAG;
    const bool q_Inacitve = !this->mpc_Ui->pc_CheckBoxDataSerieActive->isChecked();
 
    if (this->mq_Invalid == false)
    {
       // Get the datapool type if the datapool element is valid
-      const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          this->mc_DataPoolElementId.u32_NodeIndex, this->mc_DataPoolElementId.u32_DataPoolIndex);
 
       if (pc_DataPool != NULL)
@@ -605,7 +604,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
    }
 
    // Adapt the icon
-   if (e_Type == C_OSCNodeDataPool::eDIAG)
+   if (e_Type == C_OscNodeDataPool::eDIAG)
    {
       // Diag datapool
       if (q_Inacitve == true)
@@ -625,7 +624,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconVariable);
       }
    }
-   else if (e_Type == C_OSCNodeDataPool::eNVM)
+   else if (e_Type == C_OscNodeDataPool::eNVM)
    {
       // NVM datapool
       if (q_Inacitve == true)
@@ -645,7 +644,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
          this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconParameter);
       }
    }
-   else if (e_Type == C_OSCNodeDataPool::eCOM)
+   else if (e_Type == C_OscNodeDataPool::eCOM)
    {
       // COMM datapool
       if (q_Inacitve == true)
@@ -668,63 +667,63 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
    else
    {
       // HAL or HAL_NVM datapool
-      const C_OSCHalcDefDomain::E_Category e_Category = C_PuiSdHandler::h_GetInstance()->GetDomainCategoryFromDpId(
+      const C_OscHalcDefDomain::E_Category e_Category = C_PuiSdHandler::h_GetInstance()->GetDomainCategoryFromDpId(
          this->mc_DataPoolElementId, this->mc_DataPoolElementId.GetArrayElementIndexOrZero());
 
       switch (e_Category)
       {
-      case C_OSCHalcDefDomain::eCA_INPUT:
+      case C_OscHalcDefDomain::eCA_INPUT:
          if (q_Inacitve == true)
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInputInactive);
          }
          else if (this->mq_Error == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInputError);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalInputError);
          }
          else if (this->mq_Warning == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherWarning);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherWarning);
          }
          else
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInput);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalInput);
          }
          break;
-      case C_OSCHalcDefDomain::eCA_OUTPUT:
+      case C_OscHalcDefDomain::eCA_OUTPUT:
          if (q_Inacitve == true)
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutputInactive);
          }
          else if (this->mq_Error == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutputError);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOutputError);
          }
          else if (this->mq_Warning == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherWarning);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherWarning);
          }
          else
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutput);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOutput);
          }
          break;
-      case C_OSCHalcDefDomain::eCA_OTHER:
+      case C_OscHalcDefDomain::eCA_OTHER:
          if (q_Inacitve == true)
          {
             this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherInactive);
          }
          else if (this->mq_Error == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherError);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherError);
          }
          else if (this->mq_Warning == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherWarning);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherWarning);
          }
          else
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOther);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOther);
          }
          break;
       default:

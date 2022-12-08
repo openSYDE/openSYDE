@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QEvent>
 #include <QHelpEvent>
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_SdNdeDpSelectorItemUsageWidget.h"
+#include "C_SdNdeDpSelectorItemUsageWidget.hpp"
 
-#include "C_Uti.h"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,7 +46,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeDpSelectorItemUsageWidget::C_SdNdeDpSelectorItemUsageWidget(QWidget * const opc_Parent) :
-   stw_opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
+   stw::opensyde_gui_elements::C_OgeWiWithToolTip(opc_Parent),
    mq_UsedToFull(false),
    mq_ReservedToFull(false),
    mq_UsedOverReserved(false),
@@ -58,9 +57,9 @@ C_SdNdeDpSelectorItemUsageWidget::C_SdNdeDpSelectorItemUsageWidget(QWidget * con
    mu32_Reserved(0U)
 {
    // set default inactive color
-   this->mc_ColorFree = stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 20);
+   this->mc_ColorFree = stw::opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 20);
    // set default reserved color
-   this->mc_ColorReserved = stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 50);
+   this->mc_ColorReserved = stw::opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 50);
 
    this->mc_Brush.setStyle(Qt::SolidPattern);
    this->mc_Pen.setColor(Qt::transparent);
@@ -76,9 +75,9 @@ C_SdNdeDpSelectorItemUsageWidget::C_SdNdeDpSelectorItemUsageWidget(QWidget * con
    \param[out] oru32_PercentageReserved   Calculated reservation percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpSelectorItemUsageWidget::SetData(const uint32 ou32_Size, const uint32 ou32_Used,
-                                               const uint32 ou32_Reserved, uint32 & oru32_PercentageUsed,
-                                               uint32 & oru32_PercentageReserved)
+void C_SdNdeDpSelectorItemUsageWidget::SetData(const uint32_t ou32_Size, const uint32_t ou32_Used,
+                                               const uint32_t ou32_Reserved, uint32_t & oru32_PercentageUsed,
+                                               uint32_t & oru32_PercentageReserved)
 {
    // Calculate the percentage
    if (ou32_Size != 0U)
@@ -195,16 +194,16 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
             ((this->mu32_PercentageUsed > 0U) && (this->mu32_PercentageReserved == 100U)))
    {
       // only two bars are visible
-      uint32 u32_UsedWidth = 1U;
+      uint32_t u32_UsedWidth = 1U;
       QColor c_SecondBarColor = this->mc_ColorFree;
 
       if ((this->mu32_PercentageUsed >= this->mu32_PercentageReserved) &&
           (this->mu32_PercentageUsed != 0U))
       {
-         const uint32 u32_Divider = 10000U / this->mu32_PercentageUsed;
+         const uint32_t u32_Divider = 10000U / this->mu32_PercentageUsed;
          if (u32_Divider != 0)
          {
-            u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / u32_Divider;
+            u32_UsedWidth = (100U * static_cast<uint32_t>(this->width())) / u32_Divider;
          }
 
          if (this->mq_UsedOverReserved == false)
@@ -221,10 +220,10 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
       else if ((this->mu32_PercentageUsed == 0U) && (this->mu32_PercentageReserved > 0U))
       {
          // special case: only one reservation bar and no usage bar
-         const uint32 u32_Divider = 10000U / this->mu32_PercentageReserved;
+         const uint32_t u32_Divider = 10000U / this->mu32_PercentageReserved;
          if (u32_Divider != 0)
          {
-            u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / u32_Divider;
+            u32_UsedWidth = (100U * static_cast<uint32_t>(this->width())) / u32_Divider;
          }
          this->mc_Brush.setColor(this->mc_ColorReserved);
       }
@@ -233,10 +232,10 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
          // special case: reservation is 100% and usage bar has minimum 1% -> No error and no free area
          if (this->mu32_PercentageUsed != 0)
          {
-            const uint32 u32_Divider = 10000U / this->mu32_PercentageUsed;
+            const uint32_t u32_Divider = 10000U / this->mu32_PercentageUsed;
             if (u32_Divider != 0)
             {
-               u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / u32_Divider;
+               u32_UsedWidth = (100U * static_cast<uint32_t>(this->width())) / u32_Divider;
             }
          }
          else
@@ -254,12 +253,12 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
 
       // two pixel space between used and free space bars
       // is there space for the second bar?
-      if ((this->width() - static_cast<sintn>(u32_UsedWidth)) > 2)
+      if ((this->width() - static_cast<int32_t>(u32_UsedWidth)) > 2)
       {
          // draw the free area
          this->mc_Brush.setColor(c_SecondBarColor);
          c_Painter.setBrush(this->mc_Brush);
-         c_Painter.drawRect(static_cast<sintn>(u32_UsedWidth + 2U), 0, this->width(), this->height());
+         c_Painter.drawRect(static_cast<int32_t>(u32_UsedWidth + 2U), 0, this->width(), this->height());
       }
    }
    else if ((this->mu32_PercentageUsed != 0) &&
@@ -268,30 +267,30 @@ void C_SdNdeDpSelectorItemUsageWidget::paintEvent(QPaintEvent * const opc_Event)
       // all three bars are visible
 
       // the available size without the space between the bars
-      const sintn sn_UsableWidth = this->width() - 2;
-      const sintn sn_UsedWidthUsed = (100 * sn_UsableWidth) /
-                                     (10000 / static_cast<sintn>(this->mu32_PercentageUsed));
-      const sintn sn_UsedWidthReserved = (100 * sn_UsableWidth) /
-                                         (10000 / static_cast<sintn>(this->mu32_PercentageReserved));
+      const int32_t s32_UsableWidth = this->width() - 2;
+      const int32_t s32_UsedWidthUsed = (100 * s32_UsableWidth) /
+                                        (10000 / static_cast<int32_t>(this->mu32_PercentageUsed));
+      const int32_t s32_UsedWidthReserved = (100 * s32_UsableWidth) /
+                                            (10000 / static_cast<int32_t>(this->mu32_PercentageReserved));
 
       // draw the usage
       this->mc_Brush.setColor(mc_STYLE_GUIDE_COLOR_7);
       c_Painter.setBrush(this->mc_Brush);
-      c_Painter.drawRect(0, 0, sn_UsedWidthUsed, this->height());
+      c_Painter.drawRect(0, 0, s32_UsedWidthUsed, this->height());
 
       // draw the reservation
       this->mc_Brush.setColor(this->mc_ColorReserved);
       c_Painter.setBrush(this->mc_Brush);
-      c_Painter.drawRect(sn_UsedWidthUsed + 2, 0, sn_UsedWidthReserved - (sn_UsedWidthUsed + 2), this->height());
+      c_Painter.drawRect(s32_UsedWidthUsed + 2, 0, s32_UsedWidthReserved - (s32_UsedWidthUsed + 2), this->height());
 
       // two pixel space between used and free space bars
       // is there space for the second bar?
-      if ((this->width() - sn_UsedWidthReserved) > 2)
+      if ((this->width() - s32_UsedWidthReserved) > 2)
       {
          // draw the free area
          this->mc_Brush.setColor(this->mc_ColorFree);
          c_Painter.setBrush(this->mc_Brush);
-         c_Painter.drawRect(sn_UsedWidthReserved + 2, 0, this->width(), this->height());
+         c_Painter.drawRect(s32_UsedWidthReserved + 2, 0, this->width(), this->height());
       }
    }
    else

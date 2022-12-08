@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <fstream>
@@ -19,33 +19,32 @@
 #include <QProcess>
 #include <QFileDialog>
 #include <QDateTime>
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_OSCUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_RtfExportWidget.h"
-#include "TGLFile.h"
-#include "C_OSCXMLParser.h"
-#include "C_OSCProject.h"
-#include "C_PuiProject.h"
-#include "C_Uti.h"
-#include "C_PuiUtil.h"
-#include "C_SdTopologyWidget.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_RtfExportWidget.hpp"
+#include "TglFile.hpp"
+#include "C_OscXmlParser.hpp"
+#include "C_OscProject.hpp"
+#include "C_PuiProject.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_SdTopologyWidget.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 #include "ui_C_RtfExportWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_scl;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -67,7 +66,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] orc_Parent          Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_RtfExportWidget::C_RtfExportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_RtfExportWidget::C_RtfExportWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_RtfExportWidget),
    mrc_ParentDialog(orc_Parent)
@@ -100,7 +99,7 @@ C_RtfExportWidget::C_RtfExportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_RtfExportWidget::~C_RtfExportWidget(void)
+C_RtfExportWidget::~C_RtfExportWidget(void) noexcept
 {
    delete mpc_Ui;
 }
@@ -166,27 +165,27 @@ void C_RtfExportWidget::InitStaticNames(void) const
    C_CHECKSUM  file name invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
+int32_t C_RtfExportWidget::GetRtfPath(C_SclString & orc_RtfPath) const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    // get full RTF path of widget Ui
    orc_RtfPath = C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
    // check if path fulfills our path requirements
-   if (C_OSCUtils::h_CheckValidFilePath(orc_RtfPath) == true)
+   if (C_OscUtils::h_CheckValidFilePath(orc_RtfPath) == true)
    {
       // check if directory exists
-      if (TGL_DirectoryExists(TGL_ExtractFilePath(orc_RtfPath)) == true)
+      if (TglDirectoryExists(TglExtractFilePath(orc_RtfPath)) == true)
       {
          // check if file name is valid
-         const C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_RtfPath);
+         const C_SclString c_FileExtAct = TglExtractFileExtension(orc_RtfPath);
          if (c_FileExtAct.LowerCase() == ".rtf")
          {
             const QFileInfo c_Info(orc_RtfPath.c_str());
-            if (C_OSCUtils::h_CheckValidFileName(c_Info.completeBaseName().toStdString().c_str()))
+            if (C_OscUtils::h_CheckValidFileName(c_Info.completeBaseName().toStdString().c_str()))
             {
-               if (TGL_FileExists(orc_RtfPath) == true)
+               if (TglFileExists(orc_RtfPath) == true)
                {
                   s32_Return = C_WARN;
                }
@@ -222,7 +221,7 @@ sint32 C_RtfExportWidget::GetRtfPath(C_SCLString & orc_RtfPath) const
    C_NO_ERR    in any case (all signs are allowed)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_RtfExportWidget::GetCompanyName(C_SCLString & orc_CompanyName) const
+int32_t C_RtfExportWidget::GetCompanyName(C_SclString & orc_CompanyName) const
 {
    // get company name of widget Ui
    orc_CompanyName = this->mpc_Ui->pc_EditCompany->text().toStdString().c_str();
@@ -241,9 +240,9 @@ sint32 C_RtfExportWidget::GetCompanyName(C_SCLString & orc_CompanyName) const
    C_NOACT     invalid file format (not .jpg or .png)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) const
+int32_t C_RtfExportWidget::GetCompanyLogoPath(C_SclString & orc_CompanyLogoPath) const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    // get company logo path
    orc_CompanyLogoPath = this->mpc_Ui->pc_EditLogoPath->GetPath().toStdString().c_str();
@@ -254,7 +253,7 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
       s32_Return = C_NO_ERR;
    }
    // check if path fulfills our path requirements
-   else if (C_OSCUtils::h_CheckValidFilePath(orc_CompanyLogoPath) == true)
+   else if (C_OscUtils::h_CheckValidFilePath(orc_CompanyLogoPath) == true)
    {
       if (orc_CompanyLogoPath != "")
       {
@@ -263,10 +262,10 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
             C_PuiUtil::h_GetAbsolutePathFromProject(orc_CompanyLogoPath.c_str()).toStdString().c_str();
 
          // check if file exists
-         if (TGL_FileExists(orc_CompanyLogoPath) == true)
+         if (TglFileExists(orc_CompanyLogoPath) == true)
          {
             // check if file name is valid
-            const C_SCLString c_FileExtAct = TGL_ExtractFileExtension(orc_CompanyLogoPath);
+            const C_SclString c_FileExtAct = TglExtractFileExtension(orc_CompanyLogoPath);
             if ((c_FileExtAct.LowerCase() == ".jpg") || (c_FileExtAct.LowerCase() == ".png"))
             {
                s32_Return = C_NO_ERR;
@@ -292,7 +291,7 @@ sint32 C_RtfExportWidget::GetCompanyLogoPath(C_SCLString & orc_CompanyLogoPath) 
    \param[in]     orc_RtfPath    input parameter description
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_RtfExportWidget::SetRtfPath(const C_SCLString & orc_RtfPath) const
+void C_RtfExportWidget::SetRtfPath(const C_SclString & orc_RtfPath) const
 {
    this->mpc_Ui->pc_EditRtfPath->SetPath(orc_RtfPath.c_str(), C_PuiProject::h_GetInstance()->GetFolderPath());
 }
@@ -303,7 +302,7 @@ void C_RtfExportWidget::SetRtfPath(const C_SCLString & orc_RtfPath) const
    \param[in]     orc_CompanyName    input parameter description
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_RtfExportWidget::SetCompanyName(const C_SCLString & orc_CompanyName) const
+void C_RtfExportWidget::SetCompanyName(const C_SclString & orc_CompanyName) const
 {
    this->mpc_Ui->pc_EditCompany->setText(orc_CompanyName.c_str());
 }
@@ -314,7 +313,7 @@ void C_RtfExportWidget::SetCompanyName(const C_SCLString & orc_CompanyName) cons
    \param[in]     orc_CompanyLogoPath    path to company logo
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_RtfExportWidget::SetCompanyLogoPath(const C_SCLString & orc_CompanyLogoPath) const
+void C_RtfExportWidget::SetCompanyLogoPath(const C_SclString & orc_CompanyLogoPath) const
 {
    this->mpc_Ui->pc_EditLogoPath->SetPath(orc_CompanyLogoPath.c_str(), C_PuiProject::h_GetInstance()->GetFolderPath());
 }
@@ -344,11 +343,11 @@ void C_RtfExportWidget::SetCompanyLogoPath(const C_SCLString & orc_CompanyLogoPa
    C_UNKNOWN   Execution of 'DocuCreator' tool not successful (see error message)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_SCLString & orc_CompanyName,
-                                      const C_SCLString & orc_CompanyLogoPath, C_SdTopologyWidget * const opc_Widget,
-                                      C_SCLStringList & orc_WarningMessages, C_SCLString & orc_ErrorMessage)
+int32_t C_RtfExportWidget::ExportToRtf(const C_SclString & orc_RtfPath, const C_SclString & orc_CompanyName,
+                                       const C_SclString & orc_CompanyLogoPath, C_SdTopologyWidget * const opc_Widget,
+                                       C_SclStringList & orc_WarningMessages, C_SclString & orc_ErrorMessage)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    this->mc_Warnings.Clear(); // reset global warnings
    this->mc_Error = "";       //     -"-      error
@@ -359,8 +358,8 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
    tgl_assert(c_DirDocuCreatorTmp.cdUp() == true);                      // go one directory up
    c_DocuCreatorPath = c_DirDocuCreatorTmp.absolutePath();              // get current path
    c_DocuCreatorPath += "/connectors/DocuCreator/osy_docu_creator.exe"; // add DocuCreator location
-   const C_SCLString c_SclStringDocuCreatorPath = c_DocuCreatorPath.toStdString().c_str();
-   C_SCLString c_SclStringDocuCreatorConfigPath = c_DirDocuCreatorTmp.absolutePath().toStdString().c_str();
+   const C_SclString c_SclStringDocuCreatorPath = c_DocuCreatorPath.toStdString().c_str();
+   C_SclString c_SclStringDocuCreatorConfigPath = c_DirDocuCreatorTmp.absolutePath().toStdString().c_str();
    c_SclStringDocuCreatorConfigPath += "/connectors/DocuCreator/config.xml";
 
    QString c_PathNetworkTopologyScreenshot; // to save screenshot of network topology
@@ -368,7 +367,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
    osc_write_log_info("RTF File Export", "Look for DocuCreator at path \"" + c_SclStringDocuCreatorPath + "\".");
 
    // check for path of external 'DocuCreator' tool
-   if (TGL_FileExists(c_SclStringDocuCreatorPath) == false)
+   if (TglFileExists(c_SclStringDocuCreatorPath) == false)
    {
       this->mc_Error = "Can't find external tool 'DocuCreator' for RTF File Export at path \"" +
                        c_SclStringDocuCreatorPath + "\".";
@@ -385,20 +384,20 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       c_PathNetworkTopologyScreenshot = c_DirDocuCreatorTmp.absolutePath();
       c_PathNetworkTopologyScreenshot += "/connectors/DocuCreator/network_topology.png";
 
-      sintn sn_Factor; // to get better quality of image
-      sintn sn_Width = static_cast<sintn>(opc_Widget->GetScene()->width());
-      sintn sn_Height = static_cast<sintn>(opc_Widget->GetScene()->height());
+      int32_t s32_Factor; // to get better quality of image
+      int32_t s32_Width = static_cast<int32_t>(opc_Widget->GetScene()->width());
+      int32_t s32_Height = static_cast<int32_t>(opc_Widget->GetScene()->height());
       // factor values for pixels are empirical evaluated and a matter of taste
       // get longer side
-      const sintn sn_LongerSide = (sn_Width > sn_Height) ? sn_Width : sn_Height;
-      sn_Factor = 6000 / sn_LongerSide; // a maximum of round about 6000 pixels for the longer side should be enough
-      if (sn_Factor != 0)
+      const int32_t s32_LongerSide = (s32_Width > s32_Height) ? s32_Width : s32_Height;
+      s32_Factor = 6000 / s32_LongerSide; // a maximum of round about 6000 pixels for the longer side should be enough
+      if (s32_Factor != 0)
       {
-         sn_Width *= sn_Factor;
-         sn_Height *= sn_Factor;
+         s32_Width *= s32_Factor;
+         s32_Height *= s32_Factor;
       }
 
-      const QSize c_ImageSize(sn_Width, sn_Height);
+      const QSize c_ImageSize(s32_Width, s32_Height);
       QImage c_Image(c_ImageSize, QImage::Format_ARGB32);
       QPainter c_Painter(&c_Image);
       c_Painter.setRenderHint(QPainter::Antialiasing);
@@ -415,7 +414,7 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       {
          // could not save 'Network Topology' screenshot to disk
          this->mc_Error = "Could not save Network Topology screenshot to \"" +
-                          static_cast<C_SCLString>(c_PathNetworkTopologyScreenshot.toStdString().c_str()) + "\".";
+                          static_cast<C_SclString>(c_PathNetworkTopologyScreenshot.toStdString().c_str()) + "\".";
          osc_write_log_error("RTF File Export", this->mc_Error);
          s32_Return = C_BUSY;
       }
@@ -437,14 +436,14 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
       c_ConfigXml.c_Name = C_PuiProject::h_GetInstance()->GetName().toStdString().c_str();
       c_ConfigXml.c_Version = C_PuiProject::h_GetInstance()->c_Version;
       c_ConfigXml.c_Created =
-         static_cast<C_SCLString>(c_CurrentTime.toString("dd.MM.yyyy hh:mm").toStdString().c_str());
+         static_cast<C_SclString>(c_CurrentTime.toString("dd.MM.yyyy hh:mm").toStdString().c_str());
       c_ConfigXml.c_Author = C_PuiProject::h_GetInstance()->c_Editor;
       c_ConfigXml.c_SysDefPath = c_SysDefPathTmp.toStdString().c_str();
       c_ConfigXml.c_DevicesIniPath = C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str();
       c_ConfigXml.c_OutputPath = orc_RtfPath;
       c_ConfigXml.c_NetworkTopologyImage = c_PathNetworkTopologyScreenshot.toStdString().c_str();
       // openSYDE
-      c_ConfigXml.c_OpenSydeVersion = C_PuiProject::h_GetInstance()->c_OpenSYDEVersion; // used openSYDE version not
+      c_ConfigXml.c_OpenSydeVersion = C_PuiProject::h_GetInstance()->c_OpenSydeVersion; // used openSYDE version not
                                                                                         // current APPLICATION_VERSION
       // Company
       c_ConfigXml.c_CompanyName = orc_CompanyName;
@@ -543,15 +542,15 @@ sint32 C_RtfExportWidget::ExportToRtf(const C_SCLString & orc_RtfPath, const C_S
    C_NOACT     could not write data to XML file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_RtfExportWidget::m_CreateConfigXml(const C_SCLString & orc_Path,
-                                            const C_ExportXmlStructure & orc_ExportXmlStructure) const
+int32_t C_RtfExportWidget::m_CreateConfigXml(const C_SclString & orc_Path,
+                                             const C_ExportXmlStructure & orc_ExportXmlStructure) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   const C_SCLString c_ROOT_NAME = "config";
-   const C_SCLString c_PROJECT = "project";
-   const C_SCLString c_OPENSYDE = "opensyde";
-   const C_SCLString c_COMPANY = "company";
+   const C_SclString c_ROOT_NAME = "config";
+   const C_SclString c_PROJECT = "project";
+   const C_SclString c_OPENSYDE = "opensyde";
+   const C_SclString c_COMPANY = "company";
 
    // create empty DocuCreator configuration file
    std::fstream c_File;
@@ -559,62 +558,62 @@ sint32 C_RtfExportWidget::m_CreateConfigXml(const C_SCLString & orc_Path,
    c_File.open(orc_Path.c_str(), std::fstream::out);
 
    // fill DocuCreator configuration definition
-   C_OSCXMLParser c_XMLParser;
+   C_OscXmlParser c_XmlParser;
 
    //Root Node
-   c_XMLParser.CreateNodeChild(c_ROOT_NAME);
-   tgl_assert(c_XMLParser.SelectRoot() == c_ROOT_NAME);
+   c_XmlParser.CreateNodeChild(c_ROOT_NAME);
+   tgl_assert(c_XmlParser.SelectRoot() == c_ROOT_NAME);
 
    //Project content
-   tgl_assert(c_XMLParser.CreateAndSelectNodeChild(c_PROJECT) == c_PROJECT);
+   tgl_assert(c_XmlParser.CreateAndSelectNodeChild(c_PROJECT) == c_PROJECT);
 
-   c_XMLParser.CreateNodeChild("title", orc_ExportXmlStructure.c_Title);
-   c_XMLParser.CreateNodeChild("name", orc_ExportXmlStructure.c_Name);
-   c_XMLParser.CreateNodeChild("version", orc_ExportXmlStructure.c_Version);
-   c_XMLParser.CreateNodeChild("created", orc_ExportXmlStructure.c_Created);
-   c_XMLParser.CreateNodeChild("author", orc_ExportXmlStructure.c_Author);
-   c_XMLParser.CreateNodeChild("sysdefPath", orc_ExportXmlStructure.c_SysDefPath);
-   c_XMLParser.CreateNodeChild("devicesIniPath", orc_ExportXmlStructure.c_DevicesIniPath);
-   c_XMLParser.CreateNodeChild("outputPath", orc_ExportXmlStructure.c_OutputPath);
-   c_XMLParser.CreateNodeChild("networkTopologyImage", orc_ExportXmlStructure.c_NetworkTopologyImage);
+   c_XmlParser.CreateNodeChild("title", orc_ExportXmlStructure.c_Title);
+   c_XmlParser.CreateNodeChild("name", orc_ExportXmlStructure.c_Name);
+   c_XmlParser.CreateNodeChild("version", orc_ExportXmlStructure.c_Version);
+   c_XmlParser.CreateNodeChild("created", orc_ExportXmlStructure.c_Created);
+   c_XmlParser.CreateNodeChild("author", orc_ExportXmlStructure.c_Author);
+   c_XmlParser.CreateNodeChild("sysdefPath", orc_ExportXmlStructure.c_SysDefPath);
+   c_XmlParser.CreateNodeChild("devicesIniPath", orc_ExportXmlStructure.c_DevicesIniPath);
+   c_XmlParser.CreateNodeChild("outputPath", orc_ExportXmlStructure.c_OutputPath);
+   c_XmlParser.CreateNodeChild("networkTopologyImage", orc_ExportXmlStructure.c_NetworkTopologyImage);
 
    //Return
-   tgl_assert(c_XMLParser.SelectNodeParent() == c_ROOT_NAME);
+   tgl_assert(c_XmlParser.SelectNodeParent() == c_ROOT_NAME);
 
    //openSYDE version content
-   tgl_assert(c_XMLParser.CreateAndSelectNodeChild(c_OPENSYDE) == c_OPENSYDE);
+   tgl_assert(c_XmlParser.CreateAndSelectNodeChild(c_OPENSYDE) == c_OPENSYDE);
 
-   c_XMLParser.CreateNodeChild("version", orc_ExportXmlStructure.c_OpenSydeVersion);
+   c_XmlParser.CreateNodeChild("version", orc_ExportXmlStructure.c_OpenSydeVersion);
 
    //Return
-   tgl_assert(c_XMLParser.SelectNodeParent() == c_ROOT_NAME);
+   tgl_assert(c_XmlParser.SelectNodeParent() == c_ROOT_NAME);
 
    //Company details
-   tgl_assert(c_XMLParser.CreateAndSelectNodeChild(c_COMPANY) == c_COMPANY);
+   tgl_assert(c_XmlParser.CreateAndSelectNodeChild(c_COMPANY) == c_COMPANY);
 
    if (orc_ExportXmlStructure.c_CompanyName != "")
    {
-      c_XMLParser.CreateNodeChild("name", orc_ExportXmlStructure.c_CompanyName);
+      c_XmlParser.CreateNodeChild("name", orc_ExportXmlStructure.c_CompanyName);
    }
    else
    {
-      c_XMLParser.CreateNodeChild("name", "unknown");
+      c_XmlParser.CreateNodeChild("name", "unknown");
    }
 
    if (orc_ExportXmlStructure.c_CompanyLogoPath != "")
    {
-      c_XMLParser.CreateNodeChild("logo", orc_ExportXmlStructure.c_CompanyLogoPath);
+      c_XmlParser.CreateNodeChild("logo", orc_ExportXmlStructure.c_CompanyLogoPath);
    }
    else
    {
-      c_XMLParser.CreateNodeChild("logo", "notused.png");
+      c_XmlParser.CreateNodeChild("logo", "notused.png");
    }
 
    //Return
-   tgl_assert(c_XMLParser.SelectNodeParent() == c_ROOT_NAME);
+   tgl_assert(c_XmlParser.SelectNodeParent() == c_ROOT_NAME);
 
    // save DocuCreator configuration file
-   s32_Return = c_XMLParser.SaveToFile(orc_Path);
+   s32_Return = c_XmlParser.SaveToFile(orc_Path);
 
    return s32_Return;
 }
@@ -632,8 +631,8 @@ void C_RtfExportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -680,12 +679,12 @@ void C_RtfExportWidget::m_CancelClicked(void)
 void C_RtfExportWidget::m_RtfPathClicked(void)
 {
    QString c_Folder; // for default folder
-   const C_SCLString c_Tmp =
+   const C_SclString c_Tmp =
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditRtfPath->GetPath()).toStdString().c_str();
 
-   if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
+   if (TglDirectoryExists(TglExtractFilePath(c_Tmp)) == true)
    {
-      c_Folder = TGL_ExtractFilePath(c_Tmp).c_str();
+      c_Folder = TglExtractFilePath(c_Tmp).c_str();
    }
    else
    {
@@ -715,12 +714,12 @@ void C_RtfExportWidget::m_LogoPathClicked(void) const
    const QString c_Filter = C_GtGetText::h_GetText("Image file (*.jpg *.png)");
    QString c_Folder; // for default folder
 
-   const C_SCLString c_Tmp =
+   const C_SclString c_Tmp =
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_EditLogoPath->GetPath()).toStdString().c_str();
 
-   if (TGL_DirectoryExists(TGL_ExtractFilePath(c_Tmp)) == true)
+   if (TglDirectoryExists(TglExtractFilePath(c_Tmp)) == true)
    {
-      c_Folder = TGL_ExtractFilePath(c_Tmp).c_str();
+      c_Folder = TglExtractFilePath(c_Tmp).c_str();
    }
    else
    {
@@ -744,12 +743,12 @@ void C_RtfExportWidget::m_LogoPathClicked(void) const
    !C_NO_ERR   invalid settings
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_RtfExportWidget::m_CheckSettings(void) const
+int32_t C_RtfExportWidget::m_CheckSettings(void) const
 {
-   sint32 s32_Return;
-   C_SCLString c_RtfPath;
-   C_SCLString c_CompanyName;
-   C_SCLString c_CompanyLogoPath;
+   int32_t s32_Return;
+   C_SclString c_RtfPath;
+   C_SclString c_CompanyName;
+   C_SclString c_CompanyLogoPath;
 
    s32_Return = this->GetRtfPath(c_RtfPath);
    // check if RTF file already exists
@@ -760,8 +759,8 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
 
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("Save RTF file"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText("Do you really want to overwrite the existing file?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Overwrite"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Back"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Overwrite"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Back"));
       c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
 
@@ -784,15 +783,15 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       }
    }
 
-   if ((s32_Return != stw_errors::C_NO_ERR) && (s32_Return != stw_errors::C_WARN))
+   if ((s32_Return != stw::errors::C_NO_ERR) && (s32_Return != stw::errors::C_WARN))
    {
-      stw_scl::C_SCLString c_Description;
-      stw_scl::C_SCLString c_Details;
-      if (s32_Return == stw_errors::C_CONFIG)
+      stw::scl::C_SclString c_Description;
+      stw::scl::C_SclString c_Details;
+      if (s32_Return == stw::errors::C_CONFIG)
       {
          c_Description = "Directory of given RTF file path invalid.";
       }
-      else if (s32_Return == stw_errors::C_CHECKSUM)
+      else if (s32_Return == stw::errors::C_CHECKSUM)
       {
          c_Description = "File name is invalid.";
       }
@@ -810,20 +809,20 @@ sint32 C_RtfExportWidget::m_CheckSettings(void) const
       c_MessageResult.Execute();
    }
 
-   if (s32_Return == stw_errors::C_NO_ERR)
+   if (s32_Return == stw::errors::C_NO_ERR)
    {
       s32_Return = this->GetCompanyName(c_CompanyName); // always no error
    }
 
-   if (s32_Return == stw_errors::C_NO_ERR)
+   if (s32_Return == stw::errors::C_NO_ERR)
    {
       s32_Return = this->GetCompanyLogoPath(c_CompanyLogoPath);
-      if (s32_Return != stw_errors::C_NO_ERR)
+      if (s32_Return != stw::errors::C_NO_ERR)
       {
-         stw_scl::C_SCLString c_Description;
-         stw_scl::C_SCLString c_Details;
+         stw::scl::C_SclString c_Description;
+         stw::scl::C_SclString c_Details;
 
-         if (s32_Return == stw_errors::C_CONFIG)
+         if (s32_Return == stw::errors::C_CONFIG)
          {
             c_Description = "File path for company logo is invalid.";
          }

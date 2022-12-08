@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 
-#include "C_SdNdeHalcConfigTreeView.h"
-#include "C_PuiSdHandler.h"
-#include "C_UsHandler.h"
+#include "C_SdNdeHalcConfigTreeView.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -75,7 +74,7 @@ C_SdNdeHalcConfigTreeView::~C_SdNdeHalcConfigTreeView(void)
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcConfigTreeView::SetNode(const uint32 ou32_NodeIndex)
+void C_SdNdeHalcConfigTreeView::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mc_Model.SetNode(ou32_NodeIndex);
 }
@@ -89,16 +88,16 @@ void C_SdNdeHalcConfigTreeView::SetNode(const uint32 ou32_NodeIndex)
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcConfigTreeView::SetHalcChannelUseCase(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                      const uint32 ou32_UseCaseIndex, const bool oq_UseChannelIndex)
+void C_SdNdeHalcConfigTreeView::SetHalcChannelUseCase(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
+                                                      const uint32_t ou32_UseCaseIndex, const bool oq_UseChannelIndex)
 {
    this->mc_Model.SetHalcChannelUseCase(ou32_DomainIndex, ou32_ChannelIndex, ou32_UseCaseIndex, oq_UseChannelIndex);
    this->expandAll();
 
-   const sint32 s32_Col = C_SdNdeHalcConfigTreeModel::h_EnumToColumn(C_SdNdeHalcConfigTreeModel::eVALUE);
+   const int32_t s32_Col = C_SdNdeHalcConfigTreeModel::h_EnumToColumn(C_SdNdeHalcConfigTreeModel::eVALUE);
 
    // open permanent editor widgets
-   for (sint32 s32_RowParent = 0; s32_RowParent < this->mc_Model.rowCount(); s32_RowParent++)
+   for (int32_t s32_RowParent = 0; s32_RowParent < this->mc_Model.rowCount(); s32_RowParent++)
    {
       const QModelIndex & rc_CurrentParent = this->mc_Model.index(s32_RowParent, s32_Col);
 
@@ -109,7 +108,7 @@ void C_SdNdeHalcConfigTreeView::SetHalcChannelUseCase(const uint32 ou32_DomainIn
       }
 
       // children
-      for (sint32 s32_RowChild = 0; s32_RowChild < this->mc_Model.rowCount(rc_CurrentParent); s32_RowChild++)
+      for (int32_t s32_RowChild = 0; s32_RowChild < this->mc_Model.rowCount(rc_CurrentParent); s32_RowChild++)
       {
          const QModelIndex & rc_CurrentChild = this->mc_Model.index(s32_RowChild, s32_Col, rc_CurrentParent);
 
@@ -127,7 +126,7 @@ void C_SdNdeHalcConfigTreeView::SetHalcChannelUseCase(const uint32 ou32_DomainIn
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigTreeView::LoadUserSettings(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mc_Model.GetNodeIndex());
 
    if (pc_Node != NULL)
    {
@@ -148,7 +147,7 @@ void C_SdNdeHalcConfigTreeView::LoadUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigTreeView::SaveUserSettings(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mc_Model.GetNodeIndex());
 
    if (pc_Node != NULL)
    {

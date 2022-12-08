@@ -11,17 +11,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QMouseEvent>
 
-#include "stwtypes.h"
-#include "C_GiSyColorBrightnessPicker.h"
+#include "stwtypes.hpp"
+#include "C_GiSyColorBrightnessPicker.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,10 +44,10 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSyColorBrightnessPicker::C_GiSyColorBrightnessPicker(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
-   msn_Hue(0),
-   msn_Sat(0),
-   msn_Value(0),
-   mp_Pixmap(NULL)
+   ms32_Hue(0),
+   ms32_Sat(0),
+   ms32_Value(0),
+   mpc_Pixmap(NULL)
 {
 }
 
@@ -58,37 +57,38 @@ C_GiSyColorBrightnessPicker::C_GiSyColorBrightnessPicker(QWidget * const opc_Par
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSyColorBrightnessPicker::~C_GiSyColorBrightnessPicker()
 {
-   delete this->mp_Pixmap;
+   delete this->mpc_Pixmap;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set a hue, sat and value to the brightness picker and repaint it
 
-   \param[in]  osn_Hue     New hue value
-   \param[in]  osn_Sat     New sat value
-   \param[in]  osn_Value   New value value
+   \param[in]  os32_Hue     New hue value
+   \param[in]  os32_Sat     New sat value
+   \param[in]  os32_Value   New value value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorBrightnessPicker::SetColorWithHSV(const sintn osn_Hue, const sintn osn_Sat, const sintn osn_Value)
+void C_GiSyColorBrightnessPicker::SetColorWithHsv(const int32_t os32_Hue, const int32_t os32_Sat,
+                                                  const int32_t os32_Value)
 {
-   this->msn_Hue = osn_Hue;
-   this->msn_Sat = osn_Sat;
-   this->msn_Value = osn_Value;
-   delete this->mp_Pixmap;
-   this->mp_Pixmap = NULL;
+   this->ms32_Hue = os32_Hue;
+   this->ms32_Sat = os32_Sat;
+   this->ms32_Value = os32_Value;
+   delete this->mpc_Pixmap;
+   this->mpc_Pixmap = NULL;
    repaint();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Receives from a hue, sat chooser and relays.
 
-   \param[in,out]  osn_Hue    New hue value
-   \param[in,out]  osn_Sat    New sat value
+   \param[in,out]  os32_Hue    New hue value
+   \param[in,out]  os32_Sat    New sat value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorBrightnessPicker::SetColorWithHS(const sintn osn_Hue, const sintn osn_Sat)
+void C_GiSyColorBrightnessPicker::SetColorWithHs(const int32_t os32_Hue, const int32_t os32_Sat)
 {
-   Q_EMIT SigNewHsv(osn_Hue, osn_Sat, this->msn_Value);
+   Q_EMIT SigNewHsv(os32_Hue, os32_Sat, this->ms32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -102,36 +102,37 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
    Q_UNUSED(opc_Event)
 
    const QRect c_Rect(0, 0, width(), height());
-   if ((this->mp_Pixmap == NULL) ||
-       (this->mp_Pixmap->height() != c_Rect.height()) ||
-       (this->mp_Pixmap->width() != c_Rect.width()))
+   if ((this->mpc_Pixmap == NULL) ||
+       (this->mpc_Pixmap->height() != c_Rect.height()) ||
+       (this->mpc_Pixmap->width() != c_Rect.width()))
    {
-      delete this->mp_Pixmap;
+      delete this->mpc_Pixmap;
       QImage c_Image(c_Rect.width(), c_Rect.height(), QImage::Format_RGB32);
       //lint -e{826,927,9176}  Cast is necessary due to Qt interface. See Qt documentation for scanLine
-      sintn * psn_Pixel = reinterpret_cast<sintn *>(c_Image.scanLine(0));
-      for (sintn sn_YValue = 0; sn_YValue < c_Rect.height(); sn_YValue++)
+      int32_t * ps32_Pixel = reinterpret_cast<int32_t *>(c_Image.scanLine(0));
+      for (int32_t s32_VerticalValue = 0; s32_VerticalValue < c_Rect.height(); s32_VerticalValue++)
       {
          //lint -e{9016}  See Qt documentation for interface
-         sintn * const psn_End = psn_Pixel + c_Rect.width();
-         std::fill(psn_Pixel, psn_End, QColor::fromHsv(this->msn_Hue,
-                                                       this->msn_Sat,
-                                                       (255 - ((sn_YValue * 255) / (height() - 1)))).rgb());
-         psn_Pixel = psn_End;
+         int32_t * const ps32_End = ps32_Pixel + c_Rect.width();
+         std::fill(ps32_Pixel, ps32_End, QColor::fromHsv(this->ms32_Hue,
+                                                         this->ms32_Sat,
+                                                         (255 - ((s32_VerticalValue * 255) / (height() - 1)))).rgb());
+         ps32_Pixel = ps32_End;
       }
-      this->mp_Pixmap = new QPixmap(QPixmap::fromImage(c_Image));
+      this->mpc_Pixmap = new QPixmap(QPixmap::fromImage(c_Image));
    }
 
-   if (this->mp_Pixmap != NULL)
+   if (this->mpc_Pixmap != NULL)
    {
       QPainter c_Painter(this);
-      c_Painter.drawPixmap(1, 0, *this->mp_Pixmap);
+      c_Painter.drawPixmap(1, 0, *this->mpc_Pixmap);
       c_Painter.setPen(palette().windowText().color());
       c_Painter.setBrush(palette().windowText());
       QPolygon c_Polygon;
-      const sintn sn_YValue = ((255 - this->msn_Value) * (height() - 1)) / 255;
-      c_Polygon.setPoints(4, width(), sn_YValue, width() - 36, sn_YValue, width(), sn_YValue + 1,
-                          width() - 36, sn_YValue + 1);
+      const int32_t s32_VerticalValue = ((255 - this->ms32_Value) * (height() - 1)) / 255;
+      c_Polygon.setPoints(4, width(), s32_VerticalValue, width() - 36, s32_VerticalValue,
+                          width(), s32_VerticalValue + 1,
+                          width() - 36, s32_VerticalValue + 1);
       c_Painter.eraseRect(width(), 0, 5, height());
       c_Painter.setPen(Qt::white);
       c_Painter.drawPolygon(c_Polygon);
@@ -146,15 +147,14 @@ void C_GiSyColorBrightnessPicker::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   if (this->msn_Value == (255 - ((opc_Event->y() * 255) / (height() - 1))))
+   if (this->ms32_Value != (255 - ((opc_Event->y() * 255) / (height() - 1))))
    {
-      return;
+      this->ms32_Value = qMax(0, qMin((255 - ((opc_Event->y() * 255) / (height() - 1))), 255));
+      delete this->mpc_Pixmap;
+      this->mpc_Pixmap = NULL;
+      repaint();
+      Q_EMIT SigNewHsv(this->ms32_Hue, this->ms32_Sat, this->ms32_Value);
    }
-   this->msn_Value = qMax(0, qMin((255 - ((opc_Event->y() * 255) / (height() - 1))), 255));
-   delete this->mp_Pixmap;
-   this->mp_Pixmap = NULL;
-   repaint();
-   Q_EMIT SigNewHsv(this->msn_Hue, this->msn_Sat, this->msn_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -165,15 +165,14 @@ void C_GiSyColorBrightnessPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorBrightnessPicker::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   if (this->msn_Value == (255 - ((opc_Event->y() * 255) / (height() - 1))))
+   if (this->ms32_Value != (255 - ((opc_Event->y() * 255) / (height() - 1))))
    {
-      return;
+      this->ms32_Value = qMax(0, qMin((255 - ((opc_Event->y() * 255) / (height() - 1))), 255));
+      delete this->mpc_Pixmap;
+      this->mpc_Pixmap = NULL;
+      repaint();
+      Q_EMIT SigNewHsv(this->ms32_Hue, this->ms32_Sat, this->ms32_Value);
    }
-   this->msn_Value = qMax(0, qMin((255 - ((opc_Event->y() * 255) / (height() - 1))), 255));
-   delete this->mp_Pixmap;
-   this->mp_Pixmap = NULL;
-   repaint();
-   Q_EMIT SigNewHsv(this->msn_Hue, this->msn_Sat, this->msn_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

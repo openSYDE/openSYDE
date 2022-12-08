@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_TblTreItem.h"
+#include "C_TblTreItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,7 +53,7 @@ C_TblTreItem::C_TblTreItem(void) :
    Else Valid item
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_TblTreItem * C_TblTreItem::GetItem(const uint32 ou32_Index)
+C_TblTreItem * C_TblTreItem::GetItem(const uint32_t ou32_Index)
 {
    C_TblTreItem * pc_Retval = NULL;
 

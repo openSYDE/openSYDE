@@ -13,16 +13,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QKeyEvent>
 
-#include "stwtypes.h"
-#include "C_OgeLeNavigation.h"
+#include "stwtypes.hpp"
+#include "C_OgeLeNavigation.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -59,7 +58,7 @@ C_OgeLeNavigation::C_OgeLeNavigation(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeNavigation::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       //Signal parent
       Q_EMIT this->SigEscape();

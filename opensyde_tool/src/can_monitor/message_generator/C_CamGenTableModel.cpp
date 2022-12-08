@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QBitArray>
 
-#include "C_Uti.h"
-#include "TGLUtils.h"
-#include "constants.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "cam_constants.h"
-#include "C_CamGenSigUtil.h"
-#include "C_CamProHandler.h"
-#include "C_CamGenTableModel.h"
-#include "C_CamProClipBoardHelper.h"
+#include "C_Uti.hpp"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "cam_constants.hpp"
+#include "C_CamGenSigUtil.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamGenTableModel.hpp"
+#include "C_CamProClipBoardHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -63,12 +62,12 @@ C_CamGenTableModel::C_CamGenTableModel(QObject * const opc_Parent) :
    \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
+void C_CamGenTableModel::UpdateMessageKey(const uint32_t ou32_MessageIndex)
 {
-   QVector<sintn> c_Roles;
-   const sint32 s32_Col = C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eKEY);
+   QVector<int32_t> c_Roles;
+   const int32_t s32_Col = C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eKEY);
 
-   c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
+   c_Roles.push_back(static_cast<int32_t>(Qt::DisplayRole));
 
    Q_EMIT (this->dataChanged(this->index(ou32_MessageIndex, s32_Col),
                              this->index(ou32_MessageIndex, s32_Col), c_Roles));
@@ -80,12 +79,12 @@ void C_CamGenTableModel::UpdateMessageKey(const uint32 ou32_MessageIndex)
    \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
+void C_CamGenTableModel::UpdateMessageData(const uint32_t ou32_MessageIndex)
 {
-   QVector<sintn> c_Roles;
-   const sint32 s32_Col = C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDATA);
+   QVector<int32_t> c_Roles;
+   const int32_t s32_Col = C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDATA);
 
-   c_Roles.push_back(static_cast<sintn>(Qt::DisplayRole));
+   c_Roles.push_back(static_cast<int32_t>(Qt::DisplayRole));
 
    Q_EMIT (this->dataChanged(this->index(ou32_MessageIndex, s32_Col),
                              this->index(ou32_MessageIndex, s32_Col), c_Roles));
@@ -100,7 +99,7 @@ void C_CamGenTableModel::UpdateMessageData(const uint32 ou32_MessageIndex)
    \param[in]  oq_Active            Change of cyclic message state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
+void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active)
 {
    this->m_CheckAndHandleRegisterCyclicMessage(ou32_MessageIndex, oq_Active);
 }
@@ -108,23 +107,23 @@ void C_CamGenTableModel::TriggerModelUpdateCyclicMessage(const uint32 ou32_Messa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                        const sintn osn_Role) const
+QVariant C_CamGenTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                        const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_CamGenTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const C_CamGenTableModel::E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          QString c_Header;
          switch (e_Col)
@@ -167,7 +166,7 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
          c_Header += "   ";
          c_Retval = c_Header;
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          switch (e_Col)
          {
@@ -206,11 +205,11 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          QString c_Header;
          switch (e_Col)
@@ -268,40 +267,42 @@ QVariant C_CamGenTableModel::headerData(const sintn osn_Section, const Qt::Orien
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamGenTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_CamGenTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 10;
+      s32_Retval = 10;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
    {
-      const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+      const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(u32_Index);
       if (pc_Message != NULL)
       {
          const C_CamGenTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-         if (((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole))) ||
-             (osn_Role == msn_USER_ROLE_SORT))
+         if (((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) ||
+              (os32_Role == static_cast<int32_t>(Qt::EditRole))) ||
+             (os32_Role == ms32_USER_ROLE_SORT))
          {
             switch (e_Col)
             {
@@ -309,36 +310,36 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                c_Retval = C_CamProHandler::h_GetCompleteMessageName(*pc_Message);
                break;
             case eID:
-               if (osn_Role == msn_USER_ROLE_SORT)
+               if (os32_Role == ms32_USER_ROLE_SORT)
                {
                   //Use simple unit value for sorting (better than string)
-                  c_Retval = static_cast<uint64>(pc_Message->u32_Id);
+                  c_Retval = static_cast<uint64_t>(pc_Message->u32_Id);
                }
                else
                {
-                  c_Retval = mh_HandleHexValue(static_cast<uint64>(pc_Message->u32_Id), osn_Role);
+                  c_Retval = mh_HandleHexValue(static_cast<uint64_t>(pc_Message->u32_Id), os32_Role);
                }
                break;
             case eDLC:
-               c_Retval = static_cast<uint64>(pc_Message->u16_Dlc);
+               c_Retval = static_cast<uint64_t>(pc_Message->u16_Dlc);
                break;
             case eDATA:
                //Don't set any data as this column is handled differently
-               if (osn_Role == msn_USER_ROLE_SORT)
+               if (os32_Role == ms32_USER_ROLE_SORT)
                {
                   //For sorting!
-                  uint64 u64_Result = 0ULL;
+                  uint64_t u64_Result = 0ULL;
                   //Right align all filled bytes
-                  for (uint16 u16_ItByte = 0U; u16_ItByte < pc_Message->u16_Dlc; ++u16_ItByte)
+                  for (uint16_t u16_ItByte = 0U; u16_ItByte < pc_Message->u16_Dlc; ++u16_ItByte)
                   {
-                     u64_Result += static_cast<uint64>(pc_Message->c_Bytes[static_cast<uint32>(u16_ItByte)]) <<
+                     u64_Result += static_cast<uint64_t>(pc_Message->c_Bytes[static_cast<uint32_t>(u16_ItByte)]) <<
                                    (56U - (u16_ItByte * 8U));
                   }
                   c_Retval = u64_Result;
                }
                break;
             case eCYCLIC_TIME:
-               c_Retval = static_cast<uint64>(pc_Message->u32_CyclicTriggerTime);
+               c_Retval = static_cast<uint64_t>(pc_Message->u32_CyclicTriggerTime);
                break;
             case eMANUAL_TRIGGER:
                c_Retval = C_GtGetText::h_GetText("Send now");
@@ -360,15 +361,15 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             case eRTR:
                //Different handling for booleans
-               if (osn_Role == msn_USER_ROLE_SORT)
+               if (os32_Role == ms32_USER_ROLE_SORT)
                {
                   //For sorting!
-                  c_Retval = pc_Message->GetRTR();
+                  c_Retval = pc_Message->GetRtr();
                }
                break;
             case eCYCLIC_TRIGGER:
                //Different handling for booleans
-               if (osn_Role == msn_USER_ROLE_SORT)
+               if (os32_Role == ms32_USER_ROLE_SORT)
                {
                   //For sorting!
                   c_Retval = pc_Message->q_DoCyclicTrigger;
@@ -376,7 +377,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             case eXTD:
                //Different handling for booleans
-               if (osn_Role == msn_USER_ROLE_SORT)
+               if (os32_Role == ms32_USER_ROLE_SORT)
                {
                   //For sorting!
                   c_Retval = pc_Message->GetExtended();
@@ -387,9 +388,9 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+         else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
          {
-            if (this->data(orc_Index, msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
+            if (this->data(orc_Index, ms32_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
             {
                c_Retval = mc_STYLE_GUIDE_COLOR_4;
             }
@@ -405,22 +406,22 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                }
             }
          }
-         else if (osn_Role == msn_USER_ROLE_MARKER)
+         else if (os32_Role == ms32_USER_ROLE_MARKER)
          {
             if (e_Col == eDATA)
             {
                QBitArray c_Array;
                //No markings
-               c_Array.resize(static_cast<sintn>(pc_Message->u16_Dlc));
+               c_Array.resize(static_cast<int32_t>(pc_Message->u16_Dlc));
                c_Retval = c_Array;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_MARKER_TEXT)
+         else if (os32_Role == ms32_USER_ROLE_MARKER_TEXT)
          {
             if (e_Col == eDATA)
             {
                QString c_Tmp;
-               for (uint16 u16_It = 0U; u16_It < pc_Message->u16_Dlc; ++u16_It)
+               for (uint16_t u16_It = 0U; u16_It < pc_Message->u16_Dlc; ++u16_It)
                {
                   if (c_Tmp.isEmpty() == false)
                   {
@@ -431,36 +432,36 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                c_Retval = c_Tmp;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_MARKER_TRANSPARENCY)
+         else if (os32_Role == ms32_USER_ROLE_MARKER_TRANSPARENCY)
          {
             if (e_Col == eDATA)
             {
                QByteArray c_Array;
-               c_Array.resize(static_cast<sintn>(pc_Message->u16_Dlc));
+               c_Array.resize(static_cast<int32_t>(pc_Message->u16_Dlc));
                //No transparency
-               c_Array.fill(static_cast<charn>(0));
+               c_Array.fill(static_cast<char_t>(0));
                c_Retval = c_Array;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_ELEMENT_TYPE)
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_ELEMENT_TYPE)
          {
             switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
             case eNAME:
             case eID:
             case eCYCLIC_TIME:
-               c_Retval = static_cast<sintn>(eURIEL_LINE_EDIT);
+               c_Retval = static_cast<int32_t>(eURIEL_LINE_EDIT);
                break;
             case eDLC:
-               c_Retval = static_cast<sintn>(eURIEL_COMBO_BOX);
+               c_Retval = static_cast<int32_t>(eURIEL_COMBO_BOX);
                break;
             default:
-               c_Retval = static_cast<sintn>(eURIEL_NONE);
+               c_Retval = static_cast<int32_t>(eURIEL_NONE);
                break;
             }
          }
-         else if ((osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST) ||
-                  (osn_Role == msn_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST))
+         else if ((os32_Role == ms32_USER_ROLE_INTERACTION_COMBO_BOX_STRINGS_LIST) ||
+                  (os32_Role == ms32_USER_ROLE_INTERACTION_COMBO_BOX_VALUES_LIST))
          {
             QStringList c_Tmp;
             if (e_Col == eDLC)
@@ -481,7 +482,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                c_Retval = c_Tmp;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_IS_LINK)
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_IS_LINK)
          {
             switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
@@ -494,7 +495,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_USE_MIN_VALUE)
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_USE_MIN_VALUE)
          {
             switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
@@ -508,7 +509,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_MINIMUM_VALUE)
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_MINIMUM_VALUE)
          {
             switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
@@ -526,7 +527,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_USE_MAX_VALUE)
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_USE_MAX_VALUE)
          {
             switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
@@ -540,7 +541,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == msn_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
+         else if (os32_Role == ms32_USER_ROLE_INTERACTION_MAXIMUM_VALUE)
          {
             switch (e_Col) //lint !e788 //not all columns explicitly handled
             {
@@ -565,7 +566,7 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                break;
             }
          }
-         else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+         else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
          {
             switch (e_Col)
             {
@@ -585,17 +586,17 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
                c_Retval = mh_GetBoolAsCheckStateVariant(pc_Message->GetExtended());
                break;
             case eRTR:
-               c_Retval = mh_GetBoolAsCheckStateVariant(pc_Message->GetRTR());
+               c_Retval = mh_GetBoolAsCheckStateVariant(pc_Message->GetRtr());
                break;
             default:
                tgl_assert(false);
                break;
             }
          }
-         else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+         else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
          {
             QFont c_Font = C_Uti::h_GetFontPixel(mc_STYLE_GUIDE_FONT_REGULAR_12);
-            if (this->data(orc_Index, msn_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
+            if (this->data(orc_Index, ms32_USER_ROLE_INTERACTION_IS_LINK).toBool() == true)
             {
                //Special link handling
                c_Font.setUnderline(true);
@@ -616,25 +617,25 @@ QVariant C_CamGenTableModel::data(const QModelIndex & orc_Index, const sintn osn
 
    \param[in]  orc_Index   Index
    \param[in]  orc_Value   New data
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
+bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const int32_t os32_Role)
 {
    bool q_Retval = false;
 
-   if (data(orc_Index, osn_Role) != orc_Value)
+   if (data(orc_Index, os32_Role) != orc_Value)
    {
       if ((orc_Index.isValid() == true) && (orc_Index.row() >= 0))
       {
          bool q_UpdateCyclicMessage = false;
-         const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+         const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
          const C_CamGenTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-         if (osn_Role == static_cast<sintn>(Qt::EditRole))
+         if (os32_Role == static_cast<int32_t>(Qt::EditRole))
          {
             bool q_Continue = false;
             C_CamProMessageData::E_GenericUint32DataSelector e_Selector;
@@ -683,7 +684,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
             }
             if (q_Continue == true)
             {
-               const uint32 u32_Value = static_cast<uint32>(orc_Value.toULongLong());
+               const uint32_t u32_Value = static_cast<uint32_t>(orc_Value.toULongLong());
                //Deactivate message as it is sent now
                if (q_UpdateCyclicMessage == true)
                {
@@ -701,16 +702,16 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                //Special for DLC: update Data column and notify signal table!
                if (e_Col == eDLC)
                {
-                  const sint32 s32_Col = C_CamGenTableModel::h_EnumToColumn(eDATA);
+                  const int32_t s32_Col = C_CamGenTableModel::h_EnumToColumn(eDATA);
                   const QModelIndex c_Temp = orc_Index.sibling(orc_Index.row(), s32_Col);
 
-                  Q_EMIT (this->SigUpdateMessageDLC(u32_Index));
+                  Q_EMIT (this->SigUpdateMessageDlc(u32_Index));
                   //lint -e{1793} Qt example
-                  Q_EMIT (this->dataChanged(c_Temp, c_Temp, QVector<stw_types::sintn>() << osn_Role));
+                  Q_EMIT (this->dataChanged(c_Temp, c_Temp, QVector<int32_t>() << os32_Role));
                }
             }
          }
-         else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+         else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
          {
             if (orc_Value.type() == QVariant::Int)
             {
@@ -759,7 +760,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
                   //Special handling for XTD
                   if ((e_Col == eXTD) && (q_Val == false))
                   {
-                     m_SpecialXtdFlagSetHandling(orc_Index.row(), u32_Index, osn_Role);
+                     m_SpecialXtdFlagSetHandling(orc_Index.row(), u32_Index, os32_Role);
                   }
                   //Trigger sending of updated message
                   if (q_UpdateCyclicMessage == true)
@@ -788,7 +789,7 @@ bool C_CamGenTableModel::setData(const QModelIndex & orc_Index, const QVariant &
          if (q_Retval == true)
          {
             //lint -e{1793} Qt example
-            Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role));
+            Q_EMIT (this->dataChanged(orc_Index, orc_Index, QVector<int32_t>() << os32_Role));
          }
       }
    }
@@ -818,7 +819,7 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
          if (orc_Index.row() >= 0)
          {
             const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(
-               static_cast<uint32>(orc_Index.row()));
+               static_cast<uint32_t>(orc_Index.row()));
             if ((pc_Message != NULL) && (pc_Message->c_DataBaseFilePath.IsEmpty() == true))
             {
                c_Retval = c_Retval | Qt::ItemIsEditable | Qt::ItemIsEnabled;
@@ -842,7 +843,7 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
          if (orc_Index.row() >= 0)
          {
             const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(
-               static_cast<uint32>(orc_Index.row()));
+               static_cast<uint32_t>(orc_Index.row()));
             if ((pc_Message != NULL) && (pc_Message->c_DataBaseFilePath.IsEmpty() == true))
             {
                c_Retval = c_Retval | Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
@@ -866,10 +867,10 @@ Qt::ItemFlags C_CamGenTableModel::flags(const QModelIndex & orc_Index) const
    \param[in]  orc_SelectedIndices  Selected row indices (Expected: unique)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
+void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32_t> & orc_SelectedIndices) const
 {
    std::vector<C_CamProMessageData> c_Messages;
-   for (uint32 u32_It = 0UL; u32_It < orc_SelectedIndices.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < orc_SelectedIndices.size(); ++u32_It)
    {
       const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(
          orc_SelectedIndices[u32_It]);
@@ -890,7 +891,7 @@ void C_CamGenTableModel::CopySelectedItems(const std::vector<uint32> & orc_Selec
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const sint32 os32_Column)
+C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const int32_t os32_Column)
 {
    C_CamGenTableModel::E_Columns e_Retval;
    switch (os32_Column)
@@ -942,9 +943,9 @@ C_CamGenTableModel::E_Columns C_CamGenTableModel::h_ColumnToEnum(const sint32 os
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe_Value)
+int32_t C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe_Value)
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    switch (oe_Value)
    {
@@ -995,10 +996,10 @@ sint32 C_CamGenTableModel::h_EnumToColumn(const C_CamGenTableModel::E_Columns oe
    Index of new item
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamGenTableModel::AddSpecificNewItems(const std::vector<uint32> & orc_SelectedIndex,
-                                                            const std::vector<C_CamProMessageData> & orc_Messages)
+std::vector<uint32_t> C_CamGenTableModel::AddSpecificNewItems(const std::vector<uint32_t> & orc_SelectedIndex,
+                                                              const std::vector<C_CamProMessageData> & orc_Messages)
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    c_Retval = m_AddNewMessages(m_GetLastSelectedIndex(orc_SelectedIndex), orc_Messages);
    Q_EMIT (this->SigItemCountChanged(this->m_GetSizeItems()));
    return c_Retval;
@@ -1013,11 +1014,11 @@ std::vector<uint32> C_CamGenTableModel::AddSpecificNewItems(const std::vector<ui
    Index of new item
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamGenTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
+uint32_t C_CamGenTableModel::m_AddNewItem(const uint32_t ou32_SelectedIndex)
 {
-   uint32 u32_Retval;
+   uint32_t u32_Retval;
 
-   std::vector<uint32> c_Items;
+   std::vector<uint32_t> c_Items;
    std::vector<C_CamProMessageData> c_Messages;
    C_CamProMessageData c_NewMessage;
 
@@ -1047,9 +1048,9 @@ uint32 C_CamGenTableModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    Indices of new items
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamGenTableModel::m_PasteItems(const uint32 ou32_SelectedIndex)
+std::vector<uint32_t> C_CamGenTableModel::m_PasteItems(const uint32_t ou32_SelectedIndex)
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    std::vector<C_CamProMessageData> c_Messages;
    if (C_CamProClipBoardHelper::h_LoadMessages(c_Messages) == C_NO_ERR)
    {
@@ -1065,7 +1066,7 @@ std::vector<uint32> C_CamGenTableModel::m_PasteItems(const uint32 ou32_SelectedI
    Size of item container
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamGenTableModel::m_GetSizeItems(void) const
+uint32_t C_CamGenTableModel::m_GetSizeItems(void) const
 {
    return C_CamProHandler::h_GetInstance()->GetMessages().size();
 }
@@ -1078,7 +1079,7 @@ uint32 C_CamGenTableModel::m_GetSizeItems(void) const
    \param[in]  ou32_Index  Index to delete
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::m_DeleteItem(const uint32 ou32_Index)
+void C_CamGenTableModel::m_DeleteItem(const uint32_t ou32_Index)
 {
    tgl_assert(C_CamProHandler::h_GetInstance()->DeleteMessage(ou32_Index) == C_NO_ERR);
 }
@@ -1093,7 +1094,7 @@ void C_CamGenTableModel::m_DeleteItem(const uint32 ou32_Index)
    \param[in]  ou32_TargetIndex  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
+void C_CamGenTableModel::m_MoveItem(const uint32_t ou32_SourceIndex, const uint32_t ou32_TargetIndex)
 {
    tgl_assert(C_CamProHandler::h_GetInstance()->MoveMessage(ou32_SourceIndex, ou32_TargetIndex) == C_NO_ERR);
 }
@@ -1108,12 +1109,12 @@ void C_CamGenTableModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 
    Indices of new items
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamGenTableModel::m_AddNewMessages(const uint32 ou32_SelectedIndex,
-                                                         const std::vector<C_CamProMessageData> & orc_Data)
+std::vector<uint32_t> C_CamGenTableModel::m_AddNewMessages(const uint32_t ou32_SelectedIndex,
+                                                           const std::vector<C_CamProMessageData> & orc_Data)
 {
-   uint32 u32_Index;
+   uint32_t u32_Index;
 
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
 
    if (ou32_SelectedIndex < C_CamProHandler::h_GetInstance()->GetMessages().size())
    {
@@ -1126,9 +1127,9 @@ std::vector<uint32> C_CamGenTableModel::m_AddNewMessages(const uint32 ou32_Selec
 
    if (orc_Data.size() > 0UL)
    {
-      this->beginInsertRows(QModelIndex(), u32_Index, static_cast<sintn>((u32_Index + orc_Data.size()) - 1UL));
+      this->beginInsertRows(QModelIndex(), u32_Index, static_cast<int32_t>((u32_Index + orc_Data.size()) - 1UL));
       c_Retval.reserve(orc_Data.size());
-      for (uint32 u32_It = 0UL; u32_It < orc_Data.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < orc_Data.size(); ++u32_It)
       {
          C_CamProHandler::h_GetInstance()->InsertMessage(u32_Index + u32_It, orc_Data[u32_It], true);
          c_Retval.push_back(u32_Index + u32_It);
@@ -1147,7 +1148,7 @@ std::vector<uint32> C_CamGenTableModel::m_AddNewMessages(const uint32 ou32_Selec
    \param[in]  oq_Active            Flag if cyclic message is active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
+void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active)
 {
    const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(ou32_MessageIndex);
 
@@ -1162,33 +1163,34 @@ void C_CamGenTableModel::m_CheckAndHandleRegisterCyclicMessage(const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Special xtd flag set handling
 
-   \param[in]  osn_Row     Row
+   \param[in]  os32_Row     Row
    \param[in]  ou32_Index  Index
-   \param[in]  osn_Role    Role
+   \param[in]  os32_Role    Role
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableModel::m_SpecialXtdFlagSetHandling(const sintn osn_Row, const uint32 ou32_Index, const sintn osn_Role)
+void C_CamGenTableModel::m_SpecialXtdFlagSetHandling(const int32_t os32_Row, const uint32_t ou32_Index,
+                                                     const int32_t os32_Role)
 {
-   const sint32 s32_Col = C_CamGenTableModel::h_EnumToColumn(eID);
-   const uint64 u64_MessageId =
-      this->data(this->index(osn_Row, s32_Col), msn_USER_ROLE_SORT).toULongLong();
+   const int32_t s32_Col = C_CamGenTableModel::h_EnumToColumn(eID);
+   const uint64_t u64_MessageId =
+      this->data(this->index(os32_Row, s32_Col), ms32_USER_ROLE_SORT).toULongLong();
 
    if (u64_MessageId > 0x7FFULL)
    {
       constexpr C_CamProMessageData::E_GenericUint32DataSelector e_SELECTOR_ID =
          C_CamProMessageData::eGUIDS_ID;
-      constexpr uint32 u32_NEW_VAL = 0x0UL;
+      constexpr uint32_t u32_NEW_VAL = 0x0UL;
       tgl_assert(C_CamProHandler::h_GetInstance()->SetMessageUint32Value(ou32_Index, e_SELECTOR_ID,
                                                                          u32_NEW_VAL) == C_NO_ERR);
       //Message
-      Q_EMIT (this->SigReport(stw_opensyde_gui_elements::C_OgeWiCustomMessage::eWARNING,
+      Q_EMIT (this->SigReport(stw::opensyde_gui_elements::C_OgeWiCustomMessage::eWARNING,
                               C_GtGetText::h_GetText("Check Message ID"),
                               C_GtGetText::h_GetText(
                                  "XTD flag is disabled, message ID is invalid and is reset to \"0\"")));
 
       //lint -e{1793} Qt example
-      Q_EMIT (this->dataChanged(this->index(osn_Row, s32_Col),
-                                this->index(osn_Row, s32_Col),
-                                QVector<stw_types::sintn>() << osn_Role));
+      Q_EMIT (this->dataChanged(this->index(os32_Row, s32_Col),
+                                this->index(os32_Row, s32_Col),
+                                QVector<int32_t>() << os32_Role));
    }
 }

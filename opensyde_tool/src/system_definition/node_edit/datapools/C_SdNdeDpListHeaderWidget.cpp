@@ -10,36 +10,35 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 
 #include <QApplication>
 #include <QPointer>
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SdNdeDpListHeaderWidget.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SdNdeDpListHeaderWidget.hpp"
 #include "ui_C_SdNdeDpListHeaderWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpListsTreeWidget.h"
-#include "C_OgePopUpDialog.h"
-#include "C_SdNdeDpListDataSetWidget.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_OSCUtils.h"
-#include "C_SdNdeDpListPopUp.h"
-#include "TGLUtils.h"
-#include "C_SdNdeDpListCommentDialog.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpListsTreeWidget.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SdNdeDpListDataSetWidget.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SdNdeDpListPopUp.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeDpListCommentDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
-using namespace stw_errors;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,8 +69,8 @@ using namespace stw_tgl;
 C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent, QTreeWidget * const opc_ListWidget,
                                                      C_SdNdeUnoDataPoolManager * const opc_UndoManager,
                                                      C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
-                                                     const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                     const uint32 ou32_ListIndex) :
+                                                     const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                     const uint32_t ou32_ListIndex) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListHeaderWidget),
    mpc_TreeWidget(opc_ListWidget),
@@ -121,7 +120,7 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
 
    //Spin box
    this->mpc_Ui->pc_SpinBoxSize->SetMinimumCustom(1);
-   this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(std::numeric_limits<sintn>::max());
+   this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(std::numeric_limits<int32_t>::max());
 
    //Timer
    this->mc_DoubleClickTimer.setInterval(QApplication::doubleClickInterval());
@@ -136,7 +135,7 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
                                                        "://images/system_definition/NodeEdit/lists/FullscreenExitDisabled.svg");
 
    this->mpc_Ui->pc_PushButtonCollapse->hide();
-   connect(this->mpc_Ui->pc_PushButtonCollapse, &C_OgePubIconOnly::clicked, this, &C_SdNdeDpListHeaderWidget::m_OnOK);
+   connect(this->mpc_Ui->pc_PushButtonCollapse, &C_OgePubIconOnly::clicked, this, &C_SdNdeDpListHeaderWidget::m_OnOk);
 
    //signals & slots
    connect(this->mpc_Ui->pc_PushButtonExpand, &QPushButton::toggled, this,
@@ -145,25 +144,25 @@ C_SdNdeDpListHeaderWidget::C_SdNdeDpListHeaderWidget(QWidget * const opc_Parent,
            &C_SdNdeDpListHeaderWidget::PopUp);
    connect(this->mpc_Ui->pc_PushButtonDataset, &C_OgePubSvgIconOnly::clicked, this,
            &C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit);
-   connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::textChanged, this,
+   connect(this->mpc_Ui->pc_LineEditName, &stw::opensyde_gui_elements::C_OgeLeListHeader::textChanged, this,
            &C_SdNdeDpListHeaderWidget::m_CheckName);
    connect(this->mpc_Ui->pc_PushButtonComment, &C_OgePubSvgIconOnly::clicked, this,
            &C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked);
 
    //Data changes
-   connect(this->mpc_Ui->pc_SpinBoxSize, &stw_opensyde_gui_elements::C_OgeSpxEditProperties::editingFinished, this,
+   connect(this->mpc_Ui->pc_SpinBoxSize, &stw::opensyde_gui_elements::C_OgeSpxEditProperties::editingFinished, this,
            &C_SdNdeDpListHeaderWidget::m_EditSizeFinished);
-   connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::editingFinished, this,
+   connect(this->mpc_Ui->pc_LineEditName, &stw::opensyde_gui_elements::C_OgeLeListHeader::editingFinished, this,
            &C_SdNdeDpListHeaderWidget::m_EditNameFinished);
 
    //Focus
-   connect(this->mpc_Ui->pc_LineEditName, &stw_opensyde_gui_elements::C_OgeLeListHeader::SigFocus, this,
+   connect(this->mpc_Ui->pc_LineEditName, &stw::opensyde_gui_elements::C_OgeLeListHeader::SigFocus, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
-   connect(this->mpc_Ui->pc_SpinBoxSize, &stw_opensyde_gui_elements::C_OgeSpxEditProperties::SigFocus, this,
+   connect(this->mpc_Ui->pc_SpinBoxSize, &stw::opensyde_gui_elements::C_OgeSpxEditProperties::SigFocus, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
-   connect(this->mpc_Ui->pc_PushButtonExpand, &stw_opensyde_gui_elements::C_OgePubIconOnly::pressed, this,
+   connect(this->mpc_Ui->pc_PushButtonExpand, &stw::opensyde_gui_elements::C_OgePubIconOnly::pressed, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
-   connect(this->mpc_Ui->pc_PushButtonFullScreen, &stw_opensyde_gui_elements::C_OgePubIconOnly::pressed, this,
+   connect(this->mpc_Ui->pc_PushButtonFullScreen, &stw::opensyde_gui_elements::C_OgePubIconOnly::pressed, this,
            &C_SdNdeDpListHeaderWidget::m_HandleFocus);
    connect(this->mpc_Ui->pc_PushButtonComment, &C_OgePubSvgIconOnly::pressed,
            this, &C_SdNdeDpListHeaderWidget::m_HandleFocus);
@@ -201,8 +200,8 @@ C_SdNdeDpListHeaderWidget::~C_SdNdeDpListHeaderWidget(void)
 void C_SdNdeDpListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWidget,
                                                   C_SdNdeUnoDataPoolManager * const opc_UndoManager,
                                                   C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
-                                                  const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                  const uint32 ou32_ListIndex)
+                                                  const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                  const uint32_t ou32_ListIndex)
 {
    this->mpc_TreeWidget = opc_TreeWidget;
    this->mpc_UndoManager = opc_UndoManager;
@@ -218,7 +217,7 @@ void C_SdNdeDpListHeaderWidget::SetInitParameters(QTreeWidget * const opc_TreeWi
    \param[in]  oru32_Value    New index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::SetIndex(const uint32 & oru32_Value)
+void C_SdNdeDpListHeaderWidget::SetIndex(const uint32_t & oru32_Value)
 {
    this->mu32_ListIndex = oru32_Value;
    m_UpdateListNamePrefix();
@@ -283,7 +282,7 @@ void C_SdNdeDpListHeaderWidget::RegisterExpandOrCollapse(const bool & orq_Expand
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::CheckError(void)
 {
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex);
 
    if (pc_DataPool != NULL)
@@ -294,8 +293,8 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
       bool q_UsageInvalid = false;
       bool q_OutOfDataPool = false;
       bool q_ElementsInvalid = false;
-      if ((pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM) ||
-          (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
+      if ((pc_DataPool->e_Type == stw::opensyde_core::C_OscNodeDataPool::E_Type::eNVM) ||
+          (pc_DataPool->e_Type == stw::opensyde_core::C_OscNodeDataPool::E_Type::eHALC_NVM))
       {
          q_CheckSize = true;
       }
@@ -343,7 +342,7 @@ void C_SdNdeDpListHeaderWidget::CheckError(void)
 /*! \brief   Update UI elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::UpdateUI(void)
+void C_SdNdeDpListHeaderWidget::UpdateUi(void)
 {
    m_UpdateUi();
 }
@@ -354,7 +353,7 @@ void C_SdNdeDpListHeaderWidget::UpdateUI(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::UpdateDataSetCount(void)
 {
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
    if (pc_List != NULL)
@@ -531,10 +530,10 @@ void C_SdNdeDpListHeaderWidget::m_HandleFocus(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
    //Disconnect
@@ -565,13 +564,13 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
       //Data sets
       UpdateDataSetCount();
       //Size & address
-      if ((pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM) ||
-          (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
+      if ((pc_DataPool->e_Type == stw::opensyde_core::C_OscNodeDataPool::E_Type::eNVM) ||
+          (pc_DataPool->e_Type == stw::opensyde_core::C_OscNodeDataPool::E_Type::eHALC_NVM))
       {
-         const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
-         const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
-         const uint32 u32_Usage = this->mpc_Ui->pc_UsageWidget->SetUsage(pc_List->u32_NvMSize,
-                                                                         pc_List->GetNumBytesUsed());
+         const C_OscDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         const uint32_t u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
+         const uint32_t u32_Usage = this->mpc_Ui->pc_UsageWidget->SetUsage(pc_List->u32_NvmSize,
+                                                                           pc_List->GetNumBytesUsed());
          this->mpc_Ui->pc_UsageWidget->update();
 
          this->mpc_Ui->pc_GroupBoxUsage->setVisible(true);
@@ -584,13 +583,13 @@ void C_SdNdeDpListHeaderWidget::m_UpdateUi(void)
             tgl_assert(u32_SubDeviceIndex < pc_Device->c_SubDevices.size());
             if (u32_SubDeviceIndex < pc_Device->c_SubDevices.size())
             {
-               const uint32 u32_Maximum = pc_Device->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes;
-               this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(static_cast<sintn>(u32_Maximum));
+               const uint32_t u32_Maximum = pc_Device->c_SubDevices[u32_SubDeviceIndex].u32_UserEepromSizeBytes;
+               this->mpc_Ui->pc_SpinBoxSize->SetMaximumCustom(static_cast<int32_t>(u32_Maximum));
             }
          }
 
          //Size value
-         this->mpc_Ui->pc_SpinBoxSize->setValue(pc_List->u32_NvMSize);
+         this->mpc_Ui->pc_SpinBoxSize->setValue(pc_List->u32_NvmSize);
          this->mpc_Ui->pc_LabelUsage->setText(static_cast<QString>(C_GtGetText::h_GetText("Usage: %1%")).arg(u32_Usage));
       }
       else
@@ -649,7 +648,7 @@ void C_SdNdeDpListHeaderWidget::m_OnEditCommentClicked(void)
       //Resize
       c_Dialog->SetSize(QSize(750, 400));
 
-      if ((c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted)) && (this->mpc_UndoManager != NULL))
+      if ((c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted)) && (this->mpc_UndoManager != NULL))
       {
          // save to data on ok
          const QVariant c_Data = pc_ArrayEditWidget->GetComment();
@@ -677,7 +676,7 @@ void C_SdNdeDpListHeaderWidget::m_EditSizeFinished(void)
    if (this->mq_InitActive == false)
    {
       //lint -e571 cast necessary to explicitly have QVariant of type uint64
-      const QVariant c_Data = static_cast<uint64>(this->mpc_Ui->pc_SpinBoxSize->value());
+      const QVariant c_Data = static_cast<uint64_t>(this->mpc_Ui->pc_SpinBoxSize->value());
 
       if (this->mpc_UndoManager != NULL)
       {
@@ -695,13 +694,13 @@ void C_SdNdeDpListHeaderWidget::m_EditSizeFinished(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
 {
-   C_OSCNodeDataPoolList c_OSCList;
-   C_PuiSdNodeDataPoolList c_UIList;
+   C_OscNodeDataPoolList c_OscList;
+   C_PuiSdNodeDataPoolList c_UiList;
 
    const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
 
    if (C_PuiSdHandler::h_GetInstance()->GetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                        this->mu32_ListIndex, c_OSCList, c_UIList) == C_NO_ERR)
+                                                        this->mu32_ListIndex, c_OscList, c_UiList) == C_NO_ERR)
    {
       C_SdNdeDpListDataSetWidget * const pc_DataSetWidget = new C_SdNdeDpListDataSetWidget(*c_Dialog,
                                                                                            this->mu32_NodeIndex,
@@ -711,7 +710,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
       pc_DataSetWidget->SetModelViewManager(this->mpc_ModelViewManager);
       //Resize
       c_Dialog->SetSize(QSize(790, 540));
-      if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          //Register undo
          QUndoCommand * const pc_UndoCommand = pc_DataSetWidget->TakeUndoCommand();
@@ -728,7 +727,7 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
          {
             //Revert changes
             C_PuiSdHandler::h_GetInstance()->SetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                             this->mu32_ListIndex, c_OSCList, c_UIList);
+                                                             this->mu32_ListIndex, c_OscList, c_UiList);
             this->CheckError();
          }
       }
@@ -747,10 +746,10 @@ void C_SdNdeDpListHeaderWidget::m_OpenDataSetEdit(void)
 void C_SdNdeDpListHeaderWidget::m_CheckName(void) const
 {
    QString c_Content;
-   const stw_scl::C_SCLString c_Name = this->mpc_Ui->pc_LineEditName->GetName().toStdString().c_str();
+   const stw::scl::C_SclString c_Name = this->mpc_Ui->pc_LineEditName->GetName().toStdString().c_str();
 
    //check
-   bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(c_Name);
+   bool q_NameIsValid = C_OscUtils::h_CheckValidCeName(c_Name);
 
    if (q_NameIsValid == false)
    {
@@ -794,7 +793,7 @@ void C_SdNdeDpListHeaderWidget::m_OnDoubleClickTimeout(void) const
 /*! \brief   Handle OK action
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListHeaderWidget::m_OnOK(void)
+void C_SdNdeDpListHeaderWidget::m_OnOk(void)
 {
    Q_EMIT (this->SigClose());
 }
@@ -805,7 +804,7 @@ void C_SdNdeDpListHeaderWidget::m_OnOK(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
 {
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex);
 
    if (pc_DataPool != NULL)
@@ -818,10 +817,10 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
       bool q_OutOfDataPool = false;
       bool q_ElementsInvalid = false;
 
-      std::vector<uint32> c_InvalidDataSetIndices;
-      std::vector<uint32> c_InvalidElementIndices;
-      if ((pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eNVM) ||
-          (pc_DataPool->e_Type == stw_opensyde_core::C_OSCNodeDataPool::E_Type::eHALC_NVM))
+      std::vector<uint32_t> c_InvalidDataSetIndices;
+      std::vector<uint32_t> c_InvalidElementIndices;
+      if ((pc_DataPool->e_Type == stw::opensyde_core::C_OscNodeDataPool::E_Type::eNVM) ||
+          (pc_DataPool->e_Type == stw::opensyde_core::C_OscNodeDataPool::E_Type::eHALC_NVM))
       {
          q_CheckSize = true;
       }
@@ -869,13 +868,13 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
          if (q_DataSetError == true)
          {
             c_Content += C_GtGetText::h_GetText("Invalid Datasets:\n");
-            for (uint32 u32_ItDataSet = 0;
+            for (uint32_t u32_ItDataSet = 0;
                  (u32_ItDataSet < c_InvalidDataSetIndices.size()) &&
                  (u32_ItDataSet < mu32_TOOL_TIP_MAXIMUM_ITEMS);
                  ++u32_ItDataSet)
             {
-               const C_OSCNodeDataPoolDataSet * const pc_DataSet =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListDataSet(
+               const C_OscNodeDataPoolDataSet * const pc_DataSet =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListDataSet(
                      this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                      c_InvalidDataSetIndices[u32_ItDataSet]);
                if (pc_DataSet != NULL)
@@ -886,20 +885,20 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidDataSetIndices.size())
             {
                c_Content += static_cast<QString>("+%1\n").arg(
-                  static_cast<uint32>(c_InvalidDataSetIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  static_cast<uint32_t>(c_InvalidDataSetIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             c_Content += "\n";
          }
          if (q_ElementsInvalid == true)
          {
             c_Content += C_GtGetText::h_GetText("Invalid elements:\n");
-            for (uint32 u32_ItElement = 0;
+            for (uint32_t u32_ItElement = 0;
                  (u32_ItElement < c_InvalidElementIndices.size()) &&
                  (u32_ItElement < mu32_TOOL_TIP_MAXIMUM_ITEMS);
                  ++u32_ItElement)
             {
-               const C_OSCNodeDataPoolListElement * const pc_Appl =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex,
+               const C_OscNodeDataPoolListElement * const pc_Appl =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
                                                                              this->mu32_DataPoolIndex,
                                                                              this->mu32_ListIndex,
                                                                              c_InvalidElementIndices[u32_ItElement]);
@@ -911,7 +910,7 @@ void C_SdNdeDpListHeaderWidget::m_UpdateErrorToolTip(void) const
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidElementIndices.size())
             {
                c_Content += static_cast<QString>("+%1\n").arg(
-                  static_cast<uint32>(c_InvalidElementIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  static_cast<uint32_t>(c_InvalidElementIndices.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             c_Content += "\n";
          }

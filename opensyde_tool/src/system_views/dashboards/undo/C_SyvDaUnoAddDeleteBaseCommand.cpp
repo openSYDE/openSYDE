@@ -10,32 +10,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvDaRectBaseGroup.h"
-#include "C_GiSvDaLabelBase.h"
-#include "C_GiSvDaParam.h"
-#include "C_GiSvDaPieChartBase.h"
-#include "C_GiSvDaSpinBoxBase.h"
-#include "C_GiSvDaSliderBase.h"
-#include "C_GiSvDaTableBase.h"
-#include "C_GiSvDaProgressBarBase.h"
-#include "C_GiSvDaToggleBase.h"
-#include "C_PuiSvDbDataElement.h"
-#include "C_SyvDaDashboardScene.h"
-#include "C_SyvDaUnoAddDeleteBaseCommand.h"
+#include "TglUtils.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvDaRectBaseGroup.hpp"
+#include "C_GiSvDaLabelBase.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_GiSvDaPieChartBase.hpp"
+#include "C_GiSvDaSpinBoxBase.hpp"
+#include "C_GiSvDaSliderBase.hpp"
+#include "C_GiSvDaTableBase.hpp"
+#include "C_GiSvDaProgressBarBase.hpp"
+#include "C_GiSvDaToggleBase.hpp"
+#include "C_PuiSvDbDataElement.hpp"
+#include "C_SyvDaDashboardScene.hpp"
+#include "C_SyvDaUnoAddDeleteBaseCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,19 +52,19 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 
    \param[in,out] opc_Scene               Pointer to currently active scene
-   \param[in]     orc_IDs                 Affected unique IDs
+   \param[in]     orc_Ids                 Affected unique IDs
    \param[in]     orc_Text                Command description
    \param[in,out] opc_Parent              Optional pointer to parent
    \param[in]     orc_InitialSnapshotData Initial snapshot data
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaUnoAddDeleteBaseCommand::C_SyvDaUnoAddDeleteBaseCommand(QGraphicsScene * const opc_Scene,
-                                                               const std::vector<uint64> & orc_IDs,
+                                                               const std::vector<uint64_t> & orc_Ids,
                                                                const QString & orc_Text,
                                                                QUndoCommand * const opc_Parent,
                                                                const C_SyvDaDashboardSnapshot & orc_InitialSnapshotData)
    :
-   C_SebUnoAddDeleteBaseCommand(opc_Scene, orc_IDs, orc_Text, opc_Parent),
+   C_SebUnoAddDeleteBaseCommand(opc_Scene, orc_Ids, orc_Text, opc_Parent),
    mc_DataBackup(orc_InitialSnapshotData)
 {
 }
@@ -93,7 +92,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Restore(void)
       //First: Restore data rail(s) if any (not replaced if already existing due to other not registered element
       // changes)
       m_RestoreReadRailsOnly();
-      pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, &(this->mc_MapTypeAndIndexToID));
+      pc_Scene->CopyFromSnapshotToScene(this->mc_DataBackup, &(this->mc_MapTypeAndIndexToId));
       //Trigger error recheck
       pc_Scene->TriggerErrorCheck();
    }
@@ -111,7 +110,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
 
       if (pc_Scene != NULL)
       {
-         for (QMap<C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::const_iterator c_It =
+         for (QMap<C_OscNodeDataPoolListElementId, C_PuiSvReadDataConfiguration>::const_iterator c_It =
                  this->mc_SavedRailAssignments.begin();
               c_It != this->mc_SavedRailAssignments.end(); ++c_It)
          {
@@ -145,9 +144,9 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_RestoreReadRailsOnly(void)
    Boundary element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetBoundaryType(void) const
+int32_t C_SyvDaUnoAddDeleteBaseCommand::m_GetBoundaryType(void) const
 {
-   return static_cast<sint32>(C_PuiSvDbDataElement::eBOUNDARY);
+   return static_cast<int32_t>(C_PuiSvDbDataElement::eBOUNDARY);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -157,9 +156,9 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetBoundaryType(void) const
    Image element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetImageType(void) const
+int32_t C_SyvDaUnoAddDeleteBaseCommand::m_GetImageType(void) const
 {
-   return static_cast<sint32>(C_PuiSvDbDataElement::eIMAGE);
+   return static_cast<int32_t>(C_PuiSvDbDataElement::eIMAGE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -169,9 +168,9 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetImageType(void) const
    Line arrow element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetLineArrowType(void) const
+int32_t C_SyvDaUnoAddDeleteBaseCommand::m_GetLineArrowType(void) const
 {
-   return static_cast<sint32>(C_PuiSvDbDataElement::eLINE_ARROW);
+   return static_cast<int32_t>(C_PuiSvDbDataElement::eLINE_ARROW);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -181,9 +180,9 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetLineArrowType(void) const
    Text element type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetTextElementType(void) const
+int32_t C_SyvDaUnoAddDeleteBaseCommand::m_GetTextElementType(void) const
 {
-   return static_cast<sint32>(C_PuiSvDbDataElement::eTEXT_ELEMENT);
+   return static_cast<int32_t>(C_PuiSvDbDataElement::eTEXT_ELEMENT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -200,12 +199,12 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SetDataPositionOffset(const QPointF & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply Z value offset
 
-   \param[in] of64_HighestUsedZValue Highest used Z value
+   \param[in] of64_HighestUsedZetValue Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaUnoAddDeleteBaseCommand::m_SetDataZOffset(const float64 of64_HighestUsedZValue)
+void C_SyvDaUnoAddDeleteBaseCommand::m_SetDataZetOffset(const float64_t of64_HighestUsedZetValue)
 {
-   this->mc_DataBackup.SetDataZOffset(of64_HighestUsedZValue);
+   this->mc_DataBackup.SetDataZetOffset(of64_HighestUsedZetValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -227,7 +226,7 @@ C_PuiSvDashboard C_SyvDaUnoAddDeleteBaseCommand::m_GetDataBackup(void) const
    The number of stored read rails
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetStoredReadRailCount(void) const
+int32_t C_SyvDaUnoAddDeleteBaseCommand::m_GetStoredReadRailCount(void) const
 {
    return this->mc_SavedRailAssignments.size();
 }
@@ -243,10 +242,10 @@ sint32 C_SyvDaUnoAddDeleteBaseCommand::m_GetStoredReadRailCount(void) const
    C_NOACT  Already exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaUnoAddDeleteBaseCommand::m_AddReadRailToInternalBackup(const C_OSCNodeDataPoolListElementId & orc_Id,
-                                                                     const C_PuiSvReadDataConfiguration & orc_Value)
+int32_t C_SyvDaUnoAddDeleteBaseCommand::m_AddReadRailToInternalBackup(const C_OscNodeDataPoolListElementId & orc_Id,
+                                                                      const C_PuiSvReadDataConfiguration & orc_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->mc_SavedRailAssignments.find(orc_Id) != this->mc_SavedRailAssignments.end())
    {
@@ -283,7 +282,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
             this->m_Clear();
 
             //Base elements
-            m_StoreCommon(this->mc_DataBackup, this->mc_MapTypeAndIndexToID, *pc_Dashboard);
+            m_StoreCommon(this->mc_DataBackup, this->mc_MapTypeAndIndexToId, *pc_Dashboard);
             //Other elements
             for (std::vector<QGraphicsItem *>::const_iterator c_ItRelatedItem = c_RelatedItems.begin();
                  c_ItRelatedItem != c_RelatedItems.end(); ++c_ItRelatedItem)
@@ -291,16 +290,16 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
                if (pc_Unique != NULL)
                {
-                  const uint64 u64_CurUniqueID = pc_Unique->GetID();
+                  const uint64_t u64_CurUniqueId = pc_Unique->GetId();
                   pc_Data = dynamic_cast<C_PuiSvDbDataElement *>(*c_ItRelatedItem);
                   if (pc_Data != NULL)
                   {
                      const C_PuiSvDbWidgetBase * const pc_Widget = C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
                         pc_Scene->GetViewIndex(), pc_Scene->GetDashboardIndex(), pc_Data);
-                     const sint32 s32_Index = pc_Data->GetIndex();
+                     const int32_t s32_Index = pc_Data->GetIndex();
                      if (s32_Index >= 0)
                      {
-                        const uint32 u32_Index = static_cast<uint32>(s32_Index);
+                        const uint32_t u32_Index = static_cast<uint32_t>(s32_Index);
                         //Save to scene data
                         pc_Data->UpdateData();
 
@@ -340,10 +339,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_LabelData,
                                                                           C_PuiSvDbDataElement::eLABEL) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eLABEL),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eLABEL),
                                                            this->mc_DataBackup.GetLabels().size() - 1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_ParamWidget != NULL)
@@ -353,10 +352,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_ParamData,
                                                                           C_PuiSvDbDataElement::ePARAM) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::ePARAM),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::ePARAM),
                                                            this->mc_DataBackup.GetParams().size() - 1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_SpinBox != NULL)
@@ -367,10 +366,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_SpinBoxData,
                                                                           C_PuiSvDbDataElement::eSPIN_BOX) ==
                                             C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eSPIN_BOX),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eSPIN_BOX),
                                                            this->mc_DataBackup.GetSpinBoxes().size() - 1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_Slider != NULL)
@@ -381,10 +380,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_SliderData,
                                                                           C_PuiSvDbDataElement::eSLIDER) ==
                                             C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eSLIDER),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eSLIDER),
                                                            this->mc_DataBackup.GetSliders().size() - 1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_ProgressBar != NULL)
@@ -397,10 +396,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_ProgressBarData,
                                                                           C_PuiSvDbDataElement::
                                                                           ePROGRESS_BAR) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::ePROGRESS_BAR),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::ePROGRESS_BAR),
                                                            this->mc_DataBackup.GetProgressBars().size() - 1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_Toggle != NULL)
@@ -412,11 +411,11 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_ToggleData, C_PuiSvDbDataElement::
                                                                           eTOGGLE) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eTOGGLE),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eTOGGLE),
                                                            this->mc_DataBackup.GetToggles().size() -
                                                            1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_PieChart != NULL)
@@ -428,11 +427,11 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_PieChartData, C_PuiSvDbDataElement::
                                                                           ePIE_CHART) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::ePIE_CHART),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::ePIE_CHART),
                                                            this->mc_DataBackup.GetPieCharts().size() -
                                                            1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                            if (pc_Table != NULL)
@@ -444,10 +443,10 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                               {
                                  tgl_assert(this->mc_DataBackup.AddWidget(pc_TableData, C_PuiSvDbDataElement::
                                                                           eTABLE) == C_NO_ERR);
-                                 this->mc_MapTypeAndIndexToID.insert(
-                                    C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSvDbDataElement::eTABLE),
+                                 this->mc_MapTypeAndIndexToId.insert(
+                                    C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSvDbDataElement::eTABLE),
                                                            this->mc_DataBackup.GetTables().size() - 1UL),
-                                    u64_CurUniqueID);
+                                    u64_CurUniqueId);
                               }
                            }
                         }
@@ -455,7 +454,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                      //Check if data element(s) in rail, if yes then store
                      if (pc_Widget != NULL)
                      {
-                        for (uint32 u32_ItRegisteredDataElement = 0;
+                        for (uint32_t u32_ItRegisteredDataElement = 0;
                              u32_ItRegisteredDataElement < pc_Widget->c_DataPoolElementsConfig.size();
                              ++u32_ItRegisteredDataElement)
                         {
@@ -463,7 +462,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
                               pc_Widget->c_DataPoolElementsConfig[u32_ItRegisteredDataElement];
                            if (rc_Config.c_ElementId.GetIsValid() == true)
                            {
-                              const QMap<C_OSCNodeDataPoolListElementId,
+                              const QMap<C_OscNodeDataPoolListElementId,
                                          C_PuiSvReadDataConfiguration>::const_iterator c_Result =
                                  pc_View->GetReadRailAssignments().find(rc_Config.c_ElementId);
                               if (c_Result != pc_View->GetReadRailAssignments().end())
@@ -487,7 +486,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_SaveToData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaUnoAddDeleteBaseCommand::m_Clear(void)
 {
-   this->mc_MapTypeAndIndexToID.clear();
+   this->mc_MapTypeAndIndexToId.clear();
    this->mc_DataBackup.Clear();
    this->mc_SavedRailAssignments.clear();
 }
@@ -512,7 +511,7 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
       //Delete data rail(s) if not in use (anymore) else clear stored element
       if (pc_View != NULL)
       {
-         for (QMap<C_OSCNodeDataPoolListElementId,
+         for (QMap<C_OscNodeDataPoolListElementId,
                    C_PuiSvReadDataConfiguration>::iterator c_ItReadRailAssignment =
                  this->mc_SavedRailAssignments.begin();
               c_ItReadRailAssignment != this->mc_SavedRailAssignments.end();)
@@ -570,8 +569,8 @@ void C_SyvDaUnoAddDeleteBaseCommand::m_Delete(void)
    Else Valid widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(const uint32 ou32_ViewIndex,
-                                                                                const uint32 ou32_DashboardIndex,
+const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(const uint32_t ou32_ViewIndex,
+                                                                                const uint32_t ou32_DashboardIndex,
                                                                                 const C_PuiSvDbDataElement * const opc_DataElement)
 {
    const C_PuiSvDbWidgetBase * pc_Retval = NULL;
@@ -585,7 +584,7 @@ const C_PuiSvDbWidgetBase * C_SyvDaUnoAddDeleteBaseCommand::mh_GetGenericWidget(
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(ou32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            const uint32 u32_Index = static_cast<uint32>(opc_DataElement->GetIndex());
+            const uint32_t u32_Index = static_cast<uint32_t>(opc_DataElement->GetIndex());
             const C_GiSvDaLabelBase * const pc_Label  =
                dynamic_cast<const C_GiSvDaLabelBase * const>(opc_DataElement);
             const C_GiSvDaParam * const pc_ParamWidget  =

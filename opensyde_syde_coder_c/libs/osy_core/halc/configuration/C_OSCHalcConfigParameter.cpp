@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_OSCHalcConfigParameter.h"
+#include "C_SclChecksums.hpp"
+#include "C_OscHalcConfigParameter.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigParameter::C_OSCHalcConfigParameter()
+C_OscHalcConfigParameter::C_OscHalcConfigParameter()
 {
 }
 
@@ -43,7 +43,7 @@ C_OSCHalcConfigParameter::C_OSCHalcConfigParameter()
 /*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigParameter::~C_OSCHalcConfigParameter()
+C_OscHalcConfigParameter::~C_OscHalcConfigParameter()
 {
 }
 
@@ -56,9 +56,9 @@ C_OSCHalcConfigParameter::~C_OSCHalcConfigParameter()
    \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigParameter::CalcHash(uint32 & oru32_HashValue) const
+void C_OscHalcConfigParameter::CalcHash(uint32_t & oru32_HashValue) const
 {
    c_Value.CalcHash(oru32_HashValue);
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
 }

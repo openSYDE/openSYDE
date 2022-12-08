@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_SdNdeDbListDelegate.h"
+#include "C_SdNdeDbListDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -95,7 +94,7 @@ void C_SdNdeDbListDelegate::paint(QPainter * const opc_Painter, const QStyleOpti
    \param[in] opc_MovingWidget   Actual widget which will be moved
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbListDelegate::StartPaint(const sint32 os32_Index, C_SdNdeDbWidget * const opc_MovingWidget)
+void C_SdNdeDbListDelegate::StartPaint(const int32_t os32_Index, C_SdNdeDbWidget * const opc_MovingWidget)
 {
    this->ms32_IndexPaint = os32_Index;
    this->mpc_ApplicationWidget = opc_MovingWidget;

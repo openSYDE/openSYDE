@@ -8,30 +8,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "stwerrors.h"
-#include "C_SdBueBusEditWidget.h"
+#include "constants.hpp"
+#include "stwerrors.hpp"
+#include "C_SdBueBusEditWidget.hpp"
 #include "ui_C_SdBueBusEditWidget.h"
 
-#include "TGLUtils.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiUtil.h"
-#include "C_OSCSystemBus.h"
-#include "C_GtGetText.h"
+#include "TglUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OscSystemBus.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SdBueBusEditWidget::hsn_TAB_INDEX_PROPERTIES = 0;
-const stw_types::sintn C_SdBueBusEditWidget::hsn_TAB_INDEX_COMM = 1;
+const int32_t C_SdBueBusEditWidget::hs32_TAB_INDEX_PROPERTIES = 0;
+const int32_t C_SdBueBusEditWidget::hs32_TAB_INDEX_COMM = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -49,11 +48,11 @@ const stw_types::sintn C_SdBueBusEditWidget::hsn_TAB_INDEX_COMM = 1;
    Set up GUI with all elements.
 
    \param[in]      ou32_BusIndex    Bus index
-   \param[in]      osn_TabIndex     Tab index to show
+   \param[in]      os32_TabIndex     Tab index to show
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sintn osn_TabIndex,
+C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32_t ou32_BusIndex, const int32_t os32_TabIndex,
                                            QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueBusEditWidget),
@@ -63,7 +62,7 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
    mpc_BusPropertiesWidget(NULL),
    mpc_WidgetComIfDescr(NULL)
 {
-   const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+   const stw::opensyde_core::C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
       this->mu32_BusIndex);
 
    mpc_Ui->setupUi(this);
@@ -71,33 +70,33 @@ C_SdBueBusEditWidget::C_SdBueBusEditWidget(const uint32 ou32_BusIndex, const sin
    InitStaticNames();
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_PROPERTIES);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_PROPERTIES);
 
    this->me_BusType = pc_Bus->e_Type;
-   if (this->me_BusType == stw_opensyde_core::C_OSCSystemBus::eCAN)
+   if (this->me_BusType == stw::opensyde_core::C_OscSystemBus::eCAN)
    {
       // show the initial tab
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(osn_TabIndex);
-      this->m_CreateTabWidgetsAlways(osn_TabIndex, false);
-      this->m_TabChanged(osn_TabIndex);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(os32_TabIndex);
+      this->m_CreateTabWidgetsAlways(os32_TabIndex, false);
+      this->m_TabChanged(os32_TabIndex);
    }
    else
    {
       // Ethernet is not supported for the C_SdBueComIfDescriptionWidget yet
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_PROPERTIES);
-      this->m_CreateTabWidgetsAlways(hsn_TAB_INDEX_PROPERTIES, false);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_PROPERTIES);
+      this->m_CreateTabWidgetsAlways(hs32_TAB_INDEX_PROPERTIES, false);
       //lint -e{1938}  static const is guaranteed preinitialized before main
-      this->mpc_Ui->pc_TabWidgetPageNavi->removeTab(hsn_TAB_INDEX_COMM);
+      this->mpc_Ui->pc_TabWidgetPageNavi->removeTab(hs32_TAB_INDEX_COMM);
 
-      stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
-                                                                     "OnlyOneItem",
-                                                                     true);
+      stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_TabWidgetPageNavi->tabBar(),
+                                                                      "OnlyOneItem",
+                                                                      true);
    }
 
    // Connect after setCurrentIndex. The signal will not be sent if the index is not changed, but we need the call
    // in both cases
-   connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw_opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
+   connect(this->mpc_Ui->pc_TabWidgetPageNavi, &stw::opensyde_gui_elements::C_OgeTawPageNavi::currentChanged,
            this, &C_SdBueBusEditWidget::m_TabChanged);
 }
 
@@ -120,7 +119,7 @@ void C_SdBueBusEditWidget::InitStaticNames(void) const
    Tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdBueBusEditWidget::GetTabIndex(void) const
+int32_t C_SdBueBusEditWidget::GetTabIndex(void) const
 {
    return this->mpc_Ui->pc_TabWidgetPageNavi->currentIndex();
 }
@@ -132,7 +131,7 @@ sintn C_SdBueBusEditWidget::GetTabIndex(void) const
 void C_SdBueBusEditWidget::ImportMessages(void)
 {
    // Change to COMM tab
-   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+   this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_COMM);
    tgl_assert(this->mpc_WidgetComIfDescr != NULL);
    if (this->mpc_WidgetComIfDescr != NULL)
    {
@@ -183,13 +182,13 @@ void C_SdBueBusEditWidget::Save(void) const
    \param[in]  ou32_Flag   Flag for specific functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
+void C_SdBueBusEditWidget::SetFlag(const uint32_t ou32_Flag) const
 {
    if ((ou32_Flag == mu32_FLAG_EDIT_NAME) ||
        (ou32_Flag == mu32_FLAG_OPEN_PROPERTIES))
    {
       // open the properties
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_PROPERTIES);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_PROPERTIES);
 
       if (ou32_Flag == mu32_FLAG_EDIT_NAME)
       {
@@ -203,16 +202,16 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
    else if (ou32_Flag == mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR)
    {
       // open the COM interface description
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_COMM);
    }
    else if ((ou32_Flag & mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL) ==
             mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL)
    {
       // open the COM interface description with a specific protocol
       // Special case: the protocol type to navigate to in the tabs of the COMM messages is part of the flag
-      const C_OSCCanProtocol::E_Type e_ProtocolType =
-         static_cast<C_OSCCanProtocol::E_Type>(ou32_Flag & (~mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL));
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+      const C_OscCanProtocol::E_Type e_ProtocolType =
+         static_cast<C_OscCanProtocol::E_Type>(ou32_Flag & (~mu32_FLAG_OPEN_SYSDEF_BUS_COMIFDESCR_PROTOCOL));
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_COMM);
       tgl_assert(this->mpc_WidgetComIfDescr != NULL);
       if (this->mpc_WidgetComIfDescr != NULL)
       {
@@ -239,28 +238,28 @@ void C_SdBueBusEditWidget::SetFlag(const uint32 ou32_Flag) const
                                     2: os32_ElementIndex is index of CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueBusEditWidget::OpenDetail(const sint32 os32_NodeIndex, const sint32 os32_DataPoolIndex,
-                                      const sint32 os32_ListIndex, const sint32 os32_ElementIndex,
-                                      const sint32 os32_Flag) const
+void C_SdBueBusEditWidget::OpenDetail(const int32_t os32_NodeIndex, const int32_t os32_DataPoolIndex,
+                                      const int32_t os32_ListIndex, const int32_t os32_ElementIndex,
+                                      const int32_t os32_Flag) const
 {
-   if (this->me_BusType == stw_opensyde_core::C_OSCSystemBus::eCAN)
+   if (this->me_BusType == stw::opensyde_core::C_OscSystemBus::eCAN)
    {
       // open the interface description widget
-      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hsn_TAB_INDEX_COMM);
+      this->mpc_Ui->pc_TabWidgetPageNavi->setCurrentIndex(hs32_TAB_INDEX_COMM);
       tgl_assert(this->mpc_WidgetComIfDescr != NULL);
       if (this->mpc_WidgetComIfDescr != NULL)
       {
          if (os32_Flag == 1)
          {
-            this->mpc_WidgetComIfDescr->SelectSignalSearch(os32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
-                                                           static_cast<uint32>(os32_ListIndex),
-                                                           static_cast<uint32>(os32_ElementIndex));
+            this->mpc_WidgetComIfDescr->SelectSignalSearch(os32_NodeIndex, static_cast<uint32_t>(os32_DataPoolIndex),
+                                                           static_cast<uint32_t>(os32_ListIndex),
+                                                           static_cast<uint32_t>(os32_ElementIndex));
          }
          else if (os32_Flag == 2)
          {
-            this->mpc_WidgetComIfDescr->SelectMessageSearch(os32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
-                                                            static_cast<uint32>(os32_ListIndex),
-                                                            static_cast<uint32>(os32_ElementIndex));
+            this->mpc_WidgetComIfDescr->SelectMessageSearch(os32_NodeIndex, static_cast<uint32_t>(os32_DataPoolIndex),
+                                                            static_cast<uint32_t>(os32_ListIndex),
+                                                            static_cast<uint32_t>(os32_ElementIndex));
          }
          else
          {
@@ -285,14 +284,14 @@ void C_SdBueBusEditWidget::m_DataChanged(void)
    widgets have no impact on the current size of the tab widget.
    The changed widget of the current tab must be reseted to the preferred size
 
-   \param[in]  osn_Index   Index of selected tab
+   \param[in]  os32_Index   Index of selected tab
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index)
+void C_SdBueBusEditWidget::m_TabChanged(const int32_t os32_Index)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   m_CreateTabWidgetsAlways(osn_Index, true);
+   m_CreateTabWidgetsAlways(os32_Index, true);
 
    if (this->mpc_WidgetComIfDescr != NULL)
    {
@@ -300,19 +299,19 @@ void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index)
       this->mpc_WidgetComIfDescr->TriggerSaveOfSplitterUserSettings();
    }
 
-   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_TabWidgetPageNavi->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_TabWidgetPageNavi->count(); ++s32_Counter)
    {
-      if (sn_Counter != osn_Index)
+      if (s32_Counter != os32_Index)
       {
-         this->mpc_Ui->pc_TabWidgetPageNavi->widget(sn_Counter)->setSizePolicy(QSizePolicy::Ignored,
-                                                                               QSizePolicy::Ignored);
+         this->mpc_Ui->pc_TabWidgetPageNavi->widget(s32_Counter)->setSizePolicy(QSizePolicy::Ignored,
+                                                                                QSizePolicy::Ignored);
       }
    }
-   this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->setSizePolicy(QSizePolicy::Preferred,
-                                                                        QSizePolicy::Preferred);
-   this->mpc_Ui->pc_TabWidgetPageNavi->widget(osn_Index)->adjustSize();
+   this->mpc_Ui->pc_TabWidgetPageNavi->widget(os32_Index)->setSizePolicy(QSizePolicy::Preferred,
+                                                                         QSizePolicy::Preferred);
+   this->mpc_Ui->pc_TabWidgetPageNavi->widget(os32_Index)->adjustSize();
 
-   if (osn_Index == hsn_TAB_INDEX_COMM)
+   if (os32_Index == hs32_TAB_INDEX_COMM)
    {
       tgl_assert(this->mpc_WidgetComIfDescr != NULL);
       if (this->mpc_WidgetComIfDescr != NULL)
@@ -327,17 +326,17 @@ void C_SdBueBusEditWidget::m_TabChanged(const sintn osn_Index)
 
    Create widgets, if necessary
 
-   \param[in]  osn_Index         Index of selected tab
+   \param[in]  os32_Index         Index of selected tab
    \param[in]  oq_AdaptCursor    Adapt cursor
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueBusEditWidget::m_CreateTabWidgetsAlways(const sintn osn_Index, const bool oq_AdaptCursor)
+void C_SdBueBusEditWidget::m_CreateTabWidgetsAlways(const int32_t os32_Index, const bool oq_AdaptCursor)
 {
-   if (osn_Index == hsn_TAB_INDEX_PROPERTIES)
+   if (os32_Index == hs32_TAB_INDEX_PROPERTIES)
    {
       m_CreatePropertiesTab(oq_AdaptCursor);
    }
-   else if (osn_Index == hsn_TAB_INDEX_COMM)
+   else if (os32_Index == hs32_TAB_INDEX_COMM)
    {
       m_CreateCommTab(oq_AdaptCursor);
    }

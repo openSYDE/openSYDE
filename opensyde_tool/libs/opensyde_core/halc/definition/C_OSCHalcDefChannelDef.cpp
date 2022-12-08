@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_OSCHalcDefChannelDef.h"
+#include "C_SclChecksums.hpp"
+#include "C_OscHalcDefChannelDef.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,7 +34,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor/destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefChannelDef::C_OSCHalcDefChannelDef(void)
+C_OscHalcDefChannelDef::C_OscHalcDefChannelDef(void)
 {
 }
 
@@ -46,7 +46,7 @@ C_OSCHalcDefChannelDef::C_OSCHalcDefChannelDef(void)
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefChannelDef::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_OscHalcDefChannelDef::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
 }

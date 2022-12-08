@@ -10,19 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDir>
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_Uti.h"
-#include "C_PuiUtil.h"
-#include "C_PuiProject.h"
+#include "C_Uti.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_PuiProject.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

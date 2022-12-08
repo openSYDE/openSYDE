@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_OgeWiProgressBar.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiProgressBar.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -100,7 +99,7 @@ void C_OgeWiProgressBar::SetColorTooMuch(const QColor & orc_Color)
    \param[in]     os32_SpacingWidth   spacing width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiProgressBar::SetSpacingWidth(const sint32 os32_SpacingWidth)
+void C_OgeWiProgressBar::SetSpacingWidth(const int32_t os32_SpacingWidth)
 {
    this->ms32_SpacingWidth = os32_SpacingWidth;
 }
@@ -113,7 +112,7 @@ void C_OgeWiProgressBar::SetSpacingWidth(const sint32 os32_SpacingWidth)
                                     For compensating rounding problems.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiProgressBar::SetProgress(const uint32 ou32_Percentage, const bool oq_Full)
+void C_OgeWiProgressBar::SetProgress(const uint32_t ou32_Percentage, const bool oq_Full)
 {
    this->mu32_Percentage = ou32_Percentage;
    this->mq_Full = oq_Full;
@@ -127,7 +126,7 @@ void C_OgeWiProgressBar::SetProgress(const uint32 ou32_Percentage, const bool oq
    Current progress as percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OgeWiProgressBar::GetProgress(void) const
+uint32_t C_OgeWiProgressBar::GetProgress(void) const
 {
    return this->mu32_Percentage;
 }
@@ -175,7 +174,7 @@ void C_OgeWiProgressBar::paintEvent(QPaintEvent * const opc_Event)
    }
    else
    {
-      const uint32 u32_UsedWidth = (100U * static_cast<uint32>(this->width())) / (10000U / this->mu32_Percentage);
+      const uint32_t u32_UsedWidth = (100U * static_cast<uint32_t>(this->width())) / (10000U / this->mu32_Percentage);
 
       // draw the used area
       this->mc_Brush.setColor(this->mc_ColorReserved);
@@ -184,12 +183,12 @@ void C_OgeWiProgressBar::paintEvent(QPaintEvent * const opc_Event)
 
       // space between used and free space bars
       // is there space for the second bar?
-      if ((this->width() - static_cast<sint32>(u32_UsedWidth)) > this->ms32_SpacingWidth)
+      if ((this->width() - static_cast<int32_t>(u32_UsedWidth)) > this->ms32_SpacingWidth)
       {
          // draw the free area
          this->mc_Brush.setColor(this->mc_ColorFree);
          c_Painter.setBrush(this->mc_Brush);
-         c_Painter.drawRect(static_cast<sintn>(u32_UsedWidth) + static_cast<sintn>(ms32_SpacingWidth), 0,
+         c_Painter.drawRect(static_cast<int32_t>(u32_UsedWidth) + static_cast<int32_t>(ms32_SpacingWidth), 0,
                             this->width(), this->height());
       }
    }

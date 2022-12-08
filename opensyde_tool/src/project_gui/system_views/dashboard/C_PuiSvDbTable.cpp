@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_PuiSvDbTable.h"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSvDbTable.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,12 +47,12 @@ C_PuiSvDbTable::C_PuiSvDbTable(void) :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbTable::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_PuiSvDbTable::CalcHash(uint32_t & oru32_HashValue) const
 {
-   for (stw_types::uint32 u32_ItCol = 0; u32_ItCol < this->c_ColumnWidth.size(); ++u32_ItCol)
+   for (uint32_t u32_ItCol = 0; u32_ItCol < this->c_ColumnWidth.size(); ++u32_ItCol)
    {
-      const stw_types::sint32 & rs32_ColWidth = this->c_ColumnWidth[u32_ItCol];
-      stw_scl::C_SCLChecksums::CalcCRC32(&rs32_ColWidth, sizeof(rs32_ColWidth), oru32_HashValue);
+      const int32_t & rs32_ColWidth = this->c_ColumnWidth[u32_ItCol];
+      stw::scl::C_SclChecksums::CalcCRC32(&rs32_ColWidth, sizeof(rs32_ColWidth), oru32_HashValue);
    }
    C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
 }

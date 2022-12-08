@@ -8,18 +8,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFile>
 #include <QFileInfo>
 #include <QImageReader>
 
-#include "stwtypes.h"
-#include "C_SebUtil.h"
+#include "stwtypes.hpp"
+#include "C_SebUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,25 +43,22 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 QGraphicsItem * C_SebUtil::h_GetHighestParent(QGraphicsItem * const opc_Item)
 {
-   QGraphicsItem * pc_Parent;
-   QGraphicsItem * pc_ReturnItem;
+   QGraphicsItem * pc_ReturnItem = NULL;
 
-   if (opc_Item == NULL)
+   if (opc_Item != NULL)
    {
-      return NULL;
-   }
+      QGraphicsItem * const pc_Parent = opc_Item->parentItem();
 
-   pc_Parent = opc_Item->parentItem();
-
-   if (pc_Parent == NULL)
-   {
-      // no parent, return the original item
-      pc_ReturnItem = opc_Item;
-   }
-   else
-   {
-      // check if the parent has a parent itself
-      pc_ReturnItem = h_GetHighestParent(pc_Parent);
+      if (pc_Parent == NULL)
+      {
+         // no parent, return the original item
+         pc_ReturnItem = opc_Item;
+      }
+      else
+      {
+         // check if the parent has a parent itself
+         pc_ReturnItem = h_GetHighestParent(pc_Parent);
+      }
    }
 
    return pc_ReturnItem;
@@ -79,27 +75,23 @@ QGraphicsItem * C_SebUtil::h_GetHighestParent(QGraphicsItem * const opc_Item)
 //----------------------------------------------------------------------------------------------------------------------
 const QGraphicsItem * C_SebUtil::h_GetHighestParent(const QGraphicsItem * const opc_Item)
 {
-   const QGraphicsItem * pc_Parent;
-   const QGraphicsItem * pc_ReturnItem;
+   const QGraphicsItem * pc_ReturnItem = NULL;
 
-   if (opc_Item == NULL)
+   if (opc_Item != NULL)
    {
-      return NULL;
-   }
+      const QGraphicsItem * const pc_Parent = opc_Item->parentItem();
 
-   pc_Parent = opc_Item->parentItem();
-
-   if (pc_Parent == NULL)
-   {
-      // no parent, return the original item
-      pc_ReturnItem = opc_Item;
+      if (pc_Parent == NULL)
+      {
+         // no parent, return the original item
+         pc_ReturnItem = opc_Item;
+      }
+      else
+      {
+         // check if the parent has a parent itself
+         pc_ReturnItem = h_GetHighestParent(pc_Parent);
+      }
    }
-   else
-   {
-      // check if the parent has a parent itself
-      pc_ReturnItem = h_GetHighestParent(pc_Parent);
-   }
-
    return pc_ReturnItem;
 }
 
@@ -152,9 +144,9 @@ bool C_SebUtil::h_CheckFilePathForImage(QString & orc_FilePath)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUtil::h_AddLineOffset(C_PuiBsLineBase & orc_LineBase, const QPointF & orc_Offset)
 {
-   for (uint32 u32_ItElem = 0; u32_ItElem < orc_LineBase.c_UIInteractionPoints.size(); ++u32_ItElem)
+   for (uint32_t u32_ItElem = 0; u32_ItElem < orc_LineBase.c_UiInteractionPoints.size(); ++u32_ItElem)
    {
-      orc_LineBase.c_UIInteractionPoints[u32_ItElem] += orc_Offset;
+      orc_LineBase.c_UiInteractionPoints[u32_ItElem] += orc_Offset;
    }
 }
 

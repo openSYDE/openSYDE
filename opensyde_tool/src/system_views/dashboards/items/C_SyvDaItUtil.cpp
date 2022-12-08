@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaItUtil.h"
+#include "C_SyvDaItUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,17 +38,17 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItUtil::h_CopyFontSize(const QLabel * const opc_SourceLabel, QLabel * const opc_TargetLabel,
-                                   const float32 of32_Factor)
+                                   const float32_t of32_Factor)
 {
    if ((opc_SourceLabel != NULL) && (opc_TargetLabel != NULL))
    {
       QFont c_Font;
-      const float32 f32_SourcePointSize = static_cast<float32>(opc_SourceLabel->font().pointSize());
-      const float32 f32_SourcePointSizeWithFactor = f32_SourcePointSize * of32_Factor;
-      const sintn sn_PointSize = std::max(static_cast<sintn>(f32_SourcePointSizeWithFactor), 1);
+      const float32_t f32_SourcePointSize = static_cast<float32_t>(opc_SourceLabel->font().pointSize());
+      const float32_t f32_SourcePointSizeWithFactor = f32_SourcePointSize * of32_Factor;
+      const int32_t s32_PointSize = std::max(static_cast<int32_t>(f32_SourcePointSizeWithFactor), 1);
 
       c_Font = opc_TargetLabel->font();
-      c_Font.setPointSize(sn_PointSize);
+      c_Font.setPointSize(s32_PointSize);
       opc_TargetLabel->setFont(c_Font);
    }
 }
@@ -69,34 +68,34 @@ void C_SyvDaItUtil::h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc
    if ((opc_Label1 != NULL) && (opc_Label2 != NULL))
    {
       QFont c_Font;
-      sintn sn_PointSize;
-      sn_PointSize = std::min(opc_Label1->font().pointSize(), opc_Label2->font().pointSize());
+      int32_t s32_PointSize;
+      s32_PointSize = std::min(opc_Label1->font().pointSize(), opc_Label2->font().pointSize());
       if (opc_Label3 != NULL)
       {
-         sn_PointSize = std::min(sn_PointSize, opc_Label3->font().pointSize());
+         s32_PointSize = std::min(s32_PointSize, opc_Label3->font().pointSize());
       }
       if (opc_Label4 != NULL)
       {
-         sn_PointSize = std::min(sn_PointSize, opc_Label4->font().pointSize());
+         s32_PointSize = std::min(s32_PointSize, opc_Label4->font().pointSize());
       }
 
-      sn_PointSize = std::max(sn_PointSize, 1);
+      s32_PointSize = std::max(s32_PointSize, 1);
 
       //1
       c_Font = opc_Label1->font();
-      c_Font.setPointSize(sn_PointSize);
+      c_Font.setPointSize(s32_PointSize);
       opc_Label1->setFont(c_Font);
 
       //2
       c_Font = opc_Label2->font();
-      c_Font.setPointSize(sn_PointSize);
+      c_Font.setPointSize(s32_PointSize);
       opc_Label2->setFont(c_Font);
 
       //3
       if (opc_Label3 != NULL)
       {
          c_Font = opc_Label3->font();
-         c_Font.setPointSize(sn_PointSize);
+         c_Font.setPointSize(s32_PointSize);
          opc_Label3->setFont(c_Font);
       }
 
@@ -104,7 +103,7 @@ void C_SyvDaItUtil::h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc
       if (opc_Label4 != NULL)
       {
          c_Font = opc_Label4->font();
-         c_Font.setPointSize(sn_PointSize);
+         c_Font.setPointSize(s32_PointSize);
          opc_Label4->setFont(c_Font);
       }
    }
@@ -119,7 +118,7 @@ void C_SyvDaItUtil::h_SyncFontSize(QLabel * const opc_Label1, QLabel * const opc
    Style with indentations
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItUtil::h_GetHtmlIndentStyle(const uint32 ou32_NumberOfTimes)
+QString C_SyvDaItUtil::h_GetHtmlIndentStyle(const uint32_t ou32_NumberOfTimes)
 {
    return static_cast<QString>("style=\"margin-left:%1px\"").arg(ou32_NumberOfTimes * 10);
 }

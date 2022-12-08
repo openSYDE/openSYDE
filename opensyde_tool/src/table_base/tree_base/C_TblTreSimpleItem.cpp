@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include <stddef.h>
+#include <cstddef>
 #include <algorithm>
 
-#include "stwtypes.h"
-#include "C_TblTreSimpleItem.h"
+#include "stwtypes.hpp"
+#include "C_TblTreSimpleItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -77,7 +76,7 @@ void C_TblTreSimpleItem::AddChild(C_TblTreSimpleItem * const opc_Child)
    \param[in,out] opc_Child  Child to add & store
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreSimpleItem::InsertChild(const uint32 ou32_Index, C_TblTreSimpleItem * const opc_Child)
+void C_TblTreSimpleItem::InsertChild(const uint32_t ou32_Index, C_TblTreSimpleItem * const opc_Child)
 {
    if (opc_Child != NULL)
    {
@@ -92,7 +91,7 @@ void C_TblTreSimpleItem::InsertChild(const uint32 ou32_Index, C_TblTreSimpleItem
    \param[in] ou32_Space Number of items to reserve for
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreSimpleItem::ReserveChildrenSpace(const uint32 ou32_Space)
+void C_TblTreSimpleItem::ReserveChildrenSpace(const uint32_t ou32_Space)
 {
    this->c_Children.reserve(ou32_Space);
 }
@@ -106,7 +105,7 @@ void C_TblTreSimpleItem::ReserveChildrenSpace(const uint32 ou32_Space)
    \param[in,out] opc_Child  Child to set & store
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreSimpleItem::SetChild(const uint32 ou32_Index, C_TblTreSimpleItem * const opc_Child)
+void C_TblTreSimpleItem::SetChild(const uint32_t ou32_Index, C_TblTreSimpleItem * const opc_Child)
 {
    if (opc_Child != NULL)
    {
@@ -123,9 +122,9 @@ void C_TblTreSimpleItem::SetChild(const uint32 ou32_Index, C_TblTreSimpleItem * 
    Index of this item in parent item
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_TblTreSimpleItem::GetIndexInParentNumber(void) const
+int32_t C_TblTreSimpleItem::GetIndexInParentNumber(void) const
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    if (this->pc_Parent != NULL)
    {
@@ -160,10 +159,10 @@ void C_TblTreSimpleItem::ClearChildren(void)
    Else Valid index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_TblTreSimpleItem::h_GetIndex(const std::vector<C_TblTreSimpleItem *> & orc_Vector,
-                                      const C_TblTreSimpleItem * const opc_Item)
+int32_t C_TblTreSimpleItem::h_GetIndex(const std::vector<C_TblTreSimpleItem *> & orc_Vector,
+                                       const C_TblTreSimpleItem * const opc_Item)
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    if (opc_Item != NULL)
    {

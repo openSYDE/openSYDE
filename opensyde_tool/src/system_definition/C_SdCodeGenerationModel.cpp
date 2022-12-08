@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
 
-#include "C_GtGetText.h"
-#include "C_SdCodeGenerationModel.h"
-#include "C_PuiSdHandler.h"
+#include "C_GtGetText.hpp"
+#include "C_SdCodeGenerationModel.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,12 +69,12 @@ C_SdCodeGenerationModel::~C_SdCodeGenerationModel(void)
    C_NO_ERR    no problems (see above)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndices)
+int32_t C_SdCodeGenerationModel::Init(const std::vector<uint32_t> & orc_ElementIndices)
 {
-   const sint32 s32_RETURN = C_NO_ERR;
+   const int32_t s32_RETURN = C_NO_ERR;
    C_TblTreeModelCheckableItem * const pc_VisibleRootItem = new C_TblTreeModelCheckableItem();
 
-   const std::vector<C_OSCNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes;
+   const std::vector<C_OscNode> & rc_Nodes = C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_Nodes;
 
    this->beginResetModel();
 
@@ -86,35 +85,35 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
 
    pc_VisibleRootItem->c_Name = C_GtGetText::h_GetText("Network Topology");
 
-   for (uint32 u32_NodeCounter = 0; u32_NodeCounter < rc_Nodes.size(); u32_NodeCounter++)
+   for (uint32_t u32_NodeCounter = 0; u32_NodeCounter < rc_Nodes.size(); u32_NodeCounter++)
    {
       bool q_HasProgApp = false;
-      const C_OSCNode & rc_Node = rc_Nodes.at(u32_NodeCounter);
+      const C_OscNode & rc_Node = rc_Nodes.at(u32_NodeCounter);
       C_TblTreeModelCheckableItem * const pc_NodeItem = new C_TblTreeModelCheckableItem();
 
       pc_NodeItem->c_Name = rc_Node.c_Properties.c_Name.c_str();
       pc_NodeItem->u32_Index = u32_NodeCounter;
 
-      std::vector<C_OSCNodeApplication> c_Applications = rc_Node.c_Applications;
+      std::vector<C_OscNodeApplication> c_Applications = rc_Node.c_Applications;
 
       if (c_Applications.empty() == false)
       {
-         for (uint32 u32_ApplicationCounter = 0; u32_ApplicationCounter < c_Applications.size();
+         for (uint32_t u32_ApplicationCounter = 0; u32_ApplicationCounter < c_Applications.size();
               u32_ApplicationCounter++)
          {
-            const C_OSCNodeApplication & rc_Application = c_Applications.at(u32_ApplicationCounter);
+            const C_OscNodeApplication & rc_Application = c_Applications.at(u32_ApplicationCounter);
 
-            if (rc_Application.e_Type != C_OSCNodeApplication::eBINARY)
+            if (rc_Application.e_Type != C_OscNodeApplication::eBINARY)
             {
                C_TblTreeModelCheckableItem * const pc_ApplicationItem = new C_TblTreeModelCheckableItem();
-               const stw_scl::C_SCLString c_Indentation = "\n   ";
-               stw_scl::C_SCLString c_ToolTip;
-               if (rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+               const stw::scl::C_SclString c_Indentation = "\n   ";
+               stw::scl::C_SclString c_ToolTip;
+               if (rc_Application.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
                {
                   pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (Source Code; Structure Version: " +
                                                 rc_Application.u16_GenCodeVersion + ")").c_str();
                }
-               else if (rc_Application.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC)
+               else if (rc_Application.e_Type == C_OscNodeApplication::ePARAMETER_SET_HALC)
                {
                   pc_ApplicationItem->c_Name = (rc_Application.c_Name + " (Parameter Set Image)").c_str();
                }
@@ -154,7 +153,7 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
                c_ToolTip += c_Indentation + C_GtGetText::h_GetText("File Generator: ");
                c_ToolTip += rc_Application.c_CodeGeneratorPath;
                c_ToolTip += c_Indentation + C_GtGetText::h_GetText("IDE Call: ");
-               c_ToolTip += rc_Application.c_IDECall;
+               c_ToolTip += rc_Application.c_IdeCall;
 
                pc_ApplicationItem->c_ToolTipHeading = rc_Application.c_Name.c_str();
                pc_ApplicationItem->c_ToolTipContent = c_ToolTip.c_str();
@@ -200,16 +199,16 @@ sint32 C_SdCodeGenerationModel::Init(const std::vector<uint32> & orc_ElementIndi
    Checked Application Counter
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdCodeGenerationModel::GetCheckedItemCount(void) const
+uint32_t C_SdCodeGenerationModel::GetCheckedItemCount(void) const
 {
-   uint32 u32_CheckedItems = 0;
+   uint32_t u32_CheckedItems = 0;
 
-   std::vector<uint32> c_NodeIndices;
-   std::vector<std::vector<uint32> > c_AppIndicesPerNode;
+   std::vector<uint32_t> c_NodeIndices;
+   std::vector<std::vector<uint32_t> > c_AppIndicesPerNode;
 
    this->GetCheckedItems(c_NodeIndices, c_AppIndicesPerNode);
 
-   for (uint32 u32_ItItems = 0; u32_ItItems < c_AppIndicesPerNode.size(); ++u32_ItItems)
+   for (uint32_t u32_ItItems = 0; u32_ItItems < c_AppIndicesPerNode.size(); ++u32_ItItems)
    {
       u32_CheckedItems += c_AppIndicesPerNode[u32_ItItems].size();
    }
@@ -224,13 +223,13 @@ uint32 C_SdCodeGenerationModel::GetCheckedItemCount(void) const
    \param[out]  orc_ChildIndicesPerElement   Vector of vectors of application indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32> & orc_ElementIndices,
-                                              std::vector<std::vector<uint32> > & orc_ChildIndicesPerElement) const
+void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32_t> & orc_ElementIndices,
+                                              std::vector<std::vector<uint32_t> > & orc_ChildIndicesPerElement) const
 {
    std::vector<C_TblTreSimpleItem *> c_InvisibleRootChildren = this->mpc_InvisibleRootItem->c_Children;
    orc_ElementIndices.clear();
    orc_ChildIndicesPerElement.clear();
-   for (uint32 u32_ItInvisibleRootChild = 0;
+   for (uint32_t u32_ItInvisibleRootChild = 0;
         u32_ItInvisibleRootChild < c_InvisibleRootChildren.size(); u32_ItInvisibleRootChild++)
    {
       C_TblTreeModelCheckableItem * const pc_VisibleRootItem =
@@ -238,7 +237,7 @@ void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32> & orc_ElementI
       if (pc_VisibleRootItem != NULL)
       {
          std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
-         for (uint32 u32_ItVisibleRootChild = 0;
+         for (uint32_t u32_ItVisibleRootChild = 0;
               u32_ItVisibleRootChild < c_VisibleRootChildren.size(); u32_ItVisibleRootChild++)
          {
             C_TblTreeModelCheckableItem * const pc_NodeItem =
@@ -246,8 +245,8 @@ void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32> & orc_ElementI
             if (pc_NodeItem != NULL)
             {
                std::vector<C_TblTreSimpleItem *> c_NodeChildren = pc_NodeItem->c_Children;
-               std::vector<uint32> c_AppIndices;
-               for (uint32 u32_ItNodeChild = 0; u32_ItNodeChild < c_NodeChildren.size(); u32_ItNodeChild++)
+               std::vector<uint32_t> c_AppIndices;
+               for (uint32_t u32_ItNodeChild = 0; u32_ItNodeChild < c_NodeChildren.size(); u32_ItNodeChild++)
                {
                   C_TblTreeModelCheckableItem * const pc_AppItem =
                      dynamic_cast<C_TblTreeModelCheckableItem *>(c_NodeChildren.at(u32_ItNodeChild));
@@ -276,23 +275,23 @@ void C_SdCodeGenerationModel::GetCheckedItems(std::vector<uint32> & orc_ElementI
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdCodeGenerationModel::m_CheckInitItems(C_TblTreeModelCheckableItem & orc_VisibleRootItem,
-                                               const std::vector<uint32> & orc_NodeIndices) const
+                                               const std::vector<uint32_t> & orc_NodeIndices) const
 {
-   uint32 u32_CheckedNodeCounter = 0;
-   uint32 u32_NotEnabledNodeCounter = 0;
+   uint32_t u32_CheckedNodeCounter = 0;
+   uint32_t u32_NotEnabledNodeCounter = 0;
 
-   for (uint32 u32_ItRootChildren = 0; u32_ItRootChildren < orc_VisibleRootItem.c_Children.size();
+   for (uint32_t u32_ItRootChildren = 0; u32_ItRootChildren < orc_VisibleRootItem.c_Children.size();
         u32_ItRootChildren++)
    {
       C_TblTreeModelCheckableItem * const pc_NodeItem =
          dynamic_cast<C_TblTreeModelCheckableItem *>(orc_VisibleRootItem.c_Children.at(u32_ItRootChildren));
       if (pc_NodeItem != NULL)
       {
-         for (uint32 u32_ItNodeIndices = 0; u32_ItNodeIndices < orc_NodeIndices.size(); u32_ItNodeIndices++)
+         for (uint32_t u32_ItNodeIndices = 0; u32_ItNodeIndices < orc_NodeIndices.size(); u32_ItNodeIndices++)
          {
             if (pc_NodeItem->u32_Index == orc_NodeIndices.at(u32_ItNodeIndices))
             {
-               for (uint32 u32_ItNodeChildren = 0; u32_ItNodeChildren < pc_NodeItem->c_Children.size();
+               for (uint32_t u32_ItNodeChildren = 0; u32_ItNodeChildren < pc_NodeItem->c_Children.size();
                     u32_ItNodeChildren++)
                {
                   C_TblTreeModelCheckableItem * const pc_AppItem =
@@ -316,13 +315,14 @@ void C_SdCodeGenerationModel::m_CheckInitItems(C_TblTreeModelCheckableItem & orc
       }
    }
 
-   if (u32_CheckedNodeCounter == static_cast<uint32>(orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter))
+   if (u32_CheckedNodeCounter ==
+       static_cast<uint32_t>(orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter))
    {
       orc_VisibleRootItem.e_CheckState = Qt::Checked;
    }
    else if ((u32_CheckedNodeCounter > 0) &&
             (u32_CheckedNodeCounter <
-             static_cast<uint32>(orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter)))
+             static_cast<uint32_t>(orc_VisibleRootItem.c_Children.size() - u32_NotEnabledNodeCounter)))
    {
       orc_VisibleRootItem.e_CheckState = Qt::PartiallyChecked;
    }

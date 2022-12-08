@@ -8,24 +8,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaDashboardTabProperties.h"
+#include "C_SyvDaDashboardTabProperties.hpp"
 #include "ui_C_SyvDaDashboardTabProperties.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvData.h"
-#include "C_PuiSvHandler.h"
-#include "stwerrors.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "stwerrors.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,16 +43,17 @@ using namespace stw_errors;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent                Reference to parent
-   \param[in]     orc_Name                  Name of the bus for the title
-   \param[in]     ou32_DashboardIndex       Index of dashboard for editing (not relevant if oq_NewDashboard is true)
-   \param[in]     ou32_ViewIndex            Index of current view
-   \param[in]     oq_NewDashboard           Flag if new dashboard for creation ()
+   \param[in,out]  orc_Parent             Reference to parent
+   \param[in]      orc_Name               Name of the bus for the title
+   \param[in]      ou32_DashboardIndex    Index of dashboard for editing (not relevant if oq_NewDashboard is true)
+   \param[in]      ou32_ViewIndex         Index of current view
+   \param[in]      oq_NewDashboard        Flag if new dashboard for creation ()
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaDashboardTabProperties::C_SyvDaDashboardTabProperties(C_OgePopUpDialog & orc_Parent, const QString & orc_Name,
-                                                             const uint32 ou32_DashboardIndex,
-                                                             const uint32 ou32_ViewIndex, const bool oq_NewDashboard) :
+                                                             const uint32_t ou32_DashboardIndex,
+                                                             const uint32_t ou32_ViewIndex,
+                                                             const bool oq_NewDashboard) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardTabProperties()),
    mpc_ParentDialog(&orc_Parent),
@@ -213,7 +213,7 @@ C_PuiSvDashboard::E_TabType C_SyvDaDashboardTabProperties::GetDashboardTabType()
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -221,8 +221,8 @@ void C_SyvDaDashboardTabProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -282,6 +282,9 @@ void C_SyvDaDashboardTabProperties::m_CancelClicked(void)
 
    Check if Dashboard name is valid (i.e. unique) and if not color line edit font red
    and show error tooltip.
+
+   \retval   True    Dashboard name is unique
+   \retval   False   Dashboard name is duplicated
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaDashboardTabProperties::m_CheckDashboardTabName(void) const
@@ -292,7 +295,7 @@ bool C_SyvDaDashboardTabProperties::m_CheckDashboardTabName(void) const
    if (pc_View != NULL)
    {
       const QString c_NewName = this->mpc_Ui->pc_LineEditName->text();
-      const uint32 * pu32_DashboardIndex = NULL;
+      const uint32_t * pu32_DashboardIndex = NULL;
 
       if (this->mq_NewDashboard == false)
       {
@@ -328,6 +331,8 @@ bool C_SyvDaDashboardTabProperties::m_CheckDashboardTabName(void) const
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of common dashboard radio button
+
+   \param[in]  oq_IsChecked   Checked state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::m_SetCommonDashboardType(const bool oq_IsChecked) const
@@ -337,6 +342,8 @@ void C_SyvDaDashboardTabProperties::m_SetCommonDashboardType(const bool oq_IsChe
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Slot of chart dashboard radio button
+
+   \param[in]  oq_IsChecked   Checked state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardTabProperties::m_SetChartDashboardType(const bool oq_IsChecked) const

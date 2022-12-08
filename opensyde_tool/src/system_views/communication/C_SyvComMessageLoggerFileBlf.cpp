@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstring>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_SyvComMessageLoggerFileBlf.h"
+#include "C_SyvComMessageLoggerFileBlf.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 using namespace Vector;
 using namespace BLF;
 
@@ -43,8 +42,8 @@ using namespace BLF;
    \param[in]  orc_FilePath                 Path for file
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvComMessageLoggerFileBlf::C_SyvComMessageLoggerFileBlf(const stw_scl::C_SCLString & orc_FilePath) :
-   C_OSCComMessageLoggerFileBase(orc_FilePath, "")
+C_SyvComMessageLoggerFileBlf::C_SyvComMessageLoggerFileBlf(const stw::scl::C_SclString & orc_FilePath) :
+   C_OscComMessageLoggerFileBase(orc_FilePath, "")
 {
 }
 
@@ -54,7 +53,7 @@ C_SyvComMessageLoggerFileBlf::C_SyvComMessageLoggerFileBlf(const stw_scl::C_SCLS
    Writes the end line and closes the open file
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvComMessageLoggerFileBlf::~C_SyvComMessageLoggerFileBlf(void)
+C_SyvComMessageLoggerFileBlf::~C_SyvComMessageLoggerFileBlf(void) noexcept
 {
    try
    {
@@ -79,9 +78,9 @@ C_SyvComMessageLoggerFileBlf::~C_SyvComMessageLoggerFileBlf(void)
    C_RD_WR     Error on creating file, folders or deleting old file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageLoggerFileBlf::OpenFile(void)
+int32_t C_SyvComMessageLoggerFileBlf::OpenFile(void)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mc_File.is_open() == true)
    {
@@ -95,7 +94,7 @@ sint32 C_SyvComMessageLoggerFileBlf::OpenFile(void)
       this->mc_FilePath += ".blf";
    }
 
-   s32_Return = C_OSCComMessageLoggerFileBase::OpenFile();
+   s32_Return = C_OscComMessageLoggerFileBase::OpenFile();
 
    if (s32_Return == C_NO_ERR)
    {
@@ -117,7 +116,7 @@ sint32 C_SyvComMessageLoggerFileBlf::OpenFile(void)
    \param[in]     orc_MessageData      Current CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OSCComMessageLoggerData & orc_MessageData)
+void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OscComMessageLoggerData & orc_MessageData)
 {
    if (this->mc_File.is_open() == true)
    {
@@ -130,11 +129,11 @@ void C_SyvComMessageLoggerFileBlf::AddMessageToFile(const C_OSCComMessageLoggerD
       c_CanObj.flags = 0U;
       if (orc_MessageData.q_IsTx == true)
       {
-         c_CanObj.flags |= static_cast<uint8>(0x01);
+         c_CanObj.flags |= static_cast<uint8_t>(0x01);
       }
       if (orc_MessageData.c_CanMsg.u8_RTR > 0U)
       {
-         c_CanObj.flags |= static_cast<uint8>(0x80);
+         c_CanObj.flags |= static_cast<uint8_t>(0x80);
       }
 
       // CAN Id and extended flag

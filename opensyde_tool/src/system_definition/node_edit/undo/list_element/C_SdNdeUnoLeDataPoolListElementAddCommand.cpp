@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoLeDataPoolListElementAddCommand.h"
-#include "C_PuiSdHandler.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementAddCommand.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,30 +43,29 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoLeDataPoolListElementAddCommand::C_SdNdeUnoLeDataPoolListElementAddCommand(const uint32 & oru32_NodeIndex,
-                                                                                     const uint32 & oru32_DataPoolIndex,
-                                                                                     const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                                                     const std::vector<uint32> & orc_Indices,
+C_SdNdeUnoLeDataPoolListElementAddCommand::C_SdNdeUnoLeDataPoolListElementAddCommand(const uint32_t & oru32_NodeIndex,
+                                                                                     const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                                     const std::vector<uint32_t> & orc_Indices,
                                                                                      QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                                        opc_DataPoolListModelViewManager,
                                                        orc_Indices,
                                                        "Add List element", opc_Parent)
 {
-   std::vector<C_OSCNodeDataPoolListElement> c_OSCContent;
-   std::vector<C_PuiSdNodeDataPoolListElement> c_UIContent;
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(oru32_NodeIndex,
+   std::vector<C_OscNodeDataPoolListElement> c_OscContent;
+   std::vector<C_PuiSdNodeDataPoolListElement> c_UiContent;
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(oru32_NodeIndex,
                                                                                                  oru32_DataPoolIndex);
-   c_OSCContent.resize(orc_Indices.size());
-   c_UIContent.resize(orc_Indices.size());
+   c_OscContent.resize(orc_Indices.size());
+   c_UiContent.resize(orc_Indices.size());
    if (pc_DataPool != NULL)
    {
-      for (uint32 u32_ItData = 0; u32_ItData < orc_Indices.size(); ++u32_ItData)
+      for (uint32_t u32_ItData = 0; u32_ItData < orc_Indices.size(); ++u32_ItData)
       {
-         C_PuiSdHandler::h_InitDataElement(pc_DataPool->e_Type, pc_DataPool->q_IsSafety, c_OSCContent[u32_ItData]);
+         C_PuiSdHandler::h_InitDataElement(pc_DataPool->e_Type, pc_DataPool->q_IsSafety, c_OscContent[u32_ItData]);
       }
    }
-   this->m_SetInitialData(c_OSCContent, c_UIContent);
+   this->m_SetInitialData(c_OscContent, c_UiContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

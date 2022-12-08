@@ -90,7 +90,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelDpLogo">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelDpLogo">
            <property name="minimumSize">
             <size>
              <width>30</width>
@@ -170,7 +170,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabCategoryHeading" name="pc_LabelDpCategory">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabCategoryHeading" name="pc_LabelDpCategory">
            <property name="text">
             <string>TYPE</string>
            </property>
@@ -219,7 +219,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabCategorySubHeading" name="pc_LabelDpCount">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabCategorySubHeading" name="pc_LabelDpCount">
            <property name="text">
             <string>0</string>
            </property>
@@ -278,7 +278,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonAdd">
+          <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonAdd">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -360,7 +360,7 @@
         <number>6</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollLeft">
+        <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollLeft">
          <property name="minimumSize">
           <size>
            <width>16</width>
@@ -397,7 +397,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui::C_SdNdeDpSelectorListWidget" name="pc_ListWidget" native="true">
+           <widget class="stw::opensyde_gui::C_SdNdeDpSelectorListWidget" name="pc_ListWidget" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -426,7 +426,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollRight">
+        <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollRight">
          <property name="minimumSize">
           <size>
            <width>16</width>
@@ -481,7 +481,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeWiBopperle" name="pc_IndexViewWidget" native="true">
+        <widget class="stw::opensyde_gui_elements::C_OgeWiBopperle" name="pc_IndexViewWidget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -527,35 +527,35 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
+   <header>C_OgePubIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabCategorySubHeading</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabCategorySubHeading</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabCategorySubHeading.h</header>
+   <header>C_OgeLabCategorySubHeading.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabCategoryHeading</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabCategoryHeading</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabCategoryHeading.h</header>
+   <header>C_OgeLabCategoryHeading.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiBopperle</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiBopperle</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiBopperle.h</header>
+   <header>C_OgeWiBopperle.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpSelectorListWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeDpSelectorListWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeDpSelectorListWidget.h</header>
+   <header>C_SdNdeDpSelectorListWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

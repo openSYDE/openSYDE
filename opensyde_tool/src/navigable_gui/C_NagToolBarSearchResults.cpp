@@ -10,21 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QColor>
 #include <QGraphicsDropShadowEffect>
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_NagToolBarSearchResults.h"
+#include "C_NagToolBarSearchResults.hpp"
 #include "ui_C_NagToolBarSearchResults.h"
 
-#include "C_GtGetText.h"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

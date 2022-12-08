@@ -16,7 +16,8 @@ Ubuntu 20.04:
 Required Library Installation:
 ==============================
 Ubuntu 20.04:
-   libssl-dev:i386 (sudo apt-get install libssl-dev:i386; tested with version 1.1.1f)
+   libssl-dev:i386 (sudo apt install libssl-dev:i386; tested with version 1.1.1f)
+   libssl-dev:amd64 (sudo apt install libssl-dev:amd64; tested with version 1.1.1f)
    For building with 32bit compiler on a 64bit System: install gcc-multilib and g++-multilib
    
    

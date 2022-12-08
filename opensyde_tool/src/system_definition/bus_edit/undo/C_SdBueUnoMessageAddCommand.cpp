@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdBueUnoMessageAddCommand.h"
+#include "TglUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdBueUnoMessageAddCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,7 +44,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(
-   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+   const std::vector<C_OscCanMessageIdentificationIndices> & orc_MessageId,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text) :
    C_SdBueUnoMessageAddDeleteBaseCommand(orc_MessageId, opc_MessageSyncManager, opc_MessageTreeWidget,
@@ -57,24 +56,24 @@ C_SdBueUnoMessageAddCommand::C_SdBueUnoMessageAddCommand(
 /*! \brief   Set initial data
 
    \param[in]  orc_Message                   Message data
-   \param[in]  orc_OSCSignalCommons          Signals data (osc common)
-   \param[in]  orc_UISignalCommons           Signals data (ui common)
-   \param[in]  orc_UISignals                 Signals data (ui)
+   \param[in]  orc_OscSignalCommons          Signals data (osc common)
+   \param[in]  orc_UiSignalCommons           Signals data (ui common)
+   \param[in]  orc_UiSignals                 Signals data (ui)
    \param[in]  orc_OwnerNodeName             Owner node names
    \param[in]  orc_OwnerNodeInterfaceIndex   Owner node interface index
    \param[in]  orc_OwnerNodeDatapoolIndex    Owner node Datapool index
    \param[in]  orc_OwnerIsTxFlag             Owner has message as Tx flags
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OSCCanMessage> & orc_Message,
-                                                 const std::vector<std::vector<C_OSCNodeDataPoolListElement> > & orc_OSCSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UISignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UISignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<stw_types::uint32> > & orc_OwnerNodeDatapoolIndex,
+void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OscCanMessage> & orc_Message,
+                                                 const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,
                                                  const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
 {
    this->mc_Message = orc_Message;
-   this->mc_OSCSignalCommons = orc_OSCSignalCommons;
-   this->mc_UISignalCommons = orc_UISignalCommons;
-   this->mc_UISignals = orc_UISignals;
-   for (uint32 u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
+   this->mc_OscSignalCommons = orc_OscSignalCommons;
+   this->mc_UiSignalCommons = orc_UiSignalCommons;
+   this->mc_UiSignals = orc_UiSignals;
+   for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
    {
       //Convert to internal structure
       if ((((orc_OwnerNodeName.size() == orc_OwnerNodeInterfaceIndex.size()) &&
@@ -88,19 +87,19 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OSCCanMessa
              (orc_OwnerNodeName[u32_ItStep].size() > 0UL))
          {
             bool q_First = true;
-            for (stw_types::uint32 u32_ItOwner = 0; u32_ItOwner < orc_OwnerNodeName[u32_ItStep].size(); ++u32_ItOwner)
+            for (uint32_t u32_ItOwner = 0; u32_ItOwner < orc_OwnerNodeName[u32_ItStep].size(); ++u32_ItOwner)
             {
                bool q_Found = false;
                const QString & rc_CurName = orc_OwnerNodeName[u32_ItStep][u32_ItOwner];
-               C_OSCCanMessageIdentificationIndices c_CurId;
+               C_OscCanMessageIdentificationIndices c_CurId;
                //Search node index
-               for (stw_types::uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize();
+               for (uint32_t u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize();
                     ++u32_ItNode)
                {
-                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNode);
+                  const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ItNode);
                   if ((pc_Node != NULL) && (pc_Node->c_Properties.c_Name == rc_CurName.toStdString().c_str()))
                   {
-                     const C_OSCCanMessageContainer * const pc_Container =
+                     const C_OscCanMessageContainer * const pc_Container =
                         C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(
                            u32_ItNode,
                            this->mc_LastMessageId[u32_ItStep].e_ComProtocol,
@@ -142,10 +141,10 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OSCCanMessa
                      }
                      else
                      {
-                        for (stw_types::uint32 u32_ItId = 0; u32_ItId < this->mc_MatchingIds[u32_ItStep].size();
+                        for (uint32_t u32_ItId = 0; u32_ItId < this->mc_MatchingIds[u32_ItStep].size();
                              ++u32_ItId)
                         {
-                           const C_OSCCanMessageIdentificationIndices & rc_CurId =
+                           const C_OscCanMessageIdentificationIndices & rc_CurId =
                               this->mc_MatchingIds[u32_ItStep][u32_ItId];
                            if ((rc_CurId.u32_NodeIndex == c_CurId.u32_NodeIndex) &&
                                (rc_CurId.u32_DatapoolIndex == c_CurId.u32_DatapoolIndex) &&
@@ -178,7 +177,7 @@ void C_SdBueUnoMessageAddCommand::SetInitialData(const std::vector<C_OSCCanMessa
    Last known value for the message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCCanMessageIdentificationIndices> C_SdBueUnoMessageAddCommand::GetLastMessageIds(void) const
+std::vector<C_OscCanMessageIdentificationIndices> C_SdBueUnoMessageAddCommand::GetLastMessageIds(void) const
 {
    return this->mc_LastMessageId;
 }

@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand.h"
+#include "C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand.hpp"
 
-#include "C_PuiSdHandler.h"
-#include "C_OSCNode.h"
-#include "C_OSCNodeDataPool.h"
-#include "C_SdBueComIfDescriptionWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdUtil.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNode.hpp"
+#include "C_OscNodeDataPool.hpp"
+#include "C_SdBueComIfDescriptionWidget.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,7 +53,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand(
-   const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex, const C_OSCCanProtocol::E_Type oe_Protocol,
+   const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex, const C_OscCanProtocol::E_Type oe_Protocol,
    QWidget * const opc_Widget, const QString & orc_Text, QUndoCommand * const opc_Parent) :
    QUndoCommand(orc_Text, opc_Parent),
    mu32_NodeIndex(ou32_NodeIndex),
@@ -120,7 +119,7 @@ void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_SetComProtocolUsedByIn
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) const
+int32_t C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) const
 {
    return C_PuiSdHandler::h_GetInstance()->AddAutoGenCommDataPool(this->mu32_NodeIndex, this->me_Protocol);
 }
@@ -128,24 +127,24 @@ sint32 C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_AddDataPool(void) co
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoBusProtNodeConnectDisconnectBaseCommand::m_DeleteDataPool(void) const
 {
-   const C_OSCNode * pc_Node;
+   const C_OscNode * pc_Node;
 
    //Delete data pool
-   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    if (pc_Node != NULL)
    {
-      uint32 u32_ItComDataPool = 0;
+      uint32_t u32_ItComDataPool = 0;
       bool q_Found = false;
       //Match com data pool to com protocol type
-      for (uint32 u32_ItDataPool = 0; (u32_ItDataPool < pc_Node->c_DataPools.size()) && (q_Found == false);
+      for (uint32_t u32_ItDataPool = 0; (u32_ItDataPool < pc_Node->c_DataPools.size()) && (q_Found == false);
            ++u32_ItDataPool)
       {
-         const C_OSCNodeDataPool & orc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
-         if (orc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+         const C_OscNodeDataPool & orc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         if (orc_DataPool.e_Type == C_OscNodeDataPool::eCOM)
          {
             if (u32_ItComDataPool < pc_Node->c_ComProtocols.size())
             {
-               const C_OSCCanProtocol & orc_Protocol = pc_Node->c_ComProtocols[u32_ItComDataPool];
+               const C_OscCanProtocol & orc_Protocol = pc_Node->c_ComProtocols[u32_ItComDataPool];
                if (orc_Protocol.e_Type == this->me_Protocol)
                {
                   //Everything matches

@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeSpxDoubleAutoFixCustomTrigger" name="pc_DoubleSpinBox">
+    <widget class="stw::opensyde_gui_elements::C_OgeSpxDoubleAutoFixCustomTrigger" name="pc_DoubleSpinBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -40,21 +40,21 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeSpxInt64AutoFix" name="pc_SpinBox64" native="true"/>
+    <widget class="stw::opensyde_gui_elements::C_OgeSpxInt64AutoFix" name="pc_SpinBox64" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxInt64AutoFix</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxInt64AutoFix</class>
    <extends>QWidget</extends>
-   <header>C_OgeSpxInt64AutoFix.h</header>
+   <header>C_OgeSpxInt64AutoFix.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxDoubleAutoFixCustomTrigger</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxDoubleAutoFixCustomTrigger</class>
    <extends>QDoubleSpinBox</extends>
-   <header>C_OgeSpxDoubleAutoFixCustomTrigger.h</header>
+   <header>C_OgeSpxDoubleAutoFixCustomTrigger.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

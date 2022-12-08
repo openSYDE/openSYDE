@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SdBueSignalTableModel.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdUtil.h"
-#include "C_SdTooltipUtil.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "TGLUtils.h"
-#include "C_SdBueCoAddSignalsModel.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SdBueSignalTableModel.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdUtil.hpp"
+#include "C_SdTooltipUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "TglUtils.hpp"
+#include "C_SdBueCoAddSignalsModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -85,23 +84,23 @@ void C_SdBueSignalTableModel::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                             const sintn osn_Role) const
+QVariant C_SdBueSignalTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                             const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_SdBueSignalTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const C_SdBueSignalTableModel::E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -164,7 +163,7 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -185,14 +184,15 @@ QVariant C_SdBueSignalTableModel::headerData(const sintn osn_Section, const Qt::
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdBueSignalTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdBueSignalTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      sn_Retval = this->mc_SigInfoAll.size();
+      s32_Retval = this->mc_SigInfoAll.size();
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -204,60 +204,60 @@ sintn C_SdBueSignalTableModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 18;
+      s32_Retval = 18;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
       const C_SdBueSignalTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          c_Retval = this->m_GetDisplayAndEditValue(orc_Index, e_Col);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
          if (e_Col == eAUTO_MIN_MAX)
          {
-            const sintn sn_Index = orc_Index.row();
-            if ((static_cast<uintn>(sn_Index) < this->mc_SigInfoAll.size()) && (sn_Index >= 0))
+            const int32_t s32_Index = orc_Index.row();
+            if ((static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size()) && (s32_Index >= 0))
             {
-               c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.sn_AutoMinMax;
+               c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.s32_AutoMinMax;
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_ICON)
+      else if (os32_Role == ms32_USER_ROLE_ICON)
       {
          switch (e_Col)
          {
          case eICON:
             {
-               const sintn sn_Index = orc_Index.row();
-               if ((static_cast<uintn>(sn_Index) < this->mc_SigInfoAll.size()) && (sn_Index >= 0))
+               const int32_t s32_Index = orc_Index.row();
+               if ((static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size()) && (s32_Index >= 0))
                {
-                  c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_Icon;
+                  c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_Icon;
                }
                break;
             }
@@ -285,15 +285,15 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const sint
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
       {
          c_Retval = this->m_GetFontValue(e_Col);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          c_Retval = mc_STYLE_GUIDE_COLOR_8;
       }
@@ -350,7 +350,7 @@ Qt::ItemFlags C_SdBueSignalTableModel::flags(const QModelIndex & orc_Index) cons
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const int32_t & ors32_Column)
 {
    C_SdBueSignalTableModel::E_Columns e_Retval = eNAME;
    switch (ors32_Column)
@@ -427,9 +427,9 @@ C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_Columns & ore_Value)
+int32_t C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {
@@ -507,13 +507,13 @@ sint32 C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueSignalTableModel::ConvertRowToSignal(const sint32 & ors32_Row,
-                                                   C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                   uint32 & oru32_Signal) const
+int32_t C_SdBueSignalTableModel::ConvertRowToSignal(const int32_t & ors32_Row,
+                                                    C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                    uint32_t & oru32_Signal) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if ((static_cast<uintn>(ors32_Row) < this->mc_SigInfoAll.size()) && (ors32_Row >= 0))
+   if ((static_cast<uint32_t>(ors32_Row) < this->mc_SigInfoAll.size()) && (ors32_Row >= 0))
    {
       orc_MessageId = this->mc_SigInfoAll[ors32_Row].c_MessageId;
       oru32_Signal = this->mc_SigInfoAll[ors32_Row].u32_SignalIndex;
@@ -535,27 +535,27 @@ sint32 C_SdBueSignalTableModel::ConvertRowToSignal(const sint32 & ors32_Row,
    Multiplexing value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueSignalTableModel::m_GetMultiplexingValue(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                        const uint32 ou32_Signal) const
+QString C_SdBueSignalTableModel::m_GetMultiplexingValue(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                        const uint32_t ou32_Signal) const
 {
    QString c_Retval;
-   const C_OSCCanSignal * const pc_OSCSignal =
+   const C_OscCanSignal * const pc_OscSignal =
       C_PuiSdHandler::h_GetInstance()->GetCanSignal(orc_MessageId, ou32_Signal);
 
-   if (pc_OSCSignal != NULL)
+   if (pc_OscSignal != NULL)
    {
-      const C_OSCCanMessage * pc_Message;
+      const C_OscCanMessage * pc_Message;
       QString c_MultiplexerName = C_GtGetText::h_GetText("<no multiplexer defined yet>");
-      uint32 u32_Multiplexer;
-      switch (pc_OSCSignal->e_MultiplexerType)
+      uint32_t u32_Multiplexer;
+      switch (pc_OscSignal->e_MultiplexerType)
       {
-      case C_OSCCanSignal::eMUX_DEFAULT:
+      case C_OscCanSignal::eMUX_DEFAULT:
          c_Retval = "-";
          break;
-      case C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL:
+      case C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL:
          c_Retval = C_GtGetText::h_GetText("Multiplexer");
          break;
-      case C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL:
+      case C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL:
          // find out name of multiplexer
          pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
          if (pc_Message != NULL)
@@ -563,17 +563,17 @@ QString C_SdBueSignalTableModel::m_GetMultiplexingValue(const C_OSCCanMessageIde
             if (pc_Message->IsMultiplexed(&u32_Multiplexer) == true)
             {
                // multiplexer found -> name is name of corresponding data pool list element
-               const C_OSCNodeDataPoolListElement * const pc_OSCSignalCommon =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(orc_MessageId,
+               const C_OscNodeDataPoolListElement * const pc_OscSignalCommon =
+                  C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolListElement(orc_MessageId,
                                                                                 u32_Multiplexer);
-               if (pc_OSCSignalCommon != NULL)
+               if (pc_OscSignalCommon != NULL)
                {
-                  c_MultiplexerName = static_cast<QString>(pc_OSCSignalCommon->c_Name.c_str());
+                  c_MultiplexerName = static_cast<QString>(pc_OscSignalCommon->c_Name.c_str());
                }
             } // if no multiplexer is found dummy-text is used
 
             c_Retval = static_cast<QString>(C_GtGetText::h_GetText("%1=%2")).arg(c_MultiplexerName).arg(
-               pc_OSCSignal->u16_MultiplexValue);
+               pc_OscSignal->u16_MultiplexValue);
          }
          break;
       default:
@@ -599,9 +599,9 @@ QVariant C_SdBueSignalTableModel::m_GetDisplayAndEditValue(const QModelIndex & o
 {
    QVariant c_Retval;
 
-   const sintn sn_Index = orc_Index.row();
+   const int32_t s32_Index = orc_Index.row();
 
-   if ((static_cast<uintn>(sn_Index) < this->mc_SigInfoAll.size()) && (sn_Index >= 0))
+   if ((static_cast<uint32_t>(s32_Index) < this->mc_SigInfoAll.size()) && (s32_Index >= 0))
    {
       switch (oe_Column)
       {
@@ -612,52 +612,52 @@ QVariant C_SdBueSignalTableModel::m_GetDisplayAndEditValue(const QModelIndex & o
          c_Retval = "";
          break;
       case eMESSAGE:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_MsgName;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_MsgName;
          break;
       case eCAN_OPEN_INDEX:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_CoIndex;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_CoIndex;
          break;
       case eMULTIPLEXING:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_MultiplexingValue;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_MultiplexingValue;
          break;
       case eNAME:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_SigName;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_SigName;
          break;
       case eCOMMENT:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_Comment;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_Comment;
          break;
       case eSTART_BIT:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.u16_StartBit;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.u16_StartBit;
          break;
       case eLENGTH:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.u16_BitLength;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.u16_BitLength;
          break;
       case eBYTE_ORDER:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_ByteOrder;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_ByteOrder;
          break;
       case eVALUE_TYPE:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_ValueType;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_ValueType;
          break;
       case eINITIAL_VALUE:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_InitValue;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_InitValue;
          break;
       case eFACTOR:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_Factor;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_Factor;
          break;
       case eOFFSET:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_Offset;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_Offset;
          break;
       case eAUTO_MIN_MAX:
          c_Retval = "";
          break;
       case eMINIMUM_VALUE:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_MinValue;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_MinValue;
          break;
       case eMAXIMUM_VALUE:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_MaxValue;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_MaxValue;
          break;
       case eUNIT:
-         c_Retval = this->mc_SigInfoAll[sn_Index].c_SignalData.c_Unit;
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_Unit;
          break;
       default:
          tgl_assert(false);
@@ -720,53 +720,53 @@ QFont C_SdBueSignalTableModel::m_GetFontValue(const C_SdBueSignalTableModel::E_C
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableModel::m_FillSigInfo(void)
 {
-   const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> c_MessageIds =
+   const std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> c_MessageIds =
       this->mpc_SyncManager->GetUniqueMessages();
-   uint32 u32_MessageCounter;
+   uint32_t u32_MessageCounter;
 
    this->mc_SigInfoAll.clear();
 
    for (u32_MessageCounter = 0U; u32_MessageCounter < c_MessageIds.size(); ++u32_MessageCounter)
    {
-      const C_OSCCanMessage * const pc_Message =
+      const C_OscCanMessage * const pc_Message =
          C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageIds[u32_MessageCounter]);
       if (pc_Message != NULL)
       {
-         uint32 u32_SignalCounter;
+         uint32_t u32_SignalCounter;
          C_SigTableConfig c_SigConfig;
-         const C_OSCCanMessageIdentificationIndices & rc_MsgId = c_MessageIds[u32_MessageCounter];
+         const C_OscCanMessageIdentificationIndices & rc_MsgId = c_MessageIds[u32_MessageCounter];
 
          c_SigConfig.c_MessageId = rc_MsgId;
 
          for (u32_SignalCounter = 0U; u32_SignalCounter < pc_Message->c_Signals.size(); ++u32_SignalCounter)
          {
-            const C_OSCCanSignal * const pc_OSCSignal =
+            const C_OscCanSignal * const pc_OscSignal =
                C_PuiSdHandler::h_GetInstance()->GetCanSignal(rc_MsgId, u32_SignalCounter);
-            const C_OSCNodeDataPoolListElement * const pc_OSCSignalCommon =
-               C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(rc_MsgId,
+            const C_OscNodeDataPoolListElement * const pc_OscSignalCommon =
+               C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolListElement(rc_MsgId,
                                                                              u32_SignalCounter);
             const C_PuiSdNodeDataPoolListElement * const pc_UiSignalCommon =
                C_PuiSdHandler::h_GetInstance()->GetUiCanDataPoolListElement(rc_MsgId, u32_SignalCounter);
 
-            const C_OSCNodeDataPoolList * const pc_List =
-               C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+            const C_OscNodeDataPoolList * const pc_List =
+               C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolList(
                   rc_MsgId.u32_NodeIndex,
                   rc_MsgId.e_ComProtocol,
                   rc_MsgId.u32_InterfaceIndex,
                   rc_MsgId.u32_DatapoolIndex,
                   rc_MsgId.q_MessageIsTx);
 
-            if ((pc_OSCSignal != NULL) &&
-                (pc_OSCSignalCommon != NULL) &&
+            if ((pc_OscSignal != NULL) &&
+                (pc_OscSignalCommon != NULL) &&
                 (pc_UiSignalCommon != NULL) &&
                 (pc_List != NULL))
             {
                C_SigTableData c_SigData;
                const bool q_SignalValid = !pc_Message->CheckErrorSignal(
                   pc_List, u32_SignalCounter,
-                  C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(rc_MsgId.e_ComProtocol),
-                  C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(rc_MsgId.e_ComProtocol),
-                  C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(rc_MsgId.e_ComProtocol));
+                  C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(rc_MsgId.e_ComProtocol),
+                  C_OscCanProtocol::h_GetCanMessageSignalGapsValid(rc_MsgId.e_ComProtocol),
+                  C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(rc_MsgId.e_ComProtocol));
                QStringList c_TmpIcon;
 
                // Fill the signal data
@@ -774,46 +774,46 @@ void C_SdBueSignalTableModel::m_FillSigInfo(void)
                                                                            QString::number(pc_Message->u32_CanId,
                                                                                            16).toUpper());
                c_SigData.c_CoIndex = C_SdUtil::h_GetCanOpenSignalObjectIndex(
-                  pc_OSCSignal->u16_CanOpenManagerObjectDictionaryIndex,
-                  pc_OSCSignal->u8_CanOpenManagerObjectDictionarySubIndex);
+                  pc_OscSignal->u16_CanOpenManagerObjectDictionaryIndex,
+                  pc_OscSignal->u8_CanOpenManagerObjectDictionarySubIndex);
 
                c_SigData.c_MultiplexingValue = this->m_GetMultiplexingValue(rc_MsgId, u32_SignalCounter);
-               c_SigData.c_SigName = static_cast<QString>(pc_OSCSignalCommon->c_Name.c_str());
-               c_SigData.c_Comment = static_cast<QString>(pc_OSCSignalCommon->c_Comment.c_str());
-               c_SigData.u16_StartBit = pc_OSCSignal->u16_ComBitStart;
-               c_SigData.u16_BitLength = pc_OSCSignal->u16_ComBitLength;
-               c_SigData.c_ByteOrder = C_SdUtil::h_ConvertByteOrderToName(pc_OSCSignal->e_ComByteOrder);
-               c_SigData.c_ValueType = C_SdTooltipUtil::h_ConvertTypeToNameSimplified(pc_OSCSignalCommon->GetType());
-               if (pc_OSCSignalCommon->c_DataSetValues.size() > 0)
+               c_SigData.c_SigName = static_cast<QString>(pc_OscSignalCommon->c_Name.c_str());
+               c_SigData.c_Comment = static_cast<QString>(pc_OscSignalCommon->c_Comment.c_str());
+               c_SigData.u16_StartBit = pc_OscSignal->u16_ComBitStart;
+               c_SigData.u16_BitLength = pc_OscSignal->u16_ComBitLength;
+               c_SigData.c_ByteOrder = C_SdUtil::h_ConvertByteOrderToName(pc_OscSignal->e_ComByteOrder);
+               c_SigData.c_ValueType = C_SdTooltipUtil::h_ConvertTypeToNameSimplified(pc_OscSignalCommon->GetType());
+               if (pc_OscSignalCommon->c_DataSetValues.size() > 0)
                {
                   c_SigData.c_InitValue = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-                     pc_OSCSignalCommon->c_DataSetValues[0],
-                     pc_OSCSignalCommon->f64_Factor,
-                     pc_OSCSignalCommon->f64_Offset, 0);
+                     pc_OscSignalCommon->c_DataSetValues[0],
+                     pc_OscSignalCommon->f64_Factor,
+                     pc_OscSignalCommon->f64_Offset, 0);
                }
-               c_SigData.c_Factor = pc_OSCSignalCommon->f64_Factor;
-               c_SigData.c_Offset = pc_OSCSignalCommon->f64_Offset;
+               c_SigData.c_Factor = pc_OscSignalCommon->f64_Factor;
+               c_SigData.c_Offset = pc_OscSignalCommon->f64_Offset;
 
                if (pc_UiSignalCommon->q_AutoMinMaxActive == true)
                {
-                  c_SigData.sn_AutoMinMax = static_cast<sintn>(Qt::Checked);
+                  c_SigData.s32_AutoMinMax = static_cast<int32_t>(Qt::Checked);
                }
                else
                {
-                  c_SigData.sn_AutoMinMax = static_cast<sintn>(Qt::Unchecked);
+                  c_SigData.s32_AutoMinMax = static_cast<int32_t>(Qt::Unchecked);
                }
 
                c_SigData.c_MinValue = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-                  pc_OSCSignalCommon->c_MinValue,
-                  pc_OSCSignalCommon->f64_Factor,
-                  pc_OSCSignalCommon->f64_Offset,
+                  pc_OscSignalCommon->c_MinValue,
+                  pc_OscSignalCommon->f64_Factor,
+                  pc_OscSignalCommon->f64_Offset,
                   0);
                c_SigData.c_MaxValue = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-                  pc_OSCSignalCommon->c_MaxValue,
-                  pc_OSCSignalCommon->f64_Factor,
-                  pc_OSCSignalCommon->f64_Offset,
+                  pc_OscSignalCommon->c_MaxValue,
+                  pc_OscSignalCommon->f64_Factor,
+                  pc_OscSignalCommon->f64_Offset,
                   0);
-               c_SigData.c_Unit = static_cast<QString>(pc_OSCSignalCommon->c_Unit.c_str());
+               c_SigData.c_Unit = static_cast<QString>(pc_OscSignalCommon->c_Unit.c_str());
 
                // The icon
                c_TmpIcon.push_back(QString::number(20));

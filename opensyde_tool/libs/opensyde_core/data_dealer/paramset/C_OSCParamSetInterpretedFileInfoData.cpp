@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCParamSetInterpretedFileInfoData.h"
+#include "C_OscParamSetInterpretedFileInfoData.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetInterpretedFileInfoData::C_OSCParamSetInterpretedFileInfoData(void)
+C_OscParamSetInterpretedFileInfoData::C_OscParamSetInterpretedFileInfoData(void)
 {
    this->Clear();
 }
@@ -42,7 +42,7 @@ C_OSCParamSetInterpretedFileInfoData::C_OSCParamSetInterpretedFileInfoData(void)
 /*! \brief   Clear internally stored content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedFileInfoData::Clear(void)
+void C_OscParamSetInterpretedFileInfoData::Clear(void)
 {
    this->c_DateTime = "Do Jan 01 00:00:00 1970";
    this->c_Creator = "unknown";
@@ -65,13 +65,13 @@ void C_OSCParamSetInterpretedFileInfoData::Clear(void)
    \param[in] orc_UserComment    Optional user comment for this param set file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedFileInfoData::AddInterpretedFileData(const stw_scl::C_SCLString & orc_DateTime,
-                                                                  const stw_scl::C_SCLString & orc_Creator,
-                                                                  const stw_scl::C_SCLString & orc_ToolName,
-                                                                  const stw_scl::C_SCLString & orc_ToolVersion,
-                                                                  const stw_scl::C_SCLString & orc_ProjectName,
-                                                                  const stw_scl::C_SCLString & orc_ProjectVersion,
-                                                                  const stw_scl::C_SCLString & orc_UserComment)
+void C_OscParamSetInterpretedFileInfoData::AddInterpretedFileData(const stw::scl::C_SclString & orc_DateTime,
+                                                                  const stw::scl::C_SclString & orc_Creator,
+                                                                  const stw::scl::C_SclString & orc_ToolName,
+                                                                  const stw::scl::C_SclString & orc_ToolVersion,
+                                                                  const stw::scl::C_SclString & orc_ProjectName,
+                                                                  const stw::scl::C_SclString & orc_ProjectVersion,
+                                                                  const stw::scl::C_SclString & orc_UserComment)
 {
    this->c_DateTime = orc_DateTime;
    this->c_Creator = orc_Creator;

@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "TGLUtils.h"
-#include "C_SdNdeCoPdoWidget.h"
+#include "C_GtGetText.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeCoPdoWidget.hpp"
 #include "ui_C_SdNdeCoPdoWidget.h"
-#include "C_OSCCanInterfaceId.h"
-#include "C_OSCNode.h"
-#include "C_PuiSdHandler.h"
-#include "C_Uti.h"
+#include "C_OscCanInterfaceId.hpp"
+#include "C_OscNode.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -125,9 +124,9 @@ void C_SdNdeCoPdoWidget::UpdateData(void)
    \param[in]  orc_DeviceNodeId          new Node ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoPdoWidget::SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_ManagerNodeIndex,
-                                                    const uint8 ou8_ManagerInterfaceId,
-                                                    const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId)
+void C_SdNdeCoPdoWidget::SetNodeIndexAndInterfaceId(const uint32_t ou32_ManagerNodeIndex,
+                                                    const uint8_t ou8_ManagerInterfaceId,
+                                                    const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceNodeId)
 {
    bool q_DeviceChanged = false;
 
@@ -171,17 +170,17 @@ void C_SdNdeCoPdoWidget::m_UpdateUi()
    }
 
    // set bus link
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_ManagerNodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_ManagerNodeIndex);
 
    if ((pc_Node != NULL) &&
        (this->mu8_ManagerInterfaceId < pc_Node->c_Properties.c_ComInterfaces.size()))
    {
-      const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+      const C_OscNodeComInterfaceSettings & rc_ComInterface =
          pc_Node->c_Properties.c_ComInterfaces[this->mu8_ManagerInterfaceId];
 
       if (rc_ComInterface.GetBusConnected() == true)
       {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
             rc_ComInterface.u32_BusIndex);
          QString c_BusName;
 
@@ -209,17 +208,17 @@ void C_SdNdeCoPdoWidget::m_UpdateUi()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoWidget::m_OnLinkSwitchToBus(const QString & orc_Link) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_ManagerNodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_ManagerNodeIndex);
 
    if ((pc_Node != NULL) &&
        (this->mu8_ManagerInterfaceId < pc_Node->c_Properties.c_ComInterfaces.size()))
    {
-      const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+      const C_OscNodeComInterfaceSettings & rc_ComInterface =
          pc_Node->c_Properties.c_ComInterfaces[this->mu8_ManagerInterfaceId];
 
       if (rc_ComInterface.GetBusConnected() == true)
       {
-         Q_EMIT (this->SigSwitchToBusProtocol(rc_ComInterface.u32_BusIndex, orc_Link, C_OSCCanProtocol::eCAN_OPEN));
+         Q_EMIT (this->SigSwitchToBusProtocol(rc_ComInterface.u32_BusIndex, orc_Link, C_OscCanProtocol::eCAN_OPEN));
       }
    }
 }
@@ -231,19 +230,19 @@ void C_SdNdeCoPdoWidget::m_OnLinkSwitchToBus(const QString & orc_Link) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoWidget::m_OnLinkSwitchToBusProtocolMessage(
-   const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+   const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_ManagerNodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_ManagerNodeIndex);
 
    if ((pc_Node != NULL) &&
        (this->mu8_ManagerInterfaceId < pc_Node->c_Properties.c_ComInterfaces.size()))
    {
-      const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+      const C_OscNodeComInterfaceSettings & rc_ComInterface =
          pc_Node->c_Properties.c_ComInterfaces[this->mu8_ManagerInterfaceId];
 
       if (rc_ComInterface.GetBusConnected() == true)
       {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(rc_ComInterface.u32_BusIndex);
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(rc_ComInterface.u32_BusIndex);
          tgl_assert(pc_Bus != NULL);
          if (pc_Bus != NULL)
          {

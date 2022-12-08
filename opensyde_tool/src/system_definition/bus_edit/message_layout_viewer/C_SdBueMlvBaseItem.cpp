@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_SdBueMlvBaseItem.h"
-#include "C_Uti.h"
+#include "C_SdBueMlvBaseItem.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -155,10 +154,10 @@ void C_SdBueMlvBaseItem::paint(QPainter * const opc_Painter, const QStyleOptionG
       opc_Painter->setFont(this->mc_Font);
 
       // draw the text
-      opc_Painter->drawText(this->boundingRect(), static_cast<sintn>(Qt::AlignCenter),
-                            stw_opensyde_gui_logic::C_Uti::h_AdaptStringToSize(this->mc_Text,
-                                                                               opc_Painter->fontMetrics(),
-                                                                               this->boundingRect().width()));
+      opc_Painter->drawText(this->boundingRect(), static_cast<int32_t>(Qt::AlignCenter),
+                            stw::opensyde_gui_logic::C_Uti::h_AdaptStringToSize(this->mc_Text,
+                                                                                opc_Painter->fontMetrics(),
+                                                                                this->boundingRect().width()));
    }
 }
 

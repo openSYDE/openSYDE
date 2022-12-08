@@ -13,15 +13,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 
-#include "C_OgeTransparentScrollArea.h"
+#include "C_OgeTransparentScrollArea.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,10 +65,10 @@ void C_OgeTransparentScrollArea::DeactivateScrollbarResize(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTransparentScrollArea::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
+void C_OgeTransparentScrollArea::m_ScrollBarRangeChanged(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->verticalScrollBar()->hide();
    }

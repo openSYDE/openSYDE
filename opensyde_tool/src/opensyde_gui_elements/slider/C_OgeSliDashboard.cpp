@@ -13,19 +13,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgeSliDashboard.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeSliDashboard.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -117,46 +116,46 @@ void C_OgeSliDashboard::SetDisplayStyle(const C_PuiSvDbSlider::E_Type oe_Type)
 void C_OgeSliDashboard::HandleResize(void)
 {
    QString c_Style = "";
-   sintn sn_GrooveHeight;
-   sintn sn_HandleVMargin;
-   sintn sn_AvailableHeight;
-   sintn sn_Offset = 0;
+   int32_t s32_GrooveHeight;
+   int32_t s32_HandleMargin;
+   int32_t s32_AvailableHeight;
+   int32_t s32_Offset = 0;
 
    switch (me_Type)
    {
    case C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1:
    case C_PuiSvDbSlider::eTYPE_SMALL_COLOR_2:
-      sn_GrooveHeight = std::max(this->height() / 10, 1);
+      s32_GrooveHeight = std::max(this->height() / 10, 1);
       break;
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_1:
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_2:
-      sn_GrooveHeight = std::max(this->height() / 5, 1);
+      s32_GrooveHeight = std::max(this->height() / 5, 1);
       break;
    default:
       tgl_assert(false);
-      sn_GrooveHeight = 0;
+      s32_GrooveHeight = 0;
       break;
    }
-   sn_AvailableHeight = this->height() - sn_GrooveHeight;
-   if ((sn_AvailableHeight % 2) == 0)
+   s32_AvailableHeight = this->height() - s32_GrooveHeight;
+   if ((s32_AvailableHeight % 2) == 0)
    {
       //Adapt to uneven result (even result should not be bigger than uneven result)
-      sn_Offset = 1;
+      s32_Offset = 1;
    }
-   sn_HandleVMargin = (sn_AvailableHeight + sn_Offset) / 2;
-   c_Style = static_cast<QString>("stw_opensyde_gui_elements--C_OgeSliDashboard::groove {\n"
+   s32_HandleMargin = (s32_AvailableHeight + s32_Offset) / 2;
+   c_Style = static_cast<QString>("stw--opensyde_gui_elements--C_OgeSliDashboard::groove {\n"
                                   " height:%1px;\n"
                                   "}\n"
-                                  "stw_opensyde_gui_elements--C_OgeSliDashboard::handle {\n"
+                                  "stw--opensyde_gui_elements--C_OgeSliDashboard::handle {\n"
                                   " height:%2px;\n"
                                   " width:%2px;\n"
                                   " margin-top: -%3px;"
                                   " margin-bottom: -%3px;\n"
-                                  "}\n").arg(QString::number(sn_GrooveHeight),            //Bar height
-                                             QString::number(this->height() - sn_Offset), //Handle size
-                                             QString::number(sn_HandleVMargin));          //Handle offset, negative to
-                                                                                          // be outside
-                                                                                          // of groove/bar
+                                  "}\n").arg(QString::number(s32_GrooveHeight),            //Bar height
+                                             QString::number(this->height() - s32_Offset), //Handle size
+                                             QString::number(s32_HandleMargin));           //Handle offset, negative to
+                                                                                           // be outside
+                                                                                           // of groove/bar
    this->setStyleSheet(c_Style);
 }
 
@@ -221,18 +220,25 @@ void C_OgeSliDashboard::m_DrawHandle(const QRect & orc_Rect)
    {
       QPainter c_Painter(this);
       c_Painter.setClipRect(orc_Rect);
-      const float64 f64_SliderSize = static_cast<float64>(std::min(this->rect().width(), this->rect().height()));
-      const float64 f64_SliderPosY = (static_cast<float64>(this->rect().height()) - f64_SliderSize) / 2.0;
-      const float64 f64_Min = static_cast<float64>(this->minimum());
-      const float64 f64_Val = static_cast<float64>(this->value());
-      const float64 f64_Max = static_cast<float64>(this->maximum());
-      const float64 f64_Progress = (f64_Val - f64_Min) / (f64_Max - f64_Min);
-      const float64 f64_XMin = static_cast<float64>(this->rect().x());
+      const float64_t f64_SliderSize = static_cast<float64_t>(std::min(this->rect().width(), this->rect().height()));
+      const float64_t f64_SliderPosVertical = (static_cast<float64_t>(this->rect().height()) - f64_SliderSize) / 2.0;
+      const float64_t f64_Min = static_cast<float64_t>(this->minimum());
+      const float64_t f64_Val = static_cast<float64_t>(this->value());
+      const float64_t f64_Max = static_cast<float64_t>(this->maximum());
+      const float64_t f64_Progress = (f64_Val - f64_Min) / (f64_Max - f64_Min);
+      const float64_t f64_HorizontalMin = static_cast<float64_t>(this->rect().x());
       //Don't use exact width but consider all possible slider center positions instead 2* half slider offset
-      const float64 f64_Width = static_cast<float64>(this->rect().width()) - f64_SliderSize;
+      const float64_t f64_Width = static_cast<float64_t>(this->rect().width()) - f64_SliderSize;
       //X is top left corner so don't add half slider offset for correct progress information
-      const float64 f64_XMidProgress = f64_XMin + (f64_Width * f64_Progress);
-      const QRectF c_SliderRect(QPointF(f64_XMidProgress, f64_SliderPosY), QSizeF(f64_SliderSize, f64_SliderSize));
+      const float64_t f64_HorizontalMidProgress = f64_HorizontalMin + (f64_Width * f64_Progress);
+      // Qt issue in QStyle::sliderPositionFromValue (https://bugreports.qt.io/browse/QTBUG-29764)
+      // This function is actually used to handle the slider interaction,
+      // but it is buggy or max values >= 0 in this case:
+      // QStyle::sliderPositionFromValue(std::numeric_limits<int>::min(), max, 0, 100,false);
+      //const float64_t f64_HorizontalMidProgress = f64_HorizontalMin + QStyle::sliderPositionFromValue(
+      // this->minimum(),this->maximum(),this->value(),f64_Width,false);
+      const QRectF c_SliderRect(QPointF(f64_HorizontalMidProgress, f64_SliderPosVertical),
+                                QSizeF(f64_SliderSize, f64_SliderSize));
 
       this->mpc_SvgRenderer->render(&c_Painter, c_SliderRect);
    }

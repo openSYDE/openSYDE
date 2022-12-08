@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QLineEdit>
-#include "TGLUtils.h"
-#include "C_OgeSpxInt64.h"
+#include "TglUtils.hpp"
+#include "C_OgeSpxInt64.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QChar C_OgeSpxInt64::hc_UNIT_SEPERATION_CHARACTER = ' ';
@@ -142,7 +141,7 @@ void C_OgeSpxInt64::SetValue(const QVariant & orc_Value, const bool oq_AllowValu
    \param[in]  ou64_Step   Single step width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxInt64::SetStepWidth(const uint64 ou64_Step)
+void C_OgeSpxInt64::SetStepWidth(const uint64_t ou64_Step)
 {
    if (ou64_Step > 0)
    {
@@ -250,7 +249,7 @@ QVariant C_OgeSpxInt64::GetMaximum(void) const
    Current step width
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64 C_OgeSpxInt64::GetStepWidth(void) const
+uint64_t C_OgeSpxInt64::GetStepWidth(void) const
 {
    return this->mu64_StepWidth;
 }
@@ -258,23 +257,23 @@ uint64 C_OgeSpxInt64::GetStepWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do x steps
 
-   \param[in]  osn_Steps   Step count to do
+   \param[in]  os32_Steps   Step count to do
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
+void C_OgeSpxInt64::stepBy(const int32_t os32_Steps)
 {
    QVariant c_Tmp = this->GetValue();
 
-   if (osn_Steps > 0)
+   if (os32_Steps > 0)
    {
       //Step by step (avoid stepping over min/max)
-      for (sint32 s32_Step = 0L; s32_Step < osn_Steps; ++s32_Step)
+      for (int32_t s32_Step = 0L; s32_Step < os32_Steps; ++s32_Step)
       {
          if (mq_IsUnsigned == true)
          {
-            const uint64 u64_Max = this->mc_Maximum.toULongLong();
-            uint64 u64_Tmp = c_Tmp.toULongLong();
-            const uint64 u64_AllowedSteps = u64_Max - u64_Tmp;
+            const uint64_t u64_Max = this->mc_Maximum.toULongLong();
+            uint64_t u64_Tmp = c_Tmp.toULongLong();
+            const uint64_t u64_AllowedSteps = u64_Max - u64_Tmp;
             if ((u64_Tmp < u64_Max) && (u64_AllowedSteps >= this->mu64_StepWidth))
             {
                u64_Tmp += this->mu64_StepWidth;
@@ -294,12 +293,12 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
          }
          else
          {
-            const sint64 s64_Max = this->mc_Maximum.toLongLong();
-            sint64 s64_Tmp = c_Tmp.toLongLong();
-            const uint64 u64_AllowedSteps = static_cast<uint64>(s64_Max - s64_Tmp);
+            const int64_t s64_Max = this->mc_Maximum.toLongLong();
+            int64_t s64_Tmp = c_Tmp.toLongLong();
+            const uint64_t u64_AllowedSteps = static_cast<uint64_t>(s64_Max - s64_Tmp);
             if ((s64_Tmp < s64_Max) && (u64_AllowedSteps >= this->mu64_StepWidth))
             {
-               s64_Tmp += static_cast<sint64>(this->mu64_StepWidth);
+               s64_Tmp += static_cast<int64_t>(this->mu64_StepWidth);
                if (s64_Tmp < s64_Max)
                {
                   c_Tmp = s64_Tmp;
@@ -316,16 +315,16 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
          }
       }
    }
-   else if (osn_Steps < 0)
+   else if (os32_Steps < 0)
    {
       //Step by step (avoid stepping over min/max)
-      for (sint32 s32_Step = 0L; s32_Step > osn_Steps; --s32_Step)
+      for (int32_t s32_Step = 0L; s32_Step > os32_Steps; --s32_Step)
       {
          if (mq_IsUnsigned == true)
          {
-            const uint64 u64_Min = this->mc_Minimum.toULongLong();
-            uint64 u64_Tmp = c_Tmp.toULongLong();
-            const uint64 u64_AllowedSteps = u64_Tmp - u64_Min;
+            const uint64_t u64_Min = this->mc_Minimum.toULongLong();
+            uint64_t u64_Tmp = c_Tmp.toULongLong();
+            const uint64_t u64_AllowedSteps = u64_Tmp - u64_Min;
             if ((u64_Tmp > u64_Min) && (u64_AllowedSteps >= this->mu64_StepWidth))
             {
                u64_Tmp -= this->mu64_StepWidth;
@@ -345,12 +344,12 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
          }
          else
          {
-            const sint64 s64_Min = this->mc_Minimum.toLongLong();
-            sint64 s64_Tmp = c_Tmp.toLongLong();
-            const uint64 u64_AllowedSteps = static_cast<uint64>(s64_Tmp - s64_Min);
+            const int64_t s64_Min = this->mc_Minimum.toLongLong();
+            int64_t s64_Tmp = c_Tmp.toLongLong();
+            const uint64_t u64_AllowedSteps = static_cast<uint64_t>(s64_Tmp - s64_Min);
             if ((s64_Tmp > s64_Min) && (u64_AllowedSteps >= this->mu64_StepWidth))
             {
-               s64_Tmp -= static_cast<sint64>(this->mu64_StepWidth);
+               s64_Tmp -= static_cast<int64_t>(this->mu64_StepWidth);
                if (s64_Tmp > s64_Min)
                {
                   c_Tmp = s64_Tmp;
@@ -378,7 +377,7 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
 /*! \brief   Validate current input string
 
    \param[in,out]  orc_Input  Input string
-   \param[in,out]  orsn_Pos   Position
+   \param[in,out]  ors32_Pos   Position
 
    \return
    Invalid      Unusable
@@ -386,7 +385,7 @@ void C_OgeSpxInt64::stepBy(const sintn osn_Steps)
    Acceptable   Completely valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orsn_Pos) const
+QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, int32_t & ors32_Pos) const
 {
    QValidator::State e_Retval;
    if (((orc_Input.compare("") == 0) || (orc_Input.compare("+") == 0)) || (orc_Input.compare("-") == 0))
@@ -401,10 +400,10 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orsn_Pos)
       bool q_IsOverMaximum;
       const QString c_ValueOnly = this->m_ExtractSpinBoxValue(orc_Input);
 
-      Q_UNUSED(orsn_Pos)
+      Q_UNUSED(ors32_Pos)
       if (this->mq_IsUnsigned == true)
       {
-         const uint64 u64_Test = c_ValueOnly.toULongLong(pc_Result);
+         const uint64_t u64_Test = c_ValueOnly.toULongLong(pc_Result);
          if (q_Result == true)
          {
             m_CheckMinMax(u64_Test, q_IsUnderMinimum, q_IsOverMaximum);
@@ -424,7 +423,7 @@ QValidator::State C_OgeSpxInt64::validate(QString & orc_Input, sintn & orsn_Pos)
       }
       else
       {
-         const sint64 s64_Test = c_ValueOnly.toLongLong(pc_Result);
+         const int64_t s64_Test = c_ValueOnly.toLongLong(pc_Result);
          if (q_Result == true)
          {
             m_CheckMinMax(s64_Test, q_IsUnderMinimum, q_IsOverMaximum);
@@ -461,7 +460,7 @@ QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
    const QVariant c_Tmp = this->GetValue();
    if (mq_IsUnsigned == true)
    {
-      const uint64 u64_Tmp = c_Tmp.toULongLong();
+      const uint64_t u64_Tmp = c_Tmp.toULongLong();
       if (u64_Tmp == this->mc_Minimum.toULongLong())
       {
          c_Retval = StepUpEnabled;
@@ -477,7 +476,7 @@ QAbstractSpinBox::StepEnabled C_OgeSpxInt64::stepEnabled(void) const
    }
    else
    {
-      const sint64 s64_Tmp = c_Tmp.toLongLong();
+      const int64_t s64_Tmp = c_Tmp.toLongLong();
       if (s64_Tmp == this->mc_Minimum.toLongLong())
       {
          c_Retval = StepUpEnabled;
@@ -664,13 +663,13 @@ void C_OgeSpxInt64::m_ResetMinMax(void)
    //Init default min max and default value
    if (this->mq_IsUnsigned == true)
    {
-      this->mc_Minimum = std::numeric_limits<uint64>::lowest();
-      this->mc_Maximum = std::numeric_limits<uint64>::max();
+      this->mc_Minimum = std::numeric_limits<uint64_t>::lowest();
+      this->mc_Maximum = std::numeric_limits<uint64_t>::max();
    }
    else
    {
-      this->mc_Minimum = std::numeric_limits<sint64>::lowest();
-      this->mc_Maximum = std::numeric_limits<sint64>::max();
+      this->mc_Minimum = std::numeric_limits<int64_t>::lowest();
+      this->mc_Maximum = std::numeric_limits<int64_t>::max();
    }
    Q_EMIT this->SigMinMaxChanged();
 }
@@ -693,51 +692,51 @@ QVariant C_OgeSpxInt64::m_PrepareValue(const QVariant & orc_Value) const
    case QVariant::ULongLong:
       if (this->mq_IsUnsigned == true)
       {
-         c_Retval = static_cast<uint64>(orc_Value.toULongLong());
+         c_Retval = static_cast<uint64_t>(orc_Value.toULongLong());
       }
       else
       {
-         c_Retval = static_cast<sint64>(orc_Value.toULongLong());
+         c_Retval = static_cast<int64_t>(orc_Value.toULongLong());
       }
       break;
    case QVariant::UInt:
       if (this->mq_IsUnsigned == true)
       {
-         c_Retval = static_cast<uint64>(orc_Value.toUInt());
+         c_Retval = static_cast<uint64_t>(orc_Value.toUInt());
       }
       else
       {
-         c_Retval = static_cast<sint64>(orc_Value.toUInt());
+         c_Retval = static_cast<int64_t>(orc_Value.toUInt());
       }
       break;
    case QVariant::LongLong:
       if (this->mq_IsUnsigned == true)
       {
-         c_Retval = static_cast<uint64>(orc_Value.toLongLong());
+         c_Retval = static_cast<uint64_t>(orc_Value.toLongLong());
       }
       else
       {
-         c_Retval = static_cast<sint64>(orc_Value.toLongLong());
+         c_Retval = static_cast<int64_t>(orc_Value.toLongLong());
       }
       break;
    case QVariant::Int:
       if (this->mq_IsUnsigned == true)
       {
-         c_Retval = static_cast<uint64>(static_cast<sint64>(orc_Value.toInt()));
+         c_Retval = static_cast<uint64_t>(static_cast<int64_t>(orc_Value.toInt()));
       }
       else
       {
-         c_Retval = static_cast<sint64>(orc_Value.toInt());
+         c_Retval = static_cast<int64_t>(orc_Value.toInt());
       }
       break;
    case QVariant::Double:
       if (this->mq_IsUnsigned == true)
       {
-         c_Retval = static_cast<uint64>(orc_Value.toDouble());
+         c_Retval = static_cast<uint64_t>(orc_Value.toDouble());
       }
       else
       {
-         c_Retval = static_cast<sint64>(orc_Value.toDouble());
+         c_Retval = static_cast<int64_t>(orc_Value.toDouble());
       }
       break;
    default:

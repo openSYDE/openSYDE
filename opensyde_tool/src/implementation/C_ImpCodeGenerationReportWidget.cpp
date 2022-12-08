@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QDir>
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_ImpCodeGenerationReportWidget.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_ImpCodeGenerationReportWidget.hpp"
 #include "ui_C_ImpCodeGenerationReportWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_DATA_START =
@@ -47,7 +46,7 @@ const QString C_ImpCodeGenerationReportWidget::mhc_HTML_TABLE_DATA_START =
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_ImpCodeGenerationReportWidget::C_ImpCodeGenerationReportWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_ImpCodeGenerationReportWidget),
    mrc_ParentDialog(orc_Parent)
@@ -192,8 +191,8 @@ void C_ImpCodeGenerationReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEve
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

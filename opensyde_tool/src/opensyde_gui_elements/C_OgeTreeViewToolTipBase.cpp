@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
 #include <QCheckBox>
-#include "TGLUtils.h"
-#include "C_OgeTreeViewToolTipBase.h"
+#include "TglUtils.hpp"
+#include "C_OgeTreeViewToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -72,7 +71,7 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
        (opc_Model->flags(orc_Index).testFlag(Qt::ItemIsEnabled) == true))
    {
       // make sure that we have a check state
-      const QVariant c_Value = orc_Index.data(static_cast<sintn>(Qt::CheckStateRole));
+      const QVariant c_Value = orc_Index.data(static_cast<int32_t>(Qt::CheckStateRole));
       if (c_Value.isValid() == true)
       {
          bool q_AdaptState = true;
@@ -116,8 +115,8 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
             tgl_assert(pc_KeyEvent != NULL);
             if (pc_KeyEvent != NULL)
             {
-               if ((pc_KeyEvent->key() != static_cast<sintn>(Qt::Key_Space)) &&
-                   (pc_KeyEvent->key() != static_cast<sintn>(Qt::Key_Select)))
+               if ((pc_KeyEvent->key() != static_cast<int32_t>(Qt::Key_Space)) &&
+                   (pc_KeyEvent->key() != static_cast<int32_t>(Qt::Key_Select)))
                {
                   q_AdaptState = false;
                }
@@ -133,14 +132,14 @@ bool C_OgeTreeViewToolTipBaseDelegate::editorEvent(QEvent * const opc_Event, QAb
             Qt::CheckState e_State = static_cast<Qt::CheckState>(c_Value.toInt());
             if (opc_Model->flags(orc_Index).testFlag(Qt::ItemIsUserTristate) == true)
             {
-               e_State = static_cast<Qt::CheckState>(((static_cast<sintn>(e_State) + 1) % 3));
+               e_State = static_cast<Qt::CheckState>(((static_cast<int32_t>(e_State) + 1) % 3));
             }
             else
             {
                e_State = (e_State == Qt::Checked) ? Qt::Unchecked : Qt::Checked;
             }
             q_Return =
-               opc_Model->setData(orc_Index, static_cast<sintn>(e_State), static_cast<sintn>(Qt::CheckStateRole));
+               opc_Model->setData(orc_Index, static_cast<int32_t>(e_State), static_cast<int32_t>(Qt::CheckStateRole));
          }
       }
    }
@@ -296,11 +295,11 @@ QModelIndex C_OgeTreeViewToolTipBase::m_IndexAtGlobalPos(const QPoint & orc_Glob
    column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_OgeTreeViewToolTipBase::m_GetColumnWidths() const
+std::vector<int32_t> C_OgeTreeViewToolTipBase::m_GetColumnWidths() const
 {
-   std::vector<sint32> c_ColumnWidths;
+   std::vector<int32_t> c_ColumnWidths;
    c_ColumnWidths.reserve(this->model()->columnCount());
-   for (sint32 s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
+   for (int32_t s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
    {
       c_ColumnWidths.push_back(this->columnWidth(s32_ItColumn));
    }
@@ -316,18 +315,18 @@ std::vector<sint32> C_OgeTreeViewToolTipBase::m_GetColumnWidths() const
    \retval   false   column widths invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OgeTreeViewToolTipBase::m_SetColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+bool C_OgeTreeViewToolTipBase::m_SetColumnWidths(const std::vector<int32_t> & orc_ColumnWidths)
 {
    bool q_Retval = false;
 
    //Only apply user settings if number of expected columns, otherwise this could lead to unexpected behavior
    if ((orc_ColumnWidths.size() > 0UL) &&
-       (static_cast<uint32>(this->model()->columnCount()) == orc_ColumnWidths.size()))
+       (static_cast<uint32_t>(this->model()->columnCount()) == orc_ColumnWidths.size()))
    {
       q_Retval = true;
-      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
       {
-         this->setColumnWidth(static_cast<sint32>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+         this->setColumnWidth(static_cast<int32_t>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
       }
    }
    return q_Retval;

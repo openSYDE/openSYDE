@@ -8,17 +8,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "C_GiRectPixmap.h"
+#include "stwtypes.hpp"
+#include "C_GiRectPixmap.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -128,7 +127,7 @@ void C_GiRectPixmap::SetNewRect(const QRectF & orc_Rect)
    if (this->mq_DrawSvg == false)
    {
       this->mc_PixmapScaled =
-         this->mc_Pixmap.scaledToWidth(static_cast<sintn>(orc_Rect.width()), Qt::FastTransformation);
+         this->mc_Pixmap.scaledToWidth(static_cast<int32_t>(orc_Rect.width()), Qt::FastTransformation);
    }
 }
 

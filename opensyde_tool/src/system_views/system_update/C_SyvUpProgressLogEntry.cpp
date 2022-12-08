@@ -10,12 +10,11 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SyvUpProgressLogEntry.h"
+#include "C_SyvUpProgressLogEntry.hpp"
 #include "ui_C_SyvUpProgressLogEntry.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +37,7 @@ using namespace stw_opensyde_gui;
    \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpProgressLogEntry::C_SyvUpProgressLogEntry(const uint32 ou32_NodeIndex, QWidget * const opc_Parent) :
+C_SyvUpProgressLogEntry::C_SyvUpProgressLogEntry(const uint32_t ou32_NodeIndex, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpProgressLogEntry),
    mu32_NodeIndex(ou32_NodeIndex)
@@ -96,7 +95,7 @@ void C_SyvUpProgressLogEntry::SetEntryStatus(const QString & orc_Value) const
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpProgressLogEntry::DoesIndexMatch(const uint32 ou32_NodeIndex) const
+bool C_SyvUpProgressLogEntry::DoesIndexMatch(const uint32_t ou32_NodeIndex) const
 {
    return this->mu32_NodeIndex == ou32_NodeIndex;
 }
@@ -108,7 +107,7 @@ bool C_SyvUpProgressLogEntry::DoesIndexMatch(const uint32 ou32_NodeIndex) const
    Current node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpProgressLogEntry::GetNodeIndex(void) const
+uint32_t C_SyvUpProgressLogEntry::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }

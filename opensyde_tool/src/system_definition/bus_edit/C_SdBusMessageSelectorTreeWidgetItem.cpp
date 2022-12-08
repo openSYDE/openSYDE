@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdBusMessageSelectorTreeWidgetItem.h"
+#include "C_SdBusMessageSelectorTreeWidgetItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -110,18 +109,18 @@ void C_SdBusMessageSelectorTreeWidgetItem::SetAlwaysActive(const bool & orq_Valu
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sends the signal in case of a changed check state of the message
 
-   \param[in]  osn_Column  Column
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Column  Column
+   \param[in]  os32_Role    Data role
    \param[in]  orc_Value   New data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBusMessageSelectorTreeWidgetItem::setData(const sintn osn_Column, const sintn osn_Role,
+void C_SdBusMessageSelectorTreeWidgetItem::setData(const int32_t os32_Column, const int32_t os32_Role,
                                                    const QVariant & orc_Value)
 {
-   QTreeWidgetItem::setData(osn_Column, osn_Role, orc_Value);
+   QTreeWidgetItem::setData(os32_Column, os32_Role, orc_Value);
 
    if ((this->mq_IsMessage == true) &&
-       (osn_Role == static_cast<sintn>(Qt::CheckStateRole)))
+       (os32_Role == static_cast<int32_t>(Qt::CheckStateRole)))
    {
       Q_EMIT (this->SigCheckedStateChanged(this));
    }

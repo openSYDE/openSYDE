@@ -10,33 +10,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsView>
 #include <limits>
-#include "gitypes.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvDaSliderBase.h"
-#include "C_PuiSvDbSlider.h"
-#include "C_OgePopUpDialog.h"
-#include "C_SyvDaPeBase.h"
-#include "C_SyvDaPeSlider.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_OSCNodeDataPoolListElement.h"
+#include "gitypes.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvDaSliderBase.hpp"
+#include "C_PuiSvDbSlider.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SyvDaPeBase.hpp"
+#include "C_SyvDaPeSlider.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_OscNodeDataPoolListElement.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -58,16 +57,15 @@ using namespace stw_opensyde_core;
    \param[in]      oru32_ViewIndex        Index of system view
    \param[in]      oru32_DashboardIndex   Index of dashboard in system view
    \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaSliderBase::C_GiSvDaSliderBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                       const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaSliderBase::C_GiSvDaSliderBase(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                       const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                        QGraphicsItem * const opc_Parent) :
    C_GiSvDaRectBaseGroup(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eSLIDER, 1,
-                         oru64_ID, 102.2, 15.2, 550.0 * (7.0 / 9.0), 55.0, false, false, opc_Parent),
-   ms32_SliderMin(0),
+                         oru64_Id, 102.2, 15.2, 550.0 * (7.0 / 9.0), 55.0, false, false, opc_Parent),
    mf64_SliderFactor(1.0),
    mf64_UnscaledMinValue(0.0)
 {
@@ -92,9 +90,9 @@ C_GiSvDaSliderBase::~C_GiSvDaSliderBase(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvDaSliderBase::type(void) const
+int32_t C_GiSvDaSliderBase::type(void) const
 {
-   return msn_GRAPHICS_ITEM_DB_SLIDER;
+   return ms32_GRAPHICS_ITEM_DB_SLIDER;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -115,7 +113,7 @@ void C_GiSvDaSliderBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_S
 
       if (pc_Dashboard != NULL)
       {
-         const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32>(this->ms32_Index));
+         const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
          tgl_assert(pc_Box != NULL);
          if (pc_Box != NULL)
          {
@@ -148,7 +146,7 @@ void C_GiSvDaSliderBase::LoadData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -173,7 +171,7 @@ void C_GiSvDaSliderBase::UpdateData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -185,7 +183,7 @@ void C_GiSvDaSliderBase::UpdateData(void)
          }
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         &c_Box, this->me_Type) == C_NO_ERR);
       }
    }
@@ -200,7 +198,7 @@ void C_GiSvDaSliderBase::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->DeleteDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         this->me_Type) ==
                  C_NO_ERR);
    }
@@ -247,24 +245,25 @@ void C_GiSvDaSliderBase::SendCurrentValue(void)
       tgl_assert(this->GetDataPoolElementScaling(0, c_Scaling) == C_NO_ERR);
       // Prepare the value
       //We use unscaled values in the original range to have the number of steps the original range would have
-      if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_SliderFactor, 1.0) == true)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(this->mf64_SliderFactor, 1.0) == true)
       {
          this->mf64_WriteValue = this->mf64_UnscaledMinValue  +
-                                 (static_cast<float64>(this->mpc_SliderWidget->GetValue()) -
-                                  static_cast<float64>(this->ms32_SliderMin));
+                                 (static_cast<float64_t>(this->mpc_SliderWidget->GetValue()) -
+                                  static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue()));
       }
       else
       {
          //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
          this->mf64_WriteValue =
             this->mf64_UnscaledMinValue  +
-            ((static_cast<float64>(this->mpc_SliderWidget->GetValue()) - static_cast<float64>(this->ms32_SliderMin)) *
+            ((static_cast<float64_t>(this->mpc_SliderWidget->GetValue()) -
+              static_cast<float64_t>(this->mpc_SliderWidget->GetMinValue())) *
              this->mf64_SliderFactor);
       }
       //For precision reasons we only use valid values (in range of actual type),
       // but this means we have to scale the actual value,
       // so we can apply the generic transmission method (which expects a scaled value)
-      this->mf64_WriteValue = C_OSCUtils::h_GetValueScaled(this->mf64_WriteValue, c_Scaling.f64_Factor,
+      this->mf64_WriteValue = C_OscUtils::h_GetValueScaled(this->mf64_WriteValue, c_Scaling.f64_Factor,
                                                            c_Scaling.f64_Offset);
       // Send the value
       C_GiSvDaRectBaseGroup::SendCurrentValue();
@@ -283,14 +282,15 @@ bool C_GiSvDaSliderBase::CallProperties(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
          C_PuiSvDbNodeDataPoolListElementId c_ElementId;
          C_PuiSvDbDataElementScaling c_Scaling;
+         C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig;
          QGraphicsView * const pc_View = this->scene()->views().at(0);
-         QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
          C_SyvDaPeBase * pc_Dialog;
          C_SyvDaPeSlider * pc_PropertiesWidget;
 
@@ -298,6 +298,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
          {
             c_ElementId = pc_Box->c_DataPoolElementsConfig[0].c_ElementId;
             c_Scaling = pc_Box->c_DataPoolElementsConfig[0].c_ElementScaling;
+            c_FormatterConfig = pc_Box->c_DataPoolElementsConfig[0].c_DisplayFormatter;
          }
          else
          {
@@ -309,7 +310,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
          }
 
          pc_Dialog = new C_SyvDaPeBase(*c_New, this->mu32_ViewIndex, this->mu32_DashboardIndex, "Slider", c_ElementId,
-                                       c_Scaling, false, this->mq_DarkMode);
+                                       c_Scaling, true, c_FormatterConfig, false, this->mq_DarkMode);
          pc_PropertiesWidget = new C_SyvDaPeSlider(*pc_Dialog, this->mq_DarkMode);
 
          pc_Dialog->SetWidget(pc_PropertiesWidget);
@@ -322,7 +323,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
          pc_PropertiesWidget->SetShowMinMax(pc_Box->q_ShowMinMax);
          pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);
 
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             C_PuiSvDbSlider c_Box = *pc_Box;
             C_PuiSvDbNodeDataElementConfig c_Tmp;
@@ -334,6 +335,7 @@ bool C_GiSvDaSliderBase::CallProperties(void)
 
             c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
             c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
+            c_Tmp.c_DisplayFormatter = pc_Dialog->GetFormatterInformation();
             c_Box.c_DataPoolElementsConfig.clear();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
@@ -349,13 +351,14 @@ bool C_GiSvDaSliderBase::CallProperties(void)
             this->ClearDataPoolElements();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
-               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation(),
+                                             pc_Dialog->GetFormatterInformation());
             }
 
             tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
-                                                                           static_cast<uint32>(this->ms32_Index),
+                                                                           static_cast<uint32_t>(this->ms32_Index),
                                                                            &c_Box, this->me_Type) == C_NO_ERR);
 
             //Update style after data update
@@ -399,18 +402,32 @@ void C_GiSvDaSliderBase::UpdateTypePe(const C_PuiSvDbSlider::E_Type oe_Type, con
 
    Warning: Only use for preview
 
-   \param[in]  osn_Value   New value
-   \param[in]  osn_Min     New min value
-   \param[in]  osn_Max     New max value
+   \param[in]  os32_Value   New value
+   \param[in]  os32_Min     New min value
+   \param[in]  os32_Max     New max value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaSliderBase::SetValuePe(const sintn osn_Value, const sintn osn_Min, const sintn osn_Max)
+void C_GiSvDaSliderBase::SetValuePe(const int32_t os32_Value, const int32_t os32_Min, const int32_t os32_Max)
 {
    if (this->mpc_SliderWidget != NULL)
    {
-      this->mpc_SliderWidget->SetMinMax(osn_Min, QString::number(osn_Min), osn_Max, QString::number(osn_Max));
-      this->mpc_SliderWidget->SetValue(osn_Value);
+      this->mpc_SliderWidget->SetMinMax(os32_Min, QString::number(os32_Min), os32_Max, QString::number(os32_Max));
+      this->mpc_SliderWidget->SetValue(os32_Value);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for handling a new registered data element
+
+   Called at the end of RegisterDataPoolElement after registration of a specific Datapool element
+
+   \param[in]  ou32_WidgetDataPoolElementIndex  Index of new registered element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_GiSvDaSliderBase::m_OnDataElementRegistered(const uint32_t ou32_WidgetDataPoolElementIndex)
+{
+   Q_UNUSED(ou32_WidgetDataPoolElementIndex)
+   this->m_UpdateStaticValues();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -420,7 +437,7 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -429,48 +446,43 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Box->c_DataPoolElementsConfig[0];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
-               const C_OSCNodeDataPoolListElement * const pc_Element =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+               const C_OscNodeDataPoolListElement * const pc_Element =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                              rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                              rc_Config.c_ElementId.u32_ListIndex,
                                                                              rc_Config.c_ElementId.u32_ElementIndex);
                if ((pc_Element != NULL) &&
                    (this->mpc_SliderWidget != NULL))
                {
-                  uint64 u64_Steps;
-                  float64 f64_Min;
-                  float64 f64_ScaledMin;
-                  float64 f64_Max;
-                  C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, f64_Min, 0UL);
-                  this->mf64_UnscaledMinValue = f64_Min;
-                  C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, f64_Max, 0UL);
-                  f64_ScaledMin = C_OSCUtils::h_GetValueScaled(f64_Min,
-                                                               rc_Config.c_ElementScaling.f64_Factor,
-                                                               rc_Config.c_ElementScaling.f64_Offset);
+                  uint64_t u64_Steps;
+                  float64_t f64_UnscaledMax;
+                  C_PuiSvDbDataElementDisplayFormatterConfig c_Formatter;
+                  tgl_assert(this->GetDataPoolElementFormatterConfig(0UL, c_Formatter) == C_NO_ERR);
+                  C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MinValue, this->mf64_UnscaledMinValue, 0UL);
+                  C_SdNdeDpContentUtil::h_GetValueAsFloat64(pc_Element->c_MaxValue, f64_UnscaledMax, 0UL);
                   if (C_SdNdeDpContentUtil::h_GetNumberOfAvailableSteps(pc_Element->c_MinValue,
                                                                         pc_Element->c_MaxValue,
                                                                         u64_Steps, 0) == C_NO_ERR)
                   {
                      if (u64_Steps > 0)
                      {
-                        if (u64_Steps <= static_cast<uint64>(std::numeric_limits<uint32>::max()))
+                        if (u64_Steps <= static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()))
                         {
                            //Standard
-                           const sint32 s32_Max =
-                              static_cast<sint32>(static_cast<sint64>(std::numeric_limits<sint32>::lowest()) +
-                                                  static_cast<sint64>(u64_Steps));
-                           const QString c_MinText = this->GetUnscaledValueAsScaledString(f64_Min);
-                           const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_Max);
+                           const int32_t s32_Max =
+                              static_cast<int32_t>(static_cast<int64_t>(std::numeric_limits<int32_t>::lowest()) +
+                                                   static_cast<int64_t>(u64_Steps));
+                           const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
+                           const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_UnscaledMax);
                            this->mpc_SliderWidget->SetMinMax(
-                              std::numeric_limits<sint32>::lowest(), c_MinText, s32_Max, c_MaxText);
-                           this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
+                              std::numeric_limits<int32_t>::lowest(), c_MinText, s32_Max, c_MaxText);
                            //Default
                            this->mf64_SliderFactor = 1.0;
                            //Tool tip (BEFORE start value)
-                           this->mpc_SliderWidget->SetToolTipParameters(static_cast<float64>(this->ms32_SliderMin),
-                                                                        f64_ScaledMin,
-                                                                        rc_Config.c_ElementScaling.f64_Factor,
-                                                                        pc_Element->GetType());
+                           this->mpc_SliderWidget->SetToolTipParameters(this->mf64_SliderFactor,
+                                                                        this->mf64_UnscaledMinValue,
+                                                                        rc_Config.c_ElementScaling,
+                                                                        pc_Element->GetType(), c_Formatter);
                            //Start value
                            this->mpc_SliderWidget->SetValue(pc_Box->s32_Value);
                         }
@@ -480,58 +492,59 @@ void C_GiSvDaSliderBase::m_UpdateStaticValues(void)
                            //Step reduction necessary
                            //In this case we have to skip a few steps (determined by this->mf64_SliderFactor)
                            for (this->mf64_SliderFactor = 2.0;
-                                (static_cast<float64>(u64_Steps) / this->mf64_SliderFactor) >
-                                static_cast<float64>(std::numeric_limits<uint32>::max());
+                                (static_cast<float64_t>(u64_Steps) / this->mf64_SliderFactor) >
+                                static_cast<float64_t>(std::numeric_limits<uint32_t>::max());
                                 this->mf64_SliderFactor *= 2.0)
                            {
                               //All in for :)
                            }
-                           const float64 f64_Temp = static_cast<float64>(u64_Steps) / this->mf64_SliderFactor;
-                           const sint32 s32_Max =
-                              static_cast<sint32>(static_cast<sint64>(std::numeric_limits<sint32>::lowest()) +
-                                                  (static_cast<sint64>(f64_Temp)));
-                           const QString c_MinText = this->GetUnscaledValueAsScaledString(f64_Min);
-                           const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_Max);
+                           const float64_t f64_Temp = static_cast<float64_t>(u64_Steps) / this->mf64_SliderFactor;
+                           const int32_t s32_Max =
+                              static_cast<int32_t>(static_cast<int64_t>(std::numeric_limits<int32_t>::lowest()) +
+                                                   (static_cast<int64_t>(f64_Temp)));
+                           const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
+                           const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_UnscaledMax);
                            this->mpc_SliderWidget->SetMinMax(
-                              std::numeric_limits<sint32>::lowest(), c_MinText, s32_Max, c_MaxText);
-                           this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
+                              std::numeric_limits<int32_t>::lowest(), c_MinText, s32_Max, c_MaxText);
                            //Tool tip (BEFORE start value)
-                           this->mpc_SliderWidget->SetToolTipParameters(static_cast<float64>(this->ms32_SliderMin),
-                                                                        f64_ScaledMin,
-                                                                        rc_Config.c_ElementScaling.f64_Factor *
-                                                                        this->mf64_SliderFactor, pc_Element->GetType());
+                           this->mpc_SliderWidget->SetToolTipParameters(this->mf64_SliderFactor,
+                                                                        this->mf64_UnscaledMinValue,
+                                                                        rc_Config.c_ElementScaling,
+                                                                        pc_Element->GetType(), c_Formatter);
                            //Start value
                            this->mpc_SliderWidget->SetValue(pc_Box->s32_Value);
                         }
                      }
                      else
                      {
+                        const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
                         //No range at all
-                        this->mpc_SliderWidget->SetMinMax(0, QString::number(f64_Min), 0, QString::number(f64_Min));
-                        this->ms32_SliderMin = 0;
+                        this->mpc_SliderWidget->SetMinMax(0, c_MinText, 0, c_MinText);
                         //Default
                         this->mf64_SliderFactor = 1.0;
                         //Tool tip (BEFORE start value)
-                        this->mpc_SliderWidget->SetToolTipParameters(0.0, f64_ScaledMin, 1.0, pc_Element->GetType());
+                        this->mpc_SliderWidget->SetToolTipParameters(this->mf64_SliderFactor,
+                                                                     this->mf64_UnscaledMinValue,
+                                                                     rc_Config.c_ElementScaling,
+                                                                     pc_Element->GetType(), c_Formatter);
                         //Start value
                         this->mpc_SliderWidget->SetValue(0);
                      }
                   }
                   else
                   {
-                     const QString c_MinText = this->GetUnscaledValueAsScaledString(f64_Min);
-                     const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_Max);
+                     const QString c_MinText = this->GetUnscaledValueAsScaledString(this->mf64_UnscaledMinValue);
+                     const QString c_MaxText = this->GetUnscaledValueAsScaledString(f64_UnscaledMax);
                      this->mpc_SliderWidget->SetMinMax(
-                        std::numeric_limits<sint32>::lowest(), c_MinText, std::numeric_limits<sint32>::max(),
+                        std::numeric_limits<int32_t>::lowest(), c_MinText, std::numeric_limits<int32_t>::max(),
                         c_MaxText);
-                     this->ms32_SliderMin = std::numeric_limits<sint32>::lowest();
-                     //factor for uint32::max steps
-                     this->mf64_SliderFactor = (f64_Max - f64_Min) /
-                                               static_cast<float64>(std::numeric_limits<uint32>::max());
+                     //factor for uint32_t::max steps
+                     this->mf64_SliderFactor = (f64_UnscaledMax - this->mf64_UnscaledMinValue) /
+                                               static_cast<float64_t>(std::numeric_limits<uint32_t>::max());
                      //Tool tip (BEFORE start value)
-                     this->mpc_SliderWidget->SetToolTipParameters(0.0, f64_ScaledMin,
-                                                                  rc_Config.c_ElementScaling.f64_Factor *
-                                                                  this->mf64_SliderFactor, pc_Element->GetType());
+                     this->mpc_SliderWidget->SetToolTipParameters(this->mf64_SliderFactor, this->mf64_UnscaledMinValue,
+                                                                  rc_Config.c_ElementScaling,
+                                                                  pc_Element->GetType(), c_Formatter);
                      //Start value
                      this->mpc_SliderWidget->SetValue(pc_Box->s32_Value);
                   }
@@ -557,7 +570,7 @@ bool C_GiSvDaSliderBase::m_IsOnChange(void) const
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbSlider * const pc_Box = pc_Dashboard->GetSlider(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {

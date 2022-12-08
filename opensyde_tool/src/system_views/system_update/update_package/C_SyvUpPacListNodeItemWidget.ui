@@ -45,7 +45,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelSkip">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelSkip">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -64,7 +64,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelSecurity">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelSecurity">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -83,7 +83,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelDebugger">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelDebugger">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -102,7 +102,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelUserHint">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelUserHint">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -137,7 +137,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabUpdateAppPath" name="pc_LabelPath">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabUpdateAppPath" name="pc_LabelPath">
      <property name="text">
       <string>TextLabel</string>
      </property>
@@ -160,7 +160,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabUpdateAppVersion" name="pc_LabelVersion">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabUpdateAppVersion" name="pc_LabelVersion">
      <property name="text">
       <string>TextLabel</string>
      </property>
@@ -173,19 +173,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabUpdateAppPath</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabUpdateAppPath</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabUpdateAppPath.h</header>
+   <header>C_OgeLabUpdateAppPath.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabUpdateAppVersion</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabUpdateAppVersion</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabUpdateAppVersion.h</header>
+   <header>C_OgeLabUpdateAppVersion.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericBubble</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericBubble</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericBubble.h</header>
+   <header>C_OgeLabGenericBubble.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

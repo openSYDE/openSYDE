@@ -18,18 +18,19 @@
 #include <limits.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLFile.h"
-#include "CSCLString.h"
-#include "CSCLDateTime.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglFile.hpp"
+#include "C_SclString.hpp"
+#include "C_SclDateTime.hpp"
 
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_scl;
+/* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-/* -- Defines ------------------------------------------------------------------------------------------------------- */
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::scl;
+
+/* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -38,12 +39,12 @@ using namespace stw_scl;
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
-static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const opu16_Date, uint16 * const opu16_Time);
+static bool m_FileAgeDosTime(const C_SclString & orc_FileName, uint16_t * const opu16_Date, uint16_t * const opu16_Time);
 static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat, int osn_Type, struct FTW * opt_Ftwb);
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 //utility: get operating system file age
-static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const opu16_Date, uint16 * const opu16_Time)
+static bool m_FileAgeDosTime(const C_SclString & orc_FileName, uint16_t * const opu16_Date, uint16_t * const opu16_Time)
 {
    bool q_Return = false;
    struct stat t_stat;
@@ -84,22 +85,22 @@ static bool m_FileAgeDosTime(const C_SCLString & orc_FileName, uint16 * const op
    false     error -> oc_String not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool stw_tgl::TGL_FileAgeString(const C_SCLString & orc_FileName, C_SCLString & orc_String)
+bool stw::tgl::TglFileAgeString(const C_SclString & orc_FileName, C_SclString & orc_String)
 {
    bool q_Return;
-   uint16 u16_Time = 0;
-   uint16 u16_Date = 0;
-   C_SCLDateTime c_DateTime;
+   uint16_t u16_Time = 0;
+   uint16_t u16_Date = 0;
+   C_SclDateTime c_DateTime;
 
    q_Return = m_FileAgeDosTime(orc_FileName, &u16_Date, &u16_Time);
    if (q_Return == true)
    {
-      c_DateTime.mu16_Day    = static_cast<uint16>(u16_Date & 0x1FU);
-      c_DateTime.mu16_Month  = static_cast<uint16>((u16_Date >> 5) & 0x0FU);
-      c_DateTime.mu16_Year   = static_cast<uint16>((u16_Date >> 9) + 1980U);
-      c_DateTime.mu16_Hour   = static_cast<uint16>(u16_Time >> 11);
-      c_DateTime.mu16_Minute = static_cast<uint16>((u16_Time >> 5) & 0x3FU);
-      c_DateTime.mu16_Second = static_cast<uint16>((u16_Time & 0x1FU) * 2U);
+      c_DateTime.mu16_Day    = static_cast<uint16_t>(u16_Date & 0x1FU);
+      c_DateTime.mu16_Month  = static_cast<uint16_t>((u16_Date >> 5U) & 0x0FU);
+      c_DateTime.mu16_Year   = static_cast<uint16_t>((u16_Date >> 9U) + 1980U);
+      c_DateTime.mu16_Hour   = static_cast<uint16_t>(u16_Time >> 11U);
+      c_DateTime.mu16_Minute = static_cast<uint16_t>((u16_Time >> 5U) & 0x3FU);
+      c_DateTime.mu16_Second = static_cast<uint16_t>((u16_Time & 0x1FU) * 2U);
    }
    else
    {
@@ -126,10 +127,10 @@ bool stw_tgl::TGL_FileAgeString(const C_SCLString & orc_FileName, C_SCLString & 
    else      size of file in bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 stw_tgl::TGL_FileSize(const C_SCLString & orc_FileName)
+int32_t stw::tgl::TglFileSize(const C_SclString & orc_FileName)
 {
    std::FILE * pt_File;
-   sint32 s32_Size = -1;
+   int32_t s32_Size = -1;
 
    pt_File = std::fopen(orc_FileName.c_str(), "rb");
    if (pt_File != NULL)
@@ -140,6 +141,29 @@ sint32 stw_tgl::TGL_FileSize(const C_SCLString & orc_FileName)
    }
    return s32_Size;
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check whether directory exists
+
+   Detects whether the specified directory exists.
+   For the Windows target this also includes simple drive names (e.g. "d:")
+
+   \param[in]     orc_Path     path to directory (works with or without trailing path delimiter)
+
+   \return
+   true       directory exists  \n
+   false      directory does not exist
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool TGL_PACKAGE stw::tgl::TglDirectoryExists(const C_SclString & orc_Path)
+{
+   int32_t s32_Ret;
+   struct stat t_Status;
+
+   s32_Ret = stat(orc_Path.c_str(), &t_Status);
+   return ((s32_Ret == 0) && S_ISDIR(t_Status.st_mode)) ? true : false;
+}
+
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check whether file exists
@@ -153,7 +177,7 @@ sint32 stw_tgl::TGL_FileSize(const C_SCLString & orc_FileName)
    false      file does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool stw_tgl::TGL_FileExists(const C_SCLString & orc_FileName)
+bool stw::tgl::TglFileExists(const C_SclString & orc_FileName)
 {
    bool q_Return = false;
    struct stat t_stat;
@@ -182,21 +206,21 @@ bool stw_tgl::TGL_FileExists(const C_SCLString & orc_FileName)
    C_NOACT      no files found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 TGL_PACKAGE stw_tgl::TGL_FileFind(const C_SCLString & orc_SearchPattern,
-                                         SCLDynamicArray<TGL_FileSearchRecord> & orc_FoundFiles)
+int32_t TGL_PACKAGE stw::tgl::TglFileFind(const C_SclString & orc_SearchPattern,
+                                          C_SclDynamicArray<C_TglFileSearchRecord> & orc_FoundFiles)
 {
-   sint32 s32_Error = C_CONFIG;
-   DIR *pt_Dir;
+   int32_t s32_Error = C_CONFIG;
+   DIR * pc_Dir;
    struct dirent *pt_Entry;
-   C_SCLString c_Path = TGL_ExtractFilePath(orc_SearchPattern);
-   C_SCLString c_Pattern = TGL_ExtractFileName(orc_SearchPattern);
+   C_SclString c_Path = TglExtractFilePath(orc_SearchPattern);
+   C_SclString c_Pattern = TglExtractFileName(orc_SearchPattern);
 
    orc_FoundFiles.SetLength(0);
 
-   pt_Dir = opendir(c_Path.c_str());
-   if (pt_Dir != NULL)
+   pc_Dir = opendir(c_Path.c_str());
+   if (pc_Dir != NULL)
    {
-      while ((pt_Entry = readdir(pt_Dir)) != NULL)
+      while ((pt_Entry = readdir(pc_Dir)) != NULL)
       {
          if (pt_Entry->d_type == DT_REG)
          {
@@ -208,7 +232,7 @@ sint32 TGL_PACKAGE stw_tgl::TGL_FileFind(const C_SCLString & orc_SearchPattern,
             }
          }
       }
-      closedir(pt_Dir);
+      closedir(pc_Dir);
    }
 
    return s32_Error;
@@ -226,7 +250,7 @@ sint32 TGL_PACKAGE stw_tgl::TGL_FileFind(const C_SCLString & orc_SearchPattern,
    path with delimiter
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_FileIncludeTrailingDelimiter(const C_SCLString & orc_Path)
+C_SclString TGL_PACKAGE stw::tgl::TglFileIncludeTrailingDelimiter(const C_SclString & orc_Path)
 {
    if (orc_Path.Length() == 0)
    {
@@ -252,10 +276,10 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_FileIncludeTrailingDelimiter(const C_SCLStr
    extension (includes the ".")
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileExtension(const C_SCLString & orc_Path)
+C_SclString TGL_PACKAGE stw::tgl::TglExtractFileExtension(const C_SclString & orc_Path)
 {
-   uint32 u32_Pos;
-   C_SCLString c_Extension = "";
+   uint32_t u32_Pos;
+   C_SclString c_Extension = "";
 
    u32_Pos = orc_Path.LastPos(".");
    if (u32_Pos != 0U)
@@ -279,11 +303,12 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileExtension(const C_SCLString & or
    new file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_ChangeFileExtension(const C_SCLString & orc_Path,
-                                                         const C_SCLString & orc_Extension)
+C_SclString TGL_PACKAGE stw::tgl::TglChangeFileExtension(const C_SclString & orc_Path,
+                                                          const C_SclString & orc_Extension)
 {
-   uint32 u32_Pos;
-   C_SCLString c_NewPath = orc_Path;
+   uint32_t u32_Pos;
+   C_SclString c_NewPath = orc_Path;
+
    u32_Pos = c_NewPath.LastPos(".");
    if (u32_Pos != 0U)
    {
@@ -294,21 +319,20 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ChangeFileExtension(const C_SCLString & orc
    return c_NewPath;
 }
 
-
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Retrieves binary path of the current running process
 
-   \return  full path including "/binary"; empty string on error
+   \return  full path including "/binary" (including extension if any); empty string on error
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_GetExePath(void)
+C_SclString TGL_PACKAGE stw::tgl::TglGetExePath(void)
 {
-    sintn sn_Return;
-    charn acn_Arg[20];
-    std::vector<charn> c_VecPath;
-    C_SCLString c_Path = "";
+    int32_t s32_Return;
+    char_t acn_Arg[20];
+    std::vector<char_t> c_VecPath;
+    C_SclString c_Path;
     bool q_Success = false;
-    sintn sn_BuffSize;
+    int32_t s32_BuffSize;
 
     c_VecPath.resize(1, 0);
 
@@ -317,17 +341,17 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_GetExePath(void)
     {
       c_VecPath.resize(c_VecPath.size() + PATH_MAX, 0);
       // Reserving one byte for null termination
-      sn_BuffSize = c_VecPath.size() - 1;
+      s32_BuffSize = c_VecPath.size() - 1;
 
-      sn_Return = readlink(acn_Arg, &c_VecPath[0], sn_BuffSize);
+      s32_Return = readlink(acn_Arg, &c_VecPath[0], s32_BuffSize);
 
-      if ((sn_Return >= 0) &&
-          (sn_Return < sn_BuffSize))
+      if ((s32_Return >= 0) &&
+          (s32_Return < s32_BuffSize))
       {
          // Success: Buffer was big enoug and no error occured
          q_Success = true;
       }
-      else if (sn_Return < 0)
+      else if (s32_Return < 0)
       {
          // A not buffer size specific error which can not be fixed by trying again with a bigger buffer size
          // Special case: The error "errno == ENAMETOOLONG" seems no to be fixable by
@@ -363,10 +387,10 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_GetExePath(void)
    file path   (including final "\" or ":")
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFilePath(const C_SCLString & orc_Path)
+C_SclString TGL_PACKAGE stw::tgl::TglExtractFilePath(const C_SclString & orc_Path)
 {
-   uint32 u32_Return;
-   C_SCLString c_Path = ".";
+   uint32_t u32_Return;
+   C_SclString c_Path = ".";
    u32_Return = orc_Path.LastPos("/");
 
    if (u32_Return != 0U)
@@ -388,10 +412,10 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFilePath(const C_SCLString & orc_Pat
    file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileName(const C_SCLString & orc_Path)
+C_SclString TGL_PACKAGE stw::tgl::TglExtractFileName(const C_SclString & orc_Path)
 {
-   uint32 u32_Return;
-   C_SCLString c_FileName = "";
+   uint32_t u32_Return;
+   C_SclString c_FileName;
    u32_Return = orc_Path.LastPos("/");
 
    if (u32_Return != 0U)
@@ -406,7 +430,7 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileName(const C_SCLString & orc_Pat
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Convert relative file path to absolute path
+/*! \brief   Convert relative file path to absolute path
 
    Caution:
    Depending on the implementation this function might temporarily modify the current directory.
@@ -418,12 +442,12 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExtractFileName(const C_SCLString & orc_Pat
    Absolute path; empty string on error
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString TGL_PACKAGE stw_tgl::TGL_ExpandFileName(const C_SCLString & orc_RelativePath,
-                                                    const C_SCLString & orc_BasePath)
+C_SclString TGL_PACKAGE stw::tgl::TglExpandFileName(const C_SclString & orc_RelativePath,
+                                                     const C_SclString & orc_BasePath)
 {
-   charn* pcn_Path;
-   C_SCLString c_RelPath = orc_BasePath + "/" + orc_RelativePath;
-   C_SCLString c_FullPath = "";
+   char_t * pcn_Path;
+   C_SclString c_RelPath = orc_BasePath + "/" + orc_RelativePath;
+   C_SclString c_FullPath;
 
    pcn_Path = realpath(c_RelPath.c_str(), NULL);
    if (pcn_Path != NULL)
@@ -448,14 +472,14 @@ C_SCLString TGL_PACKAGE stw_tgl::TGL_ExpandFileName(const C_SCLString & orc_Rela
    -1    could not create directory
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Directory)
+int32_t TGL_PACKAGE stw::tgl::TglCreateDirectory(const C_SclString & orc_Directory)
 {
-   sintn sn_Ret;
-   sint32 s32_Result = -1;
+   int32_t s32_Ret;
+   int32_t s32_Result = -1;
    struct stat t_Status;
 
-   sn_Ret = stat(orc_Directory.c_str(), &t_Status);
-   if ((sn_Ret == 0) && S_ISDIR(t_Status.st_mode))
+   s32_Ret = stat(orc_Directory.c_str(), &t_Status);
+   if ((s32_Ret == 0) && S_ISDIR(t_Status.st_mode))
    {
       // Directory already exists
       s32_Result = 0;
@@ -463,8 +487,8 @@ sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Director
    else
    {
       // Directory does not exist, create it
-      sn_Ret =  mkdir(orc_Directory.c_str(), 0777);
-      if (sn_Ret == 0)
+      s32_Ret =  mkdir(orc_Directory.c_str(), 0777);
+      if (s32_Ret == 0)
       {
          s32_Result = 0;
       }
@@ -488,7 +512,7 @@ sint32 TGL_PACKAGE stw_tgl::TGL_CreateDirectory(const C_SCLString & orc_Director
 //---------------------------------------------------------------------------------------------------------------------
 static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat, int osn_Type, struct FTW * opt_Ftwb)
 {
-   sintn sn_Ret = 0;
+   int32_t s32_Ret = 0;
    (void)opt_Stat;
    (void)osn_Type;
    (void)opt_Ftwb;
@@ -496,9 +520,9 @@ static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat
    // Do not delete the base folder here
    if (opt_Ftwb->level > 0)
    {
-      sn_Ret = remove(opcn_Pathname);
+      s32_Ret = remove(opcn_Pathname);
    }
-   return sn_Ret;
+   return s32_Ret;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -516,47 +540,25 @@ static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat
    -1    could not remove directory
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 TGL_PACKAGE stw_tgl::TGL_RemoveDirectory(const C_SCLString & orc_Directory,
-                                                const bool oq_ContentOnly)
+int32_t TGL_PACKAGE stw::tgl::TglRemoveDirectory(const C_SclString & orc_Directory,
+                                                  const bool oq_ContentOnly)
 {
-   sintn sn_Ret = -1;
+   int32_t s32_Ret = -1;
    bool q_DirExists;
 
    // Make sure orc_Directory is a directory
-   q_DirExists = TGL_DirectoryExists(orc_Directory);
+   q_DirExists = TglDirectoryExists(orc_Directory);
    if (q_DirExists == true)
    {
       // Delete directory content
-      sn_Ret = nftw(orc_Directory.c_str(), &m_RemoveFile, 10, (FTW_DEPTH | FTW_MOUNT | FTW_PHYS));
-      if ((sn_Ret == 0) && (oq_ContentOnly == false))
+      s32_Ret = nftw(orc_Directory.c_str(), &m_RemoveFile, 10, (FTW_DEPTH | FTW_MOUNT | FTW_PHYS));
+      if ((s32_Ret == 0) && (oq_ContentOnly == false))
       {
          // Delete the base directory if requested
-         sn_Ret = remove(orc_Directory.c_str());
+         s32_Ret = remove(orc_Directory.c_str());
       }
    }
 
-   return sn_Ret;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check whether directory exists
-
-   Detects whether the specified directory exists.
-   For the Windows target this also includes simple drive names (e.g. "d:")
-
-   \param[in]     orc_Path     path to directory (works with or without trailing path delimiter)
-
-   \return
-   true       directory exists
-   false      directory does not exist
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool TGL_PACKAGE stw_tgl::TGL_DirectoryExists(const C_SCLString & orc_Path)
-{
-   sintn sn_Ret;
-   struct stat t_Status;
-
-   sn_Ret = stat(orc_Path.c_str(), &t_Status);
-   return ((sn_Ret == 0) && S_ISDIR(t_Status.st_mode)) ? true : false;
+   return s32_Ret;
 }
 

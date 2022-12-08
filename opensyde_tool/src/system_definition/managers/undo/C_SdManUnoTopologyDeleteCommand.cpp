@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdManUnoTopologyDeleteCommand.h"
+#include "C_SdManUnoTopologyDeleteCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,14 +33,14 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Default constructor
 
    \param[in,out] opc_Scene            Pointer to currently active scene
-   \param[in]     orc_IDs              Affected unique IDs
+   \param[in]     orc_Ids              Affected unique IDs
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyDeleteCommand::C_SdManUnoTopologyDeleteCommand(QGraphicsScene * const opc_Scene,
-                                                                 const std::vector<stw_types::uint64> & orc_IDs,
+                                                                 const std::vector<uint64_t> & orc_Ids,
                                                                  QUndoCommand * const opc_Parent) :
-   C_SdManUnoTopologyAddDeleteBaseCommand(opc_Scene, orc_IDs, "Delete drawing element(s)",
+   C_SdManUnoTopologyAddDeleteBaseCommand(opc_Scene, orc_Ids, "Delete drawing element(s)",
                                           opc_Parent)
 {
 }

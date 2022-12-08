@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
-#include "C_OgeWiUtil.h"
-#include "C_SyvDaPeUpdateModeTableView.h"
-#include "C_SyvDaPeUpdateModeTableModel.h"
-#include "C_SyvDaPeUpdateModeTableHeaderView.h"
-#include "constants.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_SyvDaPeUpdateModeTableView.hpp"
+#include "C_SyvDaPeUpdateModeTableModel.hpp"
+#include "C_SyvDaPeUpdateModeTableHeaderView.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,7 +43,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_TreeWidgetItem Tree widget item
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaPeUpdateModeTableView::C_SyvDaPeUpdateModeTableView(const uint32 ou32_ViewIndex,
+C_SyvDaPeUpdateModeTableView::C_SyvDaPeUpdateModeTableView(const uint32_t ou32_ViewIndex,
                                                            QTreeWidget * const opc_TreeWidget,
                                                            QTreeWidgetItem * const opc_TreeWidgetItem) :
    C_TblViewScroll(),
@@ -142,25 +141,25 @@ void C_SyvDaPeUpdateModeTableView::AdjustToItems(const bool & orq_Initial, const
    if (((this->mpc_TreeWidgetItem != NULL) && (this->mpc_TreeWidget != NULL)) && (this->model() != NULL))
    {
       //Configure
-      const sintn sn_CONST_OFFSET = 50;
-      const sintn sn_ITEM_OFFSET = 30;
-      const uint32 u32_VISIBLE_ITEM_COUNT = 7U;
-      const uint32 u32_ItemCount = this->model()->rowCount();
-      sintn sn_Height = sn_CONST_OFFSET;
+      const int32_t s32_CONST_OFFSET = 50;
+      const int32_t s32_ITEM_OFFSET = 30;
+      const uint32_t u32_VISIBLE_ITEM_COUNT = 7U;
+      const uint32_t u32_ItemCount = this->model()->rowCount();
+      int32_t s32_Height = s32_CONST_OFFSET;
 
       //Adapt dynamic elements
       if ((u32_ItemCount <= u32_VISIBLE_ITEM_COUNT) || (oq_Last == true))
       {
-         sn_Height += sn_ITEM_OFFSET * static_cast<sintn>(u32_ItemCount);
+         s32_Height += s32_ITEM_OFFSET * static_cast<int32_t>(u32_ItemCount);
       }
       else
       {
-         sn_Height += sn_ITEM_OFFSET * static_cast<sintn>(u32_VISIBLE_ITEM_COUNT);
+         s32_Height += s32_ITEM_OFFSET * static_cast<int32_t>(u32_VISIBLE_ITEM_COUNT);
       }
       //Change size
-      this->setMinimumHeight(sn_Height);
-      this->setMaximumHeight(sn_Height);
-      this->mpc_TreeWidgetItem->setSizeHint(0, QSize(this->mpc_TreeWidget->width(), sn_Height));
+      this->setMinimumHeight(s32_Height);
+      this->setMaximumHeight(s32_Height);
+      this->mpc_TreeWidgetItem->setSizeHint(0, QSize(this->mpc_TreeWidget->width(), s32_Height));
       if (orq_Initial == false)
       {
          this->mpc_TreeWidget->adjustSize();

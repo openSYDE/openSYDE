@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeCoWidget.h"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeCoWidget.hpp"
 #include "ui_C_SdNdeCoWidget.h"
-#include "C_OSCNode.h"
+#include "C_OscNode.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -99,6 +98,8 @@ C_SdNdeCoWidget::C_SdNdeCoWidget(QWidget * const opc_Parent) :
            &C_SdNdeCoConfigTreeView::SetDeviceSelected);
    connect(this->mpc_Ui->pc_IntfSettingsWidget, &C_SdNdeCoManagerIntfWidget::SigErrorChange,
            this, &C_SdNdeCoWidget::SigErrorChange);
+   connect(this->mpc_Ui->pc_IntfSettingsWidget, &C_SdNdeCoManagerIntfWidget::SigCommDatapoolsChanged,
+           this, &C_SdNdeCoWidget::SigCommDatapoolsChanged);
    connect(this->mpc_Ui->pc_DeviceWidget, &C_SdNdeCoDeviceWidget::SigSwitchToBusProtocol, this,
            &C_SdNdeCoWidget::SigSwitchToBusProtocol);
    connect(this->mpc_Ui->pc_DeviceWidget, &C_SdNdeCoDeviceWidget::SigSwitchToBusProtocolMessage, this,
@@ -127,7 +128,7 @@ C_SdNdeCoWidget::~C_SdNdeCoWidget()
 void C_SdNdeCoWidget::LoadUserSettings(void) const
 {
    // splitter
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditCoManagerSplitterX());
+   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditCoManagerSplitterHorizontal());
 
    // overview
    this->mpc_Ui->pc_OverviewWidget->LoadUserSettings();
@@ -146,11 +147,11 @@ void C_SdNdeCoWidget::LoadUserSettings(void) const
 void C_SdNdeCoWidget::SaveUserSettings(void) const
 {
    // splitter
-   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+   const QList<int32_t> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
    if (c_Sizes.size() > 0)
    {
-      C_UsHandler::h_GetInstance()->SetSdNodeEditCoManagerSplitterX(c_Sizes.at(0));
+      C_UsHandler::h_GetInstance()->SetSdNodeEditCoManagerSplitterHorizontal(c_Sizes.at(0));
    }
 
    // overview
@@ -181,10 +182,10 @@ void C_SdNdeCoWidget::InitStaticNames(void) const
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoWidget::SetNode(const uint32 ou32_NodeIndex)
+void C_SdNdeCoWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_ManagerNodeIndex;
-   sint32 s32_Return;
+   uint32_t u32_ManagerNodeIndex;
+   int32_t s32_Return;
    bool q_IsDevice;
    bool q_IsManagerSupported = true;
 
@@ -203,7 +204,7 @@ void C_SdNdeCoWidget::SetNode(const uint32 ou32_NodeIndex)
    {
       // No part of a manager
       // Check if the node can be a CANopen Manager
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
@@ -232,7 +233,7 @@ void C_SdNdeCoWidget::SetNode(const uint32 ou32_NodeIndex)
    else
    {
       // Node is already a device
-      const C_OSCNode * const pc_ManagerNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ManagerNodeIndex);
+      const C_OscNode * const pc_ManagerNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ManagerNodeIndex);
 
       this->mpc_Ui->pc_HintToManagerLabel->setText(C_GtGetText::h_GetText("Device is handled by CANopen Manager:"));
       this->mpc_Ui->pc_LinkToManagerLabel->setVisible(true);
@@ -272,7 +273,7 @@ void C_SdNdeCoWidget::Refresh()
    \param[in]  ou8_InterfaceNumber    Interface number of manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoWidget::OpenManagerConfiguration(const uint8 ou8_InterfaceNumber)
+void C_SdNdeCoWidget::OpenManagerConfiguration(const uint8_t ou8_InterfaceNumber)
 {
    this->mpc_Ui->pc_CoConfigTree->OpenManagerConfiguration(ou8_InterfaceNumber);
 }
@@ -283,7 +284,7 @@ void C_SdNdeCoWidget::OpenManagerConfiguration(const uint8 ou8_InterfaceNumber)
    \param[in]  ou32_DeviceNodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoWidget::OpenDeviceConfiguration(const uint32 ou32_DeviceNodeIndex)
+void C_SdNdeCoWidget::OpenDeviceConfiguration(const uint32_t ou32_DeviceNodeIndex)
 {
    this->mpc_Ui->pc_CoConfigTree->OpenDeviceConfiguration(ou32_DeviceNodeIndex);
 }
@@ -298,7 +299,7 @@ void C_SdNdeCoWidget::OpenDeviceConfiguration(const uint32 ou32_DeviceNodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoWidget::showEvent(QShowEvent * const opc_Event)
 {
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditCoManagerSplitterX());
+   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditCoManagerSplitterHorizontal());
    QWidget::showEvent(opc_Event);
 }
 
@@ -326,7 +327,7 @@ void C_SdNdeCoWidget::m_OnOverviewClicked(void) const
    \param[in]  ou8_InterfaceNumber  Interface number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoWidget::m_OnInterfaceSelected(const uint8 ou8_InterfaceNumber)
+void C_SdNdeCoWidget::m_OnInterfaceSelected(const uint8_t ou8_InterfaceNumber)
 {
    this->mpc_Ui->pc_OverviewWidget->setVisible(false);
    this->mpc_Ui->pc_PubOverview->setChecked(false);
@@ -345,9 +346,9 @@ void C_SdNdeCoWidget::m_OnInterfaceSelected(const uint8 ou8_InterfaceNumber)
    \param[in]  ou32_UseCaseIndex    Use case index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoWidget::m_OnDeviceSelected(const uint8 ou8_ManagerInterfaceNumber,
-                                         const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId,
-                                         const uint32 ou32_UseCaseIndex)
+void C_SdNdeCoWidget::m_OnDeviceSelected(const uint8_t ou8_ManagerInterfaceNumber,
+                                         const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceNodeId,
+                                         const uint32_t ou32_UseCaseIndex)
 {
    this->mpc_Ui->pc_OverviewWidget->setVisible(false);
    this->mpc_Ui->pc_PubOverview->setChecked(false);
@@ -366,7 +367,7 @@ void C_SdNdeCoWidget::m_OnDeviceSelected(const uint8 ou8_ManagerInterfaceNumber,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoWidget::m_OnLinkSwitchToManager(const QString & orc_Link) const
 {
-   uint32 u32_ManagerNodeIndex;
+   uint32_t u32_ManagerNodeIndex;
    bool q_Valid;
 
    // Link text is the index number of the manager node
@@ -374,7 +375,7 @@ void C_SdNdeCoWidget::m_OnLinkSwitchToManager(const QString & orc_Link) const
    tgl_assert(q_Valid == true);
    if (q_Valid == true)
    {
-      const C_OSCNode * const pc_ManagerNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ManagerNodeIndex);
+      const C_OscNode * const pc_ManagerNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ManagerNodeIndex);
       tgl_assert(pc_ManagerNode != NULL);
       if (pc_ManagerNode != NULL)
       {

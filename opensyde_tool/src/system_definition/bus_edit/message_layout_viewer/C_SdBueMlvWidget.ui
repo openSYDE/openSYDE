@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxMultiplexer">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxMultiplexer">
      <property name="title">
       <string/>
      </property>
@@ -57,14 +57,14 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMultiplexer">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMultiplexer">
         <property name="text">
          <string>TextLabel</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxMultiplexer">
+       <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxMultiplexer">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -83,7 +83,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui::C_SdBueMlvGraphicsView" name="pc_GraphicsView">
+    <widget class="stw::opensyde_gui::C_SdBueMlvGraphicsView" name="pc_GraphicsView">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -102,24 +102,24 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdBueMlvGraphicsView</class>
+   <class>stw::opensyde_gui::C_SdBueMlvGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>C_SdBueMlvGraphicsView.h</header>
+   <header>C_SdBueMlvGraphicsView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

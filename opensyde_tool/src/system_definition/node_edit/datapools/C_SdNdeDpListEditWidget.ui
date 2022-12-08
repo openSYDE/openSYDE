@@ -41,7 +41,7 @@
       <number>2</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PubBack">
+      <widget class="stw::opensyde_gui_elements::C_OgePubUpdate" name="pc_PubBack">
        <property name="minimumSize">
         <size>
          <width>180</width>
@@ -73,7 +73,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubBackNavigation" name="pc_PubPrevious">
+      <widget class="stw::opensyde_gui_elements::C_OgePubBackNavigation" name="pc_PubPrevious">
        <property name="minimumSize">
         <size>
          <width>75</width>
@@ -92,7 +92,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubPrevNavigation" name="pc_PubNext">
+      <widget class="stw::opensyde_gui_elements::C_OgePubPrevNavigation" name="pc_PubNext">
        <property name="minimumSize">
         <size>
          <width>75</width>
@@ -113,31 +113,31 @@
     </layout>
    </item>
    <item>
-    <widget class="stw_opensyde_gui::C_SdNdeDpListsWidget" name="pc_ListsWidget" native="true"/>
+    <widget class="stw::opensyde_gui::C_SdNdeDpListsWidget" name="pc_ListsWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubUpdate</class>
+   <class>stw::opensyde_gui_elements::C_OgePubUpdate</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubUpdate.h</header>
+   <header>C_OgePubUpdate.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpListsWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeDpListsWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeDpListsWidget.h</header>
+   <header>C_SdNdeDpListsWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubBackNavigation</class>
+   <class>stw::opensyde_gui_elements::C_OgePubBackNavigation</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubBackNavigation.h</header>
+   <header>C_OgePubBackNavigation.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubPrevNavigation</class>
+   <class>stw::opensyde_gui_elements::C_OgePubPrevNavigation</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubPrevNavigation.h</header>
+   <header>C_OgePubPrevNavigation.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

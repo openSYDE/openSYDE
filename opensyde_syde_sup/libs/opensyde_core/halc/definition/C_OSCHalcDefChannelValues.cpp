@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_OSCHalcDefChannelValues.h"
+#include "stwtypes.hpp"
+#include "C_OscHalcDefChannelValues.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor/destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefChannelValues::C_OSCHalcDefChannelValues(void)
+C_OscHalcDefChannelValues::C_OscHalcDefChannelValues(void)
 {
 }
 
@@ -43,7 +43,7 @@ C_OSCHalcDefChannelValues::C_OSCHalcDefChannelValues(void)
 /*! \brief  Destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefChannelValues::~C_OSCHalcDefChannelValues()
+C_OscHalcDefChannelValues::~C_OscHalcDefChannelValues()
 {
 }
 
@@ -55,21 +55,21 @@ C_OSCHalcDefChannelValues::~C_OSCHalcDefChannelValues()
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefChannelValues::CalcHash(uint32 & oru32_HashValue) const
+void C_OscHalcDefChannelValues::CalcHash(uint32_t & oru32_HashValue) const
 {
-   for (uint32 u32_It = 0UL; u32_It < this->c_Parameters.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_Parameters.size(); ++u32_It)
    {
       this->c_Parameters[u32_It].CalcHash(oru32_HashValue);
    }
-   for (uint32 u32_It = 0UL; u32_It < this->c_InputValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_InputValues.size(); ++u32_It)
    {
       this->c_InputValues[u32_It].CalcHash(oru32_HashValue);
    }
-   for (uint32 u32_It = 0UL; u32_It < this->c_OutputValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_OutputValues.size(); ++u32_It)
    {
       this->c_OutputValues[u32_It].CalcHash(oru32_HashValue);
    }
-   for (uint32 u32_It = 0UL; u32_It < this->c_StatusValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_StatusValues.size(); ++u32_It)
    {
       this->c_StatusValues[u32_It].CalcHash(oru32_HashValue);
    }

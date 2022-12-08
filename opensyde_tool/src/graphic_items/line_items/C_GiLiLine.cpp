@@ -10,29 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <limits>
 #include <QPainter>
 
-#include "constants.h"
-#include "C_GiCustomFunctions.h"
-#include "C_GiLiLine.h"
-#include "gitypes.h"
-#include "C_GiBiLineBounding.h"
-#include "C_OSCUtils.h"
-#include "C_Uti.h"
+#include "constants.hpp"
+#include "C_GiCustomFunctions.hpp"
+#include "C_GiLiLine.hpp"
+#include "gitypes.hpp"
+#include "C_GiBiLineBounding.hpp"
+#include "C_OscUtils.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::uint8 C_GiLiLine::mhu8_ANIMATION_STEP_COUNT = 60;
+const uint8_t C_GiLiLine::mhu8_ANIMATION_STEP_COUNT = 60;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -120,7 +119,7 @@ void C_GiLiLine::Init(const std::vector<QPointF> & orc_Points)
    //Points
    this->mc_Points.clear();
    this->mc_Points.reserve(orc_Points.size());
-   for (uint32 u32_ItPoint = 0; u32_ItPoint < orc_Points.size(); ++u32_ItPoint)
+   for (uint32_t u32_ItPoint = 0; u32_ItPoint < orc_Points.size(); ++u32_ItPoint)
    {
       c_AdaptedScenePos = this->mapToScene(orc_Points[u32_ItPoint]);
       C_GiCustomFunctions::h_AdaptMouseRangePos(c_AdaptedScenePos);
@@ -130,7 +129,7 @@ void C_GiLiLine::Init(const std::vector<QPointF> & orc_Points)
    //Lines
    mc_Lines.clear();
    mc_Lines.reserve(mc_Points.size() - 1);
-   for (sint32 s32_ItPoint = 0L; (s32_ItPoint + 1) < mc_Points.size(); ++s32_ItPoint)
+   for (int32_t s32_ItPoint = 0L; (s32_ItPoint + 1) < mc_Points.size(); ++s32_ItPoint)
    {
       this->m_AddLineAt(s32_ItPoint);
    }
@@ -142,9 +141,9 @@ void C_GiLiLine::Init(const std::vector<QPointF> & orc_Points)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiLiLine::type() const
+int32_t C_GiLiLine::type() const
 {
-   return msn_GRAPHICS_ITEM_LINE;
+   return ms32_GRAPHICS_ITEM_LINE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -153,7 +152,7 @@ sintn C_GiLiLine::type() const
    \param[in] ors32_Index Index of creation
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::m_AddLineAt(const stw_types::sint32 & ors32_Index)
+void C_GiLiLine::m_AddLineAt(const int32_t & ors32_Index)
 {
    if (ors32_Index >= 0L)
    {
@@ -168,7 +167,7 @@ void C_GiLiLine::m_AddLineAt(const stw_types::sint32 & ors32_Index)
          mc_Lines[ors32_Index]->SetWidth(this->GetWidth());
          mc_Lines[ors32_Index]->setOpacity(0.01);
          //Update Line Index
-         for (sint32 s32_ItLine = ors32_Index; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
+         for (int32_t s32_ItLine = ors32_Index; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
          {
             mc_Lines[s32_ItLine]->SetLineIndex(s32_ItLine);
          }
@@ -182,7 +181,7 @@ void C_GiLiLine::m_AddLineAt(const stw_types::sint32 & ors32_Index)
    \param[in] ors32_Index Index of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::m_RemoveLineAt(const sint32 & ors32_Index)
+void C_GiLiLine::m_RemoveLineAt(const int32_t & ors32_Index)
 {
    if (ors32_Index >= 0L)
    {
@@ -192,7 +191,7 @@ void C_GiLiLine::m_RemoveLineAt(const sint32 & ors32_Index)
          mc_Lines[ors32_Index]->deleteLater();
          mc_Lines.remove(ors32_Index);
          //Update Line Index
-         for (sint32 s32_ItLine = ors32_Index; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
+         for (int32_t s32_ItLine = ors32_Index; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
          {
             mc_Lines[s32_ItLine]->SetLineIndex(s32_ItLine);
          }
@@ -208,17 +207,17 @@ void C_GiLiLine::m_RemoveLineAt(const sint32 & ors32_Index)
    \param[in] ors32_LineIndex Index of changed line
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::m_UpdateLine(const stw_types::sint32 & ors32_LineIndex)
+void C_GiLiLine::m_UpdateLine(const int32_t & ors32_LineIndex)
 {
    if (ors32_LineIndex >= 0L)
    {
-      if ((ors32_LineIndex < mc_Lines.size()) && (static_cast<sintn>(ors32_LineIndex + 1L) < mc_Points.size()))
+      if ((ors32_LineIndex < mc_Lines.size()) && (static_cast<int32_t>(ors32_LineIndex + 1L) < mc_Points.size()))
       {
          //Deactivate signal to avoid to trigger change of line again
          mc_Lines[ors32_LineIndex]->AdaptLine(QLineF(-mc_Lines[ors32_LineIndex]->pos() +
                                                      mc_Points[ors32_LineIndex],
                                                      -mc_Lines[ors32_LineIndex]->pos() +
-                                                     mc_Points[static_cast<sintn>(ors32_LineIndex + 1L)]));
+                                                     mc_Points[static_cast<int32_t>(ors32_LineIndex + 1L)]));
       }
    }
 }
@@ -238,24 +237,24 @@ void C_GiLiLine::m_ApplyOffset(QPolygonF & orc_Polygon) const
       QPointF c_LineEnd;
       QPointF c_LineDiff;
       QPointF c_AdaptedLineDiff;
-      if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_OffsetStart, 0.0) == false)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(this->mf64_OffsetStart, 0.0) == false)
       {
          c_LineStart = orc_Polygon[0];
          c_LineEnd = orc_Polygon[1];
          c_LineDiff = c_LineEnd - c_LineStart;
-         c_AdaptedLineDiff = stw_opensyde_gui_logic::C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff,
-                                                                                           this->mf64_OffsetStart);
+         c_AdaptedLineDiff = stw::opensyde_gui_logic::C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff,
+                                                                                            this->mf64_OffsetStart);
          orc_Polygon[0] = c_LineStart + c_AdaptedLineDiff;
       }
 
-      if (C_OSCUtils::h_IsFloat64NearlyEqual(this->mf64_OffsetEnd, 0.0) == false)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(this->mf64_OffsetEnd, 0.0) == false)
       {
          //Second line
          c_LineStart = orc_Polygon[orc_Polygon.size() - 2];
          c_LineEnd = orc_Polygon[orc_Polygon.size() - 1];
          c_LineDiff = c_LineStart - c_LineEnd;
-         c_AdaptedLineDiff = stw_opensyde_gui_logic::C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff,
-                                                                                           this->mf64_OffsetEnd);
+         c_AdaptedLineDiff = stw::opensyde_gui_logic::C_GiBiLineBounding::h_AdaptVecToWidth(c_LineDiff,
+                                                                                            this->mf64_OffsetEnd);
          orc_Polygon[orc_Polygon.size() - 1] = c_LineEnd + c_AdaptedLineDiff;
       }
    }
@@ -290,7 +289,7 @@ void C_GiLiLine::m_SetColor(const QColor & orc_Color, const bool oq_SendUpdate)
    QPen c_Pen = this->pen();
 
    c_Pen.setColor(orc_Color);
-   for (sint32 s32_ItLine = 0; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
+   for (int32_t s32_ItLine = 0; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
    {
       mc_Lines[s32_ItLine]->SetColor(orc_Color);
    }
@@ -310,9 +309,9 @@ void C_GiLiLine::m_SetColor(const QColor & orc_Color, const bool oq_SendUpdate)
    Desired animation step count
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
+uint8_t C_GiLiLine::m_GetAnimationStepCount(void) const
 {
-   uint8 u8_Retval;
+   uint8_t u8_Retval;
 
    if (this->mq_SpeedUpAnimation == true)
    {
@@ -331,7 +330,7 @@ uint8 C_GiLiLine::m_GetAnimationStepCount(void) const
    \param[in] orf64_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::SetInteractionWidth(const stw_types::float64 & orf64_Value)
+void C_GiLiLine::SetInteractionWidth(const float64_t & orf64_Value)
 {
    this->prepareGeometryChange();
    this->mf64_InteractionWidth = orf64_Value;
@@ -353,7 +352,7 @@ void C_GiLiLine::SetInteractionWidth(const stw_types::float64 & orf64_Value)
    \param[in] orc_Pos     New position of point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::AddPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
+void C_GiLiLine::AddPoint(const int32_t & ors32_Index, const QPointF & orc_Pos)
 {
    this->mc_Points.insert(ors32_Index, orc_Pos);
 
@@ -367,7 +366,7 @@ void C_GiLiLine::AddPoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
    \param[in] orc_Pos     New position of point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos)
+void C_GiLiLine::UpdatePoint(const int32_t & ors32_Index, const QPointF & orc_Pos)
 {
    if (this->mc_Points.size() > ors32_Index)
    {
@@ -394,7 +393,7 @@ void C_GiLiLine::UpdatePoint(const sint32 & ors32_Index, const QPointF & orc_Pos
    \param[in] ors32_Index Index of point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::RemovePoint(const sint32 & ors32_Index)
+void C_GiLiLine::RemovePoint(const int32_t & ors32_Index)
 {
    //Only delete if there are enough points for a line left afterwards
    if (this->mc_Points.size() > 2L)
@@ -418,12 +417,12 @@ void C_GiLiLine::RemovePoint(const sint32 & ors32_Index)
    \param[in] ors32_Width New line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::SetWidth(const stw_types::sint32 & ors32_Width)
+void C_GiLiLine::SetWidth(const int32_t & ors32_Width)
 {
    QPen c_Pen = this->pen();
 
    c_Pen.setWidth(ors32_Width);
-   for (sint32 s32_ItLine = 0; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
+   for (int32_t s32_ItLine = 0; s32_ItLine < mc_Lines.size(); ++s32_ItLine)
    {
       mc_Lines[s32_ItLine]->SetWidth(ors32_Width);
    }
@@ -477,25 +476,25 @@ void C_GiLiLine::SetMiddleLine(const bool & orq_MiddleLine)
    \param[in] ore_Type New line style
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType & ore_Type)
+void C_GiLiLine::SetLineStyle(const stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType & ore_Type)
 {
    QPen c_Pen = this->pen();
 
    switch (ore_Type)
    {
-   case stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH:
+   case stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH:
       c_Pen.setStyle(Qt::DashLine);
       break;
-   case stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDOT:
+   case stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDOT:
       c_Pen.setStyle(Qt::DotLine);
       break;
-   case stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH_DOT:
+   case stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH_DOT:
       c_Pen.setStyle(Qt::DashDotLine);
       break;
-   case stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH_DOT_DOT:
+   case stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH_DOT_DOT:
       c_Pen.setStyle(Qt::DashDotDotLine);
       break;
-   case stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eSOLID:
+   case stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eSOLID:
    default:
       c_Pen.setStyle(Qt::SolidLine);
       break;
@@ -511,7 +510,7 @@ void C_GiLiLine::SetLineStyle(const stw_opensyde_gui_logic::C_PuiBsLineArrow::E_
    \param[in] orf64_Offset New offset
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::SetOffsetStart(const float64 & orf64_Offset)
+void C_GiLiLine::SetOffsetStart(const float64_t & orf64_Offset)
 {
    this->mf64_OffsetStart = orf64_Offset;
 }
@@ -522,7 +521,7 @@ void C_GiLiLine::SetOffsetStart(const float64 & orf64_Offset)
    \param[in] orf64_Offset New offset
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLine::SetOffsetEnd(const float64 & orf64_Offset)
+void C_GiLiLine::SetOffsetEnd(const float64_t & orf64_Offset)
 {
    this->mf64_OffsetEnd = orf64_Offset;
 }
@@ -554,7 +553,7 @@ void C_GiLiLine::SetDisabledLook(const bool oq_Disabled)
    \return Line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiLine::GetWidth() const
+int32_t C_GiLiLine::GetWidth() const
 {
    return this->pen().width();
 }
@@ -627,7 +626,7 @@ void C_GiLiLine::SetAnimated(const bool oq_Active, const bool oq_Inverse, const 
       if (this->mc_Timer.isActive() == false)
       {
          //Update interval
-         this->mc_Timer.setInterval(1000 / static_cast<sintn>(this->m_GetAnimationStepCount()));
+         this->mc_Timer.setInterval(1000 / static_cast<int32_t>(this->m_GetAnimationStepCount()));
          //Start timer
          this->mc_Timer.start();
       }
@@ -693,25 +692,25 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
       if (this->mq_Animated == true)
       {
          //Alternative pattern
-         //const float64 f64_Length = 200;
+         //const float64_t f64_Length = 200;
          //QVector<qreal> c_Pattern;
          //Point 1
-         //c_Pattern.push_back(static_cast<float64>(this->mu8_AnimationStep) /
-         //                    static_cast<float64>(C_GiLiLine::mhu8_AnimationStepCount) * f64_Length);
+         //c_Pattern.push_back(static_cast<float64_t>(this->mu8_AnimationStep) /
+         //                    static_cast<float64_t>(C_GiLiLine::mhu8_AnimationStepCount) * f64_Length);
          //Long pause
          //c_Pattern.push_back(f64_Length - c_Pattern[0]);
          //Animated package color
          //QPen c_Pen(QBrush(C_GiLiLine::mhc_AnimationPackageColor), this->GetWidth(), Qt::CustomDashLine);
          //Offset representing the current animation state, f64_Length = sum of pattern
-         //c_Pen.setDashOffset(static_cast<float64>(this->mu8_AnimationStep) *
-         //                    (f64_Length / static_cast<float64>(C_GiLiLine::mhu8_AnimationStepCount)));
+         //c_Pen.setDashOffset(static_cast<float64_t>(this->mu8_AnimationStep) *
+         //                    (f64_Length / static_cast<float64_t>(C_GiLiLine::mhu8_AnimationStepCount)));
          //c_Pen.setDashPattern(c_Pattern);
 
          QVector<qreal> c_Pattern;
-         float64 f64_Offset;
+         float64_t f64_Offset;
          QColor c_AnimatedColor;
-         const uint8 u8_ANIMATION_STEP_COUNT_OVERRIDE = C_GiLiLine::mhu8_ANIMATION_STEP_COUNT;
-         const float64 f64_PenWidth = static_cast<float64>(this->GetWidth());
+         const uint8_t u8_ANIMATION_STEP_COUNT_OVERRIDE = C_GiLiLine::mhu8_ANIMATION_STEP_COUNT;
+         const float64_t f64_PenWidth = static_cast<float64_t>(this->GetWidth());
 
          if (this->mq_MiddleLine == true)
          {
@@ -732,14 +731,14 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
          //Offset representing the current animation state, 48 / f64_PenWidth = sum of pattern
          if (this->mq_InverseAnimation == false)
          {
-            f64_Offset = static_cast<float64>(this->mu8_AnimationStep) *
-                         ((48.0 / f64_PenWidth) / static_cast<float64>(u8_ANIMATION_STEP_COUNT_OVERRIDE));
+            f64_Offset = static_cast<float64_t>(this->mu8_AnimationStep) *
+                         ((48.0 / f64_PenWidth) / static_cast<float64_t>(u8_ANIMATION_STEP_COUNT_OVERRIDE));
          }
          else
          {
-            const uint8 u8_StepsTillFinished = u8_ANIMATION_STEP_COUNT_OVERRIDE - this->mu8_AnimationStep;
-            f64_Offset = static_cast<float64>(u8_StepsTillFinished) *
-                         ((48.0 / f64_PenWidth) / static_cast<float64>(u8_ANIMATION_STEP_COUNT_OVERRIDE));
+            const uint8_t u8_StepsTillFinished = u8_ANIMATION_STEP_COUNT_OVERRIDE - this->mu8_AnimationStep;
+            f64_Offset = static_cast<float64_t>(u8_StepsTillFinished) *
+                         ((48.0 / f64_PenWidth) / static_cast<float64_t>(u8_ANIMATION_STEP_COUNT_OVERRIDE));
          }
          c_Pen.setDashOffset(f64_Offset);
          c_Pen.setDashPattern(c_Pattern);
@@ -768,9 +767,9 @@ void C_GiLiLine::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsI
 //----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiLiLine::shape(void) const
 {
-   stw_opensyde_gui_logic::C_GiBiLineBounding c_LineBounding(this->mc_Points,
-                                                             static_cast<stw_types::float64>(this->GetWidth()),
-                                                             this->mf64_InteractionWidth);
+   stw::opensyde_gui_logic::C_GiBiLineBounding c_LineBounding(this->mc_Points,
+                                                              static_cast<float64_t>(this->GetWidth()),
+                                                              this->mf64_InteractionWidth);
    return c_LineBounding.GetShape();
 }
 
@@ -783,16 +782,16 @@ QPainterPath C_GiLiLine::shape(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiLine::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Closest) const
 {
-   float64 f64_Best = std::numeric_limits<float64>::max();
+   float64_t f64_Best = std::numeric_limits<float64_t>::max();
 
    orc_Closest = orc_ScenePoint;
    if (mc_Points.size() > 0)
    {
       QPointF c_CurProj;
-      float64 f64_CurDist;
+      float64_t f64_CurDist;
       QPointF c_CurP2;
       QPointF c_CurP1 = mc_Points[0];
-      for (sint32 s32_ItPoint = 1; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
+      for (int32_t s32_ItPoint = 1; s32_ItPoint < mc_Points.size(); ++s32_ItPoint)
       {
          c_CurP2 = mc_Points[s32_ItPoint];
          C_GiBiConnectableItem::h_DistToLine(c_CurP1, c_CurP2, orc_ScenePoint, &f64_CurDist, &c_CurProj, NULL);

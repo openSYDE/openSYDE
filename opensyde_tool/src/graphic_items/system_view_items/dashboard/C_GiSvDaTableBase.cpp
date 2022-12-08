@@ -10,34 +10,33 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QGraphicsView>
 
-#include "gitypes.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdUtil.h"
-#include "C_SyvDaPeBase.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgePopUpDialog.h"
-#include "C_GiSvDaTableBase.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SyvDaPeDataElementBrowse.h"
-#include "C_SyvDaPeUpdateModeConfiguration.h"
+#include "gitypes.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SyvDaPeBase.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_GiSvDaTableBase.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SyvDaPeDataElementBrowse.hpp"
+#include "C_SyvDaPeUpdateModeConfiguration.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,16 +56,16 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      oru32_ViewIndex        Index of system view
    \param[in]      oru32_DashboardIndex   Index of dashboard in system view
    \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                     const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaTableBase::C_GiSvDaTableBase(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                     const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
    C_GiSvDaRectBaseGroup(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eTABLE,
-                         C_SyvDaItTaModel::hu32_MAX_ELEMENTS, oru64_ID, 50.0, 25.0, 100.0, 50.0, false, true,
+                         C_SyvDaItTaModel::hu32_MAX_ELEMENTS, oru64_Id, 50.0, 25.0, 100.0, 50.0, false, true,
                          opc_Parent),
    mpc_AddDataElement(NULL),
    mpc_AddSeperator(NULL),
@@ -108,9 +107,9 @@ C_GiSvDaTableBase::~C_GiSvDaTableBase(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvDaTableBase::type(void) const
+int32_t C_GiSvDaTableBase::type(void) const
 {
-   return msn_GRAPHICS_ITEM_DB_TABLE;
+   return ms32_GRAPHICS_ITEM_DB_TABLE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -158,7 +157,7 @@ void C_GiSvDaTableBase::LoadData(void)
          tgl_assert(pc_Dashboard != NULL);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiSvDbTable * const pc_Box = pc_Dashboard->GetTable(static_cast<uint32>(this->ms32_Index));
+            const C_PuiSvDbTable * const pc_Box = pc_Dashboard->GetTable(static_cast<uint32_t>(this->ms32_Index));
             tgl_assert(pc_Box != NULL);
             if (pc_Box != NULL)
             {
@@ -192,7 +191,7 @@ void C_GiSvDaTableBase::UpdateData(void)
          tgl_assert(pc_Dashboard != NULL);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiSvDbTable * const pc_Box = pc_Dashboard->GetTable(static_cast<uint32>(this->ms32_Index));
+            const C_PuiSvDbTable * const pc_Box = pc_Dashboard->GetTable(static_cast<uint32_t>(this->ms32_Index));
             tgl_assert(pc_Box != NULL);
             if (pc_Box != NULL)
             {
@@ -205,7 +204,7 @@ void C_GiSvDaTableBase::UpdateData(void)
                }
                tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                               this->mu32_DashboardIndex,
-                                                                              static_cast<uint32>(this->ms32_Index),
+                                                                              static_cast<uint32_t>(this->ms32_Index),
                                                                               &c_Box, this->me_Type) == C_NO_ERR);
             }
          }
@@ -232,15 +231,15 @@ void C_GiSvDaTableBase::UpdateShowValue(void)
 /*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparency (0..255)
+   \param[in]  os32_Value              Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaTableBase::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaTableBase::UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value)
 {
    tgl_assert(this->mpc_TableWidget != NULL);
    if (this->mpc_TableWidget != NULL)
    {
-      this->mpc_TableWidget->UpdateTransparency(ou32_DataElementIndex, osn_Value);
+      this->mpc_TableWidget->UpdateTransparency(ou32_DataElementIndex, os32_Value);
    }
 }
 
@@ -274,7 +273,7 @@ void C_GiSvDaTableBase::EditElementProperties(void)
    if ((this->mpc_TableWidget != NULL) &&
        (this->mq_EditContentModeEnabled == true))
    {
-      const std::vector<uint32> c_Indices = this->mpc_TableWidget->GetUniqueAndValidSelectedRows();
+      const std::vector<uint32_t> c_Indices = this->mpc_TableWidget->GetUniqueAndValidSelectedRows();
 
       if (c_Indices.size() == 1)
       {
@@ -282,28 +281,31 @@ void C_GiSvDaTableBase::EditElementProperties(void)
 
          if (pc_Dashboard != NULL)
          {
-            const C_PuiSvDbTable * const pc_Box = pc_Dashboard->GetTable(static_cast<uint32>(this->ms32_Index));
+            const C_PuiSvDbTable * const pc_Box = pc_Dashboard->GetTable(static_cast<uint32_t>(this->ms32_Index));
             tgl_assert(pc_Box != NULL);
             if ((pc_Box != NULL) && (pc_Box->c_DataPoolElementsConfig.size() > c_Indices[0]))
             {
                C_PuiSvDbNodeDataPoolListElementId c_ElementId;
                C_PuiSvDbDataElementScaling c_Scaling;
+               C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig;
                QString c_DisplayName;
                QGraphicsView * const pc_View = this->scene()->views().at(0);
-               QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+               const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
                C_SyvDaPeBase * pc_Dialog;
                c_ElementId = pc_Box->c_DataPoolElementsConfig[c_Indices[0]].c_ElementId;
                c_Scaling = pc_Box->c_DataPoolElementsConfig[c_Indices[0]].c_ElementScaling;
+               c_FormatterConfig = pc_Box->c_DataPoolElementsConfig[c_Indices[0]].c_DisplayFormatter;
                c_DisplayName = pc_Box->c_DataPoolElementsConfig[c_Indices[0]].c_DisplayName;
 
                pc_Dialog = new C_SyvDaPeBase(*c_New, this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                             "Table", c_ElementId, c_Scaling, true, this->mq_DarkMode, false, false,
+                                             "Table", c_ElementId, c_Scaling, true, c_FormatterConfig, true,
+                                             this->mq_DarkMode, false, false,
                                              c_DisplayName);
 
                //Resize
                c_New->SetSize(QSize(800, 500));
 
-               if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+               if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
                {
                   C_PuiSvDbTable c_Box = *pc_Box;
                   C_PuiSvDbNodeDataElementConfig c_Tmp;
@@ -311,16 +313,17 @@ void C_GiSvDaTableBase::EditElementProperties(void)
                   c_Tmp.c_ElementId = c_ElementId;
                   tgl_assert(c_ElementId == pc_Dialog->GetDataElementId());
                   c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
+                  c_Tmp.c_DisplayFormatter = pc_Dialog->GetFormatterInformation();
                   c_Tmp.c_DisplayName = pc_Dialog->GetDisplayName();
                   c_Box.c_DataPoolElementsConfig[c_Indices[0]] = c_Tmp;
 
                   //Apply
                   this->RemoveDataPoolElement(c_ElementId);
-                  this->RegisterDataPoolElement(c_Tmp.c_ElementId, c_Tmp.c_ElementScaling);
+                  this->RegisterDataPoolElement(c_Tmp.c_ElementId, c_Tmp.c_ElementScaling, c_Tmp.c_DisplayFormatter);
 
                   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                                  this->mu32_DashboardIndex,
-                                                                                 static_cast<uint32>(this->ms32_Index),
+                                                                                 static_cast<uint32_t>(this->ms32_Index),
                                                                                  &c_Box, this->me_Type) == C_NO_ERR);
                   this->mpc_TableWidget->UpdateStaticValues();
                }
@@ -432,15 +435,15 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
       tgl_assert(this->mpc_TableWidget != NULL);
       if ((oq_Active == true) && (this->mpc_TableWidget != NULL))
       {
-         const std::vector<uint32> c_SelectedRows = this->mpc_TableWidget->GetUniqueSelectedRows();
+         const std::vector<uint32_t> c_SelectedRows = this->mpc_TableWidget->GetUniqueSelectedRows();
          // Initial registration of the context menu
          if (mpc_AddDataElement == NULL)
          {
             mpc_AddDataElement =
                opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
                                                                              "Add data element(s)"),
-                                                                          static_cast<sintn>(Qt::CTRL) +
-                                                                          static_cast<sintn>(Qt::Key_Plus));
+                                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                                          static_cast<int32_t>(Qt::Key_Plus));
             // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
             this->mpc_AddDataElement->setVisible(false);
             connect(mpc_AddDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_AddNewDataElement);
@@ -470,8 +473,8 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
             mpc_MoveUpDataElement =
                opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
                                                                              "Move up"),
-                                                                          static_cast<sintn>(Qt::CTRL) +
-                                                                          static_cast<sintn>(Qt::Key_Up));
+                                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                                          static_cast<int32_t>(Qt::Key_Up));
             // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
             this->mpc_MoveUpDataElement->setVisible(false);
             connect(mpc_MoveUpDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementUp);
@@ -481,8 +484,8 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
             mpc_MoveDownDataElement =
                opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
                                                                              "Move down"),
-                                                                          static_cast<sintn>(Qt::CTRL) +
-                                                                          static_cast<sintn>(Qt::Key_Down));
+                                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                                          static_cast<int32_t>(Qt::Key_Down));
             // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
             this->mpc_MoveDownDataElement->setVisible(false);
             connect(mpc_MoveDownDataElement, &QAction::triggered, this, &C_GiSvDaTableBase::m_MoveDataElementDown);
@@ -498,7 +501,7 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
             mpc_RemoveDataElement =
                opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
                                                                              "Delete"),
-                                                                          static_cast<sintn>(Qt::Key_Delete));
+                                                                          static_cast<int32_t>(Qt::Key_Delete));
             // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
             this->mpc_RemoveDataElement->setVisible(false);
             connect(mpc_RemoveDataElement, &QAction::triggered,
@@ -550,8 +553,9 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
 
    This function is thread safe.
 
-   \param[in]   ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
-   \param[out]  orc_Values                         Vector with result value(s)
+   \param[in]      ou32_WidgetDataPoolElementIndex    Index of shown datapool element in widget
+   \param[out]     orc_Values                         Vector with result value(s)
+   \param[in,out]  orc_DisplayValues                  Display values
 
    \return
    C_NO_ERR    Value read
@@ -559,16 +563,17 @@ void C_GiSvDaTableBase::ConfigureContextMenu(C_SyvDaContextMenuManager * const o
    C_NOACT     No value received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaTableBase::GetLastValueUnscaled(const uint32 ou32_WidgetDataPoolElementIndex,
-                                               std::vector<float64> & orc_Values)
+int32_t C_GiSvDaTableBase::GetLastValueUnscaled(const uint32_t ou32_WidgetDataPoolElementIndex,
+                                                std::vector<float64_t> & orc_Values,
+                                                std::vector<QString> & orc_DisplayValues)
 {
-   uint32 u32_InternalIndex;
-   sint32 s32_Retval = this->m_MapDataElementIndexToInternalElementIndex(ou32_WidgetDataPoolElementIndex,
-                                                                         u32_InternalIndex);
+   uint32_t u32_InternalIndex;
+   int32_t s32_Retval = this->m_MapDataElementIndexToInternalElementIndex(ou32_WidgetDataPoolElementIndex,
+                                                                          u32_InternalIndex);
 
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = this->m_GetLastValue(ou32_WidgetDataPoolElementIndex, orc_Values, NULL, false);
+      s32_Retval = this->m_GetLastValue(ou32_WidgetDataPoolElementIndex, orc_DisplayValues, orc_Values);
    }
    return s32_Retval;
 }
@@ -591,7 +596,7 @@ const C_PuiSvDbTable * C_GiSvDaTableBase::GetTableItem(void) const
       const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
       if ((pc_Dashboard != NULL) && (this->GetIndex() >= 0))
       {
-         pc_Retval = pc_Dashboard->GetTable(static_cast<uint32>(this->GetIndex()));
+         pc_Retval = pc_Dashboard->GetTable(static_cast<uint32_t>(this->GetIndex()));
       }
    }
    return pc_Retval;
@@ -609,14 +614,14 @@ const C_PuiSvDbTable * C_GiSvDaTableBase::GetTableItem(void) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
+int32_t C_GiSvDaTableBase::SetTableItem(const C_PuiSvDbTable & orc_Content) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->ms32_Index >= 0)
    {
       s32_Retval = C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                       static_cast<uint32>(this->ms32_Index),
+                                                                       static_cast<uint32_t>(this->ms32_Index),
                                                                        &orc_Content, C_PuiSvDbDataElement::eTABLE);
    }
    else
@@ -642,8 +647,8 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
 
    if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
    {
-      std::vector<uint8> c_NodeActiveFlags;
-      const sint32 s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      std::vector<uint8_t> c_NodeActiveFlags;
+      const int32_t s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
          this->mu32_ViewIndex,
          c_NodeActiveFlags);
 
@@ -663,17 +668,17 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
 
       if (pc_View != NULL)
       {
-         C_OSCCanMessageIdentificationIndices c_MessageID;
-         uint32 u32_SignalIndex;
+         C_OscCanMessageIdentificationIndices c_MessageId;
+         uint32_t u32_SignalIndex;
          if ((pc_View->GetPcData().GetConnected() == true) &&
-             (C_PuiSdUtil::h_ConvertIndex(orc_DataPoolElementId, c_MessageID, u32_SignalIndex) == C_NO_ERR))
+             (C_PuiSdUtil::h_ConvertIndex(orc_DataPoolElementId, c_MessageId, u32_SignalIndex) == C_NO_ERR))
          {
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_MessageID.u32_NodeIndex);
-            if ((pc_Node != NULL) && (c_MessageID.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
+            const C_OscNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_MessageId.u32_NodeIndex);
+            if ((pc_Node != NULL) && (c_MessageId.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
             {
-               const C_OSCNodeComInterfaceSettings & rc_Interface =
-                  pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
+               const C_OscNodeComInterfaceSettings & rc_Interface =
+                  pc_Node->c_Properties.c_ComInterfaces[c_MessageId.u32_InterfaceIndex];
                if (rc_Interface.GetBusConnected() == true)
                {
                   if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
@@ -754,7 +759,7 @@ const
    Current view index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiSvDaTableBase::GetViewIndex(void) const
+uint32_t C_GiSvDaTableBase::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
@@ -786,7 +791,7 @@ bool C_GiSvDaTableBase::CheckItemError(const C_PuiSvDbNodeDataPoolListElementId 
 
    if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eBUS_SIGNAL)
    {
-      const QMap<C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_ItInvalidDlc =
+      const QMap<C_OscNodeDataPoolListElementId, uint8_t>::const_iterator c_ItInvalidDlc =
          this->mc_InvalidDlcSignals.find(orc_DataPoolElementId);
       if (c_ItInvalidDlc != this->mc_InvalidDlcSignals.end())
       {
@@ -870,21 +875,21 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
    if (this->mpc_TableWidget != NULL)
    {
       QGraphicsView * const pc_View = this->scene()->views().at(0);
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
       C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, true,
                                                                                     false, true, true, true, false);
 
       //Resize
       c_New->SetSize(QSize(800, 800));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          const std::vector<C_PuiSvDbNodeDataPoolListElementId> c_DataElements = pc_Dialog->GetSelectedDataElements();
          //Cursor
          QApplication::setOverrideCursor(Qt::WaitCursor);
          if (c_DataElements.size() > 0)
          {
-            uint32 u32_Counter;
+            uint32_t u32_Counter;
 
             for (u32_Counter = 0U;
                  (u32_Counter < c_DataElements.size()) &&
@@ -964,7 +969,7 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
          //Remove data element(s)
          this->mpc_TableWidget->RemoveSelectedItems(c_RemovedDataElements);
          //Necessary before view is checked
-         for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
+         for (uint32_t u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
          {
             const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
             if (rc_RemovedItem.GetIsValid() == true)
@@ -976,7 +981,7 @@ void C_GiSvDaTableBase::m_RemoveDataElement(void)
          pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          if (pc_View != NULL)
          {
-            for (uint32 u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
+            for (uint32_t u32_ItDataElement = 0; u32_ItDataElement < c_RemovedDataElements.size(); ++u32_ItDataElement)
             {
                const C_PuiSvDbNodeDataPoolListElementId & rc_RemovedItem = c_RemovedDataElements[u32_ItDataElement];
                if (rc_RemovedItem.GetIsValid() == true)
@@ -1008,8 +1013,8 @@ const
 {
    if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
                                                                     orc_DataPoolElementId.u32_DataPoolIndex,
                                                                     orc_DataPoolElementId.u32_ListIndex,
                                                                     orc_DataPoolElementId.u32_ElementIndex);
@@ -1017,9 +1022,9 @@ const
       if (pc_Element != NULL)
       {
          C_PuiSvReadDataConfiguration c_Config;
-         if ((((pc_Element->GetArray() == true) || (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64)) ||
-              (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
-             (pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64))
+         if ((((pc_Element->GetArray() == true) || (pc_Element->GetType() == C_OscNodeDataPoolContent::eUINT64)) ||
+              (pc_Element->GetType() == C_OscNodeDataPoolContent::eSINT64)) ||
+             (pc_Element->GetType() == C_OscNodeDataPoolContent::eFLOAT64))
          {
             c_Config.u8_RailIndex = 0;
             c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
@@ -1047,10 +1052,10 @@ const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaTableBase::m_MapDataElementIndexToInternalElementIndex(const uint32 ou32_DataElementIndex,
-                                                                      uint32 & oru32_InternalElementIndex) const
+int32_t C_GiSvDaTableBase::m_MapDataElementIndexToInternalElementIndex(const uint32_t ou32_DataElementIndex,
+                                                                       uint32_t & oru32_InternalElementIndex) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
    const C_PuiSvDbTable * const pc_Table = this->GetTableItem();
 
    if (pc_Table != NULL)

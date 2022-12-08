@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCNodeProperties.h"
+#include "C_OscNodeProperties.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +35,7 @@ using namespace stw_types;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeProperties::C_OSCNodeProperties(void)
+C_OscNodeProperties::C_OscNodeProperties(void)
 {
    this->Initialize();
 }
@@ -45,7 +44,7 @@ C_OSCNodeProperties::C_OSCNodeProperties(void)
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeProperties::~C_OSCNodeProperties(void)
+C_OscNodeProperties::~C_OscNodeProperties(void)
 {
 }
 
@@ -55,15 +54,15 @@ C_OSCNodeProperties::~C_OSCNodeProperties(void)
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeProperties::Initialize(void)
+void C_OscNodeProperties::Initialize(void)
 {
    c_Name = "Default Node name";
    c_Comment = "";
    e_DiagnosticServer = eDS_NONE;
    e_FlashLoader = eFL_NONE;
    c_ComInterfaces.resize(0);
-   c_OpenSYDEServerSettings.Initialize();
-   c_STWFlashloaderSettings.Initialize();
+   c_OpenSydeServerSettings.Initialize();
+   c_StwFlashloaderSettings.Initialize();
    c_CodeExportSettings.Initialize();
 }
 
@@ -76,22 +75,22 @@ void C_OSCNodeProperties::Initialize(void)
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeProperties::CalcHash(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_DiagnosticServer, sizeof(this->e_DiagnosticServer), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_FlashLoader, sizeof(this->e_FlashLoader), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_DiagnosticServer, sizeof(this->e_DiagnosticServer), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_FlashLoader, sizeof(this->e_FlashLoader), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_ComInterfaces.size(); ++u32_Counter)
    {
       this->c_ComInterfaces[u32_Counter].CalcHash(oru32_HashValue);
    }
 
-   this->c_OpenSYDEServerSettings.CalcHash(oru32_HashValue);
-   this->c_STWFlashloaderSettings.CalcHash(oru32_HashValue);
+   this->c_OpenSydeServerSettings.CalcHash(oru32_HashValue);
+   this->c_StwFlashloaderSettings.CalcHash(oru32_HashValue);
    this->c_CodeExportSettings.CalcHash(oru32_HashValue);
 }
 
@@ -106,14 +105,14 @@ void C_OSCNodeProperties::CalcHash(uint32 & oru32_HashValue) const
    Else NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeComInterfaceSettings * C_OSCNodeProperties::GetComInterface(
-   const C_OSCSystemBus::E_Type oe_InterfaceType, const stw_types::uint8 ou8_InterfaceNumber) const
+const C_OscNodeComInterfaceSettings * C_OscNodeProperties::GetComInterface(
+   const C_OscSystemBus::E_Type oe_InterfaceType, const uint8_t ou8_InterfaceNumber) const
 {
-   const C_OSCNodeComInterfaceSettings * pc_Retval = NULL;
+   const C_OscNodeComInterfaceSettings * pc_Retval = NULL;
 
-   for (uint32 u32_Index = 0; (u32_Index < this->c_ComInterfaces.size()) && (pc_Retval == NULL); ++u32_Index)
+   for (uint32_t u32_Index = 0; (u32_Index < this->c_ComInterfaces.size()) && (pc_Retval == NULL); ++u32_Index)
    {
-      const C_OSCNodeComInterfaceSettings & rc_CurComInterface = this->c_ComInterfaces[u32_Index];
+      const C_OscNodeComInterfaceSettings & rc_CurComInterface = this->c_ComInterfaces[u32_Index];
       //Check if match
       if ((rc_CurComInterface.e_InterfaceType == oe_InterfaceType) &&
           (ou8_InterfaceNumber == rc_CurComInterface.u8_InterfaceNumber))
@@ -130,11 +129,11 @@ const C_OSCNodeComInterfaceSettings * C_OSCNodeProperties::GetComInterface(
    \param[in]  orc_ComInterface  Com interface replacement
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeProperties::SetComInterface(const C_OSCNodeComInterfaceSettings & orc_ComInterface)
+void C_OscNodeProperties::SetComInterface(const C_OscNodeComInterfaceSettings & orc_ComInterface)
 {
-   for (uint32 u32_Index = 0; u32_Index < this->c_ComInterfaces.size(); ++u32_Index)
+   for (uint32_t u32_Index = 0; u32_Index < this->c_ComInterfaces.size(); ++u32_Index)
    {
-      const C_OSCNodeComInterfaceSettings & rc_CurComInterface = this->c_ComInterfaces[u32_Index];
+      const C_OscNodeComInterfaceSettings & rc_CurComInterface = this->c_ComInterfaces[u32_Index];
       //Check if match
       if ((rc_CurComInterface.e_InterfaceType == orc_ComInterface.e_InterfaceType) &&
           (orc_ComInterface.u8_InterfaceNumber == rc_CurComInterface.u8_InterfaceNumber))
@@ -151,14 +150,14 @@ void C_OSCNodeProperties::SetComInterface(const C_OSCNodeComInterfaceSettings & 
    \param[in]  ou8_InterfaceNumber  Interface number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe_InterfaceType,
-                                                 const uint8 ou8_InterfaceNumber)
+void C_OscNodeProperties::DisconnectComInterface(const C_OscSystemBus::E_Type oe_InterfaceType,
+                                                 const uint8_t ou8_InterfaceNumber)
 {
-   const C_OSCNodeComInterfaceSettings * const pc_Interface = GetComInterface(oe_InterfaceType, ou8_InterfaceNumber);
+   const C_OscNodeComInterfaceSettings * const pc_Interface = GetComInterface(oe_InterfaceType, ou8_InterfaceNumber);
 
    if (pc_Interface != NULL)
    {
-      C_OSCNodeComInterfaceSettings c_Tmp = *pc_Interface;
+      C_OscNodeComInterfaceSettings c_Tmp = *pc_Interface;
       c_Tmp.RemoveConnection();
       this->SetComInterface(c_Tmp);
    }
@@ -171,19 +170,19 @@ void C_OSCNodeProperties::DisconnectComInterface(const C_OSCSystemBus::E_Type oe
    \param[in]  ou32_SubDeviceIndex  Sub device index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_Device,
-                                              const uint32 ou32_SubDeviceIndex)
+void C_OscNodeProperties::CreateComInterfaces(const C_OscDeviceDefinition & orc_Device,
+                                              const uint32_t ou32_SubDeviceIndex)
 {
    bool q_Found;
 
    //Check missing can
-   for (uint8 u8_ItCan = 0U; u8_ItCan < orc_Device.u8_NumCanBusses; ++u8_ItCan)
+   for (uint8_t u8_ItCan = 0U; u8_ItCan < orc_Device.u8_NumCanBusses; ++u8_ItCan)
    {
       q_Found = false;
-      for (uint32 u32_CurInterface = 0U; u32_CurInterface < this->c_ComInterfaces.size(); ++u32_CurInterface)
+      for (uint32_t u32_CurInterface = 0U; u32_CurInterface < this->c_ComInterfaces.size(); ++u32_CurInterface)
       {
-         C_OSCNodeComInterfaceSettings & rc_CurInterface = this->c_ComInterfaces[u32_CurInterface];
-         if ((rc_CurInterface.e_InterfaceType == C_OSCSystemBus::eCAN) &&
+         C_OscNodeComInterfaceSettings & rc_CurInterface = this->c_ComInterfaces[u32_CurInterface];
+         if ((rc_CurInterface.e_InterfaceType == C_OscSystemBus::eCAN) &&
              (rc_CurInterface.u8_InterfaceNumber == u8_ItCan))
          {
             if (q_Found == true)
@@ -200,7 +199,7 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
                if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
                {
                   rc_CurInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
-                                                                   C_OSCSystemBus::eCAN,
+                                                                   C_OscSystemBus::eCAN,
                                                                    u8_ItCan));
                }
             }
@@ -208,13 +207,13 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
       }
       if (q_Found == false)
       {
-         C_OSCNodeComInterfaceSettings c_NewInterface;
-         c_NewInterface.e_InterfaceType    = C_OSCSystemBus::eCAN;
+         C_OscNodeComInterfaceSettings c_NewInterface;
+         c_NewInterface.e_InterfaceType    = C_OscSystemBus::eCAN;
          c_NewInterface.u8_InterfaceNumber = u8_ItCan;
          if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
          {
             c_NewInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
-                                                            C_OSCSystemBus::eCAN,
+                                                            C_OscSystemBus::eCAN,
                                                             u8_ItCan));
          }
          this->c_ComInterfaces.push_back(c_NewInterface);
@@ -222,13 +221,13 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
    }
 
    //Check missing Ethernet
-   for (uint8 u8_ItEth = 0; u8_ItEth < orc_Device.u8_NumEthernetBusses; ++u8_ItEth)
+   for (uint8_t u8_ItEth = 0; u8_ItEth < orc_Device.u8_NumEthernetBusses; ++u8_ItEth)
    {
       q_Found = false;
-      for (uint32 u32_CurInterface = 0; u32_CurInterface < this->c_ComInterfaces.size(); ++u32_CurInterface)
+      for (uint32_t u32_CurInterface = 0; u32_CurInterface < this->c_ComInterfaces.size(); ++u32_CurInterface)
       {
-         C_OSCNodeComInterfaceSettings & rc_CurInterface = this->c_ComInterfaces[u32_CurInterface];
-         if ((rc_CurInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET) &&
+         C_OscNodeComInterfaceSettings & rc_CurInterface = this->c_ComInterfaces[u32_CurInterface];
+         if ((rc_CurInterface.e_InterfaceType == C_OscSystemBus::eETHERNET) &&
              (rc_CurInterface.u8_InterfaceNumber == u8_ItEth))
          {
             if (q_Found == true)
@@ -245,7 +244,7 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
                if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
                {
                   rc_CurInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
-                                                                   C_OSCSystemBus::eETHERNET,
+                                                                   C_OscSystemBus::eETHERNET,
                                                                    u8_ItEth));
                }
             }
@@ -253,13 +252,13 @@ void C_OSCNodeProperties::CreateComInterfaces(const C_OSCDeviceDefinition & orc_
       }
       if (q_Found == false)
       {
-         C_OSCNodeComInterfaceSettings c_NewInterface;
-         c_NewInterface.e_InterfaceType    = C_OSCSystemBus::eETHERNET;
+         C_OscNodeComInterfaceSettings c_NewInterface;
+         c_NewInterface.e_InterfaceType    = C_OscSystemBus::eETHERNET;
          c_NewInterface.u8_InterfaceNumber = u8_ItEth;
          if (ou32_SubDeviceIndex < orc_Device.c_SubDevices.size())
          {
             c_NewInterface.SetInterfaceConnectedInDevice(orc_Device.c_SubDevices[ou32_SubDeviceIndex].IsConnected(
-                                                            C_OSCSystemBus::eETHERNET,
+                                                            C_OscSystemBus::eETHERNET,
                                                             u8_ItEth));
          }
          this->c_ComInterfaces.push_back(c_NewInterface);

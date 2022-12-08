@@ -1,33 +1,33 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeRabProperties::indicator,
-stw_opensyde_gui_elements--C_OgeRabCheckBox::indicator
+stw--opensyde_gui_elements--C_OgeRabProperties::indicator,
+stw--opensyde_gui_elements--C_OgeRabCheckBox::indicator
 {
 border-width: 1px;
 border-style: solid;
 margin-right: 6px;
 }
 
-stw_opensyde_gui_elements--C_OgeRabCheckBox::indicator
+stw--opensyde_gui_elements--C_OgeRabCheckBox::indicator
 {
 width: 30px;
 height: 30px;
 border-radius: 15px;
 }
 
-stw_opensyde_gui_elements--C_OgeRabProperties::indicator
+stw--opensyde_gui_elements--C_OgeRabProperties::indicator
 {
 width: 16px;
 height: 16px;
 border-radius: 8px;
 }
 
-stw_opensyde_gui_elements--C_OgeRabProperties::indicator:enabled:checked,
-stw_opensyde_gui_elements--C_OgeRabCheckBox::indicator:enabled:checked
+stw--opensyde_gui_elements--C_OgeRabProperties::indicator:enabled:checked,
+stw--opensyde_gui_elements--C_OgeRabCheckBox::indicator:enabled:checked
 {
 image: url(://images/RadioButtonActive.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeRabProperties::indicator:checked
+stw--opensyde_gui_elements--C_OgeRabProperties::indicator:checked
 {
 image: url(://images/RadioButtonDisabled.svg);
 }

@@ -10,30 +10,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeHalcConfigImportDialog.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeHalcConfigImportDialog.hpp"
 #include "ui_C_SdNdeHalcConfigImportDialog.h"
 
-#include "C_PuiSdHandler.h"
-#include "C_OSCHalcConfig.h"
-#include "C_OSCHalcConfigStandaloneFiler.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscHalcConfig.hpp"
+#include "C_OscHalcConfigStandaloneFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,8 +56,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      orc_ImportFileName  File path of HALC configuration import file
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeHalcConfigImportDialog::C_SdNdeHalcConfigImportDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                             const uint32 ou32_NodeIndex,
+C_SdNdeHalcConfigImportDialog::C_SdNdeHalcConfigImportDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                             const uint32_t ou32_NodeIndex,
                                                              const QString & orc_ImportFileName) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeHalcConfigImportDialog),
@@ -83,7 +82,7 @@ C_SdNdeHalcConfigImportDialog::C_SdNdeHalcConfigImportDialog(stw_opensyde_gui_el
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeHalcConfigImportDialog::~C_SdNdeHalcConfigImportDialog(void)
+C_SdNdeHalcConfigImportDialog::~C_SdNdeHalcConfigImportDialog(void) noexcept
 {
    delete this->mpc_Ui;
 }
@@ -114,17 +113,17 @@ void C_SdNdeHalcConfigImportDialog::InitStaticNames(void) const
    \retval   C_RANGE     HALC configuration of node does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
+int32_t C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
 {
-   sint32 s32_Return = C_NO_ERR;
-   const C_OSCHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   int32_t s32_Return = C_NO_ERR;
+   const C_OscHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
    orc_ErrorDetails = "";
 
    if (pc_Config != NULL)
    {
       // Load the configuration only once
-      s32_Return = C_OSCHalcConfigStandaloneFiler::h_LoadFileStandalone(this->mc_ImportConfig,
+      s32_Return = C_OscHalcConfigStandaloneFiler::h_LoadFileStandalone(this->mc_ImportConfig,
                                                                         this->mc_ImportFileName.toStdString().c_str());
 
       if (s32_Return == C_NO_ERR)
@@ -145,9 +144,9 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
                C_GtGetText::h_GetText(("Imported Hardware configuration version does not match the current "
                                        "used Hardware configuration version of this node.\n"
                                        "Current used version: " +
-                                       C_SCLString::IntToStr(pc_Config->u32_ContentVersion) + "\n"
+                                       C_SclString::IntToStr(pc_Config->u32_ContentVersion) + "\n"
                                        "Version of imported Hardware configuration: " +
-                                       C_SCLString::IntToStr(this->mc_ImportConfig.u32_DefinitionContentVersion) +
+                                       C_SclString::IntToStr(this->mc_ImportConfig.u32_DefinitionContentVersion) +
                                        "\n").c_str());
          }
          else
@@ -227,7 +226,7 @@ sint32 C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
    \retval   C_RANGE    Node index is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcConfigImportDialog::GetResult(QString & orc_ErrorDetails) const
+int32_t C_SdNdeHalcConfigImportDialog::GetResult(QString & orc_ErrorDetails) const
 {
    switch (this->ms32_Result)
    {
@@ -262,8 +261,8 @@ void C_SdNdeHalcConfigImportDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -288,8 +287,8 @@ void C_SdNdeHalcConfigImportDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcConfigImportDialog::m_OkClicked(void)
 {
-   std::vector<uint32> c_DomainIndices;
-   std::vector<std::vector<uint32> > c_MissingChannelIndices;
+   std::vector<uint32_t> c_DomainIndices;
+   std::vector<std::vector<uint32_t> > c_MissingChannelIndices;
 
    if (this->mpc_Ui->pc_TreeView->IsSelectionOfLinkedChannelsValid(c_DomainIndices, c_MissingChannelIndices) == false)
    {
@@ -299,8 +298,8 @@ void C_SdNdeHalcConfigImportDialog::m_OkClicked(void)
          C_GtGetText::h_GetText(
             "Your selection contains channels that are or will get linked to another channel which is not selected. "
             "Do you want to select all linked channels too?"));
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Select Linked Channels"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Select Linked Channels"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
       if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
       {
          this->mpc_Ui->pc_TreeView->CheckChannels(c_DomainIndices, c_MissingChannelIndices);
@@ -308,11 +307,11 @@ void C_SdNdeHalcConfigImportDialog::m_OkClicked(void)
    }
    else
    {
-      C_OSCHalcConfig c_AdaptedConfig;
+      C_OscHalcConfig c_AdaptedConfig;
 
       this->mpc_Ui->pc_TreeView->GetAdaptedConfiguration(c_AdaptedConfig);
 
-      this->ms32_Result = C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex, c_AdaptedConfig);
+      this->ms32_Result = C_PuiSdHandler::h_GetInstance()->SetHalcConfig(this->mu32_NodeIndex, c_AdaptedConfig);
 
       this->mrc_ParentDialog.accept();
    }
@@ -338,8 +337,8 @@ void C_SdNdeHalcConfigImportDialog::m_OnCancel(void)
    Consistency state
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(const C_OSCHalcConfig * const opc_Config,
-                                                        const C_OSCHalcConfigStandalone & orc_ConfigStandalone,
+bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(const C_OscHalcConfig * const opc_Config,
+                                                        const C_OscHalcConfigStandalone & orc_ConfigStandalone,
                                                         QString & orc_ErrorDetails)
 {
    bool q_Consistent = true;
@@ -348,29 +347,29 @@ bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(const C_OSCHalcConfig * 
    {
       if (opc_Config->GetDomainSize() == orc_ConfigStandalone.c_Domains.size())
       {
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < opc_Config->GetDomainSize(); ++u32_ItDomain)
+         for (uint32_t u32_ItDomain = 0UL; u32_ItDomain < opc_Config->GetDomainSize(); ++u32_ItDomain)
          {
-            const C_OSCHalcConfigDomain * const pc_RefConfig = opc_Config->GetDomainConfigDataConst(
+            const C_OscHalcConfigDomain * const pc_RefConfig = opc_Config->GetDomainConfigDataConst(
                u32_ItDomain);
             if (pc_RefConfig != NULL)
             {
-               const C_OSCHalcConfigStandaloneDomain & rc_NewConfig =
+               const C_OscHalcConfigStandaloneDomain & rc_NewConfig =
                   orc_ConfigStandalone.c_Domains[u32_ItDomain];
                if (pc_RefConfig->c_ChannelConfigs.size() == rc_NewConfig.c_ChannelConfigs.size())
                {
-                  for (uint32 u32_ItChan = 0UL; u32_ItChan < pc_RefConfig->c_ChannelConfigs.size();
+                  for (uint32_t u32_ItChan = 0UL; u32_ItChan < pc_RefConfig->c_ChannelConfigs.size();
                        ++u32_ItChan)
                   {
-                     const C_OSCHalcConfigChannel & rc_RefChan = pc_RefConfig->c_ChannelConfigs[u32_ItChan];
-                     const C_OSCHalcConfigChannel & rc_NewChan = rc_NewConfig.c_ChannelConfigs[u32_ItChan];
+                     const C_OscHalcConfigChannel & rc_RefChan = pc_RefConfig->c_ChannelConfigs[u32_ItChan];
+                     const C_OscHalcConfigChannel & rc_NewChan = rc_NewConfig.c_ChannelConfigs[u32_ItChan];
                      if (rc_RefChan.c_Parameters.size() == rc_NewChan.c_Parameters.size())
                      {
-                        for (uint32 u32_ItPar = 0UL; (u32_ItPar < rc_RefChan.c_Parameters.size()) && q_Consistent;
+                        for (uint32_t u32_ItPar = 0UL; (u32_ItPar < rc_RefChan.c_Parameters.size()) && q_Consistent;
                              ++u32_ItPar)
                         {
-                           const C_OSCHalcConfigParameterStruct & rc_RefPar =
+                           const C_OscHalcConfigParameterStruct & rc_RefPar =
                               rc_RefChan.c_Parameters[u32_ItPar];
-                           const C_OSCHalcConfigParameterStruct & rc_NewPar =
+                           const C_OscHalcConfigParameterStruct & rc_NewPar =
                               rc_NewChan.c_Parameters[u32_ItPar];
                            if (rc_RefPar.c_ParameterElements.size() == rc_NewPar.c_ParameterElements.size())
                            {
@@ -383,13 +382,13 @@ bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(const C_OSCHalcConfig * 
                                                                                                      rc_RefChan.c_Name.c_str(),
                                                                                                      "");
                               }
-                              for (uint32 u32_ItParEl = 0UL;
+                              for (uint32_t u32_ItParEl = 0UL;
                                    (u32_ItParEl < rc_RefPar.c_ParameterElements.size()) && q_Consistent;
                                    ++u32_ItParEl)
                               {
-                                 const C_OSCHalcConfigParameter & rc_RefParEl =
+                                 const C_OscHalcConfigParameter & rc_RefParEl =
                                     rc_RefPar.c_ParameterElements[u32_ItParEl];
-                                 const C_OSCHalcConfigParameter & rc_NewParEl =
+                                 const C_OscHalcConfigParameter & rc_NewParEl =
                                     rc_NewPar.c_ParameterElements[u32_ItParEl];
                                  q_Consistent = C_SdNdeHalcConfigImportDialog::mh_CheckConsistencyEl(rc_RefParEl,
                                                                                                      rc_NewParEl,
@@ -515,8 +514,8 @@ bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistency(const C_OSCHalcConfig * 
    Consistency state
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistencyEl(const C_OSCHalcConfigParameter & orc_Ref,
-                                                          const C_OSCHalcConfigParameter & orc_New,
+bool C_SdNdeHalcConfigImportDialog::mh_CheckConsistencyEl(const C_OscHalcConfigParameter & orc_Ref,
+                                                          const C_OscHalcConfigParameter & orc_New,
                                                           QString & orc_ErrorDetails, const QString & orc_Domain,
                                                           const QString & orc_Channel,
                                                           const QString & orc_CheckAddendum)

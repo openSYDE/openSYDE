@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QWidgetAction>
 
-#include "C_OgeMuSections.h"
-#include "C_OgeLabGenericNoPaddingNoMargins.h"
+#include "C_OgeMuSections.hpp"
+#include "C_OgeLabGenericNoPaddingNoMargins.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -58,7 +58,7 @@ void C_OgeMuSections::AddCustomSection(const QString & orc_SectionTitle)
    QWidgetAction * const pc_Action = new QWidgetAction(this);
    C_OgeLabGenericNoPaddingNoMargins * const pc_Label = new C_OgeLabGenericNoPaddingNoMargins(this);
 
-   // label style is handled in style sheets: stw_opensyde_gui_elements--C_OgeMuSections QLabel
+   // label style is handled in style sheets: stw--opensyde_gui_elements--C_OgeMuSections QLabel
    pc_Label->setText(orc_SectionTitle);
    pc_Action->setDefaultWidget(pc_Label);
    this->addAction(pc_Action);

@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxNavigationTab" name="pc_GroupBoxStyle">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxNavigationTab" name="pc_GroupBoxStyle">
      <property name="title">
       <string>StyleBox</string>
      </property>
@@ -81,7 +81,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelIcon">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelIcon">
             <property name="minimumSize">
              <size>
               <width>48</width>
@@ -146,7 +146,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelText">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelText">
         <property name="text">
          <string>KEEP THE MARGINS!</string>
         </property>
@@ -191,19 +191,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxNavigationTab</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxNavigationTab</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxNavigationTab.h</header>
+   <header>C_OgeGbxNavigationTab.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

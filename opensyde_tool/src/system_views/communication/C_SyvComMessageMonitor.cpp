@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "TGLUtils.h"
+#include "TglUtils.hpp"
 
-#include "C_SyvComMessageMonitor.h"
-#include "C_CieImportDbc.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SyvComMessageLoggerFileBlf.h"
+#include "C_SyvComMessageMonitor.hpp"
+#include "C_CieImportDbc.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SyvComMessageLoggerFileBlf.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_can;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::can;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,7 +44,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvComMessageMonitor::C_SyvComMessageMonitor(void) :
-   C_OSCComMessageLogger(),
+   C_OscComMessageLogger(),
    me_LoadingActivity(eNOT_ACTIVE),
    mc_Path(""),
    mu32_BusIndex(0U),
@@ -61,7 +60,7 @@ C_SyvComMessageMonitor::C_SyvComMessageMonitor(void) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvComMessageMonitor::~C_SyvComMessageMonitor(void)
+C_SyvComMessageMonitor::~C_SyvComMessageMonitor(void) noexcept
 {
    if (this->mpc_LoadingThread != NULL)
    {
@@ -103,7 +102,7 @@ void C_SyvComMessageMonitor::Start(void)
 
    this->mc_CriticalSectionConfig.Acquire();
    // Accessing to message filter counter. Need synchronization
-   C_OSCComMessageLogger::Start();
+   C_OscComMessageLogger::Start();
    this->mc_CriticalSectionConfig.Release();
 }
 
@@ -116,7 +115,7 @@ void C_SyvComMessageMonitor::Start(void)
 void C_SyvComMessageMonitor::Stop(void)
 {
    this->mc_CriticalSectionCounter.Acquire();
-   C_OSCComMessageLogger::Stop();
+   C_OscComMessageLogger::Stop();
    this->mc_CriticalSectionCounter.Release();
 }
 
@@ -130,9 +129,9 @@ void C_SyvComMessageMonitor::Stop(void)
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::StartAddOsySysDef(const C_SCLString & orc_PathSystemDefinition)
+int32_t C_SyvComMessageMonitor::StartAddOsySysDef(const C_SclString & orc_PathSystemDefinition)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_LoadingThread->isRunning() == true)
    {
@@ -159,10 +158,10 @@ sint32 C_SyvComMessageMonitor::StartAddOsySysDef(const C_SCLString & orc_PathSys
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::StartAddOsySysDef(const C_SCLString & orc_PathSystemDefinition,
-                                                 const uint32 ou32_BusIndex)
+int32_t C_SyvComMessageMonitor::StartAddOsySysDef(const C_SclString & orc_PathSystemDefinition,
+                                                  const uint32_t ou32_BusIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_LoadingThread->isRunning() == true)
    {
@@ -193,12 +192,13 @@ sint32 C_SyvComMessageMonitor::StartAddOsySysDef(const C_SCLString & orc_PathSys
    C_WARN      specified bus index was not found or is no CAN bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::SetOsySysDefBus(const C_SCLString & orc_PathSystemDefinition, const uint32 ou32_BusIndex)
+int32_t C_SyvComMessageMonitor::SetOsySysDefBus(const C_SclString & orc_PathSystemDefinition,
+                                                const uint32_t ou32_BusIndex)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   s32_Return = C_OSCComMessageLogger::SetOsySysDefBus(orc_PathSystemDefinition, ou32_BusIndex);
+   s32_Return = C_OscComMessageLogger::SetOsySysDefBus(orc_PathSystemDefinition, ou32_BusIndex);
    this->mc_CriticalSectionConfig.Release();
 
    return s32_Return;
@@ -215,13 +215,13 @@ sint32 C_SyvComMessageMonitor::SetOsySysDefBus(const C_SCLString & orc_PathSyste
    C_RANGE     openSYDE system definition not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::GetOsySysDef(const C_SCLString & orc_PathSystemDefinition,
-                                            C_OSCComMessageLoggerOsySysDefConfig & orc_SystemDefinition)
+int32_t C_SyvComMessageMonitor::GetOsySysDef(const C_SclString & orc_PathSystemDefinition,
+                                             C_OscComMessageLoggerOsySysDefConfig & orc_SystemDefinition)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   s32_Return = C_OSCComMessageLogger::GetOsySysDef(orc_PathSystemDefinition, orc_SystemDefinition);
+   s32_Return = C_OscComMessageLogger::GetOsySysDef(orc_PathSystemDefinition, orc_SystemDefinition);
    this->mc_CriticalSectionConfig.Release();
 
    return s32_Return;
@@ -237,9 +237,9 @@ sint32 C_SyvComMessageMonitor::GetOsySysDef(const C_SCLString & orc_PathSystemDe
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::StartAddDbcFile(const C_SCLString & orc_PathDbc)
+int32_t C_SyvComMessageMonitor::StartAddDbcFile(const C_SclString & orc_PathDbc)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_LoadingThread->isRunning() == true)
    {
@@ -265,12 +265,12 @@ sint32 C_SyvComMessageMonitor::StartAddDbcFile(const C_SCLString & orc_PathDbc)
    C_RANGE     DBC definition not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::GetDbcFile(const C_SCLString & orc_PathDbc,
-                                          C_CieConverter::C_CIECommDefinition & orc_DbcDefinition)
+int32_t C_SyvComMessageMonitor::GetDbcFile(const C_SclString & orc_PathDbc,
+                                           C_CieConverter::C_CieCommDefinition & orc_DbcDefinition)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
-   std::map<stw_scl::C_SCLString, C_CieConverter::C_CIECommDefinition>::iterator c_ItDbc;
+   std::map<stw::scl::C_SclString, C_CieConverter::C_CieCommDefinition>::iterator c_ItDbc;
 
    this->mc_CriticalSectionConfig.Acquire();
 
@@ -299,11 +299,11 @@ sint32 C_SyvComMessageMonitor::GetDbcFile(const C_SCLString & orc_PathDbc,
    C_NOACT     No database found with this path
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::RemoveDatabase(const C_SCLString & orc_Path)
+int32_t C_SyvComMessageMonitor::RemoveDatabase(const C_SclString & orc_Path)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
-   std::map<stw_scl::C_SCLString, C_CieConverter::C_CIECommDefinition>::iterator c_ItDbc;
+   std::map<stw::scl::C_SclString, C_CieConverter::C_CieCommDefinition>::iterator c_ItDbc;
 
    this->mc_CriticalSectionConfig.Acquire();
    c_ItDbc = this->mc_DbcFiles.find(orc_Path);
@@ -318,7 +318,7 @@ sint32 C_SyvComMessageMonitor::RemoveDatabase(const C_SCLString & orc_Path)
    if (s32_Return == C_NOACT)
    {
       // No DBC file found, let try the base class
-      s32_Return = C_OSCComMessageLogger::RemoveDatabase(orc_Path);
+      s32_Return = C_OscComMessageLogger::RemoveDatabase(orc_Path);
    }
    this->mc_CriticalSectionConfig.Release();
 
@@ -336,13 +336,13 @@ sint32 C_SyvComMessageMonitor::RemoveDatabase(const C_SCLString & orc_Path)
    C_NOACT     No database found with this path
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::ActivateDatabase(const C_SCLString & orc_Path, const bool oq_Active)
+int32_t C_SyvComMessageMonitor::ActivateDatabase(const C_SclString & orc_Path, const bool oq_Active)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    //Logger handling
    this->mc_CriticalSectionConfig.Acquire();
-   s32_Return = C_OSCComMessageLogger::ActivateDatabase(orc_Path, oq_Active);
+   s32_Return = C_OscComMessageLogger::ActivateDatabase(orc_Path, oq_Active);
    this->mc_CriticalSectionConfig.Release();
 
    return s32_Return;
@@ -360,13 +360,13 @@ sint32 C_SyvComMessageMonitor::ActivateDatabase(const C_SCLString & orc_Path, co
    C_RD_WR     Error on creating file, folders or deleting old file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::AddLogFileAsc(const C_SCLString & orc_FilePath, const bool oq_HexActive,
-                                             const bool oq_RelativeTimeStampActive)
+int32_t C_SyvComMessageMonitor::AddLogFileAsc(const C_SclString & orc_FilePath, const bool oq_HexActive,
+                                              const bool oq_RelativeTimeStampActive)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   s32_Return = C_OSCComMessageLogger::AddLogFileAsc(orc_FilePath, oq_HexActive, oq_RelativeTimeStampActive);
+   s32_Return = C_OscComMessageLogger::AddLogFileAsc(orc_FilePath, oq_HexActive, oq_RelativeTimeStampActive);
    this->mc_CriticalSectionConfig.Release();
 
    return s32_Return;
@@ -382,16 +382,16 @@ sint32 C_SyvComMessageMonitor::AddLogFileAsc(const C_SCLString & orc_FilePath, c
    C_RD_WR     Error on creating file, folders or deleting old file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::AddLogFileBlf(const C_SCLString & orc_FilePath)
+int32_t C_SyvComMessageMonitor::AddLogFileBlf(const C_SclString & orc_FilePath)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
    C_SyvComMessageLoggerFileBlf * const pc_File = new C_SyvComMessageLoggerFileBlf(orc_FilePath);
 
    s32_Return = pc_File->OpenFile();
 
    this->mc_CriticalSectionConfig.Acquire();
-   this->mc_LoggingFiles.insert(std::pair<C_SCLString,
-                                          C_OSCComMessageLoggerFileBase * const>(orc_FilePath, pc_File));
+   this->mc_LoggingFiles.emplace(std::pair<C_SclString,
+                                           C_OscComMessageLoggerFileBase * const>(orc_FilePath, pc_File));
    this->mc_CriticalSectionConfig.Release();
 
    //lint -e{429}  no memory leak of pc_File because of handling of instance in map mc_LoggingFiles
@@ -410,12 +410,12 @@ sint32 C_SyvComMessageMonitor::AddLogFileBlf(const C_SCLString & orc_FilePath)
    C_NOACT     No file with this path registered
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::RemoveLogFile(const C_SCLString & orc_FilePath)
+int32_t C_SyvComMessageMonitor::RemoveLogFile(const C_SclString & orc_FilePath)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   s32_Return = C_OSCComMessageLogger::RemoveLogFile(orc_FilePath);
+   s32_Return = C_OscComMessageLogger::RemoveLogFile(orc_FilePath);
    this->mc_CriticalSectionConfig.Release();
 
    return s32_Return;
@@ -430,7 +430,7 @@ sint32 C_SyvComMessageMonitor::RemoveLogFile(const C_SCLString & orc_FilePath)
 void C_SyvComMessageMonitor::RemoveAllLogFiles(void)
 {
    this->mc_CriticalSectionConfig.Acquire();
-   C_OSCComMessageLogger::RemoveAllLogFiles();
+   C_OscComMessageLogger::RemoveAllLogFiles();
    this->mc_CriticalSectionConfig.Release();
 }
 
@@ -442,10 +442,10 @@ void C_SyvComMessageMonitor::RemoveAllLogFiles(void)
    \param[in]  orc_Filter  Filter configuration to add
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::AddFilter(const C_OSCComMessageLoggerFilter & orc_Filter)
+void C_SyvComMessageMonitor::AddFilter(const C_OscComMessageLoggerFilter & orc_Filter)
 {
    this->mc_CriticalSectionConfig.Acquire();
-   C_OSCComMessageLogger::AddFilter(orc_Filter);
+   C_OscComMessageLogger::AddFilter(orc_Filter);
    this->mc_CriticalSectionConfig.Release();
 }
 
@@ -457,10 +457,10 @@ void C_SyvComMessageMonitor::AddFilter(const C_OSCComMessageLoggerFilter & orc_F
    \param[in]  orc_Filter  Filter configuration to remove
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::RemoveFilter(const C_OSCComMessageLoggerFilter & orc_Filter)
+void C_SyvComMessageMonitor::RemoveFilter(const C_OscComMessageLoggerFilter & orc_Filter)
 {
    this->mc_CriticalSectionConfig.Acquire();
-   C_OSCComMessageLogger::RemoveFilter(orc_Filter);
+   C_OscComMessageLogger::RemoveFilter(orc_Filter);
    this->mc_CriticalSectionConfig.Release();
 }
 
@@ -471,7 +471,7 @@ void C_SyvComMessageMonitor::RemoveFilter(const C_OSCComMessageLoggerFilter & or
 void C_SyvComMessageMonitor::RemoveAllFilter(void)
 {
    this->mc_CriticalSectionConfig.Acquire();
-   C_OSCComMessageLogger::RemoveAllFilter();
+   C_OscComMessageLogger::RemoveAllFilter();
    this->mc_CriticalSectionConfig.Release();
 }
 
@@ -484,12 +484,12 @@ void C_SyvComMessageMonitor::RemoveAllFilter(void)
    Current count of filtered CAN messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvComMessageMonitor::GetFilteredMessages(void) const
+uint32_t C_SyvComMessageMonitor::GetFilteredMessages(void) const
 {
-   uint32 u32_FilteredMessages;
+   uint32_t u32_FilteredMessages;
 
    this->mc_CriticalSectionConfig.Acquire();
-   u32_FilteredMessages = C_OSCComMessageLogger::GetFilteredMessages();
+   u32_FilteredMessages = C_OscComMessageLogger::GetFilteredMessages();
    this->mc_CriticalSectionConfig.Release();
 
    return u32_FilteredMessages;
@@ -509,12 +509,12 @@ uint32 C_SyvComMessageMonitor::GetFilteredMessages(void) const
    C_BUSY      Monitor is paused
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
+int32_t C_SyvComMessageMonitor::HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg, const bool oq_IsTx)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mc_CriticalSectionCounter.Acquire();
-   s32_Return = C_OSCComMessageLogger::HandleCanMessage(orc_Msg, oq_IsTx);
+   s32_Return = C_OscComMessageLogger::HandleCanMessage(orc_Msg, oq_IsTx);
    this->mc_CriticalSectionCounter.Release();
 
    if (s32_Return == C_NO_ERR)
@@ -535,7 +535,7 @@ sint32 C_SyvComMessageMonitor::HandleCanMessage(const T_STWCAN_Msg_RX & orc_Msg,
 void C_SyvComMessageMonitor::ResetCounter(void)
 {
    this->mc_CriticalSectionCounter.Acquire();
-   C_OSCComMessageLogger::ResetCounter();
+   C_OscComMessageLogger::ResetCounter();
    this->mc_CriticalSectionCounter.Release();
 }
 
@@ -547,7 +547,7 @@ void C_SyvComMessageMonitor::ResetCounter(void)
    \param[in]  ou8_BusLoad    Current CAN bus load in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::UpdateBusLoad(const uint8 ou8_BusLoad)
+void C_SyvComMessageMonitor::UpdateBusLoad(const uint8_t ou8_BusLoad)
 {
    this->mc_CriticalSectionMeta.Acquire();
    this->mu8_BusLoad = ou8_BusLoad;
@@ -562,7 +562,7 @@ void C_SyvComMessageMonitor::UpdateBusLoad(const uint8 ou8_BusLoad)
    \param[in]  ou32_TxCount  Current number of all CAN Tx messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::UpdateTxCounter(const uint32 ou32_TxCount)
+void C_SyvComMessageMonitor::UpdateTxCounter(const uint32_t ou32_TxCount)
 {
    this->mc_CriticalSectionMeta.Acquire();
    this->mu32_TxMessages = ou32_TxCount;
@@ -577,7 +577,7 @@ void C_SyvComMessageMonitor::UpdateTxCounter(const uint32 ou32_TxCount)
    \param[in]  ou32_TxErrors  Current detected CAN Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::UpdateTxErrors(const uint32 ou32_TxErrors)
+void C_SyvComMessageMonitor::UpdateTxErrors(const uint32_t ou32_TxErrors)
 {
    this->mc_CriticalSectionMeta.Acquire();
    this->mu32_TxErrors = ou32_TxErrors;
@@ -593,9 +593,9 @@ void C_SyvComMessageMonitor::UpdateTxErrors(const uint32 ou32_TxErrors)
    Current bus load in percentage
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_SyvComMessageMonitor::GetBusLoad(void) const
+uint8_t C_SyvComMessageMonitor::GetBusLoad(void) const
 {
-   uint8 u8_BusLoad;
+   uint8_t u8_BusLoad;
 
    this->mc_CriticalSectionMeta.Acquire();
    u8_BusLoad = this->mu8_BusLoad;
@@ -613,9 +613,9 @@ uint8 C_SyvComMessageMonitor::GetBusLoad(void) const
    Current number of Tx messages
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvComMessageMonitor::GetTxCount() const
+uint32_t C_SyvComMessageMonitor::GetTxCount() const
 {
-   uint32 u32_TxCount;
+   uint32_t u32_TxCount;
 
    this->mc_CriticalSectionMeta.Acquire();
    u32_TxCount = this->mu32_TxMessages;
@@ -633,9 +633,9 @@ uint32 C_SyvComMessageMonitor::GetTxCount() const
    Current count of Tx errors
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvComMessageMonitor::GetTxErrors(void) const
+uint32_t C_SyvComMessageMonitor::GetTxErrors(void) const
 {
-   uint32 u32_TxErrors;
+   uint32_t u32_TxErrors;
 
    this->mc_CriticalSectionMeta.Acquire();
    u32_TxErrors = this->mu32_TxErrors;
@@ -657,9 +657,9 @@ uint32 C_SyvComMessageMonitor::GetTxErrors(void) const
    C_BUSY         previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::GetResults(sint32 & ors32_Result) const
+int32_t C_SyvComMessageMonitor::GetResults(int32_t & ors32_Result) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_LoadingThread->isRunning() == true)
    {
@@ -685,9 +685,9 @@ sint32 C_SyvComMessageMonitor::GetResults(sint32 & ors32_Result) const
    C_BUSY         previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::GetResultBusses(std::vector<C_OSCSystemBus> & orc_Busses) const
+int32_t C_SyvComMessageMonitor::GetResultBusses(std::vector<C_OscSystemBus> & orc_Busses) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_LoadingThread->isRunning() == true)
    {
@@ -712,9 +712,9 @@ sint32 C_SyvComMessageMonitor::GetResultBusses(std::vector<C_OSCSystemBus> & orc
    C_NOACT     No message available
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::m_GetCanMessage(C_OSCComMessageLoggerData & orc_Message)
+int32_t C_SyvComMessageMonitor::m_GetCanMessage(C_OscComMessageLoggerData & orc_Message)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
    this->mc_CriticalSectionMsg.Acquire();
    if (this->mc_ReceivedMessages.size() > 0)
@@ -738,7 +738,7 @@ sint32 C_SyvComMessageMonitor::m_GetCanMessage(C_OSCComMessageLoggerData & orc_M
    \param[in,out]  orc_MessageData  Message data for updating
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::m_UpdateProtocolString(C_OSCComMessageLoggerData & orc_MessageData) const
+void C_SyvComMessageMonitor::m_UpdateProtocolString(C_OscComMessageLoggerData & orc_MessageData) const
 {
    // If the name is not empty, the message was already interpreted by DBC or openSYDE system definition interpretation
    if (orc_MessageData.c_Name == "")
@@ -774,7 +774,7 @@ bool C_SyvComMessageMonitor::m_CheckFilter(const T_STWCAN_Msg_RX & orc_Msg)
    bool q_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   q_Return = C_OSCComMessageLogger::m_CheckFilter(orc_Msg);
+   q_Return = C_OscComMessageLogger::m_CheckFilter(orc_Msg);
    this->mc_CriticalSectionConfig.Release();
 
    return q_Return;
@@ -790,11 +790,12 @@ bool C_SyvComMessageMonitor::m_CheckFilter(const T_STWCAN_Msg_RX & orc_Msg)
    \param[in]  ou32_BusIndex              Used CAN bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::m_InsertOsySysDef(const C_SCLString & orc_PathSystemDefinition,
-                                               const C_OSCSystemDefinition & orc_OsySysDef, const uint32 ou32_BusIndex)
+void C_SyvComMessageMonitor::m_InsertOsySysDef(const C_SclString & orc_PathSystemDefinition,
+                                               const C_OscSystemDefinition & orc_OsySysDef,
+                                               const uint32_t ou32_BusIndex)
 {
    this->mc_CriticalSectionConfig.Acquire();
-   C_OSCComMessageLogger::m_InsertOsySysDef(orc_PathSystemDefinition, orc_OsySysDef, ou32_BusIndex);
+   C_OscComMessageLogger::m_InsertOsySysDef(orc_PathSystemDefinition, orc_OsySysDef, ou32_BusIndex);
    this->mc_CriticalSectionConfig.Release();
 }
 
@@ -815,7 +816,7 @@ bool C_SyvComMessageMonitor::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
    bool q_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   q_Return = C_OSCComMessageLogger::m_CheckSysDef(orc_Msg);
+   q_Return = C_OscComMessageLogger::m_CheckSysDef(orc_Msg);
    this->mc_CriticalSectionConfig.Release();
 
    return q_Return;
@@ -833,12 +834,12 @@ bool C_SyvComMessageMonitor::m_CheckSysDef(const T_STWCAN_Msg_RX & orc_Msg)
    false    No matching CAN message exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvComMessageMonitor::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_MessageData) const
+bool C_SyvComMessageMonitor::m_InterpretSysDef(C_OscComMessageLoggerData & orc_MessageData) const
 {
    bool q_Return;
 
    this->mc_CriticalSectionConfig.Acquire();
-   q_Return = C_OSCComMessageLogger::m_InterpretSysDef(orc_MessageData);
+   q_Return = C_OscComMessageLogger::m_InterpretSysDef(orc_MessageData);
    this->mc_CriticalSectionConfig.Release();
 
    return q_Return;
@@ -856,10 +857,10 @@ bool C_SyvComMessageMonitor::m_InterpretSysDef(C_OSCComMessageLoggerData & orc_M
    false    No matching CAN message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvComMessageMonitor::m_CheckInterpretation(stw_opensyde_core::C_OSCComMessageLoggerData & orc_MessageData)
+bool C_SyvComMessageMonitor::m_CheckInterpretation(stw::opensyde_core::C_OscComMessageLoggerData & orc_MessageData)
 {
    bool q_Return = false;
-   const C_CieConverter::C_CIECanMessage * const pc_DbcMessage = this->m_CheckDbcFile(orc_MessageData.c_CanMsg);
+   const C_CieConverter::C_CieCanMessage * const pc_DbcMessage = this->m_CheckDbcFile(orc_MessageData.c_CanMsg);
 
    if (pc_DbcMessage != NULL)
    {
@@ -878,7 +879,7 @@ bool C_SyvComMessageMonitor::m_CheckInterpretation(stw_opensyde_core::C_OSCComMe
    Empty string if no match found
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SyvComMessageMonitor::m_GetProtocolStringHexHook(void) const
+C_SclString C_SyvComMessageMonitor::m_GetProtocolStringHexHook(void) const
 {
    // TODO for logging
    return "";
@@ -892,7 +893,7 @@ C_SCLString C_SyvComMessageMonitor::m_GetProtocolStringHexHook(void) const
    Empty string if no match found
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SyvComMessageMonitor::m_GetProtocolStringDecHook(void) const
+C_SclString C_SyvComMessageMonitor::m_GetProtocolStringDecHook(void) const
 {
    // TODO for logging
    return "";
@@ -913,15 +914,15 @@ C_SCLString C_SyvComMessageMonitor::m_GetProtocolStringDecHook(void) const
                DBC file added to interpretation
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComMessageMonitor::m_AddDbcFile(const C_SCLString & orc_PathDbc)
+int32_t C_SyvComMessageMonitor::m_AddDbcFile(const C_SclString & orc_PathDbc)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (orc_PathDbc.SubString(orc_PathDbc.Length() - 3U, 4U).LowerCase() == ".dbc")
    {
-      C_CieConverter::C_CIECommDefinition c_DbcDefinition;
-      C_SCLStringList c_WarningMsgs;
-      C_SCLString c_ErrorMsg;
+      C_CieConverter::C_CieCommDefinition c_DbcDefinition;
+      C_SclStringList c_WarningMsgs;
+      C_SclString c_ErrorMsg;
 
       s32_Return = C_CieImportDbc::h_ImportNetwork(orc_PathDbc, c_DbcDefinition, c_WarningMsgs, c_ErrorMsg, true);
 
@@ -929,11 +930,11 @@ sint32 C_SyvComMessageMonitor::m_AddDbcFile(const C_SCLString & orc_PathDbc)
           (s32_Return == C_WARN))
       {
          this->mc_CriticalSectionConfig.Acquire();
-         this->mc_DbcFiles.insert(std::pair<C_SCLString, C_CieConverter::C_CIECommDefinition>(orc_PathDbc,
-                                                                                              c_DbcDefinition));
+         this->mc_DbcFiles.emplace(std::pair<C_SclString, C_CieConverter::C_CieCommDefinition>(orc_PathDbc,
+                                                                                               c_DbcDefinition));
 
          // Register the database in the activation flag map
-         this->mc_DatabaseActiveFlags.insert(std::pair<C_SCLString, bool>(orc_PathDbc, true));
+         this->mc_DatabaseActiveFlags.emplace(std::pair<C_SclString, bool>(orc_PathDbc, true));
 
          this->mc_CriticalSectionConfig.Release();
       }
@@ -954,11 +955,11 @@ sint32 C_SyvComMessageMonitor::m_AddDbcFile(const C_SCLString & orc_PathDbc)
    NULL        No matching CAN message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(const T_STWCAN_Msg_RX & orc_Msg)
+const C_CieConverter::C_CieCanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(const T_STWCAN_Msg_RX & orc_Msg)
 {
-   const C_CieConverter::C_CIECanMessage * pc_DbcMessage = NULL;
+   const C_CieConverter::C_CieCanMessage * pc_DbcMessage = NULL;
 
-   std::map<stw_scl::C_SCLString, C_CieConverter::C_CIECommDefinition>::const_iterator c_ItDbc;
+   std::map<stw::scl::C_SclString, C_CieConverter::C_CieCommDefinition>::const_iterator c_ItDbc;
 
    this->mc_CriticalSectionConfig.Acquire();
 
@@ -968,17 +969,17 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
       // Check if the database is active
       if (this->mc_DatabaseActiveFlags[c_ItDbc->first] == true)
       {
-         uint32 u32_NodeCounter;
+         uint32_t u32_NodeCounter;
 
          //Nodes
          for (u32_NodeCounter = 0U; u32_NodeCounter < c_ItDbc->second.c_Nodes.size(); ++u32_NodeCounter)
          {
-            const C_CieConverter::C_CIENode & rc_Node = c_ItDbc->second.c_Nodes[u32_NodeCounter];
-            uint32 u32_MsgCounter;
+            const C_CieConverter::C_CieNode & rc_Node = c_ItDbc->second.c_Nodes[u32_NodeCounter];
+            uint32_t u32_MsgCounter;
 
             for (u32_MsgCounter = 0U; u32_MsgCounter < rc_Node.c_TxMessages.size(); ++u32_MsgCounter)
             {
-               const C_CieConverter::C_CIECanMessage & rc_Msg = rc_Node.c_TxMessages[u32_MsgCounter].c_CanMessage;
+               const C_CieConverter::C_CieCanMessage & rc_Msg = rc_Node.c_TxMessages[u32_MsgCounter].c_CanMessage;
 
                // No check of dlc here, it will be checked for each signal
                if ((orc_Msg.u32_ID == rc_Msg.u32_CanId) &&
@@ -995,7 +996,7 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
                // Not found yet, search in Rx messages
                for (u32_MsgCounter = 0U; u32_MsgCounter < rc_Node.c_RxMessages.size(); ++u32_MsgCounter)
                {
-                  const C_CieConverter::C_CIECanMessage & rc_Msg = rc_Node.c_RxMessages[u32_MsgCounter].c_CanMessage;
+                  const C_CieConverter::C_CieCanMessage & rc_Msg = rc_Node.c_RxMessages[u32_MsgCounter].c_CanMessage;
 
                   // No check of dlc here, it will be checked for each signal
                   if ((orc_Msg.u32_ID == rc_Msg.u32_CanId) &&
@@ -1017,9 +1018,10 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
          //Unmapped messages
          if (pc_DbcMessage == NULL)
          {
-            for (uint32 u32_ItMessage = 0U; u32_ItMessage < c_ItDbc->second.c_UnmappedMessages.size(); ++u32_ItMessage)
+            for (uint32_t u32_ItMessage = 0U; u32_ItMessage < c_ItDbc->second.c_UnmappedMessages.size();
+                 ++u32_ItMessage)
             {
-               const C_CieConverter::C_CIECanMessage & rc_Msg =
+               const C_CieConverter::C_CieCanMessage & rc_Msg =
                   c_ItDbc->second.c_UnmappedMessages[u32_ItMessage].c_CanMessage;
 
                // No check of dlc here, it will be checked for each signal
@@ -1053,8 +1055,8 @@ const C_CieConverter::C_CIECanMessage * C_SyvComMessageMonitor::m_CheckDbcFile(c
    false    No matching CAN message exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMessage * const opc_DbcMessage,
-                                                C_OSCComMessageLoggerData & orc_MessageData) const
+bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CieCanMessage * const opc_DbcMessage,
+                                                C_OscComMessageLoggerData & orc_MessageData) const
 {
    bool q_Return = false;
 
@@ -1062,32 +1064,32 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
 
    if (opc_DbcMessage != NULL)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
       bool q_MultiplexerFound = false;
-      uint32 u32_MultiplexerIndex = 0U;
-      uint16 u16_MultiplexerValue = 0U;
+      uint32_t u32_MultiplexerIndex = 0U;
+      uint16_t u16_MultiplexerValue = 0U;
 
       orc_MessageData.c_Name = opc_DbcMessage->c_Name.c_str();
 
       // Check if a multiplexer signal exists
       for (u32_Counter = 0U; u32_Counter < opc_DbcMessage->c_Signals.size(); ++u32_Counter)
       {
-         const C_CieConverter::C_CIECanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_Counter];
+         const C_CieConverter::C_CieCanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_Counter];
 
-         if (rc_DbcSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+         if (rc_DbcSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
          {
             mh_InterpretDbcFileCanSignal(orc_MessageData, rc_DbcSignal);
 
             if (orc_MessageData.c_Signals.size() > 0)
             {
-               C_OSCComMessageLoggerDataSignal & rc_Signal =
+               C_OscComMessageLoggerDataSignal & rc_Signal =
                   orc_MessageData.c_Signals[orc_MessageData.c_Signals.size() - 1];
 
                if (rc_Signal.q_DlcError == false)
                {
                   try
                   {
-                     u16_MultiplexerValue = static_cast<uint16>(rc_Signal.c_RawValueDec.ToInt());
+                     u16_MultiplexerValue = static_cast<uint16_t>(rc_Signal.c_RawValueDec.ToInt());
                      rc_Signal.c_Name += " (Multiplexer)";
                      q_MultiplexerFound = true;
                      u32_MultiplexerIndex = u32_Counter;
@@ -1108,10 +1110,10 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
          if ((q_MultiplexerFound == false) ||
              (u32_Counter != u32_MultiplexerIndex))
          {
-            const C_CieConverter::C_CIECanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_Counter];
+            const C_CieConverter::C_CieCanSignal & rc_DbcSignal = opc_DbcMessage->c_Signals[u32_Counter];
 
             // Interpret all not multiplexed signals and all multiplexed signals with the matching multiplexer value
-            if ((rc_DbcSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT) ||
+            if ((rc_DbcSignal.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT) ||
                 ((q_MultiplexerFound == true) &&
                  (u16_MultiplexerValue == rc_DbcSignal.u16_MultiplexValue)))
             {
@@ -1143,11 +1145,11 @@ bool C_SyvComMessageMonitor::m_InterpretDbcFile(const C_CieConverter::C_CIECanMe
    \param[in]      orc_DbcSignal    CAN signal of DBC file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OSCComMessageLoggerData & orc_MessageData,
-                                                          const C_CieConverter::C_CIECanSignal & orc_DbcSignal)
+void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OscComMessageLoggerData & orc_MessageData,
+                                                          const C_CieConverter::C_CieCanSignal & orc_DbcSignal)
 {
-   C_OSCComMessageLoggerDataSignal c_Signal;
-   C_OSCCanSignal c_OscSignal;
+   C_OscComMessageLoggerDataSignal c_Signal;
+   C_OscCanSignal c_OscSignal;
 
    c_Signal.c_Name = orc_DbcSignal.c_Element.c_Name.c_str();
    c_Signal.c_Unit = orc_DbcSignal.c_Element.c_Unit.c_str();
@@ -1172,8 +1174,8 @@ void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OSCComMessageLoggerD
       // Check if a value description matches to the current value
       try
       {
-         const stw_types::uint32 u32_Value = static_cast<uint32>(c_Signal.c_RawValueDec.ToInt64());
-         const std::map<stw_types::uint32, stw_scl::C_SCLString>::const_iterator c_ItDescription =
+         const uint32_t u32_Value = static_cast<uint32_t>(c_Signal.c_RawValueDec.ToInt64());
+         const std::map<uint32_t, stw::scl::C_SclString>::const_iterator c_ItDescription =
             orc_DbcSignal.c_ValueDescription.find(u32_Value);
 
          if (c_ItDescription != orc_DbcSignal.c_ValueDescription.end())

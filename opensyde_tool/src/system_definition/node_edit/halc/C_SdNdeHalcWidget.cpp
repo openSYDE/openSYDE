@@ -10,38 +10,37 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdNdeHalcWidget.h"
+#include "C_SdNdeHalcWidget.hpp"
 #include "ui_C_SdNdeHalcWidget.h"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_UsHandler.h"
-#include "C_Uti.h"
-#include "C_PuiProject.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_OSCHalcConfigUtil.h"
-#include "C_OSCSystemFilerUtil.h"
-#include "C_OSCHalcConfigStandaloneFiler.h"
-#include "C_SdNdeHalcConfigImportDialog.h"
-#include "C_SdNdeHalcDefUpdateDialog.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_UsHandler.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiProject.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_OscHalcConfigUtil.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscHalcConfigStandaloneFiler.hpp"
+#include "C_SdNdeHalcConfigImportDialog.hpp"
+#include "C_SdNdeHalcDefUpdateDialog.hpp"
 
-#include "C_OSCHalcDefFiler.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_OscHalcDefFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SdNdeHalcWidget::mhc_CONFIG_FILE_TYPE = ".syde_halc_conf";
@@ -139,7 +138,7 @@ C_SdNdeHalcWidget::~C_SdNdeHalcWidget()
 void C_SdNdeHalcWidget::LoadUserSettings() const
 {
    // splitter
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditHalcSplitterX());
+   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditHalcSplitterHorizontal());
 
    // sub widgets
    this->mpc_Ui->pc_WiOverviewTable->LoadUserSettings();
@@ -154,11 +153,11 @@ void C_SdNdeHalcWidget::LoadUserSettings() const
 void C_SdNdeHalcWidget::SaveUserSettings() const
 {
    // splitter
-   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+   const QList<int32_t> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
    if (c_Sizes.size() > 0)
    {
-      C_UsHandler::h_GetInstance()->SetSdNodeEditHalcSplitterX(c_Sizes.at(0));
+      C_UsHandler::h_GetInstance()->SetSdNodeEditHalcSplitterHorizontal(c_Sizes.at(0));
    }
 
    // sub widgets
@@ -226,7 +225,7 @@ void C_SdNdeHalcWidget::InitStaticNames(void) const
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::SetNode(const uint32 ou32_NodeIndex)
+void C_SdNdeHalcWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
 
@@ -246,12 +245,11 @@ void C_SdNdeHalcWidget::SetNode(const uint32 ou32_NodeIndex)
    \param[in]  os32_ChannelIndex    Index of channel of the domain (optional: -1 for not used)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::ShowChannel(const stw_types::uint32 ou32_DomainIndex,
-                                    const stw_types::sint32 os32_ChannelIndex) const
+void C_SdNdeHalcWidget::ShowChannel(const uint32_t ou32_DomainIndex, const int32_t os32_ChannelIndex) const
 {
    const bool q_UseChannelIndex = (os32_ChannelIndex >= 0);
 
-   this->mpc_Ui->pc_TreeChannels->SelectChannel(ou32_DomainIndex, static_cast<uint32>(os32_ChannelIndex),
+   this->mpc_Ui->pc_TreeChannels->SelectChannel(ou32_DomainIndex, static_cast<uint32_t>(os32_ChannelIndex),
                                                 q_UseChannelIndex);
 }
 
@@ -265,7 +263,7 @@ void C_SdNdeHalcWidget::ShowChannel(const stw_types::uint32 ou32_DomainIndex,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcWidget::showEvent(QShowEvent * const opc_Event)
 {
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditHalcSplitterX());
+   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSdNodeEditHalcSplitterHorizontal());
    QWidget::showEvent(opc_Event);
 }
 
@@ -302,9 +300,9 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
 
    if (c_FileName != "")
    {
-      sint32 s32_Return;
+      int32_t s32_Return;
       QString c_ErrorDetails;
-      QPointer<C_OgePopUpDialog> const c_PopUpDialog = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
       C_SdNdeHalcConfigImportDialog * const pc_ImportDialog =
          new C_SdNdeHalcConfigImportDialog(*c_PopUpDialog, this->mu32_NodeIndex,
                                            c_FileName);
@@ -319,7 +317,7 @@ void C_SdNdeHalcWidget::m_OnImportConfigClicked(void)
 
       if (s32_Return == C_NO_ERR)
       {
-         if (c_PopUpDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             s32_Return = pc_ImportDialog->GetResult(c_ErrorDetails);
          }
@@ -360,14 +358,14 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
 {
    const QString c_Folder =
       C_SdNdeHalcWidget::mh_GetDialogPath(C_UsHandler::h_GetInstance()->GetLastKnownHalcExportPath());
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    QString c_DefaultName = "";
    QString c_FileName = "";
 
    if (pc_Node != NULL)
    {
-      c_DefaultName = C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(pc_Node->c_Properties.c_Name.c_str()).c_str();
+      c_DefaultName = C_OscSystemFilerUtil::h_PrepareItemNameForFileName(pc_Node->c_Properties.c_Name.c_str()).c_str();
    }
 
    c_FileName =
@@ -380,7 +378,7 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
    {
       QFile c_File;
       bool q_Continue = true;
-      sint32 s32_Result;
+      int32_t s32_Result;
 
       // remember path for user settings
       C_UsHandler::h_GetInstance()->SetLastKnownHalcExportPath(c_FileName);
@@ -394,15 +392,15 @@ void C_SdNdeHalcWidget::m_OnExportConfigClicked(void)
 
       if (q_Continue == true)
       {
-         const stw_opensyde_core::C_OSCHalcConfig * const pc_Config =
-            stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+         const stw::opensyde_core::C_OscHalcConfig * const pc_Config =
+            stw::opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
          if (pc_Config != NULL)
          {
-            C_OSCHalcConfigStandalone c_StandaloneConfig;
-            C_OSCHalcConfigUtil::h_GetConfigStandalone(*pc_Config, c_StandaloneConfig);
+            C_OscHalcConfigStandalone c_StandaloneConfig;
+            C_OscHalcConfigUtil::h_GetConfigStandalone(*pc_Config, c_StandaloneConfig);
 
-            s32_Result = C_OSCHalcConfigStandaloneFiler::h_SaveFileStandalone(c_StandaloneConfig,
+            s32_Result = C_OscHalcConfigStandaloneFiler::h_SaveFileStandalone(c_StandaloneConfig,
                                                                               c_FileName.toStdString().c_str());
          }
          else
@@ -440,8 +438,8 @@ void C_SdNdeHalcWidget::m_OnCleanUpClicked(void) const
                                                       "HAL Datapools of this node will also be deleted. Associated"
                                                       "Data Blocks will be reset."));
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Delete Hardware Description"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+   c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
    c_MessageBox.SetCustomMinHeight(210, 210);
    if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eOK)
    {
@@ -484,8 +482,8 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
                                                      "HAL Datapools of this node will be lost.\n"
                                                      "For updating the hardware description please use the \"Update\" "
                                                      "button."));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete and Load"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Delete and Load"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
       c_MessageBox.SetCustomMinHeight(200, 270);
       if (c_MessageBox.Execute() != C_OgeWiCustomMessage::eOK)
       {
@@ -495,22 +493,22 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
 
    if (q_Load == true)
    {
-      uint32 u32_NotHALCDpCount = 0UL;
+      uint32_t u32_NotHalcDpCount = 0UL;
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
          if (pc_Node != NULL)
          {
-            for (uint32 u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
+            for (uint32_t u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
             {
-               const C_OSCNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
-               if (rc_Dp.e_Type != C_OSCNodeDataPool::eHALC)
+               const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
+               if (rc_Dp.e_Type != C_OscNodeDataPool::eHALC)
                {
-                  ++u32_NotHALCDpCount;
+                  ++u32_NotHalcDpCount;
                }
             }
          }
       }
-      if (u32_NotHALCDpCount > (C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE - 2UL))
+      if (u32_NotHalcDpCount > (C_OscNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE - 2UL))
       {
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
 
@@ -519,13 +517,13 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
                                                              "Cannot select hardware description,\n"
                                                              "because HAL Datapools may not be created,\n"
                                                              "as the max Datapool count (%1) would be exceeded.")).arg(
-                                        C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
+                                        C_OscNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
          c_MessageBox.SetCustomMinHeight(200, 270);
          c_MessageBox.Execute();
       }
       else
       {
-         C_OSCHalcConfig c_HalcConfig;
+         C_OscHalcConfig c_HalcConfig;
          QString c_Path;
          if (this->m_LoadHalcDefinitionFile(c_HalcConfig, c_Path) == true)
          {
@@ -536,7 +534,7 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
             }
 
             // set the HALC definition
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex, c_HalcConfig) == C_NO_ERR);
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHalcConfig(this->mu32_NodeIndex, c_HalcConfig) == C_NO_ERR);
 
             // update GUI
             this->m_UpdateNodeData();
@@ -557,12 +555,12 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
 {
-   const C_OSCHalcConfig * const pc_OldConfig = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OscHalcConfig * const pc_OldConfig = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
    tgl_assert((pc_OldConfig != NULL) && (pc_OldConfig->IsClear() == false));
    if ((pc_OldConfig != NULL) && (pc_OldConfig->IsClear() == false))
    {
-      C_OSCHalcConfig c_HalcConfig;
+      C_OscHalcConfig c_HalcConfig;
       QString c_HalcDefPath;
 
       if (this->m_LoadHalcDefinitionFile(c_HalcConfig, c_HalcDefPath) == true)
@@ -598,8 +596,8 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
                                        "equals the current hardware description version.\n"
                                        "Do you want to update the hardware description anyway?")).
                arg(c_HalcConfig.u32_ContentVersion));
-            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Update"));
-            c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_Message.SetOkButtonText(C_GtGetText::h_GetText("Update"));
+            c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
             if (c_Message.Execute() != C_OgeWiCustomMessage::eOK)
             {
                q_Continue = false;
@@ -609,21 +607,21 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
          if (q_Continue == true)
          {
             QString c_ErrorDetails = "";
-            QPointer<C_OgePopUpDialog> const c_PopUpDialog = new C_OgePopUpDialog(this, this);
+            const QPointer<C_OgePopUpDialog> c_PopUpDialog = new C_OgePopUpDialog(this, this);
             C_SdNdeHalcDefUpdateDialog * const pc_UpdateDialog =
                new C_SdNdeHalcDefUpdateDialog(*c_PopUpDialog, this->mu32_NodeIndex, c_HalcConfig, c_HalcDefPath);
 
             //Resize
             c_PopUpDialog->SetSize(QSize(1000, 820));
 
-            if (c_PopUpDialog->exec() == static_cast<sintn>(QDialog::Accepted))
+            if (c_PopUpDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
             {
-               C_OSCHalcConfig c_UpdatedHalcConfig;
-               const sint32 s32_Return = pc_UpdateDialog->GetResult(c_UpdatedHalcConfig, c_ErrorDetails);
+               C_OscHalcConfig c_UpdatedHalcConfig;
+               const int32_t s32_Return = pc_UpdateDialog->GetResult(c_UpdatedHalcConfig, c_ErrorDetails);
 
                if (s32_Return == C_NO_ERR)
                {
-                  tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex,
+                  tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHalcConfig(this->mu32_NodeIndex,
                                                                             c_UpdatedHalcConfig) == C_NO_ERR);
 
                   // update GUI
@@ -665,13 +663,13 @@ void C_SdNdeHalcWidget::m_OnUpdateClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcWidget::m_RunDatapoolMagician(void) const
 {
-   const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
+   const int32_t s32_Result = C_PuiSdHandler::h_GetInstance()->HalcGenerateDatapools(this->mu32_NodeIndex);
 
    tgl_assert((s32_Result == C_NO_ERR) || (s32_Result == C_NOACT));
 
    // make sure all HALC NVM Datapools are assigned if possible (after magician generation!)
    tgl_assert(C_PuiSdHandler::h_GetInstance()->
-              AssignAllHalcNvmDataPools(this->mu32_NodeIndex) == stw_errors::C_NO_ERR);
+              AssignAllHalcNvmDataPools(this->mu32_NodeIndex) == stw::errors::C_NO_ERR);
 
    // Inform Datapool overview about changed existence of HAL Datapools
    Q_EMIT (this->SigHalcDataPoolChanged());
@@ -720,7 +718,7 @@ void C_SdNdeHalcWidget::m_ShowOverview(const bool oq_Show) const
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_OnChannelSelected(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+void C_SdNdeHalcWidget::m_OnChannelSelected(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
                                             const bool oq_UseChannelIndex) const
 {
    // channel index only matters in case domain has any channels
@@ -738,7 +736,7 @@ void C_SdNdeHalcWidget::m_OnChannelSelected(const uint32 ou32_DomainIndex, const
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcWidget::m_OnChannelUpdate(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+void C_SdNdeHalcWidget::m_OnChannelUpdate(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
                                           const bool oq_UseChannelIndex) const
 {
    this->mpc_Ui->pc_TreeChannels->UpdateChannelText(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex);
@@ -758,7 +756,7 @@ void C_SdNdeHalcWidget::m_OnChannelUpdate(const uint32 ou32_DomainIndex, const u
    \retval   false  User canceled or error occured
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfig, QString & orc_HalcDefPath)
+bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OscHalcConfig & orc_HalcConfig, QString & orc_HalcDefPath)
 {
    bool q_Return = false;
    const QString c_Folder = mh_GetDialogPath(C_UsHandler::h_GetInstance()->GetLastKnownHalcDefPath());
@@ -769,15 +767,15 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
    if (orc_HalcDefPath.isEmpty() == false)
    {
       // load definition directly into configuration data structure
-      const sint32 s32_LoadResult =
-         C_OSCHalcDefFiler::h_LoadFile(orc_HalcConfig, orc_HalcDefPath.toStdString().c_str());
+      const int32_t s32_LoadResult =
+         C_OscHalcDefFiler::h_LoadFile(orc_HalcConfig, orc_HalcDefPath.toStdString().c_str());
 
       // remember path for user settings
       C_UsHandler::h_GetInstance()->SetLastKnownHalcDefPath(orc_HalcDefPath);
 
       if (s32_LoadResult == C_NO_ERR)
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
@@ -812,8 +810,8 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
          c_Message.SetDescription(C_GtGetText::h_GetText("Error occured loading hardware description file."));
          c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("For details see ")) +
                               C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."),  mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                               C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()));
-         C_OSCLoggingHandler::h_Flush(); // update log file
+                                               C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()));
+         C_OscLoggingHandler::h_Flush(); // update log file
          c_Message.SetCustomMinHeight(180, 300);
          c_Message.Execute();
       }
@@ -829,13 +827,13 @@ bool C_SdNdeHalcWidget::m_LoadHalcDefinitionFile(C_OSCHalcConfig & orc_HalcConfi
 void C_SdNdeHalcWidget::m_CleanUpHalcDefinition(void) const
 {
    // Clear configuration
-   tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHALCConfig(this->mu32_NodeIndex) == C_NO_ERR);
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHalcConfig(this->mu32_NodeIndex) == C_NO_ERR);
 
    // Remove HAL Datapools
-   tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->HalcRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
 
    // Reset PSI generation Data Blocks
-   tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCResetDataBlocks(this->mu32_NodeIndex) == C_NO_ERR);
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->HalcResetDataBlocks(this->mu32_NodeIndex) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -859,16 +857,16 @@ void C_SdNdeHalcWidget::m_UpdateNodeData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcWidget::m_UpdatePinCount(void) const
 {
-   const C_OSCHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OscHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
    if (pc_Config != NULL)
    {
-      uint32 u32_PinCount = 0;
+      uint32_t u32_PinCount = 0;
 
       // Update pin counter
-      for (uint32 u32_ItDomain = 0; u32_ItDomain < pc_Config->GetDomainSize(); u32_ItDomain++)
+      for (uint32_t u32_ItDomain = 0; u32_ItDomain < pc_Config->GetDomainSize(); u32_ItDomain++)
       {
-         const C_OSCHalcDefDomain * const pc_Domain = pc_Config->GetDomainDefDataConst(u32_ItDomain);
+         const C_OscHalcDefDomain * const pc_Domain = pc_Config->GetDomainDefDataConst(u32_ItDomain);
          if (pc_Domain != NULL)
          {
             if (pc_Domain->c_Channels.empty() == true)
@@ -900,7 +898,7 @@ void C_SdNdeHalcWidget::m_UpdatePinCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcWidget::m_UpdateDisplayedData(void) const
 {
-   const C_OSCHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OscHalcConfig * const pc_Config = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
    if (pc_Config != NULL)
    {

@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GiSvDaArrow.h"
-#include "C_PuiSvHandler.h"
+#include "stwtypes.hpp"
+#include "C_GiSvDaArrow.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,15 +40,15 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru32_ViewIndex      Index of system view
    \param[in]     oru32_DashboardIndex Index of dashboard in system view
    \param[in]     ors32_DataIndex      Index of connected data item
-   \param[in]     oru64_ID             Unique ID
+   \param[in]     oru64_Id             Unique ID
    \param[in]     opc_Points           Points for line
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaArrow::C_GiSvDaArrow(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                             const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaArrow::C_GiSvDaArrow(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                             const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                              const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
-   C_GiBiArrow(oru64_ID, opc_Points, opc_Parent),
+   C_GiBiArrow(oru64_Id, opc_Points, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eLINE_ARROW)
 {
    if (opc_Points == NULL)
@@ -64,10 +63,10 @@ C_GiSvDaArrow::C_GiSvDaArrow(const uint32 & oru32_ViewIndex, const uint32 & oru3
             if (pc_Dashboard != NULL)
             {
                const C_PuiBsLineArrow * const pc_Item =
-                  pc_Dashboard->GetLineArrow(static_cast<uint32>(this->ms32_Index));
+                  pc_Dashboard->GetLineArrow(static_cast<uint32_t>(this->ms32_Index));
                if (pc_Item != NULL)
                {
-                  m_Init(pc_Item->c_UIInteractionPoints);
+                  m_Init(pc_Item->c_UiInteractionPoints);
                   this->C_GiSvDaArrow::LoadData();
                }
             }
@@ -93,14 +92,15 @@ void C_GiSvDaArrow::LoadData(void)
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiBsLineArrow * const pc_Item = pc_Dashboard->GetLineArrow(static_cast<uint32>(this->ms32_Index));
+            const C_PuiBsLineArrow * const pc_Item =
+               pc_Dashboard->GetLineArrow(static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                C_PuiBsLineArrow c_Copy = *pc_Item;
                //Dark mode work around
                if (pc_View->GetDarkModeActive() == true)
                {
-                  c_Copy.c_UIColor = c_Copy.c_UIColorDark;
+                  c_Copy.c_UiColor = c_Copy.c_UiColorDark;
                }
                m_LoadFromData(c_Copy);
             }
@@ -124,7 +124,8 @@ void C_GiSvDaArrow::UpdateData(void)
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiBsLineArrow * const pc_Item = pc_Dashboard->GetLineArrow(static_cast<uint32>(this->ms32_Index));
+            const C_PuiBsLineArrow * const pc_Item =
+               pc_Dashboard->GetLineArrow(static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                C_PuiBsLineArrow c_Item = *pc_Item;
@@ -134,12 +135,12 @@ void C_GiSvDaArrow::UpdateData(void)
                //Dark mode work around
                if (pc_View->GetDarkModeActive() == true)
                {
-                  c_Item.c_UIColorDark = c_Item.c_UIColor;
-                  c_Item.c_UIColor = pc_Item->c_UIColor;
+                  c_Item.c_UiColorDark = c_Item.c_UiColor;
+                  c_Item.c_UiColor = pc_Item->c_UiColor;
                }
 
                C_PuiSvHandler::h_GetInstance()->SetDashboardLineArrow(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                      static_cast<uint32>(this->ms32_Index), c_Item);
+                                                                      static_cast<uint32_t>(this->ms32_Index), c_Item);
             }
          }
       }
@@ -155,19 +156,19 @@ void C_GiSvDaArrow::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       C_PuiSvHandler::h_GetInstance()->DeleteDashboardLineArrow(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                static_cast<uint32>(this->ms32_Index));
+                                                                static_cast<uint32_t>(this->ms32_Index));
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaArrow::SetZValueCustom(const float64 of64_ZValue)
+void C_GiSvDaArrow::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiArrow::SetZValueCustom(of64_ZValue);
+   C_GiBiArrow::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }

@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SebUnoResizeRectangleCommand.h"
-#include "C_GiBiRectBaseGroup.h"
+#include "C_SebUnoResizeRectangleCommand.hpp"
+#include "C_GiBiRectBaseGroup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
 using namespace std;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +36,7 @@ using namespace stw_opensyde_gui;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene   Pointer to currently active scene
-   \param[in]     orc_IDs     Affected unique IDs
+   \param[in]     orc_Ids     Affected unique IDs
    \param[in]     orc_OldPos  Old position
    \param[in]     orc_OldSize Old size
    \param[in]     orc_NewPos  New position
@@ -46,11 +45,11 @@ using namespace stw_opensyde_gui;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoResizeRectangleCommand::C_SebUnoResizeRectangleCommand(QGraphicsScene * const opc_Scene,
-                                                               const std::vector<stw_types::uint64> & orc_IDs,
+                                                               const std::vector<uint64_t> & orc_Ids,
                                                                const QPointF & orc_OldPos, const QSizeF & orc_OldSize,
                                                                const QPointF & orc_NewPos, const QSizeF & orc_NewSize,
                                                                QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Resize one rectangle based drawing element", opc_Parent),
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, "Resize one rectangle based drawing element", opc_Parent),
    mc_OldPos(orc_OldPos),
    mc_OldSize(orc_OldSize),
    mc_NewPos(orc_NewPos),
@@ -73,9 +72,9 @@ C_SebUnoResizeRectangleCommand::~C_SebUnoResizeRectangleCommand()
 void C_SebUnoResizeRectangleCommand::undo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-   for (uint32 u32_ItID = 0; u32_ItID < c_Items.size(); ++u32_ItID)
+   for (uint32_t u32_ItId = 0; u32_ItId < c_Items.size(); ++u32_ItId)
    {
-      m_UndoSingle(c_Items[u32_ItID]);
+      m_UndoSingle(c_Items[u32_ItId]);
    }
    QUndoCommand::undo();
 }
@@ -87,9 +86,9 @@ void C_SebUnoResizeRectangleCommand::undo(void)
 void C_SebUnoResizeRectangleCommand::redo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-   for (uint32 u32_ItID = 0; u32_ItID < c_Items.size(); ++u32_ItID)
+   for (uint32_t u32_ItId = 0; u32_ItId < c_Items.size(); ++u32_ItId)
    {
-      m_RedoSingle(c_Items[u32_ItID]);
+      m_RedoSingle(c_Items[u32_ItId]);
    }
    QUndoCommand::redo();
 }

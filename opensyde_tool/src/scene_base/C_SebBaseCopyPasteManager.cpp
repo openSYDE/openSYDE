@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
-#include "C_SebBaseCopyPasteManager.h"
+#include "C_SebBaseCopyPasteManager.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,7 +69,7 @@ QPointF C_SebBaseCopyPasteManager::GetDiff(const QPointF & orc_Position) const
    Paste counter value
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SebBaseCopyPasteManager::GetPasteCounter(void) const
+uint32_t C_SebBaseCopyPasteManager::GetPasteCounter(void) const
 {
    return this->mu32_PasteCounter;
 }
@@ -94,34 +93,34 @@ void C_SebBaseCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * c
 {
    if (opc_Data != NULL)
    {
-      uint32 u32_ItElem;
+      uint32_t u32_ItElem;
 
-      this->mc_OriginalPosition.setX(std::numeric_limits<float64>::max());
-      this->mc_OriginalPosition.setY(std::numeric_limits<float64>::max());
+      this->mc_OriginalPosition.setX(std::numeric_limits<float64_t>::max());
+      this->mc_OriginalPosition.setY(std::numeric_limits<float64_t>::max());
 
       for (u32_ItElem = 0; u32_ItElem < opc_Data->c_Boundaries.size(); ++u32_ItElem)
       {
-         m_MinToOrgPos(opc_Data->c_Boundaries[u32_ItElem].c_UIPosition);
+         m_MinToOrgPos(opc_Data->c_Boundaries[u32_ItElem].c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < opc_Data->c_Images.size(); ++u32_ItElem)
       {
-         m_MinToOrgPos(opc_Data->c_Images[u32_ItElem].c_UIPosition);
+         m_MinToOrgPos(opc_Data->c_Images[u32_ItElem].c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < opc_Data->c_LineArrows.size(); ++u32_ItElem)
       {
-         for (uint32 u32_ItConnPoint =
-                 0; u32_ItConnPoint < opc_Data->c_LineArrows[u32_ItElem].c_UIInteractionPoints.size();
+         for (uint32_t u32_ItConnPoint =
+                 0; u32_ItConnPoint < opc_Data->c_LineArrows[u32_ItElem].c_UiInteractionPoints.size();
               ++u32_ItConnPoint)
          {
-            m_MinToOrgPos(opc_Data->c_LineArrows[u32_ItElem].c_UIInteractionPoints[u32_ItConnPoint]);
+            m_MinToOrgPos(opc_Data->c_LineArrows[u32_ItElem].c_UiInteractionPoints[u32_ItConnPoint]);
          }
       }
 
       for (u32_ItElem = 0; u32_ItElem < opc_Data->c_TextElements.size(); ++u32_ItElem)
       {
-         m_MinToOrgPos(opc_Data->c_TextElements[u32_ItElem].c_UIPosition);
+         m_MinToOrgPos(opc_Data->c_TextElements[u32_ItElem].c_UiPosition);
       }
    }
 }
@@ -156,20 +155,20 @@ void C_SebBaseCopyPasteManager::m_MinToOrgPos(const QPointF & orc_Point)
 /*! \brief  Handle Z value for box
 
    \param[in]     opc_Item              Original item
-   \param[in]     orc_NormalizedZValues Normalized Z values for all copied items
+   \param[in]     orc_NormalizedZetValues Normalized Z values for all copied items
    \param[in,out] orc_Box               Box data to change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebBaseCopyPasteManager::mh_HandleZValueBox(const QGraphicsItem * const opc_Item,
-                                                   const QMap<const QGraphicsItem *,
-                                                              float64> & orc_NormalizedZValues,
-                                                   C_PuiBsBox & orc_Box)
+void C_SebBaseCopyPasteManager::mh_HandleZetValueBox(const QGraphicsItem * const opc_Item,
+                                                     const QMap<const QGraphicsItem *,
+                                                                float64_t> & orc_NormalizedZetValues,
+                                                     C_PuiBsBox & orc_Box)
 {
-   const QMap<const QGraphicsItem *, float64>::const_iterator c_ItItem = orc_NormalizedZValues.find(opc_Item);
+   const QMap<const QGraphicsItem *, float64_t>::const_iterator c_ItItem = orc_NormalizedZetValues.find(opc_Item);
 
-   if (c_ItItem != orc_NormalizedZValues.end())
+   if (c_ItItem != orc_NormalizedZetValues.end())
    {
-      orc_Box.f64_ZOrder = c_ItItem.value();
+      orc_Box.f64_ZetOrder = c_ItItem.value();
    }
 }
 
@@ -177,19 +176,19 @@ void C_SebBaseCopyPasteManager::mh_HandleZValueBox(const QGraphicsItem * const o
 /*! \brief  Handle Z value for line
 
    \param[in]     opc_Item              Original item
-   \param[in]     orc_NormalizedZValues Normalized Z values for all copied items
+   \param[in]     orc_NormalizedZetValues Normalized Z values for all copied items
    \param[in,out] orc_Line              Line data to change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebBaseCopyPasteManager::mh_HandleZValueLine(const QGraphicsItem * const opc_Item,
-                                                    const QMap<const QGraphicsItem *,
-                                                               float64> & orc_NormalizedZValues,
-                                                    C_PuiBsLineBase & orc_Line)
+void C_SebBaseCopyPasteManager::mh_HandleZetValueLine(const QGraphicsItem * const opc_Item,
+                                                      const QMap<const QGraphicsItem *,
+                                                                 float64_t> & orc_NormalizedZetValues,
+                                                      C_PuiBsLineBase & orc_Line)
 {
-   const QMap<const QGraphicsItem *, float64>::const_iterator c_ItItem = orc_NormalizedZValues.find(opc_Item);
+   const QMap<const QGraphicsItem *, float64_t>::const_iterator c_ItItem = orc_NormalizedZetValues.find(opc_Item);
 
-   if (c_ItItem != orc_NormalizedZValues.end())
+   if (c_ItItem != orc_NormalizedZetValues.end())
    {
-      orc_Line.f64_ZOrder = c_ItItem.value();
+      orc_Line.f64_ZetOrder = c_ItItem.value();
    }
 }

@@ -13,35 +13,34 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SdNdeDpViewWidget.h"
+#include "C_SdNdeDpViewWidget.hpp"
 
 #include "ui_C_SdNdeDpViewWidget.h"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_OSCNode.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiCustomMessage.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_OscNode.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // configuration for the showing of storage usage indicators
-const bool C_SdNdeDpViewWidget::mhaq_STORAGE_INDICATOR_ACTIVE[static_cast<stw_types::sintn>(stw_opensyde_core::
-                                                                                            C_OSCNodeDataPool::
-                                                                                            eHALC_NVM) + 1] =
+const bool C_SdNdeDpViewWidget::mhaq_STORAGE_INDICATOR_ACTIVE[static_cast<int32_t>(stw::opensyde_core::
+                                                                                   C_OscNodeDataPool::
+                                                                                   eHALC_NVM) + 1] =
 {
    false, // DIAG
    true,  // NVM
@@ -50,9 +49,9 @@ const bool C_SdNdeDpViewWidget::mhaq_STORAGE_INDICATOR_ACTIVE[static_cast<stw_ty
    true   // HALC_NVM
 };
 
-const bool C_SdNdeDpViewWidget::mhaq_ADD_BUTTON_INVISIBLE[static_cast<stw_types::sintn>(stw_opensyde_core::
-                                                                                        C_OSCNodeDataPool::
-                                                                                        eHALC_NVM) + 1] =
+const bool C_SdNdeDpViewWidget::mhaq_ADD_BUTTON_INVISIBLE[static_cast<int32_t>(stw::opensyde_core::
+                                                                               C_OscNodeDataPool::
+                                                                               eHALC_NVM) + 1] =
 {
    true,  // DIAG
    true,  // NVM
@@ -83,11 +82,11 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
    mpc_UsageBar(NULL),
    mu32_NodeIndex(0),
    mu32_LastKnownDataPoolIndex(0),
-   me_ActiveDataPoolType(stw_opensyde_core::C_OSCNodeDataPool::eDIAG),
-   msn_ActiveDataPoolWidget(-1),
+   me_ActiveDataPoolType(stw::opensyde_core::C_OscNodeDataPool::eDIAG),
+   ms32_ActiveDataPoolWidget(-1),
    mq_HalcNvmBased(false)
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
    mpc_Ui->setupUi(this);
 
@@ -99,33 +98,33 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(true);
    this->m_UpdateAutoStartAddressSvg();
 
-   this->mpc_Ui->pc_WidgetDpDiag->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eDIAG),
+   this->mpc_Ui->pc_WidgetDpDiag->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OscNodeDataPool::eDIAG),
                                              C_GtGetText::h_GetText("DIAG - Diagnostic Datapools"),
                                              C_GtGetText::h_GetText(
                                                 "- The use case of DIAG Datapools is monitoring live values of a system \n"
                                                 "- The lifetime of the variables is during operation only"),
                                              "pc_WidgetDpDiag");
-   this->mpc_Ui->pc_WidgetDpNvm->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eNVM),
+   this->mpc_Ui->pc_WidgetDpNvm->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OscNodeDataPool::eNVM),
                                             C_GtGetText::h_GetText("NVM - Non Volatile Memory Datapools"),
                                             C_GtGetText::h_GetText(
                                                "- The use case of NVM Datapools is to parametrize the system \n"
                                                "- The NVM parameters are located in a non volatile memory, for example in the EEPROM of the controller \n"
                                                "- Depending on the users application strategy, the parameters can be saved on shutdown and can be restored on start up"),
                                             "pc_WidgetDpNvm");
-   this->mpc_Ui->pc_WidgetDpCom->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eCOM),
+   this->mpc_Ui->pc_WidgetDpCom->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OscNodeDataPool::eCOM),
                                             C_GtGetText::h_GetText("COMM - CAN Communication Datapools"),
                                             C_GtGetText::h_GetText(
                                                "- The use case of COMM Datapools is the exchange of data between nodes \n"
                                                "- The lifetime of the variables is during operation only"),
                                             "pc_WidgetDpCom");
-   this->mpc_Ui->pc_WidgetDpHalc->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eHALC),
+   this->mpc_Ui->pc_WidgetDpHalc->InitWidget(C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OscNodeDataPool::eHALC),
                                              C_GtGetText::h_GetText("HAL - Hardware Configuration Datapools"),
                                              C_GtGetText::h_GetText(
                                                 "- The use case of HAL Datapools is to configure, monitor, and control hardware parts of the node \n"
                                                 "- The lifetime of the variables is during operation only"),
                                              "pc_WidgetDpHalc");
    this->mpc_Ui->pc_WidgetDpHalcNvm->InitWidget(
-      C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OSCNodeDataPool::eHALC_NVM),
+      C_PuiSdUtil::h_ConvertDataPoolTypeToString(C_OscNodeDataPool::eHALC_NVM),
       C_GtGetText::h_GetText("HAL - Hardware Configuration Datapools"),
       C_GtGetText::h_GetText(
          "- The use case of HAL Datapools is to configure, monitor, and control hardware parts of the node \n"
@@ -133,16 +132,16 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
       "pc_WidgetDpHalcNvm");
 
    // save pointer in an array for easy usage
-   this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eDIAG] = this->mpc_Ui->pc_WidgetDpDiag;
-   this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eNVM] = this->mpc_Ui->pc_WidgetDpNvm;
-   this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eCOM] = this->mpc_Ui->pc_WidgetDpCom;
-   this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC] = this->mpc_Ui->pc_WidgetDpHalc;
-   this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM] = this->mpc_Ui->pc_WidgetDpHalcNvm;
+   this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eDIAG] = this->mpc_Ui->pc_WidgetDpDiag;
+   this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eNVM] = this->mpc_Ui->pc_WidgetDpNvm;
+   this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eCOM] = this->mpc_Ui->pc_WidgetDpCom;
+   this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eHALC] = this->mpc_Ui->pc_WidgetDpHalc;
+   this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM] = this->mpc_Ui->pc_WidgetDpHalcNvm;
 
    // Special case: The HALC NVM Datapool will be visible if a HALC NVM based HALC Description will be loaded
    this->mpc_Ui->pc_WidgetDpHalcNvm->setVisible(false);
 
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+   for (s32_Counter = 0; s32_Counter <= static_cast<int32_t>(stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM);
         ++s32_Counter)
    {
       this->mapc_Selectors[s32_Counter]->SetSelected(false);
@@ -171,7 +170,7 @@ C_SdNdeDpViewWidget::C_SdNdeDpViewWidget(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_WidgetDpHalcNvm, &C_SdNdeDpSelectorWidget::SigErrorCheck, this,
            &C_SdNdeDpViewWidget::m_ErrorCheck);
 
-   connect(this->mpc_Ui->pc_PushButtonAutoStartAddress, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked,
+   connect(this->mpc_Ui->pc_PushButtonAutoStartAddress, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::clicked,
            this, &C_SdNdeDpViewWidget::m_AutoStartAddressClicked);
 }
 
@@ -217,14 +216,14 @@ void C_SdNdeDpViewWidget::InitStaticNames(void) const
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
+void C_SdNdeDpViewWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
    bool q_RestoreDataPoolSelection = false;
 
-   C_OSCNodeDataPool::E_Type e_RestoredDataPoolType = C_OSCNodeDataPool::eDIAG;
-   uint32 u32_RestoredDataPoolTypeIndex = 0UL;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
-   sint32 s32_Counter;
+   C_OscNodeDataPool::E_Type e_RestoredDataPoolType = C_OscNodeDataPool::eDIAG;
+   uint32_t u32_RestoredDataPoolTypeIndex = 0UL;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+   int32_t s32_Counter;
    bool q_RestoredDataPoolFound = false;
 
    //User settings store
@@ -236,28 +235,28 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
          pc_Node->c_Properties.c_Name.c_str());
       const QString c_SelectedDataPoolName = c_UserSettingsNode.GetSelectedDatapoolName();
 
-      if (pc_Node->c_HALCConfig.IsClear() == false)
+      if (pc_Node->c_HalcConfig.IsClear() == false)
       {
          // Node has a HALC Configuration loaded
-         this->mq_HalcNvmBased = pc_Node->c_HALCConfig.q_NvMBasedConfig;
+         this->mq_HalcNvmBased = pc_Node->c_HalcConfig.q_NvmBasedConfig;
 
-         if (pc_Node->c_HALCConfig.q_NvMBasedConfig == false)
+         if (pc_Node->c_HalcConfig.q_NvmBasedConfig == false)
          {
-            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC]->setVisible(true);
-            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM]->setVisible(false);
+            this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eHALC]->setVisible(true);
+            this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM]->setVisible(false);
          }
          else
          {
-            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC]->setVisible(false);
-            this->mapc_Selectors[stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM]->setVisible(true);
+            this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eHALC]->setVisible(false);
+            this->mapc_Selectors[stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM]->setVisible(true);
          }
       }
 
       if (c_SelectedDataPoolName.compare("") != 0)
       {
-         for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+         for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
          {
-            const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+            const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
             if (rc_DataPool.c_Name == c_SelectedDataPoolName.toStdString().c_str())
             {
                //Match found
@@ -265,9 +264,9 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
                e_RestoredDataPoolType = rc_DataPool.e_Type;
 
                //Iterate to specific type index
-               for (uint32 u32_ItPrevDataPool = 0; u32_ItPrevDataPool < u32_ItDataPool; ++u32_ItPrevDataPool)
+               for (uint32_t u32_ItPrevDataPool = 0; u32_ItPrevDataPool < u32_ItDataPool; ++u32_ItPrevDataPool)
                {
-                  const C_OSCNodeDataPool & rc_PrevDataPool = pc_Node->c_DataPools[u32_ItPrevDataPool];
+                  const C_OscNodeDataPool & rc_PrevDataPool = pc_Node->c_DataPools[u32_ItPrevDataPool];
                   if (rc_DataPool.e_Type == rc_PrevDataPool.e_Type)
                   {
                      ++u32_RestoredDataPoolTypeIndex;
@@ -279,7 +278,7 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
       }
 
       // Restore setting for auto start address mode
-      this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(pc_Node->q_DatapoolAutoNvMStartAddress);
+      this->mpc_Ui->pc_PushButtonAutoStartAddress->setChecked(pc_Node->q_DatapoolAutoNvmStartAddress);
       this->m_UpdateAutoStartAddressSvg();
    }
 
@@ -292,21 +291,21 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
 
    this->m_UpdateUsageBarSize();
 
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+   for (s32_Counter = 0; s32_Counter <= static_cast<int32_t>(stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM);
         ++s32_Counter)
    {
       const bool q_Return = this->mapc_Selectors[s32_Counter]->SetTypeAndNode(
-         static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(s32_Counter), ou32_NodeIndex,
+         static_cast<stw::opensyde_core::C_OscNodeDataPool::E_Type>(s32_Counter), ou32_NodeIndex,
          mhaq_STORAGE_INDICATOR_ACTIVE[s32_Counter],
          mhaq_ADD_BUTTON_INVISIBLE[s32_Counter]);
 
       if ((q_Return == true) && (q_RestoreDataPoolSelection == true))
       {
-         if (static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(s32_Counter) == e_RestoredDataPoolType)
+         if (static_cast<stw::opensyde_core::C_OscNodeDataPool::E_Type>(s32_Counter) == e_RestoredDataPoolType)
          {
-            const sint32 s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(ou32_NodeIndex,
-                                                                                         e_RestoredDataPoolType,
-                                                                                         u32_RestoredDataPoolTypeIndex);
+            const int32_t s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(ou32_NodeIndex,
+                                                                                          e_RestoredDataPoolType,
+                                                                                          u32_RestoredDataPoolTypeIndex);
             if (s32_DpIndex >= 0)
             {
                q_RestoredDataPoolFound = true;
@@ -325,7 +324,7 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
    if (q_RestoredDataPoolFound == true)
    {
       this->m_EmitActualDataPool(e_RestoredDataPoolType, u32_RestoredDataPoolTypeIndex);
-      this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->msn_ActiveDataPoolWidget);
+      this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->ms32_ActiveDataPoolWidget);
    }
 }
 
@@ -337,7 +336,7 @@ void C_SdNdeDpViewWidget::SetNode(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::SetActualDataPoolConflict(const bool oq_Active) const
 {
-   this->mapc_Selectors[this->me_ActiveDataPoolType]->SetCurrentDataPoolConflict(this->msn_ActiveDataPoolWidget,
+   this->mapc_Selectors[this->me_ActiveDataPoolType]->SetCurrentDataPoolConflict(this->ms32_ActiveDataPoolWidget,
                                                                                  oq_Active);
 }
 
@@ -347,9 +346,9 @@ void C_SdNdeDpViewWidget::SetActualDataPoolConflict(const bool oq_Active) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::UpdateDataPools(void)
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+   for (s32_Counter = 0; s32_Counter <= static_cast<int32_t>(stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM);
         ++s32_Counter)
    {
       this->mapc_Selectors[s32_Counter]->UpdateDataPools();
@@ -371,31 +370,31 @@ void C_SdNdeDpViewWidget::UpdateActualDataPool(void) const
    \param[in]  ou32_DataPoolIndex   Datapool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewWidget::SetActualDataPool(const uint32 ou32_DataPoolIndex)
+void C_SdNdeDpViewWidget::SetActualDataPool(const uint32_t ou32_DataPoolIndex)
 {
-   sintn sn_Counter;
-   uint32 u32_DpType;
-   sint32 s32_DpIndex;
+   int32_t s32_Counter;
+   uint32_t u32_DpType;
+   int32_t s32_DpIndex;
    bool q_Found = false;
 
-   for (u32_DpType = 0U; u32_DpType <= static_cast<uint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+   for (u32_DpType = 0U; u32_DpType <= static_cast<uint32_t>(stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM);
         ++u32_DpType)
    {
       // search the index
-      for (sn_Counter = 0U; sn_Counter <= static_cast<sintn>(ou32_DataPoolIndex); ++sn_Counter)
+      for (s32_Counter = 0U; s32_Counter <= static_cast<int32_t>(ou32_DataPoolIndex); ++s32_Counter)
       {
          s32_DpIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(
             this->mu32_NodeIndex,
-            static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(u32_DpType),
-            static_cast<uint32>(sn_Counter));
+            static_cast<stw::opensyde_core::C_OscNodeDataPool::E_Type>(u32_DpType),
+            static_cast<uint32_t>(s32_Counter));
 
          if ((s32_DpIndex >= 0) &&
-             (static_cast<uint32>(s32_DpIndex) == ou32_DataPoolIndex))
+             (static_cast<uint32_t>(s32_DpIndex) == ou32_DataPoolIndex))
          {
             // save the actual datpool
-            this->msn_ActiveDataPoolWidget = sn_Counter;
+            this->ms32_ActiveDataPoolWidget = s32_Counter;
             // save the actual active datapool type
-            this->me_ActiveDataPoolType = static_cast<stw_opensyde_core::C_OSCNodeDataPool::E_Type>(u32_DpType);
+            this->me_ActiveDataPoolType = static_cast<stw::opensyde_core::C_OscNodeDataPool::E_Type>(u32_DpType);
             q_Found = true;
             break;
          }
@@ -409,7 +408,7 @@ void C_SdNdeDpViewWidget::SetActualDataPool(const uint32 ou32_DataPoolIndex)
 
    if (q_Found == false)
    {
-      this->msn_ActiveDataPoolWidget = -1;
+      this->ms32_ActiveDataPoolWidget = -1;
    }
 }
 
@@ -422,17 +421,17 @@ void C_SdNdeDpViewWidget::SetActualDataPool(const uint32 ou32_DataPoolIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::NavigateToNextDataPool(const bool oq_Forwards)
 {
-   if (this->msn_ActiveDataPoolWidget >= 0)
+   if (this->ms32_ActiveDataPoolWidget >= 0)
    {
-      const sint32 s32_NewDpIndex =
+      const int32_t s32_NewDpIndex =
          C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(this->mu32_NodeIndex, this->mu32_LastKnownDataPoolIndex, oq_Forwards);
 
       tgl_assert(s32_NewDpIndex >= 0);
       if (s32_NewDpIndex >= 0)
       {
          this->SetActualDataPool(s32_NewDpIndex); // first: update internal indices
-         this->m_EmitActualDataPool(this->me_ActiveDataPoolType, this->msn_ActiveDataPoolWidget);
-         this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->msn_ActiveDataPoolWidget);
+         this->m_EmitActualDataPool(this->me_ActiveDataPoolType, this->ms32_ActiveDataPoolWidget);
+         this->mapc_Selectors[this->me_ActiveDataPoolType]->SetSelectedDataPool(this->ms32_ActiveDataPoolWidget);
       }
    }
 }
@@ -443,7 +442,7 @@ void C_SdNdeDpViewWidget::NavigateToNextDataPool(const bool oq_Forwards)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::SetNoActualDataPool(void)
 {
-   this->msn_ActiveDataPoolWidget = -1;
+   this->ms32_ActiveDataPoolWidget = -1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -462,15 +461,15 @@ void C_SdNdeDpViewWidget::resizeEvent(QResizeEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewWidget::m_SubWidgetFocused(const C_OSCNodeDataPool::E_Type oe_DataPoolType) const
+void C_SdNdeDpViewWidget::m_SubWidgetFocused(const C_OscNodeDataPool::E_Type oe_DataPoolType) const
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
    // deactivate the other widgets
-   for (s32_Counter = 0; s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+   for (s32_Counter = 0; s32_Counter <= static_cast<int32_t>(stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM);
         ++s32_Counter)
    {
-      if (s32_Counter != static_cast<sint32>(oe_DataPoolType))
+      if (s32_Counter != static_cast<int32_t>(oe_DataPoolType))
       {
          this->mapc_Selectors[s32_Counter]->SetSelected(false);
       }
@@ -478,23 +477,23 @@ void C_SdNdeDpViewWidget::m_SubWidgetFocused(const C_OSCNodeDataPool::E_Type oe_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewWidget::m_EmitActualDataPool(const C_OSCNodeDataPool::E_Type oe_DataPoolType,
-                                               const sintn osn_DataPoolWidgetIndex)
+void C_SdNdeDpViewWidget::m_EmitActualDataPool(const C_OscNodeDataPool::E_Type oe_DataPoolType,
+                                               const int32_t os32_DataPoolWidgetIndex)
 {
-   sint32 s32_DataPoolIndex;
+   int32_t s32_DataPoolIndex;
 
    // save the actual datpool
-   this->msn_ActiveDataPoolWidget = osn_DataPoolWidgetIndex;
+   this->ms32_ActiveDataPoolWidget = os32_DataPoolWidgetIndex;
    // save the actual active datapool type
    this->me_ActiveDataPoolType = oe_DataPoolType;
 
    s32_DataPoolIndex = C_PuiSdHandler::h_GetInstance()->GetDataPoolIndex(this->mu32_NodeIndex, oe_DataPoolType,
-                                                                         osn_DataPoolWidgetIndex);
+                                                                         os32_DataPoolWidgetIndex);
 
    if (s32_DataPoolIndex >= 0)
    {
-      Q_EMIT (this->SigOpenDataPoolContent(static_cast<uint32>(s32_DataPoolIndex)));
-      this->mu32_LastKnownDataPoolIndex = static_cast<uint32>(s32_DataPoolIndex);
+      Q_EMIT (this->SigOpenDataPoolContent(static_cast<uint32_t>(s32_DataPoolIndex)));
+      this->mu32_LastKnownDataPoolIndex = static_cast<uint32_t>(s32_DataPoolIndex);
    }
    else
    {
@@ -505,7 +504,7 @@ void C_SdNdeDpViewWidget::m_EmitActualDataPool(const C_OSCNodeDataPool::E_Type o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::m_NoDataPoolSelected(void)
 {
-   this->msn_ActiveDataPoolWidget = -1;
+   this->ms32_ActiveDataPoolWidget = -1;
 
    Q_EMIT (this->SigNoDataPoolSelected());
 }
@@ -530,14 +529,14 @@ void C_SdNdeDpViewWidget::m_ErrorCheck(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpViewWidget::m_StoreToUserSettings(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      if ((this->msn_ActiveDataPoolWidget >= 0) &&
+      if ((this->ms32_ActiveDataPoolWidget >= 0) &&
           (this->mu32_LastKnownDataPoolIndex < pc_Node->c_DataPools.size()))
       {
-         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[this->mu32_LastKnownDataPoolIndex];
+         const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[this->mu32_LastKnownDataPoolIndex];
          C_UsHandler::h_GetInstance()->SetProjSdNodeSelectedDatapoolName(
             pc_Node->c_Properties.c_Name.c_str(), rc_DataPool.c_Name.c_str());
       }
@@ -569,22 +568,22 @@ void C_SdNdeDpViewWidget::m_DpUpdateUsageView(void)
    if (this->mpc_UsageBar != NULL)
    {
       // update the usage view
-      const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+      const stw::opensyde_core::C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
          this->mu32_NodeIndex);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
-         const stw_opensyde_core::C_OSCDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
-         const uint32 u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
+         const stw::opensyde_core::C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
+         const uint32_t u32_SubDeviceIndex = pc_Node->u32_SubDeviceIndex;
          tgl_assert(pc_DevDef != NULL);
          if (pc_DevDef != NULL)
          {
             tgl_assert(u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size());
             if (u32_SubDeviceIndex < pc_DevDef->c_SubDevices.size())
             {
-               uint32 u32_Percentage;
-               uint32 u32_SumNvmSize = 0;
+               uint32_t u32_Percentage;
+               uint32_t u32_SumNvmSize = 0;
                std::vector<C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea> c_Areas;
                QString c_LabelTooltip = static_cast<QString>("%1% ") + C_GtGetText::h_GetText("reserved by Datapools") +
                                         static_cast<QString>(
@@ -668,7 +667,7 @@ void C_SdNdeDpViewWidget::m_AutoStartAddressClicked(const bool oq_Enabled)
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
 
       c_Message.SetHeading(C_GtGetText::h_GetText("Auto Start Address mode"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
       c_Message.SetCustomMinHeight(250, 250);
 
       if (oq_Enabled == true)
@@ -679,7 +678,7 @@ void C_SdNdeDpViewWidget::m_AutoStartAddressClicked(const bool oq_Enabled)
                                      "After activating, the start addresses of Datapools located in NVM"
                                      " will be recalculated."));
 
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Activate"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Activate"));
       }
       else
       {
@@ -688,19 +687,19 @@ void C_SdNdeDpViewWidget::m_AutoStartAddressClicked(const bool oq_Enabled)
                                      "After deactivating, the start addresses of Datapools located in NVM must "
                                      "be managed manually."));
 
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Deactivate"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Deactivate"));
       }
 
       if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
       {
-         C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+         C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
 
          if (pc_Node != NULL)
          {
-            pc_Node->q_DatapoolAutoNvMStartAddress = oq_Enabled;
+            pc_Node->q_DatapoolAutoNvmStartAddress = oq_Enabled;
             this->m_UpdateAutoStartAddressSvg();
 
-            if (pc_Node->q_DatapoolAutoNvMStartAddress == true)
+            if (pc_Node->q_DatapoolAutoNvmStartAddress == true)
             {
                // Recalculate the addresses
                pc_Node->RecalculateAddress();
@@ -740,12 +739,12 @@ void C_SdNdeDpViewWidget::m_UpdateAutoStartAddressSvg(void) const
    \param[in]       oe_DataPoolType     List with Datapool type which sent the update request
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewWidget::m_UpdateFollowingLists(const C_OSCNodeDataPool::E_Type oe_DataPoolType) const
+void C_SdNdeDpViewWidget::m_UpdateFollowingLists(const C_OscNodeDataPool::E_Type oe_DataPoolType) const
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
-   for (s32_Counter = static_cast<sint32>(oe_DataPoolType) + 1;
-        s32_Counter <= static_cast<sint32>(stw_opensyde_core::C_OSCNodeDataPool::eHALC_NVM);
+   for (s32_Counter = static_cast<int32_t>(oe_DataPoolType) + 1;
+        s32_Counter <= static_cast<int32_t>(stw::opensyde_core::C_OscNodeDataPool::eHALC_NVM);
         ++s32_Counter)
    {
       this->mapc_Selectors[s32_Counter]->ReloadDataPools();

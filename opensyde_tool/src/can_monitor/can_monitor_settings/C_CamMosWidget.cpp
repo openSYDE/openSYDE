@@ -11,20 +11,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMosWidget.h"
+#include "C_CamMosWidget.hpp"
 #include "ui_C_CamMosWidget.h"
 
-#include "C_CamOgeWiSectionHeader.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "C_CamMosSectionPopup.h"
+#include "C_CamOgeWiSectionHeader.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamMosSectionPopup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -134,8 +134,8 @@ C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
            this, &C_CamMosWidget::SigAddLogFileBlf);
    connect(this->mpc_Ui->pc_WiLogging, &C_CamMosLoggingWidget::SigRemoveAllLogFiles,
            this, &C_CamMosWidget::SigRemoveAllLogFiles);
-   connect(this->mpc_Ui->pc_WiDllConfig, &C_CamMosDllWidget::SigCANDllConfigured,
-           this, &C_CamMosWidget::SigCANDllConfigured);
+   connect(this->mpc_Ui->pc_WiDllConfig, &C_CamMosDllWidget::SigCanDllConfigured,
+           this, &C_CamMosWidget::SigCanDllConfigured);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,7 +188,7 @@ void C_CamMosWidget::SaveUserSettings(void) const
    \param[in]  os32_Result    Result of DBC file load
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::OnLoadFinishedDbc(const stw_types::sint32 os32_Result) const
+void C_CamMosWidget::OnLoadFinishedDbc(const int32_t os32_Result) const
 {
    this->mpc_Ui->pc_WiDatabase->OnLoadFinishedDbc(os32_Result);
 }
@@ -200,8 +200,8 @@ void C_CamMosWidget::OnLoadFinishedDbc(const stw_types::sint32 os32_Result) cons
    \param[in]  orc_Busses     Buses found in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::OnLoadFinishedOsySysDef(const stw_types::sint32 os32_Result,
-                                             const std::vector<stw_opensyde_core::C_OSCSystemBus> & orc_Busses) const
+void C_CamMosWidget::OnLoadFinishedOsySysDef(const int32_t os32_Result,
+                                             const std::vector<stw::opensyde_core::C_OscSystemBus> & orc_Busses) const
 {
    this->mpc_Ui->pc_WiDatabase->OnLoadFinishedOsySysDef(os32_Result, orc_Busses);
 }
@@ -213,8 +213,7 @@ void C_CamMosWidget::OnLoadFinishedOsySysDef(const stw_types::sint32 os32_Result
    \param[in]     os32_Result                      result of bus selection
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition,
-                                             const stw_types::sint32 os32_Result) const
+void C_CamMosWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition, const int32_t os32_Result) const
 {
    this->mpc_Ui->pc_WiDatabase->OnSigOsySysDefBusResult(orc_PathSystemDefinition, os32_Result);
 }
@@ -238,7 +237,7 @@ void C_CamMosWidget::OnCommunicationStarted(const bool oq_Online) const
    \param[in]   os32_Result       result of log file add operation
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosWidget::OnSigLogFileAddResult(const stw_types::sint32 os32_Result) const
+void C_CamMosWidget::OnSigLogFileAddResult(const int32_t os32_Result) const
 {
    this->mpc_Ui->pc_WiLogging->OnSigLogFileAddResult(os32_Result);
 }

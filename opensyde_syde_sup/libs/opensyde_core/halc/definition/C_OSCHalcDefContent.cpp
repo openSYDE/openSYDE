@@ -10,19 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_OSCHalcDefContent.h"
+#include "TglUtils.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscHalcDefContent.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,8 +40,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefContent::C_OSCHalcDefContent(void) :
-   C_OSCNodeDataPoolContent(),
+C_OscHalcDefContent::C_OscHalcDefContent(void) :
+   C_OscNodeDataPoolContent(),
    me_ComplexType(eCT_PLAIN)
 {
 }
@@ -52,7 +52,7 @@ C_OSCHalcDefContent::C_OSCHalcDefContent(void) :
    \param[in]  oe_Type  Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContent::SetComplexType(const C_OSCHalcDefContent::E_ComplexType oe_Type)
+void C_OscHalcDefContent::SetComplexType(const C_OscHalcDefContent::E_ComplexType oe_Type)
 {
    this->me_ComplexType = oe_Type;
 }
@@ -64,7 +64,7 @@ void C_OSCHalcDefContent::SetComplexType(const C_OSCHalcDefContent::E_ComplexTyp
    Complex type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefContent::E_ComplexType C_OSCHalcDefContent::GetComplexType() const
+C_OscHalcDefContent::E_ComplexType C_OscHalcDefContent::GetComplexType() const
 {
    return this->me_ComplexType;
 }
@@ -81,11 +81,11 @@ C_OSCHalcDefContent::E_ComplexType C_OSCHalcDefContent::GetComplexType() const
    C_CONFIG Content type invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_DisplayName,
-                                        const C_OSCNodeDataPoolContent & orc_Value)
+int32_t C_OscHalcDefContent::AddEnumItem(const stw::scl::C_SclString & orc_DisplayName,
+                                         const C_OscNodeDataPoolContent & orc_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNodeDataPoolContent * const pc_Content = this->FindEnumItem(orc_DisplayName);
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscNodeDataPoolContent * const pc_Content = this->FindEnumItem(orc_DisplayName);
 
    if (pc_Content != NULL)
    {
@@ -95,8 +95,8 @@ sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_Display
    {
       if ((orc_Value.GetType() == this->GetType()) && (orc_Value.GetArray() == this->GetArray()))
       {
-         this->mc_EnumItems.push_back(std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent>(orc_DisplayName,
-                                                                                                orc_Value));
+         this->mc_EnumItems.push_back(std::pair<stw::scl::C_SclString, C_OscNodeDataPoolContent>(orc_DisplayName,
+                                                                                                 orc_Value));
       }
       else
       {
@@ -117,10 +117,10 @@ sint32 C_OSCHalcDefContent::AddEnumItem(const stw_scl::C_SCLString & orc_Display
    C_CONFIG Enum content invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_DisplayName)
+int32_t C_OscHalcDefContent::SetEnumValue(const stw::scl::C_SclString & orc_DisplayName)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNodeDataPoolContent * const pc_NewContent = this->FindEnumItem(orc_DisplayName);
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscNodeDataPoolContent * const pc_NewContent = this->FindEnumItem(orc_DisplayName);
 
    if (pc_NewContent != NULL)
    {
@@ -131,34 +131,34 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
             switch (this->GetType())
             {
             case eUINT8:
-               this->SetValueAU8(pc_NewContent->GetValueAU8());
+               this->SetValueArrU8(pc_NewContent->GetValueArrU8());
                break;
             case eUINT16:
-               this->SetValueAU16(pc_NewContent->GetValueAU16());
+               this->SetValueArrU16(pc_NewContent->GetValueArrU16());
                break;
             case eUINT32:
-               this->SetValueAU32(pc_NewContent->GetValueAU32());
+               this->SetValueArrU32(pc_NewContent->GetValueArrU32());
                break;
             case eUINT64:
-               this->SetValueAU64(pc_NewContent->GetValueAU64());
+               this->SetValueArrU64(pc_NewContent->GetValueArrU64());
                break;
             case eSINT8:
-               this->SetValueAS8(pc_NewContent->GetValueAS8());
+               this->SetValueArrS8(pc_NewContent->GetValueArrS8());
                break;
             case eSINT16:
-               this->SetValueAS16(pc_NewContent->GetValueAS16());
+               this->SetValueArrS16(pc_NewContent->GetValueArrS16());
                break;
             case eSINT32:
-               this->SetValueAS32(pc_NewContent->GetValueAS32());
+               this->SetValueArrS32(pc_NewContent->GetValueArrS32());
                break;
             case eSINT64:
-               this->SetValueAS64(pc_NewContent->GetValueAS64());
+               this->SetValueArrS64(pc_NewContent->GetValueArrS64());
                break;
             case eFLOAT32:
-               this->SetValueAF32(pc_NewContent->GetValueAF32());
+               this->SetValueArrF32(pc_NewContent->GetValueArrF32());
                break;
             case eFLOAT64:
-               this->SetValueAF64(pc_NewContent->GetValueAF64());
+               this->SetValueArrF64(pc_NewContent->GetValueArrF64());
                break;
             default:
                break;
@@ -225,11 +225,11 @@ sint32 C_OSCHalcDefContent::SetEnumValue(const stw_scl::C_SCLString & orc_Displa
    C_RANGE  Display value does not exist for this value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContent::GetEnumValue(stw_scl::C_SCLString & orc_DisplayName)
+int32_t C_OscHalcDefContent::GetEnumValue(stw::scl::C_SclString & orc_DisplayName)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
-   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+   for (std::vector<std::pair<stw::scl::C_SclString, C_OscNodeDataPoolContent> >::const_iterator c_It =
            this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
@@ -252,11 +252,11 @@ sint32 C_OSCHalcDefContent::GetEnumValue(stw_scl::C_SCLString & orc_DisplayName)
    Found item, if pointer not NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolContent * C_OSCHalcDefContent::FindEnumItem(const stw_scl::C_SCLString & orc_DisplayName) const
+const C_OscNodeDataPoolContent * C_OscHalcDefContent::FindEnumItem(const stw::scl::C_SclString & orc_DisplayName) const
 {
-   const C_OSCNodeDataPoolContent * pc_Retval = NULL;
+   const C_OscNodeDataPoolContent * pc_Retval = NULL;
 
-   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+   for (std::vector<std::pair<stw::scl::C_SclString, C_OscNodeDataPoolContent> >::const_iterator c_It =
            this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
@@ -276,8 +276,8 @@ const C_OSCNodeDataPoolContent * C_OSCHalcDefContent::FindEnumItem(const stw_scl
    All enum items
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<std::pair<stw_scl::C_SCLString,
-                            C_OSCNodeDataPoolContent> > & C_OSCHalcDefContent::GetEnumItems(void) const
+const std::vector<std::pair<stw::scl::C_SclString,
+                            C_OscNodeDataPoolContent> > & C_OscHalcDefContent::GetEnumItems(void) const
 {
    return this->mc_EnumItems;
 }
@@ -288,7 +288,7 @@ const std::vector<std::pair<stw_scl::C_SCLString,
    \param[in]  orc_Value   New bitmask item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContent::AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & orc_Value)
+void C_OscHalcDefContent::AddBitmaskItem(const C_OscHalcDefContentBitmaskItem & orc_Value)
 {
    this->mc_BitmaskItems.push_back(orc_Value);
 }
@@ -300,7 +300,7 @@ void C_OSCHalcDefContent::AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & 
    All bitmask items
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<C_OSCHalcDefContentBitmaskItem> & C_OSCHalcDefContent::GetBitmaskItems(void) const
+const std::vector<C_OscHalcDefContentBitmaskItem> & C_OscHalcDefContent::GetBitmaskItems(void) const
 {
    return this->mc_BitmaskItems;
 }
@@ -312,7 +312,7 @@ const std::vector<C_OSCHalcDefContentBitmaskItem> & C_OSCHalcDefContent::GetBitm
    \param[in,out]  opc_Values    Values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContent::GetBitmaskStatusValues(std::vector<stw_scl::C_SCLString> * const opc_Displays,
+void C_OscHalcDefContent::GetBitmaskStatusValues(std::vector<stw::scl::C_SclString> * const opc_Displays,
                                                  std::vector<bool> * const opc_Values) const
 {
    if (opc_Displays != NULL)
@@ -325,7 +325,7 @@ void C_OSCHalcDefContent::GetBitmaskStatusValues(std::vector<stw_scl::C_SCLStrin
       opc_Values->clear();
       opc_Values->reserve(this->mc_BitmaskItems.size());
    }
-   for (std::vector<C_OSCHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+   for (std::vector<C_OscHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = this->mc_BitmaskItems.begin();
         c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
    {
       if (opc_Displays != NULL)
@@ -351,15 +351,15 @@ void C_OSCHalcDefContent::GetBitmaskStatusValues(std::vector<stw_scl::C_SCLStrin
    C_CONFIG Type invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContent::GetBitmask(const stw_scl::C_SCLString & orc_DisplayName, bool & orq_Value) const
+int32_t C_OscHalcDefContent::GetBitmask(const stw::scl::C_SclString & orc_DisplayName, bool & orq_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if ((this->GetArray() == false) && (this->GetComplexType() == C_OSCHalcDefContent::eCT_BIT_MASK))
+   if ((this->GetArray() == false) && (this->GetComplexType() == C_OscHalcDefContent::eCT_BIT_MASK))
    {
       bool q_Found = false;
 
-      for (std::vector<C_OSCHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+      for (std::vector<C_OscHalcDefContentBitmaskItem>::const_iterator c_ItBitmask = this->mc_BitmaskItems.begin();
            c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
       {
          if (orc_DisplayName == c_ItBitmask->c_Display)
@@ -394,16 +394,16 @@ sint32 C_OSCHalcDefContent::GetBitmask(const stw_scl::C_SCLString & orc_DisplayN
    C_CONFIG Type invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayName, const bool oq_Value)
+int32_t C_OscHalcDefContent::SetBitmask(const stw::scl::C_SclString & orc_DisplayName, const bool oq_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if ((this->GetArray() == false) && (this->GetComplexType() == C_OSCHalcDefContent::eCT_BIT_MASK))
+   if ((this->GetArray() == false) && (this->GetComplexType() == C_OscHalcDefContent::eCT_BIT_MASK))
    {
       bool q_Found = false;
 
       //Step 1: update flag
-      for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+      for (std::vector<C_OscHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
            c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
       {
          if (orc_DisplayName == c_ItBitmask->c_Display)
@@ -421,20 +421,20 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
       }
       else
       {
-         uint64 u64_CurrentValue = 0ULL;
+         uint64_t u64_CurrentValue = 0ULL;
          //Current value
          switch (this->GetType()) //lint !e788 not all enum constants used; this is unsigned only
          {
-         case C_OSCNodeDataPoolContent::eUINT8:
-            u64_CurrentValue = static_cast<uint64>(this->GetValueU8());
+         case C_OscNodeDataPoolContent::eUINT8:
+            u64_CurrentValue = static_cast<uint64_t>(this->GetValueU8());
             break;
-         case C_OSCNodeDataPoolContent::eUINT16:
-            u64_CurrentValue = static_cast<uint64>(this->GetValueU16());
+         case C_OscNodeDataPoolContent::eUINT16:
+            u64_CurrentValue = static_cast<uint64_t>(this->GetValueU16());
             break;
-         case C_OSCNodeDataPoolContent::eUINT32:
-            u64_CurrentValue = static_cast<uint64>(this->GetValueU32());
+         case C_OscNodeDataPoolContent::eUINT32:
+            u64_CurrentValue = static_cast<uint64_t>(this->GetValueU32());
             break;
-         case C_OSCNodeDataPoolContent::eUINT64:
+         case C_OscNodeDataPoolContent::eUINT64:
             u64_CurrentValue = this->GetValueU64();
             break;
          default:
@@ -444,14 +444,14 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
          if (s32_Retval == C_NO_ERR)
          {
             //Step 2: get initial value
-            for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+            for (std::vector<C_OscHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
                  c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
             {
                //Mask any used bits
                u64_CurrentValue = u64_CurrentValue & (~(c_ItBitmask->u64_Value));
             }
             //Step 3: apply all active flags
-            for (std::vector<C_OSCHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
+            for (std::vector<C_OscHalcDefContentBitmaskItem>::iterator c_ItBitmask = this->mc_BitmaskItems.begin();
                  c_ItBitmask != this->mc_BitmaskItems.end(); ++c_ItBitmask)
             {
                if (c_ItBitmask->q_ApplyValueSetting)
@@ -462,17 +462,17 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
             //Step 4: update value
             switch (this->GetType()) //lint !e788 not all enum constants used; this is unsigned only
             {
-            case C_OSCNodeDataPoolContent::eUINT8:
-               this->SetValueU8(static_cast<uint8>(u64_CurrentValue));
+            case C_OscNodeDataPoolContent::eUINT8:
+               this->SetValueU8(static_cast<uint8_t>(u64_CurrentValue));
                break;
-            case C_OSCNodeDataPoolContent::eUINT16:
-               this->SetValueU16(static_cast<uint16>(u64_CurrentValue));
+            case C_OscNodeDataPoolContent::eUINT16:
+               this->SetValueU16(static_cast<uint16_t>(u64_CurrentValue));
                break;
-            case C_OSCNodeDataPoolContent::eUINT32:
-               this->SetValueU32(static_cast<uint32>(u64_CurrentValue));
+            case C_OscNodeDataPoolContent::eUINT32:
+               this->SetValueU32(static_cast<uint32_t>(u64_CurrentValue));
                break;
-            case C_OSCNodeDataPoolContent::eUINT64:
-               this->SetValueU64(static_cast<uint64>(u64_CurrentValue));
+            case C_OscNodeDataPoolContent::eUINT64:
+               this->SetValueU64(static_cast<uint64_t>(u64_CurrentValue));
                break;
             default:
                //Should not happen
@@ -497,21 +497,21 @@ sint32 C_OSCHalcDefContent::SetBitmask(const stw_scl::C_SCLString & orc_DisplayN
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContent::CalcHash(uint32 & oru32_HashValue) const
+void C_OscHalcDefContent::CalcHash(uint32_t & oru32_HashValue) const
 {
-   C_OSCNodeDataPoolContent::CalcHash(oru32_HashValue);
+   C_OscNodeDataPoolContent::CalcHash(oru32_HashValue);
 
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
 
-   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+   for (std::vector<std::pair<stw::scl::C_SclString, C_OscNodeDataPoolContent> >::const_iterator c_It =
            this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
       c_It->second.CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
    {
       this->mc_BitmaskItems[u32_It].CalcHash(oru32_HashValue);
    }
@@ -526,21 +526,21 @@ void C_OSCHalcDefContent::CalcHash(uint32 & oru32_HashValue) const
    \param[in]      ou32_Index       Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContent::CalcHashElement(uint32 & oru32_HashValue, const uint32 ou32_Index) const
+void C_OscHalcDefContent::CalcHashElement(uint32_t & oru32_HashValue, const uint32_t ou32_Index) const
 {
-   C_OSCNodeDataPoolContent::CalcHashElement(oru32_HashValue, ou32_Index);
+   C_OscNodeDataPoolContent::CalcHashElement(oru32_HashValue, ou32_Index);
 
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
 
-   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+   for (std::vector<std::pair<stw::scl::C_SclString, C_OscNodeDataPoolContent> >::const_iterator c_It =
            this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
       c_It->second.CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
    {
       this->mc_BitmaskItems[u32_It].CalcHash(oru32_HashValue);
    }
@@ -554,21 +554,21 @@ void C_OSCHalcDefContent::CalcHashElement(uint32 & oru32_HashValue, const uint32
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefContent::CalcHashStructure(uint32 & oru32_HashValue) const
+void C_OscHalcDefContent::CalcHashStructure(uint32_t & oru32_HashValue) const
 {
-   C_OSCNodeDataPoolContent::CalcHashStructure(oru32_HashValue);
+   C_OscNodeDataPoolContent::CalcHashStructure(oru32_HashValue);
 
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_ComplexType, sizeof(this->me_ComplexType), oru32_HashValue);
 
-   for (std::vector<std::pair<stw_scl::C_SCLString, C_OSCNodeDataPoolContent> >::const_iterator c_It =
+   for (std::vector<std::pair<stw::scl::C_SclString, C_OscNodeDataPoolContent> >::const_iterator c_It =
            this->mc_EnumItems.begin();
         c_It != this->mc_EnumItems.end(); ++c_It)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(c_It->first.c_str(), c_It->first.Length(), oru32_HashValue);
       c_It->second.CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->mc_BitmaskItems.size(); ++u32_It)
    {
       this->mc_BitmaskItems[u32_It].CalcHashStructure(oru32_HashValue);
    }

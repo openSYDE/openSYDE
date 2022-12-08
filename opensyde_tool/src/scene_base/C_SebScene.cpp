@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsSceneDragDropEvent>
 #include <QGraphicsSceneMouseEvent>
@@ -18,34 +18,33 @@
 #include <QImageReader>
 #include <QElapsedTimer>
 
-#include "stwtypes.h"
-#include "gitypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "gitypes.hpp"
+#include "constants.hpp"
 
-#include "C_SebScene.h"
+#include "C_SebScene.hpp"
 
-#include "C_GtGetText.h"
-#include "C_GiBiCustomMouseItem.h"
-#include "C_GiUnique.h"
-#include "TGLUtils.h"
-#include "C_GiCustomFunctions.h"
-#include "C_Uti.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SebUnoZOrderSortHelper.h"
+#include "C_GtGetText.hpp"
+#include "C_GiBiCustomMouseItem.hpp"
+#include "C_GiUnique.hpp"
+#include "TglUtils.hpp"
+#include "C_GiCustomFunctions.hpp"
+#include "C_Uti.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SebUnoZetOrderSortHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 mf64_SCENE_RECT_BORDER = 0.0; //SSI: no border needed so far
+const float64_t mf64_SCENE_RECT_BORDER = 0.0; //SSI: no border needed so far
 const QString C_SebScene::mhc_BOUNDARY = "Boundary";
 const QString C_SebScene::mhc_TEXT_ELEMENT = "Text element";
 const QString C_SebScene::mhc_LINE = "Line/Arrow";
 const QString C_SebScene::mhc_IMAGE = "Image";
-const float64 C_SebScene::mhf64_MOVING_RANGE = 10.0;
+const float64_t C_SebScene::mhf64_MOVING_RANGE = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,7 +67,7 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
    mq_BlockContextMenu(false),
    mq_ProxyWidgetInteractionActive(false),
    mpc_CurrentHoverItem(NULL),
-   mu64_LastUnusedUniqueID(0),
+   mu64_LastUnusedUniqueId(0),
    mq_RubberBandActive(false),
    mq_LeftButtonPressed(false),
    mq_DrawCustomBackground(true),
@@ -83,7 +82,7 @@ C_SebScene::C_SebScene(QObject * const opc_Parent) :
    m_HandleBackground();
 
    //Timers
-   this->mc_ToolTipTimer.setInterval(static_cast<sintn>(ms32_TOOL_TIP_DELAY));
+   this->mc_ToolTipTimer.setInterval(static_cast<int32_t>(ms32_TOOL_TIP_DELAY));
    this->mc_ToolTipTimer.setSingleShot(true);
    connect(&mc_ToolTipTimer, &QTimer::timeout, this, &C_SebScene::m_TriggerToolTip);
 
@@ -104,22 +103,22 @@ C_SebScene::~C_SebScene()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Filter relevant items for Z order
 
-   \param[in,out]  orc_ZValues   Items to filter
+   \param[in,out]  orc_ZetValues   Items to filter
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::FilterChangableZValues(QList<QGraphicsItem *> & orc_ZValues) const
+void C_SebScene::FilterChangableZetValues(QList<QGraphicsItem *> & orc_ZetValues) const
 {
    QList<QGraphicsItem *> c_Tmp;
-   c_Tmp.reserve(orc_ZValues.size());
-   for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_ZValues.begin();
-        c_ItItem != orc_ZValues.end(); ++c_ItItem)
+   c_Tmp.reserve(orc_ZetValues.size());
+   for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_ZetValues.begin();
+        c_ItItem != orc_ZetValues.end(); ++c_ItItem)
    {
-      if (this->IsZOrderChangeable(*c_ItItem) == true)
+      if (this->IsZetOrderChangeable(*c_ItItem) == true)
       {
          c_Tmp.push_back(*c_ItItem);
       }
    }
-   orc_ZValues = c_Tmp;
+   orc_ZetValues = c_Tmp;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -131,15 +130,15 @@ void C_SebScene::FilterChangableZValues(QList<QGraphicsItem *> & orc_ZValues) co
    Highest used Z value of all scene items
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_SebScene::GetHighestUsedZValueList(const QList<QGraphicsItem *> & orc_Items) const
+float64_t C_SebScene::GetHighestUsedZetValueList(const QList<QGraphicsItem *> & orc_Items) const
 {
-   float64 f64_Retval = std::numeric_limits<float64>::lowest();
+   float64_t f64_Retval = std::numeric_limits<float64_t>::lowest();
    bool q_NothingFound = true;
 
    for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_Items.begin(); c_ItItem != orc_Items.end(); ++c_ItItem)
    {
       const QGraphicsItem * const pc_Item = *c_ItItem;
-      if ((pc_Item != NULL) && (this->IsZOrderChangeable(pc_Item) == true))
+      if ((pc_Item != NULL) && (this->IsZetOrderChangeable(pc_Item) == true))
       {
          // search the highest z value of all items
          if (pc_Item->zValue() > f64_Retval)
@@ -330,10 +329,10 @@ void C_SebScene::SetDarkModeActive(const bool oq_Value)
    else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
-                            const stw_types::sint32 * const ops32_Index)
+int32_t C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
+                             const int32_t * const ops32_Index)
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
    C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
 
    if (pc_Line != NULL)
@@ -356,10 +355,10 @@ sint32 C_SebScene::BendLine(QGraphicsItem * const opc_Item, const QPointF & orc_
    else: index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
-                                  const sint32 * const ops32_Index) const
+int32_t C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF & orc_ScenePos,
+                                   const int32_t * const ops32_Index) const
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
    C_GiLiLineGroup * const pc_Line = dynamic_cast<C_GiLiLineGroup *>(opc_Item);
 
    if (pc_Line != NULL)
@@ -372,14 +371,14 @@ sint32 C_SebScene::RemoveBendLine(QGraphicsItem * const opc_Item, const QPointF 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get item identified by unique item ID
 
-   \param[in]  oru64_ID    Unique item ID
+   \param[in]  oru64_Id    Unique item ID
 
    \return
    NULL: not found
    else: pointer to item
 */
 //----------------------------------------------------------------------------------------------------------------------
-QGraphicsItem * C_SebScene::GetItemByID(const uint64 & oru64_ID) const
+QGraphicsItem * C_SebScene::GetItemById(const uint64_t & oru64_Id) const
 {
    QGraphicsItem * pc_Retval = NULL;
    QGraphicsItem * pc_CurItemParent;
@@ -395,7 +394,7 @@ QGraphicsItem * C_SebScene::GetItemByID(const uint64 & oru64_ID) const
          pc_Unique = dynamic_cast<const C_GiUnique *>(pc_CurItemParent);
          if (pc_Unique != NULL)
          {
-            if (pc_Unique->CheckMatch(oru64_ID) == true)
+            if (pc_Unique->CheckMatch(oru64_Id) == true)
             {
                pc_Retval = pc_CurItemParent;
             }
@@ -1072,7 +1071,7 @@ void C_SebScene::m_HandleRevertableMove(const QPointF & orc_PositionDifference)
    \param[in]  orc_PositionDifference        Position difference of resize
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::m_HandleRevertableResizeLine(const sint32 & ors32_InteractionPointIndex,
+void C_SebScene::m_HandleRevertableResizeLine(const int32_t & ors32_InteractionPointIndex,
                                               const QPointF & orc_PositionDifference)
 {
    if (this->m_GetUndoManager() != NULL)
@@ -1089,7 +1088,7 @@ void C_SebScene::m_HandleRevertableResizeLine(const sint32 & ors32_InteractionPo
    \param[in]  orc_PositionDifference  Position difference of resize
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebScene::m_HandleSubLineMove(const sint32 & ors32_SubLineIndex, const QPointF & orc_PositionDifference)
+void C_SebScene::m_HandleSubLineMove(const int32_t & ors32_SubLineIndex, const QPointF & orc_PositionDifference)
 {
    if (this->m_GetUndoManager() != NULL)
    {
@@ -1139,7 +1138,7 @@ void C_SebScene::m_UpdateSelection(QGraphicsItem * const opc_Item, const bool oq
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebScene::m_SelectAll(void) const
 {
-   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+   const uint16_t u16_Timer = osc_write_log_performance_start();
 
    QList<QGraphicsItem *> c_ListItems = this->items();
 
@@ -1334,25 +1333,25 @@ void C_SebScene::m_CopyItemsToCopyPasteManager(const QList<QGraphicsItem *> & or
    {
       //Special handling for Z order
       //Start counting at one to compensate usage of highest used Z value
-      float64 f64_ZValue = 1.0;
-      QMap<const QGraphicsItem *, float64> c_NewZValues;
+      float64_t f64_ZetValue = 1.0;
+      QMap<const QGraphicsItem *, float64_t> c_NewZetValues;
 
       QList<QGraphicsItem *> c_SelectedItems = orc_SelectedItems;
       //Step 1: filter all relevant items for z order
-      this->FilterChangableZValues(c_SelectedItems);
+      this->FilterChangableZetValues(c_SelectedItems);
       //Step 2: sort all items via z order
-      C_SebUnoZOrderSortHelper::h_SortZValues(c_SelectedItems);
+      C_SebUnoZetOrderSortHelper::h_SortZetValues(c_SelectedItems);
       //Step 3: map all items to an z value
       for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_SelectedItems.begin(); c_ItItem != c_SelectedItems.end();
            ++c_ItItem)
       {
          //Insert Z value for this item
-         c_NewZValues.insert(*c_ItItem, f64_ZValue);
+         c_NewZetValues.insert(*c_ItItem, f64_ZetValue);
          //Iterate to next float64 value
-         f64_ZValue += 1.0;
+         f64_ZetValue += 1.0;
       }
       //Step 4: proceed with normal copy paste handling
-      this->m_GetCopyPasteManager()->CopyFromSceneToManager(orc_SelectedItems, c_NewZValues);
+      this->m_GetCopyPasteManager()->CopyFromSceneToManager(orc_SelectedItems, c_NewZetValues);
    }
 }
 
@@ -1644,7 +1643,7 @@ void C_SebScene::m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_Se
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get new unique ID
 
-   \param[in]  opc_IDMap      Optional map for item to id
+   \param[in]  opc_IdMap      Optional map for item to id
    \param[in]  os32_Type      Item type, warning: only casted enum values accepted
    \param[in]  oru32_Index    Optional current index
    \param[in]  oq_CheckExist  Check exist
@@ -1653,20 +1652,20 @@ void C_SebScene::m_ApplySetupStyleMultiple(const QList<QGraphicsItem *> & orc_Se
    New unique ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64 C_SebScene::m_GetNewUniqueID(const QMap<C_PuiBsTemporaryDataID,
-                                               uint64> * const opc_IDMap, const sint32 os32_Type,
-                                    const uint32 & oru32_Index, const bool oq_CheckExist)
+uint64_t C_SebScene::m_GetNewUniqueId(const QMap<C_PuiBsTemporaryDataId,
+                                                 uint64_t> * const opc_IdMap, const int32_t os32_Type,
+                                      const uint32_t & oru32_Index, const bool oq_CheckExist)
 {
-   uint64 u64_Retval;
+   uint64_t u64_Retval;
 
-   if (opc_IDMap != NULL)
+   if (opc_IdMap != NULL)
    {
       //Get mapped ID and use last unused unique ID as default value to know if there is no mapped value
-      u64_Retval = opc_IDMap->value(C_PuiBsTemporaryDataID(os32_Type, oru32_Index), this->mu64_LastUnusedUniqueID);
+      u64_Retval = opc_IdMap->value(C_PuiBsTemporaryDataId(os32_Type, oru32_Index), this->mu64_LastUnusedUniqueId);
       //If there is no mapped value the last unused value is used therefore the last unused value has to be increased
-      if (u64_Retval == this->mu64_LastUnusedUniqueID)
+      if (u64_Retval == this->mu64_LastUnusedUniqueId)
       {
-         ++mu64_LastUnusedUniqueID;
+         ++mu64_LastUnusedUniqueId;
          if (oq_CheckExist)
          {
             tgl_assert(false);
@@ -1675,8 +1674,8 @@ uint64 C_SebScene::m_GetNewUniqueID(const QMap<C_PuiBsTemporaryDataID,
    }
    else
    {
-      u64_Retval = this->mu64_LastUnusedUniqueID;
-      ++mu64_LastUnusedUniqueID;
+      u64_Retval = this->mu64_LastUnusedUniqueId;
+      ++mu64_LastUnusedUniqueId;
    }
    return u64_Retval;
 }
@@ -1760,7 +1759,8 @@ void C_SebScene::m_MoveSelectedItems(const QPointF & orc_Delta)
       // Is the item movable?
       if (this->IsItemMovable((*c_ItItem)) == true)
       {
-         float64 f64_NewValue = (*c_ItItem)->mapToScene((*c_ItItem)->boundingRect().topLeft()).x() + c_AdaptedDelta.x();
+         float64_t f64_NewValue = (*c_ItItem)->mapToScene((*c_ItItem)->boundingRect().topLeft()).x() +
+                                  c_AdaptedDelta.x();
 
          if (f64_NewValue < C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE)
          {
@@ -1826,7 +1826,7 @@ void C_SebScene::m_BringToFront(void)
 {
    if (this->m_GetUndoManager() != NULL)
    {
-      this->m_GetUndoManager()->AdaptZOrder(this->selectedItems(), this->items(), true);
+      this->m_GetUndoManager()->AdaptZetOrder(this->selectedItems(), this->items(), true);
    }
 }
 
@@ -1835,7 +1835,7 @@ void C_SebScene::m_SendToBack(void)
 {
    if (this->m_GetUndoManager() != NULL)
    {
-      this->m_GetUndoManager()->AdaptZOrder(this->selectedItems(), this->items(), false);
+      this->m_GetUndoManager()->AdaptZetOrder(this->selectedItems(), this->items(), false);
    }
 }
 

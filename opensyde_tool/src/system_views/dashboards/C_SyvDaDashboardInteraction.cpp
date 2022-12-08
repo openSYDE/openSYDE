@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_SyvDaDashboardInteraction.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaDashboardInteraction.hpp"
 #include "ui_C_SyvDaDashboardInteraction.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

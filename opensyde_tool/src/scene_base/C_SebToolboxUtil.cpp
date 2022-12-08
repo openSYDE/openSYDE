@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_SebToolboxUtil.h"
-#include "C_OgeLabToolboxHeadingGroup.h"
-#include "C_OgeLabToolboxHeadingGroupBig.h"
-#include "C_SdUtil.h"
-#include "C_SdTopologyListWidget.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SebToolboxUtil.hpp"
+#include "C_OgeLabToolboxHeadingGroup.hpp"
+#include "C_OgeLabToolboxHeadingGroupBig.hpp"
+#include "C_SdUtil.hpp"
+#include "C_SdTopologyListWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SebToolboxUtil::hsn_LABEL_SIZE = 33;
-const stw_types::sintn C_SebToolboxUtil::hsn_HEADING_SPACER_SIZE_TOP = 47;
+const int32_t C_SebToolboxUtil::hs32_LABEL_SIZE = 33;
+const int32_t C_SebToolboxUtil::hs32_HEADING_SPACER_SIZE_TOP = 47;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -61,7 +60,7 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
    if (opc_Layout != NULL)
    {
       pc_Retval = new C_SdTopologyListWidget(opc_Parent);
-      sintn sn_Index;
+      int32_t s32_Index;
 
       if (orc_Name != "")
       {
@@ -74,10 +73,10 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
 
          // Heading
          opc_Layout->addWidget(pc_Heading);
-         pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-         pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-         sn_Index = opc_Layout->indexOf(pc_Heading);
-         opc_Layout->setStretch(sn_Index, 0);
+         pc_Heading->setMaximumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+         pc_Heading->setMinimumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+         s32_Index = opc_Layout->indexOf(pc_Heading);
+         opc_Layout->setStretch(s32_Index, 0);
       } //lint !e429  //no memory leak because of the parent of pc_Heading and the Qt memory management
       else
       {
@@ -89,8 +88,8 @@ C_SdTopologyListWidget * C_SebToolboxUtil::h_AddNewList(const QString & orc_Name
       //List
       opc_Layout->addWidget(pc_Retval);
       orc_ListWidgets.push_back(pc_Retval);
-      sn_Index = opc_Layout->indexOf(pc_Retval);
-      opc_Layout->setStretch(sn_Index, 0);
+      s32_Index = opc_Layout->indexOf(pc_Retval);
+      opc_Layout->setStretch(s32_Index, 0);
    } //lint !e429  //no memory leak because of the parent of pc_Heading,the call of addWidget and the Qt memory
      // management
 
@@ -119,12 +118,12 @@ C_OgeFraSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, 
       C_OgeLabToolboxHeadingGroupBig * const pc_Heading = new C_OgeLabToolboxHeadingGroupBig(opc_Parent);
       pc_FrameSeparator = new C_OgeFraSeparator(opc_Parent);
       QVBoxLayout * const pc_FrameLayout = new QVBoxLayout();
-      sintn sn_Index;
+      int32_t s32_Index;
 
       // Optional top spacer
       if (oq_AddSpacerBefore == true)
       {
-         QSpacerItem * const pc_SpacerTop = new QSpacerItem(0, C_SebToolboxUtil::hsn_HEADING_SPACER_SIZE_TOP);
+         QSpacerItem * const pc_SpacerTop = new QSpacerItem(0, C_SebToolboxUtil::hs32_HEADING_SPACER_SIZE_TOP);
          opc_Layout->addSpacerItem(pc_SpacerTop);
       } //lint !e429  //no memory leak because of the parent of pc_Heading,the call of addWidget and the Qt memory
       //management
@@ -133,10 +132,10 @@ C_OgeFraSeparator * C_SebToolboxUtil::h_AddNewHeading(const QString & orc_Name, 
 
       // Heading
       opc_Layout->addWidget(pc_Heading);
-      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-      sn_Index = opc_Layout->indexOf(pc_Heading);
-      opc_Layout->setStretch(sn_Index, 0);
+      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+      s32_Index = opc_Layout->indexOf(pc_Heading);
+      opc_Layout->setStretch(s32_Index, 0);
 
       // add frame separator between heading and subheading (in dashboard toolbox) to new layout
       pc_FrameLayout->addWidget(pc_FrameSeparator);
@@ -180,17 +179,17 @@ std::vector<C_OgePubIconOnly *> C_SebToolboxUtil::h_AddNewUserHeading(const QStr
       pc_IconButton = new C_OgePubIconOnly(opc_Parent);
       pc_ClearAllUserNodesButton = new C_OgePubIconOnly(opc_Parent);
 
-      sintn sn_Index;
+      int32_t s32_Index;
 
       // Set name to heading
       pc_Heading->setText(orc_Name);
 
       // Heading
       pc_HorizontalLayout->addWidget(pc_Heading);
-      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-      sn_Index = pc_HorizontalLayout->indexOf(pc_Heading);
-      pc_HorizontalLayout->setStretch(sn_Index, 0);
+      pc_Heading->setMaximumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+      pc_Heading->setMinimumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+      s32_Index = pc_HorizontalLayout->indexOf(pc_Heading);
+      pc_HorizontalLayout->setStretch(s32_Index, 0);
 
       // Add icon button
       pc_IconButton->setIcon(QIcon("://images/IconAddEnabled.svg"));
@@ -269,18 +268,18 @@ void C_SebToolboxUtil::h_AddElementToList(QListWidget * const opc_ListWidget, co
       opc_ListWidget->addItem(orc_Text);
       pc_Item = opc_ListWidget->item(opc_ListWidget->count() - 1);
       c_Icon = C_SdUtil::h_InitStaticIconSvg(orc_IconPath, opc_ListWidget->iconSize());
-      pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, orc_Text);
-      pc_Item->setData(msn_USER_ROLE_PIXMAP_BRIGHT_MODE, static_cast<QPixmap>(orc_IconPath));
+      pc_Item->setData(ms32_USER_ROLE_ADDITIONAL_INFORMATION, orc_Text);
+      pc_Item->setData(ms32_USER_ROLE_PIXMAP_BRIGHT_MODE, static_cast<QPixmap>(orc_IconPath));
       if (orc_IconPathDark.compare("") == 0)
       {
-         pc_Item->setData(msn_USER_ROLE_PIXMAP_DARK_MODE, static_cast<QPixmap>(orc_IconPath));
+         pc_Item->setData(ms32_USER_ROLE_PIXMAP_DARK_MODE, static_cast<QPixmap>(orc_IconPath));
       }
       else
       {
-         pc_Item->setData(msn_USER_ROLE_PIXMAP_DARK_MODE, static_cast<QPixmap>(orc_IconPathDark));
+         pc_Item->setData(ms32_USER_ROLE_PIXMAP_DARK_MODE, static_cast<QPixmap>(orc_IconPathDark));
       }
-      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, orc_ToolTipHeading);
-      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, orc_ToolTipContent);
+      pc_Item->setData(ms32_USER_ROLE_TOOL_TIP_HEADING, orc_ToolTipHeading);
+      pc_Item->setData(ms32_USER_ROLE_TOOL_TIP_CONTENT, orc_ToolTipContent);
       pc_Item->setIcon(c_Icon);
    }
 }
@@ -299,21 +298,21 @@ void C_SebToolboxUtil::h_AddFinalSpacer(QVBoxLayout * const opc_Layout, QListWid
       QSpacerItem * pc_Spacer;
 
       // get index of last added list
-      sintn sn_Index = opc_Layout->indexOf(opc_ListWidget);
-      ++sn_Index;
+      int32_t s32_Index = opc_Layout->indexOf(opc_ListWidget);
+      ++s32_Index;
 
       // add the spacer
-      opc_Layout->insertSpacing(sn_Index, 10);
+      opc_Layout->insertSpacing(s32_Index, 10);
 
       // configure spacer
 
-      pc_Spacer = dynamic_cast<QSpacerItem *>(opc_Layout->itemAt(sn_Index));
+      pc_Spacer = dynamic_cast<QSpacerItem *>(opc_Layout->itemAt(s32_Index));
       if (pc_Spacer != NULL)
       {
          // without this call the spacer will not work correctly
          pc_Spacer->changeSize(20, 10, QSizePolicy::Expanding);
       }
-      opc_Layout->setStretch(sn_Index, 1);
+      opc_Layout->setStretch(s32_Index, 1);
    }
 }
 

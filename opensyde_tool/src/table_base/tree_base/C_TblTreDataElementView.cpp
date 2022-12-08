@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QKeyEvent>
 #include <QScrollBar>
-#include "C_TblTreDataElementView.h"
+#include "C_TblTreDataElementView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 QMap<C_TblTreDataElementModel::E_Mode,
-     std::vector<std::vector<uint32> > > C_TblTreDataElementView::mhc_LastKnownExpandedIndices;
+     std::vector<std::vector<uint32_t> > > C_TblTreDataElementView::mhc_LastKnownExpandedIndices;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -89,11 +88,11 @@ void C_TblTreDataElementView::SetUseInternalExpandedItems(const bool oq_Use)
    \param[in] orc_UsedDataPoolIndicesIndex Data pools to always display as used
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 os32_SkipApplicationIndex,
-                                     const std::vector<uint32> & orc_UsedDataPoolIndicesIndex)
+void C_TblTreDataElementView::InitSd(const uint32_t ou32_NodeIndex, const int32_t os32_SkipApplicationIndex,
+                                     const std::vector<uint32_t> & orc_UsedDataPoolIndicesIndex)
 {
    this->me_Mode = C_TblTreDataElementModel::eDATAPOOLS;
-   this->mc_Model.InitSD(ou32_NodeIndex, os32_SkipApplicationIndex, orc_UsedDataPoolIndicesIndex);
+   this->mc_Model.InitSd(ou32_NodeIndex, os32_SkipApplicationIndex, orc_UsedDataPoolIndicesIndex);
    //Some defaults
    this->mu32_ViewIndex = 0UL;
 }
@@ -106,28 +105,28 @@ void C_TblTreDataElementView::InitSD(const uint32 ou32_NodeIndex, const sint32 o
    \param[in] oq_ShowArrayElements      Optional flag to hide all array elements (if false)
    \param[in] oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
    \param[in] oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
-   \param[in] oq_ShowNVMLists           Optional flag to only show NVM LISTs
+   \param[in] oq_ShowNvmLists           Optional flag to only show NVM LISTs
    \param[in] opc_AlreasyUsedElements   Optional pointer to vector with already used elements. All added elements
                                         will be marked as used an will be disabled. Usable for Datapool element mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementView::InitSV(const stw_types::uint32 ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
+void C_TblTreDataElementView::InitSv(const uint32_t ou32_ViewIndex, const bool oq_ShowOnlyWriteElements,
                                      const bool oq_ShowArrayElements, const bool oq_ShowArrayIndexElements,
-                                     const bool oq_Show64BitValues, const bool oq_ShowNVMLists,
+                                     const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
                                      const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
-   if (oq_ShowNVMLists == true)
+   if (oq_ShowNvmLists == true)
    {
       this->me_Mode = C_TblTreDataElementModel::eNVM_LIST;
-      this->mc_Model.InitSV(this->mu32_ViewIndex, C_TblTreDataElementModel::eNVM_LIST, oq_ShowOnlyWriteElements,
+      this->mc_Model.InitSv(this->mu32_ViewIndex, C_TblTreDataElementModel::eNVM_LIST, oq_ShowOnlyWriteElements,
                             oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
                             opc_AlreasyUsedElements);
    }
    else
    {
       this->me_Mode = C_TblTreDataElementModel::eDATAPOOL_ELEMENT;
-      this->mc_Model.InitSV(this->mu32_ViewIndex, C_TblTreDataElementModel::eDATAPOOL_ELEMENT, oq_ShowOnlyWriteElements,
+      this->mc_Model.InitSv(this->mu32_ViewIndex, C_TblTreDataElementModel::eDATAPOOL_ELEMENT, oq_ShowOnlyWriteElements,
                             oq_ShowArrayElements, oq_ShowArrayIndexElements, oq_Show64BitValues,
                             opc_AlreasyUsedElements);
    }
@@ -171,7 +170,7 @@ void C_TblTreDataElementView::Search(const QString & orc_Text)
    \param[in] ou32_ViewIndex View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementView::SetViewIndex(const uint32 ou32_ViewIndex)
+void C_TblTreDataElementView::SetViewIndex(const uint32_t ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
 }
@@ -194,7 +193,7 @@ void C_TblTreDataElementView::SwitchMode(const C_TblTreDataElementModel::E_Mode 
                                          const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
 {
    this->me_Mode = ore_Mode;
-   this->mc_Model.InitSV(this->mu32_ViewIndex, ore_Mode, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+   this->mc_Model.InitSv(this->mu32_ViewIndex, ore_Mode, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                          oq_ShowArrayIndexElements,
                          oq_Show64BitValues, opc_AlreasyUsedElements);
    m_RestoreExpandedIndices();
@@ -246,13 +245,13 @@ void C_TblTreDataElementView::SaveExpandedIndices(void)
 {
    if (this->mq_UseInternalExpandedItems == true)
    {
-      const sintn sn_COLUMN = 0;
+      const int32_t s32_COLUMN = 0;
 
-      std::vector<std::vector<stw_types::uint32> > c_FoundItems;
+      std::vector<std::vector<uint32_t> > c_FoundItems;
       //THIS ONE HAS TO BE INVALID
       const QModelIndex c_INDEX;
       //Handle children
-      m_AppendExpandedIndices(c_FoundItems, c_INDEX, sn_COLUMN);
+      m_AppendExpandedIndices(c_FoundItems, c_INDEX, s32_COLUMN);
 
       C_TblTreDataElementView::mhc_LastKnownExpandedIndices.remove(this->me_Mode);
       C_TblTreDataElementView::mhc_LastKnownExpandedIndices.insert(this->me_Mode, c_FoundItems);
@@ -311,16 +310,16 @@ void C_TblTreDataElementView::selectionChanged(const QItemSelection & orc_Select
 
    \param[in,out] orc_FoundItems All expanded items
    \param[in]     orc_CurParent  Current parent to analyze
-   \param[in]     osn_Column     Column to use for index access
+   \param[in]     os32_Column     Column to use for index access
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementView::m_AppendExpandedIndices(std::vector<std::vector<uint32> > & orc_FoundItems,
-                                                      const QModelIndex & orc_CurParent, const sintn osn_Column)
+void C_TblTreDataElementView::m_AppendExpandedIndices(std::vector<std::vector<uint32_t> > & orc_FoundItems,
+                                                      const QModelIndex & orc_CurParent, const int32_t os32_Column)
 {
-   for (sintn sn_ItChild = 0; sn_ItChild < this->mc_Model.rowCount(orc_CurParent); ++sn_ItChild)
+   for (int32_t s32_ItChild = 0; s32_ItChild < this->mc_Model.rowCount(orc_CurParent); ++s32_ItChild)
    {
-      const QModelIndex c_CurItem = this->mc_Model.index(sn_ItChild, osn_Column, orc_CurParent);
-      m_AppendExpandedIndices(orc_FoundItems, c_CurItem, osn_Column);
+      const QModelIndex c_CurItem = this->mc_Model.index(s32_ItChild, os32_Column, orc_CurParent);
+      m_AppendExpandedIndices(orc_FoundItems, c_CurItem, os32_Column);
       if (this->isExpanded(m_ManualMapFromSource(c_CurItem)) == true)
       {
          orc_FoundItems.push_back(this->mc_Model.GetGenericRepresentationForIndex(c_CurItem));
@@ -336,15 +335,15 @@ void C_TblTreDataElementView::m_RestoreExpandedIndices(void)
 {
    if (this->mq_UseInternalExpandedItems == true)
    {
-      const QMap<stw_opensyde_gui_logic::C_TblTreDataElementModel::E_Mode,
-                 std::vector<std::vector<stw_types::uint32> > >::const_iterator c_ItMap =
+      const QMap<stw::opensyde_gui_logic::C_TblTreDataElementModel::E_Mode,
+                 std::vector<std::vector<uint32_t> > >::const_iterator c_ItMap =
          C_TblTreDataElementView::mhc_LastKnownExpandedIndices.find(this->me_Mode);
 
       if (c_ItMap != C_TblTreDataElementView::mhc_LastKnownExpandedIndices.end())
       {
          this->collapseAll();
          QModelIndexList c_List;
-         for (uint32 u32_ItExpandedItem = 0UL; u32_ItExpandedItem < c_ItMap.value().size(); ++u32_ItExpandedItem)
+         for (uint32_t u32_ItExpandedItem = 0UL; u32_ItExpandedItem < c_ItMap.value().size(); ++u32_ItExpandedItem)
          {
             const QModelIndex c_ModelIndex = this->mc_Model.GetIndexForItem(c_ItMap.value()[u32_ItExpandedItem]);
             const QModelIndex c_SortModelIndex = m_ManualMapFromSource(c_ModelIndex);
@@ -392,9 +391,9 @@ QModelIndex C_TblTreDataElementView::m_ManualMapFromSource(const QModelIndex & o
 //----------------------------------------------------------------------------------------------------------------------
 void C_TblTreDataElementView::m_ExpandInitial(void)
 {
-   for (sintn sn_ItChild = 0; sn_ItChild < this->mc_SortModel.rowCount(); ++sn_ItChild)
+   for (int32_t s32_ItChild = 0; s32_ItChild < this->mc_SortModel.rowCount(); ++s32_ItChild)
    {
-      const QModelIndex c_ModelIndex = this->mc_SortModel.index(sn_ItChild, 0);
+      const QModelIndex c_ModelIndex = this->mc_SortModel.index(s32_ItChild, 0);
       this->expand(c_ModelIndex);
       m_ExpandAllChildren(c_ModelIndex, 0UL, 3UL);
    }
@@ -408,14 +407,14 @@ void C_TblTreDataElementView::m_ExpandInitial(void)
    \param[in] ou32_MaxLayer     Max layer
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblTreDataElementView::m_ExpandAllChildren(const QModelIndex & orc_Index, const uint32 ou32_LayerCounter,
-                                                  const uint32 ou32_MaxLayer)
+void C_TblTreDataElementView::m_ExpandAllChildren(const QModelIndex & orc_Index, const uint32_t ou32_LayerCounter,
+                                                  const uint32_t ou32_MaxLayer)
 {
    if (ou32_LayerCounter < ou32_MaxLayer)
    {
-      for (sintn sn_ItChild = 0; sn_ItChild < this->mc_SortModel.rowCount(orc_Index); ++sn_ItChild)
+      for (int32_t s32_ItChild = 0; s32_ItChild < this->mc_SortModel.rowCount(orc_Index); ++s32_ItChild)
       {
-         const QModelIndex c_ModelIndex = this->mc_SortModel.index(sn_ItChild, 0, orc_Index);
+         const QModelIndex c_ModelIndex = this->mc_SortModel.index(s32_ItChild, 0, orc_Index);
          this->expand(c_ModelIndex);
          m_ExpandAllChildren(c_ModelIndex, ou32_LayerCounter + 1UL, ou32_MaxLayer);
       }

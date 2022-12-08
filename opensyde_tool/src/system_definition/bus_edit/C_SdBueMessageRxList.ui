@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxEmpty">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxEmpty">
      <property name="title">
       <string>GroupBox</string>
      </property>
@@ -64,7 +64,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelEmpty">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelEmpty">
           <property name="text">
            <string>TextLabel</string>
           </property>
@@ -102,7 +102,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNotEmpty">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNotEmpty">
      <property name="title">
       <string>GroupBox</string>
      </property>
@@ -123,11 +123,11 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
+       <widget class="stw::opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
-        <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidget">
+        <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidget">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -176,27 +176,27 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTransparentScrollArea</class>
+   <class>stw::opensyde_gui_elements::C_OgeTransparentScrollArea</class>
    <extends>QScrollArea</extends>
-   <header>C_OgeTransparentScrollArea.h</header>
+   <header>C_OgeTransparentScrollArea.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

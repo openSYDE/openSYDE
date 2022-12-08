@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiSdHandlerBusLogic.h"
-#include "C_PuiSdNodeCanMessageSyncManager.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSdHandlerBusLogic.hpp"
+#include "C_PuiSdNodeCanMessageSyncManager.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,8 +43,8 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add bus
 
-   \param[in,out]  orc_OSCBus             New OSC bus (name might be modified by this function if not unique)
-   \param[in]      orc_UIBus              UI bus
+   \param[in,out]  orc_OscBus             New OSC bus (name might be modified by this function if not unique)
+   \param[in]      orc_UiBus              UI bus
    \param[in]      opc_Name               New bus name
    \param[in]      oq_AllowBusIdAdaption  Flag if bus ID adaption is allowed
 
@@ -53,29 +52,29 @@ using namespace stw_opensyde_gui_logic;
    Index of bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSdHandlerBusLogic::AddBusAndSort(C_OSCSystemBus & orc_OSCBus, const C_PuiSdBus & orc_UIBus,
-                                             const QString * const opc_Name, const bool oq_AllowBusIdAdaption)
+uint32_t C_PuiSdHandlerBusLogic::AddBusAndSort(C_OscSystemBus & orc_OscBus, const C_PuiSdBus & orc_UiBus,
+                                               const QString * const opc_Name, const bool oq_AllowBusIdAdaption)
 {
-   const uint32 u32_Index = mc_CoreDefinition.c_Buses.size();
+   const uint32_t u32_Index = mc_CoreDefinition.c_Buses.size();
 
    if (opc_Name != NULL)
    {
-      orc_OSCBus.c_Name = opc_Name->toStdString().c_str();
+      orc_OscBus.c_Name = opc_Name->toStdString().c_str();
    }
    else
    {
-      orc_OSCBus.c_Name = C_Uti::h_GetUniqueName(
-         this->GetExistingBusNames(), orc_OSCBus.c_Name);
+      orc_OscBus.c_Name = C_Uti::h_GetUniqueName(
+         this->GetExistingBusNames(), orc_OscBus.c_Name);
    }
    if (oq_AllowBusIdAdaption == true)
    {
-      mc_CoreDefinition.GetNextFreeBusId(orc_OSCBus.u8_BusID);
+      mc_CoreDefinition.GetNextFreeBusId(orc_OscBus.u8_BusId);
    }
 
-   mc_CoreDefinition.AddBus(orc_OSCBus);
+   mc_CoreDefinition.AddBus(orc_OscBus);
 
    //insert UI part at same position as OSC part:
-   this->mc_UIBuses.insert(mc_UIBuses.begin() + u32_Index, orc_UIBus);
+   this->mc_UiBuses.insert(mc_UiBuses.begin() + u32_Index, orc_UiBus);
 
    //signal "bus change"
    Q_EMIT this->SigBussesChanged();
@@ -91,10 +90,10 @@ uint32 C_PuiSdHandlerBusLogic::AddBusAndSort(C_OSCSystemBus & orc_OSCBus, const 
    Vector of pointers to all currently registered bus names
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::GetExistingBusNames(void) const
+std::map<C_SclString, bool> C_PuiSdHandlerBusLogic::GetExistingBusNames(void) const
 {
-   std::map<C_SCLString, bool> c_Retval;
-   for (uint32 u32_ItBus = 0; u32_ItBus < this->mc_CoreDefinition.c_Buses.size(); ++u32_ItBus)
+   std::map<C_SclString, bool> c_Retval;
+   for (uint32_t u32_ItBus = 0; u32_ItBus < this->mc_CoreDefinition.c_Buses.size(); ++u32_ItBus)
    {
       c_Retval[this->mc_CoreDefinition.c_Buses[u32_ItBus].c_Name] = true;
    }
@@ -108,11 +107,11 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::GetExistingBusNames(void) co
    \param[in]  orc_Item    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::SetUIBus(const uint32 ou32_Index, const C_PuiSdBus & orc_Item)
+void C_PuiSdHandlerBusLogic::SetUiBus(const uint32_t ou32_Index, const C_PuiSdBus & orc_Item)
 {
-   if (ou32_Index < this->mc_UIBuses.size())
+   if (ou32_Index < this->mc_UiBuses.size())
    {
-      mc_UIBuses[ou32_Index] = orc_Item;
+      mc_UiBuses[ou32_Index] = orc_Item;
    }
 }
 
@@ -123,7 +122,7 @@ void C_PuiSdHandlerBusLogic::SetUIBus(const uint32 ou32_Index, const C_PuiSdBus 
    \param[in]  orc_Item    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::SetOSCBus(const uint32 ou32_Index, const C_OSCSystemBus & orc_Item)
+void C_PuiSdHandlerBusLogic::SetOscBus(const uint32_t ou32_Index, const C_OscSystemBus & orc_Item)
 {
    if (ou32_Index < this->mc_CoreDefinition.c_Buses.size())
    {
@@ -146,13 +145,13 @@ void C_PuiSdHandlerBusLogic::SetOSCBus(const uint32 ou32_Index, const C_OSCSyste
    Else Valid data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSdBus * C_PuiSdHandlerBusLogic::GetUIBus(const uint32 & oru32_Index) const
+const C_PuiSdBus * C_PuiSdHandlerBusLogic::GetUiBus(const uint32_t & oru32_Index) const
 {
    const C_PuiSdBus * pc_Retval;
 
-   if (oru32_Index < this->mc_UIBuses.size())
+   if (oru32_Index < this->mc_UiBuses.size())
    {
-      pc_Retval = &(mc_UIBuses[oru32_Index]);
+      pc_Retval = &(mc_UiBuses[oru32_Index]);
    }
    else
    {
@@ -173,9 +172,9 @@ const C_PuiSdBus * C_PuiSdHandlerBusLogic::GetUIBus(const uint32 & oru32_Index) 
    Else Valid data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCSystemBus * C_PuiSdHandlerBusLogic::GetOSCBus(const uint32 & oru32_Index) const
+const C_OscSystemBus * C_PuiSdHandlerBusLogic::GetOscBus(const uint32_t & oru32_Index) const
 {
-   const C_OSCSystemBus * pc_Retval;
+   const C_OscSystemBus * pc_Retval;
 
    if (oru32_Index < this->mc_CoreDefinition.c_Buses.size())
    {
@@ -201,14 +200,14 @@ const C_OSCSystemBus * C_PuiSdHandlerBusLogic::GetOSCBus(const uint32 & oru32_In
    false Already in use
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdHandlerBusLogic::CheckBusNameAvailable(const C_SCLString & orc_Name,
-                                                   const uint32 * const opu32_BusIndexToSkip,
-                                                   std::vector<stw_scl::C_SCLString> * const opc_ExistingNames) const
+bool C_PuiSdHandlerBusLogic::CheckBusNameAvailable(const C_SclString & orc_Name,
+                                                   const uint32_t * const opu32_BusIndexToSkip,
+                                                   std::vector<stw::scl::C_SclString> * const opc_ExistingNames) const
 {
    bool q_Retval = true;
 
    //Either end on error or continue if all node names are requested
-   for (uint32 u32_ItBus = 0;
+   for (uint32_t u32_ItBus = 0;
         (u32_ItBus < this->mc_CoreDefinition.c_Buses.size()) && ((q_Retval == true) || (opc_ExistingNames != NULL));
         ++u32_ItBus)
    {
@@ -222,7 +221,7 @@ bool C_PuiSdHandlerBusLogic::CheckBusNameAvailable(const C_SCLString & orc_Name,
       }
       if (q_Skip == false)
       {
-         const C_OSCSystemBus & rc_Bus = this->mc_CoreDefinition.c_Buses[u32_ItBus];
+         const C_OscSystemBus & rc_Bus = this->mc_CoreDefinition.c_Buses[u32_ItBus];
          //Check conflict
          if (rc_Bus.c_Name.LowerCase() == orc_Name.LowerCase())
          {
@@ -244,12 +243,12 @@ bool C_PuiSdHandlerBusLogic::CheckBusNameAvailable(const C_SCLString & orc_Name,
    \param[in]  ou32_BusIndex  Connector bus index (0 -> first bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::RemoveBus(const uint32 ou32_BusIndex)
+void C_PuiSdHandlerBusLogic::RemoveBus(const uint32_t ou32_BusIndex)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    this->mc_CoreDefinition.DeleteBus(ou32_BusIndex);
-   this->mc_UIBuses.erase(this->mc_UIBuses.begin() + ou32_BusIndex);
+   this->mc_UiBuses.erase(this->mc_UiBuses.begin() + ou32_BusIndex);
 
    // Sync bus text elements indices
    for (u32_Counter = 0U; u32_Counter < this->c_BusTextElements.size(); ++u32_Counter)
@@ -275,16 +274,16 @@ void C_PuiSdHandlerBusLogic::RemoveBus(const uint32 ou32_BusIndex)
    false No conflict
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
+bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32_t ou32_BusIndex) const
 {
    bool q_NameConflict;
    bool q_IdInvalid;
-   static QMap<std::vector<uint32>, bool> hc_PreviousResults;
+   static QMap<std::vector<uint32_t>, bool> hc_PreviousResults;
 
-   QMap<std::vector<uint32>, bool>::const_iterator c_It;
-   std::vector<uint32> c_Hashes;
-   std::vector<uint32> c_NodeIndexes;
-   std::vector<uint32> c_InterfaceIndexes;
+   QMap<std::vector<uint32_t>, bool>::const_iterator c_It;
+   std::vector<uint32_t> c_Hashes;
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
    bool q_Retval;
 
    //get all required hashes
@@ -292,7 +291,7 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
    //Bus hash
    c_Hashes.push_back(this->m_GetHashBus(ou32_BusIndex));
    //Nodes hashes
-   for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
    {
       c_Hashes.push_back(this->m_GetHashNode(c_NodeIndexes[u32_ItNode]));
    }
@@ -304,7 +303,7 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
       bool q_NameEmpty;
 
       std::vector<QString> c_InvalidNodesForBitRate;
-      std::vector<C_OSCCanProtocol::E_Type> c_InvalidProtocols;
+      std::vector<C_OscCanProtocol::E_Type> c_InvalidProtocols;
 
       //Do all checks
       if (this->CheckBusConflictDetailed(ou32_BusIndex, &q_NameConflict, &q_NameEmpty, &q_IdInvalid,
@@ -373,13 +372,13 @@ bool C_PuiSdHandlerBusLogic::CheckBusConflict(const uint32 ou32_BusIndex) const
    false No conflict
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::CheckBusConflictDetailed(const uint32 ou32_BusIndex, bool * const opq_NameConflict,
-                                                        bool * const opq_NameEmpty, bool * const opq_IdInvalid,
-                                                        std::vector<QString> * const opc_InvalidNodesForBitRate,
-                                                        std::vector<C_OSCCanProtocol::E_Type> * const opc_InvalidProtocols)
+int32_t C_PuiSdHandlerBusLogic::CheckBusConflictDetailed(const uint32_t ou32_BusIndex, bool * const opq_NameConflict,
+                                                         bool * const opq_NameEmpty, bool * const opq_IdInvalid,
+                                                         std::vector<QString> * const opc_InvalidNodesForBitRate,
+                                                         std::vector<C_OscCanProtocol::E_Type> * const opc_InvalidProtocols)
 const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Check bus errors
    if (this->mc_CoreDefinition.CheckErrorBus(ou32_BusIndex, opq_NameConflict, opq_NameEmpty, opq_IdInvalid,
@@ -388,30 +387,30 @@ const
       if ((opc_InvalidNodesForBitRate != NULL) ||
           (opc_InvalidProtocols != NULL))
       {
-         std::vector<uint32> c_ConnectedNodes;
-         std::vector<uint32> c_ConnectedInterfaces;
-         uint32 u32_NodeCounter;
+         std::vector<uint32_t> c_ConnectedNodes;
+         std::vector<uint32_t> c_ConnectedInterfaces;
+         uint32_t u32_NodeCounter;
 
          this->mc_CoreDefinition.GetNodeIndexesOfBus(ou32_BusIndex, c_ConnectedNodes, c_ConnectedInterfaces);
 
          // Check current bitrate
          if (opc_InvalidNodesForBitRate != NULL)
          {
-            const C_OSCSystemBus * const pc_CheckedBus = this->GetOSCBus(ou32_BusIndex);
+            const C_OscSystemBus * const pc_CheckedBus = this->GetOscBus(ou32_BusIndex);
 
             if ((pc_CheckedBus != NULL) &&
-                (pc_CheckedBus->e_Type == C_OSCSystemBus::eCAN)) // Only relevant for CAN
+                (pc_CheckedBus->e_Type == C_OscSystemBus::eCAN)) // Only relevant for CAN
             {
-               const uint32 u32_CurrentBitrate = static_cast<uint32>(pc_CheckedBus->u64_BitRate / 1000ULL);
+               const uint32_t u32_CurrentBitrate = static_cast<uint32_t>(pc_CheckedBus->u64_BitRate / 1000ULL);
 
                // Every node must support the CAN bitrate
                for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
                {
-                  const C_OSCNode * const pc_Node = this->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
+                  const C_OscNode * const pc_Node = this->GetOscNodeConst(c_ConnectedNodes[u32_NodeCounter]);
 
                   if (pc_Node != NULL)
                   {
-                     uint32 u32_BitrateCounter;
+                     uint32_t u32_BitrateCounter;
                      bool q_BitrateFound = false;
                      tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
 
@@ -429,7 +428,7 @@ const
                      if (q_BitrateFound == false)
                      {
                         // Bitrate not supported
-                        opc_InvalidNodesForBitRate->push_back(pc_Node->c_Properties.c_Name.c_str());
+                        opc_InvalidNodesForBitRate->emplace_back(pc_Node->c_Properties.c_Name.c_str());
                      }
                   }
                }
@@ -438,7 +437,7 @@ const
 
          if (opc_InvalidProtocols != NULL)
          {
-            for (uint8 u8_ItProt = 0; u8_ItProt < C_OSCCanProtocol::hc_ALL_PROTOCOLS.size(); ++u8_ItProt)
+            for (uint8_t u8_ItProt = 0; u8_ItProt < C_OscCanProtocol::hc_ALL_PROTOCOLS.size(); ++u8_ItProt)
             {
                //Check message errors
                bool q_MessageNameConflict;
@@ -446,23 +445,25 @@ const
                bool q_MessagesHaveNoTx;
                bool q_DelayTimeInvalid;
                bool q_MessageSignalInvalid;
+               bool q_TxMethodInvalid;
                bool q_ErrorDetected = false;
 
-               const C_OSCCanProtocol::E_Type e_Type = C_OSCCanProtocol::hc_ALL_PROTOCOLS[u8_ItProt];
+               const C_OscCanProtocol::E_Type e_Type = C_OscCanProtocol::hc_ALL_PROTOCOLS[u8_ItProt];
                C_PuiSdNodeCanMessageSyncManager c_SyncMan;
 
                c_SyncMan.Init(ou32_BusIndex, e_Type);
 
                c_SyncMan.CheckErrorBus(&q_MessageNameConflict, &q_MessageIdInvalid, &q_MessagesHaveNoTx,
                                        &q_DelayTimeInvalid,
+                                       &q_TxMethodInvalid,
                                        &q_MessageSignalInvalid,
-                                       C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(e_Type),
-                                       C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(e_Type),
-                                       C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(e_Type),
-                                       C_OSCCanProtocol::h_GetCANMessageSignalsRequired(e_Type));
-               if (((((q_MessageNameConflict == false) && (q_MessageIdInvalid == false)) &&
-                     (q_DelayTimeInvalid == false)) && (q_MessageSignalInvalid == false)) &&
-                   (q_MessagesHaveNoTx == false))
+                                       C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(e_Type),
+                                       C_OscCanProtocol::h_GetCanMessageSignalGapsValid(e_Type),
+                                       C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(e_Type),
+                                       C_OscCanProtocol::h_GetCanMessageSignalsRequired(e_Type));
+               if ((q_MessageNameConflict == false) && (q_MessageIdInvalid == false) &&
+                   (q_DelayTimeInvalid == false) && (q_MessageSignalInvalid == false) &&
+                   (q_TxMethodInvalid == false) && (q_MessagesHaveNoTx == false))
                {
                   //No error
                }
@@ -477,27 +478,27 @@ const
                   //Check protocol errors of specific nodes
                   for (u32_NodeCounter = 0U; u32_NodeCounter < c_ConnectedNodes.size(); ++u32_NodeCounter)
                   {
-                     const C_OSCNode * const pc_Node = this->GetOSCNodeConst(c_ConnectedNodes[u32_NodeCounter]);
+                     const C_OscNode * const pc_Node = this->GetOscNodeConst(c_ConnectedNodes[u32_NodeCounter]);
 
                      if (pc_Node != NULL)
                      {
                         bool q_TempCommRxSignalCountInvalid;
                         bool q_TempCommTxSignalCountInvalid;
-                        bool q_TempCoRPdoCountInvalid;
-                        bool q_TempCoTPdoCountInvalid;
+                        bool q_TempCoRxPdoCountInvalid;
+                        bool q_TempCoTxPdoCountInvalid;
 
-                        pc_Node->CheckErrorCANProtocol(c_ConnectedInterfaces[u32_NodeCounter],
+                        pc_Node->CheckErrorCanProtocol(c_ConnectedInterfaces[u32_NodeCounter],
                                                        e_Type,
                                                        true,
                                                        q_TempCommRxSignalCountInvalid,
                                                        q_TempCommTxSignalCountInvalid,
-                                                       q_TempCoRPdoCountInvalid,
-                                                       q_TempCoTPdoCountInvalid);
+                                                       q_TempCoRxPdoCountInvalid,
+                                                       q_TempCoTxPdoCountInvalid);
 
                         if ((q_TempCommRxSignalCountInvalid == true) ||
                             (q_TempCommTxSignalCountInvalid == true) ||
-                            (q_TempCoRPdoCountInvalid == true) ||
-                            (q_TempCoTPdoCountInvalid == true))
+                            (q_TempCoRxPdoCountInvalid == true) ||
+                            (q_TempCoTxPdoCountInvalid == true))
                         {
                            opc_InvalidProtocols->push_back(e_Type);
                         }
@@ -523,7 +524,7 @@ const
    Number of OSC buses
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_PuiSdHandlerBusLogic::GetOSCBusesSize(void) const
+uint32_t C_PuiSdHandlerBusLogic::GetOscBusesSize(void) const
 {
    return this->mc_CoreDefinition.c_Buses.size();
 }
@@ -542,23 +543,23 @@ stw_types::uint32 C_PuiSdHandlerBusLogic::GetOSCBusesSize(void) const
    \param[in]  ou32_BusIndex        Connected bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceNumber,
+void C_PuiSdHandlerBusLogic::AddConnection(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber,
                                            const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
-                                           const uint32 ou32_BusIndex)
+                                           const uint32_t ou32_BusIndex)
 {
-   const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(ou32_BusIndex);
-   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+   const C_OscSystemBus * const pc_Bus = this->GetOscBus(ou32_BusIndex);
+   const std::vector<uint32_t> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
    tgl_assert(c_Indices.size() == orc_Properties.size());
    if (c_Indices.size() == orc_Properties.size())
    {
-      for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+      for (uint32_t u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
       {
-         const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+         const uint32_t u32_CurIndex = c_Indices[u32_ItIndex];
          if ((u32_CurIndex < this->mc_CoreDefinition.c_Nodes.size()) && (pc_Bus != NULL))
          {
-            C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
-            const C_OSCNodeComInterfaceSettings * const pc_CurComInterface = rc_Node.c_Properties.GetComInterface(
+            C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
+            const C_OscNodeComInterfaceSettings * const pc_CurComInterface = rc_Node.c_Properties.GetComInterface(
                pc_Bus->e_Type, ou8_InterfaceNumber);
             if (pc_CurComInterface != NULL)
             {
@@ -566,14 +567,14 @@ void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const ui
                                                          pc_CurComInterface->u8_InterfaceNumber) == C_NO_ERR)
                {
                   //Adapt node ID
-                  C_OSCNodeComInterfaceSettings c_CurComInterface = *pc_CurComInterface;
+                  C_OscNodeComInterfaceSettings c_CurComInterface = *pc_CurComInterface;
                   //Adapt IP address
-                  c_CurComInterface.u8_NodeID = orc_Properties[u32_ItIndex].u8_NodeId;
+                  c_CurComInterface.u8_NodeId = orc_Properties[u32_ItIndex].u8_NodeId;
 
-                  tgl_assert(orc_Properties[u32_ItIndex].c_IP.size() == 4UL);
-                  for (uint32 u32_It = 0UL; u32_It < orc_Properties[u32_ItIndex].c_IP.size(); ++u32_It)
+                  tgl_assert(orc_Properties[u32_ItIndex].c_Ip.size() == 4UL);
+                  for (uint32_t u32_It = 0UL; u32_It < orc_Properties[u32_ItIndex].c_Ip.size(); ++u32_It)
                   {
-                     c_CurComInterface.c_Ip.au8_IpAddress[u32_It] = orc_Properties[u32_ItIndex].c_IP[u32_It];
+                     c_CurComInterface.c_Ip.au8_IpAddress[u32_It] = orc_Properties[u32_ItIndex].c_Ip[u32_It];
                   }
 
                   rc_Node.c_Properties.SetComInterface(c_CurComInterface);
@@ -581,13 +582,13 @@ void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const ui
                   C_PuiSdNodeConnection c_NewConnection;
 
                   //Add connection ID
-                  c_NewConnection.c_ConnectionID.u8_InterfaceNumber = ou8_InterfaceNumber;
-                  c_NewConnection.c_ConnectionID.e_InterfaceType = pc_Bus->e_Type;
+                  c_NewConnection.c_ConnectionId.u8_InterfaceNumber = ou8_InterfaceNumber;
+                  c_NewConnection.c_ConnectionId.e_InterfaceType = pc_Bus->e_Type;
 
-                  if (u32_CurIndex < this->mc_UINodes.size())
+                  if (u32_CurIndex < this->mc_UiNodes.size())
                   {
                      //Also add corresponding UI element:
-                     this->mc_UINodes[u32_CurIndex].c_UIBusConnections.push_back(c_NewConnection);
+                     this->mc_UiNodes[u32_CurIndex].c_UiBusConnections.push_back(c_NewConnection);
                   }
                }
             }
@@ -600,26 +601,26 @@ void C_PuiSdHandlerBusLogic::AddConnection(const uint32 ou32_NodeIndex, const ui
 /*! \brief   Remove connection
 
    \param[in]  ou32_NodeIndex    Connector node index (0 -> first node)
-   \param[in]  orc_ID            Connector ID encoding interface type and index
+   \param[in]  orc_Id            Connector ID encoding interface type and index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID)
+void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32_t ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_Id)
 {
-   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+   const std::vector<uint32_t> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
    //Check size & consistency
-   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   tgl_assert(this->mc_UiNodes.size() == this->mc_CoreDefinition.c_Nodes.size());
 
-   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+   for (uint32_t u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
    {
-      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+      const uint32_t u32_CurIndex = c_Indices[u32_ItIndex];
       if (u32_CurIndex < this->mc_CoreDefinition.c_Nodes.size())
       {
-         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
-         C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
+         C_PuiSdNode & rc_UiNode = this->mc_UiNodes[u32_CurIndex];
+         C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
 
-         rc_OSCNode.c_Properties.DisconnectComInterface(orc_ID.e_InterfaceType, orc_ID.u8_InterfaceNumber);
-         rc_UINode.DeleteConnection(orc_ID);
+         rc_OscNode.c_Properties.DisconnectComInterface(orc_Id.e_InterfaceType, orc_Id.u8_InterfaceNumber);
+         rc_UiNode.DeleteConnection(orc_Id);
       }
    }
 }
@@ -628,20 +629,20 @@ void C_PuiSdHandlerBusLogic::RemoveConnection(const uint32 ou32_NodeIndex, const
 /*! \brief   Change connection
 
    \param[in]  ou32_NodeIndex    Index of node this interface is part of
-   \param[in]  orc_ID            Previous interface ID
+   \param[in]  orc_Id            Previous interface ID
    \param[in]  ou8_NewInterface  New interface number
    \param[in]  orc_Properties    Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_ID,
-                                              const uint8 ou8_NewInterface,
+void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32_t ou32_NodeIndex, const C_PuiSdNodeConnectionId & orc_Id,
+                                              const uint8_t ou8_NewInterface,
                                               const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
    //Copy is necessary as the value changes during function call
-   const C_PuiSdNodeConnectionId c_OrgCopy = orc_ID;
+   const C_PuiSdNodeConnectionId c_OrgCopy = orc_Id;
    C_PuiSdNodeConnectionId c_Tmp;
 
-   c_Tmp.e_InterfaceType = orc_ID.e_InterfaceType;
+   c_Tmp.e_InterfaceType = orc_Id.e_InterfaceType;
    c_Tmp.u8_InterfaceNumber = ou8_NewInterface;
 
    ChangeCompleteConnection(ou32_NodeIndex, c_OrgCopy, c_Tmp, orc_Properties, 0xFFFFFFFFUL, false);
@@ -652,58 +653,58 @@ void C_PuiSdHandlerBusLogic::ChangeConnection(const uint32 ou32_NodeIndex, const
 /*! \brief   Change complete connection
 
    \param[in]  ou32_NodeIndex          Index of node this interface is part of
-   \param[in]  orc_PrevID              Previous interface ID
-   \param[in]  orc_NewID               New interface ID
+   \param[in]  orc_PrevId              Previous interface ID
+   \param[in]  orc_NewId               New interface ID
    \param[in]  orc_Properties          Properties
    \param[in]  oru32_BusIndex          Bus index to use instead of last used one
    \param[in]  oq_IncludeCanOpenSync   Flag to include CANopen data snyc handling
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeIndex,
-                                                      const C_PuiSdNodeConnectionId & orc_PrevID,
-                                                      const C_PuiSdNodeConnectionId & orc_NewID,
-                                                      const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, const uint32 & oru32_BusIndex,
+void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32_t ou32_NodeIndex,
+                                                      const C_PuiSdNodeConnectionId & orc_PrevId,
+                                                      const C_PuiSdNodeConnectionId & orc_NewId,
+                                                      const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties, const uint32_t & oru32_BusIndex,
                                                       const bool oq_IncludeCanOpenSync)
 {
    //Copy is necessary as the value changes during function call
-   const C_PuiSdNodeConnectionId c_PrevIDCopy = orc_PrevID;
-   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+   const C_PuiSdNodeConnectionId c_PrevIdCopy = orc_PrevId;
+   const std::vector<uint32_t> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
    //Check size & consistency
    tgl_assert(c_Indices.size() == orc_Properties.size());
-   tgl_assert(this->mc_UINodes.size() == this->mc_CoreDefinition.c_Nodes.size());
+   tgl_assert(this->mc_UiNodes.size() == this->mc_CoreDefinition.c_Nodes.size());
 
-   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+   for (uint32_t u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
    {
-      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
+      const uint32_t u32_CurIndex = c_Indices[u32_ItIndex];
       if (u32_CurIndex < this->mc_CoreDefinition.c_Nodes.size())
       {
-         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
-         C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
-         uint32 u32_LastBus = 0;
+         C_PuiSdNode & rc_UiNode = this->mc_UiNodes[u32_CurIndex];
+         C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[u32_CurIndex];
+         uint32_t u32_LastBus = 0;
          //Unregister
-         for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
+         for (uint32_t u32_ItComInterface = 0; u32_ItComInterface < rc_OscNode.c_Properties.c_ComInterfaces.size();
               ++u32_ItComInterface)
          {
-            C_OSCNodeComInterfaceSettings & rc_ComInterface =
-               rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
-            if ((rc_ComInterface.e_InterfaceType == c_PrevIDCopy.e_InterfaceType) &&
-                (rc_ComInterface.u8_InterfaceNumber == c_PrevIDCopy.u8_InterfaceNumber))
+            C_OscNodeComInterfaceSettings & rc_ComInterface =
+               rc_OscNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+            if ((rc_ComInterface.e_InterfaceType == c_PrevIdCopy.e_InterfaceType) &&
+                (rc_ComInterface.u8_InterfaceNumber == c_PrevIdCopy.u8_InterfaceNumber))
             {
                u32_LastBus = rc_ComInterface.u32_BusIndex;
                rc_ComInterface.RemoveConnection();
             }
          }
          //Register
-         for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_OSCNode.c_Properties.c_ComInterfaces.size();
+         for (uint32_t u32_ItComInterface = 0; u32_ItComInterface < rc_OscNode.c_Properties.c_ComInterfaces.size();
               ++u32_ItComInterface)
          {
-            C_OSCNodeComInterfaceSettings & rc_ComInterface =
-               rc_OSCNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
-            if ((rc_ComInterface.e_InterfaceType == orc_NewID.e_InterfaceType) &&
-                (rc_ComInterface.u8_InterfaceNumber == orc_NewID.u8_InterfaceNumber))
+            C_OscNodeComInterfaceSettings & rc_ComInterface =
+               rc_OscNode.c_Properties.c_ComInterfaces[u32_ItComInterface];
+            if ((rc_ComInterface.e_InterfaceType == orc_NewId.e_InterfaceType) &&
+                (rc_ComInterface.u8_InterfaceNumber == orc_NewId.u8_InterfaceNumber))
             {
-               uint32 u32_BusIndex;
+               uint32_t u32_BusIndex;
                if (oru32_BusIndex >= this->mc_CoreDefinition.c_Buses.size())
                {
                   u32_BusIndex = u32_LastBus;
@@ -713,28 +714,28 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeInde
                   u32_BusIndex = oru32_BusIndex;
                }
                rc_ComInterface.AddConnection(u32_BusIndex);
-               rc_ComInterface.u8_NodeID = orc_Properties[u32_ItIndex].u8_NodeId;
+               rc_ComInterface.u8_NodeId = orc_Properties[u32_ItIndex].u8_NodeId;
 
-               tgl_assert(orc_Properties[u32_ItIndex].c_IP.size() == 4UL);
-               for (uint32 u32_It = 0UL; u32_It < orc_Properties[u32_ItIndex].c_IP.size(); ++u32_It)
+               tgl_assert(orc_Properties[u32_ItIndex].c_Ip.size() == 4UL);
+               for (uint32_t u32_It = 0UL; u32_It < orc_Properties[u32_ItIndex].c_Ip.size(); ++u32_It)
                {
-                  rc_ComInterface.c_Ip.au8_IpAddress[u32_It] = orc_Properties[u32_ItIndex].c_IP[u32_It];
+                  rc_ComInterface.c_Ip.au8_IpAddress[u32_It] = orc_Properties[u32_ItIndex].c_Ip[u32_It];
                }
             }
          }
 
          //UI
-         for (uint32 u32_ItBusConn = 0; u32_ItBusConn < rc_UINode.c_UIBusConnections.size(); ++u32_ItBusConn)
+         for (uint32_t u32_ItBusConn = 0; u32_ItBusConn < rc_UiNode.c_UiBusConnections.size(); ++u32_ItBusConn)
          {
-            C_PuiSdNodeConnection & rc_BusConn = rc_UINode.c_UIBusConnections[u32_ItBusConn];
-            if (rc_BusConn.c_ConnectionID == c_PrevIDCopy)
+            C_PuiSdNodeConnection & rc_BusConn = rc_UiNode.c_UiBusConnections[u32_ItBusConn];
+            if (rc_BusConn.c_ConnectionId == c_PrevIdCopy)
             {
-               rc_BusConn.c_ConnectionID = orc_NewID;
+               rc_BusConn.c_ConnectionId = orc_NewId;
             }
          }
          if (oq_IncludeCanOpenSync)
          {
-            this->m_HandleChangeCompleteConnectionForCanOpen(u32_CurIndex, c_PrevIDCopy, orc_NewID);
+            this->m_HandleChangeCompleteConnectionForCanOpen(u32_CurIndex, c_PrevIdCopy, orc_NewId);
          }
       }
    }
@@ -747,18 +748,18 @@ void C_PuiSdHandlerBusLogic::ChangeCompleteConnection(const uint32 ou32_NodeInde
    \param[in]  orc_Connections   Connection information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::SetUINodeConnections(const uint32 ou32_NodeIndex,
+void C_PuiSdHandlerBusLogic::SetUiNodeConnections(const uint32_t ou32_NodeIndex,
                                                   const std::vector<C_PuiSdNodeConnection> & orc_Connections)
 {
-   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+   const std::vector<uint32_t> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
-   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+   for (uint32_t u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
    {
-      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
-      if (u32_CurIndex < this->mc_UINodes.size())
+      const uint32_t u32_CurIndex = c_Indices[u32_ItIndex];
+      if (u32_CurIndex < this->mc_UiNodes.size())
       {
-         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
-         rc_UINode.c_UIBusConnections = orc_Connections;
+         C_PuiSdNode & rc_UiNode = this->mc_UiNodes[u32_CurIndex];
+         rc_UiNode.c_UiBusConnections = orc_Connections;
       }
    }
 }
@@ -771,20 +772,20 @@ void C_PuiSdHandlerBusLogic::SetUINodeConnections(const uint32 ou32_NodeIndex,
    \param[in]  orc_Id                  New ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::SetUINodeConnectionId(const uint32 ou32_NodeIndex, const uint32 ou32_ConnectionIndex,
+void C_PuiSdHandlerBusLogic::SetUiNodeConnectionId(const uint32_t ou32_NodeIndex, const uint32_t ou32_ConnectionIndex,
                                                    const C_PuiSdNodeConnectionId & orc_Id)
 {
-   const std::vector<uint32> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
+   const std::vector<uint32_t> c_Indices = this->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
-   for (uint32 u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
+   for (uint32_t u32_ItIndex = 0UL; u32_ItIndex < c_Indices.size(); ++u32_ItIndex)
    {
-      const uint32 u32_CurIndex = c_Indices[u32_ItIndex];
-      if (u32_CurIndex < this->mc_UINodes.size())
+      const uint32_t u32_CurIndex = c_Indices[u32_ItIndex];
+      if (u32_CurIndex < this->mc_UiNodes.size())
       {
-         C_PuiSdNode & rc_UINode = this->mc_UINodes[u32_CurIndex];
-         if (ou32_ConnectionIndex < rc_UINode.c_UIBusConnections.size())
+         C_PuiSdNode & rc_UiNode = this->mc_UiNodes[u32_CurIndex];
+         if (ou32_ConnectionIndex < rc_UiNode.c_UiBusConnections.size())
          {
-            rc_UINode.c_UIBusConnections[ou32_ConnectionIndex].c_ConnectionID = orc_Id;
+            rc_UiNode.c_UiBusConnections[ou32_ConnectionIndex].c_ConnectionId = orc_Id;
          }
       }
    }
@@ -802,16 +803,16 @@ void C_PuiSdHandlerBusLogic::SetUINodeConnectionId(const uint32 ou32_NodeIndex, 
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanProtocol * C_PuiSdHandlerBusLogic::GetCanProtocol(const uint32 & oru32_NodeIndex,
-                                                                const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                const uint32 ou32_DatapoolIndex) const
+const C_OscCanProtocol * C_PuiSdHandlerBusLogic::GetCanProtocol(const uint32_t & oru32_NodeIndex,
+                                                                const C_OscCanProtocol::E_Type & ore_ComType,
+                                                                const uint32_t ou32_DatapoolIndex) const
 {
-   const C_OSCCanProtocol * pc_Retval = NULL;
+   const C_OscCanProtocol * pc_Retval = NULL;
 
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
-      pc_Retval = rc_Node.GetCANProtocolConst(ore_ComType, ou32_DatapoolIndex);
+      const C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      pc_Retval = rc_Node.GetCanProtocolConst(ore_ComType, ou32_DatapoolIndex);
    }
    return pc_Retval;
 }
@@ -828,15 +829,15 @@ const C_OSCCanProtocol * C_PuiSdHandlerBusLogic::GetCanProtocol(const uint32 & o
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPool * C_PuiSdHandlerBusLogic::GetOSCCanDataPool(const uint32 & oru32_NodeIndex,
-                                                                    const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                    const uint32 & oru32_DatapoolIndex) const
+const C_OscNodeDataPool * C_PuiSdHandlerBusLogic::GetOscCanDataPool(const uint32_t & oru32_NodeIndex,
+                                                                    const C_OscCanProtocol::E_Type & ore_ComType,
+                                                                    const uint32_t & oru32_DatapoolIndex) const
 {
-   const C_OSCNodeDataPool * pc_Retval = NULL;
+   const C_OscNodeDataPool * pc_Retval = NULL;
 
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      const C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
       pc_Retval = rc_Node.GetComDataPoolConst(ore_ComType, oru32_DatapoolIndex);
    }
    return pc_Retval;
@@ -853,15 +854,15 @@ const C_OSCNodeDataPool * C_PuiSdHandlerBusLogic::GetOSCCanDataPool(const uint32
    Pointer to protocols    Pointers to communication datapools of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector< const C_OSCNodeDataPool *> C_PuiSdHandlerBusLogic::GetOSCCanDataPools(const uint32 & oru32_NodeIndex,
-                                                                                   const C_OSCCanProtocol::E_Type & ore_ComType)
+std::vector< const C_OscNodeDataPool *> C_PuiSdHandlerBusLogic::GetOscCanDataPools(const uint32_t & oru32_NodeIndex,
+                                                                                   const C_OscCanProtocol::E_Type & ore_ComType)
 const
 {
-   std::vector<const C_OSCNodeDataPool *> c_Return;
+   std::vector<const C_OscNodeDataPool *> c_Return;
 
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      const C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
       c_Return = rc_Node.GetComDatapoolsConst(ore_ComType);
    }
    return c_Return;
@@ -879,23 +880,69 @@ const
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSdNodeDataPool * C_PuiSdHandlerBusLogic::GetUiCanDataPool(const uint32 & oru32_NodeIndex,
-                                                                     const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                     const uint32 & oru32_DatapoolIndex) const
+const C_PuiSdNodeDataPool * C_PuiSdHandlerBusLogic::GetUiCanDataPool(const uint32_t & oru32_NodeIndex,
+                                                                     const C_OscCanProtocol::E_Type & ore_ComType,
+                                                                     const uint32_t & oru32_DatapoolIndex) const
 {
    const C_PuiSdNodeDataPool * pc_Retval = NULL;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
-      const C_OSCCanProtocol * const pc_CanProtocol = rc_OSCNode.GetCANProtocolConst(ore_ComType, oru32_DatapoolIndex);
+      const C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      const C_OscCanProtocol * const pc_CanProtocol = rc_OscNode.GetCanProtocolConst(ore_ComType, oru32_DatapoolIndex);
       if (pc_CanProtocol != NULL)
       {
-         const C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
-         if (pc_CanProtocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+         const C_PuiSdNode & rc_UiNode = this->mc_UiNodes[oru32_NodeIndex];
+         if (pc_CanProtocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size())
          {
-            pc_Retval = &rc_UINode.c_UIDataPools[pc_CanProtocol->u32_DataPoolIndex];
+            pc_Retval = &rc_UiNode.c_UiDataPools[pc_CanProtocol->u32_DataPoolIndex];
+         }
+      }
+   }
+   return pc_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get com data pool list (ui)
+
+   \param[in]  ou32_NodeIndex       Node index
+   \param[in]  oe_ComType           Com type
+   \param[in]  ou32_InterfaceIndex  Interface index
+   \param[in]  ou32_DatapoolIndex   Datapool index
+   \param[in]  oq_MessageIsTx       Message is tx
+
+   \return
+   Ui com data pool list
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::GetUiCanDataPoolList(const uint32_t ou32_NodeIndex,
+                                                                             const C_OscCanProtocol::E_Type oe_ComType,
+                                                                             const uint32_t ou32_InterfaceIndex,
+                                                                             const uint32_t ou32_DatapoolIndex,
+                                                                             const bool oq_MessageIsTx) const
+{
+   const C_PuiSdNodeDataPoolList * pc_Retval = NULL;
+
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
+   if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
+   {
+      const C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      const C_PuiSdNode & rc_UiNode = this->mc_UiNodes[ou32_NodeIndex];
+      const C_OscCanProtocol * const pc_CanProtocol = rc_OscNode.GetCanProtocolConst(oe_ComType, ou32_DatapoolIndex);
+      if ((pc_CanProtocol != NULL) && (ou32_DatapoolIndex < rc_OscNode.c_DataPools.size()) &&
+          (pc_CanProtocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size()))
+      {
+         const C_OscNodeDataPool & rc_OscDataPool = rc_OscNode.c_DataPools[ou32_DatapoolIndex];
+         const C_PuiSdNodeDataPool & rc_UiDataPool = rc_UiNode.c_UiDataPools[pc_CanProtocol->u32_DataPoolIndex];
+         uint32_t u32_ListIndex = 0UL;
+         if (C_OscCanProtocol::h_GetComListIndex(rc_OscDataPool, ou32_InterfaceIndex, oq_MessageIsTx,
+                                                 u32_ListIndex) == C_NO_ERR)
+         {
+            if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
+            {
+               pc_Retval = &rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
+            }
          }
       }
    }
@@ -914,26 +961,26 @@ const C_PuiSdNodeDataPool * C_PuiSdHandlerBusLogic::GetUiCanDataPool(const uint3
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSdNodeCanProtocol * C_PuiSdHandlerBusLogic::GetUiCanProtocolConst(const uint32 & oru32_NodeIndex,
-                                                                             const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                             const uint32 ou32_DatapoolIndex)
+const C_PuiSdNodeCanProtocol * C_PuiSdHandlerBusLogic::GetUiCanProtocolConst(const uint32_t & oru32_NodeIndex,
+                                                                             const C_OscCanProtocol::E_Type & ore_ComType,
+                                                                             const uint32_t ou32_DatapoolIndex)
 const
 {
    const C_PuiSdNodeCanProtocol * pc_Retval = NULL;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
-      const C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
-      tgl_assert(rc_OSCNode.c_ComProtocols.size() == rc_UINode.c_UICanProtocols.size());
-      for (uint32 u32_ItCanProtocol = 0; u32_ItCanProtocol < rc_OSCNode.c_ComProtocols.size(); ++u32_ItCanProtocol)
+      const C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      const C_PuiSdNode & rc_UiNode = this->mc_UiNodes[oru32_NodeIndex];
+      tgl_assert(rc_OscNode.c_ComProtocols.size() == rc_UiNode.c_UiCanProtocols.size());
+      for (uint32_t u32_ItCanProtocol = 0; u32_ItCanProtocol < rc_OscNode.c_ComProtocols.size(); ++u32_ItCanProtocol)
       {
-         const C_OSCCanProtocol & rc_CanProtocol = rc_OSCNode.c_ComProtocols[u32_ItCanProtocol];
+         const C_OscCanProtocol & rc_CanProtocol = rc_OscNode.c_ComProtocols[u32_ItCanProtocol];
          if ((rc_CanProtocol.u32_DataPoolIndex == ou32_DatapoolIndex) &&
              (rc_CanProtocol.e_Type == ore_ComType))
          {
-            pc_Retval = &rc_UINode.c_UICanProtocols[u32_ItCanProtocol];
+            pc_Retval = &rc_UiNode.c_UiCanProtocols[u32_ItCanProtocol];
             break;
          }
       }
@@ -954,13 +1001,13 @@ const
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanMessageContainer * C_PuiSdHandlerBusLogic::GetCanProtocolMessageContainer(const uint32 & oru32_NodeIndex,
-                                                                                        const C_OSCCanProtocol::E_Type & ore_ComType, const uint32 & oru32_InterfaceIndex,
-                                                                                        const uint32 ou32_DatapoolIndex)
+const C_OscCanMessageContainer * C_PuiSdHandlerBusLogic::GetCanProtocolMessageContainer(
+   const uint32_t & oru32_NodeIndex, const C_OscCanProtocol::E_Type & ore_ComType,
+   const uint32_t & oru32_InterfaceIndex, const uint32_t ou32_DatapoolIndex)
 const
 {
-   const C_OSCCanMessageContainer * pc_Retval = NULL;
-   const C_OSCCanProtocol * const pc_Protocol = this->GetCanProtocol(oru32_NodeIndex, ore_ComType, ou32_DatapoolIndex);
+   const C_OscCanMessageContainer * pc_Retval = NULL;
+   const C_OscCanProtocol * const pc_Protocol = this->GetCanProtocol(oru32_NodeIndex, ore_ComType, ou32_DatapoolIndex);
 
    if (pc_Protocol != NULL)
    {
@@ -985,17 +1032,17 @@ const
    Pointer to protocols    Pointers to message containers
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<const C_OSCCanMessageContainer *> C_PuiSdHandlerBusLogic::GetCanProtocolMessageContainers(
-   const uint32 & oru32_NodeIndex, const C_OSCCanProtocol::E_Type & ore_ComType,
-   const uint32 & oru32_InterfaceIndex) const
+std::vector<const C_OscCanMessageContainer *> C_PuiSdHandlerBusLogic::GetCanProtocolMessageContainers(
+   const uint32_t & oru32_NodeIndex, const C_OscCanProtocol::E_Type & ore_ComType,
+   const uint32_t & oru32_InterfaceIndex) const
 {
-   std::vector<const C_OSCCanMessageContainer *> c_Retval;
+   std::vector<const C_OscCanMessageContainer *> c_Retval;
 
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
-      std::vector<const C_OSCCanProtocol *> c_Protocols = rc_Node.GetCANProtocolsConst(ore_ComType);
-      uint32 u32_Counter;
+      const C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      std::vector<const C_OscCanProtocol *> c_Protocols = rc_Node.GetCanProtocolsConst(ore_ComType);
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
       {
@@ -1020,15 +1067,15 @@ std::vector<const C_OSCCanMessageContainer *> C_PuiSdHandlerBusLogic::GetCanProt
    \retval C_RANGE      ou32_NodeIndex or ou32_DatapoolIndex invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::GetCanProtocolType(const uint32 ou32_NodeIndex, const uint32 ou32_DatapoolIndex,
-                                                  C_OSCCanProtocol::E_Type & ore_ComType) const
+int32_t C_PuiSdHandlerBusLogic::GetCanProtocolType(const uint32_t ou32_NodeIndex, const uint32_t ou32_DatapoolIndex,
+                                                   C_OscCanProtocol::E_Type & ore_ComType) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
-      const C_OSCCanProtocol * const pc_Prot = rc_Node.GetRelatedCANProtocolConst(ou32_DatapoolIndex);
+      const C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      const C_OscCanProtocol * const pc_Prot = rc_Node.GetRelatedCanProtocolConst(ou32_DatapoolIndex);
 
       if (pc_Prot != NULL)
       {
@@ -1050,11 +1097,11 @@ sint32 C_PuiSdHandlerBusLogic::GetCanProtocolType(const uint32 ou32_NodeIndex, c
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanMessage * C_PuiSdHandlerBusLogic::GetCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+const C_OscCanMessage * C_PuiSdHandlerBusLogic::GetCanMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 const
 {
-   const C_OSCCanMessage * pc_Retval = NULL;
-   const C_OSCCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(
+   const C_OscCanMessage * pc_Retval = NULL;
+   const C_OscCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(
       orc_MessageId.u32_NodeIndex,
       orc_MessageId.e_ComProtocol,
       orc_MessageId.u32_InterfaceIndex,
@@ -1062,7 +1109,7 @@ const
 
    if (pc_MessageContainer != NULL)
    {
-      const std::vector<C_OSCCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(
+      const std::vector<C_OscCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(
          orc_MessageId.q_MessageIsTx);
       if (orc_MessageId.u32_MessageIndex < rc_Messages.size())
       {
@@ -1078,24 +1125,24 @@ const
 
    \param[in]   orc_MessageId          Message identification indices
    \param[out]  orc_Message            Message data
-   \param[out]  orc_OSCSignalCommons   Signals data (osc common)
-   \param[out]  orc_UISignalCommons    Signals data (ui common)
-   \param[out]  orc_UISignals          Signals data (ui)
+   \param[out]  orc_OscSignalCommons   Signals data (osc common)
+   \param[out]  orc_UiSignalCommons    Signals data (ui common)
+   \param[out]  orc_UiSignals          Signals data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                     C_OSCCanMessage & orc_Message,
-                                                     std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
-                                                     std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                                     std::vector<C_PuiSdNodeCanSignal> & orc_UISignals) const
+int32_t C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                      C_OscCanMessage & orc_Message,
+                                                      std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
+                                                      std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
+                                                      std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals) const
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
-   const C_OSCNodeDataPoolList * const pc_OSCList = this->GetOSCCanDataPoolList(orc_MessageId.u32_NodeIndex,
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
+   const C_OscNodeDataPoolList * const pc_OscList = this->GetOscCanDataPoolList(orc_MessageId.u32_NodeIndex,
                                                                                 orc_MessageId.e_ComProtocol,
                                                                                 orc_MessageId.u32_InterfaceIndex,
                                                                                 orc_MessageId.u32_DatapoolIndex,
@@ -1107,25 +1154,25 @@ sint32 C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OSCCanMessageIdenti
                                                                                   orc_MessageId.q_MessageIsTx);
    const C_PuiSdNodeCanMessage * const pc_UiMessage = GetUiCanMessage(orc_MessageId);
 
-   if ((((pc_Message != NULL) && (pc_OSCList != NULL)) && (pc_UiList != NULL)) && (pc_UiMessage != NULL))
+   if ((((pc_Message != NULL) && (pc_OscList != NULL)) && (pc_UiList != NULL)) && (pc_UiMessage != NULL))
    {
       orc_Message = *pc_Message;
-      orc_UISignals = pc_UiMessage->c_Signals;
+      orc_UiSignals = pc_UiMessage->c_Signals;
       //Copy RELEVANT signals
-      orc_OSCSignalCommons.clear();
-      orc_UISignalCommons.clear();
-      orc_OSCSignalCommons.reserve(pc_Message->c_Signals.size());
-      orc_UISignalCommons.reserve(pc_Message->c_Signals.size());
-      for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
+      orc_OscSignalCommons.clear();
+      orc_UiSignalCommons.clear();
+      orc_OscSignalCommons.reserve(pc_Message->c_Signals.size());
+      orc_UiSignalCommons.reserve(pc_Message->c_Signals.size());
+      for (uint32_t u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
       {
-         const C_OSCCanSignal & rc_Message = pc_Message->c_Signals[u32_ItSignal];
-         if (rc_Message.u32_ComDataElementIndex < pc_OSCList->c_Elements.size())
+         const C_OscCanSignal & rc_Message = pc_Message->c_Signals[u32_ItSignal];
+         if (rc_Message.u32_ComDataElementIndex < pc_OscList->c_Elements.size())
          {
-            orc_OSCSignalCommons.push_back(pc_OSCList->c_Elements[rc_Message.u32_ComDataElementIndex]);
+            orc_OscSignalCommons.push_back(pc_OscList->c_Elements[rc_Message.u32_ComDataElementIndex]);
          }
          if (rc_Message.u32_ComDataElementIndex < pc_UiList->c_DataPoolListElements.size())
          {
-            orc_UISignalCommons.push_back(pc_UiList->c_DataPoolListElements[rc_Message.u32_ComDataElementIndex]);
+            orc_UiSignalCommons.push_back(pc_UiList->c_DataPoolListElements[rc_Message.u32_ComDataElementIndex]);
          }
       }
    }
@@ -1151,17 +1198,17 @@ sint32 C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OSCCanMessageIdenti
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolList * C_PuiSdHandlerBusLogic::GetOSCCanDataPoolList(const uint32 & oru32_NodeIndex,
-                                                                            const C_OSCCanProtocol::E_Type & ore_ComType, const uint32 & oru32_InterfaceIndex, const uint32 ou32_DatapoolIndex,
+const C_OscNodeDataPoolList * C_PuiSdHandlerBusLogic::GetOscCanDataPoolList(const uint32_t & oru32_NodeIndex,
+                                                                            const C_OscCanProtocol::E_Type & ore_ComType, const uint32_t & oru32_InterfaceIndex, const uint32_t ou32_DatapoolIndex,
                                                                             const bool & orq_MessageIsTx) const
 {
-   const C_OSCNodeDataPoolList * pc_Retval = NULL;
-   const C_OSCNodeDataPool * const pc_DataPool = this->GetOSCCanDataPool(oru32_NodeIndex, ore_ComType,
+   const C_OscNodeDataPoolList * pc_Retval = NULL;
+   const C_OscNodeDataPool * const pc_DataPool = this->GetOscCanDataPool(oru32_NodeIndex, ore_ComType,
                                                                          ou32_DatapoolIndex);
 
    if (pc_DataPool != NULL)
    {
-      pc_Retval = C_OSCCanProtocol::h_GetComListConst(*pc_DataPool, oru32_InterfaceIndex, orq_MessageIsTx);
+      pc_Retval = C_OscCanProtocol::h_GetComListConst(*pc_DataPool, oru32_InterfaceIndex, orq_MessageIsTx);
    }
 
    return pc_Retval;
@@ -1178,11 +1225,11 @@ const C_OSCNodeDataPoolList * C_PuiSdHandlerBusLogic::GetOSCCanDataPoolList(cons
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCCanSignal * C_PuiSdHandlerBusLogic::GetCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                            const uint32 & oru32_SignalIndex) const
+const C_OscCanSignal * C_PuiSdHandlerBusLogic::GetCanSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                            const uint32_t & oru32_SignalIndex) const
 {
-   const C_OSCCanSignal * pc_Retval = NULL;
-   const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
+   const C_OscCanSignal * pc_Retval = NULL;
+   const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
 
    if (pc_Message != NULL)
    {
@@ -1206,7 +1253,7 @@ const C_OSCCanSignal * C_PuiSdHandlerBusLogic::GetCanSignal(const C_OSCCanMessag
 */
 //----------------------------------------------------------------------------------------------------------------------
 const C_PuiSdNodeCanMessage * C_PuiSdHandlerBusLogic::GetUiCanMessage(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+   const C_OscCanMessageIdentificationIndices & orc_MessageId)
 const
 {
    const C_PuiSdNodeCanMessage * pc_Retval = NULL;
@@ -1243,7 +1290,7 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 const C_PuiSdNodeCanSignal * C_PuiSdHandlerBusLogic::GetUiCanSignal(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex) const
+   const C_OscCanMessageIdentificationIndices & orc_MessageId, const uint32_t & oru32_SignalIndex) const
 {
    const C_PuiSdNodeCanSignal * pc_Retval = NULL;
    const C_PuiSdNodeCanMessage * const pc_Message = GetUiCanMessage(orc_MessageId);
@@ -1270,16 +1317,16 @@ const C_PuiSdNodeCanSignal * C_PuiSdHandlerBusLogic::GetUiCanSignal(
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_PuiSdHandlerBusLogic::GetOSCCanDataPoolListElement(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex)
+const C_OscNodeDataPoolListElement * C_PuiSdHandlerBusLogic::GetOscCanDataPoolListElement(
+   const C_OscCanMessageIdentificationIndices & orc_MessageId, const uint32_t & oru32_SignalIndex)
 const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   const C_OSCCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   const C_OscCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
 
    if (pc_Signal != NULL)
    {
-      const C_OSCNodeDataPoolList * const pc_List = this->GetOSCCanDataPoolList(orc_MessageId.u32_NodeIndex,
+      const C_OscNodeDataPoolList * const pc_List = this->GetOscCanDataPoolList(orc_MessageId.u32_NodeIndex,
                                                                                 orc_MessageId.e_ComProtocol,
                                                                                 orc_MessageId.u32_InterfaceIndex,
                                                                                 orc_MessageId.u32_DatapoolIndex,
@@ -1309,11 +1356,11 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 const C_PuiSdNodeDataPoolListElement * C_PuiSdHandlerBusLogic::GetUiCanDataPoolListElement(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 & oru32_SignalIndex)
+   const C_OscCanMessageIdentificationIndices & orc_MessageId, const uint32_t & oru32_SignalIndex)
 const
 {
    const C_PuiSdNodeDataPoolListElement * pc_Retval = NULL;
-   const C_OSCCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
+   const C_OscCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
 
    if (pc_Signal != NULL)
    {
@@ -1347,20 +1394,20 @@ const
    Else Valid connection
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSdNodeConnection * C_PuiSdHandlerBusLogic::GetUiConnection(const uint32 ou32_NodeIndex,
-                                                                      const uint32 ou32_InterfaceIndex,
-                                                                      const C_OSCSystemBus::E_Type oe_Type) const
+const C_PuiSdNodeConnection * C_PuiSdHandlerBusLogic::GetUiConnection(const uint32_t ou32_NodeIndex,
+                                                                      const uint32_t ou32_InterfaceIndex,
+                                                                      const C_OscSystemBus::E_Type oe_Type) const
 {
    const C_PuiSdNodeConnection * pc_Retval = NULL;
-   const C_PuiSdNode * const pc_Node = this->GetUINode(ou32_NodeIndex);
+   const C_PuiSdNode * const pc_Node = this->GetUiNode(ou32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      for (uint32 u32_ItConnection = 0; u32_ItConnection < pc_Node->c_UIBusConnections.size(); ++u32_ItConnection)
+      for (uint32_t u32_ItConnection = 0; u32_ItConnection < pc_Node->c_UiBusConnections.size(); ++u32_ItConnection)
       {
-         const C_PuiSdNodeConnection & rc_Connection = pc_Node->c_UIBusConnections[u32_ItConnection];
-         if ((static_cast<uint32>(rc_Connection.c_ConnectionID.u8_InterfaceNumber) == ou32_InterfaceIndex) &&
-             (rc_Connection.c_ConnectionID.e_InterfaceType == oe_Type))
+         const C_PuiSdNodeConnection & rc_Connection = pc_Node->c_UiBusConnections[u32_ItConnection];
+         if ((static_cast<uint32_t>(rc_Connection.c_ConnectionId.u8_InterfaceNumber) == ou32_InterfaceIndex) &&
+             (rc_Connection.c_ConnectionId.e_InterfaceType == oe_Type))
          {
             pc_Retval = &rc_Connection;
             break;
@@ -1377,35 +1424,35 @@ const C_PuiSdNodeConnection * C_PuiSdHandlerBusLogic::GetUiConnection(const uint
    \param[in]   orc_MessageId          Message identification indices
    \param[in]   oru32_SignalIndex      Signal index
    \param[out]  orc_Signal             Signal data (osc)
-   \param[out]  orc_OSCSignalCommon    Signal data (osc common)
-   \param[out]  orc_UISignalCommon     Signal data (ui common)
-   \param[out]  orc_UISignal           Signal data (ui)
+   \param[out]  orc_OscSignalCommon    Signal data (osc common)
+   \param[out]  orc_UiSignalCommon     Signal data (ui common)
+   \param[out]  orc_UiSignal           Signal data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::GetCanSignalComplete(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                    const uint32 & oru32_SignalIndex, C_OSCCanSignal & orc_Signal,
-                                                    C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                                    C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
-                                                    C_PuiSdNodeCanSignal & orc_UISignal) const
+int32_t C_PuiSdHandlerBusLogic::GetCanSignalComplete(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                     const uint32_t & oru32_SignalIndex, C_OscCanSignal & orc_Signal,
+                                                     C_OscNodeDataPoolListElement & orc_OscSignalCommon,
+                                                     C_PuiSdNodeDataPoolListElement & orc_UiSignalCommon,
+                                                     C_PuiSdNodeCanSignal & orc_UiSignal) const
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
-   const C_OSCNodeDataPoolListElement * const pc_OSCSignalCommon = this->GetOSCCanDataPoolListElement(orc_MessageId,
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
+   const C_OscNodeDataPoolListElement * const pc_OscSignalCommon = this->GetOscCanDataPoolListElement(orc_MessageId,
                                                                                                       oru32_SignalIndex);
    const C_PuiSdNodeDataPoolListElement * const pc_UiSignalCommon = this->GetUiCanDataPoolListElement(orc_MessageId,
                                                                                                       oru32_SignalIndex);
    const C_PuiSdNodeCanSignal * const pc_UiSignal = GetUiCanSignal(orc_MessageId, oru32_SignalIndex);
 
-   if ((((pc_Signal != NULL) && (pc_OSCSignalCommon != NULL)) && (pc_UiSignalCommon != NULL)) && (pc_UiSignal != NULL))
+   if ((((pc_Signal != NULL) && (pc_OscSignalCommon != NULL)) && (pc_UiSignalCommon != NULL)) && (pc_UiSignal != NULL))
    {
       orc_Signal = *pc_Signal;
-      orc_OSCSignalCommon = *pc_OSCSignalCommon;
-      orc_UISignalCommon = *pc_UiSignalCommon;
-      orc_UISignal = *pc_UiSignal;
+      orc_OscSignalCommon = *pc_OscSignalCommon;
+      orc_UiSignalCommon = *pc_UiSignalCommon;
+      orc_UiSignal = *pc_UiSignal;
    }
    else
    {
@@ -1424,21 +1471,21 @@ sint32 C_PuiSdHandlerBusLogic::GetCanSignalComplete(const C_OSCCanMessageIdentif
    \param[in]  oq_Value             New value to apply
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::SetCanProtocolMessageContainerConnected(const uint32 ou32_NodeIndex,
-                                                                     const C_OSCCanProtocol::E_Type oe_ComType,
-                                                                     const uint32 ou32_InterfaceIndex,
+void C_PuiSdHandlerBusLogic::SetCanProtocolMessageContainerConnected(const uint32_t ou32_NodeIndex,
+                                                                     const C_OscCanProtocol::E_Type oe_ComType,
+                                                                     const uint32_t ou32_InterfaceIndex,
                                                                      const bool oq_Value)
 {
    if (ou32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
+      C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[ou32_NodeIndex];
       // get necessary datapool
-      std::vector<C_OSCCanProtocol *> c_Protocols = rc_Node.GetCANProtocols(oe_ComType);
-      uint32 u32_Counter;
+      std::vector<C_OscCanProtocol *> c_Protocols = rc_Node.GetCanProtocols(oe_ComType);
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0; u32_Counter < c_Protocols.size(); ++u32_Counter)
       {
-         C_OSCCanProtocol * const pc_Protocol = c_Protocols[u32_Counter];
+         C_OscCanProtocol * const pc_Protocol = c_Protocols[u32_Counter];
 
          if (ou32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
          {
@@ -1463,40 +1510,38 @@ void C_PuiSdHandlerBusLogic::SetCanProtocolMessageContainerConnected(const uint3
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                       const bool & orq_NewMessageIsTx,
-                                                       const C_OSCCanMessage & orc_Message)
+int32_t C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                        const bool & orq_NewMessageIsTx,
+                                                        const C_OscCanMessage & orc_Message)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(
+      const C_OscCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(
          orc_MessageId.u32_NodeIndex,
          orc_MessageId.e_ComProtocol,
          orc_MessageId.u32_InterfaceIndex,
          orc_MessageId.u32_DatapoolIndex);
-      const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
-      const C_OSCNodeDataPoolList * const pc_List = this->GetOSCCanDataPoolList(orc_MessageId.u32_NodeIndex,
+      const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
+      const C_OscNodeDataPoolList * const pc_List = this->GetOscCanDataPoolList(orc_MessageId.u32_NodeIndex,
                                                                                 orc_MessageId.e_ComProtocol,
                                                                                 orc_MessageId.u32_InterfaceIndex,
                                                                                 orc_MessageId.u32_DatapoolIndex,
                                                                                 orc_MessageId.q_MessageIsTx);
       if (((pc_List != NULL) && (pc_MessageContainer != NULL)) && (pc_Message != NULL))
       {
-         uint32 u32_SignalStartIndex = pc_MessageContainer->GetMessageSignalDataStartIndex(
+         uint32_t u32_SignalStartIndex = pc_MessageContainer->GetMessageSignalDataStartIndex(
             orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex);
          if ((u32_SignalStartIndex + pc_Message->c_Signals.size()) <= pc_List->c_Elements.size())
          {
-            std::vector<C_OSCNodeDataPoolListElement> c_Signals;
-            C_OSCCanMessage c_TmpMsg = orc_Message;
-            C_OSCNode & rc_Node = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+            std::vector<C_OscNodeDataPoolListElement> c_Signals;
+            C_OscNode & rc_Node = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
             //Copy signals
-            c_TmpMsg.c_Signals = pc_Message->c_Signals;
             c_Signals.reserve(pc_Message->c_Signals.size());
-            for (uint32 u32_ItSignals = 0; u32_ItSignals < pc_Message->c_Signals.size(); ++u32_ItSignals)
+            for (uint32_t u32_ItSignals = 0; u32_ItSignals < pc_Message->c_Signals.size(); ++u32_ItSignals)
             {
-               const uint32 u32_Index = u32_SignalStartIndex + u32_ItSignals;
+               const uint32_t u32_Index = u32_SignalStartIndex + u32_ItSignals;
                c_Signals.push_back(pc_List->c_Elements[u32_Index]);
             }
             s32_Retval = rc_Node.SetMessage(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
@@ -1507,7 +1552,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
             {
                //Sync ui data
                const C_PuiSdNodeCanMessage * const pc_UiMessage = this->GetUiCanMessage(orc_MessageId);
-               const C_OSCCanMessageContainer * const pc_UpdatedMessageContainer = this->GetCanProtocolMessageContainer(
+               const C_OscCanMessageContainer * const pc_UpdatedMessageContainer = this->GetCanProtocolMessageContainer(
                   orc_MessageId.u32_NodeIndex,
                   orc_MessageId.e_ComProtocol,
                   orc_MessageId.u32_InterfaceIndex,
@@ -1517,11 +1562,11 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
                   orc_MessageId.u32_DatapoolIndex, orc_MessageId.q_MessageIsTx);
                if (((pc_UiMessage != NULL) && (pc_UpdatedMessageContainer != NULL)) && (pc_UiDataPoolList != NULL))
                {
-                  const std::vector<C_OSCCanMessage> & rc_Messages = pc_UpdatedMessageContainer->GetMessagesConst(
+                  const std::vector<C_OscCanMessage> & rc_Messages = pc_UpdatedMessageContainer->GetMessagesConst(
                      orq_NewMessageIsTx);
                   const C_PuiSdNodeCanMessage c_UiMessageCopy = *pc_UiMessage;
-                  std::vector<C_PuiSdNodeDataPoolListElement> c_UISignalCommons;
-                  const C_OSCCanMessageIdentificationIndices c_NewId(orc_MessageId.u32_NodeIndex,
+                  std::vector<C_PuiSdNodeDataPoolListElement> c_UiSignalCommons;
+                  const C_OscCanMessageIdentificationIndices c_NewId(orc_MessageId.u32_NodeIndex,
                                                                      orc_MessageId.e_ComProtocol,
                                                                      orc_MessageId.u32_InterfaceIndex,
                                                                      orc_MessageId.u32_DatapoolIndex,
@@ -1531,13 +1576,13 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
                   u32_SignalStartIndex = pc_UpdatedMessageContainer->GetMessageSignalDataStartIndex(
                      orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex);
 
-                  for (uint32 u32_ItSignal = 0; u32_ItSignal < c_UiMessageCopy.c_Signals.size(); ++u32_ItSignal)
+                  for (uint32_t u32_ItSignal = 0; u32_ItSignal < c_UiMessageCopy.c_Signals.size(); ++u32_ItSignal)
                   {
-                     const uint32 u32_TargetIndex = u32_SignalStartIndex + u32_ItSignal;
+                     const uint32_t u32_TargetIndex = u32_SignalStartIndex + u32_ItSignal;
                      tgl_assert(u32_TargetIndex < pc_UiDataPoolList->c_DataPoolListElements.size());
                      if (u32_TargetIndex < pc_UiDataPoolList->c_DataPoolListElements.size())
                      {
-                        c_UISignalCommons.push_back(pc_UiDataPoolList->c_DataPoolListElements[u32_TargetIndex]);
+                        c_UiSignalCommons.push_back(pc_UiDataPoolList->c_DataPoolListElements[u32_TargetIndex]);
                      }
                   }
                   //Delete
@@ -1545,7 +1590,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
                   if (s32_Retval == C_NO_ERR)
                   {
                      //Add
-                     s32_Retval = this->m_InsertUiCanMessage(c_NewId, c_UISignalCommons, c_UiMessageCopy);
+                     s32_Retval = this->m_InsertUiCanMessage(c_NewId, c_UiSignalCommons, c_UiMessageCopy);
                   }
                }
             }
@@ -1580,10 +1625,10 @@ sint32 C_PuiSdHandlerBusLogic::SetCanMessageProperties(const C_OSCCanMessageIden
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::SetUiCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                               const C_PuiSdNodeCanMessage & orc_Message)
+int32_t C_PuiSdHandlerBusLogic::SetUiCanMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                const C_PuiSdNodeCanMessage & orc_Message)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                            orc_MessageId.e_ComProtocol,
@@ -1624,85 +1669,85 @@ sint32 C_PuiSdHandlerBusLogic::SetUiCanMessage(const C_OSCCanMessageIdentificati
 
    \param[in]  orc_MessageId        Message identification indices
    \param[in]  oru32_SignalIndex    Signal index
-   \param[in]  orc_OSCSignal        Signal data (osc)
-   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
-   \param[in]  orc_UISignalCommon   Signal data (ui common)
-   \param[in]  orc_UISignal         Signal data (ui)
+   \param[in]  orc_OscSignal        Signal data (osc)
+   \param[in]  orc_OscSignalCommon  Signal data (osc common)
+   \param[in]  orc_UiSignalCommon   Signal data (ui common)
+   \param[in]  orc_UiSignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::SetCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                            const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_OSCSignal,
-                                            const C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                            const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
-                                            const C_PuiSdNodeCanSignal & orc_UISignal)
+int32_t C_PuiSdHandlerBusLogic::SetCanSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                             const uint32_t & oru32_SignalIndex, const C_OscCanSignal & orc_OscSignal,
+                                             const C_OscNodeDataPoolListElement & orc_OscSignalCommon,
+                                             const C_PuiSdNodeDataPoolListElement & orc_UiSignalCommon,
+                                             const C_PuiSdNodeCanSignal & orc_UiSignal)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Position
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      const C_OscCanProtocol * const pc_Protocol = rc_OscNode.GetCanProtocolConst(orc_MessageId.e_ComProtocol,
                                                                                   orc_MessageId.u32_DatapoolIndex);
       C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                               orc_MessageId.e_ComProtocol,
                                                                               orc_MessageId.u32_DatapoolIndex);
-      C_OSCNodeDataPoolListElementId c_Id;
-      s32_Retval = rc_OSCNode.SetSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      C_OscNodeDataPoolListElementId c_Id;
+      s32_Retval = rc_OscNode.SetSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                         orc_MessageId.u32_DatapoolIndex,
                                         orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
-                                        oru32_SignalIndex, orc_OSCSignal, orc_OSCSignalCommon);
+                                        oru32_SignalIndex, orc_OscSignal, orc_OscSignalCommon);
       //Signal changed signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
       {
          Q_EMIT (this->SigSyncNodeDataPoolListElementChanged(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
                                                              c_Id.u32_ListIndex, c_Id.u32_ElementIndex,
-                                                             orc_OSCSignalCommon.GetType(),
-                                                             orc_OSCSignalCommon.GetArray(),
-                                                             orc_OSCSignalCommon.GetArraySize(), false));
+                                                             orc_OscSignalCommon.GetType(),
+                                                             orc_OscSignalCommon.GetArray(),
+                                                             orc_OscSignalCommon.GetArraySize(), false));
       }
       //Ui data pool part
       if (pc_Protocol != NULL)
       {
          if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
          {
-            const C_OSCCanMessageContainer & rc_MessageContainer =
+            const C_OscCanMessageContainer & rc_MessageContainer =
                pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            const std::vector<C_OSCCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(
+            const std::vector<C_OscCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(
                orc_MessageId.q_MessageIsTx);
             if (orc_MessageId.u32_MessageIndex < rc_Messages.size())
             {
-               const C_OSCCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
+               const C_OscCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
                if (oru32_SignalIndex < rc_Message.c_Signals.size())
                {
-                  const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
+                  const C_OscNodeDataPool * const pc_OscDataPool = rc_OscNode.GetComDataPoolConst(
                      orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
 
-                  if (pc_OSCDataPool != NULL)
+                  if (pc_OscDataPool != NULL)
                   {
-                     C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-                     if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+                     C_PuiSdNode & rc_UiNode = this->mc_UiNodes[orc_MessageId.u32_NodeIndex];
+                     if (pc_Protocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size())
                      {
-                        uint32 u32_ListIndex;
-                        if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                        uint32_t u32_ListIndex;
+                        if (C_OscCanProtocol::h_GetComListIndex(*pc_OscDataPool, orc_MessageId.u32_InterfaceIndex,
                                                                 orc_MessageId.q_MessageIsTx,
                                                                 u32_ListIndex) == C_NO_ERR)
                         {
-                           C_PuiSdNodeDataPool & rc_UIDataPool =
-                              rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                           if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                           C_PuiSdNodeDataPool & rc_UiDataPool =
+                              rc_UiNode.c_UiDataPools[pc_Protocol->u32_DataPoolIndex];
+                           if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                            {
-                              const C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[oru32_SignalIndex];
-                              C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                              const C_OscCanSignal & rc_Signal = rc_Message.c_Signals[oru32_SignalIndex];
+                              C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
                               if (rc_Signal.u32_ComDataElementIndex < rc_UiList.c_DataPoolListElements.size())
                               {
                                  rc_UiList.c_DataPoolListElements[rc_Signal.u32_ComDataElementIndex] =
-                                    orc_UISignalCommon;
+                                    orc_UiSignalCommon;
                               }
                            }
                         }
@@ -1726,7 +1771,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignal(const C_OSCCanMessageIdentificationI
                C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
                if (oru32_SignalIndex < rc_Message.c_Signals.size())
                {
-                  rc_Message.c_Signals[oru32_SignalIndex] = orc_UISignal;
+                  rc_Message.c_Signals[oru32_SignalIndex] = orc_UiSignal;
                }
             }
          }
@@ -1751,18 +1796,18 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignal(const C_OSCCanMessageIdentificationI
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::SetCanSignalMUXValue(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                    const uint32 & oru32_SignalIndex,
-                                                    const stw_types::uint16 ou16_MultiplexValue)
+int32_t C_PuiSdHandlerBusLogic::SetCanSignalMuxValue(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                     const uint32_t & oru32_SignalIndex,
+                                                     const uint16_t ou16_MultiplexValue)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Position
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      s32_Retval = rc_OSCNode.SetSignalMUXValue(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      s32_Retval = rc_OscNode.SetSignalMuxValue(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                                 orc_MessageId.u32_DatapoolIndex,
                                                 orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
                                                 oru32_SignalIndex, ou16_MultiplexValue);
@@ -1779,33 +1824,33 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignalMUXValue(const C_OSCCanMessageIdentif
 
    \param[in]  orc_MessageId        Message identification indices
    \param[in]  oru32_SignalIndex    Signal index
-   \param[in]  orc_OSCSignal        Signal data (osc)
-   \param[in]  orc_UISignal         Signal data (ui)
+   \param[in]  orc_OscSignal        Signal data (osc)
+   \param[in]  orc_UiSignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::SetCanSignalPosition(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                    const uint32 & oru32_SignalIndex,
-                                                    const C_OSCCanSignal & orc_OSCSignal,
-                                                    const C_PuiSdNodeCanSignal & orc_UISignal)
+int32_t C_PuiSdHandlerBusLogic::SetCanSignalPosition(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                     const uint32_t & oru32_SignalIndex,
+                                                     const C_OscCanSignal & orc_OscSignal,
+                                                     const C_PuiSdNodeCanSignal & orc_UiSignal)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Position
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
       C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                               orc_MessageId.e_ComProtocol,
                                                                               orc_MessageId.u32_DatapoolIndex);
-      s32_Retval = rc_OSCNode.SetSignalPosition(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      s32_Retval = rc_OscNode.SetSignalPosition(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                                 orc_MessageId.u32_DatapoolIndex,
                                                 orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
-                                                oru32_SignalIndex, orc_OSCSignal);
+                                                oru32_SignalIndex, orc_OscSignal);
       //Ui part
       if (pc_UiProtocol != NULL)
       {
@@ -1820,7 +1865,7 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignalPosition(const C_OSCCanMessageIdentif
                C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
                if (oru32_SignalIndex < rc_Message.c_Signals.size())
                {
-                  rc_Message.c_Signals[oru32_SignalIndex] = orc_UISignal;
+                  rc_Message.c_Signals[oru32_SignalIndex] = orc_UiSignal;
                }
             }
          }
@@ -1842,9 +1887,9 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignalPosition(const C_OSCCanMessageIdentif
    \param[in]  ou32_DatapoolIndex               Datapool index
    \param[in]  orq_MessageIsTx                  Flag if message is tx type (else rx type assumed)
    \param[in]  orc_Message                      Message data
-   \param[in]  orc_OSCSignalCommons             Signals data (osc common)
-   \param[in]  orc_UISignalCommons              Signals data (ui common)
-   \param[in]  orc_UIMessage                    Message data (ui)
+   \param[in]  orc_OscSignalCommons             Signals data (osc common)
+   \param[in]  orc_UiSignalCommons              Signals data (ui common)
+   \param[in]  orc_UiMessage                    Message data (ui)
    \param[in]  orq_AutomatedPropertiesAdaption  Optional parameter to allow or disable automated properties adaption
 
    \return
@@ -1852,31 +1897,31 @@ sint32 C_PuiSdHandlerBusLogic::SetCanSignalPosition(const C_OSCCanMessageIdentif
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::AddCanMessage(const uint32 & oru32_NodeIndex,
-                                             const C_OSCCanProtocol::E_Type & ore_ComType,
-                                             const uint32 & oru32_InterfaceIndex, const uint32 ou32_DatapoolIndex,
-                                             const bool & orq_MessageIsTx, const C_OSCCanMessage & orc_Message,
-                                             const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
-                                             const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                             const C_PuiSdNodeCanMessage & orc_UIMessage,
-                                             const bool & orq_AutomatedPropertiesAdaption)
+int32_t C_PuiSdHandlerBusLogic::AddCanMessage(const uint32_t & oru32_NodeIndex,
+                                              const C_OscCanProtocol::E_Type & ore_ComType,
+                                              const uint32_t & oru32_InterfaceIndex, const uint32_t ou32_DatapoolIndex,
+                                              const bool & orq_MessageIsTx, const C_OscCanMessage & orc_Message,
+                                              const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
+                                              const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
+                                              const C_PuiSdNodeCanMessage & orc_UiMessage,
+                                              const bool & orq_AutomatedPropertiesAdaption)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(oru32_NodeIndex,
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(oru32_NodeIndex,
                                                                                                      ore_ComType,
                                                                                                      oru32_InterfaceIndex,
                                                                                                      ou32_DatapoolIndex);
 
    if (pc_MessageContainer != NULL)
    {
-      const std::vector<C_OSCCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(orq_MessageIsTx);
-      const uint32 u32_MessageIndex = rc_Messages.size();
-      const C_OSCCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex,
+      const std::vector<C_OscCanMessage> & rc_Messages = pc_MessageContainer->GetMessagesConst(orq_MessageIsTx);
+      const uint32_t u32_MessageIndex = rc_Messages.size();
+      const C_OscCanMessageIdentificationIndices c_MessageId(oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex,
                                                              ou32_DatapoolIndex,
                                                              orq_MessageIsTx,
                                                              u32_MessageIndex);
-      s32_Retval = this->InsertCanMessage(c_MessageId, orc_Message, orc_OSCSignalCommons, orc_UISignalCommons,
-                                          orc_UIMessage, orq_AutomatedPropertiesAdaption);
+      s32_Retval = this->InsertCanMessage(c_MessageId, orc_Message, orc_OscSignalCommons, orc_UiSignalCommons,
+                                          orc_UiMessage, orq_AutomatedPropertiesAdaption);
    }
    else
    {
@@ -1890,9 +1935,9 @@ sint32 C_PuiSdHandlerBusLogic::AddCanMessage(const uint32 & oru32_NodeIndex,
 
    \param[in]  orc_MessageId                    Message identification indices
    \param[in]  orc_Message                      Message data
-   \param[in]  orc_OSCSignalCommons             Signals data (osc common)
-   \param[in]  orc_UISignalCommons              Signals data (ui common)
-   \param[in]  orc_UIMessage                    Message data (ui)
+   \param[in]  orc_OscSignalCommons             Signals data (osc common)
+   \param[in]  orc_UiSignalCommons              Signals data (ui common)
+   \param[in]  orc_UiMessage                    Message data (ui)
    \param[in]  orq_AutomatedPropertiesAdaption  Optional parameter to allow or disable automated properties adaption
 
    \return
@@ -1900,20 +1945,19 @@ sint32 C_PuiSdHandlerBusLogic::AddCanMessage(const uint32 & oru32_NodeIndex,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                const C_OSCCanMessage & orc_Message,
-                                                const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommons,
-                                                const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                                const C_PuiSdNodeCanMessage & orc_UIMessage,
-                                                const bool & orq_AutomatedPropertiesAdaption)
+int32_t C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                 const C_OscCanMessage & orc_Message,
+                                                 const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
+                                                 const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const C_PuiSdNodeCanMessage & orc_UiMessage,
+                                                 const bool & orq_AutomatedPropertiesAdaption)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      C_OSCCanMessage c_AdaptedMessage = orc_Message;
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      C_OscCanMessage c_AdaptedMessage = orc_Message;
       if (orq_AutomatedPropertiesAdaption == true)
       {
          //Get unique name
@@ -1921,15 +1965,15 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
             this->m_GetExistingMessageNames(orc_MessageId.u32_NodeIndex, orc_MessageId.u32_InterfaceIndex),
             orc_Message.c_Name);
       }
-      s32_Retval = rc_OSCNode.InsertMessage(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      s32_Retval = rc_OscNode.InsertMessage(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                             orc_MessageId.u32_DatapoolIndex,
                                             orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
                                             c_AdaptedMessage,
-                                            orc_OSCSignalCommons);
+                                            orc_OscSignalCommons);
       //Signal each new signal to the sync engine (ascending order is important)
-      for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+      for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
       {
-         C_OSCNodeDataPoolListElementId c_Id;
+         C_OscNodeDataPoolListElementId c_Id;
          if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, u32_ItSig, c_Id) == C_NO_ERR)
          {
             Q_EMIT (this->SigSyncNodeDataPoolListElementAdded(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
@@ -1939,7 +1983,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
       if (s32_Retval == C_NO_ERR)
       {
          //Ui part
-         s32_Retval = m_InsertUiCanMessage(orc_MessageId, orc_UISignalCommons, orc_UIMessage);
+         s32_Retval = m_InsertUiCanMessage(orc_MessageId, orc_UiSignalCommons, orc_UiMessage);
       }
    }
    return s32_Retval;
@@ -1955,22 +1999,22 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanMessage(const C_OSCCanMessageIdentificat
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+int32_t C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
       if (pc_Message != NULL)
       {
          //Signal each deleted signal to the sync engine (descending order is important, do this before actually
          // deleting anything)
-         for (uint32 u32_ItSig = pc_Message->c_Signals.size(); u32_ItSig > 0UL; --u32_ItSig)
+         for (uint32_t u32_ItSig = pc_Message->c_Signals.size(); u32_ItSig > 0UL; --u32_ItSig)
          {
-            C_OSCNodeDataPoolListElementId c_Id;
+            C_OscNodeDataPoolListElementId c_Id;
             if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, u32_ItSig - 1UL, c_Id) == C_NO_ERR)
             {
                Q_EMIT (this->SigSyncNodeDataPoolListElementAboutToBeDeleted(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
@@ -1981,7 +2025,7 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OSCCanMessageIdentificat
       //Ui part
       s32_Retval = m_DeleteUiCanMessage(orc_MessageId);
       //After deleting signals delete other parts
-      tgl_assert(rc_OSCNode.DeleteMessage(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      tgl_assert(rc_OscNode.DeleteMessage(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                           orc_MessageId.u32_DatapoolIndex,
                                           orc_MessageId.q_MessageIsTx,
                                           orc_MessageId.u32_MessageIndex) == C_NO_ERR);
@@ -1994,29 +2038,29 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanMessage(const C_OSCCanMessageIdentificat
 
    \param[in]  orc_MessageId        Message identification indices
    \param[in]  orc_Signal           Signal data (osc)
-   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
-   \param[in]  orc_UISignalCommon   Signal data (ui common)
-   \param[in]  orc_UISignal         Signal data (ui)
+   \param[in]  orc_OscSignalCommon  Signal data (osc common)
+   \param[in]  orc_UiSignalCommon   Signal data (ui common)
+   \param[in]  orc_UiSignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::AddCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                            const C_OSCCanSignal & orc_Signal,
-                                            const C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                            const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
-                                            const C_PuiSdNodeCanSignal & orc_UISignal)
+int32_t C_PuiSdHandlerBusLogic::AddCanSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                             const C_OscCanSignal & orc_Signal,
+                                             const C_OscNodeDataPoolListElement & orc_OscSignalCommon,
+                                             const C_PuiSdNodeDataPoolListElement & orc_UiSignalCommon,
+                                             const C_PuiSdNodeCanSignal & orc_UiSignal)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
 
    if (pc_Message != NULL)
    {
-      const uint32 u32_SignalIndex = pc_Message->c_Signals.size();
-      s32_Retval = this->InsertCanSignal(orc_MessageId, u32_SignalIndex, orc_Signal, orc_OSCSignalCommon,
-                                         orc_UISignalCommon, orc_UISignal);
+      const uint32_t u32_SignalIndex = pc_Message->c_Signals.size();
+      s32_Retval = this->InsertCanSignal(orc_MessageId, u32_SignalIndex, orc_Signal, orc_OscSignalCommon,
+                                         orc_UiSignalCommon, orc_UiSignal);
    }
    else
    {
@@ -2031,39 +2075,39 @@ sint32 C_PuiSdHandlerBusLogic::AddCanSignal(const C_OSCCanMessageIdentificationI
    \param[in]  orc_MessageId        Message identification indices
    \param[in]  oru32_SignalIndex    Signal index
    \param[in]  orc_Signal           Signal data (osc)
-   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
-   \param[in]  orc_UISignalCommon   Signal data (ui common)
-   \param[in]  orc_UISignal         Signal data (ui)
+   \param[in]  orc_OscSignalCommon  Signal data (osc common)
+   \param[in]  orc_UiSignalCommon   Signal data (ui common)
+   \param[in]  orc_UiSignal         Signal data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                               const uint32 & oru32_SignalIndex, const C_OSCCanSignal & orc_Signal,
-                                               const C_OSCNodeDataPoolListElement & orc_OSCSignalCommon,
-                                               const C_PuiSdNodeDataPoolListElement & orc_UISignalCommon,
-                                               const C_PuiSdNodeCanSignal & orc_UISignal)
+int32_t C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                const uint32_t & oru32_SignalIndex, const C_OscCanSignal & orc_Signal,
+                                                const C_OscNodeDataPoolListElement & orc_OscSignalCommon,
+                                                const C_PuiSdNodeDataPoolListElement & orc_UiSignalCommon,
+                                                const C_PuiSdNodeCanSignal & orc_UiSignal)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      C_OSCNodeDataPoolListElement c_OSCAdaptedSignalCommon = orc_OSCSignalCommon;
-      C_OSCNodeDataPoolListElementId c_Id;
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      C_OscNodeDataPoolListElement c_OscAdaptedSignalCommon = orc_OscSignalCommon;
+      C_OscNodeDataPoolListElementId c_Id;
 
       //Get unique name
-      c_OSCAdaptedSignalCommon.c_Name = C_Uti::h_GetUniqueName(
-         this->m_GetExistingSignalNames(orc_MessageId), orc_OSCSignalCommon.c_Name);
-      s32_Retval = rc_OSCNode.InsertSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      c_OscAdaptedSignalCommon.c_Name = C_Uti::h_GetUniqueName(
+         this->m_GetExistingSignalNames(orc_MessageId), orc_OscSignalCommon.c_Name);
+      s32_Retval = rc_OscNode.InsertSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                            orc_MessageId.u32_DatapoolIndex,
                                            orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
                                            oru32_SignalIndex,
                                            orc_Signal,
-                                           c_OSCAdaptedSignalCommon);
+                                           c_OscAdaptedSignalCommon);
 
       //Signal new signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
@@ -2073,7 +2117,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
       }
       if (s32_Retval == C_NO_ERR)
       {
-         const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+         const C_OscCanProtocol * const pc_Protocol = rc_OscNode.GetCanProtocolConst(orc_MessageId.e_ComProtocol,
                                                                                      orc_MessageId.u32_DatapoolIndex);
          C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                                  orc_MessageId.e_ComProtocol,
@@ -2083,34 +2127,34 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
          {
             if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
             {
-               const C_OSCCanMessageContainer & rc_MessageContainer =
+               const C_OscCanMessageContainer & rc_MessageContainer =
                   pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-               const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
+               const uint32_t u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
                   orc_MessageId.q_MessageIsTx,
                   orc_MessageId.u32_MessageIndex);
-               C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-               if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+               C_PuiSdNode & rc_UiNode = this->mc_UiNodes[orc_MessageId.u32_NodeIndex];
+               if (pc_Protocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size())
                {
-                  const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
+                  const C_OscNodeDataPool * const pc_OscDataPool = rc_OscNode.GetComDataPoolConst(
                      orc_MessageId.e_ComProtocol,
                      orc_MessageId.u32_DatapoolIndex);
 
-                  if (pc_OSCDataPool != NULL)
+                  if (pc_OscDataPool != NULL)
                   {
-                     uint32 u32_ListIndex;
-                     if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                     uint32_t u32_ListIndex;
+                     if (C_OscCanProtocol::h_GetComListIndex(*pc_OscDataPool, orc_MessageId.u32_InterfaceIndex,
                                                              orc_MessageId.q_MessageIsTx,
                                                              u32_ListIndex) == C_NO_ERR)
                      {
-                        C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                        if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                        C_PuiSdNodeDataPool & rc_UiDataPool = rc_UiNode.c_UiDataPools[pc_Protocol->u32_DataPoolIndex];
+                        if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                         {
-                           C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                           C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
                            if ((u32_SignalIndex + oru32_SignalIndex) <= rc_UiList.c_DataPoolListElements.size())
                            {
                               rc_UiList.c_DataPoolListElements.insert(
                                  rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + oru32_SignalIndex,
-                                 orc_UISignalCommon);
+                                 orc_UiSignalCommon);
                            }
                            else
                            {
@@ -2160,7 +2204,7 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
                   C_PuiSdNodeCanMessage & rc_Message = rc_Messages[orc_MessageId.u32_MessageIndex];
                   if (oru32_SignalIndex <= rc_Message.c_Signals.size())
                   {
-                     rc_Message.c_Signals.insert(rc_Message.c_Signals.begin() + oru32_SignalIndex, orc_UISignal);
+                     rc_Message.c_Signals.insert(rc_Message.c_Signals.begin() + oru32_SignalIndex, orc_UiSignal);
                   }
                   else
                   {
@@ -2201,16 +2245,16 @@ sint32 C_PuiSdHandlerBusLogic::InsertCanSignal(const C_OSCCanMessageIdentificati
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                               const uint32 & oru32_SignalIndex)
+int32_t C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                const uint32_t & oru32_SignalIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (orc_MessageId.u32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
-      C_OSCNodeDataPoolListElementId c_Id;
+      C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[orc_MessageId.u32_NodeIndex];
+      C_OscNodeDataPoolListElementId c_Id;
 
       //Signal deleted signal to the sync engine
       if (C_PuiSdUtil::h_ConvertFromSignalIndex(orc_MessageId, oru32_SignalIndex, c_Id) == C_NO_ERR)
@@ -2219,13 +2263,13 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificati
                                                                      c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
       }
 
-      s32_Retval = rc_OSCNode.DeleteSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
+      s32_Retval = rc_OscNode.DeleteSignal(orc_MessageId.e_ComProtocol, orc_MessageId.u32_InterfaceIndex,
                                            orc_MessageId.u32_DatapoolIndex,
                                            orc_MessageId.q_MessageIsTx, orc_MessageId.u32_MessageIndex,
                                            oru32_SignalIndex);
       if (s32_Retval == C_NO_ERR)
       {
-         const C_OSCCanProtocol * const pc_Protocol = rc_OSCNode.GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+         const C_OscCanProtocol * const pc_Protocol = rc_OscNode.GetCanProtocolConst(orc_MessageId.e_ComProtocol,
                                                                                      orc_MessageId.u32_DatapoolIndex);
          C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                                  orc_MessageId.e_ComProtocol,
@@ -2235,29 +2279,29 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificati
          {
             if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
             {
-               const C_OSCCanMessageContainer & rc_MessageContainer =
+               const C_OscCanMessageContainer & rc_MessageContainer =
                   pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-               const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
+               const uint32_t u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
                   orc_MessageId.q_MessageIsTx,
                   orc_MessageId.u32_MessageIndex);
-               C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-               if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+               C_PuiSdNode & rc_UiNode = this->mc_UiNodes[orc_MessageId.u32_NodeIndex];
+               if (pc_Protocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size())
                {
-                  const C_OSCNodeDataPool * const pc_OSCDataPool = rc_OSCNode.GetComDataPoolConst(
+                  const C_OscNodeDataPool * const pc_OscDataPool = rc_OscNode.GetComDataPoolConst(
                      orc_MessageId.e_ComProtocol,
                      orc_MessageId.u32_DatapoolIndex);
 
-                  if (pc_OSCDataPool != NULL)
+                  if (pc_OscDataPool != NULL)
                   {
-                     uint32 u32_ListIndex;
-                     if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                     uint32_t u32_ListIndex;
+                     if (C_OscCanProtocol::h_GetComListIndex(*pc_OscDataPool, orc_MessageId.u32_InterfaceIndex,
                                                              orc_MessageId.q_MessageIsTx,
                                                              u32_ListIndex) == C_NO_ERR)
                      {
-                        C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                        if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                        C_PuiSdNodeDataPool & rc_UiDataPool = rc_UiNode.c_UiDataPools[pc_Protocol->u32_DataPoolIndex];
+                        if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                         {
-                           C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                           C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
                            if ((u32_SignalIndex + oru32_SignalIndex) < rc_UiList.c_DataPoolListElements.size())
                            {
                               rc_UiList.c_DataPoolListElements.erase(
@@ -2352,24 +2396,24 @@ sint32 C_PuiSdHandlerBusLogic::DeleteCanSignal(const C_OSCCanMessageIdentificati
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
-   const C_OSCNodeDataPoolListElementId & orc_NodeDatapoolListElementId,
-   C_OSCCanMessageIdentificationIndices & orc_MessageId, uint32 & oru32_SignalIndex) const
+   const C_OscNodeDataPoolListElementId & orc_NodeDatapoolListElementId,
+   C_OscCanMessageIdentificationIndices & orc_MessageId, uint32_t & oru32_SignalIndex) const
 {
-   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_NodeDatapoolListElementId.u32_NodeIndex);
-   const C_OSCNodeDataPool * const pc_Datapool = this->GetOSCDataPool(orc_NodeDatapoolListElementId.u32_NodeIndex,
+   const C_OscNode * const pc_Node = this->GetOscNodeConst(orc_NodeDatapoolListElementId.u32_NodeIndex);
+   const C_OscNodeDataPool * const pc_Datapool = this->GetOscDataPool(orc_NodeDatapoolListElementId.u32_NodeIndex,
                                                                       orc_NodeDatapoolListElementId.u32_DataPoolIndex);
 
-   C_OSCCanProtocol::E_Type e_ComProtocol = C_OSCCanProtocol::eLAYER2;
-   uint32 u32_InterfaceIndex;
-   uint32 u32_MessageIndex = 0;
+   C_OscCanProtocol::E_Type e_ComProtocol = C_OscCanProtocol::eLAYER2;
 
    if ((pc_Node != NULL) && (pc_Datapool != NULL))
    {
       bool q_MessageIsTx;
-      const C_OSCNodeDataPoolList & rc_List = pc_Datapool->c_Lists[orc_NodeDatapoolListElementId.u32_ListIndex];
+      const C_OscNodeDataPoolList & rc_List = pc_Datapool->c_Lists[orc_NodeDatapoolListElementId.u32_ListIndex];
+      uint32_t u32_InterfaceIndex;
+      uint32_t u32_MessageIndex = 0;
 
       // com protocol type
-      for (uint32 u32_Pos = 0; u32_Pos < pc_Node->c_ComProtocols.size(); u32_Pos++)
+      for (uint32_t u32_Pos = 0; u32_Pos < pc_Node->c_ComProtocols.size(); u32_Pos++)
       {
          if (pc_Node->c_ComProtocols[u32_Pos].u32_DataPoolIndex == orc_NodeDatapoolListElementId.u32_DataPoolIndex)
          {
@@ -2378,16 +2422,16 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
       }
 
       // message is tx
-      q_MessageIsTx = C_OSCCanProtocol::h_ListIsComTx(rc_List);
+      q_MessageIsTx = C_OscCanProtocol::h_ListIsComTx(rc_List);
 
       // interface index
       u32_InterfaceIndex = orc_NodeDatapoolListElementId.u32_ListIndex / 2; // 2:1 relation (see EA diagram)
 
       // message index
-      const C_OSCCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(
+      const C_OscCanMessageContainer * const pc_MessageContainer = this->GetCanProtocolMessageContainer(
          orc_NodeDatapoolListElementId.u32_NodeIndex, e_ComProtocol, u32_InterfaceIndex,
          orc_NodeDatapoolListElementId.u32_DataPoolIndex);
-      std::vector<C_OSCCanMessage> c_Messages; // either tx messages or rx messages
+      std::vector<C_OscCanMessage> c_Messages; // either tx messages or rx messages
       bool q_IndexFound = false;
       tgl_assert(pc_MessageContainer != NULL);
 
@@ -2403,14 +2447,14 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
          }
       }
 
-      for (uint32 u32_PosMessage = 0; (u32_PosMessage < c_Messages.size()) && (q_IndexFound == false);
+      for (uint32_t u32_PosMessage = 0; (u32_PosMessage < c_Messages.size()) && (q_IndexFound == false);
            u32_PosMessage++)
       {
-         const C_OSCCanMessage & rc_Message = c_Messages[u32_PosMessage];
-         for (uint32 u32_PosSignal = 0; (u32_PosSignal < rc_Message.c_Signals.size()) && (q_IndexFound == false);
+         const C_OscCanMessage & rc_Message = c_Messages[u32_PosMessage];
+         for (uint32_t u32_PosSignal = 0; (u32_PosSignal < rc_Message.c_Signals.size()) && (q_IndexFound == false);
               u32_PosSignal++)
          {
-            const C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[u32_PosSignal];
+            const C_OscCanSignal & rc_Signal = rc_Message.c_Signals[u32_PosSignal];
             if (rc_Signal.u32_ComDataElementIndex == orc_NodeDatapoolListElementId.u32_ElementIndex)
             {
                u32_MessageIndex = u32_PosMessage;
@@ -2421,7 +2465,7 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
       }
 
       // output
-      orc_MessageId = C_OSCCanMessageIdentificationIndices(orc_NodeDatapoolListElementId.u32_NodeIndex,
+      orc_MessageId = C_OscCanMessageIdentificationIndices(orc_NodeDatapoolListElementId.u32_NodeIndex,
                                                            e_ComProtocol, u32_InterfaceIndex,
                                                            orc_NodeDatapoolListElementId.u32_DataPoolIndex,
                                                            q_MessageIsTx, u32_MessageIndex);
@@ -2443,37 +2487,37 @@ void C_PuiSdHandlerBusLogic::ConvertElementIndexToSignalIndex(
    C_RANGE  Nodes or Datapools or Lists or Messages do not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OSCCanMessageIdentificationIndices & orc_MessageId1,
-                                                 const C_OSCCanMessageIdentificationIndices & orc_MessageId2,
-                                                 bool & orq_IsMatch, const bool oq_IgnoreMessageDirection) const
+int32_t C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OscCanMessageIdentificationIndices & orc_MessageId1,
+                                                  const C_OscCanMessageIdentificationIndices & orc_MessageId2,
+                                                  bool & orq_IsMatch, const bool oq_IgnoreMessageDirection) const
 {
-   sint32 s32_Retval = this->mc_CoreDefinition.CheckMessageMatch(orc_MessageId1, orc_MessageId2, orq_IsMatch,
-                                                                 oq_IgnoreMessageDirection);
+   int32_t s32_Retval = this->mc_CoreDefinition.CheckMessageMatch(orc_MessageId1, orc_MessageId2, orq_IsMatch,
+                                                                  oq_IgnoreMessageDirection);
 
    //Check Ui part
    if ((s32_Retval == C_NO_ERR) && (orq_IsMatch == true))
    {
-      const C_OSCCanMessageContainer * const pc_MessageContainer1 =
+      const C_OscCanMessageContainer * const pc_MessageContainer1 =
          this->GetCanProtocolMessageContainer(orc_MessageId1.u32_NodeIndex, orc_MessageId1.e_ComProtocol,
                                               orc_MessageId1.u32_InterfaceIndex, orc_MessageId1.u32_DatapoolIndex);
-      const C_OSCCanMessageContainer * const pc_MessageContainer2 =
+      const C_OscCanMessageContainer * const pc_MessageContainer2 =
          this->GetCanProtocolMessageContainer(orc_MessageId2.u32_NodeIndex, orc_MessageId2.e_ComProtocol,
                                               orc_MessageId2.u32_InterfaceIndex, orc_MessageId2.u32_DatapoolIndex);
       if ((pc_MessageContainer1 != NULL) && (pc_MessageContainer2 != NULL))
       {
-         const std::vector<C_OSCCanMessage> & rc_Messages1 = pc_MessageContainer1->GetMessagesConst(
+         const std::vector<C_OscCanMessage> & rc_Messages1 = pc_MessageContainer1->GetMessagesConst(
             orc_MessageId1.q_MessageIsTx);
-         const std::vector<C_OSCCanMessage> & rc_Messages2 = pc_MessageContainer2->GetMessagesConst(
+         const std::vector<C_OscCanMessage> & rc_Messages2 = pc_MessageContainer2->GetMessagesConst(
             orc_MessageId2.q_MessageIsTx);
          if ((orc_MessageId1.u32_MessageIndex < rc_Messages1.size()) &&
              (orc_MessageId2.u32_MessageIndex < rc_Messages2.size()))
          {
-            const C_OSCCanMessage c_Message1 = rc_Messages1[orc_MessageId1.u32_MessageIndex];
-            const C_OSCCanMessage c_Message2 = rc_Messages2[orc_MessageId2.u32_MessageIndex];
+            const C_OscCanMessage c_Message1 = rc_Messages1[orc_MessageId1.u32_MessageIndex];
+            const C_OscCanMessage c_Message2 = rc_Messages2[orc_MessageId2.u32_MessageIndex];
             if (c_Message1.c_Signals.size() == c_Message2.c_Signals.size())
             {
                //Step 1: Get position and size in list
-               const uint32 u32_SignalSize = c_Message1.c_Signals.size();
+               const uint32_t u32_SignalSize = c_Message1.c_Signals.size();
 
                if (u32_SignalSize > 0)
                {
@@ -2493,17 +2537,17 @@ sint32 C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OSCCanMessageIdentifica
 
                   if ((pc_List1 != NULL) && (pc_List2 != NULL))
                   {
-                     const uint32 u32_List1Start = pc_MessageContainer1->GetMessageSignalDataStartIndex(
+                     const uint32_t u32_List1Start = pc_MessageContainer1->GetMessageSignalDataStartIndex(
                         orc_MessageId1.q_MessageIsTx, orc_MessageId1.u32_MessageIndex);
-                     const uint32 u32_List2Start = pc_MessageContainer2->GetMessageSignalDataStartIndex(
+                     const uint32_t u32_List2Start = pc_MessageContainer2->GetMessageSignalDataStartIndex(
                         orc_MessageId2.q_MessageIsTx, orc_MessageId2.u32_MessageIndex);
                      if (((u32_List1Start + u32_SignalSize) <= pc_List1->c_DataPoolListElements.size()) &&
                          ((u32_List2Start + u32_SignalSize) <= pc_List2->c_DataPoolListElements.size()))
                      {
-                        for (uint32 u32_ItSignal = 0; u32_ItSignal < u32_SignalSize; ++u32_ItSignal)
+                        for (uint32_t u32_ItSignal = 0; u32_ItSignal < u32_SignalSize; ++u32_ItSignal)
                         {
-                           const uint32 u32_Index1 = u32_List1Start + u32_ItSignal;
-                           const uint32 u32_Index2 = u32_List2Start + u32_ItSignal;
+                           const uint32_t u32_Index1 = u32_List1Start + u32_ItSignal;
+                           const uint32_t u32_Index2 = u32_List2Start + u32_ItSignal;
                            const C_PuiSdNodeDataPoolListElement & rc_UiElement1 =
                               pc_List1->c_DataPoolListElements[u32_Index1];
                            const C_PuiSdNodeDataPoolListElement & rc_UiElement2 =
@@ -2554,13 +2598,13 @@ sint32 C_PuiSdHandlerBusLogic::CheckMessageMatch(const C_OSCCanMessageIdentifica
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::MapBusNameToIndex(const QString & orc_BusName, uint32 & oru32_BusIndex) const
+int32_t C_PuiSdHandlerBusLogic::MapBusNameToIndex(const QString & orc_BusName, uint32_t & oru32_BusIndex) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
-   for (uint32 u32_ItBus = 0UL; u32_ItBus < this->GetOSCBusesSize(); ++u32_ItBus)
+   for (uint32_t u32_ItBus = 0UL; u32_ItBus < this->GetOscBusesSize(); ++u32_ItBus)
    {
-      const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(u32_ItBus);
+      const C_OscSystemBus * const pc_Bus = this->GetOscBus(u32_ItBus);
       tgl_assert(pc_Bus != NULL);
       if (pc_Bus != NULL)
       {
@@ -2586,10 +2630,10 @@ sint32 C_PuiSdHandlerBusLogic::MapBusNameToIndex(const QString & orc_BusName, ui
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::MapBusIndexToName(const uint32 ou32_BusIndex, QString & orc_BusName) const
+int32_t C_PuiSdHandlerBusLogic::MapBusIndexToName(const uint32_t ou32_BusIndex, QString & orc_BusName) const
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCSystemBus * const pc_Bus = this->GetOSCBus(ou32_BusIndex);
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscSystemBus * const pc_Bus = this->GetOscBus(ou32_BusIndex);
 
    if (pc_Bus != NULL)
    {
@@ -2613,17 +2657,17 @@ sint32 C_PuiSdHandlerBusLogic::MapBusIndexToName(const uint32 ou32_BusIndex, QSt
    Signal display name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                        const uint32 & oru32_SignalIndex) const
+QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                        const uint32_t & oru32_SignalIndex) const
 {
    QString c_Retval;
-   const C_OSCCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
-   const C_OSCNodeDataPoolListElement * const pc_SignalData = this->GetOSCCanDataPoolListElement(orc_MessageId,
+   const C_OscCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
+   const C_OscNodeDataPoolListElement * const pc_SignalData = this->GetOscCanDataPoolListElement(orc_MessageId,
                                                                                                  oru32_SignalIndex);
 
    if ((pc_Signal != NULL) && (pc_SignalData != NULL))
    {
-      if (pc_Signal->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (pc_Signal->e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          c_Retval = static_cast<QString>("%1 (Multiplexer)").arg(pc_SignalData->c_Name.c_str());
       }
@@ -2642,7 +2686,7 @@ QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OSCCanMessageIde
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdHandlerBusLogic::C_PuiSdHandlerBusLogic(QObject * const opc_Parent) :
-   C_PuiSdHandlerHALC(opc_Parent)
+   C_PuiSdHandlerHalc(opc_Parent)
 {
 }
 
@@ -2656,32 +2700,32 @@ C_PuiSdHandlerBusLogic::C_PuiSdHandlerBusLogic(QObject * const opc_Parent) :
                                        specified node interface & protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdHandlerBusLogic::m_GetExistingMessageNamesProtocol(const uint32 & oru32_NodeIndex,
-                                                               const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                               const uint32 & oru32_InterfaceIndex,
-                                                               std::map<C_SCLString, bool> & orc_ExistingNames)
+void C_PuiSdHandlerBusLogic::m_GetExistingMessageNamesProtocol(const uint32_t & oru32_NodeIndex,
+                                                               const C_OscCanProtocol::E_Type & ore_ComType,
+                                                               const uint32_t & oru32_InterfaceIndex,
+                                                               std::map<C_SclString, bool> & orc_ExistingNames)
 const
 {
-   const std::vector<const C_OSCCanMessageContainer *> c_Container = this->GetCanProtocolMessageContainers(
+   const std::vector<const C_OscCanMessageContainer *> c_Container = this->GetCanProtocolMessageContainers(
       oru32_NodeIndex, ore_ComType, oru32_InterfaceIndex);
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Check all COMM Datapools
    for (u32_Counter = 0U; u32_Counter < c_Container.size(); ++u32_Counter)
    {
-      const C_OSCCanMessageContainer * const pc_Container = c_Container[u32_Counter];
-      const std::vector<C_OSCCanMessage> & rc_TxMessages = pc_Container->GetMessagesConst(true);
-      const std::vector<C_OSCCanMessage> & rc_RxMessages = pc_Container->GetMessagesConst(false);
+      const C_OscCanMessageContainer * const pc_Container = c_Container[u32_Counter];
+      const std::vector<C_OscCanMessage> & rc_TxMessages = pc_Container->GetMessagesConst(true);
+      const std::vector<C_OscCanMessage> & rc_RxMessages = pc_Container->GetMessagesConst(false);
       //Tx
-      for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
+      for (uint32_t u32_ItMessage = 0; u32_ItMessage < rc_TxMessages.size(); ++u32_ItMessage)
       {
-         const C_OSCCanMessage & rc_Message = rc_TxMessages[u32_ItMessage];
+         const C_OscCanMessage & rc_Message = rc_TxMessages[u32_ItMessage];
          orc_ExistingNames[rc_Message.c_Name] = true;
       }
       //Rx
-      for (uint32 u32_ItMessage = 0; u32_ItMessage < rc_RxMessages.size(); ++u32_ItMessage)
+      for (uint32_t u32_ItMessage = 0; u32_ItMessage < rc_RxMessages.size(); ++u32_ItMessage)
       {
-         const C_OSCCanMessage & rc_Message = rc_RxMessages[u32_ItMessage];
+         const C_OscCanMessage & rc_Message = rc_RxMessages[u32_ItMessage];
          orc_ExistingNames[rc_Message.c_Name] = true;
       }
    }
@@ -2697,17 +2741,18 @@ const
    Vector of pointers to all currently registered message names contained in the specified node interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(const uint32 & oru32_NodeIndex,
-                                                                              const uint32 & oru32_InterfaceIndex) const
+std::map<C_SclString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(const uint32_t & oru32_NodeIndex,
+                                                                              const uint32_t & oru32_InterfaceIndex)
+const
 {
-   std::map<C_SCLString, bool> c_ExistingNames;
+   std::map<C_SclString, bool> c_ExistingNames;
 
    // get existing message names of all three protocols
-   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eLAYER2, oru32_InterfaceIndex, c_ExistingNames);
-   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eCAN_OPEN_SAFETY, oru32_InterfaceIndex,
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eLAYER2, oru32_InterfaceIndex, c_ExistingNames);
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eCAN_OPEN_SAFETY, oru32_InterfaceIndex,
                                      c_ExistingNames);
-   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eECES, oru32_InterfaceIndex, c_ExistingNames);
-   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OSCCanProtocol::eCAN_OPEN, oru32_InterfaceIndex,
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eECES, oru32_InterfaceIndex, c_ExistingNames);
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eCAN_OPEN, oru32_InterfaceIndex,
                                      c_ExistingNames);
 
    return c_ExistingNames;
@@ -2724,29 +2769,29 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingMessageNames(co
    Vector of pointers to all currently registered signal names contained in the specified message
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingSignalNames(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+std::map<C_SclString, bool> C_PuiSdHandlerBusLogic::m_GetExistingSignalNames(
+   const C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
-   std::map<C_SCLString, bool> c_Retval;
-   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
+   std::map<C_SclString, bool> c_Retval;
+   const C_OscNode * const pc_Node = this->GetOscNodeConst(orc_MessageId.u32_NodeIndex);
    if (pc_Node != NULL)
    {
-      const C_OSCNodeDataPool * const pc_ComDataPool = pc_Node->GetComDataPoolConst(orc_MessageId.e_ComProtocol,
+      const C_OscNodeDataPool * const pc_ComDataPool = pc_Node->GetComDataPoolConst(orc_MessageId.e_ComProtocol,
                                                                                     orc_MessageId.u32_DatapoolIndex);
       if (pc_ComDataPool != NULL)
       {
-         const C_OSCNodeDataPoolList * const pc_List = C_OSCCanProtocol::h_GetComListConst(*pc_ComDataPool,
+         const C_OscNodeDataPoolList * const pc_List = C_OscCanProtocol::h_GetComListConst(*pc_ComDataPool,
                                                                                            orc_MessageId.u32_InterfaceIndex,
                                                                                            orc_MessageId.q_MessageIsTx);
-         const C_OSCCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
+         const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
          if ((pc_Message != NULL) && (pc_List != NULL))
          {
-            for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
+            for (uint32_t u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
             {
-               const C_OSCCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
+               const C_OscCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
                if (rc_Signal.u32_ComDataElementIndex < pc_List->c_Elements.size())
                {
-                  const C_OSCNodeDataPoolListElement & rc_DataElement =
+                  const C_OscNodeDataPoolListElement & rc_DataElement =
                      pc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
                   c_Retval[rc_DataElement.c_Name] = true;
                }
@@ -2769,25 +2814,25 @@ std::map<C_SCLString, bool> C_PuiSdHandlerBusLogic::m_GetExistingSignalNames(
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSdNodeCanProtocol * C_PuiSdHandlerBusLogic::m_GetUiCanProtocol(const uint32 & oru32_NodeIndex,
-                                                                    const C_OSCCanProtocol::E_Type & ore_ComType,
-                                                                    const uint32 ou32_DatapoolIndex)
+C_PuiSdNodeCanProtocol * C_PuiSdHandlerBusLogic::m_GetUiCanProtocol(const uint32_t & oru32_NodeIndex,
+                                                                    const C_OscCanProtocol::E_Type & ore_ComType,
+                                                                    const uint32_t ou32_DatapoolIndex)
 {
    C_PuiSdNodeCanProtocol * pc_Retval = NULL;
 
-   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UINodes.size());
+   tgl_assert(this->mc_CoreDefinition.c_Nodes.size() == this->mc_UiNodes.size());
    if (oru32_NodeIndex < this->mc_CoreDefinition.c_Nodes.size())
    {
-      const C_OSCNode & rc_OSCNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
-      C_PuiSdNode & rc_UINode = this->mc_UINodes[oru32_NodeIndex];
-      tgl_assert(rc_OSCNode.c_ComProtocols.size() == rc_UINode.c_UICanProtocols.size());
-      for (uint32 u32_ItCanProtocol = 0; u32_ItCanProtocol < rc_OSCNode.c_ComProtocols.size(); ++u32_ItCanProtocol)
+      const C_OscNode & rc_OscNode = this->mc_CoreDefinition.c_Nodes[oru32_NodeIndex];
+      C_PuiSdNode & rc_UiNode = this->mc_UiNodes[oru32_NodeIndex];
+      tgl_assert(rc_OscNode.c_ComProtocols.size() == rc_UiNode.c_UiCanProtocols.size());
+      for (uint32_t u32_ItCanProtocol = 0; u32_ItCanProtocol < rc_OscNode.c_ComProtocols.size(); ++u32_ItCanProtocol)
       {
-         const C_OSCCanProtocol & rc_CanProtocol = rc_OSCNode.c_ComProtocols[u32_ItCanProtocol];
+         const C_OscCanProtocol & rc_CanProtocol = rc_OscNode.c_ComProtocols[u32_ItCanProtocol];
          if ((rc_CanProtocol.e_Type == ore_ComType) &&
              (rc_CanProtocol.u32_DataPoolIndex == ou32_DatapoolIndex))
          {
-            pc_Retval = &rc_UINode.c_UICanProtocols[u32_ItCanProtocol];
+            pc_Retval = &rc_UiNode.c_UiCanProtocols[u32_ItCanProtocol];
             break;
          }
       }
@@ -2809,29 +2854,29 @@ C_PuiSdNodeCanProtocol * C_PuiSdHandlerBusLogic::m_GetUiCanProtocol(const uint32
    Else Pointer to data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(const uint32 & oru32_NodeIndex,
-                                                                               const C_OSCCanProtocol::E_Type & ore_ComType, const uint32 & oru32_InterfaceIndex, const uint32 ou32_DatapoolIndex,
+const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(const uint32_t & oru32_NodeIndex,
+                                                                               const C_OscCanProtocol::E_Type & ore_ComType, const uint32_t & oru32_InterfaceIndex, const uint32_t ou32_DatapoolIndex,
                                                                                const bool & orq_MessageIsTx) const
 {
    const C_PuiSdNodeDataPoolList * pc_Retval = NULL;
-   const C_OSCNodeDataPool * const pc_OSCDataPool = this->GetOSCCanDataPool(oru32_NodeIndex, ore_ComType,
+   const C_OscNodeDataPool * const pc_OscDataPool = this->GetOscCanDataPool(oru32_NodeIndex, ore_ComType,
                                                                             ou32_DatapoolIndex);
 
-   if (pc_OSCDataPool != NULL)
+   if (pc_OscDataPool != NULL)
    {
-      uint32 u32_Index;
+      uint32_t u32_Index;
 
-      if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, oru32_InterfaceIndex, orq_MessageIsTx,
+      if (C_OscCanProtocol::h_GetComListIndex(*pc_OscDataPool, oru32_InterfaceIndex, orq_MessageIsTx,
                                               u32_Index) == C_NO_ERR)
       {
-         const C_PuiSdNodeDataPool * const pc_UIDataPool = this->GetUiCanDataPool(oru32_NodeIndex, ore_ComType,
+         const C_PuiSdNodeDataPool * const pc_UiDataPool = this->GetUiCanDataPool(oru32_NodeIndex, ore_ComType,
                                                                                   ou32_DatapoolIndex);
 
-         if (pc_UIDataPool != NULL)
+         if (pc_UiDataPool != NULL)
          {
-            if (u32_Index < pc_UIDataPool->c_DataPoolLists.size())
+            if (u32_Index < pc_UiDataPool->c_DataPoolLists.size())
             {
-               pc_Retval = &pc_UIDataPool->c_DataPoolLists[u32_Index];
+               pc_Retval = &pc_UiDataPool->c_DataPoolLists[u32_Index];
             }
          }
       }
@@ -2844,24 +2889,24 @@ const C_PuiSdNodeDataPoolList * C_PuiSdHandlerBusLogic::m_GetUiCanDataPoolList(c
 /*! \brief   Insert ui part for can message
 
    \param[in]  orc_MessageId        Message identification indices
-   \param[in]  orc_UISignalCommons  Signals data (ui common)
-   \param[in]  orc_UIMessage        Message data (ui)
+   \param[in]  orc_UiSignalCommons  Signals data (ui common)
+   \param[in]  orc_UiMessage        Message data (ui)
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                    const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommons,
-                                                    const C_PuiSdNodeCanMessage & orc_UIMessage)
+int32_t C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                     const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
+                                                     const C_PuiSdNodeCanMessage & orc_UiMessage)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscNode * const pc_Node = this->GetOscNodeConst(orc_MessageId.u32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+      const C_OscCanProtocol * const pc_Protocol = pc_Node->GetCanProtocolConst(orc_MessageId.e_ComProtocol,
                                                                                 orc_MessageId.u32_DatapoolIndex);
       C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                               orc_MessageId.e_ComProtocol,
@@ -2871,35 +2916,35 @@ sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentif
       {
          if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
          {
-            const C_OSCCanMessageContainer & rc_MessageContainer =
+            const C_OscCanMessageContainer & rc_MessageContainer =
                pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
+            const uint32_t u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
                orc_MessageId.q_MessageIsTx,
                orc_MessageId.u32_MessageIndex);
-            C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-            if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+            C_PuiSdNode & rc_UiNode = this->mc_UiNodes[orc_MessageId.u32_NodeIndex];
+            if (pc_Protocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size())
             {
-               const C_OSCNodeDataPool * const pc_OSCDataPool = pc_Node->GetComDataPoolConst(
+               const C_OscNodeDataPool * const pc_OscDataPool = pc_Node->GetComDataPoolConst(
                   orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
 
-               if (pc_OSCDataPool != NULL)
+               if (pc_OscDataPool != NULL)
                {
-                  uint32 u32_ListIndex;
-                  if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                  uint32_t u32_ListIndex;
+                  if (C_OscCanProtocol::h_GetComListIndex(*pc_OscDataPool, orc_MessageId.u32_InterfaceIndex,
                                                           orc_MessageId.q_MessageIsTx,
                                                           u32_ListIndex) == C_NO_ERR)
                   {
-                     C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                     if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                     C_PuiSdNodeDataPool & rc_UiDataPool = rc_UiNode.c_UiDataPools[pc_Protocol->u32_DataPoolIndex];
+                     if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                      {
-                        C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                        C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
                         if (u32_SignalIndex <= rc_UiList.c_DataPoolListElements.size())
                         {
-                           for (uint32 u32_ItSignal = 0; u32_ItSignal < orc_UISignalCommons.size(); ++u32_ItSignal)
+                           for (uint32_t u32_ItSignal = 0; u32_ItSignal < orc_UiSignalCommons.size(); ++u32_ItSignal)
                            {
                               rc_UiList.c_DataPoolListElements.insert(
                                  rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex + u32_ItSignal,
-                                 orc_UISignalCommons[u32_ItSignal]);
+                                 orc_UiSignalCommons[u32_ItSignal]);
                            }
                         }
                         else
@@ -2947,7 +2992,7 @@ sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentif
                orc_MessageId.q_MessageIsTx);
             if (orc_MessageId.u32_MessageIndex <= rc_Messages.size())
             {
-               rc_Messages.insert(rc_Messages.begin() + orc_MessageId.u32_MessageIndex, orc_UIMessage);
+               rc_Messages.insert(rc_Messages.begin() + orc_MessageId.u32_MessageIndex, orc_UiMessage);
             }
             else
             {
@@ -2981,14 +3026,14 @@ sint32 C_PuiSdHandlerBusLogic::m_InsertUiCanMessage(const C_OSCCanMessageIdentif
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdHandlerBusLogic::m_DeleteUiCanMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+int32_t C_PuiSdHandlerBusLogic::m_DeleteUiCanMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const C_OSCNode * const pc_Node = this->GetOSCNodeConst(orc_MessageId.u32_NodeIndex);
+   int32_t s32_Retval = C_NO_ERR;
+   const C_OscNode * const pc_Node = this->GetOscNodeConst(orc_MessageId.u32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetCANProtocolConst(orc_MessageId.e_ComProtocol,
+      const C_OscCanProtocol * const pc_Protocol = pc_Node->GetCanProtocolConst(orc_MessageId.e_ComProtocol,
                                                                                 orc_MessageId.u32_DatapoolIndex);
       C_PuiSdNodeCanProtocol * const pc_UiProtocol = this->m_GetUiCanProtocol(orc_MessageId.u32_NodeIndex,
                                                                               orc_MessageId.e_ComProtocol,
@@ -2998,35 +3043,36 @@ sint32 C_PuiSdHandlerBusLogic::m_DeleteUiCanMessage(const C_OSCCanMessageIdentif
       {
          if (orc_MessageId.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
          {
-            const C_OSCCanMessageContainer & rc_MessageContainer =
+            const C_OscCanMessageContainer & rc_MessageContainer =
                pc_Protocol->c_ComMessages[orc_MessageId.u32_InterfaceIndex];
-            const uint32 u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
+            const uint32_t u32_SignalIndex = rc_MessageContainer.GetMessageSignalDataStartIndex(
                orc_MessageId.q_MessageIsTx,
                orc_MessageId.u32_MessageIndex);
-            C_PuiSdNode & rc_UINode = this->mc_UINodes[orc_MessageId.u32_NodeIndex];
-            if (pc_Protocol->u32_DataPoolIndex < rc_UINode.c_UIDataPools.size())
+            C_PuiSdNode & rc_UiNode = this->mc_UiNodes[orc_MessageId.u32_NodeIndex];
+            if (pc_Protocol->u32_DataPoolIndex < rc_UiNode.c_UiDataPools.size())
             {
-               const C_OSCNodeDataPool * const pc_OSCDataPool = pc_Node->GetComDataPoolConst(
+               const C_OscNodeDataPool * const pc_OscDataPool = pc_Node->GetComDataPoolConst(
                   orc_MessageId.e_ComProtocol,
                   orc_MessageId.u32_DatapoolIndex);
 
-               if (pc_OSCDataPool != NULL)
+               if (pc_OscDataPool != NULL)
                {
-                  uint32 u32_ListIndex;
-                  if (C_OSCCanProtocol::h_GetComListIndex(*pc_OSCDataPool, orc_MessageId.u32_InterfaceIndex,
+                  uint32_t u32_ListIndex;
+                  if (C_OscCanProtocol::h_GetComListIndex(*pc_OscDataPool, orc_MessageId.u32_InterfaceIndex,
                                                           orc_MessageId.q_MessageIsTx,
                                                           u32_ListIndex) == C_NO_ERR)
                   {
-                     C_PuiSdNodeDataPool & rc_UIDataPool = rc_UINode.c_UIDataPools[pc_Protocol->u32_DataPoolIndex];
-                     if (u32_ListIndex < rc_UIDataPool.c_DataPoolLists.size())
+                     C_PuiSdNodeDataPool & rc_UiDataPool = rc_UiNode.c_UiDataPools[pc_Protocol->u32_DataPoolIndex];
+                     if (u32_ListIndex < rc_UiDataPool.c_DataPoolLists.size())
                      {
-                        C_PuiSdNodeDataPoolList & rc_UiList = rc_UIDataPool.c_DataPoolLists[u32_ListIndex];
+                        C_PuiSdNodeDataPoolList & rc_UiList = rc_UiDataPool.c_DataPoolLists[u32_ListIndex];
                         if (u32_SignalIndex < rc_UiList.c_DataPoolListElements.size())
                         {
                            const C_PuiSdNodeCanMessage * const pc_Message = this->GetUiCanMessage(orc_MessageId);
                            if (pc_Message != NULL)
                            {
-                              for (uint32 u32_ItSignal = pc_Message->c_Signals.size(); u32_ItSignal > 0; --u32_ItSignal)
+                              for (uint32_t u32_ItSignal = pc_Message->c_Signals.size(); u32_ItSignal > 0;
+                                   --u32_ItSignal)
                               {
                                  rc_UiList.c_DataPoolListElements.erase(
                                     ((rc_UiList.c_DataPoolListElements.begin() + u32_SignalIndex) + u32_ItSignal) - 1);

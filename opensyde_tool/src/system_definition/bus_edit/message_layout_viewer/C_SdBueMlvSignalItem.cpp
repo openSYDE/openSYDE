@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QGraphicsSceneHoverEvent>
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_SdBueMlvSignalItem.h"
-#include "C_GtGetText.h"
+#include "C_SdBueMlvSignalItem.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT = 20.0;
-const stw_types::float64 C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_CLICK_OFFSET = 8.0;
+const float64_t C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_HEIGHT = 20.0;
+const float64_t C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_CLICK_OFFSET = 8.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ const stw_types::float64 C_SdBueMlvSignalItem::mhf64_RESIZE_ITEM_CLICK_OFFSET = 
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalItem::C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
                                            const QColor & orc_ResizeItemColor, const QString & orc_Name,
-                                           const float64 of64_Space, QGraphicsItem * const opc_Parent) :
+                                           const float64_t of64_Space, QGraphicsItem * const opc_Parent) :
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(orc_BackgroundColor, orc_FontColor, mc_STYLE_GUIDE_FONT_REGULAR_16, orc_Name, true, opc_Parent),
    mu16_ByteRow(0U),
@@ -94,21 +93,22 @@ C_SdBueMlvSignalItem::~C_SdBueMlvSignalItem()
    \param[in]     of64_SingleItemHeight     New item height
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalItem::Update(const float64 of64_SingleItemWidth, const float64 of64_SingleItemHeight)
+void C_SdBueMlvSignalItem::Update(const float64_t of64_SingleItemWidth, const float64_t of64_SingleItemHeight)
 {
-   const uint16 u16_Length = (this->mu16_LastBit - this->mu16_StartBit) + static_cast<uint16>(1U);
-   const float64 f64_Width = (static_cast<float64>(u16_Length) * of64_SingleItemWidth) +
-                             ((static_cast<float64>(u16_Length) - 1.0) * this->mf64_Space);
+   const uint16_t u16_Length = (this->mu16_LastBit - this->mu16_StartBit) + static_cast<uint16_t>(1U);
+   const float64_t f64_Width = (static_cast<float64_t>(u16_Length) * of64_SingleItemWidth) +
+                               ((static_cast<float64_t>(u16_Length) - 1.0) * this->mf64_Space);
    // start bit is right of the last bit in not inverted mode
-   const uint16 u16_LastBitIndex = 8U - this->mu16_LastBit;
-   const float64 f64_PosX = static_cast<float64>(u16_LastBitIndex) * (of64_SingleItemWidth + this->mf64_Space);
+   const uint16_t u16_LastBitIndex = 8U - this->mu16_LastBit;
+   const float64_t f64_PosHorizontal = static_cast<float64_t>(u16_LastBitIndex) *
+                                       (of64_SingleItemWidth + this->mf64_Space);
    // compensate the border by adding 1
-   const float64 f64_PosY = ((static_cast<float64>(this->mu16_ByteRow) + 1.0) *
-                             (of64_SingleItemHeight + this->mf64_Space));
+   const float64_t f64_PosVertical = ((static_cast<float64_t>(this->mu16_ByteRow) + 1.0) *
+                                      (of64_SingleItemHeight + this->mf64_Space));
 
    this->prepareGeometryChange();
    this->SetSize(QSizeF(f64_Width, of64_SingleItemHeight));
-   this->setPos(f64_PosX, f64_PosY);
+   this->setPos(f64_PosHorizontal, f64_PosVertical);
    this->update();
 
    // rectangle for the left resize item
@@ -151,8 +151,8 @@ void C_SdBueMlvSignalItem::Update(const float64 of64_SingleItemWidth, const floa
    \param[in]     ou16_LastBit     Actual last bit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvSignalItem::SetBitPosition(const uint16 ou16_ByteRow, const uint16 ou16_StartBit,
-                                          const uint16 ou16_LastBit)
+void C_SdBueMlvSignalItem::SetBitPosition(const uint16_t ou16_ByteRow, const uint16_t ou16_StartBit,
+                                          const uint16_t ou16_LastBit)
 {
    this->mu16_ByteRow = ou16_ByteRow;
    this->mu16_StartBit = ou16_StartBit;
@@ -376,7 +376,7 @@ void C_SdBueMlvSignalItem::paint(QPainter * const opc_Painter, const QStyleOptio
       QPen c_Pen = opc_Painter->pen();
       QBrush c_Brush = opc_Painter->brush();
       QRectF c_Rect = this->boundingRect();
-      uint32 u32_Alignment = static_cast<uint32>(Qt::AlignBottom);
+      uint32_t u32_Alignment = static_cast<uint32_t>(Qt::AlignBottom);
 
       // configure the font and color for the text
       c_Pen.setColor(this->mc_DrawFontColor);
@@ -392,17 +392,17 @@ void C_SdBueMlvSignalItem::paint(QPainter * const opc_Painter, const QStyleOptio
 
       if (this->mq_ShowMsb == true)
       {
-         u32_Alignment |= static_cast<uint32>(Qt::AlignLeft);
+         u32_Alignment |= static_cast<uint32_t>(Qt::AlignLeft);
 
          // draw the text
-         opc_Painter->drawText(c_Rect, static_cast<sintn>(u32_Alignment), C_GtGetText::h_GetText("MSB"));
+         opc_Painter->drawText(c_Rect, static_cast<int32_t>(u32_Alignment), C_GtGetText::h_GetText("MSB"));
       }
       if (this->mq_ShowLsb == true)
       {
-         u32_Alignment |= static_cast<uint32>(Qt::AlignRight);
+         u32_Alignment |= static_cast<uint32_t>(Qt::AlignRight);
 
          // draw the text
-         opc_Painter->drawText(c_Rect, static_cast<sintn>(u32_Alignment), C_GtGetText::h_GetText("LSB"));
+         opc_Painter->drawText(c_Rect, static_cast<int32_t>(u32_Alignment), C_GtGetText::h_GetText("LSB"));
       }
    }
 }

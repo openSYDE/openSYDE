@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamTblDelegate.h"
-#include "C_CamOgeLeTableEdit.h"
-#include "C_CamOgeCbxTableSmall.h"
-#include "C_CamOgeWiSpinBoxGroupTable.h"
+#include "C_CamTblDelegate.hpp"
+#include "C_CamOgeLeTableEdit.hpp"
+#include "C_CamOgeCbxTableSmall.hpp"
+#include "C_CamOgeWiSpinBoxGroupTable.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

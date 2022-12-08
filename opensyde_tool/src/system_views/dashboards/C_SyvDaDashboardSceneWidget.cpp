@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaDashboardSceneWidget.h"
+#include "C_SyvDaDashboardSceneWidget.hpp"
 #include "ui_C_SyvDaDashboardSceneWidget.h"
 
-#include "C_UsHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
+#include "C_UsHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,7 +45,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent            Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardSceneWidget::C_SyvDaDashboardSceneWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
+C_SyvDaDashboardSceneWidget::C_SyvDaDashboardSceneWidget(const uint32_t ou32_ViewIndex,
+                                                         const uint32_t ou32_DashboardIndex,
                                                          QWidget * const opc_Parent) :
    C_SyvDaDashboardContentBaseWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardSceneWidget),
@@ -64,8 +64,8 @@ C_SyvDaDashboardSceneWidget::C_SyvDaDashboardSceneWidget(const uint32 ou32_ViewI
 
    // configure scene
    this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->width()),
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->height()));
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->width()),
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->height()));
    this->mpc_Ui->pc_GraphicsView->SetSceneAndConnect(this->mpc_Scene);
 
    // make all generic connects
@@ -110,7 +110,7 @@ C_SyvDaDashboardSceneWidget::C_SyvDaDashboardSceneWidget(const uint32 ou32_ViewI
    }
    this->mpc_Ui->pc_GraphicsView->SetZoomValue(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
                                                   c_ViewName).GetDashboardSettings(
-                                                  c_DashboardName).sn_SceneZoom, true);
+                                                  c_DashboardName).s32_SceneZoom, true);
    this->mpc_Ui->pc_GraphicsView->SetViewPos(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
                                                 c_ViewName).GetDashboardSettings(
                                                 c_DashboardName).c_ScenePos);
@@ -132,7 +132,7 @@ C_SyvDaDashboardSceneWidget::~C_SyvDaDashboardSceneWidget()
    \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSceneWidget::SetDashboardIndex(const uint32 ou32_Value)
+void C_SyvDaDashboardSceneWidget::SetDashboardIndex(const uint32_t ou32_Value)
 {
    this->mpc_Scene->SetDashboardIndex(ou32_Value);
 }
@@ -266,14 +266,14 @@ void C_SyvDaDashboardSceneWidget::UpdateTransmissionConfiguration(void)
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSceneWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
+void C_SyvDaDashboardSceneWidget::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc)
 {
    if (this->mpc_Scene != NULL)
    {
-      this->mpc_Scene->HandleManualOperationFinished(os32_Result, ou8_NRC);
+      this->mpc_Scene->HandleManualOperationFinished(os32_Result, ou8_Nrc);
    }
 }
 

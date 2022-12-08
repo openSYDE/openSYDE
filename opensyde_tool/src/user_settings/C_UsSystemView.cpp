@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_UsSystemView.h"
+#include "stwtypes.hpp"
+#include "C_UsSystemView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,13 +35,13 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemView::C_UsSystemView(void) :
-   sn_SetupViewZoom(100),
+   s32_SetupViewZoom(100),
    c_SetupViewPos(0, 0),
-   sn_UpdateViewZoom(100),
+   s32_UpdateViewZoom(100),
    c_UpdateViewPos(0, 0),
    mq_NavigationExpanded(false),
-   ms32_UpdateSplitterX(-1),
-   ms32_UpdateHorizontalSplitterY(-1),
+   ms32_UpdateSplitterHorizontal(-1),
+   ms32_UpdateHorizontalSplitterVertical(-1),
    mc_UpdateProgressLogPos(-1, -1),
    mc_UpdateProgressLogSize(600, 400),
    mq_UpdateProgressLogMaximized(true),
@@ -61,18 +60,18 @@ C_UsSystemView::C_UsSystemView(void) :
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 
-   \param[in]  osn_SetupViewZoom    Zoom init value
+   \param[in]  os32_SetupViewZoom   Zoom init value
    \param[in]  orc_SetupViewPos     Position init value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_UsSystemView::C_UsSystemView(const sintn osn_SetupViewZoom, const QPoint & orc_SetupViewPos) :
-   sn_SetupViewZoom(osn_SetupViewZoom),
+C_UsSystemView::C_UsSystemView(const int32_t os32_SetupViewZoom, const QPoint & orc_SetupViewPos) :
+   s32_SetupViewZoom(os32_SetupViewZoom),
    c_SetupViewPos(orc_SetupViewPos),
-   sn_UpdateViewZoom(100),
+   s32_UpdateViewZoom(100),
    c_UpdateViewPos(0, 0),
    mq_NavigationExpanded(false),
-   ms32_UpdateSplitterX(-1),
-   ms32_UpdateHorizontalSplitterY(-1),
+   ms32_UpdateSplitterHorizontal(-1),
+   ms32_UpdateHorizontalSplitterVertical(-1),
    mc_UpdateProgressLogPos(-1, -1),
    mc_UpdateProgressLogSize(600, 400),
    mq_UpdateProgressLogMaximized(true),
@@ -96,8 +95,8 @@ C_UsSystemView::C_UsSystemView(const sintn osn_SetupViewZoom, const QPoint & orc
    \param[in]  of64_DataRateBytesPerMs    Data rate bytes per ms
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::AddNodeUpdateDataRate(const QString & orc_NodeName, const uint32 ou32_Checksum,
-                                           const float64 of64_DataRateBytesPerMs)
+void C_UsSystemView::AddNodeUpdateDataRate(const QString & orc_NodeName, const uint32_t ou32_Checksum,
+                                           const float64_t of64_DataRateBytesPerMs)
 {
    if (this->mc_Nodes.contains(orc_NodeName) == true)
    {
@@ -120,9 +119,9 @@ void C_UsSystemView::AddNodeUpdateDataRate(const QString & orc_NodeName, const u
    Current update splitter X value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsSystemView::GetUpdateSplitterX(void) const
+int32_t C_UsSystemView::GetUpdateSplitterHorizontal(void) const
 {
-   return this->ms32_UpdateSplitterX;
+   return this->ms32_UpdateSplitterHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,9 +131,9 @@ sint32 C_UsSystemView::GetUpdateSplitterX(void) const
    Current update splitter Y value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsSystemView::GetUpdateHorizontalSplitterY() const
+int32_t C_UsSystemView::GetUpdateHorizontalSplitterVertical() const
 {
-   return this->ms32_UpdateHorizontalSplitterY;
+   return this->ms32_UpdateHorizontalSplitterVertical;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -143,9 +142,9 @@ sint32 C_UsSystemView::GetUpdateHorizontalSplitterY() const
    \param[in]  os32_Value  New update splitter X value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::SetUpdateSplitterX(const sint32 os32_Value)
+void C_UsSystemView::SetUpdateSplitterHorizontal(const int32_t os32_Value)
 {
-   this->ms32_UpdateSplitterX = os32_Value;
+   this->ms32_UpdateSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,9 +153,9 @@ void C_UsSystemView::SetUpdateSplitterX(const sint32 os32_Value)
    \param[in]  os32_Value  New update splitter Y value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::SetUpdateHorizontalSplitterY(const sint32 os32_Value)
+void C_UsSystemView::SetUpdateHorizontalSplitterVertical(const int32_t os32_Value)
 {
-   this->ms32_UpdateHorizontalSplitterY = os32_Value;
+   this->ms32_UpdateHorizontalSplitterVertical = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -409,24 +408,24 @@ void C_UsSystemView::SetDashboardTearOffPosition(const QString & orc_DashboardNa
 
    \param[in]  orc_DashboardName    Dashboard name (identifier)
    \param[in]  orc_Position         Scene position
-   \param[in]  osn_Zoom             Scene zoom
+   \param[in]  os32_Zoom            Scene zoom
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsSystemView::SetProjSvDashboardScenePositionAndZoom(const QString & orc_DashboardName,
-                                                            const QPoint & orc_Position, const sintn osn_Zoom)
+                                                            const QPoint & orc_Position, const int32_t os32_Zoom)
 {
    if (this->mc_Dashboards.contains(orc_DashboardName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemViewDashboard & rc_Dashboard = this->mc_Dashboards.operator [](orc_DashboardName);
       rc_Dashboard.c_ScenePos = orc_Position;
-      rc_Dashboard.sn_SceneZoom = osn_Zoom;
+      rc_Dashboard.s32_SceneZoom = os32_Zoom;
    }
    else
    {
       C_UsSystemViewDashboard c_DashboardSettings;
       c_DashboardSettings.c_ScenePos = orc_Position;
-      c_DashboardSettings.sn_SceneZoom = osn_Zoom;
+      c_DashboardSettings.s32_SceneZoom = os32_Zoom;
       this->mc_Dashboards.insert(orc_DashboardName, c_DashboardSettings);
    }
 }
@@ -534,7 +533,7 @@ void C_UsSystemView::SetDashboardToolboxMaximized(const bool oq_Value)
    Current dashboard selected tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_UsSystemView::GetDashboardSelectedTabIndex(void) const
+int32_t C_UsSystemView::GetDashboardSelectedTabIndex(void) const
 {
    return this->ms32_DashboardSelectedTabIndex;
 }
@@ -545,7 +544,7 @@ stw_types::sint32 C_UsSystemView::GetDashboardSelectedTabIndex(void) const
    \param[in]  os32_Value   New dashboard selected tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemView::SetDashboardSelectedTabIndex(const stw_types::sint32 os32_Value)
+void C_UsSystemView::SetDashboardSelectedTabIndex(const int32_t os32_Value)
 {
    this->ms32_DashboardSelectedTabIndex = os32_Value;
 }

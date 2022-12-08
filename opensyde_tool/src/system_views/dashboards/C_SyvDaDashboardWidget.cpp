@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
 
-#include "C_SyvDaDashboardWidget.h"
+#include "C_SyvDaDashboardWidget.hpp"
 #include "ui_C_SyvDaDashboardWidget.h"
 
-#include "C_PuiSvHandler.h"
-#include "C_OgeWiUtil.h"
-#include "C_SyvDaDashboardSceneWidget.h"
-#include "C_SyvDaChaWidget.h"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_SyvDaDashboardSceneWidget.hpp"
+#include "C_SyvDaChaWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out]  opc_Parent            Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
+C_SyvDaDashboardWidget::C_SyvDaDashboardWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
                                                const QString & orc_Name, const bool oq_Window,
                                                QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -129,7 +128,7 @@ C_SyvDaDashboardWidget::~C_SyvDaDashboardWidget(void)
    Index of the view
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDaDashboardWidget::GetViewIndex(void) const
+uint32_t C_SyvDaDashboardWidget::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
@@ -141,7 +140,7 @@ uint32 C_SyvDaDashboardWidget::GetViewIndex(void) const
    Index of the dashboard
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDaDashboardWidget::GetDashboardIndex(void) const
+uint32_t C_SyvDaDashboardWidget::GetDashboardIndex(void) const
 {
    return this->mu32_DashboardIndex;
 }
@@ -152,7 +151,7 @@ uint32 C_SyvDaDashboardWidget::GetDashboardIndex(void) const
    \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::SetDashboardIndex(const uint32 ou32_Value)
+void C_SyvDaDashboardWidget::SetDashboardIndex(const uint32_t ou32_Value)
 {
    this->mu32_DashboardIndex = ou32_Value;
    this->mpc_Content->SetDashboardIndex(this->mu32_DashboardIndex);
@@ -267,12 +266,12 @@ void C_SyvDaDashboardWidget::UpdateTransmissionConfiguration(void) const
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
+void C_SyvDaDashboardWidget::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) const
 {
-   this->mpc_Content->HandleManualOperationFinished(os32_Result, ou8_NRC);
+   this->mpc_Content->HandleManualOperationFinished(os32_Result, ou8_Nrc);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

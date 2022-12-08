@@ -8,27 +8,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
-#include "C_SdUtil.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_CieExportReportWidget.h"
+#include "C_SdUtil.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_CieExportReportWidget.hpp"
 #include "ui_C_CieExportReportWidget.h"
-#include "C_CieExportDbc.h"
+#include "C_CieExportDbc.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_scl;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_CieExportReportWidget::mhc_HTML_TABLE_HEADER_START =
@@ -55,7 +54,7 @@ const QString C_CieExportReportWidget::mhc_HTML_TABLE_DATA_START =
    \param[in]     orc_FilePath        Loaded file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CieExportReportWidget::C_CieExportReportWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+C_CieExportReportWidget::C_CieExportReportWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                  const QString & orc_FilePath) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieExportReportWidget),
@@ -110,10 +109,10 @@ void C_CieExportReportWidget::InitStaticNames(void) const
    \param[in] orc_Warnings                 warnings of DBC file export
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieExportReportWidget::SetMessageData(const std::map<C_SCLString,
-                                                            C_SCLString> & orc_NodeMapping,
+void C_CieExportReportWidget::SetMessageData(const std::map<C_SclString,
+                                                            C_SclString> & orc_NodeMapping,
                                              const C_CieExportDbc::C_ExportStatistic & orc_ExportStatistic,
-                                             const C_SCLStringList & orc_Warnings)
+                                             const C_SclStringList & orc_Warnings)
 {
    //Copy to internal data
    this->mc_NodeMapping = orc_NodeMapping;
@@ -137,8 +136,8 @@ void C_CieExportReportWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -173,11 +172,11 @@ void C_CieExportReportWidget::m_OkClicked(void)
 void C_CieExportReportWidget::m_BuildReport(void)
 {
    // get nodes
-   C_SCLString c_Nodes = "Node(s): ";
+   C_SclString c_Nodes = "Node(s): ";
    bool q_FirstEntry = true;
 
    // build up node mapping
-   std::map<C_SCLString, C_SCLString>::const_iterator c_Iter;
+   std::map<C_SclString, C_SclString>::const_iterator c_Iter;
    for (c_Iter = this->mc_NodeMapping.begin(); c_Iter != this->mc_NodeMapping.end(); ++c_Iter)
    {
       if (q_FirstEntry == true)
@@ -192,13 +191,13 @@ void C_CieExportReportWidget::m_BuildReport(void)
    }
 
    // build up warning messages
-   C_SCLString c_Warnings;
-   const uint32 u32_NumOfWarnings = this->mc_Warnings.GetCount();
+   C_SclString c_Warnings;
+   const uint32_t u32_NumOfWarnings = this->mc_Warnings.GetCount();
    if (u32_NumOfWarnings > 0)
    {
       c_Warnings += "<br/>";
       c_Warnings +=  "Warnings: ";
-      for (uint32 u32_Pos = 0; u32_Pos < this->mc_Warnings.GetCount(); u32_Pos++)
+      for (uint32_t u32_Pos = 0; u32_Pos < this->mc_Warnings.GetCount(); u32_Pos++)
       {
          c_Warnings += "<br/>";
          c_Warnings += this->mc_Warnings.Strings[u32_Pos];
@@ -242,9 +241,9 @@ void C_CieExportReportWidget::m_BuildReport(void)
    c_CompleteLog += "<br/><br/>";
    c_CompleteLog += C_GtGetText::h_GetText("For detailed information see ");
    //Update log file
-   C_OSCLoggingHandler::h_Flush();
+   C_OscLoggingHandler::h_Flush();
    c_CompleteLog += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
-                    arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                    arg(C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                     arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                     arg(C_GtGetText::h_GetText("log file"));
    c_CompleteLog += "</td></tr></table>";

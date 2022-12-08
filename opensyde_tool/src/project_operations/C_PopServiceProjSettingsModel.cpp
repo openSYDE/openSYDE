@@ -11,20 +11,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_PopServiceProjSettingsModel.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
+#include "stwerrors.hpp"
+#include "C_PopServiceProjSettingsModel.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
 
-#include "C_UsHandler.h"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,9 +65,9 @@ C_PopServiceProjSettingsModel::~C_PopServiceProjSettingsModel(void)
    \retval  C_RANGE     View is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopServiceProjSettingsModel::Init(const std::vector<stw_types::uint32> & orc_ElementIndices)
+int32_t C_PopServiceProjSettingsModel::Init(const std::vector<uint32_t> & orc_ElementIndices)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    C_TblTreeModelCheckableItem * const pc_VisibleRootItem = new C_TblTreeModelCheckableItem();
 
@@ -80,7 +79,7 @@ sint32 C_PopServiceProjSettingsModel::Init(const std::vector<stw_types::uint32> 
 
    pc_VisibleRootItem->c_Name = C_GtGetText::h_GetText("System Commissioning");
 
-   for (uint32 u32_ViewCnt = 0; u32_ViewCnt < orc_ElementIndices.size(); ++u32_ViewCnt)
+   for (uint32_t u32_ViewCnt = 0; u32_ViewCnt < orc_ElementIndices.size(); ++u32_ViewCnt)
    {
       C_TblTreeModelCheckableItem * const pc_TreeNode = new C_TblTreeModelCheckableItem();
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(u32_ViewCnt);
@@ -140,14 +139,14 @@ sint32 C_PopServiceProjSettingsModel::Init(const std::vector<stw_types::uint32> 
    \param[out]      orc_ChildIndicesPerElement   Vector of vectors for child indices per view
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopServiceProjSettingsModel::GetCheckedItems(std::vector<uint32> & orc_ElementIndices,
-                                                    std::vector<std::vector<uint32> > & orc_ChildIndicesPerElement)
+void C_PopServiceProjSettingsModel::GetCheckedItems(std::vector<uint32_t> & orc_ElementIndices,
+                                                    std::vector<std::vector<uint32_t> > & orc_ChildIndicesPerElement)
 const
 {
    std::vector<C_TblTreSimpleItem *> c_InvisibleRootChildren = this->mpc_InvisibleRootItem->c_Children;
    orc_ElementIndices.clear();
    orc_ChildIndicesPerElement.clear();
-   for (uint32 u32_ItInvisibleRootChild = 0;
+   for (uint32_t u32_ItInvisibleRootChild = 0;
         u32_ItInvisibleRootChild < c_InvisibleRootChildren.size(); u32_ItInvisibleRootChild++)
    {
       C_TblTreeModelCheckableItem * const pc_VisibleRootItem =
@@ -155,7 +154,7 @@ const
       if (pc_VisibleRootItem != NULL)
       {
          std::vector<C_TblTreSimpleItem *> c_VisibleRootChildren = pc_VisibleRootItem->c_Children;
-         for (uint32 u32_ItVisibleRootChild = 0;
+         for (uint32_t u32_ItVisibleRootChild = 0;
               u32_ItVisibleRootChild < c_VisibleRootChildren.size(); u32_ItVisibleRootChild++)
          {
             C_TblTreeModelCheckableItem * const pc_ViewItem =
@@ -163,8 +162,8 @@ const
             if (pc_ViewItem != NULL)
             {
                std::vector<C_TblTreSimpleItem *> c_ViewChildren = pc_ViewItem->c_Children;
-               std::vector<uint32> c_ChildIndices;
-               for (uint32 u32_ItNodeChild = 0; u32_ItNodeChild < c_ViewChildren.size(); u32_ItNodeChild++)
+               std::vector<uint32_t> c_ChildIndices;
+               for (uint32_t u32_ItNodeChild = 0; u32_ItNodeChild < c_ViewChildren.size(); u32_ItNodeChild++)
                {
                   C_TblTreeModelCheckableItem * const pc_ChildItem =
                      dynamic_cast<C_TblTreeModelCheckableItem *>(c_ViewChildren.at(u32_ItNodeChild));
@@ -197,18 +196,18 @@ const
  *
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PopServiceProjSettingsModel::GetCheckedItemCount(void) const
+uint32_t C_PopServiceProjSettingsModel::GetCheckedItemCount(void) const
 {
-   uint32 u32_CheckedItems = 0;
+   uint32_t u32_CheckedItems = 0;
 
-   std::vector<uint32> c_ViewIndices;
-   std::vector<std::vector<uint32> > c_ChildIndicesPerView;
+   std::vector<uint32_t> c_ViewIndices;
+   std::vector<std::vector<uint32_t> > c_ChildIndicesPerView;
 
    this->GetCheckedItems(c_ViewIndices, c_ChildIndicesPerView);
 
-   for (uint32 u32_ItItem = 0; u32_ItItem < c_ChildIndicesPerView.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0; u32_ItItem < c_ChildIndicesPerView.size(); ++u32_ItItem)
    {
-      for (uint32 u32_ItChild = 0; u32_ItChild < c_ChildIndicesPerView[u32_ItItem].size(); ++u32_ItChild)
+      for (uint32_t u32_ItChild = 0; u32_ItChild < c_ChildIndicesPerView[u32_ItItem].size(); ++u32_ItChild)
       {
          if (c_ChildIndicesPerView[u32_ItItem][u32_ItChild] == 1)
          {
@@ -227,13 +226,13 @@ uint32 C_PopServiceProjSettingsModel::GetCheckedItemCount(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopServiceProjSettingsModel::m_CheckInitItems(C_TblTreeModelCheckableItem & orc_VisibleRootItem,
-                                                     const std::vector<uint32> & orc_ViewIndices) const
+                                                     const std::vector<uint32_t> & orc_ViewIndices) const
 {
-   uint32 u32_CheckedChildCounter;
-   uint32 u32_CheckedViewCounter = 0;
-   uint32 u32_CheckedPartViewCounter = 0;
+   uint32_t u32_CheckedChildCounter;
+   uint32_t u32_CheckedViewCounter = 0;
+   uint32_t u32_CheckedPartViewCounter = 0;
 
-   for (uint32 u32_ItRootChildren = 0; u32_ItRootChildren < orc_VisibleRootItem.c_Children.size();
+   for (uint32_t u32_ItRootChildren = 0; u32_ItRootChildren < orc_VisibleRootItem.c_Children.size();
         u32_ItRootChildren++)
    {
       C_TblTreeModelCheckableItem * const pc_ViewItem =
@@ -256,12 +255,12 @@ void C_PopServiceProjSettingsModel::m_CheckInitItems(C_TblTreeModelCheckableItem
             c_ViewConfig = C_UsHandler::h_GetInstance()->GetViewPermissions(pc_View->GetName());
          }
 
-         for (uint32 u32_ItNodeIndices = 0; u32_ItNodeIndices < orc_ViewIndices.size(); u32_ItNodeIndices++)
+         for (uint32_t u32_ItNodeIndices = 0; u32_ItNodeIndices < orc_ViewIndices.size(); u32_ItNodeIndices++)
          {
             if (pc_ViewItem->u32_Index == orc_ViewIndices.at(u32_ItNodeIndices))
             {
                u32_CheckedChildCounter = 0;
-               for (uint32 u32_ItNodeChildren = 0; u32_ItNodeChildren < pc_ViewItem->c_Children.size();
+               for (uint32_t u32_ItNodeChildren = 0; u32_ItNodeChildren < pc_ViewItem->c_Children.size();
                     u32_ItNodeChildren++)
                {
                   C_TblTreeModelCheckableItem * const pc_ChildItem =

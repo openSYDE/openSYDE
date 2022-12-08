@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
-#include "constants.h"
-#include "C_OgeListWidgetToolTipBase.h"
+#include "constants.hpp"
+#include "C_OgeListWidgetToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -93,12 +92,12 @@ bool C_OgeListWidgetToolTipBase::event(QEvent * const opc_Event)
             const QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(pc_HelpEvent->globalPos()));
             if (c_Index.isValid() == true)
             {
-               const sint32 s32_ToolTipRow = c_Index.row();
-               const sint32 s32_ToolTipCol = c_Index.column();
+               const int32_t s32_ToolTipRow = c_Index.row();
+               const int32_t s32_ToolTipCol = c_Index.column();
                if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
                {
-                  const QString c_Heading = c_Index.data(msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
-                  const QString c_Content = c_Index.data(msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                  const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                  const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
                   if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                   {
                      this->ms32_HoveredRow = s32_ToolTipRow;

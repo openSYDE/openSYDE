@@ -10,20 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLFile.h"
-#include "stwerrors.h"
-#include "CSCLStringList.h"
-#include "C_OSCSecurityPem.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCSecurityPemDatabase.h"
+#include "TglFile.hpp"
+#include "stwerrors.hpp"
+#include "C_SclStringList.hpp"
+#include "C_OscSecurityPem.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscSecurityPemDatabase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,7 +41,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSecurityPemDatabase::C_OSCSecurityPemDatabase()
+C_OscSecurityPemDatabase::C_OscSecurityPemDatabase()
 {
 }
 
@@ -52,9 +52,9 @@ C_OSCSecurityPemDatabase::C_OSCSecurityPemDatabase()
    Size of database
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCSecurityPemDatabase::GetSizeOfDatabase() const
+uint32_t C_OscSecurityPemDatabase::GetSizeOfDatabase() const
 {
-   return this->mc_StoredPemFiles.size();
+   return static_cast<uint32_t>(this->mc_StoredPemFiles.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -66,19 +66,19 @@ uint32 C_OSCSecurityPemDatabase::GetSizeOfDatabase() const
    PEM file by serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCSecurityPemKeyInfo * C_OSCSecurityPemDatabase::GetPemFileBySerialNumber(
-   const std::vector<uint8> & orc_SerialNumber) const
+const C_OscSecurityPemKeyInfo * C_OscSecurityPemDatabase::GetPemFileBySerialNumber(
+   const std::vector<uint8_t> & orc_SerialNumber) const
 {
-   const C_OSCSecurityPemKeyInfo * pc_Retval = NULL;
+   const C_OscSecurityPemKeyInfo * pc_Retval = NULL;
 
-   for (uint32 u32_ItFile = 0UL; u32_ItFile < this->mc_StoredPemFiles.size(); ++u32_ItFile)
+   for (uint32_t u32_ItFile = 0UL; u32_ItFile < this->mc_StoredPemFiles.size(); ++u32_ItFile)
    {
-      const C_OSCSecurityPemKeyInfo & rc_KeyFile = this->mc_StoredPemFiles[u32_ItFile];
-      const std::vector<uint8> & rc_CurSerialNumber = rc_KeyFile.GetPubKeySerialNumber();
+      const C_OscSecurityPemKeyInfo & rc_KeyFile = this->mc_StoredPemFiles[u32_ItFile];
+      const std::vector<uint8_t> & rc_CurSerialNumber = rc_KeyFile.GetPubKeySerialNumber();
       if (rc_CurSerialNumber.size() == orc_SerialNumber.size())
       {
          bool q_Matches = true;
-         for (uint32 u32_ItKey = 0UL; (u32_ItKey < rc_CurSerialNumber.size()) && (q_Matches == true); ++u32_ItKey)
+         for (uint32_t u32_ItKey = 0UL; (u32_ItKey < rc_CurSerialNumber.size()) && (q_Matches == true); ++u32_ItKey)
          {
             if (rc_CurSerialNumber[u32_ItKey] != orc_SerialNumber[u32_ItKey])
             {
@@ -107,23 +107,24 @@ const C_OSCSecurityPemKeyInfo * C_OSCSecurityPemDatabase::GetPemFileBySerialNumb
    \retval   C_RANGE    Folder not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPemDatabase::ParseFolder(const std::string & orc_FolderPath)
+int32_t C_OscSecurityPemDatabase::ParseFolder(const std::string & orc_FolderPath)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   const stw_scl::C_SCLString c_SclFolderPathWithDelimiter = stw_tgl::TGL_FileIncludeTrailingDelimiter(orc_FolderPath);
+   const stw::scl::C_SclString c_SclFolderPathWithDelimiter =
+      stw::tgl::TglFileIncludeTrailingDelimiter(orc_FolderPath);
    const std::string c_FolderPathWithDelimiter = c_SclFolderPathWithDelimiter.c_str();
 
    // Remove previous results
    this->mc_StoredPemFiles.clear();
 
-   if (TGL_DirectoryExists(c_FolderPathWithDelimiter))
+   if (TglDirectoryExists(c_FolderPathWithDelimiter))
    {
-      const std::vector<std::string> c_Files = C_OSCSecurityPemDatabase::mh_GetPEMFiles(c_FolderPathWithDelimiter);
-      for (uint32 u32_It = 0UL; u32_It < c_Files.size(); ++u32_It)
+      const std::vector<std::string> c_Files = C_OscSecurityPemDatabase::mh_GetPemFiles(c_FolderPathWithDelimiter);
+      for (uint32_t u32_It = 0UL; u32_It < c_Files.size(); ++u32_It)
       {
          const std::string c_CurFolderPath = c_Files[u32_It];
-         C_OSCSecurityPem c_NewFile;
+         C_OscSecurityPem c_NewFile;
          std::string c_ErrorMessage;
          s32_Retval = c_NewFile.LoadFromFile(c_CurFolderPath, c_ErrorMessage);
          if (s32_Retval == C_NO_ERR)
@@ -137,9 +138,9 @@ sint32 C_OSCSecurityPemDatabase::ParseFolder(const std::string & orc_FolderPath)
          }
       }
       osc_write_log_info("Read PEM database",
-                         "Imported " + stw_scl::C_SCLString::IntToStr(
+                         "Imported " + stw::scl::C_SclString::IntToStr(
                             this->mc_StoredPemFiles.size()) + " valid PEM files of the total seen " +
-                         stw_scl::C_SCLString::IntToStr(
+                         stw::scl::C_SclString::IntToStr(
                             c_Files.size()) + " PEM files in folder \"" + c_FolderPathWithDelimiter + "\".");
       //Reset error status
       s32_Retval = C_NO_ERR;
@@ -158,7 +159,7 @@ sint32 C_OSCSecurityPemDatabase::ParseFolder(const std::string & orc_FolderPath)
    \param[in,out]  orc_ErrorMessage    Error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSecurityPemDatabase::m_TryAddKey(const C_OSCSecurityPemKeyInfo & orc_NewKey, std::string & orc_ErrorMessage)
+void C_OscSecurityPemDatabase::m_TryAddKey(const C_OscSecurityPemKeyInfo & orc_NewKey, std::string & orc_ErrorMessage)
 {
    if (orc_NewKey.GetPubKeyTextDecoded().size() > 0UL)
    {
@@ -200,20 +201,20 @@ void C_OSCSecurityPemDatabase::m_TryAddKey(const C_OSCSecurityPemKeyInfo & orc_N
    PEM files
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<std::string> C_OSCSecurityPemDatabase::mh_GetPEMFiles(const std::string & orc_FolderPath)
+std::vector<std::string> C_OscSecurityPemDatabase::mh_GetPemFiles(const std::string & orc_FolderPath)
 {
    std::vector<std::string> c_Retval;
-   stw_scl::SCLDynamicArray<TGL_FileSearchRecord> c_FilesSCL;
+   stw::scl::C_SclDynamicArray<C_TglFileSearchRecord> c_FilesScl;
 
-   TGL_FileFind(orc_FolderPath + "*", c_FilesSCL);
-   for (sint32 s32_It = 0; s32_It < c_FilesSCL.GetLength(); ++s32_It)
+   TglFileFind(orc_FolderPath + "*", c_FilesScl);
+   for (int32_t s32_It = 0; s32_It < c_FilesScl.GetLength(); ++s32_It)
    {
-      const TGL_FileSearchRecord & rc_FileRecord = c_FilesSCL[s32_It];
-      const stw_scl::C_SCLString c_FileNameSCL = rc_FileRecord.c_FileName;
-      const stw_scl::C_SCLString c_Extension = TGL_ExtractFileExtension(c_FileNameSCL);
+      const C_TglFileSearchRecord & rc_FileRecord = c_FilesScl[s32_It];
+      const stw::scl::C_SclString c_FileNameScl = rc_FileRecord.c_FileName;
+      const stw::scl::C_SclString c_Extension = TglExtractFileExtension(c_FileNameScl);
       if (c_Extension == ".pem")
       {
-         c_Retval.push_back(orc_FolderPath + c_FileNameSCL.c_str());
+         c_Retval.push_back(orc_FolderPath + c_FileNameScl.c_str());
       }
    }
    return c_Retval;

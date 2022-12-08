@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_SdBueMessageRxList.h"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdBueMessageRxList.hpp"
 #include "ui_C_SdBueMessageRxList.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -100,11 +99,11 @@ void C_SdBueMessageRxList::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
                                     const std::vector<QString> & orc_EntryDatapoolNames,
-                                    const std::vector<uint32> & orc_NodeIndexes,
-                                    const std::vector<uint32> & orc_InterfaceIndexes,
-                                    const std::vector<uint32> & orc_DatapoolIndexes,
+                                    const std::vector<uint32_t> & orc_NodeIndexes,
+                                    const std::vector<uint32_t> & orc_InterfaceIndexes,
+                                    const std::vector<uint32_t> & orc_DatapoolIndexes,
                                     const std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes,
-                                    const std::vector<uint32> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly,
+                                    const std::vector<uint32_t> & orc_ReceiveTimeoutValues, const bool oq_ReadOnly,
                                     const QString & orc_SpecificTooltip)
 {
    Clear();
@@ -116,15 +115,15 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
        (orc_EntryNames.size() == orc_EntryDatapoolNames.size()) &&
        (orc_EntryNames.size() == orc_DatapoolIndexes.size()))
    {
-      std::vector<uint32> c_NodeDatapoolIndexes;
+      std::vector<uint32_t> c_NodeDatapoolIndexes;
       std::vector<QString> c_NodeDatapoolNames;
       std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
-      std::vector<uint32> c_ReceiveTimeoutValues;
+      std::vector<uint32_t> c_ReceiveTimeoutValues;
 
       this->mc_Entries.reserve(orc_EntryNames.size());
-      for (uint32 u32_ItEntry = 0; u32_ItEntry < orc_EntryNames.size(); ++u32_ItEntry)
+      for (uint32_t u32_ItEntry = 0; u32_ItEntry < orc_EntryNames.size(); ++u32_ItEntry)
       {
-         const uint32 u32_NextEntry = u32_ItEntry + 1U;
+         const uint32_t u32_NextEntry = u32_ItEntry + 1U;
 
          // Collecting all Datapool specific information for each Node Rx message
          c_NodeDatapoolIndexes.push_back(orc_DatapoolIndexes[u32_ItEntry]);
@@ -186,10 +185,10 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
    \param[in] ou32_Value Last known cycle time value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxList::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
+void C_SdBueMessageRxList::SetLastKnownCycleTimeValue(const uint32_t ou32_Value)
 {
    this->mu32_LastKnownCycleTimeValue = ou32_Value;
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -210,7 +209,7 @@ void C_SdBueMessageRxList::SetRxTimeoutPreconditions(const bool oq_TxMethodOnEve
 {
    this->mq_TxMethodOnEvent = oq_TxMethodOnEvent;
    this->mq_DisableOptionPossible = oq_DisableOptionPossible;
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -230,7 +229,7 @@ void C_SdBueMessageRxList::SetRxTimeoutConfigurationReadOnly(const bool oq_Timeo
 {
    this->mq_TimeoutConfigurationReadOnly = oq_TimeoutConfigurationReadOnly;
 
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -248,14 +247,14 @@ void C_SdBueMessageRxList::SetRxTimeoutConfigurationReadOnly(const bool oq_Timeo
    \param[in] orc_DatapoolIndexes  Datapool Indexes (ID)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxList::CheckNodes(const std::vector<uint32> & orc_NodeIndexes,
-                                      const std::vector<uint32> & orc_InterfaceIndexes,
-                                      const std::vector<uint32> & orc_DatapoolIndexes) const
+void C_SdBueMessageRxList::CheckNodes(const std::vector<uint32_t> & orc_NodeIndexes,
+                                      const std::vector<uint32_t> & orc_InterfaceIndexes,
+                                      const std::vector<uint32_t> & orc_DatapoolIndexes) const
 {
    if ((orc_NodeIndexes.size() == orc_InterfaceIndexes.size()) &&
        (orc_NodeIndexes.size() == orc_DatapoolIndexes.size()))
    {
-      for (uint32 u32_ItNode = 0; u32_ItNode < orc_NodeIndexes.size(); ++u32_ItNode)
+      for (uint32_t u32_ItNode = 0; u32_ItNode < orc_NodeIndexes.size(); ++u32_ItNode)
       {
          this->CheckSpecificNode(orc_NodeIndexes[u32_ItNode], orc_InterfaceIndexes[u32_ItNode],
                                  orc_DatapoolIndexes[u32_ItNode], true);
@@ -276,10 +275,10 @@ void C_SdBueMessageRxList::CheckNodes(const std::vector<uint32> & orc_NodeIndexe
    \param[in] oq_Checked          Status
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxList::CheckSpecificNode(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                             const uint32 ou32_DatapoolIndex, const bool oq_Checked) const
+void C_SdBueMessageRxList::CheckSpecificNode(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                             const uint32_t ou32_DatapoolIndex, const bool oq_Checked) const
 {
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if ((pc_Entry != NULL) && (pc_Entry->DoesMatch(ou32_NodeIndex, ou32_InterfaceIndex) == true))
@@ -326,7 +325,7 @@ void C_SdBueMessageRxList::SetModeSingleNode(const bool oq_ModeSingleNode)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxList::Clear(void)
 {
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       disconnect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeToggled, this, &C_SdBueMessageRxList::SigNodeToggled);

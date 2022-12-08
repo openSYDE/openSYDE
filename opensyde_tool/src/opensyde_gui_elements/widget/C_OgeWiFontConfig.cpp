@@ -10,39 +10,38 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_OgeWiFontConfig.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiFontConfig.hpp"
 #include "ui_C_OgeWiFontConfig.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_8 = 0;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_9 = 1;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_10 = 2;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_11 = 3;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_12 = 4;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_14 = 5;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_16 = 6;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_18 = 7;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_20 = 8;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_22 = 9;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_24 = 10;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_26 = 11;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_28 = 12;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_36 = 13;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_48 = 14;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_72 = 15;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_100 = 16;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_200 = 17;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_300 = 18;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_400 = 19;
-const sintn C_OgeWiFontConfig::mhsn_INDEX_SIZE_500 = 20;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_8 = 0;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_9 = 1;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_10 = 2;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_11 = 3;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_12 = 4;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_14 = 5;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_16 = 6;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_18 = 7;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_20 = 8;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_22 = 9;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_24 = 10;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_26 = 11;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_28 = 12;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_36 = 13;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_48 = 14;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_72 = 15;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_100 = 16;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_200 = 17;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_300 = 18;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_400 = 19;
+const int32_t C_OgeWiFontConfig::mhs32_INDEX_SIZE_500 = 20;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -112,7 +111,7 @@ C_OgeWiFontConfig::C_OgeWiFontConfig(QWidget * const opc_Parent) :
    //Connect update
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxSize, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&QComboBox::currentIndexChanged), this,
+                                                         int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_OgeWiFontConfig::m_TriggerUpdate);
    connect(this->mpc_Ui->pc_FontComboBox, &QFontComboBox::currentFontChanged, this,
            &C_OgeWiFontConfig::m_TriggerUpdate);
@@ -154,7 +153,7 @@ void C_OgeWiFontConfig::SetFont(const QFont & orc_Font)
    //Disconnect update
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxSize, static_cast<void (QComboBox::*)(
-                                                            sintn)>(&QComboBox::currentIndexChanged), this,
+                                                            int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_OgeWiFontConfig::m_TriggerUpdate);
    disconnect(this->mpc_Ui->pc_FontComboBox, &QFontComboBox::currentFontChanged, this,
               &C_OgeWiFontConfig::m_TriggerUpdate);
@@ -172,7 +171,7 @@ void C_OgeWiFontConfig::SetFont(const QFont & orc_Font)
    //Reconnect update
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxSize, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&QComboBox::currentIndexChanged), this,
+                                                         int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_OgeWiFontConfig::m_TriggerUpdate);
    connect(this->mpc_Ui->pc_FontComboBox, &QFontComboBox::currentFontChanged, this,
            &C_OgeWiFontConfig::m_TriggerUpdate);
@@ -206,10 +205,10 @@ void C_OgeWiFontConfig::m_TriggerUpdate(void)
    Size combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiFontConfig::m_GetSizeIndex(const QFont & orc_Font) const
+int32_t C_OgeWiFontConfig::m_GetSizeIndex(const QFont & orc_Font) const
 {
-   sintn sn_Retval = -1;
-   sint32 s32_Size;
+   int32_t s32_Retval = -1;
+   int32_t s32_Size;
 
    if (orc_Font.pointSize() > 0)
    {
@@ -223,71 +222,71 @@ sintn C_OgeWiFontConfig::m_GetSizeIndex(const QFont & orc_Font) const
    switch (s32_Size)
    {
    case 9:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_9;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_9;
       break;
    case 10:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_10;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_10;
       break;
    case 11:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_11;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_11;
       break;
    case 12:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_12;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_12;
       break;
    case 14:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_14;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_14;
       break;
    case 16:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_16;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_16;
       break;
    case 18:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_18;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_18;
       break;
    case 20:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_20;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_20;
       break;
    case 22:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_22;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_22;
       break;
    case 24:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_24;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_24;
       break;
    case 26:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_26;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_26;
       break;
    case 28:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_28;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_28;
       break;
    case 36:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_36;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_36;
       break;
    case 48:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_48;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_48;
       break;
    case 72:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_72;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_72;
       break;
    case 100:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_100;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_100;
       break;
    case 200:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_200;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_200;
       break;
    case 300:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_300;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_300;
       break;
    case 400:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_400;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_400;
       break;
    case 500:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_500;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_500;
       break;
    case 8: // chosen as default
    default:
-      sn_Retval = C_OgeWiFontConfig::mhsn_INDEX_SIZE_8;
+      s32_Retval = C_OgeWiFontConfig::mhs32_INDEX_SIZE_8;
       break;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -300,67 +299,67 @@ void C_OgeWiFontConfig::m_GetSize(QFont & orc_Font) const
 {
    switch (this->mpc_Ui->pc_ComboBoxSize->currentIndex())
    {
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_9:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_9:
       orc_Font.setPixelSize(9);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_10:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_10:
       orc_Font.setPixelSize(10);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_11:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_11:
       orc_Font.setPixelSize(11);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_12:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_12:
       orc_Font.setPixelSize(12);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_14:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_14:
       orc_Font.setPixelSize(14);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_16:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_16:
       orc_Font.setPixelSize(16);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_18:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_18:
       orc_Font.setPixelSize(18);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_20:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_20:
       orc_Font.setPixelSize(20);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_22:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_22:
       orc_Font.setPixelSize(22);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_24:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_24:
       orc_Font.setPixelSize(24);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_26:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_26:
       orc_Font.setPixelSize(26);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_28:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_28:
       orc_Font.setPixelSize(28);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_36:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_36:
       orc_Font.setPixelSize(36);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_48:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_48:
       orc_Font.setPixelSize(48);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_72:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_72:
       orc_Font.setPixelSize(72);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_100:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_100:
       orc_Font.setPixelSize(100);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_200:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_200:
       orc_Font.setPixelSize(200);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_300:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_300:
       orc_Font.setPixelSize(300);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_400:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_400:
       orc_Font.setPixelSize(400);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_500:
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_500:
       orc_Font.setPixelSize(500);
       break;
-   case C_OgeWiFontConfig::mhsn_INDEX_SIZE_8: // chosen as default
+   case C_OgeWiFontConfig::mhs32_INDEX_SIZE_8: // chosen as default
    default:
       orc_Font.setPixelSize(8);
       break;

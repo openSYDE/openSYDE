@@ -10,42 +10,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_CamMainWindow.h"
+#include "C_CamMainWindow.hpp"
 #include "ui_C_CamMainWindow.h"
 
-#include "TGLUtils.h"
-#include "TGLTime.h"
-#include "C_OSCUtils.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_CamUti.h"
-#include "C_UsHandler.h"
-#include "C_CamProHandler.h"
-#include "C_CamDbHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_GtGetText.h"
-#include "C_HeHandler.h"
+#include "TglUtils.hpp"
+#include "TglTime.hpp"
+#include "C_OscUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_CamUti.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_GtGetText.hpp"
+#include "C_HeHandler.hpp"
 
 #include <QDebug>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 C_CamMainWindow::mhs32_SETTINGS_SPLITTER_MAX = 350;
-const sint32 C_CamMainWindow::mhs32_MESSAGE_GEN_SPLITTER_MAX = 120;
+const int32_t C_CamMainWindow::mhs32_SETTINGS_SPLITTER_MAX = 350;
+const int32_t C_CamMainWindow::mhs32_MESSAGE_GEN_SPLITTER_MAX = 120;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -88,7 +87,7 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
    this->setWindowTitle("openSYDE CAN Monitor");
 
    // set help file path (openSYDE CAN Monitor specific)
-   stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().SetHelpFileRelPath("/../Help/openSYDE PC Tool.chm");
+   stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().SetHelpFileRelPath("/../Help/openSYDE PC Tool.chm");
 
    // Connections
    // State handling
@@ -179,13 +178,13 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_TitleBarWidget, &C_CamTitleBarWidget::SigPrepareForSave,
            this, &C_CamMainWindow::m_SaveUserSettings);
    // CAN DLL configuration
-   connect(this->mpc_Ui->pc_SettingsWidget, &C_CamMosWidget::SigCANDllConfigured, this,
+   connect(this->mpc_Ui->pc_SettingsWidget, &C_CamMosWidget::SigCanDllConfigured, this,
            &C_CamMainWindow::m_OnCanDllConfigChange);
 
-   mpc_CanThread = new stw_opensyde_gui_logic::C_SyvComDriverThread(&C_CamMainWindow::mh_ThreadFunc, this);
+   mpc_CanThread = new stw::opensyde_gui_logic::C_SyvComDriverThread(&C_CamMainWindow::mh_ThreadFunc, this);
 
    // Starting the real communication
-   mpc_CanDllDispatcher = new stw_can::C_CAN();
+   mpc_CanDllDispatcher = new stw::can::C_Can();
 
    // Prepare the COM driver for CAN message handling
    this->mc_ComDriver.InitBase(this->mpc_CanDllDispatcher);
@@ -274,9 +273,9 @@ void C_CamMainWindow::closeEvent(QCloseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (stw_opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
+   if (stw::opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
    {
-      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+      stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
          this->metaObject()->className());
    }
    else if (this->mpc_Ui->pc_GeneratorWidget->CheckAndHandleKey(opc_KeyEvent->text()) == true)
@@ -284,18 +283,18 @@ void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       //Accepted
    }
    // Save on Ctrl+S
-   else if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_S)) &&
+   else if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_S)) &&
             (opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       this->mpc_Ui->pc_TitleBarWidget->SaveConfig();
    }
    // Save as on F12
-   else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F12))
+   else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F12))
    {
       this->mpc_Ui->pc_TitleBarWidget->SaveAsConfig();
    }
    // Search on F3
-   else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F3))
+   else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F3))
    {
       if (opc_KeyEvent->modifiers().testFlag(Qt::ShiftModifier) == false)
       {
@@ -309,7 +308,7 @@ void C_CamMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       }
    }
    // Set focus to SearchBar on Ctrl + F
-   else if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F)) &&
+   else if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F)) &&
             (opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       this->mpc_Ui->pc_TraceWidget->SearchBarFocus();
@@ -377,7 +376,7 @@ void C_CamMainWindow::dropEvent(QDropEvent * const opc_Event)
    if (mh_CheckMime(pc_MimeData, &c_FilePath) == true)
    {
       // Check if path is a valid path with no irregular characters
-      if (C_OSCUtils::h_CheckValidFilePath(c_FilePath.toStdString().c_str()) == false)
+      if (C_OscUtils::h_CheckValidFilePath(c_FilePath.toStdString().c_str()) == false)
       {
          C_OgeWiUtil::h_ShowPathInvalidError(this, c_FilePath);
       }
@@ -416,8 +415,8 @@ void C_CamMainWindow::dropEvent(QDropEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_StartLogging(void)
 {
-   sint32 s32_Bitrate;
-   sint32 s32_Return;
+   int32_t s32_Bitrate;
+   int32_t s32_Return;
 
    s32_Return = this->m_InitCan(s32_Bitrate);
 
@@ -456,7 +455,7 @@ void C_CamMainWindow::m_StartLogging(void)
    {
       // Use the current configured bitrate of the CAN DLL for the bus load calculation
       this->mc_ComDriver.StartLogging(s32_Bitrate);
-      this->mpc_Ui->pc_TraceWidget->SetCANBitrate(s32_Bitrate);
+      this->mpc_Ui->pc_TraceWidget->SetCanBitrate(s32_Bitrate);
       this->mpc_CanThread->start();
       this->mpc_Ui->pc_GeneratorWidget->SetCommunicationStarted(true);
       this->mpc_Ui->pc_SettingsWidget->OnCommunicationStarted(true);
@@ -507,7 +506,7 @@ void C_CamMainWindow::m_StopLogging(void)
    this->mc_ComDriver.RemoveAllCyclicCanMessages();
    this->mpc_Ui->pc_SettingsWidget->OnCommunicationStarted(false);
    //Clear bitrate
-   this->mpc_Ui->pc_TraceWidget->SetCANBitrate(0);
+   this->mpc_Ui->pc_TraceWidget->SetCanBitrate(0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -523,17 +522,17 @@ void C_CamMainWindow::m_StopLogging(void)
    C_WARN      Bitrate could not be read
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMainWindow::m_InitCan(sint32 & ors32_Bitrate)
+int32_t C_CamMainWindow::m_InitCan(int32_t & ors32_Bitrate)
 {
    QString c_DllPath;
-   sint32 s32_Return = C_RD_WR;
+   int32_t s32_Return = C_RD_WR;
    QFileInfo c_File;
 
    // Initialize
    ors32_Bitrate = 0;
 
    // Get absolute DLL path (resolve variables and make absolute if it is relative ant not empty)
-   c_DllPath = C_CamProHandler::h_GetInstance()->GetCANDllPath();
+   c_DllPath = C_CamProHandler::h_GetInstance()->GetCanDllPath();
    if (c_DllPath.isEmpty() == false)
    {
       c_DllPath = C_CamUti::h_GetResolvedAbsolutePathFromExe(c_DllPath);
@@ -554,13 +553,13 @@ sint32 C_CamMainWindow::m_InitCan(sint32 & ors32_Bitrate)
 
          if (s32_Return == C_NO_ERR)
          {
-            stw_can::T_STWCAN_Status t_Status;
+            stw::can::T_STWCAN_Status c_Status;
 
             // Get the bitrate of the CAN DLL
-            s32_Return = this->mpc_CanDllDispatcher->CAN_Status(t_Status);
+            s32_Return = this->mpc_CanDllDispatcher->CAN_Status(c_Status);
             if (s32_Return == C_NO_ERR)
             {
-               ors32_Bitrate = t_Status.iActBitrate;
+               ors32_Bitrate = c_Status.iActBitrate;
             }
             else
             {
@@ -617,7 +616,7 @@ void C_CamMainWindow::m_LoadInitialProject(void)
    // if it failed: check all recent projects
    if (q_ProjectLoadSuccess == false)
    {
-      sint32 s32_Pos;
+      int32_t s32_Pos;
 
       // try to load projects from recent project list (stop on success)
       for (s32_Pos = 0; s32_Pos < c_Projects.size(); ++s32_Pos)
@@ -684,19 +683,19 @@ void C_CamMainWindow::m_SaveUserSettings(void)
    // update to actual value if settings are not collapsed
    if (C_UsHandler::h_GetInstance()->GetSettingsAreExpanded() == true)
    {
-      const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterSettings->sizes();
+      const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterSettings->sizes();
       if (c_Sizes.size() > 1)
       {
-         C_UsHandler::h_GetInstance()->SetSplitterSettingsX(c_Sizes.at(1));
+         C_UsHandler::h_GetInstance()->SetSplitterSettingsHorizontal(c_Sizes.at(1));
       }
    }
    // update to actual value if message generator is not collapsed
    if (C_UsHandler::h_GetInstance()->GetMessageGenIsExpanded() == true)
    {
-      const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterMessageGen->sizes();
+      const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterMessageGen->sizes();
       if (c_Sizes.size() > 1)
       {
-         C_UsHandler::h_GetInstance()->SetSplitterMessageGenY(c_Sizes.at(1));
+         C_UsHandler::h_GetInstance()->SetSplitterMessageGenVertical(c_Sizes.at(1));
       }
    }
 }
@@ -726,9 +725,9 @@ bool C_CamMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
          const QList<QUrl> c_UrlList = opc_Mime->urls();
 
          // extract the local paths of the files
-         for (sintn sn_It = 0; sn_It < c_UrlList.size(); ++sn_It)
+         for (int32_t s32_It = 0; s32_It < c_UrlList.size(); ++s32_It)
          {
-            c_PathList.append(c_UrlList.at(sn_It).toLocalFile());
+            c_PathList.append(c_UrlList.at(s32_It).toLocalFile());
          }
          if (c_PathList.size() == 1)
          {
@@ -780,7 +779,7 @@ void C_CamMainWindow::m_ThreadFunc(void)
    this->mc_ComDriver.DistributeMessages();
 
    //rescind CPU time to other threads ...
-   stw_tgl::TGL_Sleep(1);
+   stw::tgl::TglSleep(1);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -796,18 +795,18 @@ void C_CamMainWindow::m_OnExpandSettings(const bool oq_Expand)
    {
       // expand
       this->mpc_Ui->pc_SplitterSettings->SetSecondSegment(
-         std::max(mhs32_SETTINGS_SPLITTER_MAX, C_UsHandler::h_GetInstance()->GetSplitterSettingsX()));
+         std::max(mhs32_SETTINGS_SPLITTER_MAX, C_UsHandler::h_GetInstance()->GetSplitterSettingsHorizontal()));
    }
    else
    {
       // remember segment size (only when they were expanded, i.e. do not overwrite on tool start)
       if (C_UsHandler::h_GetInstance()->GetSettingsAreExpanded() == true)
       {
-         const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterSettings->sizes();
+         const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterSettings->sizes();
 
          if (c_Sizes.size() > 1)
          {
-            C_UsHandler::h_GetInstance()->SetSplitterSettingsX(c_Sizes.at(1));
+            C_UsHandler::h_GetInstance()->SetSplitterSettingsHorizontal(c_Sizes.at(1));
          }
       }
       //collapse (because childrenCollapsible == false the following results in minimum size)
@@ -837,9 +836,9 @@ void C_CamMainWindow::m_OnSettingsSplitterHandleDoubleClick(void) const
    \param[in]  ors32_Index    Index of splitter widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const sint32 & ors32_Index)
+void C_CamMainWindow::m_OnSettingsSplitterMoved(const int32_t & ors32_Pos, const int32_t & ors32_Index)
 {
-   const QList<sintn> & rc_Sizes = this->mpc_Ui->pc_SplitterSettings->sizes();
+   const QList<int32_t> & rc_Sizes = this->mpc_Ui->pc_SplitterSettings->sizes();
 
    if (ors32_Index == 1)
    {
@@ -883,7 +882,7 @@ void C_CamMainWindow::m_OnSettingsSplitterMoved(const sint32 & ors32_Pos, const 
       {
          this->mpc_Ui->pc_SplitterSettings->SetSecondSegment(
             std::max(mhs32_SETTINGS_SPLITTER_MAX,
-                     static_cast<sint32>(this->mpc_Ui->pc_SplitterSettings->width()) - ors32_Pos));
+                     static_cast<int32_t>(this->mpc_Ui->pc_SplitterSettings->width()) - ors32_Pos));
       }
    }
 }
@@ -902,7 +901,7 @@ void C_CamMainWindow::m_OnExpandMessageGen(const bool oq_Expand)
       // expand
       this->mpc_Ui->pc_SplitterMessageGen
       ->SetSecondSegment(std::max(mhs32_MESSAGE_GEN_SPLITTER_MAX,
-                                  C_UsHandler::h_GetInstance()->GetSplitterMessageGenY()));
+                                  C_UsHandler::h_GetInstance()->GetSplitterMessageGenVertical()));
    }
    else
    {
@@ -910,11 +909,11 @@ void C_CamMainWindow::m_OnExpandMessageGen(const bool oq_Expand)
       if (C_UsHandler::h_GetInstance()->GetMessageGenIsExpanded() == true)
       {
          {
-            const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterMessageGen->sizes();
+            const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterMessageGen->sizes();
 
             if (c_Sizes.size() > 1)
             {
-               C_UsHandler::h_GetInstance()->SetSplitterMessageGenY(c_Sizes.at(1));
+               C_UsHandler::h_GetInstance()->SetSplitterMessageGenVertical(c_Sizes.at(1));
             }
          }
       }
@@ -945,9 +944,9 @@ void C_CamMainWindow::m_OnMessageGenSplitterHandleDoubleClick(void) const
    \param[in]  ors32_Index    Index of splitter widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, const sint32 & ors32_Index)
+void C_CamMainWindow::m_OnMessageGenSplitterMoved(const int32_t & ors32_Pos, const int32_t & ors32_Index)
 {
-   const QList<sintn> & rc_Sizes = this->mpc_Ui->pc_SplitterMessageGen->sizes();
+   const QList<int32_t> & rc_Sizes = this->mpc_Ui->pc_SplitterMessageGen->sizes();
 
    if (ors32_Index == 1)
    {
@@ -991,7 +990,7 @@ void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, cons
       {
          this->mpc_Ui->pc_SplitterMessageGen->SetSecondSegment(
             std::max(mhs32_MESSAGE_GEN_SPLITTER_MAX,
-                     static_cast<sint32>(this->mpc_Ui->pc_SplitterMessageGen->height()) - ors32_Pos));
+                     static_cast<int32_t>(this->mpc_Ui->pc_SplitterMessageGen->height()) - ors32_Pos));
       }
    }
 }
@@ -1003,15 +1002,15 @@ void C_CamMainWindow::m_OnMessageGenSplitterMoved(const sint32 & ors32_Pos, cons
    \param[in]  oq_Active            Flag if cyclic message is active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_RegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
+void C_CamMainWindow::m_RegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active)
 {
    const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(ou32_MessageIndex);
 
    if (pc_Message != NULL)
    {
       //Prepare necessary parameter
-      stw_opensyde_core::C_OSCComDriverBaseCanMessage c_Message;
-      c_Message.c_Msg = pc_Message->ToCANMessage();
+      stw::opensyde_core::C_OscComDriverBaseCanMessage c_Message;
+      c_Message.c_Msg = pc_Message->ToCanMessage();
       c_Message.u32_Interval = pc_Message->u32_CyclicTriggerTime;
       c_Message.u32_TimeToSend = 0UL;
       //Send
@@ -1033,15 +1032,15 @@ void C_CamMainWindow::m_RegisterCyclicMessage(const uint32 ou32_MessageIndex, co
    \param[in]  ou32_TimeToSend      Time to send this message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_SendMessage(const uint32 ou32_MessageIndex, const stw_types::uint32 ou32_TimeToSend)
+void C_CamMainWindow::m_SendMessage(const uint32_t ou32_MessageIndex, const uint32_t ou32_TimeToSend)
 {
    const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(ou32_MessageIndex);
 
    if (pc_Message != NULL)
    {
       //Prepare necessary parameter
-      stw_opensyde_core::C_OSCComDriverBaseCanMessage c_Message;
-      c_Message.c_Msg = pc_Message->ToCANMessage();
+      stw::opensyde_core::C_OscComDriverBaseCanMessage c_Message;
+      c_Message.c_Msg = pc_Message->ToCanMessage();
       c_Message.u32_Interval = 0UL;
       c_Message.u32_TimeToSend = ou32_TimeToSend;
       //Send
@@ -1109,14 +1108,14 @@ void C_CamMainWindow::m_OnDatabaseLoadStarted(const QString & orc_File, const QS
    \param[in]  os32_Result    Loading result
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Result)
+void C_CamMainWindow::m_OnDatabaseLoadFinished(const int32_t os32_Result)
 {
    if ((this->mc_CurrentLoadedFile.isEmpty() == false) && (this->mc_CurrentLoadedFileOrg.isEmpty() == false))
    {
       //C_NO_ERR -> no err, C_WARN -> no significant error
       if ((os32_Result == C_NO_ERR) || (os32_Result == C_WARN))
       {
-         stw_opensyde_gui_logic::C_SyvComMessageMonitor * const pc_MessageMonitor =
+         stw::opensyde_gui_logic::C_SyvComMessageMonitor * const pc_MessageMonitor =
             this->mpc_Ui->pc_TraceWidget->GetMessageMonitor();
 
          if (pc_MessageMonitor != NULL)
@@ -1127,7 +1126,7 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
                //Check if already known
                if (C_CamDbHandler::h_GetInstance()->GetContainsDbc(this->mc_CurrentLoadedFileOrg) == false)
                {
-                  C_CieConverter::C_CIECommDefinition c_DbcDefinition;
+                  C_CieConverter::C_CieCommDefinition c_DbcDefinition;
                   if (pc_MessageMonitor->GetDbcFile(this->mc_CurrentLoadedFile.toStdString().c_str(),
                                                     c_DbcDefinition) == C_NO_ERR)
                   {
@@ -1145,8 +1144,8 @@ void C_CamMainWindow::m_OnDatabaseLoadFinished(const stw_types::sint32 os32_Resu
                //Check if already known
                if (C_CamDbHandler::h_GetInstance()->GetContainsOsy(this->mc_CurrentLoadedFileOrg) == false)
                {
-                  const stw_opensyde_core::C_OSCSystemDefinition c_Tmp;
-                  stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig c_SystemDefinition(c_Tmp, 0UL);
+                  const stw::opensyde_core::C_OscSystemDefinition c_Tmp;
+                  stw::opensyde_core::C_OscComMessageLoggerOsySysDefConfig c_SystemDefinition(c_Tmp, 0UL);
                   if (pc_MessageMonitor->GetOsySysDef(this->mc_CurrentLoadedFile.toStdString().c_str(),
                                                       c_SystemDefinition) == C_NO_ERR)
                   {
@@ -1208,7 +1207,7 @@ void C_CamMainWindow::m_OnActivateDatabase(const QString & orc_File, const QStri
 {
    Q_UNUSED(orc_File)
    //the file should only be in one database
-   C_CamDbHandler::h_GetInstance()->SetDBCActive(orc_OrgPath, oq_Active);
+   C_CamDbHandler::h_GetInstance()->SetDbcActive(orc_OrgPath, oq_Active);
    C_CamDbHandler::h_GetInstance()->SetOsyActive(orc_OrgPath, oq_Active);
    //Handle messages
    if (oq_Active == false)
@@ -1232,7 +1231,7 @@ void C_CamMainWindow::m_OnActivateDatabase(const QString & orc_File, const QStri
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_OnOsyChangeBus(const QString & orc_File, const QString & orc_OrgPath,
-                                       const uint32 ou32_BusIndex)
+                                       const uint32_t ou32_BusIndex)
 {
    bool q_AnyChange = true;
 
@@ -1259,16 +1258,16 @@ void C_CamMainWindow::m_OnCanDllConfigChange(void)
 {
    if (this->mq_LoggingStarted == true)
    {
-      sint32 s32_Result;
+      int32_t s32_Result;
 
-      stw_can::T_STWCAN_Status t_Status;
-      sint32 s32_Bitrate;
+      stw::can::T_STWCAN_Status c_Status;
+      int32_t s32_Bitrate;
 
       // Get the bitrate of the CAN DLL
-      s32_Result = this->mpc_CanDllDispatcher->CAN_Status(t_Status);
+      s32_Result = this->mpc_CanDllDispatcher->CAN_Status(c_Status);
       if (s32_Result == C_NO_ERR)
       {
-         s32_Bitrate = t_Status.iActBitrate;
+         s32_Bitrate = c_Status.iActBitrate;
       }
       else
       {
@@ -1283,7 +1282,7 @@ void C_CamMainWindow::m_OnCanDllConfigChange(void)
       }
 
       this->mc_ComDriver.UpdateBitrate(s32_Bitrate);
-      this->mpc_Ui->pc_TraceWidget->SetCANBitrate(s32_Bitrate);
+      this->mpc_Ui->pc_TraceWidget->SetCanBitrate(s32_Bitrate);
    }
 }
 
@@ -1295,7 +1294,7 @@ void C_CamMainWindow::m_OnCanDllConfigChange(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_CheckMessagesForLoadedDatabase(const QString & orc_DatabasePath)
 {
-   const std::vector<uint32> c_Indices = C_CamProHandler::h_GetInstance()->GetInvalidMessagesFromDatabase(
+   const std::vector<uint32_t> c_Indices = C_CamProHandler::h_GetInstance()->GetInvalidMessagesFromDatabase(
       orc_DatabasePath);
 
    this->m_DisplayCheckMessagesDialog(orc_DatabasePath, c_Indices);
@@ -1318,7 +1317,7 @@ void C_CamMainWindow::m_CheckForLastDatabaseLoaded(const QString & orc_DatabaseP
       const C_CamProDatabaseData & rc_Db = rc_Dbs[rc_Dbs.size() - 1UL];
       if (rc_Db.c_Name == orc_DatabasePath)
       {
-         const std::vector<uint32> c_Indices = C_CamProHandler::h_GetInstance()->GetInvalidMessagesWithNoDatabase();
+         const std::vector<uint32_t> c_Indices = C_CamProHandler::h_GetInstance()->GetInvalidMessagesWithNoDatabase();
          this->m_DisplayCheckMessagesDialog(orc_DatabasePath, c_Indices);
       }
    }
@@ -1332,7 +1331,7 @@ void C_CamMainWindow::m_CheckForLastDatabaseLoaded(const QString & orc_DatabaseP
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMainWindow::m_DisplayCheckMessagesDialog(const QString & orc_DatabasePath,
-                                                   const std::vector<uint32> & orc_Indices)
+                                                   const std::vector<uint32_t> & orc_Indices)
 {
    if (orc_Indices.size() > 0UL)
    {
@@ -1345,7 +1344,7 @@ void C_CamMainWindow::m_DisplayCheckMessagesDialog(const QString & orc_DatabaseP
 
       c_Details = C_GtGetText::h_GetText("Following messages are removed from message generator: \n");
 
-      for (uint32 u32_It = 0UL; u32_It < orc_Indices.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < orc_Indices.size(); ++u32_It)
       {
          QString c_Entry;
          const C_CamProMessageData * const pc_Message =

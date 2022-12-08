@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLString.h"
-#include "C_UtiFindNameHelper.h"
+#include "C_SclString.hpp"
+#include "C_UtiFindNameHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +38,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     orc_Cmp   Search string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_UtiFindNameHelper::C_UtiFindNameHelper(const stw_scl::C_SCLString & orc_Cmp) :
+C_UtiFindNameHelper::C_UtiFindNameHelper(const stw::scl::C_SclString & orc_Cmp) :
    mc_Cmp(orc_Cmp)
 {
 }
@@ -53,7 +53,7 @@ C_UtiFindNameHelper::C_UtiFindNameHelper(const stw_scl::C_SCLString & orc_Cmp) :
    false: no match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_UtiFindNameHelper::operator ()(const stw_scl::C_SCLString * const opc_Cur) const
+bool C_UtiFindNameHelper::operator ()(const stw::scl::C_SclString * const opc_Cur) const
 {
    bool q_Retval = false;
 

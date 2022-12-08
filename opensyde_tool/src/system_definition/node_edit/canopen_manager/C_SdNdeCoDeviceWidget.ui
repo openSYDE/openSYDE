@@ -30,33 +30,33 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui::C_SdNdeCoDeviceEdsWidget" name="pc_DevEdsWidget" native="true"/>
+    <widget class="stw::opensyde_gui::C_SdNdeCoDeviceEdsWidget" name="pc_DevEdsWidget" native="true"/>
    </item>
    <item>
-    <widget class="stw_opensyde_gui::C_SdNdeCoDeviceConfigWidget" name="pc_DevConfigWidget" native="true"/>
+    <widget class="stw::opensyde_gui::C_SdNdeCoDeviceConfigWidget" name="pc_DevConfigWidget" native="true"/>
    </item>
    <item>
-    <widget class="stw_opensyde_gui::C_SdNdeCoPdoWidget" name="pc_DevPdoWidget" native="true"/>
+    <widget class="stw::opensyde_gui::C_SdNdeCoPdoWidget" name="pc_DevPdoWidget" native="true"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoDeviceEdsWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeCoDeviceEdsWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeCoDeviceEdsWidget.h</header>
+   <header>C_SdNdeCoDeviceEdsWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoDeviceConfigWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeCoDeviceConfigWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeCoDeviceConfigWidget.h</header>
+   <header>C_SdNdeCoDeviceConfigWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeCoPdoWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeCoPdoWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeCoPdoWidget.h</header>
+   <header>C_SdNdeCoPdoWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

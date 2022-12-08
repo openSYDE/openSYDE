@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdUtil.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdUtil.hpp"
+#include "TglUtils.hpp"
 
-#include "C_SdNdeUnoDataPoolListAddDeleteBaseCommand.h"
+#include "C_SdNdeUnoDataPoolListAddDeleteBaseCommand.hpp"
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,9 +50,9 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent                  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseCommand(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex, stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
-                                                                                       const std::vector<uint32> & orc_Indices, const QString & orc_Text,
+C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseCommand(const uint32_t & oru32_NodeIndex,
+                                                                                       const uint32_t & oru32_DataPoolIndex, stw::opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                                                                       const std::vector<uint32_t> & orc_Indices, const QString & orc_Text,
                                                                                        QUndoCommand * const opc_Parent)
    :
    C_SdNdeUnoDataPoolListBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, opc_DataPoolListsTreeWidget,
@@ -68,25 +67,25 @@ C_SdNdeUnoDataPoolListAddDeleteBaseCommand::C_SdNdeUnoDataPoolListAddDeleteBaseC
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Add(void)
 {
-   const uint16 u16_TimerId = osc_write_log_performance_start();
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
 
    m_SortAscending();
-   for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
+   for (uint32_t u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
    {
       this->mpc_DataPoolListsTreeWidget->InsertRowWithoutData(this->mc_Indices[u32_Index]);
       tgl_assert(C_PuiSdHandler::h_GetInstance()->InsertDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                      this->mc_Indices[u32_Index],
-                                                                     this->mc_OSCContent[u32_Index],
-                                                                     this->mc_UIContent[u32_Index]) == C_NO_ERR);
+                                                                     this->mc_OscContent[u32_Index],
+                                                                     this->mc_UiContent[u32_Index]) == C_NO_ERR);
    }
    //Before selection: update UI
    m_UpdateModels();
-   this->mpc_DataPoolListsTreeWidget->UpdateUI();
+   this->mpc_DataPoolListsTreeWidget->UpdateUi();
    //Register error change
    this->mpc_DataPoolListsTreeWidget->HandleErrorChange();
    //Selection
    this->mpc_DataPoolListsTreeWidget->clearSelection();
-   for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
+   for (uint32_t u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
    {
       QTreeWidgetItem * const pc_Item = this->mpc_DataPoolListsTreeWidget->topLevelItem(this->mc_Indices[u32_Index]);
       tgl_assert(pc_Item != NULL);
@@ -110,25 +109,25 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Add(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Delete(void)
 {
-   const uint16 u16_TimerId = osc_write_log_performance_start();
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
 
-   this->mc_OSCContent.resize(this->mc_Indices.size());
-   this->mc_UIContent.resize(this->mc_Indices.size());
+   this->mc_OscContent.resize(this->mc_Indices.size());
+   this->mc_UiContent.resize(this->mc_Indices.size());
    m_SortDescending();
    //Clear selection
-   for (uint32 u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
+   for (uint32_t u32_Index = 0; u32_Index < this->mc_Indices.size(); ++u32_Index)
    {
       tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                   this->mc_Indices[u32_Index],
-                                                                  this->mc_OSCContent[u32_Index],
-                                                                  this->mc_UIContent[u32_Index]) == C_NO_ERR);
+                                                                  this->mc_OscContent[u32_Index],
+                                                                  this->mc_UiContent[u32_Index]) == C_NO_ERR);
       tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveDataPoolList(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                      this->mc_Indices[u32_Index]) == C_NO_ERR);
       this->mpc_DataPoolListsTreeWidget->takeTopLevelItem(this->mc_Indices[u32_Index]);
    }
    //Before selection: update UI
    m_UpdateModels();
-   this->mpc_DataPoolListsTreeWidget->UpdateUI();
+   this->mpc_DataPoolListsTreeWidget->UpdateUi();
    //Register error change
    this->mpc_DataPoolListsTreeWidget->HandleErrorChange();
    //Selection
@@ -136,7 +135,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Delete(void)
    //Select one over highest deleted index
    if (this->mc_Indices.size() > 0)
    {
-      sint32 s32_NewSelection = this->mc_Indices[this->mc_Indices.size() - 1];
+      int32_t s32_NewSelection = this->mc_Indices[this->mc_Indices.size() - 1];
       if ((this->mpc_DataPoolListsTreeWidget->topLevelItemCount() > s32_NewSelection) && (s32_NewSelection >= 0))
       {
          QTreeWidgetItem * const pc_Item = this->mpc_DataPoolListsTreeWidget->topLevelItem(s32_NewSelection);
@@ -171,7 +170,7 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_Delete(void)
    \param[in] orc_Value Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetIndices(const std::vector<stw_types::uint32> & orc_Value)
+void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetIndices(const std::vector<uint32_t> & orc_Value)
 {
    mc_Indices = orc_Value;
 }
@@ -179,16 +178,16 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetIndices(const std::vector<
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set initial data
 
-   \param[in] orc_OSCContent Initial OSC content
-   \param[in] orc_UIContent  Initial UI content
+   \param[in] orc_OscContent Initial OSC content
+   \param[in] orc_UiContent  Initial UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetInitialData(
-   const std::vector<C_OSCNodeDataPoolList> & orc_OSCContent,
-   const std::vector<C_PuiSdNodeDataPoolList> & orc_UIContent)
+   const std::vector<C_OscNodeDataPoolList> & orc_OscContent,
+   const std::vector<C_PuiSdNodeDataPoolList> & orc_UiContent)
 {
-   this->mc_OSCContent = orc_OSCContent;
-   this->mc_UIContent = orc_UIContent;
+   this->mc_OscContent = orc_OscContent;
+   this->mc_UiContent = orc_UiContent;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -197,9 +196,9 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SetInitialData(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SortDescending(void)
 {
-   C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolList, C_PuiSdNodeDataPoolList>(this->mc_Indices,
-                                                                                            this->mc_OSCContent,
-                                                                                            this->mc_UIContent);
+   C_SdUtil::h_SortIndicesDescendingAndSync<C_OscNodeDataPoolList, C_PuiSdNodeDataPoolList>(this->mc_Indices,
+                                                                                            this->mc_OscContent,
+                                                                                            this->mc_UiContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -208,9 +207,9 @@ void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SortDescending(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoDataPoolListAddDeleteBaseCommand::m_SortAscending(void)
 {
-   C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolList, C_PuiSdNodeDataPoolList>(this->mc_Indices,
-                                                                                           this->mc_OSCContent,
-                                                                                           this->mc_UIContent);
+   C_SdUtil::h_SortIndicesAscendingAndSync<C_OscNodeDataPoolList, C_PuiSdNodeDataPoolList>(this->mc_Indices,
+                                                                                           this->mc_OscContent,
+                                                                                           this->mc_UiContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

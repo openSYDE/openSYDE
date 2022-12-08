@@ -8,20 +8,19 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#include "precomp_headers.h" //pre-compiled headers
+#include "precomp_headers.hpp" //pre-compiled headers
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OsyHexFile.h"
-#include "CSCLString.h"
-#include "CXFLECUInformation.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OsyHexFile.hpp"
+#include "C_SclString.hpp"
+#include "CXFLECUInformation.hpp"
+#include "TglUtils.hpp"
 
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
-using namespace stw_diag_lib;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
+using namespace stw::diag_lib;
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   get address of signature block from hex file
@@ -39,14 +38,14 @@ using namespace stw_diag_lib;
    C_NOACT      no block found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OsyHexFile::GetSignatureBlockAddress(uint32 & oru32_Address)
+int32_t C_OsyHexFile::GetSignatureBlockAddress(uint32_t & oru32_Address)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    oru32_Address = this->mu32_MinAdr;
 
    //lint -e{926}
-   s32_Return = this->FindPattern(oru32_Address, 10, reinterpret_cast<const uint8 *>(";zwm2KgUZ!"));
+   s32_Return = this->FindPattern(oru32_Address, 10, reinterpret_cast<const uint8_t *>(";zwm2KgUZ!"));
    if (s32_Return == -1)
    {
       s32_Return = C_NOACT;
@@ -62,36 +61,36 @@ sint32 C_OsyHexFile::GetSignatureBlockAddress(uint32 & oru32_Address)
    If the application_info structure with the device ID information is in the hex file more than once, AND
     the device ID in at least one of the copies is different, we fail.
 
-   \param[out]    orc_DeviceID                     device ID found in hex-file
+   \param[out]    orc_DeviceId                     device ID found in hex-file
 
    \return
-   C_NO_ERR     everything OK (device ID in orc_DeviceID)
+   C_NO_ERR     everything OK (device ID in orc_DeviceId)
    C_NOACT      device-ID not found
    C_CONFIG     ambiguous device-IDs in hex-file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
+int32_t C_OsyHexFile::ScanDeviceIdFromHexFile(C_SclString & orc_DeviceId)
 {
-   sint32 s32_Return;
-   sint32 s32_Index;
-   C_SCLString c_DeviceID = "";
+   int32_t s32_Return;
+   C_SclString c_DeviceId = "";
 
-   SCLDynamicArray<C_XFLECUInformation> c_InfoBlocks;
+   C_SclDynamicArray<C_XFLECUInformation> c_InfoBlocks;
    s32_Return = this->GetECUInformationBlocks(c_InfoBlocks, 0x0U, false, false, true);
    if ((s32_Return == C_NO_ERR) && (c_InfoBlocks.GetLength() > 0))
    {
+      int32_t s32_Index;
       for (s32_Index = 0; s32_Index < c_InfoBlocks.GetLength(); s32_Index++)
       {
          if (c_InfoBlocks[s32_Index].ContainsDeviceID() == true)
          {
-            const C_SCLString c_Help = c_InfoBlocks[s32_Index].GetDeviceID();
-            if (c_DeviceID == "") //no device-ID seen yet ...
+            const C_SclString c_Help = c_InfoBlocks[s32_Index].GetDeviceID();
+            if (c_DeviceId == "") //no device-ID seen yet ...
             {
-               c_DeviceID = c_Help;
+               c_DeviceId = c_Help;
             }
             else
             {
-               if (c_DeviceID != c_Help)
+               if (c_DeviceId != c_Help)
                {
                   s32_Return = C_CONFIG; //ambiguous device IDs !
                   break;
@@ -102,9 +101,9 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
    }
    if (s32_Return == C_NO_ERR)
    {
-      if (c_DeviceID != "")
+      if (c_DeviceId != "")
       {
-         orc_DeviceID = c_DeviceID;
+         orc_DeviceId = c_DeviceId;
       }
       else
       {
@@ -132,11 +131,11 @@ sint32 C_OsyHexFile::ScanDeviceIdFromHexFile(C_SCLString & orc_DeviceID)
    C_OVERFLOW   multiple application information blocks detected in hex file and device names differ
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformation & orc_InfoBlock)
+int32_t C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformation & orc_InfoBlock)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   SCLDynamicArray<C_XFLECUInformation> c_InfoBlocks;
+   C_SclDynamicArray<C_XFLECUInformation> c_InfoBlocks;
    s32_Return = this->GetECUInformationBlocks(c_InfoBlocks, 0x0U, false, false, true);
    tgl_assert(s32_Return == C_NO_ERR); //no plausible reasons documented
 
@@ -146,7 +145,7 @@ sint32 C_OsyHexFile::ScanApplicationInformationBlockFromHexFile(C_XFLECUInformat
    }
    else if (c_InfoBlocks.GetLength() > 1)
    {
-      for (sint32 s32_Pos = 1; s32_Pos < c_InfoBlocks.GetLength(); s32_Pos++)
+      for (int32_t s32_Pos = 1; s32_Pos < c_InfoBlocks.GetLength(); s32_Pos++)
       {
          // compare every device name with first device name, this is enough because all must be equal
          if (c_InfoBlocks[0].GetDeviceID() != c_InfoBlocks[s32_Pos].GetDeviceID())

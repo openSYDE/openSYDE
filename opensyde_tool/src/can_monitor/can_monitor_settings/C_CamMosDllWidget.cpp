@@ -11,34 +11,33 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "C_CamMosDllWidget.h"
+#include "C_CamMosDllWidget.hpp"
 #include "ui_C_CamMosDllWidget.h"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CCAN.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_Uti.h"
-#include "C_CamProHandler.h"
-#include "cam_constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_UsHandler.h"
-#include "C_CamUti.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_Can.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_Uti.hpp"
+#include "C_CamProHandler.hpp"
+#include "cam_constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamUti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_can;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::can;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -180,11 +179,11 @@ void C_CamMosDllWidget::m_InitUi(void)
            this, &C_CamMosDllWidget::SigHide);
 
    // behavior of DLL selection (Other vs. PEAK and Vector)
-   connect(this->mpc_Ui->pc_RadioButtonPeak, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
+   connect(this->mpc_Ui->pc_RadioButtonPeak, &stw::opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_CamMosDllWidget::m_ConcreteDllClicked);
-   connect(this->mpc_Ui->pc_RadioButtonVector, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
+   connect(this->mpc_Ui->pc_RadioButtonVector, &stw::opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_CamMosDllWidget::m_ConcreteDllClicked);
-   connect(this->mpc_Ui->pc_RadioButtonOther, &stw_opensyde_gui_elements::C_OgeRabProperties::clicked,
+   connect(this->mpc_Ui->pc_RadioButtonOther, &stw::opensyde_gui_elements::C_OgeRabProperties::clicked,
            this, &C_CamMosDllWidget::m_OtherDllClicked);
    connect(this->mpc_Ui->pc_LineEditCustomDllPath, &C_CamOgeLeFilePath::editingFinished, this,
            &C_CamMosDllWidget::m_OnCustomDllEdited);
@@ -211,10 +210,10 @@ void C_CamMosDllWidget::m_InitUi(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDllWidget::m_LoadConfig(void) const
 {
-   const C_CamProHandler::E_CANDllType e_CANDllType = C_CamProHandler::h_GetInstance()->GetCANDllType();
+   const C_CamProHandler::E_CanDllType e_CanDllType = C_CamProHandler::h_GetInstance()->GetCanDllType();
 
    // check radio button depending on type
-   switch (e_CANDllType)
+   switch (e_CanDllType)
    {
    case C_CamProHandler::ePEAK:
       // PEAK
@@ -239,7 +238,7 @@ void C_CamMosDllWidget::m_LoadConfig(void) const
    }
 
    // set line edit text to last known custom path
-   const QString c_Path = C_CamProHandler::h_GetInstance()->GetCustomCANDllPath();
+   const QString c_Path = C_CamProHandler::h_GetInstance()->GetCustomCanDllPath();
    if (c_Path == "")
    {
       this->mpc_Ui->pc_LineEditCustomDllPath->SetPath("");
@@ -261,7 +260,7 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
    QString c_Path;
 
    // Get absolute DLL path (resolve variables and make absolute if it is relative ant not empty)
-   c_Path = C_CamProHandler::h_GetInstance()->GetCANDllPath();
+   c_Path = C_CamProHandler::h_GetInstance()->GetCanDllPath();
    if (c_Path.isEmpty() == false)
    {
       c_Path = C_CamUti::h_GetResolvedAbsolutePathFromExe(c_Path);
@@ -269,8 +268,8 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
 
    if (QFile::exists(c_Path) == true)
    {
-      C_CAN c_Can;
-      const sint32 s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
+      C_Can c_Can;
+      const int32_t s32_Return = c_Can.DLL_Open(c_Path.toStdString().c_str());
 
       if (s32_Return == C_NO_ERR)
       {
@@ -278,7 +277,7 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
          c_Can.CAN_InteractiveSetup();
 
          // inform about possible changes
-         Q_EMIT (this->SigCANDllConfigured());
+         Q_EMIT (this->SigCanDllConfigured());
       }
       else
       {
@@ -305,7 +304,7 @@ void C_CamMosDllWidget::m_ConfigureDllClicked(void)
 void C_CamMosDllWidget::m_ConcreteDllClicked(void) const
 {
    this->mpc_Ui->pc_WidgetCustomDll->setVisible(false);
-   this->m_UpdateCANDllPath();
+   this->m_UpdateCanDllPath();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -319,38 +318,38 @@ void C_CamMosDllWidget::m_OtherDllClicked(void) const
    {
       this->mpc_Ui->pc_LineEditCustomDllPath->setFocus();
    }
-   this->m_UpdateCANDllPath();
+   this->m_UpdateCanDllPath();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new CAN DLL path in data handling.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDllWidget::m_UpdateCANDllPath(void) const
+void C_CamMosDllWidget::m_UpdateCanDllPath(void) const
 {
-   C_CamProHandler::E_CANDllType e_Type;
+   C_CamProHandler::E_CanDllType e_Type;
 
    if (this->mpc_Ui->pc_RadioButtonVector->isChecked() == true)
    {
-      e_Type = C_CamProHandler::E_CANDllType::eVECTOR;
+      e_Type = C_CamProHandler::E_CanDllType::eVECTOR;
    }
    else if (this->mpc_Ui->pc_RadioButtonOther->isChecked() == true)
    {
       const QString c_Path = this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
 
       // remember path in data handling
-      C_CamProHandler::h_GetInstance()->SetCustomCANDllPath(c_Path);
+      C_CamProHandler::h_GetInstance()->SetCustomCanDllPath(c_Path);
 
       // set type
-      e_Type = C_CamProHandler::E_CANDllType::eOTHER;
+      e_Type = C_CamProHandler::E_CanDllType::eOTHER;
    }
    else
    {
-      e_Type = C_CamProHandler::E_CANDllType::ePEAK;
+      e_Type = C_CamProHandler::E_CanDllType::ePEAK;
    }
 
    // set CAN DLL type in data handling
-   C_CamProHandler::h_GetInstance()->SetCANDllType(e_Type);
+   C_CamProHandler::h_GetInstance()->SetCanDllType(e_Type);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -374,7 +373,7 @@ void C_CamMosDllWidget::m_OnExpand(const bool oq_Expand) const
 void C_CamMosDllWidget::m_OnBrowse(void)
 {
    QString c_Path;
-   QString c_Folder = C_CamProHandler::h_GetInstance()->GetCustomCANDllPath();
+   QString c_Folder = C_CamProHandler::h_GetInstance()->GetCustomCanDllPath();
    const QString c_Filter = static_cast<QString>(C_GtGetText::h_GetText("CAN DLL ")) + "(*.dll)";
    QFileDialog c_Dialog(this, C_GtGetText::h_GetText("Select CAN DLL"), c_Folder, c_Filter);
 
@@ -392,7 +391,7 @@ void C_CamMosDllWidget::m_OnBrowse(void)
    c_Dialog.setDirectory(c_Folder);
    c_Dialog.setDefaultSuffix(".dll");
 
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Dialog.exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Path = c_Dialog.selectedFiles().at(0);
 
@@ -426,7 +425,7 @@ void C_CamMosDllWidget::m_SetCustomDllPath(const QString & orc_New)
    if (c_Path.isEmpty() == false)
    {
       this->mpc_Ui->pc_LineEditCustomDllPath->SetPath(c_Path, C_Uti::h_GetExePath());
-      this->m_UpdateCANDllPath();
+      this->m_UpdateCanDllPath();
    }
 }
 
@@ -453,11 +452,11 @@ void C_CamMosDllWidget::m_OnCustomDllEdited(void)
    const QString c_Path =  this->mpc_Ui->pc_LineEditCustomDllPath->GetPath();
    const QString c_ResolvedPath = C_CamUti::h_ResolvePlaceholderVariables(c_Path);
 
-   if ((stw_opensyde_core::C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == true) ||
+   if ((stw::opensyde_core::C_OscUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == true) ||
        (c_ResolvedPath.isEmpty() == true)) // actually empty path is not valid but feedback on "play" is good enough
    {
       // update data handling
-      this->m_UpdateCANDllPath();
+      this->m_UpdateCanDllPath();
    }
    else
    {

@@ -14,22 +14,21 @@
 #include <QScrollBar>
 #include <QDesktopServices>
 #include <QClipboard>
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeFraSeparator.h"
-#include "C_OgeLabProgressLogItem.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeFraSeparator.hpp"
+#include "C_OgeLabProgressLogItem.hpp"
 
-#include "C_SyvUpProgressLog.h"
+#include "C_SyvUpProgressLog.hpp"
 #include "ui_C_SyvUpProgressLog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -91,7 +90,7 @@ C_SyvUpProgressLog::~C_SyvUpProgressLog(void)
 void C_SyvUpProgressLog::Clear(void)
 {
    //Connect
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_ConnectEntries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_ConnectEntries.size(); ++u32_ItEntry)
    {
       C_SyvUpProgressLogEntry * const pc_Entry = this->mc_ConnectEntries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -102,7 +101,7 @@ void C_SyvUpProgressLog::Clear(void)
    }
    this->mc_ConnectEntries.clear();
    //Spacer
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_SpacerEntries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_SpacerEntries.size(); ++u32_ItEntry)
    {
       C_SyvUpProgressLogEntry * const pc_Entry = this->mc_SpacerEntries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -113,7 +112,7 @@ void C_SyvUpProgressLog::Clear(void)
    }
    this->mc_SpacerEntries.clear();
    //Update
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_UpdateEntries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_UpdateEntries.size(); ++u32_ItEntry)
    {
       C_SyvUpProgressLogEntry * const pc_Entry = this->mc_UpdateEntries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -124,7 +123,7 @@ void C_SyvUpProgressLog::Clear(void)
    }
    this->mc_UpdateEntries.clear();
    //Process
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_ProcessEntries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_ProcessEntries.size(); ++u32_ItEntry)
    {
       QLabel * const pc_Entry = this->mc_ProcessEntries[u32_ItEntry];
       if (pc_Entry != NULL)
@@ -177,7 +176,7 @@ void C_SyvUpProgressLog::AddSubHeading(const QString & orc_Value)
    \param[in] oq_Update      Flag if entry for update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpProgressLog::AddEntry(const uint32 ou32_NodeIndex, const QString & orc_Value, const bool oq_Update)
+void C_SyvUpProgressLog::AddEntry(const uint32_t ou32_NodeIndex, const QString & orc_Value, const bool oq_Update)
 {
    C_SyvUpProgressLogEntry * const pc_Entry = new C_SyvUpProgressLogEntry(ou32_NodeIndex, this);
 
@@ -238,7 +237,7 @@ void C_SyvUpProgressLog::AddSpacer(void)
    \param[in] oq_Update      Flag if entry for update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpProgressLog::UpdateStatus(const uint32 ou32_NodeIndex, const QString & orc_Value,
+void C_SyvUpProgressLog::UpdateStatus(const uint32_t ou32_NodeIndex, const QString & orc_Value,
                                       const bool oq_Update) const
 {
    const std::vector<C_SyvUpProgressLogEntry *> * pc_Entries;
@@ -251,7 +250,7 @@ void C_SyvUpProgressLog::UpdateStatus(const uint32 ou32_NodeIndex, const QString
    {
       pc_Entries = &this->mc_ConnectEntries;
    }
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < pc_Entries->size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < pc_Entries->size(); ++u32_ItEntry)
    {
       C_SyvUpProgressLogEntry * const pc_Entry = pc_Entries->at(u32_ItEntry);
       if ((pc_Entry != NULL) && (pc_Entry->DoesIndexMatch(ou32_NodeIndex) == true))
@@ -267,7 +266,7 @@ void C_SyvUpProgressLog::UpdateStatus(const uint32 ou32_NodeIndex, const QString
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::AddLogHyperlink(void)
 {
-   const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   const QString c_LogFilePath = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
 
    if (this->mpc_LogHyperlink == NULL)
    {
@@ -278,7 +277,7 @@ void C_SyvUpProgressLog::AddLogHyperlink(void)
       this->mpc_LogHyperlink = new C_OgeLabProgressLogItem(this);
 
       //Update log file
-      C_OSCLoggingHandler::h_Flush();
+      C_OscLoggingHandler::h_Flush();
       //Configure
       this->mpc_LogHyperlink->setText(static_cast<QString>(
                                          "%1<a href=\"file:\\\\\\%2\"><span style=\"color: %3;\">%4</span></a>.").
@@ -310,11 +309,11 @@ void C_SyvUpProgressLog::AddLogHyperlink(void)
    All registered connect node entry indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SyvUpProgressLog::GetConnectNodeEntryIndices(void)
+std::vector<uint32_t> C_SyvUpProgressLog::GetConnectNodeEntryIndices(void)
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    c_Retval.reserve(mc_ConnectEntries.size());
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < mc_ConnectEntries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < mc_ConnectEntries.size(); ++u32_ItEntry)
    {
       const C_SyvUpProgressLogEntry * const pc_Entry = mc_ConnectEntries.at(u32_ItEntry);
       if (pc_Entry != NULL)
@@ -347,7 +346,7 @@ void C_SyvUpProgressLog::m_SetHeadingVisible(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpProgressLog::m_OpenLink(void) const
 {
-   const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   const QString c_LogFilePath = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
 
    QDesktopServices::openUrl(static_cast<QUrl>(static_cast<QString>("file:%1").arg(c_LogFilePath)));
 }
@@ -355,14 +354,14 @@ void C_SyvUpProgressLog::m_OpenLink(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scroll to bottom
 
-   \param[in] osn_Min New scroll bar minimum
-   \param[in] osn_Max New scroll bar maximum
+   \param[in] os32_Min New scroll bar minimum
+   \param[in] os32_Max New scroll bar maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpProgressLog::m_ScrollToBottom(const sintn osn_Min, const sintn osn_Max) const
+void C_SyvUpProgressLog::m_ScrollToBottom(const int32_t os32_Min, const int32_t os32_Max) const
 {
-   Q_UNUSED(osn_Min)
-   this->mpc_Ui->pc_ScrollArea->verticalScrollBar()->setValue(osn_Max);
+   Q_UNUSED(os32_Min)
+   this->mpc_Ui->pc_ScrollArea->verticalScrollBar()->setValue(os32_Max);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -399,7 +398,7 @@ void C_SyvUpProgressLog::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 void C_SyvUpProgressLog::m_CopyHyperLink() const
 {
    // get link location
-   const QString c_LogFilePath = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+   const QString c_LogFilePath = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
 
    QClipboard * const pc_Clipboard = QApplication::clipboard();
 

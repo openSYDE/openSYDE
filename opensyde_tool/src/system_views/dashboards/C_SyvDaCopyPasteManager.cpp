@@ -10,41 +10,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "gitypes.h"
-#include "TGLUtils.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_PuiSvDashboard.h"
-#include "C_SyvClipBoardHelper.h"
-#include "C_SyvDaCopyPasteManager.h"
-#include "C_GiSvDaArrow.h"
-#include "C_GiSvDaBoundary.h"
-#include "C_GiSvDaImageGroup.h"
-#include "C_GiSvDaLabelBase.h"
-#include "C_GiSvDaParam.h"
-#include "C_GiSvDaPieChartBase.h"
-#include "C_GiSvDaTableBase.h"
-#include "C_GiSvDaSpinBoxBase.h"
-#include "C_GiSvDaSliderBase.h"
-#include "C_GiSvDaProgressBarBase.h"
-#include "C_GiSvDaToggleBase.h"
-#include "C_GiSvDaTextElement.h"
-#include "C_SebUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_GtGetText.h"
+#include "gitypes.hpp"
+#include "TglUtils.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_PuiSvDashboard.hpp"
+#include "C_SyvClipBoardHelper.hpp"
+#include "C_SyvDaCopyPasteManager.hpp"
+#include "C_GiSvDaArrow.hpp"
+#include "C_GiSvDaBoundary.hpp"
+#include "C_GiSvDaImageGroup.hpp"
+#include "C_GiSvDaLabelBase.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_GiSvDaPieChartBase.hpp"
+#include "C_GiSvDaTableBase.hpp"
+#include "C_GiSvDaSpinBoxBase.hpp"
+#include "C_GiSvDaSliderBase.hpp"
+#include "C_GiSvDaProgressBarBase.hpp"
+#include "C_GiSvDaToggleBase.hpp"
+#include "C_GiSvDaTextElement.hpp"
+#include "C_SebUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaCopyPasteManager::hc_CLIP_BOARD_BASE_TAG_NAME = "opensyde-system-definition";
@@ -91,7 +90,7 @@ C_SyvDaCopyPasteManager::~C_SyvDaCopyPasteManager(void)
 const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc_Parent)
 {
    C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(this->mc_LastKnownData, this->mc_LastKnownRails,
-                                                    this->mc_LastKnownElementIDGroups, this->mu32_ViewIndex,
+                                                    this->mc_LastKnownElementIdGroups, this->mu32_ViewIndex,
                                                     opc_Parent);
 
    return &this->mc_LastKnownData;
@@ -105,7 +104,7 @@ const C_PuiBsElements * C_SyvDaCopyPasteManager::GetSnapshot(QWidget * const opc
    Else Valid rails
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+const QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId,
            C_PuiSvReadDataConfiguration> * C_SyvDaCopyPasteManager::GetRails() const
 {
    return &this->mc_LastKnownRails;
@@ -118,8 +117,8 @@ const QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
    \param[in]  ou32_DashboardIndex  Dashboard index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_ViewIndex,
-                                                            const uint32 ou32_DashboardIndex)
+void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32_t ou32_ViewIndex,
+                                                            const uint32_t ou32_DashboardIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->mu32_DashboardIndex = ou32_DashboardIndex;
@@ -129,11 +128,12 @@ void C_SyvDaCopyPasteManager::PrepareCopyFromSceneToManager(const uint32 ou32_Vi
 /*! \brief   Copy selected files to copy paste manager
 
    \param[in]  orc_SelectedItems       Selected items to copy
-   \param[in]  orc_NormalizedZValues   Normalized Z values for all copied items
+   \param[in]  orc_NormalizedZetValues   Normalized Z values for all copied items
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *> & orc_SelectedItems,
-                                                     const QMap<const QGraphicsItem *, float64> & orc_NormalizedZValues)
+                                                     const QMap<const QGraphicsItem *,
+                                                                float64_t> & orc_NormalizedZetValues)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
@@ -143,14 +143,14 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
       if (pc_Dashboard != NULL)
       {
          C_PuiSvDashboard c_Snapshot;
-         uint32 u32_Index;
+         uint32_t u32_Index;
          const C_GiSvDaImageGroup * pc_Image;
          const C_GiSvDaBoundary * pc_Boundary;
          const C_GiSvDaArrow * pc_LineArrow;
          const C_GiSvDaTextElement * pc_TextElement;
 
          std::vector<const QGraphicsItem *> c_HandledItems;
-         QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
+         QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
 
          //Clear data
          for (QList<QGraphicsItem *>::const_iterator c_ItItem = orc_SelectedItems.begin();
@@ -159,7 +159,7 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
          {
             bool q_Handled = false;
             QGraphicsItem * const pc_CurItem = C_SebUtil::h_GetHighestParent(*c_ItItem);
-            for (uint32 u32_ItHandledItems = 0; u32_ItHandledItems < c_HandledItems.size(); ++u32_ItHandledItems)
+            for (uint32_t u32_ItHandledItems = 0; u32_ItHandledItems < c_HandledItems.size(); ++u32_ItHandledItems)
             {
                if (c_HandledItems[u32_ItHandledItems] == pc_CurItem)
                {
@@ -194,92 +194,92 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                      const C_GiSvDaToggleBase * const pc_Toggle = dynamic_cast<const C_GiSvDaToggleBase *>(pc_CurItem);
                      if (pc_Label != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_Label->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_Label->GetIndex());
                         const C_PuiSvDbLabel * const pc_LabelData = pc_Dashboard->GetLabel(u32_Index);
                         if (pc_LabelData != NULL)
                         {
                            C_PuiSvDbLabel c_Tmp = *pc_LabelData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eLABEL) == C_NO_ERR);
                         }
                      }
                      else if (pc_Param != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_Param->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_Param->GetIndex());
                         const C_PuiSvDbParam * const pc_ParamData = pc_Dashboard->GetParam(u32_Index);
                         if (pc_ParamData != NULL)
                         {
                            C_PuiSvDbParam c_Tmp = *pc_ParamData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::ePARAM) == C_NO_ERR);
                         }
                      }
                      else if (pc_PieChart != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_PieChart->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_PieChart->GetIndex());
                         const C_PuiSvDbPieChart * const pc_PieChartData = pc_Dashboard->GetPieChart(u32_Index);
                         if (pc_PieChartData != NULL)
                         {
                            C_PuiSvDbPieChart c_Tmp = *pc_PieChartData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp,
                                                            C_PuiSvDbDataElement::ePIE_CHART) == C_NO_ERR);
                         }
                      }
                      else if (pc_ProgressBar != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_ProgressBar->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_ProgressBar->GetIndex());
                         const C_PuiSvDbProgressBar * const pc_ProgressBarData = pc_Dashboard->GetProgressBar(u32_Index);
                         if (pc_ProgressBarData != NULL)
                         {
                            C_PuiSvDbProgressBar c_Tmp = *pc_ProgressBarData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp,
                                                            C_PuiSvDbDataElement::ePROGRESS_BAR) == C_NO_ERR);
                         }
                      }
                      else if (pc_Slider != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_Slider->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_Slider->GetIndex());
                         const C_PuiSvDbSlider * const pc_SliderData = pc_Dashboard->GetSlider(u32_Index);
                         if (pc_SliderData != NULL)
                         {
                            C_PuiSvDbSlider c_Tmp = *pc_SliderData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eSLIDER) == C_NO_ERR);
                         }
                      }
                      else if (pc_SpinBox != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_SpinBox->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_SpinBox->GetIndex());
                         const C_PuiSvDbSpinBox * const pc_SpinBoxData = pc_Dashboard->GetSpinBox(u32_Index);
                         if (pc_SpinBoxData != NULL)
                         {
                            C_PuiSvDbSpinBox c_Tmp = *pc_SpinBoxData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp,
                                                            C_PuiSvDbDataElement::eSPIN_BOX) == C_NO_ERR);
                         }
                      }
                      else if (pc_Table != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_Table->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_Table->GetIndex());
                         const C_PuiSvDbTable * const pc_TableData = pc_Dashboard->GetTable(u32_Index);
                         if (pc_TableData != NULL)
                         {
                            C_PuiSvDbTable c_Tmp = *pc_TableData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eTABLE) == C_NO_ERR);
                         }
                      }
                      else if (pc_Toggle != NULL)
                      {
-                        u32_Index = static_cast<uint32>(pc_Toggle->GetIndex());
+                        u32_Index = static_cast<uint32_t>(pc_Toggle->GetIndex());
                         const C_PuiSvDbToggle * const pc_ToggleData = pc_Dashboard->GetToggle(u32_Index);
                         if (pc_ToggleData != NULL)
                         {
                            C_PuiSvDbToggle c_Tmp = *pc_ToggleData;
-                           C_SebBaseCopyPasteManager::mh_HandleZValueBox(*c_ItItem, orc_NormalizedZValues, c_Tmp);
+                           C_SebBaseCopyPasteManager::mh_HandleZetValueBox(*c_ItItem, orc_NormalizedZetValues, c_Tmp);
                            tgl_assert(c_Snapshot.AddWidget(&c_Tmp, C_PuiSvDbDataElement::eTOGGLE) == C_NO_ERR);
                         }
                      }
@@ -288,62 +288,62 @@ void C_SyvDaCopyPasteManager::CopyFromSceneToManager(const QList<QGraphicsItem *
                         // copy the element
                         switch (pc_CurItem->type())
                         {
-                        case msn_GRAPHICS_ITEM_TEXTELEMENT:
+                        case ms32_GRAPHICS_ITEM_TEXTELEMENT:
 
                            pc_TextElement = dynamic_cast<const C_GiSvDaTextElement *>(pc_CurItem);
                            if (pc_TextElement != NULL)
                            {
-                              u32_Index = static_cast<uint32>(pc_TextElement->GetIndex());
+                              u32_Index = static_cast<uint32_t>(pc_TextElement->GetIndex());
                               if (u32_Index < pc_Dashboard->c_TextElements.size())
                               {
                                  c_Snapshot.c_TextElements.push_back(pc_Dashboard->c_TextElements[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(
-                                    *c_ItItem, orc_NormalizedZValues,
+                                 C_SyvDaCopyPasteManager::mh_HandleZetValueBox(
+                                    *c_ItItem, orc_NormalizedZetValues,
                                     c_Snapshot.c_TextElements[c_Snapshot.c_TextElements.size() - 1]);
                               }
                            }
                            break;
-                        case msn_GRAPHICS_ITEM_BOUNDARY:
+                        case ms32_GRAPHICS_ITEM_BOUNDARY:
 
                            pc_Boundary = dynamic_cast<const C_GiSvDaBoundary *>(pc_CurItem);
                            if (pc_Boundary != NULL)
                            {
-                              u32_Index = static_cast<uint32>(pc_Boundary->GetIndex());
+                              u32_Index = static_cast<uint32_t>(pc_Boundary->GetIndex());
                               if (u32_Index < pc_Dashboard->c_Boundaries.size())
                               {
                                  c_Snapshot.c_Boundaries.push_back(pc_Dashboard->c_Boundaries[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(
-                                    *c_ItItem, orc_NormalizedZValues,
+                                 C_SyvDaCopyPasteManager::mh_HandleZetValueBox(
+                                    *c_ItItem, orc_NormalizedZetValues,
                                     c_Snapshot.c_Boundaries[c_Snapshot.c_Boundaries.size() - 1]);
                               }
                            }
                            break;
-                        case msn_GRAPHICS_ITEM_IMAGE:
+                        case ms32_GRAPHICS_ITEM_IMAGE:
 
                            pc_Image = dynamic_cast<const C_GiSvDaImageGroup *>(pc_CurItem);
                            if (pc_Image != NULL)
                            {
-                              u32_Index = static_cast<uint32>(pc_Image->GetIndex());
+                              u32_Index = static_cast<uint32_t>(pc_Image->GetIndex());
                               if (u32_Index < pc_Dashboard->c_Images.size())
                               {
                                  c_Snapshot.c_Images.push_back(pc_Dashboard->c_Images[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueBox(
-                                    *c_ItItem, orc_NormalizedZValues,
+                                 C_SyvDaCopyPasteManager::mh_HandleZetValueBox(
+                                    *c_ItItem, orc_NormalizedZetValues,
                                     c_Snapshot.c_Images[c_Snapshot.c_Images.size() - 1]);
                               }
                            }
                            break;
-                        case msn_GRAPHICS_ITEM_LINE_ARROW:
+                        case ms32_GRAPHICS_ITEM_LINE_ARROW:
 
                            pc_LineArrow = dynamic_cast<const C_GiSvDaArrow *>(pc_CurItem);
                            if (pc_LineArrow != NULL)
                            {
-                              u32_Index = static_cast<uint32>(pc_LineArrow->GetIndex());
+                              u32_Index = static_cast<uint32_t>(pc_LineArrow->GetIndex());
                               if (u32_Index < pc_Dashboard->c_LineArrows.size())
                               {
                                  c_Snapshot.c_LineArrows.push_back(pc_Dashboard->c_LineArrows[u32_Index]);
-                                 C_SyvDaCopyPasteManager::mh_HandleZValueLine(
-                                    *c_ItItem, orc_NormalizedZValues,
+                                 C_SyvDaCopyPasteManager::mh_HandleZetValueLine(
+                                    *c_ItItem, orc_NormalizedZetValues,
                                     c_Snapshot.c_LineArrows[c_Snapshot.c_LineArrows.size() - 1]);
                               }
                            }
@@ -380,9 +380,9 @@ bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
 {
    this->mc_LastKnownRails.clear();
    this->mc_LastKnownData.Clear();
-   this->mc_LastKnownElementIDGroups.clear();
+   this->mc_LastKnownElementIdGroups.clear();
    return (C_SyvClipBoardHelper::h_LoadDashboardFromClipboard(this->mc_LastKnownData, this->mc_LastKnownRails,
-                                                              this->mc_LastKnownElementIDGroups,
+                                                              this->mc_LastKnownElementIdGroups,
                                                               C_SyvDaCopyPasteManager::hc_CLIP_BOARD_BASE_TAG_NAME) ==
            C_NO_ERR);
 }
@@ -392,17 +392,17 @@ bool C_SyvDaCopyPasteManager::CheckValidContentAndPrepareData(void)
 
    \param[in,out]  orc_CopyData           Copy data
    \param[in,out]  orc_Rails              System view dashboard rails
-   \param[in]      orc_ElementIDGroups    Element ID groups
+   \param[in]      orc_ElementIdGroups    Element ID groups
    \param[in]      ou32_ViewIndex         View index
    \param[in,out]  opc_Parent             Parent for dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_CopyData,
-                                                      QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId,
+                                                      QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId,
                                                            C_PuiSvReadDataConfiguration> & orc_Rails,
                                                       const QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                                 C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups,
-                                                      const uint32 ou32_ViewIndex,
+                                                                 C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups,
+                                                      const uint32_t ou32_ViewIndex,
                                                       QWidget * const opc_Parent)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
@@ -410,24 +410,24 @@ void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_Cop
    if (pc_View != NULL)
    {
       //Check param widget validity
-      for (uint32 u32_ItParam = 0; u32_ItParam < orc_CopyData.GetParams().size();)
+      for (uint32_t u32_ItParam = 0; u32_ItParam < orc_CopyData.GetParams().size();)
       {
          std::set<QString> c_AdaptedLists;
          bool q_Found = false;
          bool q_ElementMissing = false;
          const C_PuiSvDbParam & rc_ParamWidget = orc_CopyData.GetParams()[u32_ItParam];
          //Check each parameter element
-         for (uint32 u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
+         for (uint32_t u32_ItElement = 0; u32_ItElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
               ++u32_ItElement)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_ParamWidget.c_DataPoolElementsConfig[u32_ItElement];
             if (rc_Config.c_ElementId.GetIsValid() == true)
             {
-               const stw_opensyde_core::C_OSCNodeDataPoolListId c_ListId(rc_Config.c_ElementId.u32_NodeIndex,
-                                                                         rc_Config.c_ElementId.u32_DataPoolIndex,
-                                                                         rc_Config.c_ElementId.u32_ListIndex);
-               const stw_opensyde_core::C_OSCNodeDataPoolList * const pc_List =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(c_ListId.u32_NodeIndex,
+               const stw::opensyde_core::C_OscNodeDataPoolListId c_ListId(rc_Config.c_ElementId.u32_NodeIndex,
+                                                                          rc_Config.c_ElementId.u32_DataPoolIndex,
+                                                                          rc_Config.c_ElementId.u32_ListIndex);
+               const stw::opensyde_core::C_OscNodeDataPoolList * const pc_List =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(c_ListId.u32_NodeIndex,
                                                                       c_ListId.u32_DataPoolIndex,
                                                                       c_ListId.u32_ListIndex);
                if (pc_View->CheckNvmParamListUsage(c_ListId) == true)
@@ -439,15 +439,15 @@ void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_Cop
                if (pc_List != NULL)
                {
                   //Iterate over all list elements
-                  for (uint32 u32_ItSDElement = 0UL; u32_ItSDElement < pc_List->c_Elements.size(); ++u32_ItSDElement)
+                  for (uint32_t u32_ItSdElement = 0UL; u32_ItSdElement < pc_List->c_Elements.size(); ++u32_ItSdElement)
                   {
                      bool q_FoundOne = false;
-                     const stw_opensyde_core::C_OSCNodeDataPoolListElementId c_ElementId(
+                     const stw::opensyde_core::C_OscNodeDataPoolListElementId c_ElementId(
                         rc_Config.c_ElementId.u32_NodeIndex,
                         rc_Config.c_ElementId.u32_DataPoolIndex,
-                        rc_Config.c_ElementId.u32_ListIndex, u32_ItSDElement);
+                        rc_Config.c_ElementId.u32_ListIndex, u32_ItSdElement);
                      //Check if each element contained
-                     for (uint32 u32_ItCheckElement = 0;
+                     for (uint32_t u32_ItCheckElement = 0;
                           u32_ItCheckElement < rc_ParamWidget.c_DataPoolElementsConfig.size();
                           ++u32_ItCheckElement)
                      {
@@ -467,10 +467,10 @@ void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_Cop
                      if (q_FoundOne == false)
                      {
                         QString c_Tmp;
-                        const stw_opensyde_core::C_OSCNode * const pc_Node =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_ListId.u32_NodeIndex);
-                        const stw_opensyde_core::C_OSCNodeDataPool * const pc_DataPool =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(c_ListId.u32_NodeIndex,
+                        const stw::opensyde_core::C_OscNode * const pc_Node =
+                           C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_ListId.u32_NodeIndex);
+                        const stw::opensyde_core::C_OscNodeDataPool * const pc_DataPool =
+                           C_PuiSdHandler::h_GetInstance()->GetOscDataPool(c_ListId.u32_NodeIndex,
                                                                            c_ListId.u32_DataPoolIndex);
 
                         //For each missing element add default
@@ -533,7 +533,7 @@ void C_SyvDaCopyPasteManager::h_AdaptCopyDataForPaste(C_PuiSvDashboard & orc_Cop
       //Check ID validity
       {
          const bool q_Changed1 = orc_CopyData.DiscardInvalidIndices();
-         const bool q_Changed2 = C_SyvDaCopyPasteManager::mh_ValidateCrcs(orc_CopyData, orc_Rails, orc_ElementIDGroups);
+         const bool q_Changed2 = C_SyvDaCopyPasteManager::mh_ValidateCrcs(orc_CopyData, orc_Rails, orc_ElementIdGroups);
          if (q_Changed1 || q_Changed2)
          {
             C_OgeWiCustomMessage c_Message(opc_Parent);
@@ -563,7 +563,7 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
    C_SebBaseCopyPasteManager::m_CalcOriginalPosition(opc_Data);
    if (pc_ExpectedData != NULL)
    {
-      uint32 u32_ItElem;
+      uint32_t u32_ItElem;
       const std::vector<C_PuiSvDbLabel> & rc_Labels = pc_ExpectedData->GetLabels();
       const std::vector<C_PuiSvDbPieChart> & rc_PieCharts = pc_ExpectedData->GetPieCharts();
       const std::vector<C_PuiSvDbProgressBar> & rc_ProgressBars = pc_ExpectedData->GetProgressBars();
@@ -575,43 +575,43 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
       for (u32_ItElem = 0; u32_ItElem < rc_Labels.size(); ++u32_ItElem)
       {
          const C_PuiSvDbLabel & rc_Widget = rc_Labels[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < rc_PieCharts.size(); ++u32_ItElem)
       {
          const C_PuiSvDbPieChart & rc_Widget = rc_PieCharts[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < rc_ProgressBars.size(); ++u32_ItElem)
       {
          const C_PuiSvDbProgressBar & rc_Widget = rc_ProgressBars[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < rc_SpinBoxs.size(); ++u32_ItElem)
       {
          const C_PuiSvDbSpinBox & rc_Widget = rc_SpinBoxs[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < rc_Sliders.size(); ++u32_ItElem)
       {
          const C_PuiSvDbSlider & rc_Widget = rc_Sliders[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < rc_Tabless.size(); ++u32_ItElem)
       {
          const C_PuiSvDbTable & rc_Widget = rc_Tabless[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
 
       for (u32_ItElem = 0; u32_ItElem < rc_Toggles.size(); ++u32_ItElem)
       {
          const C_PuiSvDbToggle & rc_Widget = rc_Toggles[u32_ItElem];
-         m_MinToOrgPos(rc_Widget.c_UIPosition);
+         m_MinToOrgPos(rc_Widget.c_UiPosition);
       }
    }
 }
@@ -621,7 +621,7 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
 
    \param[in,out]  orc_Data               System view dashboard
    \param[in,out]  orc_Rails              System view dashboard rails
-   \param[in]      orc_ElementIDGroups    Element ID groups
+   \param[in]      orc_ElementIdGroups    Element ID groups
 
    \return
    Flags
@@ -630,17 +630,17 @@ void C_SyvDaCopyPasteManager::m_CalcOriginalPosition(const C_PuiBsElements * con
    \retval   False   Nothing changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaCopyPasteManager::mh_ValidateCrcs(C_PuiSvDashboard & orc_Data, QMap<C_OSCNodeDataPoolListElementId,
+bool C_SyvDaCopyPasteManager::mh_ValidateCrcs(C_PuiSvDashboard & orc_Data, QMap<C_OscNodeDataPoolListElementId,
                                                                                 C_PuiSvReadDataConfiguration> & orc_Rails, const QMap<C_PuiSvDbNodeDataPoolListElementId,
-                                                                                                                                      C_PuiSvDbElementIdCRCGroup> & orc_ElementIDGroups)
+                                                                                                                                      C_PuiSvDbElementIdCrcGroup> & orc_ElementIdGroups)
 {
    bool q_Retval = false;
 
    for (QMap<C_PuiSvDbNodeDataPoolListElementId,
-             C_PuiSvDbElementIdCRCGroup>::ConstIterator c_It = orc_ElementIDGroups.cbegin();
-        c_It != orc_ElementIDGroups.cend(); ++c_It)
+             C_PuiSvDbElementIdCrcGroup>::ConstIterator c_It = orc_ElementIdGroups.cbegin();
+        c_It != orc_ElementIdGroups.cend(); ++c_It)
    {
-      if (c_It.value().CheckCRC() != C_NO_ERR)
+      if (c_It.value().CheckCrc() != C_NO_ERR)
       {
          orc_Rails.remove(c_It.key());
          orc_Data.RemoveAllReferencesToElementId(c_It.key());

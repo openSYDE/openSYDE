@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "C_SdNdeCoDeviceWidget.h"
+#include "TglUtils.hpp"
+#include "C_SdNdeCoDeviceWidget.hpp"
 #include "ui_C_SdNdeCoDeviceWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_CONFIGURATION = 0UL;
-const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_PDOS = 1UL;
-const uint32 C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_EDS_FILE = 2UL;
+const uint32_t C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_CONFIGURATION = 0UL;
+const uint32_t C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_PDOS = 1UL;
+const uint32_t C_SdNdeCoDeviceWidget::mhu32_INDEX_DEVICE_USE_CASE_EDS_FILE = 2UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -81,9 +80,9 @@ C_SdNdeCoDeviceWidget::~C_SdNdeCoDeviceWidget()
    \param[in]  ou32_UseCaseIndex           Use case index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoDeviceWidget::SetDeviceUseCase(const uint32 ou32_ManagerNodeIndex, const uint8 ou8_ManagerInterfaceId,
-                                             const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceNodeId,
-                                             const uint32 ou32_UseCaseIndex)
+void C_SdNdeCoDeviceWidget::SetDeviceUseCase(const uint32_t ou32_ManagerNodeIndex, const uint8_t ou8_ManagerInterfaceId,
+                                             const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceNodeId,
+                                             const uint32_t ou32_UseCaseIndex)
 {
    bool q_EdsWidgetVisibility = false;
    bool q_PdoWidgetVisibility = false;

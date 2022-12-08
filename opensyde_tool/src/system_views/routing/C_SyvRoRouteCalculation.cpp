@@ -8,19 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvRoRouteCalculation.h"
+#include "C_SyvRoRouteCalculation.hpp"
 
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
-#include "C_PuiSvPc.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiSvPc.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,11 +43,11 @@ using namespace stw_opensyde_core;
    \param[in]     oe_Mode              Decision for update or diagnostic routing
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvRoRouteCalculation::C_SyvRoRouteCalculation(const uint32 ou32_ViewIndex, const uint32 ou32_TargetNodeIndex,
-                                                 const C_OSCRoutingCalculation::E_Mode oe_Mode)
+C_SyvRoRouteCalculation::C_SyvRoRouteCalculation(const uint32_t ou32_ViewIndex, const uint32_t ou32_TargetNodeIndex,
+                                                 const C_OscRoutingCalculation::E_Mode oe_Mode)
 {
-   const stw_opensyde_core::C_OSCSystemDefinition & rc_SystemDefintion =
-      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst();
+   const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefintion =
+      C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
    const C_PuiSvPc & rc_Pc = pc_View->GetPcData();
 
@@ -56,7 +55,7 @@ C_SyvRoRouteCalculation::C_SyvRoRouteCalculation(const uint32 ou32_ViewIndex, co
 
    // Use the original node active flags. The potential deactivated sub nodes has no impact for the usages as
    // routing points
-   this->mpc_Calculation = new C_OSCRoutingCalculation(rc_SystemDefintion.c_Nodes,
+   this->mpc_Calculation = new C_OscRoutingCalculation(rc_SystemDefintion.c_Nodes,
                                                        pc_View->GetNodeActiveFlags(),
                                                        rc_Pc.GetBusIndex(),
                                                        ou32_TargetNodeIndex, oe_Mode);
@@ -80,7 +79,7 @@ C_SyvRoRouteCalculation::~C_SyvRoRouteCalculation()
    Pointer to Vector with all found routes
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<C_OSCRoutingRoute> * C_SyvRoRouteCalculation::GetRoutes(void) const
+const std::vector<C_OscRoutingRoute> * C_SyvRoRouteCalculation::GetRoutes(void) const
 {
    return this->mpc_Calculation->GetRoutes();
 }
@@ -93,7 +92,7 @@ const std::vector<C_OSCRoutingRoute> * C_SyvRoRouteCalculation::GetRoutes(void) 
    NULL:             No route found
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCRoutingRoute * C_SyvRoRouteCalculation::GetBestRoute(void) const
+const C_OscRoutingRoute * C_SyvRoRouteCalculation::GetBestRoute(void) const
 {
    return this->mpc_Calculation->GetBestRoute();
 }
@@ -108,8 +107,8 @@ const C_OSCRoutingRoute * C_SyvRoRouteCalculation::GetBestRoute(void) const
    \retval   false  Interface can not be used or is not relevant
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvRoRouteCalculation::CheckItfNumberForRouting(const uint32 ou32_TargetNodeIndex,
-                                                       const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
+bool C_SyvRoRouteCalculation::CheckItfNumberForRouting(const uint32_t ou32_TargetNodeIndex,
+                                                       const C_OscNodeComInterfaceSettings & orc_ComItfSettings) const
 {
    return this->mpc_Calculation->CheckItfNumberForRouting(ou32_TargetNodeIndex, orc_ComItfSettings);
 }
@@ -125,7 +124,7 @@ bool C_SyvRoRouteCalculation::CheckItfNumberForRouting(const uint32 ou32_TargetN
    C_NOACT     Target function (update or diagnostic) deactivated on all connected bus. No routing necessary.
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvRoRouteCalculation::GetState(void) const
+int32_t C_SyvRoRouteCalculation::GetState(void) const
 {
    return this->mpc_Calculation->GetState();
 }

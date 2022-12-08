@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdBus.h"
+#include "C_PuiSdBus.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,7 +40,7 @@ using namespace stw_opensyde_gui_logic;
 C_PuiSdBus::C_PuiSdBus() :
    C_PuiBsLineBase()
 {
-   s32_UIWidthPixels = 6;
+   s32_UiWidthPixels = 6;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,18 +51,18 @@ C_PuiSdBus::C_PuiSdBus() :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdBus::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSdBus::CalcHash(uint32_t & oru32_HashValue) const
 {
-   sintn sn_Value;
+   int32_t s32_Value;
 
-   sn_Value = this->c_UIColorMiddleLine.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIColorMiddleLine.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIColorMiddleLine.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIColorMiddleLine.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorMiddleLine.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorMiddleLine.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorMiddleLine.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorMiddleLine.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
    C_PuiBsLineBase::CalcHash(oru32_HashValue);
 }

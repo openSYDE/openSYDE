@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "C_GiBiImageGroup.h"
-#include "C_PuiSdDataElement.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiBsImage.h"
-#include "gitypes.h"
+#include "stwtypes.hpp"
+#include "C_GiBiImageGroup.hpp"
+#include "C_PuiSdDataElement.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiBsImage.hpp"
+#include "gitypes.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiImageGroupWithoutData::mhf64_ACTION_POINT_OFFSET_IMAGE = 8.0;
+const float64_t C_GiImageGroupWithoutData::mhf64_ACTION_POINT_OFFSET_IMAGE = 8.0;
 
-const float64 C_GiImageGroupWithoutData::mhf64_MIN_WIDTH_IMAGE = 10.0;
-const float64 C_GiImageGroupWithoutData::mhf64_MIN_HEIGHT_IMAGE = 10.0;
+const float64_t C_GiImageGroupWithoutData::mhf64_MIN_WIDTH_IMAGE = 10.0;
+const float64_t C_GiImageGroupWithoutData::mhf64_MIN_HEIGHT_IMAGE = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -47,18 +46,17 @@ const float64 C_GiImageGroupWithoutData::mhf64_MIN_HEIGHT_IMAGE = 10.0;
 
    Set up GUI with all elements.
 
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orc_ImagePath        File path of image
-   \param[in]       oe_Type              Item type
-   \param[in]       oq_RequestLateInit   Flag if initialization should be postponed
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]      oru64_Id                  Unique ID
+   \param[in]      orc_ImagePath             File path of image
+   \param[in]      oq_RequestLateImageInit   Request late image init
+   \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, const QString & orc_ImagePath,
+C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64_t & oru64_Id, const QString & orc_ImagePath,
                                                      const bool oq_RequestLateImageInit,
                                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_IMAGE,
+   C_GiBiRectBaseGroup(oru64_Id, mhf64_MIN_WIDTH_IMAGE,
                        mhf64_MIN_HEIGHT_IMAGE, mhf64_ACTION_POINT_OFFSET_IMAGE, true, opc_Parent),
    mpc_Image(NULL),
    mpc_SvgGraphicsItem(NULL),
@@ -75,20 +73,18 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
 
    Set up GUI with all elements.
 
-   \param[in]       oru64_ID             Unique ID
-   \param[in]       orc_Image            Image
-   \param[in]       orf64_Width          Width of image view
-   \param[in]       orf64_Height          Height of image view
-   \param[in]       orc_ImagePath        Filepath to the image
-   \param[in]       oe_Type              Item type
-   \param[in,out]   opc_Parent           Optional pointer to parent
+   \param[in]      oru64_Id      Unique ID
+   \param[in]      of64_Width    Width of image view
+   \param[in]      of64_Height   Height of image view
+   \param[in]      orc_Image     Image
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, const float64 of64_Width,
-                                                     const float64 of64_Height, const QPixmap & orc_Image,
+C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64_t & oru64_Id, const float64_t of64_Width,
+                                                     const float64_t of64_Height, const QPixmap & orc_Image,
                                                      QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiBiRectBaseGroup(oru64_ID, mhf64_MIN_WIDTH_IMAGE,
+   C_GiBiRectBaseGroup(oru64_Id, mhf64_MIN_WIDTH_IMAGE,
                        mhf64_MIN_HEIGHT_IMAGE, mhf64_ACTION_POINT_OFFSET_IMAGE, true, opc_Parent),
    mpc_SvgGraphicsItem(NULL),
    mq_IsSvgFlag(false)
@@ -104,7 +100,7 @@ C_GiImageGroupWithoutData::C_GiImageGroupWithoutData(const uint64 & oru64_ID, co
 
    Clean up.
 */
-//--------------------------------------------- ------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540}  no memory leak because of the parent of mpc_Image and the Qt memory management
 C_GiImageGroupWithoutData::~C_GiImageGroupWithoutData()
 {
@@ -132,7 +128,7 @@ QPixmap C_GiImageGroupWithoutData::GetImage(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Late image initialization
 
-   \param[in] orc_ImagePath File path of image
+   \param[in]  orc_ImagePath  File path of image
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiImageGroupWithoutData::m_LateImageInit(const QString & orc_ImagePath)
@@ -161,7 +157,7 @@ void C_GiImageGroupWithoutData::m_LateImageInit(const QString & orc_ImagePath)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiImageGroupWithoutData::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+void C_GiImageGroupWithoutData::m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight)
 {
    Q_UNUSED(of64_DiffWidth)
    Q_UNUSED(of64_DiffHeight)

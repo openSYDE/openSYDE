@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCDeviceDefinition.h"
-#include "CSCLString.h"
-#include "TGLUtils.h"
+#include "C_OscDeviceDefinition.hpp"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_scl::C_SCLString C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME = "Sensor-Technik Wiedemann GmbH";
+const stw::scl::C_SclString C_OscDeviceDefinition::hc_DEFAULT_COMPANY_NAME = "Sensor-Technik Wiedemann GmbH";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -38,7 +38,7 @@ const stw_scl::C_SCLString C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME = "Sen
    Initialize all class elements with default values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDeviceDefinition::C_OSCDeviceDefinition(void)
+C_OscDeviceDefinition::C_OscDeviceDefinition(void)
 {
    this->Clear();
 }
@@ -49,7 +49,7 @@ C_OSCDeviceDefinition::C_OSCDeviceDefinition(void)
    Sets all numeric elements to zero and all strings to ""
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDeviceDefinition::Clear(void)
+void C_OscDeviceDefinition::Clear(void)
 {
    c_DeviceName = "";
    c_DeviceNameAlias = "";
@@ -63,7 +63,7 @@ void C_OSCDeviceDefinition::Clear(void)
    c_SupportedBitrates.clear();
 
    u8_ManufacturerId = 0;
-   c_ManufacturerDisplayValue = C_OSCDeviceDefinition::hc_DEFAULT_COMPANY_NAME;
+   c_ManufacturerDisplayValue = C_OscDeviceDefinition::hc_DEFAULT_COMPANY_NAME;
 
    c_SubDevices.clear();
 }
@@ -74,9 +74,9 @@ void C_OSCDeviceDefinition::Clear(void)
    String to display
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCDeviceDefinition::GetDisplayName(void) const
+stw::scl::C_SclString C_OscDeviceDefinition::GetDisplayName(void) const
 {
-   stw_scl::C_SCLString c_Retval;
+   stw::scl::C_SclString c_Retval;
    if (this->c_DeviceNameAlias == "")
    {
       c_Retval = this->c_DeviceName;

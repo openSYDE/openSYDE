@@ -32,10 +32,10 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui::C_SdNdeDpViewWidget" name="pc_WidgetDpView" native="true"/>
+      <widget class="stw::opensyde_gui::C_SdNdeDpViewWidget" name="pc_WidgetDpView" native="true"/>
      </item>
      <item>
-      <widget class="stw_opensyde_gui::C_SdNdeDpListEditWidget" name="pc_ListsWidget" native="true"/>
+      <widget class="stw::opensyde_gui::C_SdNdeDpListEditWidget" name="pc_ListsWidget" native="true"/>
      </item>
     </layout>
    </item>
@@ -43,15 +43,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpViewWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeDpViewWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeDpViewWidget.h</header>
+   <header>C_SdNdeDpViewWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpListEditWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeDpListEditWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeDpListEditWidget.h</header>
+   <header>C_SdNdeDpListEditWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

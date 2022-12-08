@@ -1,12 +1,12 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeChxProperties::indicator
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator
 {
 width: 30px;
 height: 30px;
 margin-right: 6px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxPropertiesSmall::indicator
+stw--opensyde_gui_elements--C_OgeChxPropertiesSmall::indicator
 {
 width: 22px;
 height: 22px;
@@ -14,49 +14,49 @@ margin-top: 3px;
 margin-right: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator
+stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator
 {
 width: 24px;
 height: 24px;
 margin-right: 6px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator
+stw--opensyde_gui_elements--C_OgeChxDefaultSmall::indicator
 {
 width: 22px;
 height: 22px;
 margin-top: 3px;
 }
 
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator
 {
 width: 22px;
 height: 22px;
 margin-top: 2px;
 }
 
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::indicator
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator
 {
 width: 22px;
 height: 22px;
 margin-top: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxDefaultSmall
+stw--opensyde_gui_elements--C_OgeChxDefaultSmall
 {
 margin-bottom: 4px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxTiny::indicator
+stw--opensyde_gui_elements--C_OgeChxTiny::indicator
 {
 width: 16px;
 height: 16px;
 border: 1px solid;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator
 {
 width: 15px;
 height: 15px;
@@ -64,9 +64,9 @@ height: 15px;
 
 /* --------------------------------------------------------------------- */
 /*Table cell*/
-stw_opensyde_gui--C_SdBueSignalTableView::indicator,
-stw_opensyde_gui--C_SdBueMessageTableView::indicator,
-stw_opensyde_gui--C_SdNdeCoPdoTableView::indicator
+stw--opensyde_gui--C_SdBueSignalTableView::indicator,
+stw--opensyde_gui--C_SdBueMessageTableView::indicator,
+stw--opensyde_gui--C_SdNdeCoPdoTableView::indicator
 {
 width: 40px;
 height: 40px;
@@ -74,8 +74,8 @@ border-style:solid;
 border-width: 0px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcOvTableView::indicator,
-stw_opensyde_gui--C_SdNdeDpListTableView::indicator
+stw--opensyde_gui--C_SdNdeHalcOvTableView::indicator,
+stw--opensyde_gui--C_SdNdeDpListTableView::indicator
 {
 width: 30px;
 height: 30px;
@@ -83,27 +83,27 @@ border: none;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator,
-stw_opensyde_gui_elements--C_OgeChxProperties::indicator,
-stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator,
-stw_opensyde_gui_elements--C_OgeChxTristate::indicator,
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator,
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::indicator,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator
+stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator,
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator,
+stw--opensyde_gui_elements--C_OgeChxDefaultSmall::indicator,
+stw--opensyde_gui_elements--C_OgeChxTristate::indicator,
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator,
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator,
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator
 {
 border: none;
 }
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator
+stw--opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator
 {
 margin-right: 8px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:checked
+stw--opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:checked
 {
 width: 24px;
 height: 24px;
@@ -111,7 +111,7 @@ border-style: none;
 border-width: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:!checked
+stw--opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:!checked
 {
 width: 22px;
 height: 22px;
@@ -120,19 +120,19 @@ border-width: 1px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentError:!checked
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentError:!checked
 {
 padding-left: 22px;
 padding-right: 3px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator:checked
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator:checked
 {
 padding-left: 8px;
 padding-right: 3px;
 }
 
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator:checked
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentError::indicator:checked
 {
 image: url(://images/Error_iconV2.svg);
 width: 24px;
@@ -140,85 +140,85 @@ height: 24px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:enabled:checked,
-stw_opensyde_gui_elements--C_OgeChxProperties::indicator:enabled:checked,
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:checked,
-stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:checked,
-stw_opensyde_gui_elements--C_OgeChxTristate::indicator:enabled:checked,
-stw_opensyde_gui--C_SdBueSignalTableView::indicator:enabled:checked,
-stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:checked,
-stw_opensyde_gui--C_SdNdeCoPdoTableView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdBueMessageTableView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdNdeHalcOvTableView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdNdeDpListTableView::indicator:enabled:checked,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::indicator:enabled:checked,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:checked,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:checked
+stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:enabled:checked,
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator:enabled:checked,
+stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:checked,
+stw--opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:checked,
+stw--opensyde_gui_elements--C_OgeChxTristate::indicator:enabled:checked,
+stw--opensyde_gui--C_SdBueSignalTableView::indicator:enabled:checked,
+stw--opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:checked,
+stw--opensyde_gui--C_SdNdeCoPdoTableView::indicator:enabled:checked,
+stw--opensyde_gui--C_SdBueMessageTableView::indicator:enabled:checked,
+stw--opensyde_gui--C_SdNdeHalcOvTableView::indicator:enabled:checked,
+stw--opensyde_gui--C_SdNdeDpListTableView::indicator:enabled:checked,
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:enabled:checked,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator:enabled:checked,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:enabled:checked,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:enabled:checked,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:checked
 {
 image: url(://images/CheckBoxActiveWithoutBackground.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeChxTiny::indicator:checked
+stw--opensyde_gui_elements--C_OgeChxTiny::indicator:checked
 {
 image: url(://images/CheckBoxTinyActive.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:indeterminate,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:indeterminate,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::indicator:indeterminate,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:indeterminate,
-stw_opensyde_gui--C_SdNdeCoConfigTreeWidget::indicator:indeterminate
+stw--opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:indeterminate,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator:indeterminate,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:indeterminate,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:indeterminate,
+stw--opensyde_gui--C_SdNdeCoConfigTreeWidget::indicator:indeterminate
 {
 image: url(://images/CheckBoxIndeterminate.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:!checked,
-stw_opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:!checked,
-stw_opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:!checked
+stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:!checked,
+stw--opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:!checked,
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:!checked
 {
 image: url(://images/CheckBoxDisabledNotChecked.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:checked,
-stw_opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:checked,
-stw_opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:checked,
-stw_opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:disabled:checked,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:disabled:checked,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled:checked,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::indicator:disabled:checked,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:disabled:checked,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:disabled:checked
+stw--opensyde_gui_elements--C_OgeChxDefaultCheckedDisabled::indicator:disabled:checked,
+stw--opensyde_gui_elements--C_OgeChxTristate::indicator:disabled:checked,
+stw--opensyde_gui_elements--C_OgeChxProperties::indicator:disabled:checked,
+stw--opensyde_gui_elements--C_OgeChxDefaultSmall::indicator:disabled:checked,
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::indicator:disabled:checked,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::indicator:disabled:checked,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::indicator:disabled:checked,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::indicator:disabled:checked,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:disabled:checked
 {
 image: url(://images/CheckBoxActiveDisabledWithoutBackground.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:checked:enabled
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:checked:enabled
 {
 image: url(://images/system_views/dashboards/icons/ToggleStwOnT1Bright.svg);
 }
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:checked:disabled
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:checked:disabled
 {
 image: url(://images/system_views/dashboards/icons/ToggleStwOnT1Bright_Disabled.svg);
 }
 
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:!checked:enabled
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:!checked:enabled
 {
 image: url(://images/system_views/dashboards/icons/ToggleStwOffT1Bright.svg);
 }
-stw_opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:!checked:disabled
+stw--opensyde_gui_elements--C_OgeChxTristateTransparentToggle::indicator:!checked:disabled
 {
 image: url(://images/system_views/dashboards/icons/ToggleStwOffT1Bright_Disabled.svg);
 }
 
 /*No image necessary*/
-stw_opensyde_gui--C_SdBueSignalTableView::indicator:enabled,
-stw_opensyde_gui--C_SdBueMessageTableView::indicator:enabled,
-stw_opensyde_gui--C_SdNdeCoPdoTableView::indicator:enabled,
-stw_opensyde_gui--C_SdNdeHalcOvTableView::indicator:enabled,
-stw_opensyde_gui--C_SdNdeDpListTableView::indicator:enabled,
-stw_opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:!checked
+stw--opensyde_gui--C_SdBueSignalTableView::indicator:enabled,
+stw--opensyde_gui--C_SdBueMessageTableView::indicator:enabled,
+stw--opensyde_gui--C_SdNdeCoPdoTableView::indicator:enabled,
+stw--opensyde_gui--C_SdNdeHalcOvTableView::indicator:enabled,
+stw--opensyde_gui--C_SdNdeDpListTableView::indicator:enabled,
+stw--opensyde_gui_elements--C_OgeChxSystemCommisioningEdit::indicator:!checked
 {
 image: none;
 image-position: center left;

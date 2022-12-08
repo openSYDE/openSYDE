@@ -27,7 +27,7 @@
     <number>27</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral_3">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral_3">
      <property name="title">
       <string/>
      </property>
@@ -55,7 +55,7 @@
            <number>6</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelBusHeading">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelBusHeading">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -106,7 +106,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_3">
+           <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame_3">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -140,7 +140,7 @@
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonPeak">
+             <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonPeak">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -162,7 +162,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonVector">
+             <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonVector">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -181,7 +181,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonOther">
+             <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonOther">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -221,7 +221,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCustomDllPath">
+               <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelCustomDllPath">
                 <property name="text">
                  <string>DLL</string>
                 </property>
@@ -244,7 +244,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditCustomDllPath">
+               <widget class="stw::opensyde_gui_elements::C_OgeLeFilePath" name="pc_LineEditCustomDllPath">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -260,7 +260,7 @@
                </widget>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgePubPathVariables" name="pc_PushButtonVariables">
+               <widget class="stw::opensyde_gui_elements::C_OgePubPathVariables" name="pc_PushButtonVariables">
                 <property name="minimumSize">
                  <size>
                   <width>33</width>
@@ -279,7 +279,7 @@
                </widget>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonBrowse">
+               <widget class="stw::opensyde_gui_elements::C_OgePubOpen" name="pc_PushButtonBrowse">
                 <property name="minimumSize">
                  <size>
                   <width>33</width>
@@ -324,7 +324,7 @@
                <number>10</number>
               </property>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonConfigureDll">
+               <widget class="stw::opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonConfigureDll">
                 <property name="minimumSize">
                  <size>
                   <width>150</width>
@@ -359,7 +359,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonTestConnection">
+               <widget class="stw::opensyde_gui_elements::C_OgePubConfigure" name="pc_BushButtonTestConnection">
                 <property name="minimumSize">
                  <size>
                   <width>150</width>
@@ -393,7 +393,7 @@
              </layout>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelBitrateInfo">
+             <widget class="stw::opensyde_gui_elements::C_OgeLabGroupSubItem" name="pc_LabelBitrateInfo">
               <property name="text">
                <string>TextLabel</string>
               </property>
@@ -440,7 +440,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
+      <widget class="stw::opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -481,7 +481,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -527,66 +527,66 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeFilePath</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeFilePath</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeFilePath.h</header>
+   <header>C_OgeLeFilePath.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubOpen</class>
+   <class>stw::opensyde_gui_elements::C_OgePubOpen</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubOpen.h</header>
+   <header>C_OgePubOpen.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubPathVariables</class>
+   <class>stw::opensyde_gui_elements::C_OgePubPathVariables</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubPathVariables.h</header>
+   <header>C_OgePubPathVariables.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeRabProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeRabProperties</class>
    <extends>QRadioButton</extends>
-   <header>C_OgeRabProperties.h</header>
+   <header>C_OgeRabProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupSubItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupSubItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupSubItem.h</header>
+   <header>C_OgeLabGroupSubItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubConfigure</class>
+   <class>stw::opensyde_gui_elements::C_OgePubConfigure</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubConfigure.h</header>
+   <header>C_OgePubConfigure.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

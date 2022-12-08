@@ -10,37 +10,35 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
-#include "C_Uti.h"
-#include "C_SdUtil.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_GtGetText.h"
-#include "C_NagToolTip.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvDaTableBase.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeDpContentUtil.h"
-#include "C_SyvDaItTaModel.h"
-#include "C_GiSvDaTableBase.h"
-#include "C_OSCNodeDataPoolContentUtil.h"
+#include "C_Uti.hpp"
+#include "C_SdUtil.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_NagToolTip.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvDaTableBase.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
+#include "C_SyvDaItTaModel.hpp"
+#include "C_GiSvDaTableBase.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //Cast to integer on some level so this is the allowed maximum
-const uint32 C_SyvDaItTaModel::hu32_MAX_ELEMENTS = static_cast<uint32>(std::numeric_limits<sintn>::max());
+const uint32_t C_SyvDaItTaModel::hu32_MAX_ELEMENTS = static_cast<uint32_t>(std::numeric_limits<int32_t>::max());
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,24 +66,24 @@ C_SyvDaItTaModel::C_SyvDaItTaModel(C_PuiSvDbDataElementHandler * const opc_Data,
    mc_IconParameter(":/images/system_definition/IconParameter.svg"),
    mc_IconSignal(":/images/system_definition/IconSignal.svg"),
    mc_IconVariable(":/images/system_definition/IconVariable.svg"),
-   mc_IconHALInput(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg"),
-   mc_IconHALOutput(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg"),
-   mc_IconHALOther(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg"),
+   mc_IconHalInput(":/images/system_definition/NodeEdit/halc/InputSmallActive.svg"),
+   mc_IconHalOutput(":/images/system_definition/NodeEdit/halc/OutputSmallActive.svg"),
+   mc_IconHalOther(":/images/system_definition/NodeEdit/halc/OtherSmallActive.svg"),
    // Warning icons
    mc_IconParameterWarning("://images/system_definition/IconParameterWarning.svg"),
    mc_IconSignalWarning("://images/system_definition/IconSignalWarning.svg"),
    mc_IconVariableWarning("://images/system_definition/IconVariableWarning.svg"),
-   mc_IconHALOtherWarning(":/images/system_definition/NodeEdit/halc/OtherSmallWarning.svg"),
+   mc_IconHalOtherWarning(":/images/system_definition/NodeEdit/halc/OtherSmallWarning.svg"),
    // Error icons
    mc_IconParameterError("://images/system_definition/IconParameterError.svg"),
    mc_IconSignalError("://images/system_definition/IconSignalError.svg"),
    mc_IconVariableError("://images/system_definition/IconVariableError.svg"),
-   mc_IconHALInputError(":/images/system_definition/NodeEdit/halc/InputSmallError.svg"),
-   mc_IconHALOutputError(":/images/system_definition/NodeEdit/halc/OutputSmallError.svg"),
-   mc_IconHALOtherError(":/images/system_definition/NodeEdit/halc/OtherSmallError.svg")
+   mc_IconHalInputError(":/images/system_definition/NodeEdit/halc/InputSmallError.svg"),
+   mc_IconHalOutputError(":/images/system_definition/NodeEdit/halc/OutputSmallError.svg"),
+   mc_IconHalOtherError(":/images/system_definition/NodeEdit/halc/OtherSmallError.svg")
 {
    //Register to allow data changed signal
-   qRegisterMetaType<QVector<sintn> >();
+   qRegisterMetaType<QVector<int32_t> >();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,17 +152,18 @@ void C_SyvDaItTaModel::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Sty
 void C_SyvDaItTaModel::InitMinMaxAndName(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if (pc_TableWidget != NULL)
    {
       const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
       if (pc_Item != NULL)
       {
-         const uint32 u32_Count = pc_Item->c_DataPoolElementsConfig.size();
+         const uint32_t u32_Count = pc_Item->c_DataPoolElementsConfig.size();
 
          //Clear
+         this->mc_ScaledDisplayDataValues.clear();
          this->mc_UnscaledLastDataValues.clear();
          this->mc_UnscaledMaxValues.clear();
          this->mc_UnscaledMinValues.clear();
@@ -176,6 +175,7 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
          this->mc_ShowPercentage.clear();
 
          //Reserve
+         this->mc_ScaledDisplayDataValues.reserve(u32_Count);
          this->mc_UnscaledLastDataValues.reserve(u32_Count);
          this->mc_UnscaledMaxValues.reserve(u32_Count);
          this->mc_UnscaledMinValues.reserve(u32_Count);
@@ -189,120 +189,14 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
          this->mc_Transparency.resize(u32_Count, 255);
 
          //Look up
-         for (uint32 u32_ItElement = 0; u32_ItElement < u32_Count; ++u32_ItElement)
+         for (uint32_t u32_ItElement = 0; u32_ItElement < u32_Count; ++u32_ItElement)
          {
             const C_PuiSvDbNodeDataPoolListElementId * const pc_ElementId =
                this->GetDataPoolElementIndex(u32_ItElement);
             if (pc_ElementId != NULL)
             {
-               const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Item->c_DataPoolElementsConfig[u32_ItElement];
-               if (pc_ElementId->GetIsValid() == true)
-               {
-                  const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(pc_ElementId->u32_NodeIndex,
-                                                                                pc_ElementId->u32_DataPoolIndex,
-                                                                                pc_ElementId->u32_ListIndex,
-                                                                                pc_ElementId->u32_ElementIndex);
-                  const C_PuiSdNodeDataPoolListElement * const pc_UIElement =
-                     C_PuiSdHandler::h_GetInstance()->GetUIDataPoolListElement(pc_ElementId->u32_NodeIndex,
-                                                                               pc_ElementId->u32_DataPoolIndex,
-                                                                               pc_ElementId->u32_ListIndex,
-                                                                               pc_ElementId->u32_ElementIndex);
-                  const C_OSCNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
-                     pc_ElementId->u32_NodeIndex, pc_ElementId->u32_DataPoolIndex);
-
-                  tgl_assert(pc_OSCElement != NULL);
-                  if (pc_OSCElement != NULL)
-                  {
-                     C_OSCNodeDataPoolContentUtil::E_ValueChangedTo e_FullyUsefulAndTotallyNecessaryVariable;
-                     C_OSCNodeDataPoolContent c_Val = pc_OSCElement->c_MinValue;
-                     std::vector<float64> c_Values;
-                     C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_OSCElement->c_MinValue, c_Values);
-                     this->mc_UnscaledMinValues.push_back(c_Values);
-                     //Set unscaled starting value to 0 if possible
-                     C_OSCNodeDataPoolContentUtil::h_SetValueInMinMaxRange(pc_OSCElement->c_MinValue,
-                                                                           pc_OSCElement->c_MaxValue, c_Val,
-                                                                           e_FullyUsefulAndTotallyNecessaryVariable,
-                                                                           C_OSCNodeDataPoolContentUtil::eTO_ZERO);
-                     C_SdNdeDpContentUtil::h_GetValuesAsFloat64(c_Val, c_Values);
-                     this->mc_UnscaledLastDataValues.push_back(c_Values);
-                     C_SdNdeDpContentUtil::h_GetValuesAsFloat64(pc_OSCElement->c_MaxValue, c_Values);
-                     this->mc_UnscaledMaxValues.push_back(c_Values);
-                     this->mc_ArrayItemIndex.push_back(pc_ElementId->GetArrayElementIndexOrZero());
-
-                     if (rc_Config.c_DisplayName.compare("") == 0)
-                     {
-                        if (pc_Datapool != NULL)
-                        {
-                           if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
-                               (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
-                           {
-                              this->mc_Names.push_back(C_PuiSvHandler::h_GetShortNamespace(*pc_ElementId));
-                           }
-                           else
-                           {
-                              if (pc_ElementId->GetUseArrayElementIndex())
-                              {
-                                 this->mc_Names.push_back(static_cast<QString>("%1[%2]").
-                                                          arg(pc_OSCElement->c_Name.c_str()).
-                                                          arg(pc_ElementId->GetArrayElementIndex()));
-                              }
-                              else
-                              {
-                                 this->mc_Names.push_back(pc_OSCElement->c_Name.c_str());
-                              }
-                           }
-                        }
-                     }
-                     else
-                     {
-                        this->mc_Names.push_back(rc_Config.c_DisplayName);
-                     }
-                     if (rc_Config.c_ElementScaling.q_UseDefault == true)
-                     {
-                        this->mc_Units.push_back(pc_OSCElement->c_Unit.c_str());
-                     }
-                     else
-                     {
-                        this->mc_Units.push_back(rc_Config.c_ElementScaling.c_Unit);
-                     }
-                     //Percentage
-                     if (pc_OSCElement->GetArray())
-                     {
-                        if (pc_ElementId->GetUseArrayElementIndex())
-                        {
-                           this->mc_ShowPercentage.push_back(true);
-                        }
-                        else
-                        {
-                           this->mc_ShowPercentage.push_back(false);
-                        }
-                     }
-                     else
-                     {
-                        this->mc_ShowPercentage.push_back(true);
-                     }
-                  }
-                  //String
-                  tgl_assert(pc_UIElement != NULL);
-                  if (pc_UIElement != NULL)
-                  {
-                     this->mc_InterpretAsStringFlags.push_back(pc_UIElement->q_InterpretAsString);
-                  }
-               }
-               else
-               {
-                  const std::vector<float64> c_Empty;
-                  //Fill up values with dummies
-                  this->mc_Names.push_back(pc_ElementId->GetInvalidNamePlaceholder());
-                  this->mc_Units.push_back("");
-                  this->mc_ShowPercentage.push_back(false);
-                  this->mc_InterpretAsStringFlags.push_back(false);
-                  this->mc_UnscaledMaxValues.push_back(c_Empty);
-                  this->mc_UnscaledMinValues.push_back(c_Empty);
-                  this->mc_UnscaledLastDataValues.push_back(c_Empty);
-                  this->mc_ArrayItemIndex.push_back(0UL);
-               }
+               this->m_InitMinMaxAndNameForOneRow(*pc_ElementId,
+                                                  pc_Item->c_DataPoolElementsConfig[u32_ItElement]);
             }
          }
       }
@@ -316,28 +210,30 @@ void C_SyvDaItTaModel::InitMinMaxAndName(void)
 void C_SyvDaItTaModel::UpdateValue(void)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if (pc_TableWidget != NULL)
    {
       const C_PuiSvDbTable * const pc_Item = pc_TableWidget->GetTableItem();
       if (pc_Item != NULL)
       {
-         const uint32 u32_Count = pc_TableWidget->GetWidgetDataPoolElementCount();
+         const uint32_t u32_Count = pc_TableWidget->GetWidgetDataPoolElementCount();
 
          //For each unique ID
-         for (uint32 u32_ItElement = 0; u32_ItElement < u32_Count; ++u32_ItElement)
+         for (uint32_t u32_ItElement = 0; u32_ItElement < u32_Count; ++u32_ItElement)
          {
             C_PuiSvDbNodeDataPoolListElementId c_Id;
             if (pc_TableWidget->GetDataPoolElementIndex(u32_ItElement, c_Id) == C_NO_ERR)
             {
-               std::vector<float64> c_UnscaledValues;
-               if ((pc_TableWidget->GetLastValueUnscaled(u32_ItElement, c_UnscaledValues) == C_NO_ERR) &&
+               std::vector<float64_t> c_UnscaledValues;
+               std::vector<QString> c_ScaledDisplayValues;
+               if ((pc_TableWidget->GetLastValueUnscaled(u32_ItElement, c_UnscaledValues,
+                                                         c_ScaledDisplayValues) == C_NO_ERR) &&
                    (c_UnscaledValues.size() > 0))
                {
                   //For each table item
-                  for (uint32 u32_ItConfig = 0; u32_ItConfig < pc_Item->c_DataPoolElementsConfig.size();
+                  for (uint32_t u32_ItConfig = 0; u32_ItConfig < pc_Item->c_DataPoolElementsConfig.size();
                        ++u32_ItConfig)
                   {
                      const C_PuiSvDbNodeDataElementConfig & rc_Config =
@@ -351,8 +247,17 @@ void C_SyvDaItTaModel::UpdateValue(void)
                         }
                         else
                         {
-                           this->mc_UnscaledLastDataValues.resize(static_cast<uintn>(u32_ItConfig) + 1U);
+                           this->mc_UnscaledLastDataValues.resize(static_cast<uint32_t>(u32_ItConfig) + 1U);
                            this->mc_UnscaledLastDataValues[u32_ItConfig] = c_UnscaledValues;
+                        }
+                        if (u32_ItConfig < this->mc_ScaledDisplayDataValues.size())
+                        {
+                           this->mc_ScaledDisplayDataValues[u32_ItConfig] = c_ScaledDisplayValues;
+                        }
+                        else
+                        {
+                           this->mc_ScaledDisplayDataValues.resize(static_cast<uint32_t>(u32_ItConfig) + 1U);
+                           this->mc_ScaledDisplayDataValues[u32_ItConfig] = c_ScaledDisplayValues;
                         }
                      }
                   }
@@ -371,8 +276,8 @@ void C_SyvDaItTaModel::UpdateError(void)
 {
    if (this->rowCount() > 0)
    {
-      QVector<sintn> c_Roles;
-      c_Roles.push_back(msn_USER_ROLE_ICON);
+      QVector<int32_t> c_Roles;
+      c_Roles.push_back(ms32_USER_ROLE_ICON);
       Q_EMIT (this->dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), c_Roles));
    }
 }
@@ -381,14 +286,14 @@ void C_SyvDaItTaModel::UpdateError(void)
 /*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparency (0..255)
+   \param[in]  os32_Value              Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaModel::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_SyvDaItTaModel::UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if (pc_TableWidget != NULL)
    {
@@ -398,16 +303,16 @@ void C_SyvDaItTaModel::UpdateTransparency(const uint32 ou32_DataElementIndex, co
          C_PuiSvDbNodeDataPoolListElementId c_Id;
          if (pc_TableWidget->GetDataPoolElementIndex(ou32_DataElementIndex, c_Id) == C_NO_ERR)
          {
-            for (uint32 u32_ItConfig = 0; u32_ItConfig < pc_Item->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+            for (uint32_t u32_ItConfig = 0; u32_ItConfig < pc_Item->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_Item->c_DataPoolElementsConfig[u32_ItConfig];
                if ((rc_Config.c_ElementId == c_Id) && (u32_ItConfig < this->mc_Transparency.size()))
                {
                   const QModelIndex c_Index =
-                     this->index(static_cast<sintn>(u32_ItConfig), h_EnumToColumn(C_SyvDaItTaModel::eVALUE));
-                  this->mc_Transparency[u32_ItConfig] = osn_Value;
+                     this->index(static_cast<int32_t>(u32_ItConfig), h_EnumToColumn(C_SyvDaItTaModel::eVALUE));
+                  this->mc_Transparency[u32_ItConfig] = os32_Value;
                   Q_EMIT this->dataChanged(c_Index, c_Index,
-                                           QVector<sintn>() << static_cast<sintn>(Qt::ForegroundRole));
+                                           QVector<int32_t>() << static_cast<int32_t>(Qt::ForegroundRole));
                }
             }
          }
@@ -422,7 +327,7 @@ void C_SyvDaItTaModel::UpdateTransparency(const uint32 ou32_DataElementIndex, co
    \param[in]  orc_ItemIndices   Item indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::vector<uint32> & orc_ItemIndices) const
+void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::vector<uint32_t> & orc_ItemIndices) const
 {
    //Step 1: extract rows
    orc_ItemIndices.reserve(orc_Indices.count());
@@ -430,7 +335,7 @@ void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::v
    {
       if (c_ItIndex->row() >= 0)
       {
-         orc_ItemIndices.push_back(static_cast<uint32>(c_ItIndex->row()));
+         orc_ItemIndices.push_back(static_cast<uint32_t>(c_ItIndex->row()));
       }
    }
    if (orc_ItemIndices.size() > 0)
@@ -443,23 +348,23 @@ void C_SyvDaItTaModel::GetUniqueRows(const QModelIndexList & orc_Indices, std::v
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                      const sintn osn_Role) const
+QVariant C_SyvDaItTaModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                      const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_SyvDaItTaModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const C_SyvDaItTaModel::E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -479,7 +384,7 @@ QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orienta
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          switch (e_Col)
          {
@@ -513,15 +418,15 @@ QVariant C_SyvDaItTaModel::headerData(const sintn osn_Section, const Qt::Orienta
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-      const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-         dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+      const stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+         dynamic_cast<const stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
       if (pc_TableWidget != NULL)
       {
@@ -530,16 +435,16 @@ sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
          {
             if (pc_Item->c_DataPoolElementsConfig.size() == 0)
             {
-               sn_Retval = 1;
+               s32_Retval = 1;
             }
             else
             {
-               sn_Retval = pc_Item->c_DataPoolElementsConfig.size();
+               s32_Retval = pc_Item->c_DataPoolElementsConfig.size();
             }
          }
       }
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -551,40 +456,40 @@ sintn C_SyvDaItTaModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItTaModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SyvDaItTaModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
-      sn_Retval = 4;
+      s32_Retval = 4;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if ((orc_Index.isValid()) && (orc_Index.row() >= 0))
    {
-      const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+      const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
       const C_SyvDaItTaModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
       const C_PuiSvDbNodeDataPoolListElementId * const pc_DataElementId = this->GetDataPoolElementIndex(u32_Index);
       if (pc_DataElementId != NULL)
       {
          //Generic settings, independent of invalid flag
-         if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+         if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
          {
             switch (e_Col)
             {
@@ -600,7 +505,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                break;
             }
          }
-         else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+         else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
          {
             //Stylesheets do not allow access of specific rows so we need to set it manually
             switch (e_Col)
@@ -630,13 +535,13 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
             if (pc_DataElementId->GetIsValid() == true)
             {
                //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-               const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-                  dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+               const stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+                  dynamic_cast<const stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
                if (pc_TableWidget != NULL)
                {
                   //Default
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      switch (e_Col)
                      {
@@ -662,14 +567,14 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      }
                   }
-                  else if (osn_Role == msn_USER_ROLE_ICON)
+                  else if (os32_Role == ms32_USER_ROLE_ICON)
                   {
-                     const C_OSCNodeDataPool * pc_DataPool;
+                     const C_OscNodeDataPool * pc_DataPool;
                      switch (e_Col)
                      {
                      case C_SyvDaItTaModel::eICON:
                         pc_DataPool =
-                           C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(pc_DataElementId->u32_NodeIndex,
+                           C_PuiSdHandler::h_GetInstance()->GetOscDataPool(pc_DataElementId->u32_NodeIndex,
                                                                            pc_DataElementId->u32_DataPoolIndex);
                         if (pc_DataPool != NULL)
                         {
@@ -684,21 +589,21 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                               {
                               // first string is normal icon, second string selected icon
                               // (no selected color specified here, so just use same icon)
-                              case C_OSCNodeDataPool::eDIAG:
+                              case C_OscNodeDataPool::eDIAG:
                                  c_Icons.append(this->mc_IconVariableWarning);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eNVM:
+                              case C_OscNodeDataPool::eNVM:
                                  c_Icons.append(this->mc_IconParameterWarning);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eCOM:
+                              case C_OscNodeDataPool::eCOM:
                                  c_Icons.append(this->mc_IconSignalWarning);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eHALC:
-                              case C_OSCNodeDataPool::eHALC_NVM:
-                                 c_Icons.append(this->mc_IconHALOtherWarning); // in warning case no different HAL icons
+                              case C_OscNodeDataPool::eHALC:
+                              case C_OscNodeDataPool::eHALC_NVM:
+                                 c_Icons.append(this->mc_IconHalOtherWarning); // in warning case no different HAL icons
                                  c_Retval = c_Icons;
                                  break;
                               default:
@@ -708,45 +613,45 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                            else if (pc_TableWidget->CheckItemError(*pc_DataElementId, c_Error,
                                                                    q_IsTransmissionError) == true)
                            {
-                              const C_OSCHalcDefDomain::E_Category e_Category =
+                              const C_OscHalcDefDomain::E_Category e_Category =
                                  C_PuiSdHandler::h_GetInstance()->GetDomainCategoryFromDpId(
                                     *pc_DataElementId, pc_DataElementId->GetArrayElementIndexOrZero());
                               switch (pc_DataPool->e_Type)
                               {
                               // first string is normal icon, second string selected icon
                               // (no selected color specified here, so just use same icon)
-                              case C_OSCNodeDataPool::eDIAG:
+                              case C_OscNodeDataPool::eDIAG:
                                  c_Icons.append(this->mc_IconVariableError);
                                  c_Icons.append(this->mc_IconVariableError);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eNVM:
+                              case C_OscNodeDataPool::eNVM:
                                  c_Icons.append(this->mc_IconParameterError);
                                  c_Icons.append(this->mc_IconParameterError);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eCOM:
+                              case C_OscNodeDataPool::eCOM:
                                  c_Icons.append(this->mc_IconSignalError);
                                  c_Icons.append(this->mc_IconSignalError);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eHALC:
-                              case C_OSCNodeDataPool::eHALC_NVM:
+                              case C_OscNodeDataPool::eHALC:
+                              case C_OscNodeDataPool::eHALC_NVM:
                                  switch (e_Category)
                                  {
-                                 case C_OSCHalcDefDomain::eCA_INPUT:
-                                    c_Icons.append(this->mc_IconHALInputError);
-                                    c_Icons.append(this->mc_IconHALInputError);
+                                 case C_OscHalcDefDomain::eCA_INPUT:
+                                    c_Icons.append(this->mc_IconHalInputError);
+                                    c_Icons.append(this->mc_IconHalInputError);
                                     c_Retval = c_Icons;
                                     break;
-                                 case C_OSCHalcDefDomain::eCA_OUTPUT:
-                                    c_Icons.append(this->mc_IconHALOutputError);
-                                    c_Icons.append(this->mc_IconHALOutputError);
+                                 case C_OscHalcDefDomain::eCA_OUTPUT:
+                                    c_Icons.append(this->mc_IconHalOutputError);
+                                    c_Icons.append(this->mc_IconHalOutputError);
                                     c_Retval = c_Icons;
                                     break;
-                                 case C_OSCHalcDefDomain::eCA_OTHER:
-                                    c_Icons.append(this->mc_IconHALOtherError);
-                                    c_Icons.append(this->mc_IconHALOtherError);
+                                 case C_OscHalcDefDomain::eCA_OTHER:
+                                    c_Icons.append(this->mc_IconHalOtherError);
+                                    c_Icons.append(this->mc_IconHalOtherError);
                                     c_Retval = c_Icons;
                                     break;
                                  default:
@@ -759,7 +664,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                            }
                            else
                            {
-                              const C_OSCHalcDefDomain::E_Category e_Category =
+                              const C_OscHalcDefDomain::E_Category e_Category =
                                  C_PuiSdHandler::h_GetInstance()->GetDomainCategoryFromDpId(
                                     *pc_DataElementId, pc_DataElementId->GetArrayElementIndexOrZero());
 
@@ -767,38 +672,38 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                               {
                               // first string is normal icon, second string selected icon
                               // (no selected color specified here, so just use same icon)
-                              case C_OSCNodeDataPool::eDIAG:
+                              case C_OscNodeDataPool::eDIAG:
                                  c_Icons.append(this->mc_IconVariable);
                                  c_Icons.append(this->mc_IconVariable);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eNVM:
+                              case C_OscNodeDataPool::eNVM:
                                  c_Icons.append(this->mc_IconParameter);
                                  c_Icons.append(this->mc_IconParameter);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eCOM:
+                              case C_OscNodeDataPool::eCOM:
                                  c_Icons.append(this->mc_IconSignal);
                                  c_Icons.append(this->mc_IconSignal);
                                  c_Retval = c_Icons;
                                  break;
-                              case C_OSCNodeDataPool::eHALC:
-                              case C_OSCNodeDataPool::eHALC_NVM:
+                              case C_OscNodeDataPool::eHALC:
+                              case C_OscNodeDataPool::eHALC_NVM:
                                  switch (e_Category)
                                  {
-                                 case C_OSCHalcDefDomain::eCA_INPUT:
-                                    c_Icons.append(this->mc_IconHALInput);
-                                    c_Icons.append(this->mc_IconHALInput);
+                                 case C_OscHalcDefDomain::eCA_INPUT:
+                                    c_Icons.append(this->mc_IconHalInput);
+                                    c_Icons.append(this->mc_IconHalInput);
                                     c_Retval = c_Icons;
                                     break;
-                                 case C_OSCHalcDefDomain::eCA_OUTPUT:
-                                    c_Icons.append(this->mc_IconHALOutput);
-                                    c_Icons.append(this->mc_IconHALOutput);
+                                 case C_OscHalcDefDomain::eCA_OUTPUT:
+                                    c_Icons.append(this->mc_IconHalOutput);
+                                    c_Icons.append(this->mc_IconHalOutput);
                                     c_Retval = c_Icons;
                                     break;
-                                 case C_OSCHalcDefDomain::eCA_OTHER:
-                                    c_Icons.append(this->mc_IconHALOther);
-                                    c_Icons.append(this->mc_IconHALOther);
+                                 case C_OscHalcDefDomain::eCA_OTHER:
+                                    c_Icons.append(this->mc_IconHalOther);
+                                    c_Icons.append(this->mc_IconHalOther);
                                     c_Retval = c_Icons;
                                     break;
                                  default:
@@ -818,7 +723,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      }
                   }
-                  else if (osn_Role == static_cast<sintn>(Qt::EditRole))
+                  else if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                   {
                      switch (e_Col)
                      {
@@ -832,7 +737,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      }
                   }
-                  else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+                  else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
                   {
                      QString c_Error;
 
@@ -864,10 +769,10 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      case C_SyvDaItTaModel::eNAME:
                         //get element name as heading
-                        if (C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(*pc_DataElementId) != NULL)
+                        if (C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(*pc_DataElementId) != NULL)
                         {
                            c_Retval =
-                              C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(*pc_DataElementId)->c_Name.
+                              C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(*pc_DataElementId)->c_Name.
                               c_str();
                         }
                         break;
@@ -877,7 +782,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      }
                   }
-                  else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+                  else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
                   {
                      QString c_Error;
                      switch (e_Col)
@@ -934,7 +839,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         break;
                      }
                   }
-                  else if (osn_Role == msn_USER_ROLE_TOOL_TIP_TYPE)
+                  else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_TYPE)
                   {
                      QString c_Error;
                      switch (e_Col)
@@ -944,12 +849,12 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                         if ((pc_TableWidget->GetViewActive(*pc_DataElementId) == false) ||
                             (pc_TableWidget->GetViewDashboardRouteValid(*pc_DataElementId) == false))
                         {
-                           c_Retval = static_cast<sintn>(C_NagToolTip::eWARNING);
+                           c_Retval = static_cast<int32_t>(C_NagToolTip::eWARNING);
                         }
                         else if (pc_TableWidget->CheckItemError(*pc_DataElementId, c_Error,
                                                                 q_IsTransmissionError) == true)
                         {
-                           c_Retval = static_cast<sintn>(C_NagToolTip::eERROR);
+                           c_Retval = static_cast<int32_t>(C_NagToolTip::eERROR);
                         }
                         else
                         {
@@ -960,7 +865,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      case C_SyvDaItTaModel::eVALUE:
                      case C_SyvDaItTaModel::eBAR:
                      default:
-                        c_Retval = static_cast<sintn>(C_NagToolTip::eDEFAULT);
+                        c_Retval = static_cast<int32_t>(C_NagToolTip::eDEFAULT);
                         break;
                      }
                   }
@@ -973,7 +878,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
             else
             {
                //Invalid
-               if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+               if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                {
                   switch (e_Col)
                   {
@@ -993,7 +898,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      break;
                   }
                }
-               else if (osn_Role == static_cast<sintn>(Qt::EditRole))
+               else if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                {
                   switch (e_Col)
                   {
@@ -1007,7 +912,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      break;
                   }
                }
-               else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+               else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
                {
                   switch (e_Col)
                   {
@@ -1021,7 +926,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      break;
                   }
                }
-               else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+               else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
                {
                   switch (e_Col)
                   {
@@ -1037,15 +942,15 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      break;
                   }
                }
-               else if (osn_Role == msn_USER_ROLE_TOOL_TIP_TYPE)
+               else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_TYPE)
                {
                   switch (e_Col)
                   {
                   case C_SyvDaItTaModel::eNAME:
-                     c_Retval = static_cast<sintn>(C_NagToolTip::eDEFAULT);
+                     c_Retval = static_cast<int32_t>(C_NagToolTip::eDEFAULT);
                      break;
                   case C_SyvDaItTaModel::eICON:
-                     c_Retval = static_cast<sintn>(C_NagToolTip::eWARNING);
+                     c_Retval = static_cast<int32_t>(C_NagToolTip::eWARNING);
                      break;
                   case C_SyvDaItTaModel::eVALUE:
                   case C_SyvDaItTaModel::eBAR:
@@ -1053,7 +958,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      break;
                   }
                }
-               else if (osn_Role == msn_USER_ROLE_ICON)
+               else if (os32_Role == ms32_USER_ROLE_ICON)
                {
                   QStringList c_Icons;
                   switch (e_Col)
@@ -1066,21 +971,21 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
                      {
                      // first string is normal icon, second string selected icon
                      //(no selected color specified here, so just use same icon)
-                     case C_OSCNodeDataPool::eDIAG:
+                     case C_OscNodeDataPool::eDIAG:
                         c_Icons.append(this->mc_IconVariableWarning);
                         c_Retval = c_Icons;
                         break;
-                     case C_OSCNodeDataPool::eNVM:
+                     case C_OscNodeDataPool::eNVM:
                         c_Icons.append(this->mc_IconParameterWarning);
                         c_Retval = c_Icons;
                         break;
-                     case C_OSCNodeDataPool::eCOM:
+                     case C_OscNodeDataPool::eCOM:
                         c_Icons.append(this->mc_IconSignalWarning);
                         c_Retval = c_Icons;
                         break;
-                     case C_OSCNodeDataPool::eHALC:
-                     case C_OSCNodeDataPool::eHALC_NVM:
-                        c_Icons.append(this->mc_IconHALOtherWarning); // in warning case no different HAL icons
+                     case C_OscNodeDataPool::eHALC:
+                     case C_OscNodeDataPool::eHALC_NVM:
+                        c_Icons.append(this->mc_IconHalOtherWarning); // in warning case no different HAL icons
                         c_Retval = c_Icons;
                         break;
                      default:
@@ -1115,7 +1020,7 @@ QVariant C_SyvDaItTaModel::data(const QModelIndex & orc_Index, const sintn osn_R
 */
 //-----------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in default implementation
-void C_SyvDaItTaModel::CopySelectedItems(const std::vector<uint32> & orc_SelectedIndices) const
+void C_SyvDaItTaModel::CopySelectedItems(const std::vector<uint32_t> & orc_SelectedIndices) const
 {
    //Copy paste not supported
    Q_UNUSED(orc_SelectedIndices)
@@ -1147,8 +1052,8 @@ void C_SyvDaItTaModel::MoveItems(const QModelIndexList & orc_Indices, const bool
    Index of new item
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
-                                 const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
+uint32_t C_SyvDaItTaModel::AddItem(const QModelIndexList & orc_Indices,
+                                   const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
    this->mc_AddDataPoolElementId = orc_DataPoolElementId;
    return this->AddNewItem(C_SyvDaItTaModel::mh_GetSelectedRows(orc_Indices));
@@ -1180,7 +1085,7 @@ void C_SyvDaItTaModel::RemoveItems(const QModelIndexList & orc_Indices,
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItTaModel::E_Columns C_SyvDaItTaModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_SyvDaItTaModel::E_Columns C_SyvDaItTaModel::h_ColumnToEnum(const int32_t & ors32_Column)
 {
    C_SyvDaItTaModel::E_Columns e_Retval = eICON;
    switch (ors32_Column)
@@ -1214,9 +1119,9 @@ C_SyvDaItTaModel::E_Columns C_SyvDaItTaModel::h_ColumnToEnum(const sint32 & ors3
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaItTaModel::h_EnumToColumn(const C_SyvDaItTaModel::E_Columns & ore_Value)
+int32_t C_SyvDaItTaModel::h_EnumToColumn(const C_SyvDaItTaModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {
@@ -1250,7 +1155,7 @@ sint32 C_SyvDaItTaModel::h_EnumToColumn(const C_SyvDaItTaModel::E_Columns & ore_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementIndex(const uint32 ou32_Index) const
+const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementIndex(const uint32_t ou32_Index) const
 {
    const C_PuiSvDbNodeDataPoolListElementId * pc_Retval = NULL;
 
@@ -1281,13 +1186,13 @@ const C_PuiSvDbNodeDataPoolListElementId * C_SyvDaItTaModel::GetDataPoolElementI
    Index of new item
 */
 //-----------------------------------------------------------------------------
-uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
+uint32_t C_SyvDaItTaModel::m_AddNewItem(const uint32_t ou32_SelectedIndex)
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if ((pc_TableWidget != NULL) && (this->mc_AddDataPoolElementId.GetIsValid() == true))
    {
@@ -1298,7 +1203,7 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
             this->mc_AddDataPoolElementId);
          C_PuiSvDbTable c_Copy = *pc_Item;
          bool q_ChangeRowCount;
-         sint32 s32_InsertAt;
+         int32_t s32_InsertAt;
 
          //Check if new row
          if (pc_Item->c_DataPoolElementsConfig.size() > 0)
@@ -1316,13 +1221,13 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
             // use valid index
             if (ou32_SelectedIndex < m_GetSizeItems())
             {
-               s32_InsertAt = static_cast<sint32>(ou32_SelectedIndex) + 1;
+               s32_InsertAt = static_cast<int32_t>(ou32_SelectedIndex) + 1;
             }
             else
             {
                s32_InsertAt = m_GetSizeItems();
             }
-            u32_Retval = static_cast<uint32>(s32_InsertAt);
+            u32_Retval = static_cast<uint32_t>(s32_InsertAt);
          }
          else
          {
@@ -1350,7 +1255,8 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
              (this->mpc_Data->IsDataElementRegistered(this->mc_AddDataPoolElementId) == false))
          {
             tgl_assert(this->mpc_Data->RegisterDataPoolElement(this->mc_AddDataPoolElementId,
-                                                               c_NewConfig.c_ElementScaling) == C_NO_ERR);
+                                                               c_NewConfig.c_ElementScaling,
+                                                               c_NewConfig.c_DisplayFormatter) == C_NO_ERR);
          }
          //Reinitialize static content
          InitMinMaxAndName();
@@ -1379,9 +1285,9 @@ uint32 C_SyvDaItTaModel::m_AddNewItem(const uint32 ou32_SelectedIndex)
    Indices of new items
 */
 //-----------------------------------------------------------------------------
-std::vector<uint32> C_SyvDaItTaModel::m_PasteItems(const uint32 ou32_SelectedIndex)
+std::vector<uint32_t> C_SyvDaItTaModel::m_PasteItems(const uint32_t ou32_SelectedIndex)
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    //Paste not supported
    Q_UNUSED(ou32_SelectedIndex)
    return c_Retval;
@@ -1395,13 +1301,13 @@ std::vector<uint32> C_SyvDaItTaModel::m_PasteItems(const uint32 ou32_SelectedInd
    Size of item container
 */
 //-----------------------------------------------------------------------------
-uint32 C_SyvDaItTaModel::m_GetSizeItems(void) const
+uint32_t C_SyvDaItTaModel::m_GetSizeItems(void) const
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   const stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<const stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   const stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<const stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if (pc_TableWidget != NULL)
    {
@@ -1424,11 +1330,11 @@ uint32 C_SyvDaItTaModel::m_GetSizeItems(void) const
    \param[in] ou32_Index Index to delete
 */
 //-----------------------------------------------------------------------------
-void C_SyvDaItTaModel::m_DeleteItem(const uint32 ou32_Index)
+void C_SyvDaItTaModel::m_DeleteItem(const uint32_t ou32_Index)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if (pc_TableWidget != NULL)
    {
@@ -1452,9 +1358,9 @@ void C_SyvDaItTaModel::m_DeleteItem(const uint32 ou32_Index)
    \param[in]  ou32_LastIndex    Highest index of this section of removed items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaModel::m_BeginRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
+void C_SyvDaItTaModel::m_BeginRemoveRows(const uint32_t ou32_FirstIndex, const uint32_t ou32_LastIndex)
 {
-   const uint32 u32_DeletedItemCount = ou32_LastIndex - ou32_FirstIndex;
+   const uint32_t u32_DeletedItemCount = ou32_LastIndex - ou32_FirstIndex;
 
    if (this->m_GetSizeItems() == u32_DeletedItemCount)
    {
@@ -1473,9 +1379,9 @@ void C_SyvDaItTaModel::m_BeginRemoveRows(const uint32 ou32_FirstIndex, const uin
    \param[in]  ou32_LastIndex    Highest index of this section of removed items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaModel::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint32 ou32_LastIndex)
+void C_SyvDaItTaModel::m_EndRemoveRows(const uint32_t ou32_FirstIndex, const uint32_t ou32_LastIndex)
 {
-   const uint32 u32_DeletedItemCount = ou32_LastIndex - ou32_FirstIndex;
+   const uint32_t u32_DeletedItemCount = ou32_LastIndex - ou32_FirstIndex;
 
    if (this->m_GetSizeItems() == u32_DeletedItemCount)
    {
@@ -1498,11 +1404,11 @@ void C_SyvDaItTaModel::m_EndRemoveRows(const uint32 ou32_FirstIndex, const uint3
    \param[in] ou32_TargetIndex Target index
 */
 //-----------------------------------------------------------------------------
-void C_SyvDaItTaModel::m_MoveItem(const uint32 ou32_SourceIndex, const uint32 ou32_TargetIndex)
+void C_SyvDaItTaModel::m_MoveItem(const uint32_t ou32_SourceIndex, const uint32_t ou32_TargetIndex)
 {
    //lint -e{929}  false positive in PC-Lint: allowed by MISRA 5-2-2
-   stw_opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
-      dynamic_cast<stw_opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
+   stw::opensyde_gui::C_GiSvDaTableBase * const pc_TableWidget =
+      dynamic_cast<stw::opensyde_gui::C_GiSvDaTableBase * const>(this->mpc_Data);
 
    if (pc_TableWidget != NULL)
    {
@@ -1536,8 +1442,8 @@ C_PuiSvDbNodeDataElementConfig C_SyvDaItTaModel::mh_GetConfigForNewItem(
    const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
    C_PuiSvDbNodeDataElementConfig c_NewConfig;
-   const C_OSCNodeDataPoolListElement * const pc_Element =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
+   const C_OscNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
                                                                  orc_DataPoolElementId.u32_DataPoolIndex,
                                                                  orc_DataPoolElementId.u32_ListIndex,
                                                                  orc_DataPoolElementId.u32_ElementIndex);
@@ -1550,6 +1456,10 @@ C_PuiSvDbNodeDataElementConfig C_SyvDaItTaModel::mh_GetConfigForNewItem(
       c_NewConfig.c_ElementScaling.f64_Factor = pc_Element->f64_Factor;
       c_NewConfig.c_ElementScaling.c_Unit = pc_Element->c_Unit.c_str();
    }
+
+   c_NewConfig.c_DisplayFormatter.q_IsActive = false;
+   c_NewConfig.c_DisplayFormatter.c_FormatterString = "";
+
    return c_NewConfig;
 }
 
@@ -1563,7 +1473,7 @@ C_PuiSvDbNodeDataElementConfig C_SyvDaItTaModel::mh_GetConfigForNewItem(
    Deleted index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32 ou32_Index,
+C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32_t ou32_Index,
                                                                   std::vector<C_PuiSvDbNodeDataElementConfig> & orc_AdaptedItems)
 {
    C_PuiSvDbNodeDataPoolListElementId c_Retval;
@@ -1576,7 +1486,7 @@ C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32 o
       //Remove
       orc_AdaptedItems.erase(orc_AdaptedItems.begin() + ou32_Index);
       //Check other usages
-      for (uint32 u32_ItConfig = 0; u32_ItConfig < orc_AdaptedItems.size(); ++u32_ItConfig)
+      for (uint32_t u32_ItConfig = 0; u32_ItConfig < orc_AdaptedItems.size(); ++u32_ItConfig)
       {
          const C_PuiSvDbNodeDataElementConfig & rc_Config = orc_AdaptedItems[u32_ItConfig];
          if ((rc_Config.c_ElementId.GetIsValid() == true) && (rc_Config.c_ElementId == *pc_CurId))
@@ -1602,9 +1512,9 @@ C_PuiSvDbNodeDataPoolListElementId C_SyvDaItTaModel::m_RemoveItem(const uint32 o
    Value in percent
 */
 //----------------------------------------------------------------------------------------------------------------------
-float32 C_SyvDaItTaModel::m_GetPercentage(const uint32 ou32_Index) const
+float32_t C_SyvDaItTaModel::m_GetPercentage(const uint32_t ou32_Index) const
 {
-   float32 f32_Retval = 0.0F;
+   float32_t f32_Retval = 0.0F;
 
    if (((((((((ou32_Index < this->mc_UnscaledLastDataValues.size()) &&
               (ou32_Index < this->mc_UnscaledMinValues.size())) &&
@@ -1616,14 +1526,14 @@ float32 C_SyvDaItTaModel::m_GetPercentage(const uint32 ou32_Index) const
         (ou32_Index < this->mc_ShowPercentage.size())) &&
        (this->mc_ShowPercentage[ou32_Index] == true))
    {
-      const float64 & rf64_Value = this->mc_UnscaledLastDataValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
-      const float64 & rf64_Min = this->mc_UnscaledMinValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
-      const float64 & rf64_Max = this->mc_UnscaledMaxValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
-      const float64 f64_Range = rf64_Max - rf64_Min;
+      const float64_t & rf64_Value = this->mc_UnscaledLastDataValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
+      const float64_t & rf64_Min = this->mc_UnscaledMinValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
+      const float64_t & rf64_Max = this->mc_UnscaledMaxValues[ou32_Index][this->mc_ArrayItemIndex[ou32_Index]];
+      const float64_t f64_Range = rf64_Max - rf64_Min;
       if (f64_Range > 0.0)
       {
          //Convert
-         f32_Retval = static_cast<float32>((rf64_Value - rf64_Min) / f64_Range);
+         f32_Retval = static_cast<float32_t>((rf64_Value - rf64_Min) / f64_Range);
 
          //Limit
          f32_Retval = std::max(f32_Retval, 0.0F);
@@ -1648,7 +1558,7 @@ float32 C_SyvDaItTaModel::m_GetPercentage(const uint32 ou32_Index) const
    Value encoded into QVariant
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
+QString C_SyvDaItTaModel::m_GetValue(const uint32_t ou32_Index) const
 {
    QString c_Retval = "";
 
@@ -1664,34 +1574,29 @@ QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
             if (this->mc_ShowPercentage[ou32_Index])
             {
                //Single value of array
-               c_Retval =
-                  this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][this->
-                                                                                                             mc_ArrayItemIndex
-                                                                                                             [ou32_Index
-                                                                                                             ]],
-                                                                 ou32_Index);
+               c_Retval = this->mc_ScaledDisplayDataValues[ou32_Index][this->
+                                                                       mc_ArrayItemIndex
+                                                                       [ou32_Index
+                                                                       ]];
             }
             else
             {
                //Complete array
-               for (uint32 u32_It = 0; u32_It < this->mc_UnscaledLastDataValues[ou32_Index].size(); ++u32_It)
+               for (uint32_t u32_It = 0; u32_It < this->mc_ScaledDisplayDataValues[ou32_Index].size(); ++u32_It)
                {
                   if (u32_It > 0)
                   {
                      c_Retval += ";";
                   }
 
-                  c_Retval +=
-                     this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][u32_It],
-                                                                    ou32_Index);
+                  c_Retval += this->mc_ScaledDisplayDataValues[ou32_Index][u32_It];
                }
             }
          }
-         else if (this->mc_UnscaledLastDataValues[ou32_Index].size() == 1)
+         else if (this->mc_ScaledDisplayDataValues[ou32_Index].size() == 1)
          {
             //Single value
-            c_Retval = this->mpc_Data->GetUnscaledValueAsScaledString(this->mc_UnscaledLastDataValues[ou32_Index][0UL],
-                                                                      ou32_Index);
+            c_Retval = this->mc_ScaledDisplayDataValues[ou32_Index][0UL];
          }
          else
          {
@@ -1700,17 +1605,12 @@ QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
       }
       else
       {
-         std::vector<sint8> c_VecValues;
-         uint32 u32_Counter;
-
-         // Copy and cast the float values
-         c_VecValues.resize(this->mc_UnscaledLastDataValues[ou32_Index].size());
-         for (u32_Counter = 0U; u32_Counter < this->mc_UnscaledLastDataValues[ou32_Index].size(); ++u32_Counter)
+         //String in first element
+         tgl_assert(this->mc_ScaledDisplayDataValues[ou32_Index].size() >= 1);
+         if (this->mc_ScaledDisplayDataValues[ou32_Index].size() >= 1)
          {
-            c_VecValues[u32_Counter] = static_cast<sint8>(this->mc_UnscaledLastDataValues[ou32_Index][u32_Counter]);
+            c_Retval = this->mc_ScaledDisplayDataValues[ou32_Index][0UL];
          }
-
-         c_Retval = C_SdNdeDpUtil::h_ConvertToString(c_VecValues);
       }
    }
 
@@ -1726,13 +1626,175 @@ QString C_SyvDaItTaModel::m_GetValue(const uint32 ou32_Index) const
    Unique row indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SyvDaItTaModel::mh_GetSelectedRows(const QModelIndexList & orc_Indices)
+std::vector<uint32_t> C_SyvDaItTaModel::mh_GetSelectedRows(const QModelIndexList & orc_Indices)
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    for (QModelIndexList::const_iterator c_It = orc_Indices.begin(); c_It != orc_Indices.end(); ++c_It)
    {
       c_Retval.push_back(c_It->row());
    }
    C_Uti::h_Uniqueify(c_Retval);
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init min max and name for one row
+
+   \param[in]  orc_ElementId        Element id
+   \param[in]  orc_ElementConfig    Element config
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_InitMinMaxAndNameForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
+                                                    const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig)
+{
+   if (orc_ElementId.GetIsValid() == true)
+   {
+      const C_OscNodeDataPoolListElement * const pc_OscElement =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_ElementId.u32_NodeIndex,
+                                                                    orc_ElementId.u32_DataPoolIndex,
+                                                                    orc_ElementId.u32_ListIndex,
+                                                                    orc_ElementId.u32_ElementIndex);
+      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
+         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(orc_ElementId.u32_NodeIndex,
+                                                                   orc_ElementId.u32_DataPoolIndex,
+                                                                   orc_ElementId.u32_ListIndex,
+                                                                   orc_ElementId.u32_ElementIndex);
+      const C_OscNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
+         orc_ElementId.u32_NodeIndex, orc_ElementId.u32_DataPoolIndex);
+
+      tgl_assert(pc_OscElement != NULL);
+      tgl_assert(pc_UiElement != NULL);
+      tgl_assert(pc_Datapool != NULL);
+      if ((pc_OscElement != NULL) && (pc_UiElement != NULL) && (pc_Datapool != NULL))
+      {
+         this->m_InitValuesForOneRow(orc_ElementId, orc_ElementConfig, *pc_OscElement, *pc_UiElement);
+
+         if (orc_ElementConfig.c_DisplayName.compare("") == 0)
+         {
+            if ((pc_Datapool->e_Type == C_OscNodeDataPool::eHALC) ||
+                (pc_Datapool->e_Type == C_OscNodeDataPool::eHALC_NVM))
+            {
+               this->mc_Names.emplace_back(C_PuiSvHandler::h_GetShortNamespace(orc_ElementId));
+            }
+            else
+            {
+               if (orc_ElementId.GetUseArrayElementIndex())
+               {
+                  this->mc_Names.emplace_back(static_cast<QString>("%1[%2]").
+                                              arg(pc_OscElement->c_Name.c_str()).
+                                              arg(orc_ElementId.GetArrayElementIndex()));
+               }
+               else
+               {
+                  this->mc_Names.emplace_back(pc_OscElement->c_Name.c_str());
+               }
+            }
+         }
+         else
+         {
+            this->mc_Names.emplace_back(orc_ElementConfig.c_DisplayName);
+         }
+         if (orc_ElementConfig.c_ElementScaling.q_UseDefault == true)
+         {
+            this->mc_Units.emplace_back(pc_OscElement->c_Unit.c_str());
+         }
+         else
+         {
+            this->mc_Units.emplace_back(orc_ElementConfig.c_ElementScaling.c_Unit);
+         }
+      }
+   }
+   else
+   {
+      const std::vector<float64_t> c_Empty;
+      //Fill up values with dummies
+      this->mc_Names.emplace_back(orc_ElementId.GetInvalidNamePlaceholder());
+      this->mc_Units.emplace_back("");
+      this->mc_ShowPercentage.push_back(false);
+      this->mc_InterpretAsStringFlags.push_back(false);
+      this->mc_UnscaledMaxValues.push_back(c_Empty);
+      this->mc_UnscaledMinValues.push_back(c_Empty);
+      this->mc_ScaledDisplayDataValues.emplace_back(std::vector<QString>());
+      this->mc_UnscaledLastDataValues.push_back(c_Empty);
+      this->mc_ArrayItemIndex.push_back(0UL);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init values for one row
+
+   \param[in]  orc_ElementId        Element id
+   \param[in]  orc_ElementConfig    Element config
+   \param[in]  orc_OscElement       Osc element
+   \param[in]  orc_UiElement        Ui element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_InitValuesForOneRow(const C_PuiSvDbNodeDataPoolListElementId & orc_ElementId,
+                                             const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
+                                             const C_OscNodeDataPoolListElement & orc_OscElement,
+                                             const C_PuiSdNodeDataPoolListElement & orc_UiElement)
+{
+   std::vector<float64_t> c_Values;
+   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_OscElement.c_MinValue, c_Values);
+   this->mc_UnscaledMinValues.push_back(c_Values);
+   C_SdNdeDpContentUtil::h_GetValuesAsFloat64(orc_OscElement.c_MaxValue, c_Values);
+   this->mc_UnscaledMaxValues.push_back(c_Values);
+   this->m_InitStartValueForOneRow(orc_ElementConfig, orc_OscElement, orc_UiElement);
+   this->mc_ArrayItemIndex.push_back(orc_ElementId.GetArrayElementIndexOrZero());
+
+   //Percentage
+   if (orc_OscElement.GetArray())
+   {
+      if (orc_ElementId.GetUseArrayElementIndex())
+      {
+         this->mc_ShowPercentage.push_back(true);
+      }
+      else
+      {
+         this->mc_ShowPercentage.push_back(false);
+      }
+   }
+   else
+   {
+      this->mc_ShowPercentage.push_back(true);
+   }
+
+   //String
+   this->mc_InterpretAsStringFlags.push_back(orc_UiElement.q_InterpretAsString);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Init start value for one row
+
+   \param[in]  orc_ElementConfig    Element config
+   \param[in]  orc_OscElement       Osc element
+   \param[in]  orc_UiElement        Ui element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaModel::m_InitStartValueForOneRow(const C_PuiSvDbNodeDataElementConfig & orc_ElementConfig,
+                                                 const C_OscNodeDataPoolListElement & orc_OscElement,
+                                                 const C_PuiSdNodeDataPoolListElement & orc_UiElement)
+{
+   C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_FullyUsefulAndTotallyNecessaryVariable;
+   C_OscNodeDataPoolContent c_Val = orc_OscElement.c_MinValue;
+   std::vector<float64_t> c_Values;
+   std::vector<QString> c_Formatted;
+   C_PuiSvDbDataElementDisplayFormatterConfig c_Formatter;
+   //Formatter
+   c_Formatter.SetDisplayFormatter(orc_ElementConfig.c_DisplayFormatter);
+   c_Formatter.SetType(
+      C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(
+         orc_OscElement.c_MinValue,
+         orc_ElementConfig.c_ElementScaling,
+         orc_UiElement.q_InterpretAsString));
+   //Set unscaled starting value to 0 if possible
+   C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_OscElement.c_MinValue,
+                                                         orc_OscElement.c_MaxValue, c_Val,
+                                                         e_FullyUsefulAndTotallyNecessaryVariable,
+                                                         C_OscNodeDataPoolContentUtil::eTO_ZERO);
+   c_Formatted = c_Formatter.GetValuesContentFormatted(c_Val,
+                                                       orc_ElementConfig.c_ElementScaling,
+                                                       c_Values);
+   this->mc_ScaledDisplayDataValues.push_back(c_Formatted);
+   this->mc_UnscaledLastDataValues.push_back(c_Values);
 }

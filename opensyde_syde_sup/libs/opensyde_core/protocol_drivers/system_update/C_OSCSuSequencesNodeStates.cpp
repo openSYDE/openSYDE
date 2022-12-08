@@ -1,21 +1,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 /*!
    \file
-   \brief       Node state for C_OSCSuSequences and its sequences
+   \brief       Node state for C_OscSuSequences and its sequences
 
    \copyright   Copyright 2021 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_OSCSuSequencesNodeStates.h"
+#include "stwtypes.hpp"
+#include "C_OscSuSequencesNodeStates.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeFileStates::C_OSCSuSequencesNodeFileStates(void) :
+C_OscSuSequencesNodeFileStates::C_OscSuSequencesNodeFileStates(void) :
    c_FileName(""),
    e_FileExists(eSUSEQ_STATE_NOT_EXECUTED),
    e_FileLoaded(eSUSEQ_STATE_NOT_EXECUTED)
@@ -44,8 +44,8 @@ C_OSCSuSequencesNodeFileStates::C_OSCSuSequencesNodeFileStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeHexFileStates::C_OSCSuSequencesNodeHexFileStates(void) :
-   C_OSCSuSequencesNodeFileStates(),
+C_OscSuSequencesNodeHexFileStates::C_OscSuSequencesNodeHexFileStates(void) :
+   C_OscSuSequencesNodeFileStates(),
    e_SignatureBlockAddressFromFileRead(eSUSEQ_STATE_NOT_EXECUTED),
    e_NodeNameCompared(eSUSEQ_STATE_NOT_EXECUTED),
    e_DataDumpFromFileRead(eSUSEQ_STATE_NOT_EXECUTED),
@@ -60,8 +60,8 @@ C_OSCSuSequencesNodeHexFileStates::C_OSCSuSequencesNodeHexFileStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeOtherFileStates::C_OSCSuSequencesNodeOtherFileStates(void) :
-   C_OSCSuSequencesNodeFileStates(),
+C_OscSuSequencesNodeOtherFileStates::C_OscSuSequencesNodeOtherFileStates(void) :
+   C_OscSuSequencesNodeFileStates(),
    e_RequestFileTransferSent(eSUSEQ_STATE_NOT_EXECUTED),
    e_AllTransferDataSent(eSUSEQ_STATE_NOT_EXECUTED),
    e_RequestTransferFileExitSent(eSUSEQ_STATE_NOT_EXECUTED),
@@ -73,8 +73,8 @@ C_OSCSuSequencesNodeOtherFileStates::C_OSCSuSequencesNodeOtherFileStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodePsiFileStates::C_OSCSuSequencesNodePsiFileStates(void) :
-   C_OSCSuSequencesNodeFileStates(),
+C_OscSuSequencesNodePsiFileStates::C_OscSuSequencesNodePsiFileStates(void) :
+   C_OscSuSequencesNodeFileStates(),
    e_PsiFileWrote(eSUSEQ_STATE_NOT_EXECUTED)
 {
 }
@@ -82,8 +82,8 @@ C_OSCSuSequencesNodePsiFileStates::C_OSCSuSequencesNodePsiFileStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodePemFileStates::C_OSCSuSequencesNodePemFileStates(void) :
-   C_OSCSuSequencesNodeFileStates(),
+C_OscSuSequencesNodePemFileStates::C_OscSuSequencesNodePemFileStates(void) :
+   C_OscSuSequencesNodeFileStates(),
    e_PemFileExtracted(eSUSEQ_STATE_NOT_EXECUTED),
    e_SecurityKeySent(eSUSEQ_STATE_NOT_EXECUTED),
    e_SecurityFlagSent(eSUSEQ_STATE_NOT_EXECUTED),
@@ -94,8 +94,8 @@ C_OSCSuSequencesNodePemFileStates::C_OSCSuSequencesNodePemFileStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeStwFlHexFileStates::C_OSCSuSequencesNodeStwFlHexFileStates(void) :
-   C_OSCSuSequencesNodeFileStates(),
+C_OscSuSequencesNodeStwFlHexFileStates::C_OscSuSequencesNodeStwFlHexFileStates(void) :
+   C_OscSuSequencesNodeFileStates(),
    e_FileSent(eSUSEQ_STATE_NOT_EXECUTED)
 {
 }
@@ -104,7 +104,7 @@ C_OSCSuSequencesNodeStwFlHexFileStates::C_OSCSuSequencesNodeStwFlHexFileStates(v
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeStates::C_OSCSuSequencesNodeStates(void) :
+C_OscSuSequencesNodeStates::C_OscSuSequencesNodeStates(void) :
    q_Timeout(false),
    q_AuthenticationError(false),
    q_CouldNotReachedDueToRoutingError(false),
@@ -116,8 +116,8 @@ C_OSCSuSequencesNodeStates::C_OSCSuSequencesNodeStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeConnectStates::C_OSCSuSequencesNodeConnectStates(void) :
-   C_OSCSuSequencesNodeStates(),
+C_OscSuSequencesNodeConnectStates::C_OscSuSequencesNodeConnectStates(void) :
+   C_OscSuSequencesNodeStates(),
    e_InformationRead(eSUSEQ_STATE_NOT_EXECUTED),
    q_AuthenticationNecessarySet(false),
    q_AuthenticationNecessary(false)
@@ -128,7 +128,7 @@ C_OSCSuSequencesNodeConnectStates::C_OSCSuSequencesNodeConnectStates(void) :
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSuSequencesNodeUpdateStates::C_OSCSuSequencesNodeUpdateStates(void) :
-   C_OSCSuSequencesNodeStates()
+C_OscSuSequencesNodeUpdateStates::C_OscSuSequencesNodeUpdateStates(void) :
+   C_OscSuSequencesNodeStates()
 {
 }

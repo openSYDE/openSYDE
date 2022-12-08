@@ -8,16 +8,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_SyvUpPacListNodeItemFileWidget.h"
+#include "C_SyvUpPacListNodeItemFileWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,8 +43,8 @@ using namespace stw_opensyde_gui;
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacListNodeItemFileWidget::C_SyvUpPacListNodeItemFileWidget(const uint32 ou32_ViewIndex,
-                                                                   const uint32 ou32_NodeIndex,
+C_SyvUpPacListNodeItemFileWidget::C_SyvUpPacListNodeItemFileWidget(const uint32_t ou32_ViewIndex,
+                                                                   const uint32_t ou32_NodeIndex,
                                                                    const QString & orc_DeviceName,
                                                                    const bool oq_FileBased,
                                                                    const bool oq_StwFlashloader,
@@ -62,7 +61,7 @@ C_SyvUpPacListNodeItemFileWidget::C_SyvUpPacListNodeItemFileWidget(const uint32 
    Type of return values, e.g. STW error codes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacListNodeItemFileWidget::GetType(void) const
+uint32_t C_SyvUpPacListNodeItemFileWidget::GetType(void) const
 {
    return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_FILE;
 }

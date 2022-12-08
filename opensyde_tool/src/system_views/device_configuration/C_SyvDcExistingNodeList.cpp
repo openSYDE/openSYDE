@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "TGLUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDcExistingNodeWidget.h"
-#include "C_SyvDcExistingNodeList.h"
+#include "TglUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDcExistingNodeWidget.hpp"
+#include "C_SyvDcExistingNodeList.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -93,7 +92,7 @@ C_SyvDcExistingNodeList::C_SyvDcExistingNodeList(QWidget * const opc_Parent) :
    C_CONFIG    Node configuration invalid (too many connections to a bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcExistingNodeList::SetView(const uint32 ou32_Index, const bool oq_ShowAssignment)
+int32_t C_SyvDcExistingNodeList::SetView(const uint32_t ou32_Index, const bool oq_ShowAssignment)
 {
    this->mu32_ViewIndex = ou32_Index;
    this->mq_ShowAssignment = oq_ShowAssignment;
@@ -112,16 +111,16 @@ sint32 C_SyvDcExistingNodeList::SetView(const uint32 ou32_Index, const bool oq_S
                                           - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32 ou32_NodeIndex,
-                                                  const C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                                  const std::map<uint8,
+void C_SyvDcExistingNodeList::ConnectSerialNumber(const uint32_t ou32_NodeIndex,
+                                                  const C_OscProtocolSerialNumber & orc_SerialNumber,
+                                                  const std::map<uint8_t,
                                                                  C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 const
 {
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       const C_SyvDcExistingNodeWidget * const pc_Widget =
-         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareIndex(ou32_NodeIndex) == true))
       {
          pc_Widget->ConnectSerialNumber(orc_SerialNumber, orc_SubNodeIdsToOldNodeIds);
@@ -136,14 +135,14 @@ const
    \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeList::DisconnectSerialNumber(const uint32 ou32_NodeIndex,
-                                                     const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber)
+void C_SyvDcExistingNodeList::DisconnectSerialNumber(const uint32_t ou32_NodeIndex,
+                                                     const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber)
 const
 {
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       const C_SyvDcExistingNodeWidget * const pc_Widget =
-         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if ((pc_Widget != NULL) && (pc_Widget->CompareIndex(ou32_NodeIndex) == true))
       {
          pc_Widget->DisconnectSerialNumber(orc_SerialNumber);
@@ -159,7 +158,7 @@ const
    Number of communicating nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDcExistingNodeList::GetCommunicatingNodeCount(void) const
+uint32_t C_SyvDcExistingNodeList::GetCommunicatingNodeCount(void) const
 {
    return this->mu32_CommunicatingNodeCount;
 }
@@ -171,14 +170,14 @@ uint32 C_SyvDcExistingNodeList::GetCommunicatingNodeCount(void) const
    Number of nodes which have an assigned serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDcExistingNodeList::GetAssignmentCount(void) const
+uint32_t C_SyvDcExistingNodeList::GetAssignmentCount(void) const
 {
-   uint32 u32_Retval = 0;
+   uint32_t u32_Retval = 0;
 
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       const C_SyvDcExistingNodeWidget * const pc_Widget =
-         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if ((pc_Widget != NULL) && (pc_Widget->IsAssigned() == true))
       {
          ++u32_Retval;
@@ -197,10 +196,10 @@ uint32 C_SyvDcExistingNodeList::GetAssignmentCount(void) const
 std::vector<C_SyvDcDeviceConfiguation> C_SyvDcExistingNodeList::GetConfigs(void) const
 {
    std::vector<C_SyvDcDeviceConfiguation> c_Retval;
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       const C_SyvDcExistingNodeWidget * const pc_Widget =
-         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if (pc_Widget != NULL)
       {
          tgl_assert(pc_Widget->IsAssigned() == true);
@@ -219,10 +218,10 @@ std::vector<C_SyvDcDeviceConfiguation> C_SyvDcExistingNodeList::GetConfigs(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeList::StartDrag(const QString & orc_DeviceName, const bool oq_DeviceNameValid) const
 {
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       const C_SyvDcExistingNodeWidget * const pc_Widget =
-         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if (pc_Widget != NULL)
       {
          pc_Widget->StartDrag(orc_DeviceName, oq_DeviceNameValid);
@@ -236,10 +235,10 @@ void C_SyvDcExistingNodeList::StartDrag(const QString & orc_DeviceName, const bo
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcExistingNodeList::StopDrag(void) const
 {
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       const C_SyvDcExistingNodeWidget * const pc_Widget =
-         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<const C_SyvDcExistingNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if (pc_Widget != NULL)
       {
          pc_Widget->StopDrag();
@@ -255,10 +254,10 @@ void C_SyvDcExistingNodeList::StopDrag(void) const
    C_CONFIG    Node configuration invalid (too many connections to a bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcExistingNodeList::m_Init(void)
+int32_t C_SyvDcExistingNodeList::m_Init(void)
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    //Init/Reinit UI
    this->clear();
@@ -267,24 +266,24 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
    //No point if PC not connected
    if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
    {
-      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
-      for (uint32 u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
+      const std::vector<uint8_t> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
+      for (uint32_t u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
       {
          //Active
          if (rc_NodeActiveFlags[u32_ItNode] == true)
          {
-            uint32 u32_SquadIndex;
-            const C_OSCNodeSquad * pc_Squad = NULL;
-            std::vector<uint32> c_RelevantNodeIndexes;
-            std::set<uint32> c_FirstSubNodeConnectedInterfaces;
-            uint32 u32_SubNodeCounter;
+            uint32_t u32_SquadIndex;
+            const C_OscNodeSquad * pc_Squad = NULL;
+            std::vector<uint32_t> c_RelevantNodeIndexes;
+            std::set<uint32_t> c_FirstSubNodeConnectedInterfaces;
+            uint32_t u32_SubNodeCounter;
             bool q_AllSubNodesAvailable = true;
 
             // Check for squad and get all node indexes which are part of the squad
             // The indexes of the squad must be in order, so skip all the nodes after the first one in the first loop
             if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(u32_ItNode, u32_SquadIndex) == C_NO_ERR)
             {
-               pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_SquadIndex);
+               pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_SquadIndex);
                tgl_assert(pc_Squad != NULL);
                if (pc_Squad != NULL)
                {
@@ -301,18 +300,18 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
 
             for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_RelevantNodeIndexes.size(); ++u32_SubNodeCounter)
             {
-               const uint32 u32_CurNodeIndex = c_RelevantNodeIndexes[u32_SubNodeCounter];
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_CurNodeIndex);
+               const uint32_t u32_CurNodeIndex = c_RelevantNodeIndexes[u32_SubNodeCounter];
+               const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_CurNodeIndex);
                bool q_Connected = false;
 
                if (pc_Node != NULL)
                {
                   tgl_assert(pc_Node->pc_DeviceDefinition != NULL);
                   tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
-                  for (uint32 u32_ItInterface = 0; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
+                  for (uint32_t u32_ItInterface = 0; u32_ItInterface < pc_Node->c_Properties.c_ComInterfaces.size();
                        ++u32_ItInterface)
                   {
-                     const C_OSCNodeComInterfaceSettings & rc_Interface =
+                     const C_OscNodeComInterfaceSettings & rc_Interface =
                         pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
                      //Connected to current bus
                      if (((rc_Interface.GetBusConnected() == true) &&
@@ -352,7 +351,7 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
             if (q_AllSubNodesAvailable == true)
             {
                //All checks passed at node
-               const sint32 s32_NodeReturn = m_AppendNode(u32_ItNode, (pc_Squad != NULL));
+               const int32_t s32_NodeReturn = m_AppendNode(u32_ItNode, (pc_Squad != NULL));
 
                // Save the error case
                if (s32_Return == C_NO_ERR)
@@ -368,7 +367,7 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
             if (pc_Squad != NULL)
             {
                //lint -e{850} Index modified for skipping index step
-               u32_ItNode += (static_cast<uint32>(c_RelevantNodeIndexes.size()) - 1U);
+               u32_ItNode += (static_cast<uint32_t>(c_RelevantNodeIndexes.size()) - 1U);
             }
          }
       }
@@ -388,10 +387,10 @@ sint32 C_SyvDcExistingNodeList::m_Init(void)
    C_CONFIG    Node configuration invalid (too many connections to a bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcExistingNodeList::m_AppendNode(const uint32 ou32_NodeIndex, const bool oq_PartOfSquad)
+int32_t C_SyvDcExistingNodeList::m_AppendNode(const uint32_t ou32_NodeIndex, const bool oq_PartOfSquad)
 {
    C_SyvDcExistingNodeWidget * const pc_Widget = new C_SyvDcExistingNodeWidget(this);
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->addItem("");
 
@@ -420,11 +419,11 @@ sint32 C_SyvDcExistingNodeList::m_AppendNode(const uint32 ou32_NodeIndex, const 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcExistingNodeList::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
+void C_SyvDcExistingNodeList::m_ScrollBarRangeChangedVer(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scroll bar to stop resizing the parent widget when showing or hiding the scroll
    // bar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->verticalScrollBar()->hide();
    }

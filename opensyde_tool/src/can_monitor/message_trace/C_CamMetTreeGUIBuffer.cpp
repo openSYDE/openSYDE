@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMetTreeGUIBuffer.h"
+#include "C_CamMetTreeGuiBuffer.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,13 +37,13 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamMetTreeGUIBuffer::C_CamMetTreeGUIBuffer(QObject * const opc_Parent) :
+C_CamMetTreeGuiBuffer::C_CamMetTreeGuiBuffer(QObject * const opc_Parent) :
    QObject(opc_Parent),
    mq_Connected(false)
 {
    mc_Timer.setInterval(100);
    mc_Timer.start();
-   connect(this, &C_CamMetTreeGUIBuffer::SigInternalTrigger, this, &C_CamMetTreeGUIBuffer::m_HandleUpdateUi);
+   connect(this, &C_CamMetTreeGuiBuffer::SigInternalTrigger, this, &C_CamMetTreeGuiBuffer::m_HandleUpdateUi);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ C_CamMetTreeGUIBuffer::C_CamMetTreeGUIBuffer(QObject * const opc_Parent) :
    \param[in] orc_NewData Single, new data entry
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeGUIBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewData)
+void C_CamMetTreeGuiBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewData)
 {
    this->mc_BufferMutex.lock();
    this->mc_Buffer.push_back(orc_NewData);
@@ -60,7 +60,7 @@ void C_CamMetTreeGUIBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewDat
    if (this->mq_Connected == false)
    {
       this->mq_Connected = true;
-      connect(&mc_Timer, &QTimer::timeout, this, &C_CamMetTreeGUIBuffer::SigInternalTrigger);
+      connect(&mc_Timer, &QTimer::timeout, this, &C_CamMetTreeGuiBuffer::SigInternalTrigger);
    }
 }
 
@@ -68,7 +68,7 @@ void C_CamMetTreeGUIBuffer::HandleData(const C_CamMetTreeLoggerData & orc_NewDat
 /*! \brief  Removes all already added entries without reading
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeGUIBuffer::ClearBuffer(void)
+void C_CamMetTreeGuiBuffer::ClearBuffer(void)
 {
    this->mc_BufferMutex.lock();
    this->mc_Buffer.clear();
@@ -79,7 +79,7 @@ void C_CamMetTreeGUIBuffer::ClearBuffer(void)
 /*! \brief  Trigger UI update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeGUIBuffer::m_HandleUpdateUi(void)
+void C_CamMetTreeGuiBuffer::m_HandleUpdateUi(void)
 {
    std::list<C_CamMetTreeLoggerData> c_BufferCopy;
    this->mc_BufferMutex.lock();

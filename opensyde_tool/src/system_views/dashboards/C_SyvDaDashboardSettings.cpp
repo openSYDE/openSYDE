@@ -8,27 +8,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDaDashboardSettings.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDaDashboardSettings.hpp"
 #include "ui_C_SyvDaDashboardSettings.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MIN = 10;
-const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MAX = 65000;
-const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN = 10;
+const int32_t C_SyvDaDashboardSettings::mhs32_MIN = 10;
+const int32_t C_SyvDaDashboardSettings::mhs32_MAX = 65000;
+const int32_t C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN = 10;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -49,8 +48,7 @@ const stw_types::sintn C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN = 10;
    \param[in]     ou32_ViewIndex View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent,
-                                                   const stw_types::uint32 ou32_ViewIndex) :
+C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_ViewIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardSettings),
    mrc_Parent(orc_Parent),
@@ -62,29 +60,29 @@ C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent
 
    //Min
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxFast->SetMinimumCustom(C_SyvDaDashboardSettings::mhsn_MIN);
+   this->mpc_Ui->pc_SpinBoxFast->SetMinimumCustom(C_SyvDaDashboardSettings::mhs32_MIN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxMedium->SetMinimumCustom(
-      C_SyvDaDashboardSettings::mhsn_MIN + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+      C_SyvDaDashboardSettings::mhs32_MIN + C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxSlow->SetMinimumCustom(
-      C_SyvDaDashboardSettings::mhsn_MIN + (2 * C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN));
+      C_SyvDaDashboardSettings::mhs32_MIN + (2 * C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN));
    //Max
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxFast->SetMaximumCustom(
-      C_SyvDaDashboardSettings::mhsn_MAX - (2 * C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN));
+      C_SyvDaDashboardSettings::mhs32_MAX - (2 * C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN));
    //lint -e{1938}  static const is guaranteed preinitialized before main
    this->mpc_Ui->pc_SpinBoxMedium->SetMaximumCustom(
-      C_SyvDaDashboardSettings::mhsn_MAX - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+      C_SyvDaDashboardSettings::mhs32_MAX - C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxSlow->SetMaximumCustom(C_SyvDaDashboardSettings::mhsn_MAX);
+   this->mpc_Ui->pc_SpinBoxSlow->SetMaximumCustom(C_SyvDaDashboardSettings::mhs32_MAX);
    //Step size
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxFast->setSingleStep(C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+   this->mpc_Ui->pc_SpinBoxFast->setSingleStep(C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxMedium->setSingleStep(C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+   this->mpc_Ui->pc_SpinBoxMedium->setSingleStep(C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_SpinBoxSlow->setSingleStep(C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+   this->mpc_Ui->pc_SpinBoxSlow->setSingleStep(C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
 
    this->m_Load();
 
@@ -95,21 +93,21 @@ C_SyvDaDashboardSettings::C_SyvDaDashboardSettings(C_OgePopUpDialog & orc_Parent
    this->mpc_Ui->pc_PushButtonOk->setAutoDefault(true);
 
    //Connects
-   connect(this->mpc_Ui->pc_PushButtonOk, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonOk, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDaDashboardSettings::m_OkClicked);
-   connect(this->mpc_Ui->pc_PushButtonCancel, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonCancel, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDaDashboardSettings::m_CancelClicked);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxFast, static_cast<void (QSpinBox::*)(
-                                                        sintn)>(&QSpinBox::valueChanged), this,
+                                                        int32_t)>(&QSpinBox::valueChanged), this,
            &C_SyvDaDashboardSettings::m_OnFastChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxMedium, static_cast<void (QSpinBox::*)(
-                                                          sintn)>(&QSpinBox::valueChanged), this,
+                                                          int32_t)>(&QSpinBox::valueChanged), this,
            &C_SyvDaDashboardSettings::m_OnMediumChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxSlow, static_cast<void (QSpinBox::*)(
-                                                        sintn)>(&QSpinBox::valueChanged), this,
+                                                        int32_t)>(&QSpinBox::valueChanged), this,
            &C_SyvDaDashboardSettings::m_OnSlowChanged);
 }
 
@@ -159,17 +157,19 @@ void C_SyvDaDashboardSettings::InitStaticNames(void) const
 void C_SyvDaDashboardSettings::Save(void) const
 {
    tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewUpdateRateFast(this->mu32_ViewIndex,
-                                                                     static_cast<uint16>(this->mpc_Ui->pc_SpinBoxFast->
-                                                                                         value())) ==
-              C_NO_ERR);
-   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewUpdateRateMedium(this->mu32_ViewIndex,
-                                                                       static_cast<uint16>(this->mpc_Ui->
-                                                                                           pc_SpinBoxMedium->
+                                                                     static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxFast
+                                                                                           ->
                                                                                            value())) ==
               C_NO_ERR);
+   tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewUpdateRateMedium(this->mu32_ViewIndex,
+                                                                       static_cast<uint16_t>(this->mpc_Ui->
+                                                                                             pc_SpinBoxMedium->
+                                                                                             value())) ==
+              C_NO_ERR);
    tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewUpdateRateSlow(this->mu32_ViewIndex,
-                                                                     static_cast<uint16>(this->mpc_Ui->pc_SpinBoxSlow->
-                                                                                         value())) ==
+                                                                     static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxSlow
+                                                                                           ->
+                                                                                           value())) ==
               C_NO_ERR);
 }
 
@@ -186,8 +186,8 @@ void C_SyvDaDashboardSettings::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -216,9 +216,9 @@ void C_SyvDaDashboardSettings::m_Load(void) const
 
    if (pc_View != NULL)
    {
-      this->mpc_Ui->pc_SpinBoxFast->setValue(static_cast<sintn>(pc_View->GetUpdateRateFast()));
-      this->mpc_Ui->pc_SpinBoxMedium->setValue(static_cast<sintn>(pc_View->GetUpdateRateMedium()));
-      this->mpc_Ui->pc_SpinBoxSlow->setValue(static_cast<sintn>(pc_View->GetUpdateRateSlow()));
+      this->mpc_Ui->pc_SpinBoxFast->setValue(static_cast<int32_t>(pc_View->GetUpdateRateFast()));
+      this->mpc_Ui->pc_SpinBoxMedium->setValue(static_cast<int32_t>(pc_View->GetUpdateRateMedium()));
+      this->mpc_Ui->pc_SpinBoxSlow->setValue(static_cast<int32_t>(pc_View->GetUpdateRateSlow()));
    }
 }
 
@@ -243,56 +243,56 @@ void C_SyvDaDashboardSettings::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle fast value change
 
-   \param[in] osn_Value New value
+   \param[in] os32_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSettings::m_OnFastChanged(const stw_types::sintn osn_Value) const
+void C_SyvDaDashboardSettings::m_OnFastChanged(const int32_t os32_Value) const
 {
-   const sintn sn_FastValue = osn_Value;
-   const sintn sn_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();
+   const int32_t s32_FastValue = os32_Value;
+   const int32_t s32_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();
 
-   if (sn_FastValue >= (sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
+   if (s32_FastValue >= (s32_MediumValue - C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxMedium->setValue(sn_FastValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+      this->mpc_Ui->pc_SpinBoxMedium->setValue(s32_FastValue + C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle medium value change
 
-   \param[in] osn_Value New value
+   \param[in] os32_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSettings::m_OnMediumChanged(const stw_types::sintn osn_Value) const
+void C_SyvDaDashboardSettings::m_OnMediumChanged(const int32_t os32_Value) const
 {
-   const sintn sn_FastValue = this->mpc_Ui->pc_SpinBoxFast->value();
-   const sintn sn_MediumValue = osn_Value;
-   const sintn sn_SlowValue = this->mpc_Ui->pc_SpinBoxSlow->value();
+   const int32_t s32_FastValue = this->mpc_Ui->pc_SpinBoxFast->value();
+   const int32_t s32_MediumValue = os32_Value;
+   const int32_t s32_SlowValue = this->mpc_Ui->pc_SpinBoxSlow->value();
 
-   if (sn_FastValue >= (sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
+   if (s32_FastValue >= (s32_MediumValue - C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxFast->setValue(sn_MediumValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+      this->mpc_Ui->pc_SpinBoxFast->setValue(s32_MediumValue - C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    }
 
-   if (sn_SlowValue <= (sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
+   if (s32_SlowValue <= (s32_MediumValue + C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxSlow->setValue(sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+      this->mpc_Ui->pc_SpinBoxSlow->setValue(s32_MediumValue + C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle slow value change
 
-   \param[in] osn_Value New value
+   \param[in] os32_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardSettings::m_OnSlowChanged(const stw_types::sintn osn_Value) const
+void C_SyvDaDashboardSettings::m_OnSlowChanged(const int32_t os32_Value) const
 {
-   const sintn sn_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();
-   const sintn sn_SlowValue = osn_Value;
+   const int32_t s32_MediumValue = this->mpc_Ui->pc_SpinBoxMedium->value();
+   const int32_t s32_SlowValue = os32_Value;
 
-   if (sn_SlowValue <= (sn_MediumValue + C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN))
+   if (s32_SlowValue <= (s32_MediumValue + C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN))
    {
-      this->mpc_Ui->pc_SpinBoxMedium->setValue(sn_SlowValue - C_SyvDaDashboardSettings::mhsn_MIN_DISTANCE_BETWEEN);
+      this->mpc_Ui->pc_SpinBoxMedium->setValue(s32_SlowValue - C_SyvDaDashboardSettings::mhs32_MIN_DISTANCE_BETWEEN);
    }
 }

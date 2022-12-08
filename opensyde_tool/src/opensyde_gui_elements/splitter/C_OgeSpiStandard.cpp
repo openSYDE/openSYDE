@@ -13,7 +13,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QPaintEvent>
@@ -21,17 +21,16 @@
 #include <QSplitterHandle>
 #include <QLayout>
 
-#include "C_OgeSpiStandard.h"
-#include "constants.h"
+#include "C_OgeSpiStandard.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 ms32_HANDLE_WIDTH = 5;   //px
-const sint32 ms32_HANDLE_LENGTH = 30; //px
+const int32_t ms32_HANDLE_WIDTH = 5;   //px
+const int32_t ms32_HANDLE_LENGTH = 30; //px
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -54,7 +53,7 @@ const sint32 ms32_HANDLE_LENGTH = 30; //px
 C_OgeSpiStandard::C_OgeSpiStandard(QWidget * const opc_Parent) :
    C_OgeSpiBase(opc_Parent)
 {
-   this->setHandleWidth(static_cast<sintn>(ms32_HANDLE_WIDTH));
+   this->setHandleWidth(static_cast<int32_t>(ms32_HANDLE_WIDTH));
    this->setChildrenCollapsible(false);
 
    this->setContentsMargins(0, 0, 0, 0);
@@ -84,7 +83,7 @@ void C_OgeSpiStandard::SetColor(const QColor & orc_Color) const
    \param[in]  os32_MarginBottom    Margin bottom (resp. right if handle is horizontal)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpiStandard::SetMargins(const sint32 os32_MarginTop, const sint32 os32_MarginBottom) const
+void C_OgeSpiStandard::SetMargins(const int32_t os32_MarginTop, const int32_t os32_MarginBottom) const
 {
    // Index 0 is always is hidden, take number 1
    C_OgeSpiStandardHandle * const pc_Handle = dynamic_cast<C_OgeSpiStandardHandle *>(this->handle(1));
@@ -130,7 +129,7 @@ void C_OgeSpiStandardHandle::SetColor(const QColor & orc_Color)
    \param[in]  os32_MarginBottom    Margin bottom (resp. right if handle is horizontal)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpiStandardHandle::SetMargins(const sint32 os32_MarginTop, const sint32 os32_MarginBottom)
+void C_OgeSpiStandardHandle::SetMargins(const int32_t os32_MarginTop, const int32_t os32_MarginBottom)
 {
    this->ms32_MarginTop = os32_MarginTop;
    this->ms32_MarginBottom = os32_MarginBottom;
@@ -152,39 +151,40 @@ void C_OgeSpiStandardHandle::paintEvent(QPaintEvent * const opc_Event)
    c_Painter.setPen(this->mc_Color);
    if (orientation() == Qt::Horizontal)
    {
-      const sint32 s32_TopY = this->rect().top() + this->ms32_MarginTop;
-      const sint32 s32_BotY = this->rect().bottom() - this->ms32_MarginBottom;
-      const sint32 s32_DistanceToHandle = static_cast<sint32>((s32_BotY - s32_TopY) / 2) -
-                                          static_cast<sint32>(ms32_HANDLE_LENGTH / 2);
-      const sint32 s32_HandleTopY = s32_TopY + s32_DistanceToHandle;
-      const sint32 s32_HandleBotY = s32_BotY - s32_DistanceToHandle;
+      const int32_t s32_TopVertical = this->rect().top() + this->ms32_MarginTop;
+      const int32_t s32_BotVertical = this->rect().bottom() - this->ms32_MarginBottom;
+      const int32_t s32_DistanceToHandle = static_cast<int32_t>((s32_BotVertical - s32_TopVertical) / 2) -
+                                           static_cast<int32_t>(ms32_HANDLE_LENGTH / 2);
+      const int32_t s32_HandleTopVertical = s32_TopVertical + s32_DistanceToHandle;
+      const int32_t s32_HandleBotVertical = s32_BotVertical - s32_DistanceToHandle;
 
       // draw middle line
-      c_Painter.drawLine(rect().width() / 2, s32_TopY, rect().width() / 2, s32_BotY);
+      c_Painter.drawLine(rect().width() / 2, s32_TopVertical, rect().width() / 2, s32_BotVertical);
 
       // draw left handle line
-      c_Painter.drawLine(this->rect().left(), s32_HandleTopY, this->rect().left(), s32_HandleBotY);
+      c_Painter.drawLine(this->rect().left(), s32_HandleTopVertical, this->rect().left(), s32_HandleBotVertical);
 
       //draw right handle line
-      c_Painter.drawLine(this->rect().right(), s32_HandleTopY, this->rect().right(), s32_HandleBotY);
+      c_Painter.drawLine(this->rect().right(), s32_HandleTopVertical, this->rect().right(), s32_HandleBotVertical);
    }
    else
    {
-      const sint32 s32_LeftX = this->rect().left() + this->ms32_MarginTop;
-      const sint32 s32_RightX = this->rect().right() - this->ms32_MarginBottom;
-      const sint32 s32_DistanceToHandle = static_cast<sint32>((s32_RightX - s32_LeftX) / 2) -
-                                          static_cast<sint32>(ms32_HANDLE_LENGTH / 2);
-      const sint32 s32_HandleLeftX = s32_LeftX + s32_DistanceToHandle;
-      const sint32 s32_HandleRightX = s32_RightX - s32_DistanceToHandle;
+      const int32_t s32_LeftHorizontal = this->rect().left() + this->ms32_MarginTop;
+      const int32_t s32_RightHorizontal = this->rect().right() - this->ms32_MarginBottom;
+      const int32_t s32_DistanceToHandle = static_cast<int32_t>((s32_RightHorizontal - s32_LeftHorizontal) / 2) -
+                                           static_cast<int32_t>(ms32_HANDLE_LENGTH / 2);
+      const int32_t s32_HandleLeftHorizontal = s32_LeftHorizontal + s32_DistanceToHandle;
+      const int32_t s32_HandleRightHorizontal = s32_RightHorizontal - s32_DistanceToHandle;
 
       // draw middle line
-      c_Painter.drawLine(s32_LeftX, this->rect().height() / 2, s32_RightX, this->rect().height() / 2);
+      c_Painter.drawLine(s32_LeftHorizontal, this->rect().height() / 2, s32_RightHorizontal, this->rect().height() / 2);
 
       // draw top handle line
-      c_Painter.drawLine(s32_HandleLeftX, this->rect().top(), s32_HandleRightX, this->rect().top());
+      c_Painter.drawLine(s32_HandleLeftHorizontal, this->rect().top(), s32_HandleRightHorizontal, this->rect().top());
 
       //draw bottom handle line
-      c_Painter.drawLine(s32_HandleLeftX, this->rect().bottom(), s32_HandleRightX, this->rect().bottom());
+      c_Painter.drawLine(s32_HandleLeftHorizontal, this->rect().bottom(), s32_HandleRightHorizontal,
+                         this->rect().bottom());
    }
 }
 

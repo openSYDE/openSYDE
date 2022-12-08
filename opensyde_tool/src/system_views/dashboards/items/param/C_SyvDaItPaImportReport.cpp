@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_ImpUtil.h"
-#include "C_SyvDaItPaTreeModel.h"
-#include "C_SyvDaItPaImportReport.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_SyvDaItPaTreeModel.hpp"
+#include "C_SyvDaItPaImportReport.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 #include "ui_C_SyvDaItPaImportReport.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaItPaImportReport::mhc_HTML_TABLE_HEADER_START =
@@ -59,11 +58,11 @@ const QString C_SyvDaItPaImportReport::mhc_HTML_TABLE_DATA_START =
    \param[in]      orc_Path            Selected file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItPaImportReport::C_SyvDaItPaImportReport(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                 const std::vector<C_OSCParamSetInterpretedNode> & orc_Data,
-                                                 const std::vector<C_OSCNodeDataPoolListElementId> & orc_ElementIds,
-                                                 const C_OSCNodeDataPoolListElementId & orc_Id,
-                                                 const uint32 ou32_ValidLayers, const QString & orc_Path) :
+C_SyvDaItPaImportReport::C_SyvDaItPaImportReport(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                 const std::vector<C_OscParamSetInterpretedNode> & orc_Data,
+                                                 const std::vector<C_OscNodeDataPoolListElementId> & orc_ElementIds,
+                                                 const C_OscNodeDataPoolListElementId & orc_Id,
+                                                 const uint32_t ou32_ValidLayers, const QString & orc_Path) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaItPaImportReport),
    mrc_ParentDialog(orc_Parent),
@@ -114,8 +113,8 @@ void C_SyvDaItPaImportReport::InitStaticNames(void) const
    \param[out]  orc_OutputContent   Content to replace items with
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OSCNodeDataPoolListElementId> & orc_OutputListIds,
-                                        std::vector<C_OSCNodeDataPoolContent> & orc_OutputContent) const
+void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OscNodeDataPoolListElementId> & orc_OutputListIds,
+                                        std::vector<C_OscNodeDataPoolContent> & orc_OutputContent) const
 {
    orc_OutputListIds = this->mc_OutputListIds;
    orc_OutputContent = this->mc_OutputContent;
@@ -130,7 +129,7 @@ void C_SyvDaItPaImportReport::GetOutput(std::vector<C_OSCNodeDataPoolListElement
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::GetFloatRangeCheckResults(
-   std::vector<C_OSCNodeDataPoolListElementId> & orc_InvalidValueIds, std::vector<QString> & orc_InvalidValues,
+   std::vector<C_OscNodeDataPoolListElementId> & orc_InvalidValueIds, std::vector<QString> & orc_InvalidValues,
    std::vector<QString> & orc_NewValues) const
 {
    orc_InvalidValueIds = this->mc_FloatRangeCheckInvalidValueIds;
@@ -151,8 +150,8 @@ void C_SyvDaItPaImportReport::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -217,22 +216,22 @@ void C_SyvDaItPaImportReport::m_SetReport(void)
 void C_SyvDaItPaImportReport::m_HandleSourceFileInformation(QString & orc_Text) const
 {
    QString c_ReadContent;
-   uint32 u32_NodeCount = 0UL;
-   uint32 u32_DatapoolCount = 0UL;
-   uint32 u32_ListCount = 0UL;
-   uint32 u32_ParameterCount = 0UL;
+   uint32_t u32_NodeCount = 0UL;
+   uint32_t u32_DatapoolCount = 0UL;
+   uint32_t u32_ListCount = 0UL;
+   uint32_t u32_ParameterCount = 0UL;
 
-   for (uint32 u32_ItNode = 0UL; u32_ItNode < this->mrc_Data.size(); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mrc_Data.size(); ++u32_ItNode)
    {
-      const C_OSCParamSetInterpretedNode & rc_Node = this->mrc_Data[u32_ItNode];
+      const C_OscParamSetInterpretedNode & rc_Node = this->mrc_Data[u32_ItNode];
       ++u32_NodeCount;
-      for (uint32 u32_ItDp = 0UL; u32_ItDp < rc_Node.c_DataPools.size(); ++u32_ItDp)
+      for (uint32_t u32_ItDp = 0UL; u32_ItDp < rc_Node.c_DataPools.size(); ++u32_ItDp)
       {
-         const C_OSCParamSetInterpretedDataPool & rc_Dp = rc_Node.c_DataPools[u32_ItDp];
+         const C_OscParamSetInterpretedDataPool & rc_Dp = rc_Node.c_DataPools[u32_ItDp];
          ++u32_DatapoolCount;
-         for (uint32 u32_ItList = 0UL; u32_ItList < rc_Dp.c_Lists.size(); ++u32_ItList)
+         for (uint32_t u32_ItList = 0UL; u32_ItList < rc_Dp.c_Lists.size(); ++u32_ItList)
          {
-            const C_OSCParamSetInterpretedList & rc_List = rc_Dp.c_Lists[u32_ItList];
+            const C_OscParamSetInterpretedList & rc_List = rc_Dp.c_Lists[u32_ItList];
             ++u32_ListCount;
             u32_ParameterCount += rc_List.c_Elements.size();
          }
@@ -256,9 +255,9 @@ void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
    QString c_TableApplyContent;
    QString c_TableMismatchContent;
    QString c_TableRemainContent;
-   uint32 u32_TableApplyContent = 0UL;
-   uint32 u32_TableMismatchContent = 0UL;
-   uint32 u32_TableRemainContent = 0UL;
+   uint32_t u32_TableApplyContent = 0UL;
+   uint32_t u32_TableMismatchContent = 0UL;
+   uint32_t u32_TableRemainContent = 0UL;
 
    orc_Text += "<h3>";
    orc_Text += C_GtGetText::h_GetText("Import Preview");
@@ -388,44 +387,46 @@ void C_SyvDaItPaImportReport::m_HandleParsing(QString & orc_Text)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyContent, QString & orc_TableMismatchContent,
-                                                    QString & orc_TableRemainContent, uint32 & oru32_TableApplyCount,
-                                                    uint32 & oru32_TableMismatchCount, uint32 & oru32_TableRemainCount)
+                                                    QString & orc_TableRemainContent, uint32_t & oru32_TableApplyCount,
+                                                    uint32_t & oru32_TableMismatchCount,
+                                                    uint32_t & oru32_TableRemainCount)
 {
-   for (uint32 u32_ItParam = 0; u32_ItParam < this->mrc_ElementIds.size(); ++u32_ItParam)
+   for (uint32_t u32_ItParam = 0; u32_ItParam < this->mrc_ElementIds.size(); ++u32_ItParam)
    {
       bool q_Found = false;
-      const C_OSCNodeDataPoolListElementId & rc_ParamId = this->mrc_ElementIds[u32_ItParam];
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(rc_ParamId.u32_NodeIndex);
-      const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNodeDataPoolListElementId & rc_ParamId = this->mrc_ElementIds[u32_ItParam];
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(rc_ParamId.u32_NodeIndex);
+      const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          rc_ParamId.u32_NodeIndex, rc_ParamId.u32_DataPoolIndex);
-      const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+      const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
          rc_ParamId.u32_NodeIndex, rc_ParamId.u32_DataPoolIndex, rc_ParamId.u32_ListIndex);
-      const C_OSCNodeDataPoolListElementId c_ElementId(rc_ParamId.u32_NodeIndex,
+      const C_OscNodeDataPoolListElementId c_ElementId(rc_ParamId.u32_NodeIndex,
                                                        rc_ParamId.u32_DataPoolIndex,
                                                        rc_ParamId.u32_ListIndex,
                                                        rc_ParamId.u32_ElementIndex);
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_ElementId);
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_ElementId);
       if ((((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL)) && (pc_Element != NULL))
       {
-         for (uint32 u32_ItNode = 0UL; u32_ItNode < this->mrc_Data.size(); ++u32_ItNode)
+         for (uint32_t u32_ItNode = 0UL; u32_ItNode < this->mrc_Data.size(); ++u32_ItNode)
          {
-            const C_OSCParamSetInterpretedNode & rc_Node = this->mrc_Data[u32_ItNode];
+            const C_OscParamSetInterpretedNode & rc_Node = this->mrc_Data[u32_ItNode];
             if (pc_Node->c_Properties.c_Name == rc_Node.c_Name)
             {
-               for (uint32 u32_ItDp = 0UL; u32_ItDp < rc_Node.c_DataPools.size(); ++u32_ItDp)
+               for (uint32_t u32_ItDp = 0UL; u32_ItDp < rc_Node.c_DataPools.size(); ++u32_ItDp)
                {
-                  const C_OSCParamSetInterpretedDataPool & rc_Dp = rc_Node.c_DataPools[u32_ItDp];
+                  const C_OscParamSetInterpretedDataPool & rc_Dp = rc_Node.c_DataPools[u32_ItDp];
                   if (pc_DataPool->c_Name == rc_Dp.c_DataPoolInfo.c_Name)
                   {
-                     for (uint32 u32_ItList = 0UL; u32_ItList < rc_Dp.c_Lists.size(); ++u32_ItList)
+                     for (uint32_t u32_ItList = 0UL; u32_ItList < rc_Dp.c_Lists.size(); ++u32_ItList)
                      {
-                        const C_OSCParamSetInterpretedList & rc_List = rc_Dp.c_Lists[u32_ItList];
+                        const C_OscParamSetInterpretedList & rc_List = rc_Dp.c_Lists[u32_ItList];
                         if (pc_List->c_Name == rc_List.c_Name)
                         {
-                           for (uint32 u32_ItElement = 0UL; u32_ItElement < rc_List.c_Elements.size(); ++u32_ItElement)
+                           for (uint32_t u32_ItElement = 0UL; u32_ItElement < rc_List.c_Elements.size();
+                                ++u32_ItElement)
                            {
-                              const C_OSCParamSetInterpretedElement & rc_Element = rc_List.c_Elements[u32_ItElement];
+                              const C_OscParamSetInterpretedElement & rc_Element = rc_List.c_Elements[u32_ItElement];
                               if (pc_Element->c_Name == rc_Element.c_Name)
                               {
                                  QString c_Value;
@@ -504,7 +505,7 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
                                  else
                                  {
                                     {
-                                       C_OSCNodeDataPoolContent c_Content = rc_Element.c_NvmValue;
+                                       C_OscNodeDataPoolContent c_Content = rc_Element.c_NvmValue;
                                        C_SyvDaItPaTreeModel::h_AdaptFloatRangeOfValueAndAppendResults(c_Content,
                                                                                                       c_ElementId,
                                                                                                       this->mc_FloatRangeCheckInvalidValueIds, this->mc_FloatRangeCheckInvalidValues,
@@ -546,16 +547,16 @@ void C_SyvDaItPaImportReport::m_PrepareTableContent(QString & orc_TableApplyCont
    \param[in]      orc_Reason          Optional reason for discarding
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uint32 & oru32_TableCount,
-                                                 const C_OSCNodeDataPoolListElementId & orc_Id,
+void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uint32_t & oru32_TableCount,
+                                                 const C_OscNodeDataPoolListElementId & orc_Id,
                                                  const QString & orc_Value, const QString & orc_Reason) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_Id.u32_NodeIndex);
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_Id.u32_NodeIndex);
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_Id.u32_NodeIndex,
                                                                                                  orc_Id.u32_DataPoolIndex);
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex, orc_Id.u32_ListIndex);
-   const C_OSCNodeDataPoolListElement * const pc_Element = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+   const C_OscNodeDataPoolListElement * const pc_Element = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
       orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex, orc_Id.u32_ListIndex, orc_Id.u32_ElementIndex);
 
    if ((((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL)) && (pc_Element != NULL))
@@ -602,7 +603,7 @@ void C_SyvDaItPaImportReport::m_AppendTableEntry(QString & orc_TableContent, uin
    Get Name for current filter
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
+QString C_SyvDaItPaImportReport::m_GetFilter(const uint32_t ou32_Value) const
 {
    QString c_Retval;
 
@@ -613,15 +614,15 @@ QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
    }
    else if (ou32_Value <= this->mu32_ValidLayers)
    {
-      const C_OSCNode * pc_Node;
-      const C_OSCNodeDataPool * pc_DataPool;
-      const C_OSCNodeDataPoolList * pc_List;
-      const C_OSCNodeDataPoolListElement * pc_Element;
+      const C_OscNode * pc_Node;
+      const C_OscNodeDataPool * pc_DataPool;
+      const C_OscNodeDataPoolList * pc_List;
+      const C_OscNodeDataPoolListElement * pc_Element;
       //Get specific name for current layer
       switch (ou32_Value)
       {
       case 4UL:
-         pc_Element = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+         pc_Element = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
             this->mrc_Id.u32_NodeIndex, this->mrc_Id.u32_DataPoolIndex, this->mrc_Id.u32_ListIndex,
             this->mrc_Id.u32_ElementIndex);
          if (pc_Element != NULL)
@@ -631,7 +632,7 @@ QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
          }
          break;
       case 3UL:
-         pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
             this->mrc_Id.u32_NodeIndex, this->mrc_Id.u32_DataPoolIndex, this->mrc_Id.u32_ListIndex);
          if (pc_List != NULL)
          {
@@ -639,7 +640,7 @@ QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
          }
          break;
       case 2UL:
-         pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(this->mrc_Id.u32_NodeIndex,
+         pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(this->mrc_Id.u32_NodeIndex,
                                                                        this->mrc_Id.u32_DataPoolIndex);
          if (pc_DataPool != NULL)
          {
@@ -648,7 +649,7 @@ QString C_SyvDaItPaImportReport::m_GetFilter(const uint32 ou32_Value) const
          }
          break;
       case 1UL:
-         pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mrc_Id.u32_NodeIndex);
+         pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mrc_Id.u32_NodeIndex);
          if (pc_Node != NULL)
          {
             c_Retval = static_cast<QString>(C_GtGetText::h_GetText("Node \"%1\"")).arg(

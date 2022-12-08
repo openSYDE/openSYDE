@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_CamDbOsy.h"
-#include "C_CamGenSigUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_CamDbOsy.hpp"
+#include "C_CamGenSigUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,7 +41,7 @@ using namespace stw_opensyde_gui_logic;
 C_CamDbOsy::C_CamDbOsy() :
    mq_Active(true),
    mq_FoundAll(false),
-   mc_Data(C_OSCSystemDefinition(), 0UL)
+   mc_Data(C_OscSystemDefinition(), 0UL)
 {
 }
 
@@ -63,7 +62,7 @@ void C_CamDbOsy::SetActive(const bool oq_Active)
    \param[in]  orc_Data    New data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamDbOsy::SetData(const stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig & orc_Data)
+void C_CamDbOsy::SetData(const stw::opensyde_core::C_OscComMessageLoggerOsySysDefConfig & orc_Data)
 {
    this->mc_Data = orc_Data;
 }
@@ -78,8 +77,8 @@ void C_CamDbOsy::FindAllMessages(void)
 {
    if (this->mq_FoundAll == false)
    {
-      std::vector<uint32> c_NodeIndexes;
-      std::vector<uint32> c_InterfaceIndexes;
+      std::vector<uint32_t> c_NodeIndexes;
+      std::vector<uint32_t> c_InterfaceIndexes;
       C_CamDbOsyMessageId c_CurId;
       C_CamDbOsyListId c_CurListId;
 
@@ -91,20 +90,20 @@ void C_CamDbOsy::FindAllMessages(void)
       if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
       {
          //All found nodes & interfaces
-         for (uint32 u32_ItFoundItem = 0UL; u32_ItFoundItem < c_NodeIndexes.size();
+         for (uint32_t u32_ItFoundItem = 0UL; u32_ItFoundItem < c_NodeIndexes.size();
               ++u32_ItFoundItem)
          {
             if (c_NodeIndexes[u32_ItFoundItem] < this->mc_Data.c_OsySysDef.c_Nodes.size())
             {
                //Found node
-               const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
+               const C_OscNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
                //Id
                c_CurListId.c_Id.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                c_CurId.c_Id.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                //All protocols
-               for (uint8 u8_ItProt = 0U; u8_ItProt < rc_Node.c_ComProtocols.size(); ++u8_ItProt)
+               for (uint8_t u8_ItProt = 0U; u8_ItProt < rc_Node.c_ComProtocols.size(); ++u8_ItProt)
                {
-                  const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
+                  const C_OscCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
                   //Id
                   c_CurListId.c_Id.u32_DataPoolIndex = rc_Protocol.u32_DataPoolIndex;
                   c_CurId.c_Id.e_ComProtocol = rc_Protocol.e_Type;
@@ -112,24 +111,24 @@ void C_CamDbOsy::FindAllMessages(void)
                   if ((rc_Protocol.u32_DataPoolIndex < rc_Node.c_DataPools.size()) &&
                       (c_InterfaceIndexes[u32_ItFoundItem] < rc_Protocol.c_ComMessages.size()))
                   {
-                     const C_OSCNodeDataPool & rc_Datapool = rc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex];
+                     const C_OscNodeDataPool & rc_Datapool = rc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex];
                      //Found container
-                     const C_OSCCanMessageContainer & rc_Container =
+                     const C_OscCanMessageContainer & rc_Container =
                         rc_Protocol.c_ComMessages[c_InterfaceIndexes[u32_ItFoundItem]];
                      //Id
                      c_CurId.c_Id.u32_InterfaceIndex = c_InterfaceIndexes[u32_ItFoundItem];
-                     if ((C_OSCCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem], false,
+                     if ((C_OscCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem], false,
                                                               c_CurListId.c_Id.u32_ListIndex) == C_NO_ERR) &&
                          (c_CurListId.c_Id.u32_ListIndex < rc_Datapool.c_Lists.size()))
                      {
                         //Each Rx message
-                        for (uint32 u32_ItMsg = 0UL; u32_ItMsg < rc_Container.c_RxMessages.size(); ++u32_ItMsg)
+                        for (uint32_t u32_ItMsg = 0UL; u32_ItMsg < rc_Container.c_RxMessages.size(); ++u32_ItMsg)
                         {
-                           const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
+                           const C_OscCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
                            //Use first occurance
                            if (!this->mc_FoundMessagesId.contains(rc_Message.c_Name.c_str()))
                            {
-                              const uint32 u32_Hash =
+                              const uint32_t u32_Hash =
                                  C_CamGenSigUtil::h_CalcMessageHash(rc_Message,
                                                                     rc_Datapool.c_Lists[c_CurListId.c_Id.u32_ListIndex]);
                               //Id
@@ -142,19 +141,19 @@ void C_CamDbOsy::FindAllMessages(void)
                            }
                         }
                      }
-                     if ((C_OSCCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem], true,
+                     if ((C_OscCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem], true,
                                                               c_CurListId.c_Id.u32_ListIndex) == C_NO_ERR) &&
                          (c_CurListId.c_Id.u32_ListIndex < rc_Datapool.c_Lists.size()))
                      {
                         //Each Tx message
-                        for (uint32 u32_ItMsg = 0UL;
+                        for (uint32_t u32_ItMsg = 0UL;
                              u32_ItMsg < rc_Container.c_TxMessages.size(); ++u32_ItMsg)
                         {
-                           const C_OSCCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
+                           const C_OscCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
                            //Use first occurance
                            if (!this->mc_FoundMessagesId.contains(rc_Message.c_Name.c_str()))
                            {
-                              const uint32 u32_Hash =
+                              const uint32_t u32_Hash =
                                  C_CamGenSigUtil::h_CalcMessageHash(rc_Message,
                                                                     rc_Datapool.c_Lists[c_CurListId.c_Id.u32_ListIndex]);
                               //Id
@@ -188,40 +187,40 @@ void C_CamDbOsy::FindAllMessages(void)
    C_NOACT  No matching message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtended, QString & orc_Message) const
+int32_t C_CamDbOsy::FindMessageById(const uint32_t ou32_Id, const bool oq_IsExtended, QString & orc_Message) const
 {
-   sint32 s32_Retval = C_NOACT;
+   int32_t s32_Retval = C_NOACT;
 
-   std::vector<uint32> c_NodeIndexes;
-   std::vector<uint32> c_InterfaceIndexes;
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
 
    this->mc_Data.c_OsySysDef.GetNodeIndexesOfBus(this->mc_Data.u32_BusIndex, c_NodeIndexes, c_InterfaceIndexes);
    if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
    {
       //All found nodes & interfaces
-      for (uint32 u32_ItFoundItem = 0UL; (u32_ItFoundItem < c_NodeIndexes.size()) && (s32_Retval == C_NOACT);
+      for (uint32_t u32_ItFoundItem = 0UL; (u32_ItFoundItem < c_NodeIndexes.size()) && (s32_Retval == C_NOACT);
            ++u32_ItFoundItem)
       {
          if (c_NodeIndexes[u32_ItFoundItem] < this->mc_Data.c_OsySysDef.c_Nodes.size())
          {
             //Found node
-            const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
+            const C_OscNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
             //All protocols
-            for (uint8 u8_ItProt = 0U; (u8_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
+            for (uint8_t u8_ItProt = 0U; (u8_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
                  ++u8_ItProt)
             {
-               const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
+               const C_OscCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
                if (c_InterfaceIndexes[u32_ItFoundItem] < rc_Protocol.c_ComMessages.size())
                {
                   //Found container
-                  const C_OSCCanMessageContainer & rc_Container =
+                  const C_OscCanMessageContainer & rc_Container =
                      rc_Protocol.c_ComMessages[c_InterfaceIndexes[u32_ItFoundItem]];
                   //Each Rx message
-                  for (uint32 u32_ItMsg =
+                  for (uint32_t u32_ItMsg =
                           0UL; (u32_ItMsg < rc_Container.c_RxMessages.size()) && (s32_Retval == C_NOACT);
                        ++u32_ItMsg)
                   {
-                     const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
+                     const C_OscCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
                      if ((rc_Message.u32_CanId == ou32_Id) && (rc_Message.q_IsExtended == oq_IsExtended))
                      {
                         //Found match
@@ -230,10 +229,10 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtende
                      }
                   }
                   //Each Tx message
-                  for (uint32 u32_ItMsg = 0UL;
+                  for (uint32_t u32_ItMsg = 0UL;
                        (u32_ItMsg < rc_Container.c_TxMessages.size()) && (s32_Retval == C_NOACT); ++u32_ItMsg)
                   {
-                     const C_OSCCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
+                     const C_OscCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
                      if ((rc_Message.u32_CanId == ou32_Id) && (rc_Message.q_IsExtended == oq_IsExtended))
                      {
                         //Found match
@@ -259,9 +258,9 @@ sint32 C_CamDbOsy::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtende
    C_NOACT  Message not found in file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
+int32_t C_CamDbOsy::FindMessage(const QString & orc_Message)
 {
-   sint32 s32_Retval = C_NOACT;
+   int32_t s32_Retval = C_NOACT;
 
    //Check if already searched once
    if ((this->mc_FoundMessagesId.contains(orc_Message) == true) &&
@@ -271,8 +270,8 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
    }
    else
    {
-      std::vector<uint32> c_NodeIndexes;
-      std::vector<uint32> c_InterfaceIndexes;
+      std::vector<uint32_t> c_NodeIndexes;
+      std::vector<uint32_t> c_InterfaceIndexes;
       C_CamDbOsyMessageId c_CurId;
       C_CamDbOsyListId c_CurListId;
 
@@ -280,21 +279,21 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
       if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
       {
          //All found nodes & interfaces
-         for (uint32 u32_ItFoundItem = 0UL; (u32_ItFoundItem < c_NodeIndexes.size()) && (s32_Retval == C_NOACT);
+         for (uint32_t u32_ItFoundItem = 0UL; (u32_ItFoundItem < c_NodeIndexes.size()) && (s32_Retval == C_NOACT);
               ++u32_ItFoundItem)
          {
             if (c_NodeIndexes[u32_ItFoundItem] < this->mc_Data.c_OsySysDef.c_Nodes.size())
             {
                //Found node
-               const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
+               const C_OscNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_NodeIndexes[u32_ItFoundItem]];
                //Id
                c_CurListId.c_Id.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                c_CurId.c_Id.u32_NodeIndex = c_NodeIndexes[u32_ItFoundItem];
                //All protocols
-               for (uint8 u8_ItProt = 0U; (u8_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
+               for (uint8_t u8_ItProt = 0U; (u8_ItProt < rc_Node.c_ComProtocols.size()) && (s32_Retval == C_NOACT);
                     ++u8_ItProt)
                {
-                  const C_OSCCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
+                  const C_OscCanProtocol & rc_Protocol = rc_Node.c_ComProtocols[u8_ItProt];
                   //Id
                   c_CurListId.c_Id.u32_DataPoolIndex = rc_Protocol.u32_DataPoolIndex;
                   c_CurId.c_Id.e_ComProtocol = rc_Protocol.e_Type;
@@ -302,28 +301,28 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
                   if ((rc_Protocol.u32_DataPoolIndex < rc_Node.c_DataPools.size()) &&
                       (c_InterfaceIndexes[u32_ItFoundItem] < rc_Protocol.c_ComMessages.size()))
                   {
-                     const C_OSCNodeDataPool & rc_Datapool = rc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex];
+                     const C_OscNodeDataPool & rc_Datapool = rc_Node.c_DataPools[rc_Protocol.u32_DataPoolIndex];
                      //Found container
-                     const C_OSCCanMessageContainer & rc_Container =
+                     const C_OscCanMessageContainer & rc_Container =
                         rc_Protocol.c_ComMessages[c_InterfaceIndexes[u32_ItFoundItem]];
                      //Id
                      c_CurId.c_Id.u32_InterfaceIndex = c_InterfaceIndexes[u32_ItFoundItem];
                      //Each Rx message
-                     for (uint32 u32_ItMsg = 0UL; u32_ItMsg < rc_Container.c_RxMessages.size(); ++u32_ItMsg)
+                     for (uint32_t u32_ItMsg = 0UL; u32_ItMsg < rc_Container.c_RxMessages.size(); ++u32_ItMsg)
                      {
-                        const C_OSCCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
+                        const C_OscCanMessage & rc_Message = rc_Container.c_RxMessages[u32_ItMsg];
                         if (orc_Message.compare(rc_Message.c_Name.c_str()) == 0)
                         {
                            //Found match
                            //Id
                            c_CurId.c_Id.q_MessageIsTx = false;
                            c_CurId.c_Id.u32_MessageIndex = u32_ItMsg;
-                           if ((C_OSCCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem],
+                           if ((C_OscCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem],
                                                                     c_CurId.c_Id.q_MessageIsTx,
                                                                     c_CurListId.c_Id.u32_ListIndex) == C_NO_ERR) &&
                                (c_CurListId.c_Id.u32_ListIndex < rc_Datapool.c_Lists.size()))
                            {
-                              const uint32 u32_Hash =
+                              const uint32_t u32_Hash =
                                  C_CamGenSigUtil::h_CalcMessageHash(rc_Message,
                                                                     rc_Datapool.c_Lists[c_CurListId.c_Id.u32_ListIndex]);
                               c_CurId.u32_Hash = u32_Hash;
@@ -334,22 +333,22 @@ sint32 C_CamDbOsy::FindMessage(const QString & orc_Message)
                         }
                      }
                      //Each Tx message
-                     for (uint32 u32_ItMsg = 0UL;
+                     for (uint32_t u32_ItMsg = 0UL;
                           (u32_ItMsg < rc_Container.c_TxMessages.size()) && (s32_Retval == C_NOACT); ++u32_ItMsg)
                      {
-                        const C_OSCCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
+                        const C_OscCanMessage & rc_Message = rc_Container.c_TxMessages[u32_ItMsg];
                         if (orc_Message.compare(rc_Message.c_Name.c_str()) == 0)
                         {
                            //Found match
                            //Id
                            c_CurId.c_Id.q_MessageIsTx = true;
                            c_CurId.c_Id.u32_MessageIndex = u32_ItMsg;
-                           if ((C_OSCCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem],
+                           if ((C_OscCanProtocol::h_GetComListIndex(rc_Datapool, c_InterfaceIndexes[u32_ItFoundItem],
                                                                     c_CurId.c_Id.q_MessageIsTx,
                                                                     c_CurListId.c_Id.u32_ListIndex) == C_NO_ERR) &&
                                (c_CurListId.c_Id.u32_ListIndex < rc_Datapool.c_Lists.size()))
                            {
-                              const uint32 u32_Hash =
+                              const uint32_t u32_Hash =
                                  C_CamGenSigUtil::h_CalcMessageHash(rc_Message,
                                                                     rc_Datapool.c_Lists[c_CurListId.c_Id.u32_ListIndex]);
                               c_CurId.u32_Hash = u32_Hash;
@@ -414,12 +413,12 @@ const QMap<QString, C_CamDbOsyMessageId> & C_CamDbOsy::GetFoundMessages(void) co
    Else Valid OSC CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_core::C_OSCCanMessage * C_CamDbOsy::GetOSCMessage(const QString & orc_Message, const bool oq_UseHash,
-                                                                     const uint32 ou32_Hash,
-                                                                     C_OSCCanProtocol::E_Type * const ope_ProtocolType)
+const stw::opensyde_core::C_OscCanMessage * C_CamDbOsy::GetOscMessage(const QString & orc_Message,
+                                                                      const bool oq_UseHash, const uint32_t ou32_Hash,
+                                                                      C_OscCanProtocol::E_Type * const ope_ProtocolType)
 const
 {
-   const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
+   const stw::opensyde_core::C_OscCanMessage * pc_Retval = NULL;
 
    //Don't allow access to inactive file
    if (this->mq_Active)
@@ -434,16 +433,16 @@ const
          {
             if (c_It->c_Id.u32_NodeIndex < this->mc_Data.c_OsySysDef.c_Nodes.size())
             {
-               const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_It->c_Id.u32_NodeIndex];
-               const C_OSCCanProtocol * const pc_Protocol = rc_Node.GetCANProtocolConst(c_It->c_Id.e_ComProtocol,
+               const C_OscNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_It->c_Id.u32_NodeIndex];
+               const C_OscCanProtocol * const pc_Protocol = rc_Node.GetCanProtocolConst(c_It->c_Id.e_ComProtocol,
                                                                                         c_It->c_Id.u32_DatapoolIndex);
                if (pc_Protocol != NULL)
                {
                   if (c_It->c_Id.u32_InterfaceIndex < pc_Protocol->c_ComMessages.size())
                   {
-                     const C_OSCCanMessageContainer & rc_Container =
+                     const C_OscCanMessageContainer & rc_Container =
                         pc_Protocol->c_ComMessages[c_It->c_Id.u32_InterfaceIndex];
-                     const std::vector<C_OSCCanMessage> & rc_Messages = rc_Container.GetMessagesConst(
+                     const std::vector<C_OscCanMessage> & rc_Messages = rc_Container.GetMessagesConst(
                         c_It->c_Id.q_MessageIsTx);
                      if (c_It->c_Id.u32_MessageIndex < rc_Messages.size())
                      {
@@ -476,11 +475,11 @@ const
    Else Valid OSC list
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbOsy::GetOSCList(const QString & orc_Message,
-                                                                        const bool oq_UseHash,
-                                                                        const uint32 ou32_Hash) const
+const stw::opensyde_core::C_OscNodeDataPoolList * C_CamDbOsy::GetOscList(const QString & orc_Message,
+                                                                         const bool oq_UseHash,
+                                                                         const uint32_t ou32_Hash) const
 {
-   const stw_opensyde_core::C_OSCNodeDataPoolList * pc_Retval = NULL;
+   const stw::opensyde_core::C_OscNodeDataPoolList * pc_Retval = NULL;
 
    //Don't allow access to inactive file
    if (this->mq_Active)
@@ -494,10 +493,10 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbOsy::GetOSCList(const QS
          {
             if (c_It->c_Id.u32_NodeIndex < this->mc_Data.c_OsySysDef.c_Nodes.size())
             {
-               const C_OSCNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_It->c_Id.u32_NodeIndex];
+               const C_OscNode & rc_Node = this->mc_Data.c_OsySysDef.c_Nodes[c_It->c_Id.u32_NodeIndex];
                if (c_It->c_Id.u32_DataPoolIndex < rc_Node.c_DataPools.size())
                {
-                  const C_OSCNodeDataPool & rc_DataPool = rc_Node.c_DataPools[c_It->c_Id.u32_DataPoolIndex];
+                  const C_OscNodeDataPool & rc_DataPool = rc_Node.c_DataPools[c_It->c_Id.u32_DataPoolIndex];
                   if (c_It->c_Id.u32_ListIndex < rc_DataPool.c_Lists.size())
                   {
                      pc_Retval = &rc_DataPool.c_Lists[c_It->c_Id.u32_ListIndex];
@@ -520,7 +519,7 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbOsy::GetOSCList(const QS
    False No change
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamDbOsy::ReplaceOsyBusIndex(const uint32 ou32_BusIndex)
+bool C_CamDbOsy::ReplaceOsyBusIndex(const uint32_t ou32_BusIndex)
 {
    bool q_Retval;
 
@@ -552,7 +551,7 @@ bool C_CamDbOsy::ReplaceOsyBusIndex(const uint32 ou32_BusIndex)
    \retval   false  Invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamDbOsy::CheckHashForMessage(const QString & orc_Message, const uint32 ou32_Hash) const
+bool C_CamDbOsy::CheckHashForMessage(const QString & orc_Message, const uint32_t ou32_Hash) const
 {
    bool q_Retval = false;
 

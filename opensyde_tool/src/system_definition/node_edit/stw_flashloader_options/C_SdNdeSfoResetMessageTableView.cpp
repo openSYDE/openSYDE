@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QHeaderView>
-#include "C_SdNdeSfoResetMessageTableView.h"
-#include "constants.h"
+#include "C_SdNdeSfoResetMessageTableView.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -82,7 +81,7 @@ C_SdNdeSfoResetMessageTableView::C_SdNdeSfoResetMessageTableView(QWidget * const
    \param[in] ou32_NodeIndex Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeSfoResetMessageTableView::SetNode(const stw_types::uint32 ou32_NodeIndex)
+void C_SdNdeSfoResetMessageTableView::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mc_Model.SetIndex(ou32_NodeIndex);
 

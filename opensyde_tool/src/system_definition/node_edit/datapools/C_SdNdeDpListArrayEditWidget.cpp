@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SdNdeDpListArrayEditWidget.h"
+#include "C_SdNdeDpListArrayEditWidget.hpp"
 #include "ui_C_SdNdeDpListArrayEditWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -47,13 +46,13 @@ using namespace stw_opensyde_core;
                                   Else use data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListArrayEditWidget::C_SdNdeDpListArrayEditWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                           const uint32 & oru32_NodeIndex,
-                                                           const uint32 & oru32_DataPoolIndex,
-                                                           const uint32 & oru32_ListIndex,
-                                                           const uint32 & oru32_ElementIndex,
+C_SdNdeDpListArrayEditWidget::C_SdNdeDpListArrayEditWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                           const uint32_t & oru32_NodeIndex,
+                                                           const uint32_t & oru32_DataPoolIndex,
+                                                           const uint32_t & oru32_ListIndex,
+                                                           const uint32_t & oru32_ElementIndex,
                                                            const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                                           const uint32 & oru32_DataSetIndex) :
+                                                           const uint32_t & oru32_DataSetIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDpListArrayEditWidget),
    mrc_Parent(orc_Parent),
@@ -71,9 +70,9 @@ C_SdNdeDpListArrayEditWidget::C_SdNdeDpListArrayEditWidget(stw_opensyde_gui_elem
                                           ore_ArrayEditType, oru32_DataSetIndex);
 
    //Connects
-   connect(this->mpc_Ui->pc_BushButtonOk, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_BushButtonOk, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SdNdeDpListArrayEditWidget::m_OkClicked);
-   connect(this->mpc_Ui->pc_BushButtonCancel, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_BushButtonCancel, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SdNdeDpListArrayEditWidget::m_CancelClicked);
 }
 
@@ -94,12 +93,12 @@ C_SdNdeDpListArrayEditWidget::~C_SdNdeDpListArrayEditWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListArrayEditWidget::InitStaticNames(void) const
 {
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(this->mu32_NodeIndex,
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(this->mu32_NodeIndex,
                                                                                                  this->mu32_DataPoolIndex);
-   const C_OSCNodeDataPoolListElement * const pc_Element =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+   const C_OscNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex, this->mu32_ElementIndex);
-   const C_OSCNodeDataPoolDataSet * const pc_DataSet = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListDataSet(
+   const C_OscNodeDataPoolDataSet * const pc_DataSet = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListDataSet(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex,
       this->mu32_ListIndex,
       this->mu32_DataSetIndex);
@@ -177,8 +176,8 @@ void C_SdNdeDpListArrayEditWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

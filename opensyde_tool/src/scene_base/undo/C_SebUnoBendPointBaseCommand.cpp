@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SebUnoBendPointBaseCommand.h"
-#include "C_SebScene.h"
+#include "stwtypes.hpp"
+#include "C_SebUnoBendPointBaseCommand.hpp"
+#include "C_SebScene.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
 using namespace std;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,17 +37,17 @@ using namespace stw_opensyde_gui;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene         Pointer to currently active scene
-   \param[in]     orc_IDs           Affected unique IDs
+   \param[in]     orc_Ids           Affected unique IDs
    \param[in]     orc_Text          Command description
    \param[in]     orc_ScenePosition Scene position to bend or remove bend point at
    \param[in,out] opc_Parent        Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoBendPointBaseCommand::C_SebUnoBendPointBaseCommand(QGraphicsScene * const opc_Scene,
-                                                           const std::vector<uint64> & orc_IDs,
+                                                           const std::vector<uint64_t> & orc_Ids,
                                                            const QString & orc_Text, const QPointF & orc_ScenePosition,
                                                            QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, orc_Text, opc_Parent),
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, orc_Text, opc_Parent),
    mc_ScenePosition(orc_ScenePosition),
    ms32_Index(-1)
 {
@@ -73,7 +72,7 @@ void C_SebUnoBendPointBaseCommand::m_DeleteBend(void)
    if (pc_Scene != NULL)
    {
       vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-      for (uint32 u32_ItItem = 0; u32_ItItem < c_Items.size(); ++u32_ItItem)
+      for (uint32_t u32_ItItem = 0; u32_ItItem < c_Items.size(); ++u32_ItItem)
       {
          if (this->ms32_Index < 0)
          {
@@ -98,7 +97,7 @@ void C_SebUnoBendPointBaseCommand::m_AddBend(void)
    if (pc_Scene != NULL)
    {
       vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-      for (uint32 u32_ItItem = 0; u32_ItItem < c_Items.size(); ++u32_ItItem)
+      for (uint32_t u32_ItItem = 0; u32_ItItem < c_Items.size(); ++u32_ItItem)
       {
          if (this->ms32_Index < 0)
          {

@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "C_GtGetText.h"
-#include "TGLFile.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "C_GtGetText.hpp"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
 #include "libintl.h" //gettext header
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,19 +64,19 @@ bool C_GtGetText::mhq_Initialized = false;
    C_NOACT     internal error in gettext library
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLString & orc_MoFileName)
+int32_t C_GtGetText::h_Initialize(const C_SclString & orc_BasePath, const C_SclString & orc_MoFileName)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   s32_Return = stw_errors::C_NO_ERR;
+   s32_Return = stw::errors::C_NO_ERR;
 
    if ((orc_BasePath == "") || (orc_MoFileName == ""))
    {
-      s32_Return = stw_errors::C_RANGE;
+      s32_Return = stw::errors::C_RANGE;
    }
    else
    {
-      charn * pcn_Return;
+      char_t * pcn_Return;
       pcn_Return = bindtextdomain(orc_MoFileName.c_str(), orc_BasePath.c_str());
       if (pcn_Return != NULL)
       {
@@ -92,10 +91,10 @@ sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLSt
       }
       if (pcn_Return == NULL)
       {
-         s32_Return = stw_errors::C_NOACT;
+         s32_Return = stw::errors::C_NOACT;
       }
    }
-   if (s32_Return == stw_errors::C_NO_ERR)
+   if (s32_Return == stw::errors::C_NO_ERR)
    {
       mhq_Initialized = true;
    }
@@ -126,18 +125,18 @@ sint32 C_GtGetText::h_Initialize(const C_SCLString & orc_BasePath, const C_SCLSt
    C_NOACT     could not set language
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
+int32_t C_GtGetText::h_SetLanguage(const C_SclString & orc_Language)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   s32_Return = stw_tgl::TGL_SetEnvironmentVariable("LANG", orc_Language);
+   s32_Return = stw::tgl::TglSetEnvironmentVariable("LANG", orc_Language);
    if (s32_Return == -1)
    {
-      s32_Return = stw_errors::C_NOACT;
+      s32_Return = stw::errors::C_NOACT;
    }
    else
    {
-      s32_Return = stw_errors::C_NO_ERR;
+      s32_Return = stw::errors::C_NO_ERR;
    }
 
    return s32_Return;
@@ -155,16 +154,16 @@ sint32 C_GtGetText::h_SetLanguage(const C_SCLString & orc_Language)
    Note: when parsing the texts in the application using the "xgettext" utility pass "--keyword=h_GetText" so this
     function will be properly identified.
 
-   \param[in]  opcn_MessageID    key
+   \param[in]  opcn_MessageId    key
 
    \return
    Pointer to text (see description)
 */
 //----------------------------------------------------------------------------------------------------------------------
-const charn * C_GtGetText::h_GetText(const charn * const opcn_MessageID)
+const char_t * C_GtGetText::h_GetText(const char_t * const opcn_MessageId)
 {
-   static const charn hacn_ERROR[] = "C_GtGetText not initialized";
-   const charn * pcn_String;
+   static const char_t hacn_ERROR[] = "C_GtGetText not initialized";
+   const char_t * pcn_String;
 
    if (mhq_Initialized == false)
    {
@@ -172,7 +171,7 @@ const charn * C_GtGetText::h_GetText(const charn * const opcn_MessageID)
    }
    else
    {
-      pcn_String = gettext(opcn_MessageID);
+      pcn_String = gettext(opcn_MessageId);
    }
    return pcn_String;
 }

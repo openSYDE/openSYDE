@@ -4,7 +4,7 @@
    \brief       Connects the openSYDE protocol driver to a node with GUI specific functionality
 
    - Depending on the type of data pool element call the
-     corresponding read function from C_OSCDiagProtocolBase
+     corresponding read function from C_OscDiagProtocolBase
    - Place the results into the defined data pool element
 
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
@@ -12,19 +12,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SyvComDataDealer.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PuiSvDbDataElementContent.h"
+#include "C_SyvComDataDealer.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PuiSvDbDataElementContent.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,7 +44,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvComDataDealer::C_SyvComDataDealer(void) :
-   C_OSCDataDealerNvmSafe()
+   C_OscDataDealerNvmSafe()
 {
 }
 
@@ -59,9 +58,9 @@ C_SyvComDataDealer::C_SyvComDataDealer(void) :
    \param[in]     opc_DiagProtocol  Pointer to used diagnostic protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvComDataDealer::C_SyvComDataDealer(C_OSCNode * const opc_Node, const uint32 ou32_NodeIndex,
-                                       C_OSCDiagProtocolBase * const opc_DiagProtocol) :
-   C_OSCDataDealerNvmSafe(opc_Node, ou32_NodeIndex, opc_DiagProtocol)
+C_SyvComDataDealer::C_SyvComDataDealer(C_OscNode * const opc_Node, const uint32_t ou32_NodeIndex,
+                                       C_OscDiagProtocolBase * const opc_DiagProtocol) :
+   C_OscDataDealerNvmSafe(opc_Node, ou32_NodeIndex, opc_DiagProtocol)
 {
 }
 
@@ -84,7 +83,7 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
 {
    if (opc_Widget != NULL)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < opc_Widget->GetWidgetDataPoolElementCount(); ++u32_Counter)
       {
@@ -95,7 +94,7 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
             if ((c_DpElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT) &&
                 (c_DpElementId.u32_NodeIndex == this->GetNodeIndex()))
             {
-               QMap<C_OSCNodeDataPoolListElementId,
+               QMap<C_OscNodeDataPoolListElementId,
                     QList<C_PuiSvDbDataElementHandler *> >::iterator c_ItElement;
 
                // Is there an entry?
@@ -128,7 +127,7 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from server's data pool and updates the associated widgets
 
-   Calls DataPoolRead of C_OSCDataDealer and updates the registered widgets.
+   Calls DataPoolRead of C_OscDataDealer and updates the registered widgets.
 
    \param[in]     ou8_DataPoolIndex    data pool index
    \param[in]     ou16_ListIndex       list index
@@ -148,12 +147,12 @@ void C_SyvComDataDealer::RegisterWidget(C_PuiSvDbDataElementHandler * const opc_
    C_OVERFLOW  size of data received from server does not match size of specified data pool element
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                        const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
+int32_t C_SyvComDataDealer::DataPoolRead(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                         const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   s32_Return = C_OSCDataDealer::DataPoolRead(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, opu8_NrCode);
+   s32_Return = C_OscDataDealer::DataPoolRead(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, opu8_NrCode);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -166,7 +165,7 @@ sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Read data from server's NVM and updates the associated widgets
 
-   Calls NvmRead of C_OSCDataDealer and updates the registered widgets.
+   Calls NvmRead of C_OscDataDealer and updates the registered widgets.
 
    \param[in]     ou8_DataPoolIndex    data pool index
    \param[in]     ou16_ListIndex       list index
@@ -186,12 +185,12 @@ sint32 C_SyvComDataDealer::DataPoolRead(const uint8 ou8_DataPoolIndex, const uin
    C_COM       expected server response not received because of communication error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                   const uint16 ou16_ElementIndex, uint8 * const opu8_NrCode)
+int32_t C_SyvComDataDealer::NvmRead(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                    const uint16_t ou16_ElementIndex, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   s32_Return = C_OSCDataDealer::NvmRead(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, opu8_NrCode);
+   s32_Return = C_OscDataDealer::NvmRead(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex, opu8_NrCode);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -225,24 +224,24 @@ sint32 C_SyvComDataDealer::NvmRead(const uint8 ou8_DataPoolIndex, const uint16 o
                parameter out of range (checked by client side)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComDataDealer::NvmReadList(const uint32 ou32_DataPoolIndex, const uint32 ou32_ListIndex,
-                                       uint8 * const opu8_NrCode)
+int32_t C_SyvComDataDealer::NvmReadList(const uint32_t ou32_DataPoolIndex, const uint32_t ou32_ListIndex,
+                                        uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   s32_Return = C_OSCDataDealerNvm::NvmReadList(ou32_DataPoolIndex, ou32_ListIndex, opu8_NrCode);
+   s32_Return = C_OscDataDealerNvm::NvmReadList(ou32_DataPoolIndex, ou32_ListIndex, opu8_NrCode);
 
    //Allow checksum errors (handled by param widget)
    if ((s32_Return == C_NO_ERR) || (s32_Return == C_CHECKSUM))
    {
-      uint32 u32_ElementCounter;
-      const C_OSCNodeDataPoolList & rc_List = this->mpc_Node->c_DataPools[ou32_DataPoolIndex].c_Lists[ou32_ListIndex];
+      uint32_t u32_ElementCounter;
+      const C_OscNodeDataPoolList & rc_List = this->mpc_Node->c_DataPools[ou32_DataPoolIndex].c_Lists[ou32_ListIndex];
 
       for (u32_ElementCounter = 0U; u32_ElementCounter < rc_List.c_Elements.size(); ++u32_ElementCounter)
       {
-         this->m_OnReadDataPoolNvmEventReceived(static_cast<uint8>(ou32_DataPoolIndex),
-                                                static_cast<uint16>(ou32_ListIndex),
-                                                static_cast<uint16>(u32_ElementCounter));
+         this->m_OnReadDataPoolNvmEventReceived(static_cast<uint8_t>(ou32_DataPoolIndex),
+                                                static_cast<uint16_t>(ou32_ListIndex),
+                                                static_cast<uint16_t>(u32_ElementCounter));
       }
    }
 
@@ -251,14 +250,14 @@ sint32 C_SyvComDataDealer::NvmReadList(const uint32 ou32_DataPoolIndex, const ui
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                       const uint16 ou16_ElementIndex)
+void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8_t ou8_DataPoolIndex, const uint16_t ou16_ListIndex,
+                                                       const uint16_t ou16_ElementIndex)
 {
    if (this->mpc_Node != NULL)
    {
-      QMap<C_OSCNodeDataPoolListElementId,
+      QMap<C_OscNodeDataPoolListElementId,
            QList<C_PuiSvDbDataElementHandler *> >::const_iterator c_ItElement;
-      const C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+      const C_OscNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
                                                        ou16_ElementIndex);
 
       // Get the correct list with all pointers to the widgets which are showing this datapool element
@@ -268,7 +267,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
       {
          const QList<C_PuiSvDbDataElementHandler *> & rc_ListWidgets = c_ItElement.value();
          QList<C_PuiSvDbDataElementHandler *>::const_iterator c_ItWidget;
-         const C_OSCNodeDataPoolContent * const pc_ElementContent =
+         const C_OscNodeDataPoolContent * const pc_ElementContent =
             &this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex)->c_Value;
          // Create the necessary instance with a copy of the content. The timestamp will be filled in the constructor
          const C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
@@ -284,7 +283,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
       }
       else
       {
-         stw_scl::C_SCLString c_Info;
+         stw::scl::C_SclString c_Info;
          c_Info.PrintFormatted("C_SyvComDataDealer: incoming data with no interested widget " \
                                "(dp: %d List: %d element: %d) !", ou8_DataPoolIndex, ou16_ListIndex,
                                ou16_ElementIndex);
@@ -304,14 +303,16 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventReceived(const uint8 ou8_DataPoolI
    \param[in]  ou8_ErrorCode       received error code
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                            const uint16 ou16_ElementIndex, const uint8 ou8_ErrorCode)
+void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8_t ou8_DataPoolIndex,
+                                                            const uint16_t ou16_ListIndex,
+                                                            const uint16_t ou16_ElementIndex,
+                                                            const uint8_t ou8_ErrorCode)
 {
    if (this->mpc_Node != NULL)
    {
-      QMap<C_OSCNodeDataPoolListElementId,
+      QMap<C_OscNodeDataPoolListElementId,
            QList<C_PuiSvDbDataElementHandler *> >::const_iterator c_ItElement;
-      const C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+      const C_OscNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
                                                        ou16_ElementIndex);
 
       // Get the correct list with all pointers to the widgets which are showing this datapool element
@@ -334,7 +335,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_Data
       }
       else
       {
-         C_OSCDataDealerNvmSafe::m_OnReadDataPoolEventErrorReceived(ou8_DataPoolIndex, ou16_ListIndex,
+         C_OscDataDealerNvmSafe::m_OnReadDataPoolEventErrorReceived(ou8_DataPoolIndex, ou16_ListIndex,
                                                                     ou16_ElementIndex, ou8_ErrorCode);
       }
    }
@@ -342,14 +343,15 @@ void C_SyvComDataDealer::m_OnReadDataPoolEventErrorReceived(const uint8 ou8_Data
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex,
-                                                          const uint16 ou16_ElementIndex)
+void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8_t ou8_DataPoolIndex,
+                                                          const uint16_t ou16_ListIndex,
+                                                          const uint16_t ou16_ElementIndex)
 {
    if (this->mpc_Node != NULL)
    {
-      QMap<C_OSCNodeDataPoolListElementId,
+      QMap<C_OscNodeDataPoolListElementId,
            QList<C_PuiSvDbDataElementHandler *> >::const_iterator c_ItElement;
-      const C_OSCNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
+      const C_OscNodeDataPoolListElementId c_ElementId(this->mu32_NodeIndex, ou8_DataPoolIndex, ou16_ListIndex,
                                                        ou16_ElementIndex);
 
       // Get the correct list with all pointers to the widgets which are showing this datapool element
@@ -359,7 +361,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPo
       {
          const QList<C_PuiSvDbDataElementHandler *> & rc_ListWidgets = c_ItElement.value();
          QList<C_PuiSvDbDataElementHandler *>::const_iterator c_ItWidget;
-         const C_OSCNodeDataPoolContent * const pc_ElementContent =
+         const C_OscNodeDataPoolContent * const pc_ElementContent =
             &this->mpc_Node->GetDataPoolListElement(ou8_DataPoolIndex, ou16_ListIndex, ou16_ElementIndex)->c_NvmValue;
          // Create the necessary instance with a copy of the content. The timestamp will be filled in the constructor
          const C_PuiSvDbDataElementContent c_DbContent(*pc_ElementContent);
@@ -375,7 +377,7 @@ void C_SyvComDataDealer::m_OnReadDataPoolNvmEventReceived(const uint8 ou8_DataPo
       }
       else
       {
-         stw_scl::C_SCLString c_Info;
+         stw::scl::C_SclString c_Info;
          c_Info.PrintFormatted("C_SyvComDataDealer: incoming NVM data with no interested widget " \
                                "(dp: %d List: %d element: %d) !", ou8_DataPoolIndex, ou16_ListIndex,
                                ou16_ElementIndex);

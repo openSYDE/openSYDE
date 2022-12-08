@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 
-#include "C_OSCUtils.h"
-#include "C_GiBiConnectableItem.h"
+#include "C_OscUtils.hpp"
+#include "C_GiBiConnectableItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -72,14 +71,14 @@ void C_GiBiConnectableItem::TriggerSigChangedGraphic()
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::h_DistToLine(const QPointF & orc_LineStart, const QPointF & orc_LineEnd,
-                                         const QPointF & orc_EvPoint, float64 * const opf64_Distance,
-                                         QPointF * const opc_Projection, float64 * const opf64_RestrictPosition)
+                                         const QPointF & orc_EvPoint, float64_t * const opf64_Distance,
+                                         QPointF * const opc_Projection, float64_t * const opf64_RestrictPosition)
 {
    const QPointF c_Diff = orc_LineEnd - orc_LineStart;
-   const float64 f64_LengthSquared = (c_Diff.x() * c_Diff.x()) + (c_Diff.y() * c_Diff.y());
+   const float64_t f64_LengthSquared = (c_Diff.x() * c_Diff.x()) + (c_Diff.y() * c_Diff.y());
 
    //Check if line has length
-   if (C_OSCUtils::h_IsFloat64NearlyEqual(f64_LengthSquared, 0.0) == true)
+   if (C_OscUtils::h_IsFloat64NearlyEqual(f64_LengthSquared, 0.0) == true)
    {
       if (opf64_Distance != NULL)
       {
@@ -92,8 +91,8 @@ void C_GiBiConnectableItem::h_DistToLine(const QPointF & orc_LineStart, const QP
    }
    else
    {
-      float64 f64_Tmp1;
-      float64 f64_RestrictPosition;
+      float64_t f64_Tmp1;
+      float64_t f64_RestrictPosition;
       QPointF c_Projection;
       //Projected t position on line in range of 0 to 1
       f64_Tmp1 = QPointF::dotProduct(orc_EvPoint - orc_LineStart, c_Diff);
@@ -126,7 +125,7 @@ void C_GiBiConnectableItem::h_DistToLine(const QPointF & orc_LineStart, const QP
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiConnectableItem::h_DistToPoint(const QPointF & orc_Point1, const QPointF & orc_Point2,
-                                          stw_types::float64 & orf64_Distance)
+                                          float64_t & orf64_Distance)
 {
    const QPointF c_Diff = orc_Point1 - orc_Point2;
 

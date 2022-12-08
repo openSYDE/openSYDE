@@ -13,15 +13,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SdNdeLeIpAddressWidget.h"
+#include "C_SdNdeLeIpAddressWidget.hpp"
 #include "ui_C_SdNdeLeIpAddressWidget.h"
 #include <QRegularExpression>
-#include "TGLUtils.h"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,7 +55,7 @@ C_SdNdeLeIpAddressWidget::C_SdNdeLeIpAddressWidget(QWidget * const opc_Parent) :
    this->mapc_LineEdit[2] = this->mpc_Ui->pc_LineEditIpPart3;
    this->mapc_LineEdit[3] = this->mpc_Ui->pc_LineEditIpPart4;
 
-   for (uint32 u32_Pos = 0; u32_Pos < static_cast<uint32>(mhsn_IPV4SIZE); ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos < static_cast<uint32_t>(mhs32_IPV4SIZE); ++u32_Pos)
    {
       this->mapc_LineEdit[u32_Pos]->setFocusPolicy(Qt::StrongFocus);
       this->mapc_LineEdit[u32_Pos]->installEventFilter(this);
@@ -98,7 +97,7 @@ C_SdNdeLeIpAddressWidget::C_SdNdeLeIpAddressWidget(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeLeIpAddressWidget::~C_SdNdeLeIpAddressWidget()
 {
-   for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
    {
       delete this->mapc_Validator[u32_Pos];
    }
@@ -113,16 +112,16 @@ C_SdNdeLeIpAddressWidget::~C_SdNdeLeIpAddressWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeLeIpAddressWidget::SlotTextChanged(const QLineEdit * const opc_LineEdit)
 {
-   for (uint32 u32_Pos = 0; u32_Pos != mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos != mhs32_IPV4SIZE; ++u32_Pos)
    {
       if (opc_LineEdit == this->mapc_LineEdit[u32_Pos])
       {
-         if (((opc_LineEdit->text().size() + 1) >= mhsn_IPV4MAXDIGITS) && // +1 since we are hanging one digit behind
+         if (((opc_LineEdit->text().size() + 1) >= mhs32_IPV4MAXDIGITS) && // +1 since we are hanging one digit behind
              (opc_LineEdit->text().size() == opc_LineEdit->cursorPosition()) &&
              (opc_LineEdit->hasSelectedText() == false)) // we only want to move further if line edit is not selected
          {
             // auto-move to next item
-            if ((u32_Pos + 1) < mhsn_IPV4SIZE)
+            if ((u32_Pos + 1) < mhs32_IPV4SIZE)
             {
                this->mapc_LineEdit[u32_Pos + 1]->setFocus();
                this->mapc_LineEdit[u32_Pos + 1]->selectAll();
@@ -143,7 +142,7 @@ std::vector<QLineEdit *> C_SdNdeLeIpAddressWidget::GetLineEdits(void)
 {
    std::vector<QLineEdit *> c_LineEdits;
 
-   for (uint32 u32_Pos = 0; u32_Pos != mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos != mhs32_IPV4SIZE; ++u32_Pos)
    {
       c_LineEdits.push_back(this->mapc_LineEdit[u32_Pos]);
    }
@@ -167,7 +166,7 @@ bool C_SdNdeLeIpAddressWidget::IsLineEditPartOfWidget(const QLineEdit * const op
 {
    bool q_IsPartOfWidget = false;
 
-   for (uint32 u32_Pos = 0; u32_Pos != mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos != mhs32_IPV4SIZE; ++u32_Pos)
    {
       if (this->mapc_LineEdit[u32_Pos] == opc_LineEdit)
       {
@@ -189,7 +188,7 @@ void C_SdNdeLeIpAddressWidget::m_FocusInSlot(void)
 {
    bool q_FlagZero = true;
 
-   for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
    {
       if (this->mapc_LineEdit[u32_Pos]->text().trimmed() != "0")
       {
@@ -199,7 +198,7 @@ void C_SdNdeLeIpAddressWidget::m_FocusInSlot(void)
 
    if (q_FlagZero == true)
    {
-      for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+      for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
       {
          // clear entry
          this->mapc_LineEdit[u32_Pos]->setText("");
@@ -217,7 +216,7 @@ void C_SdNdeLeIpAddressWidget::m_FocusOutSlot(void)
 {
    bool q_FlagHasFocus = false;
 
-   for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
    {
       if (this->mapc_LineEdit[u32_Pos]->hasFocus() == true)
       {
@@ -227,7 +226,7 @@ void C_SdNdeLeIpAddressWidget::m_FocusOutSlot(void)
 
    if (q_FlagHasFocus == false)
    {
-      for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+      for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
       {
          this->m_RemoveLeadingZeroes(this->mapc_LineEdit[u32_Pos]);
          if (this->mapc_LineEdit[u32_Pos]->text().trimmed() == "")
@@ -284,7 +283,7 @@ bool C_SdNdeLeIpAddressWidget::eventFilter(QObject * opc_Obj, QEvent * opc_Event
       QKeyEvent * const pc_KeyEvent = dynamic_cast<QKeyEvent *>(opc_Event);
       if (pc_KeyEvent != NULL)
       {
-         for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+         for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
          {
             QLineEdit * const pc_LineEdit = this->mapc_LineEdit[u32_Pos];
 
@@ -371,9 +370,9 @@ void C_SdNdeLeIpAddressWidget::SetError(const bool oq_Error) const
    \param[in]       ou32_Pos   one of the first three IPv4 address line edits, ranging from 0 to 2.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeLeIpAddressWidget::m_MoveNextLineEdit(const uint32 ou32_Pos)
+void C_SdNdeLeIpAddressWidget::m_MoveNextLineEdit(const uint32_t ou32_Pos)
 {
-   if ((ou32_Pos + 1) < mhsn_IPV4SIZE)
+   if ((ou32_Pos + 1) < mhs32_IPV4SIZE)
    {
       this->mapc_LineEdit[ou32_Pos + 1]->setFocus();
       this->mapc_LineEdit[ou32_Pos + 1]->setCursorPosition(0);
@@ -387,7 +386,7 @@ void C_SdNdeLeIpAddressWidget::m_MoveNextLineEdit(const uint32 ou32_Pos)
    \param[in]       ou32_Pos   one of the last three IPv4 address line edits, ranging from 1 to 3.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeLeIpAddressWidget::m_MovePrevLineEdit(const uint32 ou32_Pos)
+void C_SdNdeLeIpAddressWidget::m_MovePrevLineEdit(const uint32_t ou32_Pos)
 {
    if (ou32_Pos > 0)
    {
@@ -404,14 +403,14 @@ void C_SdNdeLeIpAddressWidget::m_MovePrevLineEdit(const uint32 ou32_Pos)
 
    Convert uint8 to IP Address format.
 
-   \param[in]  opu8_IPAddress    IP address in uint8 format (must point to 4 uint8s)
+   \param[in]  opu8_IpAddress    IP address in uint8 format (must point to 4 uint8s)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeLeIpAddressWidget::SetIPAddress(const uint8 * const opu8_IPAddress)
+void C_SdNdeLeIpAddressWidget::SetIpAddress(const uint8_t * const opu8_IpAddress)
 {
-   for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
    {
-      this->mapc_LineEdit[u32_Pos]->setText(static_cast<QString>("%1").arg(opu8_IPAddress[u32_Pos], 0, 10, QChar(' ')));
+      this->mapc_LineEdit[u32_Pos]->setText(static_cast<QString>("%1").arg(opu8_IpAddress[u32_Pos], 0, 10, QChar(' ')));
    }
 }
 
@@ -423,11 +422,11 @@ void C_SdNdeLeIpAddressWidget::SetIPAddress(const uint8 * const opu8_IPAddress)
    \return IP Address as vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_SdNdeLeIpAddressWidget::GetIPAddress(void) const
+std::vector<int32_t> C_SdNdeLeIpAddressWidget::GetIpAddress(void) const
 {
-   std::vector<sint32> c_Return;
+   std::vector<int32_t> c_Return;
 
-   for (uint32 u32_Pos = 0; u32_Pos < mhsn_IPV4SIZE; ++u32_Pos)
+   for (uint32_t u32_Pos = 0; u32_Pos < mhs32_IPV4SIZE; ++u32_Pos)
    {
       c_Return.push_back(this->mapc_LineEdit[u32_Pos]->text().toInt());
    }
@@ -441,9 +440,9 @@ std::vector<sint32> C_SdNdeLeIpAddressWidget::GetIPAddress(void) const
  *  \param[in]  ou32_Pos        Position of one of the four IPv4 address line edits starting from 0 to 3.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeLeIpAddressWidget::SetCursorPosition(const uint32 ou32_Pos)
+void C_SdNdeLeIpAddressWidget::SetCursorPosition(const uint32_t ou32_Pos)
 {
-   if (ou32_Pos < mhsn_IPV4SIZE)
+   if (ou32_Pos < mhs32_IPV4SIZE)
    {
       this->mapc_LineEdit[ou32_Pos]->setFocus();
       this->mapc_LineEdit[ou32_Pos]->setCursorPosition(0);

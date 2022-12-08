@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeIpAddressConfigurationWidget.h"
-#include "TGLUtils.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeIpAddressConfigurationWidget.hpp"
+#include "TglUtils.hpp"
 #include "ui_C_SdNdeIpAddressConfigurationWidget.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OgeWiUtil.hpp"
 // QLineEdit is multiple times included with the following include, but cannot do anything else then suppress lint
 // warning
 //lint -save -e451
-#include "C_OgeLeIpAddress.h"
+#include "C_OgeLeIpAddress.hpp"
 //lint -restore
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,13 +46,14 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent Optional pointer to parent
-   \param[in]     ou32_Index Node index
-   \param[in]     ou32_ComIf Node COM Interface Number
+   \param[in,out]  orc_Parent       Optional pointer to parent
+   \param[in]      ou32_NodeIndex   Node index
+   \param[in]      ou32_ComIf       Node COM Interface Number
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeIpAddressConfigurationWidget::C_SdNdeIpAddressConfigurationWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 ou32_NodeIndex, const uint32 ou32_ComIf) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32_t ou32_NodeIndex,
+   const uint32_t ou32_ComIf) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeIpAddressConfigurationWidget),
    mrc_ParentDialog(orc_Parent),
@@ -135,7 +135,7 @@ void C_SdNdeIpAddressConfigurationWidget::InitStaticNames(void) const
 
    When user presses 'Tab' the next IP address line or button should be focused.
 
-   \param[in]       opc_LineEdit     One line edit part of one IP address line where 'Tab' key was pressed
+   \param[in]  opc_LineEdit   One line edit part of one IP address line where 'Tab' key was pressed
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeIpAddressConfigurationWidget::SlotTabKey(const QLineEdit * const opc_LineEdit)
@@ -161,7 +161,7 @@ void C_SdNdeIpAddressConfigurationWidget::SlotTabKey(const QLineEdit * const opc
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeIpAddressConfigurationWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -169,8 +169,8 @@ void C_SdNdeIpAddressConfigurationWidget::keyPressEvent(QKeyEvent * const opc_Ke
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -195,15 +195,15 @@ void C_SdNdeIpAddressConfigurationWidget::keyPressEvent(QKeyEvent * const opc_Ke
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeIpAddressConfigurationWidget::m_LoadData(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      const C_OSCNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[this->mu32_ComIf];
+      const C_OscNodeComInterfaceSettings & rc_CurInterface = pc_Node->c_Properties.c_ComInterfaces[this->mu32_ComIf];
 
-      this->mpc_Ui->pc_WidgetIpAddress->SetIPAddress(rc_CurInterface.c_Ip.au8_IpAddress);
-      this->mpc_Ui->pc_WidgetSubNetMask->SetIPAddress(rc_CurInterface.c_Ip.au8_NetMask);
-      this->mpc_Ui->pc_WidgetDefaultGateway->SetIPAddress(rc_CurInterface.c_Ip.au8_DefaultGateway);
+      this->mpc_Ui->pc_WidgetIpAddress->SetIpAddress(rc_CurInterface.c_Ip.au8_IpAddress);
+      this->mpc_Ui->pc_WidgetSubNetMask->SetIpAddress(rc_CurInterface.c_Ip.au8_NetMask);
+      this->mpc_Ui->pc_WidgetDefaultGateway->SetIpAddress(rc_CurInterface.c_Ip.au8_DefaultGateway);
 
       // directly start typing without cursor move
       this->mpc_Ui->pc_WidgetIpAddress->SetCursorPosition(0);
@@ -220,9 +220,9 @@ void C_SdNdeIpAddressConfigurationWidget::m_LoadData(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeIpAddressConfigurationWidget::m_OkClicked(void)
 {
-   const bool q_IpValid = C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckIpAddressIsValid(
+   const bool q_IpValid = C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().CheckIpAddressIsValid(
       this->mu32_NodeIndex, this->mu32_ComIf,
-      this->mpc_Ui->pc_WidgetIpAddress->GetIPAddress());
+      this->mpc_Ui->pc_WidgetIpAddress->GetIpAddress());
    bool q_WriteToData = true;
 
    //set invalid text property
@@ -234,7 +234,7 @@ void C_SdNdeIpAddressConfigurationWidget::m_OkClicked(void)
       c_Error.SetHeading(C_GtGetText::h_GetText("IP Address Settings"));
       c_Error.SetDescription(C_GtGetText::h_GetText(
                                 "IP Address does conflict with another node on the same Ethernet. Are you sure you want to assign this IP Address?"));
-      c_Error.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_Error.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
       c_Error.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
       c_Error.SetCustomMinHeight(180, 250);
 
@@ -248,11 +248,11 @@ void C_SdNdeIpAddressConfigurationWidget::m_OkClicked(void)
    if (q_WriteToData)
    {
       //write current settings to data
-      C_PuiSdHandler::h_GetInstance()->SetOSCNodeEthernetConfiguration(
+      C_PuiSdHandler::h_GetInstance()->SetOscNodeEthernetConfiguration(
          this->mu32_NodeIndex, this->mu32_ComIf,
-         this->mpc_Ui->pc_WidgetIpAddress->GetIPAddress(),
-         this->mpc_Ui->pc_WidgetSubNetMask->GetIPAddress(),
-         this->mpc_Ui->pc_WidgetDefaultGateway->GetIPAddress());
+         this->mpc_Ui->pc_WidgetIpAddress->GetIpAddress(),
+         this->mpc_Ui->pc_WidgetSubNetMask->GetIpAddress(),
+         this->mpc_Ui->pc_WidgetDefaultGateway->GetIpAddress());
       //close dialog after data write
       this->mrc_ParentDialog.accept();
    }

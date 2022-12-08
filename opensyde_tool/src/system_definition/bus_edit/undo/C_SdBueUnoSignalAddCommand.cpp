@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_SdBueUnoSignalAddCommand.h"
-#include "C_SdUtil.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_SdBueUnoSignalAddCommand.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,9 +52,10 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalAddCommand::C_SdBueUnoSignalAddCommand(
-   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageId, const std::vector<uint32> & orc_SignalIndex,
-   const std::vector<uint16> & orc_StartBit, const std::vector<C_OSCCanSignal::E_MultiplexerType> & orc_MultiplexerType,
-   const std::vector<uint16> & orc_MultiplexerValue, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+   const std::vector<C_OscCanMessageIdentificationIndices> & orc_MessageId,
+   const std::vector<uint32_t> & orc_SignalIndex, const std::vector<uint16_t> & orc_StartBit,
+   const std::vector<C_OscCanSignal::E_MultiplexerType> & orc_MultiplexerType,
+   const std::vector<uint16_t> & orc_MultiplexerValue, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text) :
    C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, orc_SignalIndex, orc_StartBit, orc_MultiplexerType,
                                         orc_MultiplexerValue, opc_MessageSyncManager,
@@ -63,14 +63,14 @@ C_SdBueUnoSignalAddCommand::C_SdBueUnoSignalAddCommand(
                                         orc_Text)
 {
    //Adapt default signal
-   for (uint32 u32_ItStep = 0UL; u32_ItStep < this->mc_OSCSignalCommon.size(); ++u32_ItStep)
+   for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_OscSignalCommon.size(); ++u32_ItStep)
    {
-      if ((((this->mc_OSCSignalCommon[u32_ItStep].GetArray() == false) &&
-            (this->mc_OSCSignalCommon[u32_ItStep].GetType() == C_OSCNodeDataPoolContent::eUINT8)) &&
-           (this->mc_UISignalCommon[u32_ItStep].q_AutoMinMaxActive == true)) &&
+      if ((((this->mc_OscSignalCommon[u32_ItStep].GetArray() == false) &&
+            (this->mc_OscSignalCommon[u32_ItStep].GetType() == C_OscNodeDataPoolContent::eUINT8)) &&
+           (this->mc_UiSignalCommon[u32_ItStep].q_AutoMinMaxActive == true)) &&
           (this->mc_Signal[u32_ItStep].u16_ComBitLength == 1U))
       {
-         this->mc_OSCSignalCommon[u32_ItStep].c_MaxValue.SetValueU8(1);
+         this->mc_OscSignalCommon[u32_ItStep].c_MaxValue.SetValueU8(1);
       }
       else
       {
@@ -84,25 +84,25 @@ C_SdBueUnoSignalAddCommand::C_SdBueUnoSignalAddCommand(
 /*! \brief   Set initial data
 
    \param[in]  orc_Signal           Signal data (osc)
-   \param[in]  orc_OSCSignalCommon  Signal data (osc common)
-   \param[in]  orc_UISignalCommon   Signal data (ui common)
-   \param[in]  orc_UISignal         Signal data (ui)
+   \param[in]  orc_OscSignalCommon  Signal data (osc common)
+   \param[in]  orc_UiSignalCommon   Signal data (ui common)
+   \param[in]  orc_UiSignal         Signal data (ui)
    \param[in]  orc_ProtocolType     Current active protocol to handle necessary adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoSignalAddCommand::SetInitialData(const std::vector<C_OSCCanSignal> & orc_Signal,
-                                                const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCSignalCommon,
-                                                const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UISignalCommon,
-                                                const std::vector<C_PuiSdNodeCanSignal> & orc_UISignal,
-                                                const std::vector<C_OSCCanProtocol::E_Type> & orc_ProtocolType)
+void C_SdBueUnoSignalAddCommand::SetInitialData(const std::vector<C_OscCanSignal> & orc_Signal,
+                                                const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommon,
+                                                const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommon,
+                                                const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignal,
+                                                const std::vector<C_OscCanProtocol::E_Type> & orc_ProtocolType)
 {
    this->mc_Signal = orc_Signal;
-   this->mc_OSCSignalCommon = orc_OSCSignalCommon;
-   this->mc_UISignalCommon = orc_UISignalCommon;
-   this->mc_UISignal = orc_UISignal;
-   for (uint32 u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
+   this->mc_OscSignalCommon = orc_OscSignalCommon;
+   this->mc_UiSignalCommon = orc_UiSignalCommon;
+   this->mc_UiSignal = orc_UiSignal;
+   for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
    {
-      this->mc_UISignal[u32_ItStep].u8_ColorIndex = 0U;
+      this->mc_UiSignal[u32_ItStep].u8_ColorIndex = 0U;
 
       // Adapt do safety protocol restrictions
       C_SdUtil::h_AdaptSignalToProtocolType(this->mc_Signal[u32_ItStep], orc_ProtocolType[u32_ItStep], NULL);

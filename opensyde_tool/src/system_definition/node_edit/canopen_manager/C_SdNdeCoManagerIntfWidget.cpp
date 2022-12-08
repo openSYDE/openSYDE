@@ -10,34 +10,33 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdNdeCoManagerIntfWidget.h"
+#include "C_SdNdeCoManagerIntfWidget.hpp"
 #include "ui_C_SdNdeCoManagerIntfWidget.h"
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCCanOpenManagerInfo.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscCanOpenManagerInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
-const uint8 mu8_NMT_ERROR_RESTART_ALL_DEVICES = 0;
-const uint8 mu8_NMT_ERROR_RESTART_FAILURE_DEVICE = 1;
-const uint8 mu8_NMT_ERROR_STOP_ALL_DEVICES = 2;
+const uint8_t mu8_NMT_ERROR_RESTART_ALL_DEVICES = 0;
+const uint8_t mu8_NMT_ERROR_RESTART_FAILURE_DEVICE = 1;
+const uint8_t mu8_NMT_ERROR_STOP_ALL_DEVICES = 2;
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
@@ -74,9 +73,18 @@ C_SdNdeCoManagerIntfWidget::C_SdNdeCoManagerIntfWidget(QWidget * const opc_Paren
    this->mpc_Ui->pc_SpinBoxSDOTimeout->SetMinimumCustom(1);
    this->mpc_Ui->pc_SpinBoxSDOTimeout->SetMaximumCustom(65535);
 
+   // set SYNC times min/max
+   this->mpc_Ui->pc_SpinBoxSYNCPeriod->SetMinimumCustom(1);
+   this->mpc_Ui->pc_SpinBoxSYNCPeriod->SetMaximumCustom(0x7FFFFFFF);
+
+   this->mpc_Ui->pc_SpinBoxSYNCWindowLength->SetMinimumCustom(1);
+   this->mpc_Ui->pc_SpinBoxSYNCWindowLength->SetMaximumCustom(0x7FFFFFFF);
+
    //disable items per default
    this->mpc_Ui->pc_CheckBoxNMTStartAll->setEnabled(false);
    this->mpc_Ui->pc_SpinBoxProducerTime->setEnabled(false);
+   this->mpc_Ui->pc_SpinBoxSYNCPeriod->setEnabled(false);
+   this->mpc_Ui->pc_SpinBoxSYNCWindowLength->setEnabled(false);
 
    // connects
    // Can be connected here due to no changes on real data. Only reconfiguration of ui elements
@@ -101,14 +109,14 @@ C_SdNdeCoManagerIntfWidget::~C_SdNdeCoManagerIntfWidget()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoManagerIntfWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_LabelCANopenIdCaption->setText(C_GtGetText::h_GetText("CANopen Manager Node ID"));
+   this->mpc_Ui->pc_LabelCanOpenIdCaption->setText(C_GtGetText::h_GetText("CANopen Manager Node ID"));
 
-   this->mpc_Ui->pc_LabelCANopenId->setText(C_GtGetText::h_GetText("CANopen Node ID"));
-   this->mpc_Ui->pc_LabelCANopenId->
+   this->mpc_Ui->pc_LabelCanOpenId->setText(C_GtGetText::h_GetText("CANopen Node ID"));
+   this->mpc_Ui->pc_LabelCanOpenId->
    SetToolTipInformation(C_GtGetText::h_GetText("CANopen Node ID"),
                          C_GtGetText::h_GetText("Unique Node ID within a CANopen network."));
 
-   this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setText(C_GtGetText::h_GetText("use openSYDE Node ID"));
+   this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setText(C_GtGetText::h_GetText("Use openSYDE Node ID"));
    this->mpc_Ui->pc_CheckBoxSameAsOpensyde->
    SetToolTipInformation(C_GtGetText::h_GetText("Use openSYDE Node ID"),
                          C_GtGetText::h_GetText("If enabled, openSYDE Node ID is used as CANopen Node ID. \n"
@@ -177,6 +185,36 @@ void C_SdNdeCoManagerIntfWidget::InitStaticNames(void) const
                          C_GtGetText::h_GetText("Heartbeat interval produced by the CANopen Manager."));
 
    this->mpc_Ui->pc_SpinBoxProducerTime->setSuffix(C_GtGetText::h_GetText(" ms"));
+
+   this->mpc_Ui->pc_LabelSYNCPdoCaption->setText(C_GtGetText::h_GetText("SYNC PDO"));
+
+   this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled->setText(C_GtGetText::h_GetText("Produce SYNC"));
+   this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled->
+   SetToolTipInformation(C_GtGetText::h_GetText("Produce SYNC"),
+                         C_GtGetText::h_GetText(
+                            "If enabled, the CANopen Manager sends the SYNC message with a fixed COB-ID 0x80 according "
+                            "to the defined \"Cycle Period\" interval.\nAll CANopen Devices get "
+                            "the \"Window Length\" time distributed to Object 0x1007.\n"
+                            "When disabled, the PDO SYNC will not be sent and the CANopen Devices will not get the"
+                            "\"Window Length\" time configuration distributed."));
+
+   this->mpc_Ui->pc_LabelSYNCPeriod->setText(C_GtGetText::h_GetText("Cycle Period"));
+   this->mpc_Ui->pc_LabelSYNCPeriod->
+   SetToolTipInformation(C_GtGetText::h_GetText("Cycle Period"),
+                         C_GtGetText::h_GetText(
+                            "SYNC PDO produced with the interval of \"Cycle Period\" by the CANopen Manager."));
+
+   this->mpc_Ui->pc_SpinBoxSYNCPeriod->setSuffix(C_GtGetText::h_GetText(" us"));
+
+   this->mpc_Ui->pc_LabelSYNCWindowLength->setText(C_GtGetText::h_GetText("Window Length"));
+   this->mpc_Ui->pc_LabelSYNCWindowLength->
+   SetToolTipInformation(C_GtGetText::h_GetText("Window Length"),
+                         C_GtGetText::h_GetText(
+                            "SYNC PDO \"Window Length\" will be distributed by CANopen Manager"
+                            " to Object 0x1007 of all CANopen Devices.\n"
+                            "Will not be used by CANopen Manager for incoming PDOs."));
+
+   this->mpc_Ui->pc_SpinBoxSYNCWindowLength->setSuffix(C_GtGetText::h_GetText(" us"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,8 +226,8 @@ void C_SdNdeCoManagerIntfWidget::InitStaticNames(void) const
    \param[in]  ou8_InterfaceId    new interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoManagerIntfWidget::SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_NodeIndex,
-                                                            const uint8 ou8_InterfaceId)
+void C_SdNdeCoManagerIntfWidget::SetNodeIndexAndInterfaceId(const uint32_t ou32_NodeIndex,
+                                                            const uint8_t ou8_InterfaceId)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mu8_InterfaceId = ou8_InterfaceId;
@@ -208,19 +246,19 @@ void C_SdNdeCoManagerIntfWidget::SetNodeIndexAndInterfaceId(const stw_types::uin
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoManagerIntfWidget::SaveToData(void) const
 {
-   C_OSCCanOpenManagerInfo::E_NMTErrorBehaviourType e_NMTErrorBehaviour = C_OSCCanOpenManagerInfo::eSTOP_ALL_DEVICES;
+   C_OscCanOpenManagerInfo::E_NmtErrorBehaviourType e_NmtErrorBehaviour = C_OscCanOpenManagerInfo::eSTOP_ALL_DEVICES;
 
    if (this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->currentIndex() == mu8_NMT_ERROR_RESTART_ALL_DEVICES)
    {
-      e_NMTErrorBehaviour = C_OSCCanOpenManagerInfo::eRESTART_ALL_DEVICES;
+      e_NmtErrorBehaviour = C_OscCanOpenManagerInfo::eRESTART_ALL_DEVICES;
    }
    else if (this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->currentIndex() == mu8_NMT_ERROR_STOP_ALL_DEVICES)
    {
-      e_NMTErrorBehaviour = C_OSCCanOpenManagerInfo::eSTOP_ALL_DEVICES;
+      e_NmtErrorBehaviour = C_OscCanOpenManagerInfo::eSTOP_ALL_DEVICES;
    }
    else if (this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->currentIndex() == mu8_NMT_ERROR_RESTART_FAILURE_DEVICE)
    {
-      e_NMTErrorBehaviour = C_OSCCanOpenManagerInfo::eRESTART_FAILURE_DEVICE;
+      e_NmtErrorBehaviour = C_OscCanOpenManagerInfo::eRESTART_FAILURE_DEVICE;
    }
    else
    {
@@ -232,17 +270,25 @@ void C_SdNdeCoManagerIntfWidget::SaveToData(void) const
       this->mu32_NodeIndex,
       this->mu8_InterfaceId,
       this->mpc_Ui->pc_CheckBoxSameAsOpensyde->isChecked(),
-      static_cast<uint8>(this->mpc_Ui->pc_SpinBoxCANopenId->value()),
-      static_cast<uint16>(this->mpc_Ui->pc_SpinBoxSDOTimeout->value()),
+      static_cast<uint8_t>(this->mpc_Ui->pc_SpinBoxCanOpenId->value()),
+      static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxSDOTimeout->value()),
       this->mpc_Ui->pc_CheckBoxAutostart->isChecked(),
       this->mpc_Ui->pc_CheckBoxStartDevices->isChecked(),
       this->mpc_Ui->pc_CheckBoxNMTStartAll->isChecked(),
-      e_NMTErrorBehaviour);
+      e_NmtErrorBehaviour);
    C_PuiSdHandler::h_GetInstance()->SetCanOpenManagerProducerHeartbeat(
       this->mu32_NodeIndex,
       this->mu8_InterfaceId,
-      static_cast<uint16>(this->mpc_Ui->pc_SpinBoxProducerTime->value()),
+      static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxProducerTime->value()),
       this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing->isChecked());
+
+   // SYNC PDO
+   C_PuiSdHandler::h_GetInstance()->SetCanOpenManagerPdoSync(
+      this->mu32_NodeIndex,
+      this->mu8_InterfaceId,
+      static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxSYNCPeriod->value()),
+      static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxSYNCWindowLength->value()),
+      this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled->isChecked());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -299,6 +345,42 @@ void C_SdNdeCoManagerIntfWidget::m_HandleHeartbeatEnableState(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle pc_CheckBoxEnableHeartbeatProducing state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoManagerIntfWidget::m_OnPdoSyncEnableChanged(void) const
+{
+   this->m_HandlePdoSyncEnableState();
+   this->m_OnPdoSyncTimeValueChanged();
+
+   // Update COMM Datapools due to own error check in Datapool view
+   Q_EMIT (this->SigCommDatapoolsChanged());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle pc_CheckBoxEnableHeartbeatProducing state
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoManagerIntfWidget::m_HandlePdoSyncEnableState(void) const
+{
+   const bool q_Enabled = (this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled->isChecked() == true);
+
+   this->mpc_Ui->pc_SpinBoxSYNCPeriod->setEnabled(q_Enabled);
+   this->mpc_Ui->pc_SpinBoxSYNCWindowLength->setEnabled(q_Enabled);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle SYNC PDO cycle period or window length time change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeCoManagerIntfWidget::m_OnPdoSyncTimeValueChanged(void) const
+{
+   this->m_SaveChanges();
+
+   Q_EMIT (this->SigErrorChange());
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle pc_CheckBoxSameAsOpensyde state changed
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -306,15 +388,15 @@ void C_SdNdeCoManagerIntfWidget::m_OnSameAsOpensydeNodeIdChanged(void) const
 {
    // Avoid unnecessary duplicated calls of m_OnCoNodeIdChanged
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_SpinBoxCANopenId, static_cast<void (QSpinBox::*)(
-                                                                sintn)>(&QSpinBox::valueChanged), this,
+   disconnect(this->mpc_Ui->pc_SpinBoxCanOpenId, static_cast<void (QSpinBox::*)(
+                                                                int32_t)>(&QSpinBox::valueChanged), this,
               &C_SdNdeCoManagerIntfWidget::m_OnCoNodeIdChanged);
 
    this->m_HandleSameAsOpensydeNodeIdState();
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxCANopenId, static_cast<void (QSpinBox::*)(
-                                                             sintn)>(&QSpinBox::valueChanged), this,
+   connect(this->mpc_Ui->pc_SpinBoxCanOpenId, static_cast<void (QSpinBox::*)(
+                                                             int32_t)>(&QSpinBox::valueChanged), this,
            &C_SdNdeCoManagerIntfWidget::m_OnCoNodeIdChanged);
 
    this->m_OnCoNodeIdChanged();
@@ -329,35 +411,35 @@ void C_SdNdeCoManagerIntfWidget::m_HandleSameAsOpensydeNodeIdState(void) const
    if (this->mpc_Ui->pc_CheckBoxSameAsOpensyde->isChecked() == true)
    {
       //get current node ID of node interface
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
 
       // set openSYDE node id min/max
       // necessary to be compatible with complete openSYDE Node ID range
-      this->mpc_Ui->pc_SpinBoxCANopenId->SetMinimumCustom(mu8_MIN_NODE_ID_OS);
-      this->mpc_Ui->pc_SpinBoxCANopenId->SetMaximumCustom(mu8_MAX_NODE_ID_OS);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_OS);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_OS);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
-         const C_OSCNodeComInterfaceSettings * const pc_ComInterface = pc_Node->c_Properties.GetComInterface(
-            C_OSCSystemBus::eCAN, this->mu8_InterfaceId);
+         const C_OscNodeComInterfaceSettings * const pc_ComInterface = pc_Node->c_Properties.GetComInterface(
+            C_OscSystemBus::eCAN, this->mu8_InterfaceId);
 
          tgl_assert(pc_ComInterface != NULL);
          if (pc_ComInterface != NULL)
          {
-            this->mpc_Ui->pc_SpinBoxCANopenId->setValue(static_cast<sintn>(pc_ComInterface->u8_NodeID));
+            this->mpc_Ui->pc_SpinBoxCanOpenId->setValue(static_cast<int32_t>(pc_ComInterface->u8_NodeId));
          }
       }
 
-      this->mpc_Ui->pc_SpinBoxCANopenId->setEnabled(false);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->setEnabled(false);
    }
    else
    {
       // set CANopen node id min/max
-      this->mpc_Ui->pc_SpinBoxCANopenId->SetMinimumCustom(mu8_MIN_NODE_ID_CANOPEN);
-      this->mpc_Ui->pc_SpinBoxCANopenId->SetMaximumCustom(mu8_MAX_NODE_ID_CANOPEN);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMinimumCustom(mu8_MIN_NODE_ID_CANOPEN);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->SetMaximumCustom(mu8_MAX_NODE_ID_CANOPEN);
 
-      this->mpc_Ui->pc_SpinBoxCANopenId->setEnabled(true);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->setEnabled(true);
    }
 }
 
@@ -379,7 +461,7 @@ void C_SdNdeCoManagerIntfWidget::m_OnCoNodeIdChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoManagerIntfWidget::m_CheckCoNodeId(void) const
 {
-   const C_OSCCanOpenManagerInfo * const pc_CanOpenManagerInfo = C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(
+   const C_OscCanOpenManagerInfo * const pc_CanOpenManagerInfo = C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(
       this->mu32_NodeIndex, this->mu8_InterfaceId);
 
    if (pc_CanOpenManagerInfo != NULL)
@@ -391,12 +473,12 @@ void C_SdNdeCoManagerIntfWidget::m_CheckCoNodeId(void) const
 
       q_NoConflict = (q_NodeIdConflict == false) && (q_ManagerNodeIdInvalid == false);
 
-      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxCANopenId, "Valid", (q_NoConflict == true));
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_SpinBoxCanOpenId, "Valid", (q_NoConflict == true));
 
       if (q_NoConflict == true)
       {
-         this->mpc_Ui->pc_SpinBoxCANopenId->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
-         this->mpc_Ui->pc_SpinBoxCANopenId->ShowToolTipWhenDisabled(false);
+         this->mpc_Ui->pc_SpinBoxCanOpenId->SetToolTipAdditionalInfo("", C_NagToolTip::eDEFAULT);
+         this->mpc_Ui->pc_SpinBoxCanOpenId->ShowToolTipWhenDisabled(false);
       }
       else
       {
@@ -412,8 +494,8 @@ void C_SdNdeCoManagerIntfWidget::m_CheckCoNodeId(void) const
                "\nThe CANopen Node ID must be in the range for CANopen (1 - 127).");
          }
 
-         this->mpc_Ui->pc_SpinBoxCANopenId->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
-         this->mpc_Ui->pc_SpinBoxCANopenId->ShowToolTipWhenDisabled(true);
+         this->mpc_Ui->pc_SpinBoxCanOpenId->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
+         this->mpc_Ui->pc_SpinBoxCanOpenId->ShowToolTipWhenDisabled(true);
       }
    }
 }
@@ -436,7 +518,7 @@ void C_SdNdeCoManagerIntfWidget::m_OnHeartbeatProducerTimeChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoManagerIntfWidget::m_CheckHeartbeatProducerTime(void) const
 {
-   const C_OSCCanOpenManagerInfo * const pc_CanOpenManagerInfo = C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(
+   const C_OscCanOpenManagerInfo * const pc_CanOpenManagerInfo = C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(
       this->mu32_NodeIndex, this->mu8_InterfaceId);
 
    if (pc_CanOpenManagerInfo != NULL)
@@ -453,7 +535,7 @@ void C_SdNdeCoManagerIntfWidget::m_CheckHeartbeatProducerTime(void) const
       else
       {
          const QString c_Content = C_GtGetText::h_GetText(
-            "The producer time of the Manager must be higher than than the consumer time of all Devices.");
+            "The producer time of the Manager must be lower than than the consumer time of all Devices.");
          this->mpc_Ui->pc_SpinBoxProducerTime->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
       }
    }
@@ -467,25 +549,33 @@ void C_SdNdeCoManagerIntfWidget::m_CheckHeartbeatProducerTime(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoManagerIntfWidget::m_LoadFromData(void)
 {
-   const C_OSCCanOpenManagerInfo * const pc_CanOpenManagerInfo = C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(
+   const C_OscCanOpenManagerInfo * const pc_CanOpenManagerInfo = C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(
       this->mu32_NodeIndex, this->mu8_InterfaceId);
 
    //Disconnects for SaveChanges
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   disconnect(this->mpc_Ui->pc_SpinBoxCANopenId, static_cast<void (QSpinBox::*)(
-                                                                sintn)>(&QSpinBox::valueChanged), this,
+   disconnect(this->mpc_Ui->pc_SpinBoxCanOpenId, static_cast<void (QSpinBox::*)(
+                                                                int32_t)>(&QSpinBox::valueChanged), this,
               &C_SdNdeCoManagerIntfWidget::m_OnCoNodeIdChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxSDOTimeout, static_cast<void (QSpinBox::*)(
-                                                                 sintn)>(&QSpinBox::valueChanged), this,
+                                                                 int32_t)>(&QSpinBox::valueChanged), this,
               &C_SdNdeCoManagerIntfWidget::m_SaveChanges);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_SpinBoxProducerTime, static_cast<void (QSpinBox::*)(
-                                                                   sintn)>(&QSpinBox::valueChanged), this,
+                                                                   int32_t)>(&QSpinBox::valueChanged), this,
               &C_SdNdeCoManagerIntfWidget::m_OnHeartbeatProducerTimeChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxSYNCPeriod, static_cast<void (QSpinBox::*)(
+                                                                 int32_t)>(&QSpinBox::valueChanged), this,
+              &C_SdNdeCoManagerIntfWidget::m_OnPdoSyncTimeValueChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxSYNCWindowLength, static_cast<void (QSpinBox::*)(
+                                                                       int32_t)>(&QSpinBox::valueChanged), this,
+              &C_SdNdeCoManagerIntfWidget::m_OnPdoSyncTimeValueChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour,
-              static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
+              static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_SdNdeCoManagerIntfWidget::m_SaveChanges);
 
    disconnect(this->mpc_Ui->pc_CheckBoxSameAsOpensyde, &QCheckBox::stateChanged, this,
@@ -498,31 +588,34 @@ void C_SdNdeCoManagerIntfWidget::m_LoadFromData(void)
               &C_SdNdeCoManagerIntfWidget::m_SaveChanges);
    disconnect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing, &QCheckBox::stateChanged, this,
               &C_SdNdeCoManagerIntfWidget::m_OnHeartbeatEnableChanged);
+   disconnect(this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled, &QCheckBox::stateChanged, this,
+              &C_SdNdeCoManagerIntfWidget::m_OnPdoSyncEnableChanged);
 
    if (pc_CanOpenManagerInfo != NULL)
    {
-      this->mpc_Ui->pc_SpinBoxCANopenId->setValue(static_cast<sintn>(pc_CanOpenManagerInfo->u8_NodeIDValue));
-      this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setChecked(pc_CanOpenManagerInfo->q_UseOpenSYDENodeID);
+      this->mpc_Ui->pc_SpinBoxCanOpenId->setValue(static_cast<int32_t>(pc_CanOpenManagerInfo->u8_NodeIdValue));
+      this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setChecked(pc_CanOpenManagerInfo->q_UseOpenSydeNodeId);
       this->mpc_Ui->pc_CheckBoxAutostart->setChecked(pc_CanOpenManagerInfo->q_AutostartCanOpenManager);
       this->mpc_Ui->pc_CheckBoxStartDevices->setChecked(pc_CanOpenManagerInfo->q_StartDevices);
-      this->mpc_Ui->pc_CheckBoxNMTStartAll->setChecked(pc_CanOpenManagerInfo->q_NMTStartAll);
-      this->mpc_Ui->pc_SpinBoxSDOTimeout->setValue(static_cast<sintn>(pc_CanOpenManagerInfo->u16_GlobalSDOTimeoutMs));
+      this->mpc_Ui->pc_CheckBoxNMTStartAll->setChecked(pc_CanOpenManagerInfo->q_NmtStartAll);
+      this->mpc_Ui->pc_SpinBoxSDOTimeout->setValue(static_cast<int32_t>(pc_CanOpenManagerInfo->u16_GlobalSdoTimeoutMs));
       this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing->setChecked(pc_CanOpenManagerInfo->q_EnableHeartbeatProducing);
-      this->mpc_Ui->pc_SpinBoxProducerTime->setValue(static_cast<sintn>(pc_CanOpenManagerInfo->
-                                                                        u16_HeartbeatProducerTimeMs));
+      this->mpc_Ui->pc_SpinBoxProducerTime->setValue(static_cast<int32_t>(pc_CanOpenManagerInfo->
+                                                                          u16_HeartbeatProducerTimeMs));
 
-      if (pc_CanOpenManagerInfo->e_NMTErrorBehaviour == C_OSCCanOpenManagerInfo::eRESTART_ALL_DEVICES)
+      if (pc_CanOpenManagerInfo->e_NmtErrorBehaviour == C_OscCanOpenManagerInfo::eRESTART_ALL_DEVICES)
       {
-         this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->setCurrentIndex(static_cast<sintn>(
+         this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->setCurrentIndex(static_cast<int32_t>(
                                                                         mu8_NMT_ERROR_RESTART_ALL_DEVICES));
       }
-      else if (pc_CanOpenManagerInfo->e_NMTErrorBehaviour == C_OSCCanOpenManagerInfo::eSTOP_ALL_DEVICES)
+      else if (pc_CanOpenManagerInfo->e_NmtErrorBehaviour == C_OscCanOpenManagerInfo::eSTOP_ALL_DEVICES)
       {
-         this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->setCurrentIndex(static_cast<sintn>(mu8_NMT_ERROR_STOP_ALL_DEVICES));
+         this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->setCurrentIndex(
+            static_cast<int32_t>(mu8_NMT_ERROR_STOP_ALL_DEVICES));
       }
-      else if (pc_CanOpenManagerInfo->e_NMTErrorBehaviour == C_OSCCanOpenManagerInfo::eRESTART_FAILURE_DEVICE)
+      else if (pc_CanOpenManagerInfo->e_NmtErrorBehaviour == C_OscCanOpenManagerInfo::eRESTART_FAILURE_DEVICE)
       {
-         this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->setCurrentIndex(static_cast<sintn>(
+         this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour->setCurrentIndex(static_cast<int32_t>(
                                                                         mu8_NMT_ERROR_RESTART_FAILURE_DEVICE));
       }
       else
@@ -530,12 +623,19 @@ void C_SdNdeCoManagerIntfWidget::m_LoadFromData(void)
          //unknown state
          tgl_assert(false);
       }
+
+      // SYNC PDO
+      this->mpc_Ui->pc_SpinBoxSYNCPeriod->setValue(static_cast<int32_t>(pc_CanOpenManagerInfo->u32_SyncCyclePeriodUs));
+      this->mpc_Ui->pc_SpinBoxSYNCWindowLength->setValue(static_cast<int32_t>(pc_CanOpenManagerInfo->
+                                                                              u32_SyncWindowLengthUs));
+      this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled->setChecked(pc_CanOpenManagerInfo->q_ProduceSyncMessage);
    }
 
    //trigger OnChange/Handle Events manually
    this->m_HandleSameAsOpensydeNodeIdState();
    this->m_OnStartDevicesChanged();
    this->m_HandleHeartbeatEnableState();
+   this->m_HandlePdoSyncEnableState();
 
    //save current values to data (incorrect default values should be fixed)
    this->SaveToData();
@@ -548,20 +648,29 @@ void C_SdNdeCoManagerIntfWidget::m_LoadFromData(void)
    //connects for SaveChanges
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxCANopenId, static_cast<void (QSpinBox::*)(
-                                                             sintn)>(&QSpinBox::valueChanged), this,
+   connect(this->mpc_Ui->pc_SpinBoxCanOpenId, static_cast<void (QSpinBox::*)(
+                                                             int32_t)>(&QSpinBox::valueChanged), this,
            &C_SdNdeCoManagerIntfWidget::m_OnCoNodeIdChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxSDOTimeout, static_cast<void (QSpinBox::*)(
-                                                              sintn)>(&QSpinBox::valueChanged), this,
+                                                              int32_t)>(&QSpinBox::valueChanged), this,
            &C_SdNdeCoManagerIntfWidget::m_SaveChanges);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_SpinBoxProducerTime, static_cast<void (QSpinBox::*)(
-                                                                sintn)>(&QSpinBox::valueChanged), this,
+                                                                int32_t)>(&QSpinBox::valueChanged), this,
            &C_SdNdeCoManagerIntfWidget::m_OnHeartbeatProducerTimeChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxSYNCPeriod, static_cast<void (QSpinBox::*)(
+                                                              int32_t)>(&QSpinBox::valueChanged), this,
+           &C_SdNdeCoManagerIntfWidget::m_OnPdoSyncTimeValueChanged);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxSYNCWindowLength, static_cast<void (QSpinBox::*)(
+                                                                    int32_t)>(&QSpinBox::valueChanged), this,
+           &C_SdNdeCoManagerIntfWidget::m_OnPdoSyncTimeValueChanged);
+
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxNMTErrorBehaviour,
-           static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SdNdeCoManagerIntfWidget::m_SaveChanges);
 
    connect(this->mpc_Ui->pc_CheckBoxSameAsOpensyde, &QCheckBox::stateChanged, this,
@@ -574,6 +683,8 @@ void C_SdNdeCoManagerIntfWidget::m_LoadFromData(void)
            &C_SdNdeCoManagerIntfWidget::m_SaveChanges);
    connect(this->mpc_Ui->pc_CheckBoxEnableHeartbeatProducing, &QCheckBox::stateChanged, this,
            &C_SdNdeCoManagerIntfWidget::m_OnHeartbeatEnableChanged);
+   connect(this->mpc_Ui->pc_CheckBoxSYNCProduceEnabled, &QCheckBox::stateChanged, this,
+           &C_SdNdeCoManagerIntfWidget::m_OnPdoSyncEnableChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

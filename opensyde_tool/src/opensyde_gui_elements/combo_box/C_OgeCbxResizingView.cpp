@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QAbstractItemView>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_OgeCbxResizingView.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_OgeCbxResizingView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,24 +53,24 @@ C_OgeCbxResizingView::C_OgeCbxResizingView(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeCbxResizingView::ResizeViewToContents(void) const
 {
-   sint32 s32_MaxWidth = 0;
-   QFont c_Font = stw_opensyde_gui::mc_STYLE_GUIDE_FONT_REGULAR_12;
+   QFont c_Font = stw::opensyde_gui::mc_STYLE_GUIDE_FONT_REGULAR_12;
 
    c_Font.setPixelSize(c_Font.pointSize());
    {
+      int32_t s32_MaxWidth = 0;
       const QFontMetrics c_Metrics(c_Font);
 
       //Consider each item text
-      for (sint32 s32_ItItem = 0; s32_ItItem < this->count(); ++s32_ItItem)
+      for (int32_t s32_ItItem = 0; s32_ItItem < this->count(); ++s32_ItItem)
       {
          s32_MaxWidth =
-            std::max(s32_MaxWidth, static_cast<sint32>(c_Metrics.horizontalAdvance(this->itemText(s32_ItItem))));
+            std::max(s32_MaxWidth, static_cast<int32_t>(c_Metrics.horizontalAdvance(this->itemText(s32_ItItem))));
       }
       //Use combo box size as minimum, otherwise use longest entry
       //+ magic number (some offset to avoid cutting of any text)
-      s32_MaxWidth = std::max(static_cast<sintn>(s32_MaxWidth + 10L), this->minimumSizeHint().width());
+      s32_MaxWidth = std::max(static_cast<int32_t>(s32_MaxWidth + 10L), this->minimumSizeHint().width());
       //5: Padding left
-      this->view()->setMinimumWidth(static_cast<sintn>(s32_MaxWidth + 5L));
+      this->view()->setMinimumWidth(static_cast<int32_t>(s32_MaxWidth + 5L));
    }
    //Height: Number of items + border
    //27: Item height

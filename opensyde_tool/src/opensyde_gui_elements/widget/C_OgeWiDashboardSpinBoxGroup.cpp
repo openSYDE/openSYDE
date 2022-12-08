@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeWiUtil.h"
-#include "C_OgeWiDashboardSpinBoxGroup.h"
-#include "TGLUtils.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeWiDashboardSpinBoxGroup.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,13 +55,13 @@ C_OgeWiDashboardSpinBoxGroup::C_OgeWiDashboardSpinBoxGroup(QWidget * const opc_P
 void C_OgeWiDashboardSpinBoxGroup::AdjustFontToSize(void)
 {
    //Consider borders (absolute) + buttons (relative)!
-   const sintn sn_ImprovedWidth = (this->size().width() - 2) - m_GetSpinButtonWidth();
-   const QSize c_Size = QSize(std::max(1, sn_ImprovedWidth), this->size().height() - 2);
-   const sintn sn_NewPointSize = C_OgeWiUtil::h_UpdateFontSize(this, this->GetText(), 1.0F, false, &c_Size);
+   const int32_t s32_ImprovedWidth = (this->size().width() - 2) - m_GetSpinButtonWidth();
+   const QSize c_Size = QSize(std::max(1, s32_ImprovedWidth), this->size().height() - 2);
+   const int32_t s32_NewPointSize = C_OgeWiUtil::h_UpdateFontSize(this, this->GetText(), 1.0F, false, &c_Size);
 
-   if (sn_NewPointSize > 0)
+   if (s32_NewPointSize > 0)
    {
-      this->setStyleSheet(static_cast<QString>("*{font-size:%1pt;}").arg(sn_NewPointSize));
+      this->setStyleSheet(static_cast<QString>("*{font-size:%1pt;}").arg(s32_NewPointSize));
    }
 }
 

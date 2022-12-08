@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_SdNdeDpListTableWidget.h"
-#include "C_SdNdeDpListTableWidget.h"
+#include "stwerrors.hpp"
+#include "C_SdNdeDpListTableWidget.hpp"
+#include "C_SdNdeDpListTableWidget.hpp"
 #include "ui_C_SdNdeDpListTableWidget.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpListsTreeWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpListsTreeWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -67,7 +66,7 @@ C_SdNdeDpListTableWidget::C_SdNdeDpListTableWidget(QWidget * const opc_Parent, Q
 
    InitStaticNames();
 
-   m_SetCRCVisibility(false);
+   m_SetCrcVisibility(false);
    this->mpc_Ui->pc_TableView->SetUndoStack(opc_UndoStack);
 
    //Connects
@@ -100,7 +99,7 @@ C_SdNdeDpListTableWidget::~C_SdNdeDpListTableWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableWidget::InitStaticNames(void) const
 {
-   this->mpc_Ui->pc_CheckBoxCRC->SetToolTipInformation(C_GtGetText::h_GetText(
+   this->mpc_Ui->pc_CheckBoxCrc->SetToolTipInformation(C_GtGetText::h_GetText(
                                                           "Add checksum"), C_GtGetText::h_GetText(
                                                           "CRC16 Checksum Option. If active, 2 bytes are reserved at the beginning of the list."));
 }
@@ -125,24 +124,23 @@ void C_SdNdeDpListTableWidget::SetTreeWidgetAndUndoManager(QTreeWidget * const o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Specify associated list
 
-   \param[in] oru32_NodeIndex     Node index
-   \param[in] oru32_DataPoolIndex Node data pool index
-   \param[in] oru32_ListIndex     Node data pool list index
+   \param[in] ou32_NodeIndex     Node index
+   \param[in] ou32_DataPoolIndex Node data pool index
+   \param[in] ou32_ListIndex     Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableWidget::SetList(const stw_types::uint32 & oru32_NodeIndex,
-                                       const stw_types::uint32 & oru32_DataPoolIndex,
-                                       const stw_types::uint32 & oru32_ListIndex)
+void C_SdNdeDpListTableWidget::SetList(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                       const uint32_t ou32_ListIndex)
 {
    //Internal
-   this->mu32_NodeIndex = oru32_NodeIndex;
-   this->mu32_DataPoolIndex = oru32_DataPoolIndex;
-   this->mu32_ListIndex = oru32_ListIndex;
+   this->mu32_NodeIndex = ou32_NodeIndex;
+   this->mu32_DataPoolIndex = ou32_DataPoolIndex;
+   this->mu32_ListIndex = ou32_ListIndex;
    //Init CRC option
-   m_InitCRCOption();
+   m_InitCrcOption();
    //Init table
-   this->mpc_Ui->pc_TableView->SetList(oru32_NodeIndex, oru32_DataPoolIndex,
-                                       oru32_ListIndex);
+   this->mpc_Ui->pc_TableView->SetList(ou32_NodeIndex, ou32_DataPoolIndex,
+                                       ou32_ListIndex);
    m_AdjustToItems(true);
 }
 
@@ -255,7 +253,7 @@ void C_SdNdeDpListTableWidget::SetModelViewManager(C_SdNdeDpListModelViewManager
    \param[in] os32_DataElementIndex   Data element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableWidget::SelectDataElement(const sint32 os32_DataElementIndex) const
+void C_SdNdeDpListTableWidget::SelectDataElement(const int32_t os32_DataElementIndex) const
 {
    this->mpc_Ui->pc_TableView->SelectDataElement(os32_DataElementIndex);
 }
@@ -330,7 +328,7 @@ void C_SdNdeDpListTableWidget::m_OnSizeChangePossible(void)
 /*! \brief   Forward signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableWidget::m_OnSelectionChanged(const uint32 & oru32_Count)
+void C_SdNdeDpListTableWidget::m_OnSelectionChanged(const uint32_t & oru32_Count)
 {
    Q_EMIT this->SigSelectionChanged(this->mu32_ListIndex, oru32_Count);
 }
@@ -359,7 +357,7 @@ void C_SdNdeDpListTableWidget::m_OnButtonChange(const bool & orq_AddActive, cons
    \param[in] orq_Value New checkbox value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableWidget::m_OnCRCOptionChange(const bool & orq_Value)
+void C_SdNdeDpListTableWidget::m_OnCrcOptionChange(const bool & orq_Value)
 {
    if (this->mpc_UndoStack != NULL)
    {
@@ -376,40 +374,40 @@ void C_SdNdeDpListTableWidget::m_OnCRCOptionChange(const bool & orq_Value)
 /*! \brief   Init CRC Option check box
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableWidget::m_InitCRCOption(void)
+void C_SdNdeDpListTableWidget::m_InitCrcOption(void)
 {
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(this->mu32_NodeIndex,
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(this->mu32_NodeIndex,
                                                                                                  this->mu32_DataPoolIndex);
 
-   m_SetCRCVisibility(false);
+   m_SetCrcVisibility(false);
    if (pc_DataPool != NULL)
    {
-      if (pc_DataPool->e_Type == C_OSCNodeDataPool::eNVM)
+      if (pc_DataPool->e_Type == C_OscNodeDataPool::eNVM)
       {
-         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
             this->mu32_NodeIndex,
             this->mu32_DataPoolIndex,
             this->mu32_ListIndex);
 
          if (pc_List != NULL)
          {
-            disconnect(this->mpc_Ui->pc_CheckBoxCRC, &QCheckBox::toggled, this,
-                       &C_SdNdeDpListTableWidget::m_OnCRCOptionChange);
-            m_SetCRCVisibility(true);
-            this->mpc_Ui->pc_CheckBoxCRC->setChecked(pc_List->q_NvMCRCActive);
+            disconnect(this->mpc_Ui->pc_CheckBoxCrc, &QCheckBox::toggled, this,
+                       &C_SdNdeDpListTableWidget::m_OnCrcOptionChange);
+            m_SetCrcVisibility(true);
+            this->mpc_Ui->pc_CheckBoxCrc->setChecked(pc_List->q_NvmCrcActive);
             if (pc_DataPool->q_IsSafety == true)
             {
-               this->mpc_Ui->pc_CheckBoxCRC->setText(C_GtGetText::h_GetText(
+               this->mpc_Ui->pc_CheckBoxCrc->setText(C_GtGetText::h_GetText(
                                                         "Add Checksum (Cannot be disabled for safety Datapools)"));
-               this->mpc_Ui->pc_CheckBoxCRC->setEnabled(false);
+               this->mpc_Ui->pc_CheckBoxCrc->setEnabled(false);
             }
             else
             {
-               this->mpc_Ui->pc_CheckBoxCRC->setText(C_GtGetText::h_GetText("Add Checksum"));
-               this->mpc_Ui->pc_CheckBoxCRC->setEnabled(true);
+               this->mpc_Ui->pc_CheckBoxCrc->setText(C_GtGetText::h_GetText("Add Checksum"));
+               this->mpc_Ui->pc_CheckBoxCrc->setEnabled(true);
             }
-            connect(this->mpc_Ui->pc_CheckBoxCRC, &QCheckBox::toggled, this,
-                    &C_SdNdeDpListTableWidget::m_OnCRCOptionChange);
+            connect(this->mpc_Ui->pc_CheckBoxCrc, &QCheckBox::toggled, this,
+                    &C_SdNdeDpListTableWidget::m_OnCrcOptionChange);
          }
       }
    }
@@ -421,7 +419,7 @@ void C_SdNdeDpListTableWidget::m_InitCRCOption(void)
    \param[in] orq_Visible Flag for visibility
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableWidget::m_SetCRCVisibility(const bool & orq_Visible) const
+void C_SdNdeDpListTableWidget::m_SetCrcVisibility(const bool & orq_Visible) const
 {
    this->mpc_Ui->pc_WidgetCRC->setVisible(orq_Visible);
 }
@@ -437,9 +435,9 @@ void C_SdNdeDpListTableWidget::m_AdjustToItems(const bool & orq_Initial)
    if ((this->mpc_TreeWidget != NULL) && (this->mq_PopUp == false))
    {
       //Configure
-      const sint32 s32_Height = C_SdNdeDpUtil::h_GetTableSize(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                              this->mu32_ListIndex,
-                                                              this->mpc_TreeWidget->height());
+      const int32_t s32_Height = C_SdNdeDpUtil::h_GetTableSize(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                                               this->mu32_ListIndex,
+                                                               this->mpc_TreeWidget->height());
       //Change size (necessary to reach minimum!)
       this->setMinimumHeight(s32_Height);
       this->setMaximumHeight(s32_Height);

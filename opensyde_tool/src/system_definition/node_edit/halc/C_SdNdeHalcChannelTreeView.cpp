@@ -8,24 +8,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "C_SdNdeHalcChannelTreeView.h"
-#include "C_OgeContextMenu.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_PuiSdHandler.h"
-#include "C_UsHandler.h"
+#include "C_SdNdeHalcChannelTreeView.hpp"
+#include "C_OgeContextMenu.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -80,7 +79,7 @@ C_SdNdeHalcChannelTreeView::~C_SdNdeHalcChannelTreeView()
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelTreeView::SetNode(const stw_types::uint32 ou32_NodeIndex)
+void C_SdNdeHalcChannelTreeView::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mc_Model.SetNode(ou32_NodeIndex);
    this->expandAll();
@@ -94,7 +93,7 @@ void C_SdNdeHalcChannelTreeView::SetNode(const stw_types::uint32 ou32_NodeIndex)
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelTreeView::UpdateChannelText(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+void C_SdNdeHalcChannelTreeView::UpdateChannelText(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
                                                    const bool oq_UseChannelIndex)
 {
    this->mc_Model.UpdateChannelText(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex);
@@ -109,7 +108,7 @@ void C_SdNdeHalcChannelTreeView::UpdateChannelText(const uint32 ou32_DomainIndex
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelTreeView::SelectChannel(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+void C_SdNdeHalcChannelTreeView::SelectChannel(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
                                                const bool oq_UseChannelIndex)
 {
    const QModelIndex c_Index = this->mc_Model.GetModelIndexFromIndexes(ou32_DomainIndex, ou32_ChannelIndex,
@@ -143,8 +142,8 @@ void C_SdNdeHalcChannelTreeView::ResetDelegate(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelTreeView::LoadUserSettings(void)
 {
-   uint32 u32_DomainIndex;
-   uint32 u32_ChannelIndex;
+   uint32_t u32_DomainIndex;
+   uint32_t u32_ChannelIndex;
    bool q_ChannelCase;
 
    // last known channel
@@ -174,7 +173,7 @@ void C_SdNdeHalcChannelTreeView::SaveUserSettings(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelTreeView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F2))
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F2))
    {
       if (this->currentIndex().isValid() == true)
       {
@@ -347,8 +346,8 @@ void C_SdNdeHalcChannelTreeView::m_OnReset(void)
    c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to reset the selected channel(s) to their "
                                                    "default configuration and lose your current settings? For linked "
                                                    "channel(s) the use case will be reset to default."));
-   c_Message.SetOKButtonText(C_GtGetText::h_GetText("Reset"));
-   c_Message.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+   c_Message.SetOkButtonText(C_GtGetText::h_GetText("Reset"));
+   c_Message.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
    if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
    {
       this->mc_Model.Reset(this->selectionModel()->selectedIndexes());
@@ -368,8 +367,8 @@ void C_SdNdeHalcChannelTreeView::m_OnChannelSelected(const QModelIndex & orc_Ind
 {
    if ((orc_Index.isValid() == true) && (this->mc_Model.hasChildren(orc_Index) == false))
    {
-      uint32 u32_DomainIndex;
-      uint32 u32_ChannelIndex;
+      uint32_t u32_DomainIndex;
+      uint32_t u32_ChannelIndex;
       bool q_ChannelCase;
 
       C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(orc_Index, u32_DomainIndex, u32_ChannelIndex,
@@ -414,13 +413,13 @@ void C_SdNdeHalcChannelTreeView::m_OnSelectionChanged(void) const
    \retval   false: not found; indices not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeHalcChannelTreeView::m_LoadUsChannel(uint32 & oru32_DomainIndex, uint32 & oru32_ChannelIndex,
+bool C_SdNdeHalcChannelTreeView::m_LoadUsChannel(uint32_t & oru32_DomainIndex, uint32_t & oru32_ChannelIndex,
                                                  bool & orq_ChannelCase) const
 {
    bool q_Found = false;
 
-   const uint32 u32_NodeIndex = this->mc_Model.GetNodeIndex();
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+   const uint32_t u32_NodeIndex = this->mc_Model.GetNodeIndex();
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
 
    // make sure they are initialized
    oru32_DomainIndex = 0;
@@ -431,29 +430,29 @@ bool C_SdNdeHalcChannelTreeView::m_LoadUsChannel(uint32 & oru32_DomainIndex, uin
    {
       const C_UsNode c_UsNode = C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
       const QString c_Domain = c_UsNode.GetSelectedHalcDomainName();
-      const QString c_ChannelID = c_UsNode.GetSelectedHalcChannel();
+      const QString c_ChannelId = c_UsNode.GetSelectedHalcChannel();
 
       if (c_Domain.isEmpty() == false)
       {
          // search domain name
-         for (uint32 u32_DomainIt = 0; u32_DomainIt < pc_Node->c_HALCConfig.GetDomainSize(); u32_DomainIt++)
+         for (uint32_t u32_DomainIt = 0; u32_DomainIt < pc_Node->c_HalcConfig.GetDomainSize(); u32_DomainIt++)
          {
-            const C_OSCHalcDefDomain * const pc_Domain = pc_Node->c_HALCConfig.GetDomainDefDataConst(u32_DomainIt);
+            const C_OscHalcDefDomain * const pc_Domain = pc_Node->c_HalcConfig.GetDomainDefDataConst(u32_DomainIt);
 
             if ((pc_Domain != NULL) && (pc_Domain->c_Name.c_str() == c_Domain))
             {
                oru32_DomainIndex = u32_DomainIt;
 
-               if (c_ChannelID.isEmpty() == false)
+               if (c_ChannelId.isEmpty() == false)
                {
                   //search channel ID
-                  for (uint32 u32_ChannelIt = 0; u32_ChannelIt < pc_Domain->c_Channels.size(); u32_ChannelIt++)
+                  for (uint32_t u32_ChannelIt = 0; u32_ChannelIt < pc_Domain->c_Channels.size(); u32_ChannelIt++)
                   {
-                     const C_OSCHalcDefChannelDef * const pc_Channel =
-                        C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileChannelDataConst(u32_NodeIndex,
+                     const C_OscHalcDefChannelDef * const pc_Channel =
+                        C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileChannelDataConst(u32_NodeIndex,
                                                                                            oru32_DomainIndex,
                                                                                            u32_ChannelIt);
-                     if ((pc_Channel != NULL) && (pc_Channel->c_Name.c_str() == c_ChannelID))
+                     if ((pc_Channel != NULL) && (pc_Channel->c_Name.c_str() == c_ChannelId))
                      {
                         oru32_ChannelIndex = u32_ChannelIt;
                         q_Found = true;
@@ -480,14 +479,14 @@ bool C_SdNdeHalcChannelTreeView::m_LoadUsChannel(uint32 & oru32_DomainIndex, uin
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelTreeView::m_SaveUsChannel(void) const
 {
-   uint32 u32_DomainIndex;
-   uint32 u32_ChannelIndex;
+   uint32_t u32_DomainIndex;
+   uint32_t u32_ChannelIndex;
    bool q_ChannelCase;
-   const uint32 u32_NodeIndex = this->mc_Model.GetNodeIndex();
+   const uint32_t u32_NodeIndex = this->mc_Model.GetNodeIndex();
 
    C_SdNdeHalcChannelTreeModel::h_GetIndexesFromModelIndex(this->currentIndex(), u32_DomainIndex, u32_ChannelIndex,
                                                            q_ChannelCase);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
 
    if (pc_Node != NULL)
    {
@@ -495,15 +494,15 @@ void C_SdNdeHalcChannelTreeView::m_SaveUsChannel(void) const
 
       if (this->currentIndex().isValid() == true)
       {
-         const C_OSCHalcDefDomain * const pc_Domain = pc_Node->c_HALCConfig.GetDomainDefDataConst(u32_DomainIndex);
+         const C_OscHalcDefDomain * const pc_Domain = pc_Node->c_HalcConfig.GetDomainDefDataConst(u32_DomainIndex);
          if (pc_Domain != NULL)
          {
             C_UsHandler::h_GetInstance()->SetProjSdNodeSelectedHalcDomain(pc_Node->c_Properties.c_Name.c_str(),
                                                                           pc_Domain->c_Name.c_str());
             if (q_ChannelCase == true)
             {
-               const C_OSCHalcDefChannelDef * const pc_Channel =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileChannelDataConst(u32_NodeIndex, u32_DomainIndex,
+               const C_OscHalcDefChannelDef * const pc_Channel =
+                  C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileChannelDataConst(u32_NodeIndex, u32_DomainIndex,
                                                                                      u32_ChannelIndex);
 
                if (pc_Channel != NULL)

@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvUpSummaryWidgetSmall.h"
+#include "C_SyvUpSummaryWidgetSmall.hpp"
 #include "ui_C_SyvUpSummaryWidgetSmall.h"
-#include "C_GtGetText.h"
-#include "constants.h"
+#include "C_GtGetText.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -139,9 +138,9 @@ void C_SyvUpSummaryWidgetSmall::SetHeading(const QString & orc_Icon, const QStri
    \param[in]   oq_Finished       Flag if already finished
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpSummaryWidgetSmall::SetProgress(const stw_types::uint16 ou16_Progress100, const bool oq_Finished) const
+void C_SyvUpSummaryWidgetSmall::SetProgress(const uint16_t ou16_Progress100, const bool oq_Finished) const
 {
-   this->mpc_Ui->pc_ProgressBar->SetProgress(static_cast<sint32>(ou16_Progress100), oq_Finished);
+   this->mpc_Ui->pc_ProgressBar->SetProgress(static_cast<int32_t>(ou16_Progress100), oq_Finished);
    this->mpc_Ui->pc_LabelPercent->setText(QString::number(ou16_Progress100) + "%");
 }
 

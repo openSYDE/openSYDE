@@ -10,21 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_OSCCanProtocol.h"
-#include "CSCLChecksums.h"
-#include "TGLUtils.h"
+#include "stwerrors.hpp"
+#include "C_OscCanProtocol.hpp"
+#include "C_SclChecksums.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_tgl;
-using namespace stw_errors;
+
+using namespace stw::opensyde_core;
+using namespace stw::tgl;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const std::vector<C_OSCCanProtocol::E_Type> C_OSCCanProtocol::hc_ALL_PROTOCOLS = C_OSCCanProtocol::mh_GetAllProtocols();
+const std::vector<C_OscCanProtocol::E_Type> C_OscCanProtocol::hc_ALL_PROTOCOLS = C_OscCanProtocol::mh_GetAllProtocols();
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -40,7 +40,7 @@ const std::vector<C_OSCCanProtocol::E_Type> C_OSCCanProtocol::hc_ALL_PROTOCOLS =
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanProtocol::C_OSCCanProtocol(void) :
+C_OscCanProtocol::C_OscCanProtocol(void) :
    e_Type(eLAYER2),
    u32_DataPoolIndex(0)
 {
@@ -55,12 +55,12 @@ C_OSCCanProtocol::C_OSCCanProtocol(void) :
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
+void C_OscCanProtocol::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_DataPoolIndex, sizeof(this->u32_DataPoolIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_DataPoolIndex, sizeof(this->u32_DataPoolIndex), oru32_HashValue);
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_ComMessages.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_ComMessages.size(); ++u32_Counter)
    {
       this->c_ComMessages[u32_Counter].CalcHash(oru32_HashValue);
    }
@@ -80,13 +80,13 @@ void C_OSCCanProtocol::CalcHash(uint32 & oru32_HashValue) const
    C_RANGE  Either interface, message or signal not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_DataPool,
-                                                 const uint32 ou32_InterfaceIndex, const uint32 ou32_MessageIndex,
-                                                 const bool oq_IsTx,
-                                                 std::vector<const C_OSCNodeDataPoolListElement *> & orc_Signals) const
+int32_t C_OscCanProtocol::GetAllSignalsForMessage(const C_OscNodeDataPool & orc_DataPool,
+                                                  const uint32_t ou32_InterfaceIndex, const uint32_t ou32_MessageIndex,
+                                                  const bool oq_IsTx,
+                                                  std::vector<const C_OscNodeDataPoolListElement *> & orc_Signals) const
 {
-   const C_OSCNodeDataPoolList * const pc_List = h_GetComListConst(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
-   sint32 s32_Retval = C_NO_ERR;
+   const C_OscNodeDataPoolList * const pc_List = h_GetComListConst(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_Signals.clear();
 
@@ -94,16 +94,16 @@ sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_D
    {
       if (ou32_InterfaceIndex < this->c_ComMessages.size())
       {
-         const C_OSCCanMessageContainer & rc_ComMessageContainer = this->c_ComMessages[ou32_InterfaceIndex];
-         const std::vector<C_OSCCanMessage> & rc_ComMessages = rc_ComMessageContainer.GetMessagesConst(oq_IsTx);
+         const C_OscCanMessageContainer & rc_ComMessageContainer = this->c_ComMessages[ou32_InterfaceIndex];
+         const std::vector<C_OscCanMessage> & rc_ComMessages = rc_ComMessageContainer.GetMessagesConst(oq_IsTx);
          //Check consistency
          if (ou32_MessageIndex < rc_ComMessages.size())
          {
-            const C_OSCCanMessage & rc_Message = rc_ComMessages[ou32_MessageIndex];
-            for (uint32 u32_ItSignal = 0; u32_ItSignal < rc_Message.c_Signals.size(); ++u32_ItSignal)
+            const C_OscCanMessage & rc_Message = rc_ComMessages[ou32_MessageIndex];
+            for (uint32_t u32_ItSignal = 0; u32_ItSignal < rc_Message.c_Signals.size(); ++u32_ItSignal)
             {
-               const C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[u32_ItSignal];
-               const uint32 u32_ListSignalIndex = rc_Signal.u32_ComDataElementIndex;
+               const C_OscCanSignal & rc_Signal = rc_Message.c_Signals[u32_ItSignal];
+               const uint32_t u32_ListSignalIndex = rc_Signal.u32_ComDataElementIndex;
                if (u32_ListSignalIndex < pc_List->c_Elements.size())
                {
                   orc_Signals.push_back(&pc_List->c_Elements[u32_ListSignalIndex]);
@@ -143,11 +143,12 @@ sint32 C_OSCCanProtocol::GetAllSignalsForMessage(const C_OSCNodeDataPool & orc_D
    Else List matching the requested interface and type
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNodeDataPool & orc_DataPool,
-                                                                  const uint32 ou32_InterfaceIndex, const bool oq_IsTx)
+const C_OscNodeDataPoolList * C_OscCanProtocol::h_GetComListConst(const C_OscNodeDataPool & orc_DataPool,
+                                                                  const uint32_t ou32_InterfaceIndex,
+                                                                  const bool oq_IsTx)
 {
-   const C_OSCNodeDataPoolList * pc_Retval = NULL;
-   const sint32 s32_ListIndex = h_GetListIndex(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
+   const C_OscNodeDataPoolList * pc_Retval = NULL;
+   const int32_t s32_ListIndex = h_GetListIndex(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
 
    if (s32_ListIndex >= 0)
    {
@@ -169,26 +170,26 @@ const C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComListConst(const C_OSCNod
    >= 0 List matching the requested interface and type
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, const uint32 ou32_InterfaceIndex,
-                                        const bool oq_IsTx)
+int32_t C_OscCanProtocol::h_GetListIndex(const C_OscNodeDataPool & orc_DataPool, const uint32_t ou32_InterfaceIndex,
+                                         const bool oq_IsTx)
 {
-   sint32 s32_ResultIndex = -1;
+   int32_t s32_ResultIndex = -1;
 
-   const uint32 u32_ListIndex = ou32_InterfaceIndex * 2UL;
+   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2UL;
 
-   if ((u32_ListIndex + 1UL) < orc_DataPool.c_Lists.size())
+   if ((u32_ListIndex + 1UL) < static_cast<uint32_t>(orc_DataPool.c_Lists.size()))
    {
-      const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
+      const C_OscNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
       if (h_ListIsComTx(rc_List) == oq_IsTx)
       {
-         s32_ResultIndex = static_cast<sint32>(u32_ListIndex);
+         s32_ResultIndex = static_cast<int32_t>(u32_ListIndex);
       }
       else
       {
-         const C_OSCNodeDataPoolList & rc_List2 = orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex + 1)];
+         const C_OscNodeDataPoolList & rc_List2 = orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex) + 1];
          if (h_ListIsComTx(rc_List2) == oq_IsTx)
          {
-            s32_ResultIndex = static_cast<sint32>(u32_ListIndex + 1U);
+            s32_ResultIndex = static_cast<int32_t>(u32_ListIndex + 1U);
          }
       }
    }
@@ -208,25 +209,25 @@ sint32 C_OSCCanProtocol::h_GetListIndex(const C_OSCNodeDataPool & orc_DataPool, 
    Else List matching the requested interface and type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_DataPool,
-                                                       const uint32 ou32_InterfaceIndex, const bool oq_IsTx)
+C_OscNodeDataPoolList * C_OscCanProtocol::h_GetComList(C_OscNodeDataPool & orc_DataPool,
+                                                       const uint32_t ou32_InterfaceIndex, const bool oq_IsTx)
 {
-   C_OSCNodeDataPoolList * pc_Retval = NULL;
-   const uint32 u32_ListIndex = ou32_InterfaceIndex * 2UL;
+   C_OscNodeDataPoolList * pc_Retval = NULL;
+   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2UL;
 
-   if ((u32_ListIndex + 1UL) < orc_DataPool.c_Lists.size())
+   if ((u32_ListIndex + 1UL) < static_cast<uint32_t>(orc_DataPool.c_Lists.size()))
    {
-      const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
+      const C_OscNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
       if (h_ListIsComTx(rc_List) == oq_IsTx)
       {
          pc_Retval = &orc_DataPool.c_Lists[u32_ListIndex];
       }
       else
       {
-         const C_OSCNodeDataPoolList & rc_List2 = orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex + 1)];
+         const C_OscNodeDataPoolList & rc_List2 = orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex) + 1];
          if (h_ListIsComTx(rc_List2) == oq_IsTx)
          {
-            pc_Retval = &orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex + 1)];
+            pc_Retval = &orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex) + 1];
          }
       }
    }
@@ -246,15 +247,15 @@ C_OSCNodeDataPoolList * C_OSCCanProtocol::h_GetComList(C_OSCNodeDataPool & orc_D
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPool, const uint32 ou32_InterfaceIndex,
-                                           const bool oq_IsTx, uint32 & oru32_ListIndex)
+int32_t C_OscCanProtocol::h_GetComListIndex(const C_OscNodeDataPool & orc_DataPool, const uint32_t ou32_InterfaceIndex,
+                                            const bool oq_IsTx, uint32_t & oru32_ListIndex)
 {
-   sint32 s32_Retval = C_RANGE;
-   const uint32 u32_ListIndex = ou32_InterfaceIndex * 2UL;
+   int32_t s32_Retval = C_RANGE;
+   const uint32_t u32_ListIndex = ou32_InterfaceIndex * 2UL;
 
-   if ((u32_ListIndex + 1UL) < orc_DataPool.c_Lists.size())
+   if ((u32_ListIndex + 1UL) < static_cast<uint32_t>(orc_DataPool.c_Lists.size()))
    {
-      const C_OSCNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
+      const C_OscNodeDataPoolList & rc_List = orc_DataPool.c_Lists[u32_ListIndex];
       s32_Retval = C_NO_ERR;
       if (h_ListIsComTx(rc_List) == oq_IsTx)
       {
@@ -262,7 +263,7 @@ sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPoo
       }
       else
       {
-         const C_OSCNodeDataPoolList & rc_List2 = orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex + 1)];
+         const C_OscNodeDataPoolList & rc_List2 = orc_DataPool.c_Lists[static_cast<size_t>(u32_ListIndex) + 1];
          if (h_ListIsComTx(rc_List2) == oq_IsTx)
          {
             oru32_ListIndex = u32_ListIndex + 1UL;
@@ -286,25 +287,25 @@ sint32 C_OSCCanProtocol::h_GetComListIndex(const C_OSCNodeDataPool & orc_DataPoo
    Else List element matching the requested interface, type, message and signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(const C_OSCNodeDataPool & orc_DataPool,
-                                                                              const uint32 ou32_InterfaceIndex,
+const C_OscNodeDataPoolListElement * C_OscCanProtocol::GetComListElementConst(const C_OscNodeDataPool & orc_DataPool,
+                                                                              const uint32_t ou32_InterfaceIndex,
                                                                               const bool oq_IsTx,
-                                                                              const uint32 ou32_MessageIndex,
-                                                                              const uint32 ou32_SignalIndex) const
+                                                                              const uint32_t ou32_MessageIndex,
+                                                                              const uint32_t ou32_SignalIndex) const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   const C_OSCNodeDataPoolList * const pc_List = h_GetComListConst(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   const C_OscNodeDataPoolList * const pc_List = h_GetComListConst(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
 
    if ((pc_List != NULL) && (ou32_InterfaceIndex < this->c_ComMessages.size()))
    {
-      const C_OSCCanMessageContainer & rc_MessageContainer = this->c_ComMessages[ou32_InterfaceIndex];
-      const std::vector<C_OSCCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_IsTx);
+      const C_OscCanMessageContainer & rc_MessageContainer = this->c_ComMessages[ou32_InterfaceIndex];
+      const std::vector<C_OscCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_IsTx);
       if (ou32_MessageIndex < rc_Messages.size())
       {
-         const C_OSCCanMessage & rc_Message = rc_Messages[ou32_MessageIndex];
+         const C_OscCanMessage & rc_Message = rc_Messages[ou32_MessageIndex];
          if (ou32_SignalIndex < rc_Message.c_Signals.size())
          {
-            const C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[ou32_SignalIndex];
+            const C_OscCanSignal & rc_Signal = rc_Message.c_Signals[ou32_SignalIndex];
             if (rc_Signal.u32_ComDataElementIndex < pc_List->c_Elements.size())
             {
                pc_Retval = &pc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
@@ -330,24 +331,24 @@ const C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElementConst(co
    Else List element matching the requested interface, type, message and signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeDataPool & orc_DataPool,
-                                                                   const uint32 ou32_InterfaceIndex, const bool oq_IsTx,
-                                                                   const uint32 ou32_MessageIndex,
-                                                                   const uint32 ou32_SignalIndex) const
+C_OscNodeDataPoolListElement * C_OscCanProtocol::GetComListElement(C_OscNodeDataPool & orc_DataPool,
+                                                                   const uint32_t ou32_InterfaceIndex,
+                                                                   const bool oq_IsTx, const uint32_t ou32_MessageIndex,
+                                                                   const uint32_t ou32_SignalIndex) const
 {
-   C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   C_OSCNodeDataPoolList * const pc_List = h_GetComList(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
+   C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   C_OscNodeDataPoolList * const pc_List = h_GetComList(orc_DataPool, ou32_InterfaceIndex, oq_IsTx);
 
    if ((pc_List != NULL) && (ou32_InterfaceIndex < this->c_ComMessages.size()))
    {
-      const C_OSCCanMessageContainer & rc_MessageContainer = this->c_ComMessages[ou32_InterfaceIndex];
-      const std::vector<C_OSCCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_IsTx);
+      const C_OscCanMessageContainer & rc_MessageContainer = this->c_ComMessages[ou32_InterfaceIndex];
+      const std::vector<C_OscCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_IsTx);
       if (ou32_MessageIndex < rc_Messages.size())
       {
-         const C_OSCCanMessage & rc_Message = rc_Messages[ou32_MessageIndex];
+         const C_OscCanMessage & rc_Message = rc_Messages[ou32_MessageIndex];
          if (ou32_SignalIndex < rc_Message.c_Signals.size())
          {
-            const C_OSCCanSignal & rc_Signal = rc_Message.c_Signals[ou32_SignalIndex];
+            const C_OscCanSignal & rc_Signal = rc_Message.c_Signals[ou32_SignalIndex];
             if (rc_Signal.u32_ComDataElementIndex < pc_List->c_Elements.size())
             {
                pc_Retval = &pc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
@@ -369,14 +370,14 @@ C_OSCNodeDataPoolListElement * C_OSCCanProtocol::GetComListElement(C_OSCNodeData
    false Rx
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)
+bool C_OscCanProtocol::h_ListIsComTx(const C_OscNodeDataPoolList & orc_List)
 {
    bool q_Retval = false;
 
    if (orc_List.c_Name.Length() >= 2)
    {
       //Check second to last letter
-      if (orc_List.c_Name[static_cast<sintn>(orc_List.c_Name.Length() - 1)] == 'T')
+      if (orc_List.c_Name[orc_List.c_Name.Length() - 1] == 'T')
       {
          q_Retval = true;
       }
@@ -393,18 +394,18 @@ bool C_OSCCanProtocol::h_ListIsComTx(const C_OSCNodeDataPoolList & orc_List)
    CAN message DLC offset for signal range check
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Type)
+uint32_t C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(const E_Type oe_Type)
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
    switch (oe_Type)
    {
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eECES:
       u32_Retval = 2UL;
       break;
-   case C_OSCCanProtocol::eLAYER2:
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eLAYER2:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eCAN_OPEN:
    default:
       u32_Retval = 0UL;
       break;
@@ -422,18 +423,18 @@ uint32 C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(const E_Type oe_Ty
    \retval   False   Gaps between signals in a CAN message are not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(const E_Type oe_Type)
+bool C_OscCanProtocol::h_GetCanMessageSignalGapsValid(const E_Type oe_Type)
 {
    bool q_Retval;
 
    switch (oe_Type)
    {
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eCAN_OPEN:
       q_Retval = false;
       break;
-   case C_OSCCanProtocol::eLAYER2:
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eLAYER2:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eECES:
    default:
       q_Retval = true;
       break;
@@ -451,18 +452,18 @@ bool C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(const E_Type oe_Type)
    \retval   False   Byte alignment in a CAN message is not required
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(const E_Type oe_Type)
+bool C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(const E_Type oe_Type)
 {
    bool q_Retval;
 
    switch (oe_Type)
    {
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eCAN_OPEN:
       q_Retval = true;
       break;
-   case C_OSCCanProtocol::eLAYER2:
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eLAYER2:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eECES:
    default:
       q_Retval = false;
       break;
@@ -480,18 +481,18 @@ bool C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(const E_Type o
    \retval   False   CAN message requires no signals
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanProtocol::h_GetCANMessageSignalsRequired(const E_Type oe_Type)
+bool C_OscCanProtocol::h_GetCanMessageSignalsRequired(const E_Type oe_Type)
 {
    bool q_Retval;
 
    switch (oe_Type)
    {
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eCAN_OPEN:
       q_Retval = true;
       break;
-   case C_OSCCanProtocol::eLAYER2:
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eLAYER2:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eECES:
    default:
       q_Retval = false;
       break;
@@ -507,17 +508,17 @@ bool C_OSCCanProtocol::h_GetCANMessageSignalsRequired(const E_Type oe_Type)
    All protocols
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCCanProtocol::E_Type> C_OSCCanProtocol::mh_GetAllProtocols()
+std::vector<C_OscCanProtocol::E_Type> C_OscCanProtocol::mh_GetAllProtocols()
 {
-   std::vector<C_OSCCanProtocol::E_Type> c_Retval;
+   std::vector<C_OscCanProtocol::E_Type> c_Retval;
    c_Retval.push_back(eLAYER2);
    c_Retval.push_back(eCAN_OPEN_SAFETY);
    c_Retval.push_back(eECES);
    c_Retval.push_back(eCAN_OPEN);
    //Check vector indices are same as enum values
-   for (uint32 u32_ItProt = 0UL; u32_ItProt < c_Retval.size(); ++u32_ItProt)
+   for (uint32_t u32_ItProt = 0UL; u32_ItProt < c_Retval.size(); ++u32_ItProt)
    {
-      tgl_assert(static_cast<uint32>(c_Retval[u32_ItProt]) == u32_ItProt);
+      tgl_assert(static_cast<uint32_t>(c_Retval[u32_ItProt]) == u32_ItProt);
    }
    return c_Retval;
 }

@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLTime.h"
+#include "TglTime.hpp"
 
-#include "C_PuiSvDbDataElementContent.h"
+#include "C_PuiSvDbDataElementContent.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(void) :
-   C_OSCNodeDataPoolContent(),
+   C_OscNodeDataPoolContent(),
    mu32_TimeStamp(0U)
 {
 }
@@ -46,7 +46,7 @@ C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(void) :
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(const C_PuiSvDbDataElementContent & orc_Source) :
-   C_OSCNodeDataPoolContent(orc_Source)
+   C_OscNodeDataPoolContent(orc_Source)
 {
    this->mu32_TimeStamp = orc_Source.mu32_TimeStamp;
 }
@@ -59,11 +59,11 @@ C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(const C_PuiSvDbDataElem
    \param[in]     orc_Source      Reference to source
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(const stw_opensyde_core::C_OSCNodeDataPoolContent & orc_Source)
+C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(const stw::opensyde_core::C_OscNodeDataPoolContent & orc_Source)
    :
-   C_OSCNodeDataPoolContent(orc_Source)
+   C_OscNodeDataPoolContent(orc_Source)
 {
-   this->mu32_TimeStamp = stw_tgl::TGL_GetTickCount();
+   this->mu32_TimeStamp = stw::tgl::TglGetTickCount();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -75,13 +75,13 @@ C_PuiSvDbDataElementContent::C_PuiSvDbDataElementContent(const stw_opensyde_core
    Copied element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvDbDataElementContent & C_PuiSvDbDataElementContent::operator =(const C_PuiSvDbDataElementContent & orc_Source)
+C_PuiSvDbDataElementContent & C_PuiSvDbDataElementContent::operator =(const C_PuiSvDbDataElementContent & orc_Source) &
 {
    if (this != &orc_Source)
    {
       this->mu32_TimeStamp = orc_Source.mu32_TimeStamp;
 
-      C_OSCNodeDataPoolContent::operator =(orc_Source);
+      C_OscNodeDataPoolContent::operator =(orc_Source);
    }
 
    return (*this);
@@ -93,7 +93,7 @@ C_PuiSvDbDataElementContent & C_PuiSvDbDataElementContent::operator =(const C_Pu
    \param[in]     ou32_Timestamp   Timestamp value in ms
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbDataElementContent::SetTimeStamp(const stw_types::uint32 ou32_Timestamp)
+void C_PuiSvDbDataElementContent::SetTimeStamp(const uint32_t ou32_Timestamp)
 {
    this->mu32_TimeStamp = ou32_Timestamp;
 }
@@ -105,7 +105,7 @@ void C_PuiSvDbDataElementContent::SetTimeStamp(const stw_types::uint32 ou32_Time
    Timestamp value in ms
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_PuiSvDbDataElementContent::GetTimeStamp(void) const
+uint32_t C_PuiSvDbDataElementContent::GetTimeStamp(void) const
 {
    return this->mu32_TimeStamp;
 }

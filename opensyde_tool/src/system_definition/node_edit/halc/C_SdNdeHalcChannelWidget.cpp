@@ -10,30 +10,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgePopUpDialog.h"
-#include "C_SdNdeHalcChannelDpPreviewPopUp.h"
-#include "C_SdNdeHalcChannelWidget.h"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SdNdeHalcChannelDpPreviewPopUp.hpp"
+#include "C_SdNdeHalcChannelWidget.hpp"
 #include "ui_C_SdNdeHalcChannelWidget.h"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiUtil.h"
-#include "C_Uti.h"
-#include "C_OgeWiCustomMessage.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -69,7 +68,7 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    this->InitStaticNames();
 
    // name length restriction
-   this->mpc_Ui->pc_LeName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+   this->mpc_Ui->pc_LeName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
 
    // set color
    this->mpc_Ui->pc_LabChannelTitle->SetBackgroundColor(0);
@@ -180,7 +179,7 @@ void C_SdNdeHalcChannelWidget::InitStaticNames(void) const
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelWidget::SetNode(const uint32 ou32_NodeIndex)
+void C_SdNdeHalcChannelWidget::SetNode(const uint32_t ou32_NodeIndex)
 {
    this->mu32_NodeIndex = ou32_NodeIndex;
    this->mpc_Ui->pc_TreeConfig->SetNode(this->mu32_NodeIndex);
@@ -193,7 +192,7 @@ void C_SdNdeHalcChannelWidget::SetNode(const uint32 ou32_NodeIndex)
    \param[in]  ou32_ChannelIndex    Channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelWidget::SetChannel(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex)
+void C_SdNdeHalcChannelWidget::SetChannel(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex)
 {
    this->mu32_DomainIndex = ou32_DomainIndex;
    this->mu32_ChannelIndex = ou32_ChannelIndex;
@@ -247,11 +246,11 @@ void C_SdNdeHalcChannelWidget::SaveUserSettings(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_OnNameEdited(void)
 {
-   sint32 s32_Return;
-   const stw_scl::C_SCLString c_NewName = this->mpc_Ui->pc_LeName->text().toStdString().c_str();
+   int32_t s32_Return;
+   const stw::scl::C_SclString c_NewName = this->mpc_Ui->pc_LeName->text().toStdString().c_str();
 
    // update data
-   s32_Return =  C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigName(mu32_NodeIndex, mu32_DomainIndex,
+   s32_Return =  C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelConfigName(mu32_NodeIndex, mu32_DomainIndex,
                                                                                  mu32_ChannelIndex, mq_UseChannelIndex,
                                                                                  c_NewName);
    tgl_assert(s32_Return == C_NO_ERR);
@@ -266,11 +265,11 @@ void C_SdNdeHalcChannelWidget::m_OnNameEdited(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_OnCommentEdited(void)
 {
-   sint32 s32_Return;
-   const stw_scl::C_SCLString c_NewComment = this->mpc_Ui->pc_TedComment->toPlainText().toStdString().c_str();
+   int32_t s32_Return;
+   const stw::scl::C_SclString c_NewComment = this->mpc_Ui->pc_TedComment->toPlainText().toStdString().c_str();
 
    // update data
-   s32_Return = C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigComment(mu32_NodeIndex, mu32_DomainIndex,
+   s32_Return = C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelConfigComment(mu32_NodeIndex, mu32_DomainIndex,
                                                                                    mu32_ChannelIndex,
                                                                                    mq_UseChannelIndex, c_NewComment);
 
@@ -288,10 +287,10 @@ void C_SdNdeHalcChannelWidget::m_OnCommentEdited(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_OnSafetyToggled(const bool oq_Checked) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    // update data
-   s32_Return = C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigSafety(mu32_NodeIndex, mu32_DomainIndex,
+   s32_Return = C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelConfigSafety(mu32_NodeIndex, mu32_DomainIndex,
                                                                                   mu32_ChannelIndex, mq_UseChannelIndex,
                                                                                   oq_Checked);
    tgl_assert(s32_Return == C_NO_ERR);
@@ -305,15 +304,15 @@ void C_SdNdeHalcChannelWidget::m_OnSafetyToggled(const bool oq_Checked) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_HandleHalcNvmFlag(void)
 {
-   const C_OSCHalcConfig * const pc_HalcConfig = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OscHalcConfig * const pc_HalcConfig = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
-   if (pc_HalcConfig->e_SafetyMode == C_OSCHalcConfig::eONE_LEVEL_ALL_SAFE)
+   if (pc_HalcConfig->e_SafetyMode == C_OscHalcConfig::eONE_LEVEL_ALL_SAFE)
    {
       this->mpc_Ui->pc_ChxSafety->setVisible(false);
       this->mpc_Ui->pc_LabSafetyState->setVisible(true);
       this->mpc_Ui->pc_LabSafetyState->setText("ON");
    }
-   else if (pc_HalcConfig->e_SafetyMode == C_OSCHalcConfig::eONE_LEVEL_ALL_NON_SAFE)
+   else if (pc_HalcConfig->e_SafetyMode == C_OscHalcConfig::eONE_LEVEL_ALL_NON_SAFE)
    {
       this->mpc_Ui->pc_ChxSafety->setVisible(false);
       this->mpc_Ui->pc_LabSafetyState->setVisible(true);
@@ -332,35 +331,35 @@ void C_SdNdeHalcChannelWidget::m_HandleHalcNvmFlag(void)
    \param[in]  os32_NewIndex  New combobox index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcChannelWidget::m_OnUseCaseChanged(const sint32 os32_NewIndex)
+void C_SdNdeHalcChannelWidget::m_OnUseCaseChanged(const int32_t os32_NewIndex)
 {
    if (this->ms32_LastComboboxUseCaseIndex != os32_NewIndex)
    {
-      if ((os32_NewIndex >= 0) && (os32_NewIndex < static_cast<sint32>(this->mc_CbxUseCaseIndices.size())))
+      if ((os32_NewIndex >= 0) && (os32_NewIndex < static_cast<int32_t>(this->mc_CbxUseCaseIndices.size())))
       {
          bool q_IsLinkedOld;
          bool q_IsLinkedNew;
          std::vector<QString> c_LinkedChannelNamesOld;
          std::vector<QString> c_LinkedChannelNamesNew;
-         std::vector<uint32> c_LinkedChannelIndicesOld;
-         std::vector<uint32> c_LinkedChannelIndicesNew;
-         sint32 s32_Result;
-         const uint32 u32_UseCaseIndexNew = this->mc_CbxUseCaseIndices[os32_NewIndex];
-         uint32 u32_UseCaseIndexOld = 0;
+         std::vector<uint32_t> c_LinkedChannelIndicesOld;
+         std::vector<uint32_t> c_LinkedChannelIndicesNew;
+         int32_t s32_Result;
+         const uint32_t u32_UseCaseIndexNew = this->mc_CbxUseCaseIndices[os32_NewIndex];
+         uint32_t u32_UseCaseIndexOld = 0;
          if ((this->ms32_LastComboboxUseCaseIndex >= 0) &&
-             (this->ms32_LastComboboxUseCaseIndex < static_cast<sint32>(this->mc_CbxUseCaseIndices.size())))
+             (this->ms32_LastComboboxUseCaseIndex < static_cast<int32_t>(this->mc_CbxUseCaseIndices.size())))
          {
             u32_UseCaseIndexOld = this->mc_CbxUseCaseIndices[this->ms32_LastComboboxUseCaseIndex];
          }
 
          s32_Result =
-            C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
+            C_PuiSdHandler::h_GetInstance()->CheckHalcDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
                                                                           this->mu32_ChannelIndex, true, q_IsLinkedOld,
                                                                           &c_LinkedChannelNamesOld,
                                                                           &c_LinkedChannelIndicesOld);
          tgl_assert(s32_Result == C_NO_ERR);
          s32_Result =
-            C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
+            C_PuiSdHandler::h_GetInstance()->CheckHalcDomainChannelLinked(this->mu32_NodeIndex, this->mu32_DomainIndex,
                                                                           this->mu32_ChannelIndex, true, q_IsLinkedNew,
                                                                           &c_LinkedChannelNamesNew,
                                                                           &c_LinkedChannelIndicesNew,
@@ -372,7 +371,7 @@ void C_SdNdeHalcChannelWidget::m_OnUseCaseChanged(const sint32 os32_NewIndex)
          {
             // update data
             s32_Result =
-               C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigUseCase(this->mu32_NodeIndex,
+               C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelConfigUseCase(this->mu32_NodeIndex,
                                                                                   this->mu32_DomainIndex,
                                                                                   this->mu32_ChannelIndex,
                                                                                   this->mq_UseChannelIndex,
@@ -381,7 +380,7 @@ void C_SdNdeHalcChannelWidget::m_OnUseCaseChanged(const sint32 os32_NewIndex)
 
             // update linked channels
             s32_Result =
-               C_PuiSdHandler::h_GetInstance()->SetHALCDomainChannelConfigOfLinkedChannels(this->mu32_NodeIndex,
+               C_PuiSdHandler::h_GetInstance()->SetHalcDomainChannelConfigOfLinkedChannels(this->mu32_NodeIndex,
                                                                                            this->mu32_DomainIndex,
                                                                                            this->mu32_ChannelIndex,
                                                                                            this->mq_UseChannelIndex,
@@ -413,19 +412,19 @@ void C_SdNdeHalcChannelWidget::m_OnUseCaseChanged(const sint32 os32_NewIndex)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_SetLinkedSymbolAndChannel(const bool oq_IsLinked,
-                                                           const std::vector<uint32> & orc_LinkedChannelIndices) const
+                                                           const std::vector<uint32_t> & orc_LinkedChannelIndices) const
 {
    QString c_LinkText = "-";
 
    // get link text
    if ((oq_IsLinked == true) && (orc_LinkedChannelIndices.size() > 0))
    {
-      const uint32 u32_LinkedChannelIndex = orc_LinkedChannelIndices[0];
-      const C_OSCHalcConfigChannel * const pc_LinkedChannel =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
+      const uint32_t u32_LinkedChannelIndex = orc_LinkedChannelIndices[0];
+      const C_OscHalcConfigChannel * const pc_LinkedChannel =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
                                                                          u32_LinkedChannelIndex, true);
-      const C_OSCHalcConfigDomain * const pc_Domain =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
+      const C_OscHalcConfigDomain * const pc_Domain =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
 
       if ((pc_LinkedChannel != NULL) && (pc_Domain != NULL) && (u32_LinkedChannelIndex < pc_Domain->c_Channels.size()))
       {
@@ -451,10 +450,10 @@ void C_SdNdeHalcChannelWidget::m_SetLinkedSymbolAndChannel(const bool oq_IsLinke
 void C_SdNdeHalcChannelWidget::m_OnLinkedChannelClicked(const QString & orc_LinkedChannelName)
 {
    // get domain
-   const C_OSCHalcConfigDomain * const pc_Domain =
-      C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
+   const C_OscHalcConfigDomain * const pc_Domain =
+      C_PuiSdHandler::h_GetInstance()->GetHalcDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
 
-   for (uint32 u32_Counter = 0; u32_Counter < pc_Domain->c_Channels.size(); u32_Counter++)
+   for (uint32_t u32_Counter = 0; u32_Counter < pc_Domain->c_Channels.size(); u32_Counter++)
    {
       if (orc_LinkedChannelName.contains(pc_Domain->c_Channels.at(u32_Counter).c_Name.c_str()) == true)
       {
@@ -470,11 +469,11 @@ void C_SdNdeHalcChannelWidget::m_OnLinkedChannelClicked(const QString & orc_Link
 void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
 {
    // Make sure HALC magician did its work
-   const sint32 s32_Result = C_PuiSdHandler::h_GetInstance()->HALCGenerateDatapools(this->mu32_NodeIndex);
+   const int32_t s32_Result = C_PuiSdHandler::h_GetInstance()->HalcGenerateDatapools(this->mu32_NodeIndex);
 
    tgl_assert((s32_Result == C_NO_ERR) || (s32_Result == C_NOACT));
 
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    new C_SdNdeHalcChannelDpPreviewPopUp(*c_New,
                                         this->mu32_NodeIndex,
                                         this->mu32_DomainIndex,
@@ -502,8 +501,8 @@ void C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked(void)
 void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
 {
    // get domain
-   const C_OSCHalcConfigDomain * const pc_Domain =
-      C_PuiSdHandler::h_GetInstance()->GetHALCDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
+   const C_OscHalcConfigDomain * const pc_Domain =
+      C_PuiSdHandler::h_GetInstance()->GetHalcDomainConfigDataConst(this->mu32_NodeIndex, this->mu32_DomainIndex);
 
    if (pc_Domain != NULL)
    {
@@ -511,17 +510,17 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
       this->mq_UseChannelIndex = !(pc_Domain->c_Channels.empty());
 
       // get channel
-      const C_OSCHalcConfigChannel * const pc_Channel =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
+      const C_OscHalcConfigChannel * const pc_Channel =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(this->mu32_NodeIndex, this->mu32_DomainIndex,
                                                                          this->mu32_ChannelIndex,
                                                                          this->mq_UseChannelIndex);
 
       if (pc_Channel != NULL)
       {
          bool q_IsLinked = false;
-         uint32 u32_UseCaseCounter = 0; // for counting all channels and knowing indices of available ones
-         sint32 s32_SelectedUseCaseCbxIndex = -1;
-         std::vector<stw_types::uint32> c_LinkedChannelIndices;
+         uint32_t u32_UseCaseCounter = 0; // for counting all channels and knowing indices of available ones
+         int32_t s32_SelectedUseCaseCbxIndex = -1;
+         std::vector<uint32_t> c_LinkedChannelIndices;
 
          // disconnect to avoid data handling update while loading
          this->m_ConnectWidgets(false);
@@ -535,13 +534,13 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
          this->mpc_Ui->pc_LabDomainName->setText(pc_Domain->c_SingularName.c_str());
          switch (pc_Domain->e_Category)
          {
-         case C_OSCHalcDefDomain::eCA_INPUT:
+         case C_OscHalcDefDomain::eCA_INPUT:
             this->mpc_Ui->pc_LabImage->SetSvg("://images/system_definition/NodeEdit/halc/InputLargeCenterActive.svg");
             break;
-         case C_OSCHalcDefDomain::eCA_OUTPUT:
+         case C_OscHalcDefDomain::eCA_OUTPUT:
             this->mpc_Ui->pc_LabImage->SetSvg("://images/system_definition/NodeEdit/halc/OutputLargeCenterActive.svg");
             break;
-         case C_OSCHalcDefDomain::eCA_OTHER:
+         case C_OscHalcDefDomain::eCA_OTHER:
             this->mpc_Ui->pc_LabImage->SetSvg("://images/system_definition/NodeEdit/halc/OtherLargeCenterActive.svg");
             break;
          default:
@@ -567,18 +566,18 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
          // use case only matters in channel case
          if (mq_UseChannelIndex == true)
          {
-            for (std::vector<C_OSCHalcDefChannelUseCase>::const_iterator c_ItUseCases =
+            for (std::vector<C_OscHalcDefChannelUseCase>::const_iterator c_ItUseCases =
                     pc_Domain->c_ChannelUseCases.begin();
                  c_ItUseCases != pc_Domain->c_ChannelUseCases.end(); ++c_ItUseCases)
             {
-               const C_OSCHalcDefChannelUseCase & rc_CurrentUseCase = *c_ItUseCases;
+               const C_OscHalcDefChannelUseCase & rc_CurrentUseCase = *c_ItUseCases;
 
                // only add available use cases to combobox
-               for (std::vector<C_OSCHalcDefChannelAvailability>::const_iterator c_ItCurrentAvail =
+               for (std::vector<C_OscHalcDefChannelAvailability>::const_iterator c_ItCurrentAvail =
                        rc_CurrentUseCase.c_Availability.begin();
                     c_ItCurrentAvail != rc_CurrentUseCase.c_Availability.end(); ++c_ItCurrentAvail)
                {
-                  const C_OSCHalcDefChannelAvailability & rc_CurrentAvail = *c_ItCurrentAvail;
+                  const C_OscHalcDefChannelAvailability & rc_CurrentAvail = *c_ItCurrentAvail;
 
                   if (rc_CurrentAvail.u32_ValueIndex == this->mu32_ChannelIndex)
                   {
@@ -591,7 +590,7 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
                      // remember current item index for combobox & link property for link
                      if ((pc_Channel->u32_UseCaseIndex == u32_UseCaseCounter))
                      {
-                        s32_SelectedUseCaseCbxIndex = static_cast<sint32>(this->mpc_Ui->pc_CbxUseCase->count() - 1);
+                        s32_SelectedUseCaseCbxIndex = static_cast<int32_t>(this->mpc_Ui->pc_CbxUseCase->count() - 1);
                         if (rc_CurrentAvail.c_DependentValues.empty() == false)
                         {
                            q_IsLinked = true;
@@ -655,7 +654,7 @@ void C_SdNdeHalcChannelWidget::m_ConnectWidgets(const bool oq_Connect) const
       //lint -save -e929 Cast required to avoid ambiguous signal of Qt interface
       connect(this->mpc_Ui->pc_LabViewDatapools, &QLabel::linkActivated,
               this, &C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked);
-      connect(this->mpc_Ui->pc_CbxUseCase, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+      connect(this->mpc_Ui->pc_CbxUseCase, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
               this, &C_SdNdeHalcChannelWidget::m_OnUseCaseChanged);
       //lint -restore
    }
@@ -672,7 +671,8 @@ void C_SdNdeHalcChannelWidget::m_ConnectWidgets(const bool oq_Connect) const
       //lint -save -e929 Cast required to avoid ambiguous signal of Qt interface
       disconnect(this->mpc_Ui->pc_LabViewDatapools, &QLabel::linkActivated,
                  this, &C_SdNdeHalcChannelWidget::m_OnViewDatapoolDetailsClicked);
-      disconnect(this->mpc_Ui->pc_CbxUseCase, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+      disconnect(this->mpc_Ui->pc_CbxUseCase,
+                 static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
                  this, &C_SdNdeHalcChannelWidget::m_OnUseCaseChanged);
       //lint -restore
    }
@@ -688,13 +688,13 @@ void C_SdNdeHalcChannelWidget::m_ConnectWidgets(const bool oq_Connect) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelWidget::m_CheckName(const QString & orc_NewName) const
 {
-   const stw_scl::C_SCLString c_NewName = orc_NewName.toStdString().c_str();
+   const stw::scl::C_SclString c_NewName = orc_NewName.toStdString().c_str();
 
    //check name
    const bool q_NameIsUnique =
-      C_PuiSdHandler::h_GetInstance()->CheckHALCChannelNameAvailable(mu32_NodeIndex, mu32_DomainIndex,
+      C_PuiSdHandler::h_GetInstance()->CheckHalcChannelNameAvailable(mu32_NodeIndex, mu32_DomainIndex,
                                                                      c_NewName, &mu32_ChannelIndex);
-   const bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(c_NewName);
+   const bool q_NameIsValid = C_OscUtils::h_CheckValidCeName(c_NewName);
 
    //set invalid text property
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LeName, "Valid", (q_NameIsUnique && q_NameIsValid));
@@ -738,15 +738,15 @@ bool C_SdNdeHalcChannelWidget::m_AskUserToContinueLinkingIfNecessary(const bool 
                                                                      const bool oq_IsLinkedNew,
                                                                      const std::vector<QString> & orc_LinkedChannelNamesOld, const
                                                                      std::vector<QString> & orc_LinkedChannelNamesNew,
-                                                                     const uint32 ou32_NewUseCaseIndex)
+                                                                     const uint32_t ou32_NewUseCaseIndex)
 {
    bool q_Continue = true;
 
    if ((oq_IsLinkedOld == true) || (oq_IsLinkedNew == true))
    {
       // if linking/unlinking: ask user to continue
-      const C_OSCHalcDefChannelUseCase * const pc_UseCase =
-         C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileUseCaseData(this->mu32_NodeIndex,
+      const C_OscHalcDefChannelUseCase * const pc_UseCase =
+         C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileUseCaseData(this->mu32_NodeIndex,
                                                                        this->mu32_DomainIndex,
                                                                        ou32_NewUseCaseIndex);
       if (pc_UseCase != NULL)
@@ -788,8 +788,8 @@ bool C_SdNdeHalcChannelWidget::m_AskUserToContinueLinkingIfNecessary(const bool 
 
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Use Case Selection"));
          c_MessageBox.SetDescription(c_Description);
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Apply Selection"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+         c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Apply Selection"));
+         c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
 
          if (c_MessageBox.Execute() != C_OgeWiCustomMessage::eYES)
          {

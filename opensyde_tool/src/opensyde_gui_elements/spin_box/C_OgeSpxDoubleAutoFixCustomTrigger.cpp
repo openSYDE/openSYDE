@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeSpxInt64.h"
-#include "C_OgeSpxDoubleAutoFixCustomTrigger.h"
+#include "C_OgeSpxInt64.hpp"
+#include "C_OgeSpxDoubleAutoFixCustomTrigger.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,11 +65,11 @@ void C_OgeSpxDoubleAutoFixCustomTrigger::SetSuffix(const QString & orc_Suffix)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Do x steps
 
-   \param[in]  osn_Steps   Step count to do
+   \param[in]  os32_Steps   Step count to do
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxDoubleAutoFixCustomTrigger::stepBy(const sintn osn_Steps)
+void C_OgeSpxDoubleAutoFixCustomTrigger::stepBy(const int32_t os32_Steps)
 {
-   C_OgeSpxDoubleAutoFix::stepBy(osn_Steps);
+   C_OgeSpxDoubleAutoFix::stepBy(os32_Steps);
    Q_EMIT (this->SigValueChanged());
 }

@@ -12,24 +12,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMosFilterItemWidget.h"
+#include "C_CamMosFilterItemWidget.hpp"
 #include "ui_C_CamMosFilterItemWidget.h"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_CamMosFilterPopup.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_CamMosFilterPopup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,7 +52,7 @@ using namespace stw_types;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMosFilterItemWidget::C_CamMosFilterItemWidget(const C_CamProFilterData & orc_Filter, QWidget * const opc_Parent) :
-   stw_opensyde_gui_elements::C_OgeWiOnlyBackground(opc_Parent),
+   stw::opensyde_gui_elements::C_OgeWiOnlyBackground(opc_Parent),
    mpc_Ui(new Ui::C_CamMosFilterItemWidget),
    mq_ButtonPressed(false)
 {
@@ -125,7 +124,7 @@ void C_CamMosFilterItemWidget::m_CreateTooltipInformation(void)
    c_Content += "\n";
 
    // show information of first few filter items (maximum 3)
-   for (sint32 s32_Pos = 0; (s32_Pos < c_FilterItems.size()) && (s32_Pos < 3); s32_Pos++)
+   for (int32_t s32_Pos = 0; (s32_Pos < c_FilterItems.size()) && (s32_Pos < 3); s32_Pos++)
    {
       const C_CamProFilterItemData & rc_FilterItem = c_FilterItems[s32_Pos];
       QString c_Temp = "";
@@ -219,13 +218,13 @@ void C_CamMosFilterItemWidget::m_OnEdit()
    c_New->SetSize(QSize(700, 820));
 
    // Update settings on accept
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       // check if there are any changes
       C_CamProFilterData c_FilterDataNew = pc_Dialog->GetFilterData();
       c_FilterDataNew.q_Enabled = this->mc_Filter.q_Enabled; // enabled flag of whole filter is not set in dialog
-      uint32 u32_HashValueOld = 0xFFFFFFFFUL;
-      uint32 u32_HashValueNew = 0xFFFFFFFFUL;
+      uint32_t u32_HashValueOld = 0xFFFFFFFFUL;
+      uint32_t u32_HashValueNew = 0xFFFFFFFFUL;
       this->mc_Filter.CalcHash(u32_HashValueOld);
       c_FilterDataNew.CalcHash(u32_HashValueNew);
 

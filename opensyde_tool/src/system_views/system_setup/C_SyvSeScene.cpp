@@ -8,32 +8,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QGraphicsItem>
 #include <QDialog>
 
-#include "gitypes.h"
+#include "gitypes.hpp"
 
-#include "TGLUtils.h"
-#include "C_SyvSeScene.h"
-#include "C_GiSvNodeSyvSetup.h"
-#include "C_SdNdeNodeEditWidget.h"
-#include "C_SdBueBusEditWidget.h"
-#include "C_SebUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_GiSvPc.h"
-#include "C_GiSvPcBusConnector.h"
-#include "C_PuiSvHandler.h"
+#include "TglUtils.hpp"
+#include "C_SyvSeScene.hpp"
+#include "C_GiSvNodeSyvSetup.hpp"
+#include "C_SdNdeNodeEditWidget.hpp"
+#include "C_SdBueBusEditWidget.hpp"
+#include "C_SebUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_GiSvPc.hpp"
+#include "C_GiSvPcBusConnector.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,7 +53,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvSeScene::C_SyvSeScene(const uint32 ou32_ViewIndex, QObject * const opc_Parent) :
+C_SyvSeScene::C_SyvSeScene(const uint32_t ou32_ViewIndex, QObject * const opc_Parent) :
    C_SyvTopologyBaseScene(ou32_ViewIndex, opc_Parent),
    mq_EditMode(false),
    mpc_SelectedBusConnectorItem(NULL),
@@ -172,7 +171,7 @@ void C_SyvSeScene::Save(void) const
    }
    if (q_NoConnection == true)
    {
-      C_PuiSvHandler::h_GetInstance()->SetViewPCConnected(this->mu32_ViewIndex, false, 0);
+      C_PuiSvHandler::h_GetInstance()->SetViewPcConnected(this->mu32_ViewIndex, false, 0);
    }
 }
 
@@ -223,7 +222,7 @@ void C_SyvSeScene::ReloadViewData(void)
                   if (pc_PcBus != NULL)
                   {
                      if ((pc_PcBus->GetIndex() >= 0) &&
-                         (static_cast<uint32>(pc_PcBus->GetIndex()) == pc_View->GetPcData().GetBusIndex()))
+                         (static_cast<uint32_t>(pc_PcBus->GetIndex()) == pc_View->GetPcData().GetBusIndex()))
                      {
                         pc_FoundBus = pc_PcBus;
                      }
@@ -231,8 +230,8 @@ void C_SyvSeScene::ReloadViewData(void)
                }
                //Reset bus (might be different)
                pc_PcBusConnection->RevertBus(pc_FoundBus, NULL,
-                                             pc_View->GetPcData().GetConnectionData().c_UIInteractionPoints[0]);
-               pc_PcBusConnection->SetPoints(pc_View->GetPcData().GetConnectionData().c_UIInteractionPoints);
+                                             pc_View->GetPcData().GetConnectionData().c_UiInteractionPoints[0]);
+               pc_PcBusConnection->SetPoints(pc_View->GetPcData().GetConnectionData().c_UiInteractionPoints);
             }
             else
             {
@@ -264,7 +263,7 @@ void C_SyvSeScene::ReloadViewData(void)
                if (pc_PcBus != NULL)
                {
                   if ((pc_PcBus->GetIndex() >= 0) &&
-                      (static_cast<uint32>(pc_PcBus->GetIndex()) == pc_View->GetPcData().GetBusIndex()))
+                      (static_cast<uint32_t>(pc_PcBus->GetIndex()) == pc_View->GetPcData().GetBusIndex()))
                   {
                      pc_FoundBus = pc_PcBus;
                   }
@@ -359,7 +358,7 @@ bool C_SyvSeScene::IsItemMovable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
 
-   if (opc_Item->type() == msn_GRAPHICS_ITEM_PC)
+   if (opc_Item->type() == ms32_GRAPHICS_ITEM_PC)
    {
       q_Return = true;
    }
@@ -381,7 +380,7 @@ bool C_SyvSeScene::IsItemSelectable(const QGraphicsItem * const opc_Item) const
 {
    bool q_Return = false;
 
-   if (opc_Item->type() == msn_GRAPHICS_ITEM_PC)
+   if (opc_Item->type() == ms32_GRAPHICS_ITEM_PC)
    {
       q_Return = true;
    }
@@ -415,10 +414,11 @@ C_SebUnoBaseManager * C_SyvSeScene::m_GetUndoManager(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-C_GiNode * C_SyvSeScene::m_CreateNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
-                                      const float64 & orf64_Height, QGraphicsItem * const opc_Parent)
+C_GiNode * C_SyvSeScene::m_CreateNode(const int32_t & ors32_Index, const uint64_t & oru64_Id,
+                                      const float64_t & orf64_Width, const float64_t & orf64_Height,
+                                      QGraphicsItem * const opc_Parent)
 {
-   return new C_GiSvNodeSyvSetup(this->mu32_ViewIndex, ors32_Index, oru64_ID, orf64_Width, orf64_Height, opc_Parent);
+   return new C_GiSvNodeSyvSetup(this->mu32_ViewIndex, ors32_Index, oru64_Id, orf64_Width, orf64_Height, opc_Parent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -492,7 +492,7 @@ void C_SyvSeScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent * const opc_Ev
 
       if (pc_Parent != NULL)
       {
-         if (pc_Parent->type() == msn_GRAPHICS_ITEM_PC)
+         if (pc_Parent->type() == ms32_GRAPHICS_ITEM_PC)
          {
             this->m_Edit(pc_Parent);
          }
@@ -541,7 +541,7 @@ void C_SyvSeScene::m_SelectionChanged(void)
    //Reset selected bus connector
    if (this->mpc_SelectedBusConnectorItem != NULL)
    {
-      this->mpc_SelectedBusConnectorItem->RestoreZOrder();
+      this->mpc_SelectedBusConnectorItem->RestoreZetOrder();
       this->mpc_SelectedBusConnectorItem = NULL;
    }
    if (this->mq_ProxyWidgetInteractionActive == false)
@@ -565,14 +565,14 @@ void C_SyvSeScene::m_SelectionChanged(void)
             }
          }
 
-         if (c_SelectedItems[0]->type() == msn_GRAPHICS_ITEM_PC_CONNECTION)
+         if (c_SelectedItems[0]->type() == ms32_GRAPHICS_ITEM_PC_CONNECTION)
          {
             // bring the selected bus connector to the top
 
             this->mpc_SelectedBusConnectorItem = dynamic_cast<C_GiSvPcBusConnector *>(c_SelectedItems[0]);
             if (this->mpc_SelectedBusConnectorItem != NULL)
             {
-               this->mpc_SelectedBusConnectorItem->SetZValueCustom(mf64_ZORDER_MAX);
+               this->mpc_SelectedBusConnectorItem->SetZetValueCustom(mf64_ZORDER_MAX);
                this->mpc_SelectedBusConnectorItem->SetResizing(true);
             }
          }
@@ -611,17 +611,17 @@ void C_SyvSeScene::m_SelectionChanged(void)
 
    \param[in]     ore_ConnectState Connect state
    \param[in,out] opc_Item         Connected generic item
-   \param[in]     opc_Type         Bus type
+   \param[in]     ope_Type         Bus type
    \param[in,out] opc_Connector    Source
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase::E_ConnectState & ore_ConnectState,
                                                    const QGraphicsItem * const opc_Item,
-                                                   const C_OSCSystemBus::E_Type * const opc_Type,
+                                                   const C_OscSystemBus::E_Type * const ope_Type,
                                                    const C_GiLiBusConnectorBase * const opc_Connector) const
 {
    Q_UNUSED(opc_Item)
-   Q_UNUSED(opc_Type)
+   Q_UNUSED(ope_Type)
    Q_UNUSED(opc_Connector)
    if (this->mq_EditMode == true)
    {
@@ -665,7 +665,7 @@ void C_SyvSeScene::m_OnPcBusConnectionStartConnect(const C_GiLiBusConnectorBase:
                {
                   const bool q_Disabled =
                      C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(this->mu32_ViewIndex,
-                                                                       static_cast<uint32>(pc_Bus->GetIndex()));
+                                                                       static_cast<uint32_t>(pc_Bus->GetIndex()));
                   if (q_Disabled == false)
                   {
                      pc_Item->SetTemporaryCursor(Qt::CrossCursor);

@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QMouseEvent>
 
-#include "C_Uti.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_SyvDaItTaView.h"
-#include "C_SyvDaItTableHeaderView.h"
+#include "C_Uti.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SyvDaItTaView.hpp"
+#include "C_SyvDaItTableHeaderView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -135,12 +134,12 @@ void C_SyvDaItTaView::UpdateError(void)
 /*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparency (0..255)
+   \param[in]  os32_Value               Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaView::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_SyvDaItTaView::UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value)
 {
-   this->mc_Model.UpdateTransparency(ou32_DataElementIndex, osn_Value);
+   this->mc_Model.UpdateTransparency(ou32_DataElementIndex, os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,7 +151,7 @@ void C_SyvDaItTaView::UpdateTransparency(const uint32 ou32_DataElementIndex, con
 void C_SyvDaItTaView::AddItem(const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId)
 {
    const QModelIndexList c_IndexList = this->selectedIndexes();
-   const uint32 u32_NewItem = this->mc_Model.AddItem(c_IndexList, orc_DataPoolElementId);
+   const uint32_t u32_NewItem = this->mc_Model.AddItem(c_IndexList, orc_DataPoolElementId);
 
    // select new item
    this->selectRow(u32_NewItem);
@@ -191,9 +190,9 @@ void C_SyvDaItTaView::RemoveSelectedItems(std::vector<C_PuiSvDbNodeDataPoolListE
    Selected item indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SyvDaItTaView::GetUniqueSelectedRows(void) const
+std::vector<uint32_t> C_SyvDaItTaView::GetUniqueSelectedRows(void) const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    const QModelIndexList c_IndexList = this->selectedIndexes();
    this->mc_Model.GetUniqueRows(c_IndexList, c_Retval);
    return c_Retval;
@@ -206,11 +205,11 @@ std::vector<uint32> C_SyvDaItTaView::GetUniqueSelectedRows(void) const
    Only valid selected item indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SyvDaItTaView::GetUniqueAndValidSelectedRows(void) const
+std::vector<uint32_t> C_SyvDaItTaView::GetUniqueAndValidSelectedRows(void) const
 {
-   std::vector<uint32> c_Retval;
-   const std::vector<uint32> c_Tmp = GetUniqueSelectedRows();
-   for (uint32 u32_It = 0UL; u32_It < c_Tmp.size(); ++u32_It)
+   std::vector<uint32_t> c_Retval;
+   const std::vector<uint32_t> c_Tmp = GetUniqueSelectedRows();
+   for (uint32_t u32_It = 0UL; u32_It < c_Tmp.size(); ++u32_It)
    {
       const C_PuiSvDbNodeDataPoolListElementId * const pc_DataElementId =
          this->mc_Model.GetDataPoolElementIndex(c_Tmp[u32_It]);
@@ -228,13 +227,13 @@ std::vector<uint32> C_SyvDaItTaView::GetUniqueAndValidSelectedRows(void) const
    \param[in]  orc_ColumnWidths  Stored column widths (Restores default values if empty)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItTaView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+void C_SyvDaItTaView::SetCurrentColumnWidths(const std::vector<int32_t> & orc_ColumnWidths)
 {
    if (orc_ColumnWidths.size() > 0)
    {
-      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
       {
-         this->setColumnWidth(static_cast<sintn>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+         this->setColumnWidth(static_cast<int32_t>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
       }
    }
    else
@@ -254,11 +253,11 @@ void C_SyvDaItTaView::SetCurrentColumnWidths(const std::vector<sint32> & orc_Col
    Current column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_SyvDaItTaView::GetCurrentColumnWidths(void) const
+std::vector<int32_t> C_SyvDaItTaView::GetCurrentColumnWidths(void) const
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(this->model()->columnCount());
-   for (sint32 s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
+   for (int32_t s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
    {
       c_Retval.push_back(this->columnWidth(s32_ItCol));
    }

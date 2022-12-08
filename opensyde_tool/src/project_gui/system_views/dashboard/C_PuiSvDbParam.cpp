@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvDbParam.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvDbParam.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,14 +53,14 @@ C_PuiSvDbParam::C_PuiSvDbParam(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbParam::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_PuiSvDbParam::CalcHash(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataSetSelectionIndices.size(); ++u32_Counter)
    {
-      const sint32 & rs32_Value = this->c_DataSetSelectionIndices[u32_Counter];
-      stw_scl::C_SCLChecksums::CalcCRC32(&rs32_Value, sizeof(rs32_Value), oru32_HashValue);
+      const int32_t & rs32_Value = this->c_DataSetSelectionIndices[u32_Counter];
+      stw::scl::C_SclChecksums::CalcCRC32(&rs32_Value, sizeof(rs32_Value), oru32_HashValue);
    }
 
    for (u32_Counter = 0U; u32_Counter < this->c_ListValues.size(); ++u32_Counter)
@@ -71,23 +70,23 @@ void C_PuiSvDbParam::CalcHash(stw_types::uint32 & oru32_HashValue) const
 
    for (u32_Counter = 0U; u32_Counter < this->c_ColWidth.size(); ++u32_Counter)
    {
-      const std::vector<stw_types::sint32> & rc_ColWidths = this->c_ColWidth[u32_Counter];
-      for (uint32 u32_Col = 0U; u32_Col < rc_ColWidths.size(); ++u32_Col)
+      const std::vector<int32_t> & rc_ColWidths = this->c_ColWidth[u32_Counter];
+      for (uint32_t u32_Col = 0U; u32_Col < rc_ColWidths.size(); ++u32_Col)
       {
-         const sint32 & rs32_Value = rc_ColWidths[u32_Col];
-         stw_scl::C_SCLChecksums::CalcCRC32(&rs32_Value, sizeof(rs32_Value), oru32_HashValue);
+         const int32_t & rs32_Value = rc_ColWidths[u32_Col];
+         stw::scl::C_SclChecksums::CalcCRC32(&rs32_Value, sizeof(rs32_Value), oru32_HashValue);
       }
    }
    for (u32_Counter = 0U; u32_Counter < this->c_ExpandedItems.size(); ++u32_Counter)
    {
       const C_PuiSvDbExpandedTreeIndex & rc_CurItem = this->c_ExpandedItems[u32_Counter];
       rc_CurItem.c_ExpandedId.CalcHash(oru32_HashValue);
-      stw_scl::C_SCLChecksums::CalcCRC32(&rc_CurItem.u32_Layer, sizeof(rc_CurItem.u32_Layer), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&rc_CurItem.u32_Layer, sizeof(rc_CurItem.u32_Layer), oru32_HashValue);
    }
    for (u32_Counter = 0U; u32_Counter < this->c_ColPosIndices.size(); ++u32_Counter)
    {
-      const sint32 & rs32_Value = this->c_ColPosIndices[u32_Counter];
-      stw_scl::C_SCLChecksums::CalcCRC32(&rs32_Value, sizeof(rs32_Value), oru32_HashValue);
+      const int32_t & rs32_Value = this->c_ColPosIndices[u32_Counter];
+      stw::scl::C_SclChecksums::CalcCRC32(&rs32_Value, sizeof(rs32_Value), oru32_HashValue);
    }
 
    C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
@@ -117,9 +116,9 @@ bool C_PuiSvDbParam::IsReadElement(void) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bool & orq_Error) const
+int32_t C_PuiSvDbParam::CheckError(const C_OscNodeDataPoolListId & orc_ListId, bool & orq_Error) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    tgl_assert(this->c_DataPoolElementsConfig.size() == this->c_ListValues.size());
    if (this->c_DataPoolElementsConfig.size() == this->c_ListValues.size())
@@ -127,19 +126,19 @@ sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bo
       tgl_assert(this->c_DataPoolElementsConfig.size() == this->c_DataSetSelectionIndices.size());
       if (this->c_DataPoolElementsConfig.size() == this->c_DataSetSelectionIndices.size())
       {
-         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
             orc_ListId.u32_NodeIndex, orc_ListId.u32_DataPoolIndex, orc_ListId.u32_ListIndex);
          if (pc_List != NULL)
          {
             orq_Error = false;
-            for (uint32 u32_ItConfig = 0;
+            for (uint32_t u32_ItConfig = 0;
                  ((u32_ItConfig < this->c_DataPoolElementsConfig.size()) && (orq_Error == false)) &&
                  (s32_Retval == C_NO_ERR);
                  ++u32_ItConfig)
             {
                const C_PuiSvDbNodeDataElementConfig & rc_Config = this->c_DataPoolElementsConfig[u32_ItConfig];
-               const C_OSCNodeDataPoolContent & rc_Content = this->c_ListValues[u32_ItConfig];
-               const sint32 s32_DataSetIndex = this->c_DataSetSelectionIndices[u32_ItConfig];
+               const C_OscNodeDataPoolContent & rc_Content = this->c_ListValues[u32_ItConfig];
+               const int32_t s32_DataSetIndex = this->c_DataSetSelectionIndices[u32_ItConfig];
                //List match
                if (((rc_Config.c_ElementId.u32_NodeIndex == orc_ListId.u32_NodeIndex) &&
                     (rc_Config.c_ElementId.u32_DataPoolIndex == orc_ListId.u32_DataPoolIndex)) &&
@@ -154,7 +153,7 @@ sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bo
                      if (rc_Config.c_ElementId.u32_ElementIndex < pc_List->c_Elements.size())
                      {
                         bool q_Ok;
-                        const C_OSCNodeDataPoolListElement & rc_Element =
+                        const C_OscNodeDataPoolListElement & rc_Element =
                            pc_List->c_Elements[rc_Config.c_ElementId.u32_ElementIndex];
                         s32_Retval = C_PuiSvDbParam::h_CheckMinMax(rc_Element, rc_Content, q_Ok);
                         if (s32_Retval == C_NO_ERR)
@@ -203,10 +202,10 @@ sint32 C_PuiSvDbParam::CheckError(const C_OSCNodeDataPoolListId & orc_ListId, bo
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbParam::h_CheckMinMax(const C_OSCNodeDataPoolListElement & orc_Elem,
-                                     const C_OSCNodeDataPoolContent & orc_Value, bool & orq_Ok)
+int32_t C_PuiSvDbParam::h_CheckMinMax(const C_OscNodeDataPoolListElement & orc_Elem,
+                                      const C_OscNodeDataPoolContent & orc_Value, bool & orq_Ok)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orq_Ok = false;
    //Check if comparable
@@ -240,9 +239,9 @@ sint32 C_PuiSvDbParam::h_CheckMinMax(const C_OSCNodeDataPoolListElement & orc_El
    \retval   C_RANGE    Index not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbParam::RemoveElement(const uint32 & oru32_Index)
+int32_t C_PuiSvDbParam::RemoveElement(const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_PuiSvDbWidgetBase::RemoveElement(oru32_Index);
+   int32_t s32_Retval = C_PuiSvDbWidgetBase::RemoveElement(oru32_Index);
 
    if (s32_Retval == C_NO_ERR)
    {

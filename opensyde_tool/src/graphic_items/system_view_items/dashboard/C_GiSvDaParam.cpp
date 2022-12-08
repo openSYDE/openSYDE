@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QMouseEvent>
 #include <QGraphicsView>
-#include "gitypes.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_GiSvDaParam.h"
-#include "C_PuiSvHandler.h"
+#include "gitypes.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,16 +51,16 @@ using namespace stw_opensyde_gui_logic;
    \param[in]      oru32_ViewIndex        Index of system view
    \param[in]      oru32_DashboardIndex   Index of dashboard in system view
    \param[in]      ors32_DataIndex        Index of data element in dashboard in system view
-   \param[in]      oru64_ID               Unique ID
+   \param[in]      oru64_Id               Unique ID
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaParam::C_GiSvDaParam(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                             const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaParam::C_GiSvDaParam(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                             const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                              QGraphicsItem * const opc_Parent) :
    C_GiSvDaRectBaseGroup(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::ePARAM,
-                         static_cast<uint32>(std::numeric_limits<sintn>::max()),
-                         oru64_ID, 90.0, 50.0, 180.0, 100.0, false, true, opc_Parent),
+                         static_cast<uint32_t>(std::numeric_limits<int32_t>::max()),
+                         oru64_Id, 90.0, 50.0, 180.0, 100.0, false, true, opc_Parent),
    mq_Connected(false),
    mpc_AddDataElement(NULL)
 {
@@ -94,9 +93,9 @@ C_GiSvDaParam::~C_GiSvDaParam(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvDaParam::type(void) const
+int32_t C_GiSvDaParam::type(void) const
 {
-   return msn_GRAPHICS_ITEM_DB_PARAM;
+   return ms32_GRAPHICS_ITEM_DB_PARAM;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -137,7 +136,7 @@ void C_GiSvDaParam::LoadData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbParam * const pc_Box = pc_Dashboard->GetParam(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbParam * const pc_Box = pc_Dashboard->GetParam(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -151,7 +150,7 @@ void C_GiSvDaParam::LoadData(void)
             else
             {
                //Initialize with default values
-               const std::vector<stw_types::sint32> c_Empty;
+               const std::vector<int32_t> c_Empty;
                this->mpc_ParamWidget->SetColumnWidth(c_Empty);
             }
             this->mpc_ParamWidget->SetAllExpandedTreeItems(pc_Box->c_ExpandedItems);
@@ -171,7 +170,7 @@ void C_GiSvDaParam::UpdateData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbParam * const pc_Box = pc_Dashboard->GetParam(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbParam * const pc_Box = pc_Dashboard->GetParam(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -186,7 +185,7 @@ void C_GiSvDaParam::UpdateData(void)
          }
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         &c_Box, this->me_Type) == C_NO_ERR);
       }
    }
@@ -201,7 +200,7 @@ void C_GiSvDaParam::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->DeleteDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         this->me_Type) ==
                  C_NO_ERR);
    }
@@ -341,8 +340,8 @@ void C_GiSvDaParam::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_C
             mpc_AddDataElement =
                opc_ContextMenuManager->RegisterActionWithKeyboardShortcut(C_GtGetText::h_GetText(
                                                                              "Add list(s)"),
-                                                                          static_cast<sintn>(Qt::CTRL) +
-                                                                          static_cast<sintn>(Qt::Key_Plus));
+                                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                                          static_cast<int32_t>(Qt::Key_Plus));
             // The action has to be set invisible initial. Only with that the function SetVisibleWithAutoHide can work.
             this->mpc_AddDataElement->setVisible(false);
             connect(mpc_AddDataElement, &QAction::triggered, this->mpc_ParamWidget,
@@ -360,21 +359,21 @@ void C_GiSvDaParam::ConfigureContextMenu(C_SyvDaContextMenuManager * const opc_C
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaParam::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
+void C_GiSvDaParam::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc)
 {
    bool q_WidgetRelevant = false;
 
    if (this->mpc_ParamWidget != NULL)
    {
-      q_WidgetRelevant = this->mpc_ParamWidget->HandleManualOperationFinished(os32_Result, ou8_NRC);
+      q_WidgetRelevant = this->mpc_ParamWidget->HandleManualOperationFinished(os32_Result, ou8_Nrc);
    }
 
    if (q_WidgetRelevant == false)
    {
-      C_GiSvDaRectBaseGroup::HandleManualOperationFinished(os32_Result, ou8_NRC);
+      C_GiSvDaRectBaseGroup::HandleManualOperationFinished(os32_Result, ou8_Nrc);
    }
 }
 
@@ -407,11 +406,12 @@ void C_GiSvDaParam::SetSyvComDriver(C_SyvComDriverDiag & orc_ComDriver)
    C_NOACT     No value received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaParam::GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex, C_OSCNodeDataPoolContent & orc_Value)
+int32_t C_GiSvDaParam::GetLastValue(const uint32_t ou32_WidgetDataPoolElementIndex,
+                                    C_OscNodeDataPoolContent & orc_Value)
 {
-   uint32 u32_InternalIndex;
-   sint32 s32_Retval = this->m_MapDataElementIndexToInternalElementIndex(ou32_WidgetDataPoolElementIndex,
-                                                                         u32_InternalIndex);
+   uint32_t u32_InternalIndex;
+   int32_t s32_Retval = this->m_MapDataElementIndexToInternalElementIndex(ou32_WidgetDataPoolElementIndex,
+                                                                          u32_InternalIndex);
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -427,7 +427,7 @@ sint32 C_GiSvDaParam::GetLastValue(const uint32 ou32_WidgetDataPoolElementIndex,
    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiSvDaParam::GetViewIndex(void) const
+uint32_t C_GiSvDaParam::GetViewIndex(void) const
 {
    return this->mu32_ViewIndex;
 }
@@ -450,7 +450,7 @@ const C_PuiSvDbParam * C_GiSvDaParam::GetParamItem(void) const
       const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
       if ((pc_Dashboard != NULL) && (this->GetIndex() >= 0))
       {
-         pc_Retval = pc_Dashboard->GetParam(static_cast<uint32>(this->GetIndex()));
+         pc_Retval = pc_Dashboard->GetParam(static_cast<uint32_t>(this->GetIndex()));
       }
    }
    return pc_Retval;
@@ -468,14 +468,14 @@ const C_PuiSvDbParam * C_GiSvDaParam::GetParamItem(void) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaParam::SetParamItem(const C_PuiSvDbParam & orc_Content) const
+int32_t C_GiSvDaParam::SetParamItem(const C_PuiSvDbParam & orc_Content) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->ms32_Index >= 0)
    {
       s32_Retval = C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                       static_cast<uint32>(this->ms32_Index),
+                                                                       static_cast<uint32_t>(this->ms32_Index),
                                                                        &orc_Content, C_PuiSvDbDataElement::ePARAM);
    }
    else
@@ -496,29 +496,30 @@ sint32 C_GiSvDaParam::SetParamItem(const C_PuiSvDbParam & orc_Content) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaParam::AddParamItemDataElement(const C_OSCNodeDataPoolListElementId & orc_Id,
-                                              const C_OSCNodeDataPoolContent * const opc_Content)
+int32_t C_GiSvDaParam::AddParamItemDataElement(const C_OscNodeDataPoolListElementId & orc_Id,
+                                               const C_OscNodeDataPoolContent * const opc_Content)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->ms32_Index >= 0)
    {
       const C_PuiSvDbParam * pc_ParamItem;
       s32_Retval = C_PuiSvHandler::h_GetInstance()->AddViewDashboardParamNewDataPoolElement(this->mu32_ViewIndex,
                                                                                             this->mu32_DashboardIndex,
-                                                                                            static_cast<uint32>(this->
-                                                                                                                ms32_Index),
+                                                                                            static_cast<uint32_t>(this->
+                                                                                                                  ms32_Index),
                                                                                             orc_Id, opc_Content);
       //Trigger data element reload
       pc_ParamItem = this->GetParamItem();
       if (pc_ParamItem != NULL)
       {
-         for (uint32 u32_ItConfig = 0; u32_ItConfig < pc_ParamItem->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
+         for (uint32_t u32_ItConfig = 0; u32_ItConfig < pc_ParamItem->c_DataPoolElementsConfig.size(); ++u32_ItConfig)
          {
             const C_PuiSvDbNodeDataElementConfig & rc_Config = pc_ParamItem->c_DataPoolElementsConfig[u32_ItConfig];
             if ((rc_Config.c_ElementId.GetIsValid() == true) && (rc_Config.c_ElementId == orc_Id))
             {
-               this->RegisterDataPoolElement(rc_Config.c_ElementId, rc_Config.c_ElementScaling);
+               this->RegisterDataPoolElement(rc_Config.c_ElementId, rc_Config.c_ElementScaling,
+                                             rc_Config.c_DisplayFormatter);
             }
          }
       }
@@ -540,9 +541,9 @@ sint32 C_GiSvDaParam::AddParamItemDataElement(const C_OSCNodeDataPoolListElement
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
+int32_t C_GiSvDaParam::DeleteLists(const std::vector<stw::opensyde_core::C_OscNodeDataPoolListId> & orc_ListIds)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Implicitly update the data this one is important for the following reload step!
    this->UpdateData();
@@ -562,15 +563,15 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
             {
                C_PuiSvDbParam c_Copy = *pc_Param;
                //Check each element (back to front!)
-               for (uint32 u32_ItElement = pc_Param->c_DataPoolElementsConfig.size(); u32_ItElement > 0UL;
+               for (uint32_t u32_ItElement = pc_Param->c_DataPoolElementsConfig.size(); u32_ItElement > 0UL;
                     --u32_ItElement)
                {
                   const C_PuiSvDbNodeDataElementConfig & rc_Config =
-                     pc_Param->c_DataPoolElementsConfig[static_cast<uintn>(u32_ItElement) - 1U];
+                     pc_Param->c_DataPoolElementsConfig[static_cast<uint32_t>(u32_ItElement) - 1U];
                   //Each found list
-                  for (uint32 u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
+                  for (uint32_t u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
                   {
-                     const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
+                     const C_OscNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
                      tgl_assert(rc_Config.c_ElementId.GetIsValid() == true);
                      if (rc_Config.c_ElementId.GetIsValid() == true)
                      {
@@ -590,21 +591,22 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
                   }
                }
                //Each found list
-               for (uint32 u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
+               for (uint32_t u32_ItListId = 0; u32_ItListId < orc_ListIds.size(); ++u32_ItListId)
                {
-                  const C_OSCNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
+                  const C_OscNodeDataPoolListId & rc_ListId = orc_ListIds[u32_ItListId];
                   //Handle expansion (back to front!)
-                  for (uint32 u32_ItExpansion = c_Copy.c_ExpandedItems.size(); u32_ItExpansion > 0UL; --u32_ItExpansion)
+                  for (uint32_t u32_ItExpansion = c_Copy.c_ExpandedItems.size(); u32_ItExpansion > 0UL;
+                       --u32_ItExpansion)
                   {
                      const C_PuiSvDbExpandedTreeIndex & rc_Expanded =
-                        c_Copy.c_ExpandedItems[static_cast<uintn>(u32_ItExpansion) - 1U];
+                        c_Copy.c_ExpandedItems[static_cast<uint32_t>(u32_ItExpansion) - 1U];
                      if (((rc_Expanded.c_ExpandedId.u32_NodeIndex == rc_ListId.u32_NodeIndex) &&
                           (rc_Expanded.c_ExpandedId.u32_DataPoolIndex == rc_ListId.u32_DataPoolIndex)) &&
                          (rc_Expanded.c_ExpandedId.u32_ListIndex == rc_ListId.u32_ListIndex))
                      {
                         //New item at current position
                         c_Copy.c_ExpandedItems.erase(c_Copy.c_ExpandedItems.begin() +
-                                                     (static_cast<sintn>(u32_ItExpansion) - 1));
+                                                     (static_cast<int32_t>(u32_ItExpansion) - 1));
                      }
                   }
                }
@@ -630,7 +632,7 @@ sint32 C_GiSvDaParam::DeleteLists(const std::vector<stw_opensyde_core::C_OSCNode
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          if (pc_View != NULL)
          {
-            for (uint32 u32_ItDeletedItem = 0; (u32_ItDeletedItem < c_DeletedIds.size()) && (s32_Retval == C_NO_ERR);
+            for (uint32_t u32_ItDeletedItem = 0; (u32_ItDeletedItem < c_DeletedIds.size()) && (s32_Retval == C_NO_ERR);
                  ++u32_ItDeletedItem)
             {
                if (pc_View->CheckReadUsage(c_DeletedIds[u32_ItDeletedItem]) == false)
@@ -722,10 +724,10 @@ QString C_GiSvDaParam::m_GetCommonToolTipContent(void) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiSvDaParam::m_MapDataElementIndexToInternalElementIndex(const uint32 ou32_DataElementIndex,
-                                                                  uint32 & oru32_InternalElementIndex) const
+int32_t C_GiSvDaParam::m_MapDataElementIndexToInternalElementIndex(const uint32_t ou32_DataElementIndex,
+                                                                   uint32_t & oru32_InternalElementIndex) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
    const C_PuiSvDbParam * const pc_Param = this->GetParamItem();
 
    if (pc_Param != NULL)

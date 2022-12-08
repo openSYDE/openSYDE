@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QMouseEvent>
 
-#include "C_SdBueCoAddSignalsView.h"
+#include "C_SdBueCoAddSignalsView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,7 +48,7 @@ C_SdBueCoAddSignalsView::C_SdBueCoAddSignalsView(QWidget * const opc_Parent) :
 {
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
-   this->mc_SortModel.setSortRole(static_cast<sintn>(Qt::DisplayRole));
+   this->mc_SortModel.setSortRole(static_cast<int32_t>(Qt::DisplayRole));
    this->mc_SortModel.setSourceModel(&this->mc_Model);
    this->C_SdBueCoAddSignalsView::setModel(&this->mc_SortModel);
    //Delete last selection model, see Qt documentation for setModel
@@ -89,7 +88,7 @@ C_SdBueCoAddSignalsView::C_SdBueCoAddSignalsView(QWidget * const opc_Parent) :
    \param[in]  orc_MessageId  Message id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueCoAddSignalsView::SetIndex(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueCoAddSignalsView::SetIndex(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    this->mc_Model.SetIndex(orc_MessageId);
    this->sortByColumn(C_SdBueCoAddSignalsModel::h_EnumToColumn(C_SdBueCoAddSignalsModel::eINDEX), Qt::AscendingOrder);
@@ -111,19 +110,20 @@ void C_SdBueCoAddSignalsView::PrepareCleanUp()
    Selected signals
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCCanOpenManagerMappableSignal> C_SdBueCoAddSignalsView::GetSelectedSignals() const
+std::vector<C_OscCanOpenManagerMappableSignal> C_SdBueCoAddSignalsView::GetSelectedSignals() const
 {
-   std::vector<C_OSCCanOpenManagerMappableSignal> c_Retval;
-   const std::map<uint32, std::vector<uint32> > c_UniqueSignals = C_SdBueCoAddSignalsModel::h_GetUniqueIndices(m_MapModelIndices(
-                                                                                                                  this->
-                                                                                                                  selectedIndexes()));
-   for (std::map<uint32, std::vector<uint32> >::const_iterator c_ItTopLevel = c_UniqueSignals.cbegin();
+   std::vector<C_OscCanOpenManagerMappableSignal> c_Retval;
+   const std::map<uint32_t, std::vector<uint32_t> > c_UniqueSignals = C_SdBueCoAddSignalsModel::h_GetUniqueIndices(m_MapModelIndices(
+                                                                                                                      this
+                                                                                                                      ->
+                                                                                                                      selectedIndexes()));
+   for (std::map<uint32_t, std::vector<uint32_t> >::const_iterator c_ItTopLevel = c_UniqueSignals.cbegin();
         c_ItTopLevel != c_UniqueSignals.cend(); ++c_ItTopLevel)
    {
-      for (std::vector<uint32>::const_iterator c_ItSignal = c_ItTopLevel->second.cbegin();
+      for (std::vector<uint32_t>::const_iterator c_ItSignal = c_ItTopLevel->second.cbegin();
            c_ItSignal != c_ItTopLevel->second.cend(); ++c_ItSignal)
       {
-         const C_OSCCanOpenManagerMappableSignal * const pc_Entry = this->mc_Model.GetDataForIndex(c_ItTopLevel->first,
+         const C_OscCanOpenManagerMappableSignal * const pc_Entry = this->mc_Model.GetDataForIndex(c_ItTopLevel->first,
                                                                                                    *c_ItSignal);
          if (pc_Entry != NULL)
          {
@@ -206,14 +206,14 @@ void C_SdBueCoAddSignalsView::selectionChanged(const QItemSelection & orc_Select
    Unique rows
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdBueCoAddSignalsView::mh_CountUnique(const QModelIndexList & orc_Indices)
+uint32_t C_SdBueCoAddSignalsView::mh_CountUnique(const QModelIndexList & orc_Indices)
 {
-   uint32 u32_Retval = 0;
+   uint32_t u32_Retval = 0;
 
-   const std::map<stw_types::uint32,
-                  std::vector<stw_types::uint32> > c_Rows = C_SdBueCoAddSignalsModel::h_GetUniqueIndices(orc_Indices);
+   const std::map<uint32_t,
+                  std::vector<uint32_t> > c_Rows = C_SdBueCoAddSignalsModel::h_GetUniqueIndices(orc_Indices);
 
-   for (std::map<stw_types::uint32, std::vector<stw_types::uint32> >::const_iterator c_It = c_Rows.cbegin();
+   for (std::map<uint32_t, std::vector<uint32_t> >::const_iterator c_It = c_Rows.cbegin();
         c_It != c_Rows.cend(); ++c_It)
    {
       u32_Retval += c_It->second.size();
@@ -235,14 +235,14 @@ void C_SdBueCoAddSignalsView::m_InitColumns(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Showing or hiding the vertical scrollbar for no resizing the parent widget
 
-   \param[in]  osn_Min  Min
-   \param[in]  osn_Max  Max
+   \param[in]  os32_Min  Min
+   \param[in]  os32_Max  Max
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueCoAddSignalsView::m_ShowHideVerticalScrollBar(const sintn osn_Min, const sintn osn_Max) const
+void C_SdBueCoAddSignalsView::m_ShowHideVerticalScrollBar(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->verticalScrollBar()->hide();
    }
@@ -255,14 +255,14 @@ void C_SdBueCoAddSignalsView::m_ShowHideVerticalScrollBar(const sintn osn_Min, c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Show hide horizontal scroll bar
 
-   \param[in]  osn_Min  Min
-   \param[in]  osn_Max  Max
+   \param[in]  os32_Min  Min
+   \param[in]  os32_Max  Max
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueCoAddSignalsView::m_ShowHideHorizontalScrollBar(const sintn osn_Min, const sintn osn_Max) const
+void C_SdBueCoAddSignalsView::m_ShowHideHorizontalScrollBar(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->horizontalScrollBar()->hide();
    }

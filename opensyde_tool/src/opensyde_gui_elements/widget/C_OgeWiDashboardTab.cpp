@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFontMetrics>
-#include "constants.h"
-#include "C_PuiSvHandler.h"
-#include "C_OgeWiDashboardTab.h"
+#include "constants.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgeWiDashboardTab.hpp"
 #include "ui_C_OgeWiDashboardTab.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -112,11 +111,11 @@ C_OgeWiDashboardTab::~C_OgeWiDashboardTab(void)
 void C_OgeWiDashboardTab::SetText(const QString & orc_Text)
 {
    // 30 = Icon, 10 = Icon <-> Text, 13 = X, 30 = space so everything fits
-   const sintn sn_OFFSET = 30 + 10 + 13 + 30;
+   const int32_t s32_OFFSET = 30 + 10 + 13 + 30;
    const QFontMetrics c_FontMetrics(this->mpc_Ui->pc_LabelName->font());
 
    this->mpc_Ui->pc_LabelName->setText(orc_Text);
-   this->resize(c_FontMetrics.horizontalAdvance(orc_Text) + sn_OFFSET, this->height());
+   this->resize(c_FontMetrics.horizontalAdvance(orc_Text) + s32_OFFSET, this->height());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -148,7 +147,7 @@ void C_OgeWiDashboardTab::SetToolTip(const QString & orc_Heading, const QString 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiDashboardTab::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }

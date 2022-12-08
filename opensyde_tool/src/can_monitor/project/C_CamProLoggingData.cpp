@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamProLoggingData.h"
-#include "CSCLChecksums.h"
-#include "C_Uti.h"
+#include "C_CamProLoggingData.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,15 +53,15 @@ C_CamProLoggingData::C_CamProLoggingData(void) :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProLoggingData::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_CamProLoggingData::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileName.toStdString().c_str(), this->c_FileName.length(),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Directory.toStdString().c_str(), this->c_Directory.length(),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_OverwriteMode, sizeof(this->e_OverwriteMode), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_FileFormat, sizeof(this->e_FileFormat), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_FileName.toStdString().c_str(), this->c_FileName.length(),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Directory.toStdString().c_str(), this->c_Directory.length(),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_Enabled, sizeof(this->q_Enabled), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_OverwriteMode, sizeof(this->e_OverwriteMode), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_FileFormat, sizeof(this->e_FileFormat), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

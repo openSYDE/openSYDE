@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_GiSvDaLabelBase.h"
-#include "C_SyvDaPeLabel.h"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaLabelBase.hpp"
+#include "C_SyvDaPeLabel.hpp"
 #include "ui_C_SyvDaPeLabel.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_DEFAULT = 0;
-const sintn C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_TRANSPARENT = 1;
+const int32_t C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_DEFAULT = 0;
+const int32_t C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_TRANSPARENT = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,7 +67,7 @@ C_SyvDaPeLabel::C_SyvDaPeLabel(C_SyvDaPeBase & orc_Parent, const bool oq_DarkMod
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                         int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeLabel::m_UpdatePreview);
    connect(this->mpc_Ui->pc_CheckBoxCaption, &QCheckBox::toggled, this, &C_SyvDaPeLabel::m_UpdatePreview);
    connect(this->mpc_Ui->pc_CheckBoxUnit, &QCheckBox::toggled, this, &C_SyvDaPeLabel::m_UpdatePreview);
@@ -128,7 +127,7 @@ C_PuiSvDbLabel::E_Type C_SyvDaPeLabel::GetType(void) const
    C_PuiSvDbLabel::E_Type e_Retval;
    switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
    {
-   case C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_TRANSPARENT:
+   case C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_TRANSPARENT:
       e_Retval = C_PuiSvDbLabel::eTRANSPARENT;
       break;
    default:
@@ -186,10 +185,10 @@ void C_SyvDaPeLabel::SetType(const C_PuiSvDbLabel::E_Type oe_Type) const
    switch (oe_Type)
    {
    case C_PuiSvDbLabel::eTRANSPARENT:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_TRANSPARENT);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_TRANSPARENT);
       break;
    case C_PuiSvDbLabel::eDEFAULT:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeLabel::mhsn_INDEX_STYLE_TYPE_DEFAULT);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_DEFAULT);
       break;
    default:
       tgl_assert(false);

@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_SdNdeUnoAedDataPoolListManager.h"
-#include "C_SdNdeUnoAedDataPoolListDataChangeCommand.h"
-#include "C_SdNdeDpListTableView.h"
-#include "C_SdNdeDpListTableModel.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeUnoAedDataPoolListManager.hpp"
+#include "C_SdNdeUnoAedDataPoolListDataChangeCommand.hpp"
+#include "C_SdNdeDpListTableView.hpp"
+#include "C_SdNdeDpListTableModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -64,13 +63,13 @@ C_SdNdeUnoAedDataPoolListManager::C_SdNdeUnoAedDataPoolListManager(void) :
                                                          actions on
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32 & oru32_NodeIndex,
-                                                            const uint32 & oru32_DataPoolIndex,
-                                                            const uint32 & oru32_ListIndex,
-                                                            const uint32 & oru32_ElementIndex,
+void C_SdNdeUnoAedDataPoolListManager::DoDataChangeElements(const uint32_t & oru32_NodeIndex,
+                                                            const uint32_t & oru32_DataPoolIndex,
+                                                            const uint32_t & oru32_ListIndex,
+                                                            const uint32_t & oru32_ElementIndex,
                                                             const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                                            const uint32 & oru32_DataSetIndex,
-                                                            const uint32 & oru32_ArrayElementIndex,
+                                                            const uint32_t & oru32_DataSetIndex,
+                                                            const uint32_t & oru32_ArrayElementIndex,
                                                             const QVariant & orc_NewData,
                                                             C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager)
 {

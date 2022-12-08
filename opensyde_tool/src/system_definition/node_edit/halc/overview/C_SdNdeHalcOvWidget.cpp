@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_SdNdeHalcOvWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_SdNdeHalcOvWidget.hpp"
 #include "ui_C_SdNdeHalcOvWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -113,7 +112,7 @@ void C_SdNdeHalcOvWidget::UpdateData(void)
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcOvWidget::SetNodeIndex(const uint32 ou32_NodeIndex)
+void C_SdNdeHalcOvWidget::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
    this->mpc_Ui->pc_TableView->SetNodeIndex(ou32_NodeIndex);
 
@@ -150,7 +149,7 @@ void C_SdNdeHalcOvWidget::m_UpdateUi(void)
    \param[in]  oq_UseChannelIndex   Use channel index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcOvWidget::m_OnChannelSelected(const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
+void C_SdNdeHalcOvWidget::m_OnChannelSelected(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
                                               const bool oq_UseChannelIndex)
 {
    Q_EMIT (this->SigChannelSelected(ou32_DomainIndex, ou32_ChannelIndex, oq_UseChannelIndex));

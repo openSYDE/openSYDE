@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdNodeCanMessageContainer.h"
+#include "C_PuiSdNodeCanMessageContainer.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,14 +45,14 @@ C_PuiSdNodeCanMessageContainer::C_PuiSdNodeCanMessageContainer(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdNodeCanMessageContainer::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_PuiSdNodeCanMessageContainer::CalcHash(uint32_t & oru32_HashValue) const
 {
-   for (stw_types::uint32 u32_ItMessage = 0; u32_ItMessage < this->c_TxMessages.size(); ++u32_ItMessage)
+   for (uint32_t u32_ItMessage = 0; u32_ItMessage < this->c_TxMessages.size(); ++u32_ItMessage)
    {
       const C_PuiSdNodeCanMessage & rc_Message = this->c_TxMessages[u32_ItMessage];
       rc_Message.CalcHash(oru32_HashValue);
    }
-   for (stw_types::uint32 u32_ItMessage = 0; u32_ItMessage < this->c_RxMessages.size(); ++u32_ItMessage)
+   for (uint32_t u32_ItMessage = 0; u32_ItMessage < this->c_RxMessages.size(); ++u32_ItMessage)
    {
       const C_PuiSdNodeCanMessage & rc_Message = this->c_RxMessages[u32_ItMessage];
       rc_Message.CalcHash(oru32_HashValue);
@@ -70,14 +70,7 @@ void C_PuiSdNodeCanMessageContainer::CalcHash(stw_types::uint32 & oru32_HashValu
 //----------------------------------------------------------------------------------------------------------------------
 const std::vector<C_PuiSdNodeCanMessage> & C_PuiSdNodeCanMessageContainer::GetMessagesConst(const bool & orq_IsTx) const
 {
-   if (orq_IsTx == true)
-   {
-      return this->c_TxMessages;
-   }
-   else
-   {
-      return this->c_RxMessages;
-   }
+   return (orq_IsTx == true) ? this->c_TxMessages : this->c_RxMessages;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,12 +84,5 @@ const std::vector<C_PuiSdNodeCanMessage> & C_PuiSdNodeCanMessageContainer::GetMe
 //----------------------------------------------------------------------------------------------------------------------
 std::vector<C_PuiSdNodeCanMessage> & C_PuiSdNodeCanMessageContainer::GetMessages(const bool & orq_IsTx)
 {
-   if (orq_IsTx == true)
-   {
-      return this->c_TxMessages;
-   }
-   else
-   {
-      return this->c_RxMessages;
-   }
+   return (orq_IsTx == true) ? this->c_TxMessages : this->c_RxMessages;
 }

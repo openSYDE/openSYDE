@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "TGLUtils.h"
-#include "C_OSCNodeFilerV2.h"
-#include "C_OSCSystemFilerUtil.h"
-#include "C_OSCNodeDataPoolFilerV2.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
+#include "C_OscNodeFilerV2.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscNodeDataPoolFilerV2.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,42 +48,42 @@ using namespace stw_opensyde_core;
 
    \param[in]      ou16_XmlFormatVersion  version of XML format
    \param[out]     orc_Node               data storage
-   \param[in,out]  orc_XMLParser          XML with node active
+   \param[in,out]  orc_XmlParser          XML with node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNode(const uint16 ou16_XmlFormatVersion, C_OSCNode & orc_Node,
-                                    C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNode(const uint16_t ou16_XmlFormatVersion, C_OscNode & orc_Node,
+                                     C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_Node.Initialize();
 
-   if (orc_XMLParser.SelectNodeChild("core") == "core")
+   if (orc_XmlParser.SelectNodeChild("core") == "core")
    {
       //Type
-      if (orc_XMLParser.SelectNodeChild("type") == "type")
+      if (orc_XmlParser.SelectNodeChild("type") == "type")
       {
-         orc_Node.c_DeviceType = orc_XMLParser.GetNodeContent();
+         orc_Node.c_DeviceType = orc_XmlParser.GetNodeContent();
          //Return
-         orc_XMLParser.SelectNodeParent(); //back up to core
+         orc_XmlParser.SelectNodeParent(); //back up to core
       }
-      s32_Retval = mh_LoadProperties(orc_Node.c_Properties, orc_XMLParser);
+      s32_Retval = mh_LoadProperties(orc_Node.c_Properties, orc_XmlParser);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = mh_LoadApplications(orc_Node.c_Applications, orc_XMLParser);
+         s32_Retval = mh_LoadApplications(orc_Node.c_Applications, orc_XmlParser);
          if (s32_Retval == C_NO_ERR)
          {
-            if (orc_XMLParser.SelectNodeChild("com-protocols") == "com-protocols")
+            if (orc_XmlParser.SelectNodeChild("com-protocols") == "com-protocols")
             {
-               s32_Retval = h_LoadNodeComProtocols(orc_Node.c_ComProtocols, orc_XMLParser);
+               s32_Retval = h_LoadNodeComProtocols(orc_Node.c_ComProtocols, orc_XmlParser);
                if (s32_Retval == C_NO_ERR)
                {
                   //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "core"); //back up to core
+                  tgl_assert(orc_XmlParser.SelectNodeParent() == "core"); //back up to core
                }
             }
             else
@@ -93,14 +93,14 @@ sint32 C_OSCNodeFilerV2::h_LoadNode(const uint16 ou16_XmlFormatVersion, C_OSCNod
             }
             if (s32_Retval == C_NO_ERR)
             {
-               s32_Retval = mh_LoadDataPools(ou16_XmlFormatVersion, orc_Node, orc_XMLParser);
+               s32_Retval = mh_LoadDataPools(ou16_XmlFormatVersion, orc_Node, orc_XmlParser);
             }
          }
       }
       //Return
       if (s32_Retval == C_NO_ERR)
       {
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
       }
    }
    else
@@ -119,24 +119,24 @@ sint32 C_OSCNodeFilerV2::h_LoadNode(const uint16 ou16_XmlFormatVersion, C_OSCNod
    post-condition: the passed XML parser has the active node set to the same "node"
 
    \param[in]      orc_Node         data storage
-   \param[in,out]  orc_XMLParser    XML with node active
+   \param[in,out]  orc_XmlParser    XML with node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNode(const C_OscNode & orc_Node, C_OscXmlParserBase & orc_XmlParser)
 {
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("core") == "core");
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("core") == "core");
    //Type
-   orc_XMLParser.CreateNodeChild("type", orc_Node.c_DeviceType);
-   mh_SaveProperties(orc_Node.c_Properties, orc_XMLParser);
-   mh_SaveApplications(orc_Node.c_Applications, orc_XMLParser);
-   orc_XMLParser.CreateAndSelectNodeChild("com-protocols");
-   h_SaveNodeComProtocols(orc_Node.c_ComProtocols, orc_XMLParser);
+   orc_XmlParser.CreateNodeChild("type", orc_Node.c_DeviceType);
+   mh_SaveProperties(orc_Node.c_Properties, orc_XmlParser);
+   mh_SaveApplications(orc_Node.c_Applications, orc_XmlParser);
+   orc_XmlParser.CreateAndSelectNodeChild("com-protocols");
+   h_SaveNodeComProtocols(orc_Node.c_ComProtocols, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
-   mh_SaveDataPools(orc_Node.c_DataPools, orc_XMLParser);
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
+   mh_SaveDataPools(orc_Node.c_DataPools, orc_XmlParser);
 
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,59 +147,59 @@ void C_OSCNodeFilerV2::h_SaveNode(const C_OSCNode & orc_Node, C_OSCXMLParserBase
    post-condition: the passed XML parser has the active node set to the same "com-protocols"
 
    \param[out]     orc_NodeComProtocols   data storage
-   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in,out]  orc_XmlParser          XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
-                                                C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComProtocols(std::vector<C_OscCanProtocol> & orc_NodeComProtocols,
+                                                 C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComProtocol;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   C_SclString c_CurNodeComProtocol;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_NodeComProtocols.reserve(u32_ExpectedSize);
    }
 
-   c_CurNodeComProtocol = orc_XMLParser.SelectNodeChild("com-protocol");
+   c_CurNodeComProtocol = orc_XmlParser.SelectNodeChild("com-protocol");
 
    //Clear
    orc_NodeComProtocols.clear();
    if (c_CurNodeComProtocol == "com-protocol")
    {
-      C_OSCCanProtocol c_CurComProtocol;
+      C_OscCanProtocol c_CurComProtocol;
       do
       {
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadNodeComProtocol(c_CurComProtocol, orc_XMLParser);
+            s32_Retval = h_LoadNodeComProtocol(c_CurComProtocol, orc_XmlParser);
          }
 
          //Append
          orc_NodeComProtocols.push_back(c_CurComProtocol);
 
          //Next
-         c_CurNodeComProtocol = orc_XMLParser.SelectNodeNext("com-protocol");
+         c_CurNodeComProtocol = orc_XmlParser.SelectNodeNext("com-protocol");
       }
       while (c_CurNodeComProtocol == "com-protocol");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocols");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-protocols");
    }
    //Compare length
    if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
    {
       if (u32_ExpectedSize != orc_NodeComProtocols.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected comm protocol count, expected: %i, got %i", u32_ExpectedSize,
                               orc_NodeComProtocols.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -216,19 +216,19 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocols(std::vector<C_OSCCanProtocol> & 
    post-condition: the passed XML parser has the active node set to the same "com-protocols"
 
    \param[in]      orc_NodeComProtocols   data storage
-   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in,out]  orc_XmlParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol> & orc_NodeComProtocols,
-                                              C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComProtocols(const std::vector<C_OscCanProtocol> & orc_NodeComProtocols,
+                                              C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeComProtocols.size());
-   for (uint32 u32_ItComProtocol = 0; u32_ItComProtocol < orc_NodeComProtocols.size(); ++u32_ItComProtocol)
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeComProtocols.size()));
+   for (uint32_t u32_ItComProtocol = 0; u32_ItComProtocol < orc_NodeComProtocols.size(); ++u32_ItComProtocol)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("com-protocol");
-      h_SaveNodeComProtocol(orc_NodeComProtocols[u32_ItComProtocol], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("com-protocol");
+      h_SaveNodeComProtocol(orc_NodeComProtocols[u32_ItComProtocol], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocols");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-protocols");
    }
 }
 
@@ -240,25 +240,25 @@ void C_OSCNodeFilerV2::h_SaveNodeComProtocols(const std::vector<C_OSCCanProtocol
    post-condition: the passed XML parser has the active node set to the same "com-protocol"
 
    \param[out]     orc_NodeComProtocol    data storage
-   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in,out]  orc_XmlParser          XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocol(C_OSCCanProtocol & orc_NodeComProtocol,
-                                               C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComProtocol(C_OscCanProtocol & orc_NodeComProtocol,
+                                                C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   orc_NodeComProtocol.u32_DataPoolIndex = orc_XMLParser.GetAttributeUint32("data-pool-index");
+   orc_NodeComProtocol.u32_DataPoolIndex = orc_XmlParser.GetAttributeUint32("data-pool-index");
 
-   if (orc_XMLParser.SelectNodeChild("communication-protocol") == "communication-protocol")
+   if (orc_XmlParser.SelectNodeChild("communication-protocol") == "communication-protocol")
    {
-      s32_Retval = h_StringToCommunicationProtocol(orc_XMLParser.GetNodeContent(), orc_NodeComProtocol.e_Type);
+      s32_Retval = h_StringToCommunicationProtocol(orc_XmlParser.GetNodeContent(), orc_NodeComProtocol.e_Type);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocol");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-protocol");
    }
    else
    {
@@ -266,12 +266,12 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocol(C_OSCCanProtocol & orc_NodeComPro
       s32_Retval = C_CONFIG;
    }
 
-   if ((orc_XMLParser.SelectNodeChild("com-message-containers") == "com-message-containers") &&
+   if ((orc_XmlParser.SelectNodeChild("com-message-containers") == "com-message-containers") &&
        (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = h_LoadNodeComMessageContainers(orc_NodeComProtocol.c_ComMessages, orc_XMLParser);
+      s32_Retval = h_LoadNodeComMessageContainers(orc_NodeComProtocol.c_ComMessages, orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocol");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-protocol");
    }
    else
    {
@@ -289,20 +289,20 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComProtocol(C_OSCCanProtocol & orc_NodeComPro
    post-condition: the passed XML parser has the active node set to the same "com-protocol"
 
    \param[in]      orc_NodeComProtocol    data storage
-   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in,out]  orc_XmlParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComProtocol(const C_OSCCanProtocol & orc_NodeComProtocol,
-                                             C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComProtocol(const C_OscCanProtocol & orc_NodeComProtocol,
+                                             C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("data-pool-index", orc_NodeComProtocol.u32_DataPoolIndex);
-   orc_XMLParser.CreateNodeChild("communication-protocol",
+   orc_XmlParser.SetAttributeUint32("data-pool-index", orc_NodeComProtocol.u32_DataPoolIndex);
+   orc_XmlParser.CreateNodeChild("communication-protocol",
                                  h_CommunicationProtocolToString(orc_NodeComProtocol.e_Type));
    //Messages
-   orc_XMLParser.CreateAndSelectNodeChild("com-message-containers");
-   h_SaveNodeComMessageContainers(orc_NodeComProtocol.c_ComMessages, orc_XMLParser);
+   orc_XmlParser.CreateAndSelectNodeChild("com-message-containers");
+   h_SaveNodeComMessageContainers(orc_NodeComProtocol.c_ComMessages, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "com-protocol");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "com-protocol");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -313,59 +313,59 @@ void C_OSCNodeFilerV2::h_SaveNodeComProtocol(const C_OSCCanProtocol & orc_NodeCo
    post-condition: the passed XML parser has the active node set to the same "com-message-containers"
 
    \param[out]     orc_NodeComMessageContainers    data storage
-   \param[in,out]  orc_XMLParser                   XML with list active
+   \param[in,out]  orc_XmlParser                   XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainers(
-   std::vector<C_OSCCanMessageContainer> & orc_NodeComMessageContainers, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComMessageContainers(
+   std::vector<C_OscCanMessageContainer> & orc_NodeComMessageContainers, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComMessageContainer;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   C_SclString c_CurNodeComMessageContainer;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_NodeComMessageContainers.reserve(u32_ExpectedSize);
    }
 
-   c_CurNodeComMessageContainer = orc_XMLParser.SelectNodeChild("com-message-container");
+   c_CurNodeComMessageContainer = orc_XmlParser.SelectNodeChild("com-message-container");
 
    //Clear
    orc_NodeComMessageContainers.clear();
    if (c_CurNodeComMessageContainer == "com-message-container")
    {
-      C_OSCCanMessageContainer c_CurComMessageContainer;
+      C_OscCanMessageContainer c_CurComMessageContainer;
       do
       {
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadNodeComMessageContainer(c_CurComMessageContainer, orc_XMLParser);
+            s32_Retval = h_LoadNodeComMessageContainer(c_CurComMessageContainer, orc_XmlParser);
          }
 
          //Append
          orc_NodeComMessageContainers.push_back(c_CurComMessageContainer);
 
          //Next
-         c_CurNodeComMessageContainer = orc_XMLParser.SelectNodeNext("com-message-container");
+         c_CurNodeComMessageContainer = orc_XmlParser.SelectNodeNext("com-message-container");
       }
       while (c_CurNodeComMessageContainer == "com-message-container");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-containers");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message-containers");
    }
    //Compare length
    if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
    {
       if (u32_ExpectedSize != orc_NodeComMessageContainers.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected comm message container count, expected: %i, got %i", u32_ExpectedSize,
                               orc_NodeComMessageContainers.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -382,20 +382,20 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainers(
    post-condition: the passed XML parser has the active node set to the same "com-message-containers"
 
    \param[in]      orc_NodeComMessageContainers    data storage
-   \param[in,out]  orc_XMLParser                   XML with list active
+   \param[in,out]  orc_XmlParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComMessageContainers(
-   const std::vector<C_OSCCanMessageContainer> & orc_NodeComMessageContainers, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComMessageContainers(
+   const std::vector<C_OscCanMessageContainer> & orc_NodeComMessageContainers, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeComMessageContainers.size());
-   for (uint32 u32_ItComMessageContainer = 0; u32_ItComMessageContainer < orc_NodeComMessageContainers.size();
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeComMessageContainers.size()));
+   for (uint32_t u32_ItComMessageContainer = 0; u32_ItComMessageContainer < orc_NodeComMessageContainers.size();
         ++u32_ItComMessageContainer)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("com-message-container");
-      h_SaveNodeComMessageContainer(orc_NodeComMessageContainers[u32_ItComMessageContainer], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("com-message-container");
+      h_SaveNodeComMessageContainer(orc_NodeComMessageContainers[u32_ItComMessageContainer], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-containers");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message-containers");
    }
 }
 
@@ -407,28 +407,28 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessageContainers(
    post-condition: the passed XML parser has the active node set to the same "com-message-container"
 
    \param[out]     orc_NodeComMessageContainer  data storage
-   \param[in,out]  orc_XMLParser                XML with list active
+   \param[in,out]  orc_XmlParser                XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainer(C_OSCCanMessageContainer & orc_NodeComMessageContainer,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComMessageContainer(C_OscCanMessageContainer & orc_NodeComMessageContainer,
+                                                        C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_NodeComMessageContainer.q_IsComProtocolUsedByInterface =
-      orc_XMLParser.GetAttributeBool("com-protocol-usage-flag");
+      orc_XmlParser.GetAttributeBool("com-protocol-usage-flag");
 
-   if (orc_XMLParser.SelectNodeChild("tx-messages") == "tx-messages")
+   if (orc_XmlParser.SelectNodeChild("tx-messages") == "tx-messages")
    {
-      s32_Retval = h_LoadNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XMLParser);
+      s32_Retval = h_LoadNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XmlParser);
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message-container");
       }
    }
    else
@@ -437,13 +437,13 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainer(C_OSCCanMessageContainer 
       s32_Retval = C_CONFIG;
    }
 
-   if ((orc_XMLParser.SelectNodeChild("rx-messages") == "rx-messages") && (s32_Retval == C_NO_ERR))
+   if ((orc_XmlParser.SelectNodeChild("rx-messages") == "rx-messages") && (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = h_LoadNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XMLParser);
+      s32_Retval = h_LoadNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XmlParser);
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message-container");
       }
    }
    else
@@ -462,24 +462,24 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessageContainer(C_OSCCanMessageContainer 
    post-condition: the passed XML parser has the active node set to the same "com-message-container"
 
    \param[in]      orc_NodeComMessageContainer  data storage
-   \param[in,out]  orc_XMLParser                XML with list active
+   \param[in,out]  orc_XmlParser                XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComMessageContainer(const C_OSCCanMessageContainer & orc_NodeComMessageContainer,
-                                                     C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComMessageContainer(const C_OscCanMessageContainer & orc_NodeComMessageContainer,
+                                                     C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeBool("com-protocol-usage-flag",
+   orc_XmlParser.SetAttributeBool("com-protocol-usage-flag",
                                   orc_NodeComMessageContainer.q_IsComProtocolUsedByInterface);
    //Tx messages
-   orc_XMLParser.CreateAndSelectNodeChild("tx-messages");
-   h_SaveNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XMLParser);
+   orc_XmlParser.CreateAndSelectNodeChild("tx-messages");
+   h_SaveNodeComMessages(orc_NodeComMessageContainer.c_TxMessages, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message-container");
    //Rx messages
-   orc_XMLParser.CreateAndSelectNodeChild("rx-messages");
-   h_SaveNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XMLParser);
+   orc_XmlParser.CreateAndSelectNodeChild("rx-messages");
+   h_SaveNodeComMessages(orc_NodeComMessageContainer.c_RxMessages, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message-container");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message-container");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -490,30 +490,30 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessageContainer(const C_OSCCanMessageContai
    post-condition: the passed XML parser has the active node set to the same unknown
 
    \param[out]     orc_NodeComMessages    data storage
-   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in,out]  orc_XmlParser          XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & orc_NodeComMessages,
-                                               C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComMessages(std::vector<C_OscCanMessage> & orc_NodeComMessages,
+                                                C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComMessage;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   C_SclString c_CurNodeComMessage;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_NodeComMessages.reserve(u32_ExpectedSize);
    }
 
-   c_CurNodeComMessage = orc_XMLParser.SelectNodeChild("com-message");
+   c_CurNodeComMessage = orc_XmlParser.SelectNodeChild("com-message");
 
    //Clear
    orc_NodeComMessages.clear();
@@ -521,29 +521,29 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & or
    {
       do
       {
-         C_OSCCanMessage c_CurComMessage;
+         C_OscCanMessage c_CurComMessage;
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadNodeComMessage(c_CurComMessage, orc_XMLParser);
+            s32_Retval = h_LoadNodeComMessage(c_CurComMessage, orc_XmlParser);
          }
 
          //Append
          orc_NodeComMessages.push_back(c_CurComMessage);
 
          //Next
-         c_CurNodeComMessage = orc_XMLParser.SelectNodeNext("com-message");
+         c_CurNodeComMessage = orc_XmlParser.SelectNodeNext("com-message");
       }
       while (c_CurNodeComMessage == "com-message");
       //Return
-      orc_XMLParser.SelectNodeParent();
+      orc_XmlParser.SelectNodeParent();
    }
    //Compare length
    if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
    {
       if (u32_ExpectedSize != orc_NodeComMessages.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected messages count, expected: %i, got %i", u32_ExpectedSize,
                               orc_NodeComMessages.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -560,19 +560,19 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessages(std::vector<C_OSCCanMessage> & or
    post-condition: the passed XML parser has the active node set to the same unknown
 
    \param[in]      orc_NodeComMessages    data storage
-   \param[in,out]  orc_XMLParser          XML with list active
+   \param[in,out]  orc_XmlParser          XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage> & orc_NodeComMessages,
-                                             C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComMessages(const std::vector<C_OscCanMessage> & orc_NodeComMessages,
+                                             C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeComMessages.size());
-   for (uint32 u32_ItComMessage = 0; u32_ItComMessage < orc_NodeComMessages.size(); ++u32_ItComMessage)
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeComMessages.size()));
+   for (uint32_t u32_ItComMessage = 0; u32_ItComMessage < orc_NodeComMessages.size(); ++u32_ItComMessage)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("com-message");
-      h_SaveNodeComMessage(orc_NodeComMessages[u32_ItComMessage], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("com-message");
+      h_SaveNodeComMessage(orc_NodeComMessages[u32_ItComMessage], orc_XmlParser);
       //Return
-      orc_XMLParser.SelectNodeParent();
+      orc_XmlParser.SelectNodeParent();
    }
 }
 
@@ -584,27 +584,27 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessages(const std::vector<C_OSCCanMessage> 
    post-condition: the passed XML parser has the active node set to the same "com-message"
 
    \param[out]     orc_NodeComMessage  data storage
-   \param[in,out]  orc_XMLParser       XML with list active
+   \param[in,out]  orc_XmlParser       XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMessage, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComMessage(C_OscCanMessage & orc_NodeComMessage, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   orc_NodeComMessage.u32_CanId = orc_XMLParser.GetAttributeUint32("can-id");
-   orc_NodeComMessage.q_IsExtended = orc_XMLParser.GetAttributeBool("is-extended");
-   orc_NodeComMessage.u16_Dlc = static_cast<uint16>(orc_XMLParser.GetAttributeUint32("dlc"));
-   orc_NodeComMessage.u32_CycleTimeMs = orc_XMLParser.GetAttributeUint32("cycle-time");
+   orc_NodeComMessage.u32_CanId = orc_XmlParser.GetAttributeUint32("can-id");
+   orc_NodeComMessage.q_IsExtended = orc_XmlParser.GetAttributeBool("is-extended");
+   orc_NodeComMessage.u16_Dlc = static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("dlc"));
+   orc_NodeComMessage.u32_CycleTimeMs = orc_XmlParser.GetAttributeUint32("cycle-time");
    orc_NodeComMessage.u16_DelayTimeMs =
-      static_cast<uint16>(orc_XMLParser.GetAttributeUint32("minimum-cycle-time"));
+      static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("minimum-cycle-time"));
 
-   if (orc_XMLParser.AttributeExists("receive-timeout") == true)
+   if (orc_XmlParser.AttributeExists("receive-timeout") == true)
    {
-      orc_NodeComMessage.u32_TimeoutMs = orc_XMLParser.GetAttributeUint32("receive-timeout");
+      orc_NodeComMessage.u32_TimeoutMs = orc_XmlParser.GetAttributeUint32("receive-timeout");
    }
    else
    {
@@ -612,43 +612,43 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMessa
       orc_NodeComMessage.u32_TimeoutMs = (3UL * orc_NodeComMessage.u32_CycleTimeMs) + 10UL;
    }
 
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_NodeComMessage.c_Name = orc_XMLParser.GetNodeContent();
+      orc_NodeComMessage.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message");
    }
    else
    {
       osc_write_log_error("Loading node definition", "Could not find \"com-message\".\"name\" node.");
       s32_Retval = C_CONFIG;
    }
-   if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+   if (orc_XmlParser.SelectNodeChild("comment") == "comment")
    {
-      orc_NodeComMessage.c_Comment = orc_XMLParser.GetNodeContent();
+      orc_NodeComMessage.c_Comment = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message");
    }
-   if ((orc_XMLParser.SelectNodeChild("tx-method") == "tx-method") &&
+   if ((orc_XmlParser.SelectNodeChild("tx-method") == "tx-method") &&
        (s32_Retval == C_NO_ERR))
    {
-      mh_StringToNodeComMessageTxMethod(orc_XMLParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
+      mh_StringToNodeComMessageTxMethod(orc_XmlParser.GetNodeContent(), orc_NodeComMessage.e_TxMethod);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message");
    }
    else
    {
       osc_write_log_error("Loading node definition", "Could not find \"com-message\".\"tx-method\" node.");
       s32_Retval = C_CONFIG;
    }
-   if ((orc_XMLParser.SelectNodeChild("com-signals") == "com-signals") &&
+   if ((orc_XmlParser.SelectNodeChild("com-signals") == "com-signals") &&
        (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = h_LoadNodeComSignals(orc_NodeComMessage.c_Signals, orc_XMLParser);
+      s32_Retval = h_LoadNodeComSignals(orc_NodeComMessage.c_Signals, orc_XmlParser);
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message");
       }
    }
    else
@@ -667,25 +667,25 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComMessage(C_OSCCanMessage & orc_NodeComMessa
    post-condition: the passed XML parser has the active node set to the same "com-message"
 
    \param[in]      orc_NodeComMessage  data storage
-   \param[in,out]  orc_XMLParser       XML with list active
+   \param[in,out]  orc_XmlParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeComMessage,
-                                            C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComMessage(const C_OscCanMessage & orc_NodeComMessage,
+                                            C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("can-id", orc_NodeComMessage.u32_CanId);
-   orc_XMLParser.SetAttributeBool("is-extended", orc_NodeComMessage.q_IsExtended);
-   orc_XMLParser.SetAttributeUint32("dlc", orc_NodeComMessage.u16_Dlc);
-   orc_XMLParser.SetAttributeUint32("cycle-time", orc_NodeComMessage.u32_CycleTimeMs);
-   orc_XMLParser.SetAttributeUint32("minimum-cycle-time", orc_NodeComMessage.u16_DelayTimeMs);
-   orc_XMLParser.SetAttributeUint32("receive-timeout", orc_NodeComMessage.u32_TimeoutMs);
-   orc_XMLParser.CreateNodeChild("name", orc_NodeComMessage.c_Name);
-   orc_XMLParser.CreateNodeChild("comment", orc_NodeComMessage.c_Comment);
-   orc_XMLParser.CreateNodeChild("tx-method", mh_NodeComMessageTxMethodToString(orc_NodeComMessage.e_TxMethod));
-   orc_XMLParser.CreateAndSelectNodeChild("com-signals");
-   h_SaveNodeComSignals(orc_NodeComMessage.c_Signals, orc_XMLParser);
+   orc_XmlParser.SetAttributeUint32("can-id", orc_NodeComMessage.u32_CanId);
+   orc_XmlParser.SetAttributeBool("is-extended", orc_NodeComMessage.q_IsExtended);
+   orc_XmlParser.SetAttributeUint32("dlc", orc_NodeComMessage.u16_Dlc);
+   orc_XmlParser.SetAttributeUint32("cycle-time", orc_NodeComMessage.u32_CycleTimeMs);
+   orc_XmlParser.SetAttributeUint32("minimum-cycle-time", orc_NodeComMessage.u16_DelayTimeMs);
+   orc_XmlParser.SetAttributeUint32("receive-timeout", orc_NodeComMessage.u32_TimeoutMs);
+   orc_XmlParser.CreateNodeChild("name", orc_NodeComMessage.c_Name);
+   orc_XmlParser.CreateNodeChild("comment", orc_NodeComMessage.c_Comment);
+   orc_XmlParser.CreateNodeChild("tx-method", mh_NodeComMessageTxMethodToString(orc_NodeComMessage.e_TxMethod));
+   orc_XmlParser.CreateAndSelectNodeChild("com-signals");
+   h_SaveNodeComSignals(orc_NodeComMessage.c_Signals, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "com-message");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "com-message");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -696,30 +696,30 @@ void C_OSCNodeFilerV2::h_SaveNodeComMessage(const C_OSCCanMessage & orc_NodeComM
    post-condition: the passed XML parser has the active node set to the same "com-signals"
 
    \param[out]     orc_NodeComSignals  data storage
-   \param[in,out]  orc_XMLParser       XML with list active
+   \param[in,out]  orc_XmlParser       XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_NodeComSignals,
-                                              C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComSignals(std::vector<C_OscCanSignal> & orc_NodeComSignals,
+                                               C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   C_SCLString c_CurNodeComSignal;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   C_SclString c_CurNodeComSignal;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_NodeComSignals.reserve(u32_ExpectedSize);
    }
 
-   c_CurNodeComSignal = orc_XMLParser.SelectNodeChild("com-signal");
+   c_CurNodeComSignal = orc_XmlParser.SelectNodeChild("com-signal");
 
    //Clear
    orc_NodeComSignals.clear();
@@ -727,29 +727,29 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_
    {
       do
       {
-         C_OSCCanSignal c_CurComSignal;
+         C_OscCanSignal c_CurComSignal;
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadNodeComSignal(c_CurComSignal, orc_XMLParser);
+            s32_Retval = h_LoadNodeComSignal(c_CurComSignal, orc_XmlParser);
          }
 
          //Append
          orc_NodeComSignals.push_back(c_CurComSignal);
 
          //Next
-         c_CurNodeComSignal = orc_XMLParser.SelectNodeNext("com-signal");
+         c_CurNodeComSignal = orc_XmlParser.SelectNodeNext("com-signal");
       }
       while (c_CurNodeComSignal == "com-signal");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signals");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-signals");
    }
    //Compare length
    if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
    {
       if (u32_ExpectedSize != orc_NodeComSignals.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected comm signal count, expected: %i, got %i", u32_ExpectedSize,
                               orc_NodeComSignals.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -766,19 +766,19 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComSignals(std::vector<C_OSCCanSignal> & orc_
    post-condition: the passed XML parser has the active node set to the same "com-signals"
 
    \param[in]      orc_NodeComSignals  data storage
-   \param[in,out]  orc_XMLParser       XML with list active
+   \param[in,out]  orc_XmlParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> & orc_NodeComSignals,
-                                            C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComSignals(const std::vector<C_OscCanSignal> & orc_NodeComSignals,
+                                            C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeComSignals.size());
-   for (uint32 u32_ItComSignal = 0; u32_ItComSignal < orc_NodeComSignals.size(); ++u32_ItComSignal)
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeComSignals.size()));
+   for (uint32_t u32_ItComSignal = 0; u32_ItComSignal < orc_NodeComSignals.size(); ++u32_ItComSignal)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("com-signal");
-      h_SaveNodeComSignal(orc_NodeComSignals[u32_ItComSignal], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("com-signal");
+      h_SaveNodeComSignal(orc_NodeComSignals[u32_ItComSignal], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signals");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-signals");
    }
 }
 
@@ -790,26 +790,26 @@ void C_OSCNodeFilerV2::h_SaveNodeComSignals(const std::vector<C_OSCCanSignal> & 
    post-condition: the passed XML parser has the active node set to the same "com-signal"
 
    \param[out]     orc_NodeComSignal   data storage
-   \param[in,out]  orc_XMLParser       XML with list active
+   \param[in,out]  orc_XmlParser       XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_LoadNodeComSignal(C_OSCCanSignal & orc_NodeComSignal, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::h_LoadNodeComSignal(C_OscCanSignal & orc_NodeComSignal, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   orc_NodeComSignal.u32_ComDataElementIndex = orc_XMLParser.GetAttributeUint32("data-element-index");
-   orc_NodeComSignal.u16_ComBitStart = static_cast<uint16>(orc_XMLParser.GetAttributeUint32("bit-start"));
-   orc_NodeComSignal.u16_ComBitLength = static_cast<uint16>(orc_XMLParser.GetAttributeUint32("bit-length"));
+   orc_NodeComSignal.u32_ComDataElementIndex = orc_XmlParser.GetAttributeUint32("data-element-index");
+   orc_NodeComSignal.u16_ComBitStart = static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("bit-start"));
+   orc_NodeComSignal.u16_ComBitLength = static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("bit-length"));
 
-   if (orc_XMLParser.SelectNodeChild("byte-order") == "byte-order")
+   if (orc_XmlParser.SelectNodeChild("byte-order") == "byte-order")
    {
-      s32_Retval = mh_StringToCommunicationByteOrder(orc_XMLParser.GetNodeContent(), orc_NodeComSignal.e_ComByteOrder);
+      s32_Retval = mh_StringToCommunicationByteOrder(orc_XmlParser.GetNodeContent(), orc_NodeComSignal.e_ComByteOrder);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "com-signal");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "com-signal");
    }
    else
    {
@@ -828,15 +828,15 @@ sint32 C_OSCNodeFilerV2::h_LoadNodeComSignal(C_OSCCanSignal & orc_NodeComSignal,
    post-condition: the passed XML parser has the active node set to the same "com-signal"
 
    \param[in]      orc_NodeComSignal   data storage
-   \param[in,out]  orc_XMLParser       XML with list active
+   \param[in,out]  orc_XmlParser       XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComSignal, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::h_SaveNodeComSignal(const C_OscCanSignal & orc_NodeComSignal, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("data-element-index", orc_NodeComSignal.u32_ComDataElementIndex);
-   orc_XMLParser.SetAttributeUint32("bit-start", orc_NodeComSignal.u16_ComBitStart);
-   orc_XMLParser.SetAttributeUint32("bit-length", orc_NodeComSignal.u16_ComBitLength);
-   orc_XMLParser.CreateNodeChild("byte-order", mh_CommunicationByteOrderToString(orc_NodeComSignal.e_ComByteOrder));
+   orc_XmlParser.SetAttributeUint32("data-element-index", orc_NodeComSignal.u32_ComDataElementIndex);
+   orc_XmlParser.SetAttributeUint32("bit-start", orc_NodeComSignal.u16_ComBitStart);
+   orc_XmlParser.SetAttributeUint32("bit-length", orc_NodeComSignal.u16_ComBitLength);
+   orc_XmlParser.CreateNodeChild("byte-order", mh_CommunicationByteOrderToString(orc_NodeComSignal.e_ComByteOrder));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -848,22 +848,22 @@ void C_OSCNodeFilerV2::h_SaveNodeComSignal(const C_OSCCanSignal & orc_NodeComSig
    Stringified communication protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeFilerV2::h_CommunicationProtocolToString(const C_OSCCanProtocol::E_Type & ore_CommunicationProtocol)
+C_SclString C_OscNodeFilerV2::h_CommunicationProtocolToString(const C_OscCanProtocol::E_Type & ore_CommunicationProtocol)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_CommunicationProtocol)
    {
-   case C_OSCCanProtocol::eLAYER2:
+   case C_OscCanProtocol::eLAYER2:
       c_Retval = "layer 2";
       break;
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eECES:
       c_Retval = "eces";
       break;
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
       c_Retval = "can open safety";
       break;
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eCAN_OPEN:
    default:
       c_Retval = "invalid";
       break;
@@ -882,22 +882,22 @@ C_SCLString C_OSCNodeFilerV2::h_CommunicationProtocolToString(const C_OSCCanProt
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::h_StringToCommunicationProtocol(const C_SCLString & orc_String,
-                                                         C_OSCCanProtocol::E_Type & ore_Type)
+int32_t C_OscNodeFilerV2::h_StringToCommunicationProtocol(const C_SclString & orc_String,
+                                                          C_OscCanProtocol::E_Type & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "can open safety")
    {
-      ore_Type = C_OSCCanProtocol::eCAN_OPEN_SAFETY;
+      ore_Type = C_OscCanProtocol::eCAN_OPEN_SAFETY;
    }
    else if (orc_String == "eces")
    {
-      ore_Type = C_OSCCanProtocol::eECES;
+      ore_Type = C_OscCanProtocol::eECES;
    }
    else if (orc_String == "layer 2")
    {
-      ore_Type = C_OSCCanProtocol::eLAYER2;
+      ore_Type = C_OscCanProtocol::eLAYER2;
    }
    else
    {
@@ -916,25 +916,26 @@ sint32 C_OSCNodeFilerV2::h_StringToCommunicationProtocol(const C_SCLString & orc
    post-condition: the passed XML parser has the active node set to the same "core"
 
    \param[out]     orc_NodeProperties  data storage
-   \param[in,out]  orc_XMLParser       XML with core active
+   \param[in,out]  orc_XmlParser       XML with core active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodeProperties, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::mh_LoadProperties(C_OscNodeProperties & orc_NodeProperties,
+                                            C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("properties") == "properties")
+   if (orc_XmlParser.SelectNodeChild("properties") == "properties")
    {
       //Name
-      if (orc_XMLParser.SelectNodeChild("name") == "name")
+      if (orc_XmlParser.SelectNodeChild("name") == "name")
       {
-         orc_NodeProperties.c_Name = orc_XMLParser.GetNodeContent();
+         orc_NodeProperties.c_Name = orc_XmlParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
       else
       {
@@ -942,19 +943,19 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
          s32_Retval = C_CONFIG;
       }
       //Comment
-      if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+      if (orc_XmlParser.SelectNodeChild("comment") == "comment")
       {
-         orc_NodeProperties.c_Comment = orc_XMLParser.GetNodeContent();
+         orc_NodeProperties.c_Comment = orc_XmlParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
       //Diagnostic server
-      if ((orc_XMLParser.SelectNodeChild("diagnostic-server") == "diagnostic-server") && (s32_Retval == C_NO_ERR))
+      if ((orc_XmlParser.SelectNodeChild("diagnostic-server") == "diagnostic-server") && (s32_Retval == C_NO_ERR))
       {
          s32_Retval =
-            mh_StringToDiagnosticServer(orc_XMLParser.GetNodeContent(), orc_NodeProperties.e_DiagnosticServer);
+            mh_StringToDiagnosticServer(orc_XmlParser.GetNodeContent(), orc_NodeProperties.e_DiagnosticServer);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
       else
       {
@@ -962,11 +963,11 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
          s32_Retval = C_CONFIG;
       }
       //Flash loader
-      if ((orc_XMLParser.SelectNodeChild("flash-loader") == "flash-loader") && (s32_Retval == C_NO_ERR))
+      if ((orc_XmlParser.SelectNodeChild("flash-loader") == "flash-loader") && (s32_Retval == C_NO_ERR))
       {
-         s32_Retval = mh_StringToFlashLoader(orc_XMLParser.GetNodeContent(), orc_NodeProperties.e_FlashLoader);
+         s32_Retval = mh_StringToFlashLoader(orc_XmlParser.GetNodeContent(), orc_NodeProperties.e_FlashLoader);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
       else
       {
@@ -974,29 +975,29 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
          s32_Retval = C_CONFIG;
       }
       //Communication interfaces
-      if ((orc_XMLParser.SelectNodeChild("communication-interfaces") == "communication-interfaces") &&
+      if ((orc_XmlParser.SelectNodeChild("communication-interfaces") == "communication-interfaces") &&
           (s32_Retval == C_NO_ERR))
       {
-         C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("communication-interface");
+         C_SclString c_CurNode = orc_XmlParser.SelectNodeChild("communication-interface");
          if (c_CurNode == "communication-interface")
          {
             do
             {
-               C_OSCNodeComInterfaceSettings c_ComInterface;
+               C_OscNodeComInterfaceSettings c_ComInterface;
 
                c_ComInterface.u8_InterfaceNumber =
-                  static_cast<uint8>(orc_XMLParser.GetAttributeUint32("interface-number"));
-               c_ComInterface.u8_NodeID = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("node-id"));
-               c_ComInterface.q_IsUpdateEnabled = orc_XMLParser.GetAttributeBool("update-available");
-               c_ComInterface.q_IsRoutingEnabled = orc_XMLParser.GetAttributeBool("routing-available");
-               c_ComInterface.q_IsDiagnosisEnabled = orc_XMLParser.GetAttributeBool("diagnosis-available");
+                  static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("interface-number"));
+               c_ComInterface.u8_NodeId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("node-id"));
+               c_ComInterface.q_IsUpdateEnabled = orc_XmlParser.GetAttributeBool("update-available");
+               c_ComInterface.q_IsRoutingEnabled = orc_XmlParser.GetAttributeBool("routing-available");
+               c_ComInterface.q_IsDiagnosisEnabled = orc_XmlParser.GetAttributeBool("diagnosis-available");
                //Type
-               if ((orc_XMLParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
+               if ((orc_XmlParser.SelectNodeChild("type") == "type") && (s32_Retval == C_NO_ERR))
                {
-                  s32_Retval = C_OSCSystemFilerUtil::h_BusTypeStringToEnum(
-                     orc_XMLParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
+                  s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(
+                     orc_XmlParser.GetNodeContent(), c_ComInterface.e_InterfaceType);
                   //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+                  tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
                }
                else
                {
@@ -1006,14 +1007,18 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                }
 
                //IP address
-               if ((orc_XMLParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
+               if ((orc_XmlParser.SelectNodeChild("ip-address") == "ip-address") && (s32_Retval == C_NO_ERR))
                {
-                  c_ComInterface.c_Ip.au8_IpAddress[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
-                  c_ComInterface.c_Ip.au8_IpAddress[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
-                  c_ComInterface.c_Ip.au8_IpAddress[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
-                  c_ComInterface.c_Ip.au8_IpAddress[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
+                  c_ComInterface.c_Ip.au8_IpAddress[0] =
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte1"));
+                  c_ComInterface.c_Ip.au8_IpAddress[1] =
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte2"));
+                  c_ComInterface.c_Ip.au8_IpAddress[2] =
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte3"));
+                  c_ComInterface.c_Ip.au8_IpAddress[3] =
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte4"));
                   //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+                  tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
                }
                else
                {
@@ -1024,14 +1029,14 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                }
 
                //net mask
-               if ((orc_XMLParser.SelectNodeChild("net-mask") == "net-mask") && (s32_Retval == C_NO_ERR))
+               if ((orc_XmlParser.SelectNodeChild("net-mask") == "net-mask") && (s32_Retval == C_NO_ERR))
                {
-                  c_ComInterface.c_Ip.au8_NetMask[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
-                  c_ComInterface.c_Ip.au8_NetMask[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
-                  c_ComInterface.c_Ip.au8_NetMask[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
-                  c_ComInterface.c_Ip.au8_NetMask[3] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
+                  c_ComInterface.c_Ip.au8_NetMask[0] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte1"));
+                  c_ComInterface.c_Ip.au8_NetMask[1] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte2"));
+                  c_ComInterface.c_Ip.au8_NetMask[2] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte3"));
+                  c_ComInterface.c_Ip.au8_NetMask[3] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte4"));
                   //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+                  tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
                }
                else
                {
@@ -1042,18 +1047,18 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                }
 
                //default gateway
-               if ((orc_XMLParser.SelectNodeChild("default-gateway") == "default-gateway") && (s32_Retval == C_NO_ERR))
+               if ((orc_XmlParser.SelectNodeChild("default-gateway") == "default-gateway") && (s32_Retval == C_NO_ERR))
                {
                   c_ComInterface.c_Ip.au8_DefaultGateway[0] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte1"));
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte1"));
                   c_ComInterface.c_Ip.au8_DefaultGateway[1] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte2"));
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte2"));
                   c_ComInterface.c_Ip.au8_DefaultGateway[2] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte3"));
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte3"));
                   c_ComInterface.c_Ip.au8_DefaultGateway[3] =
-                     static_cast<uint8>(orc_XMLParser.GetAttributeUint32("byte4"));
+                     static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("byte4"));
                   //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+                  tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
                }
                else
                {
@@ -1063,12 +1068,12 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                   c_ComInterface.c_Ip.au8_DefaultGateway[3] = 0U;
                }
                //Bus
-               if (orc_XMLParser.SelectNodeChild("bus") == "bus")
+               if (orc_XmlParser.SelectNodeChild("bus") == "bus")
                {
-                  c_ComInterface.SetBusConnected(orc_XMLParser.GetAttributeBool("connected"));
-                  c_ComInterface.u32_BusIndex = orc_XMLParser.GetAttributeUint32("bus-index");
+                  c_ComInterface.SetBusConnected(orc_XmlParser.GetAttributeBool("connected"));
+                  c_ComInterface.u32_BusIndex = orc_XmlParser.GetAttributeUint32("bus-index");
                   //Return
-                  tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+                  tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
                }
                else
                {
@@ -1077,78 +1082,78 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
                   s32_Retval = C_CONFIG;
                }
                orc_NodeProperties.c_ComInterfaces.push_back(c_ComInterface);
-               c_CurNode = orc_XMLParser.SelectNodeNext("communication-interface");
+               c_CurNode = orc_XmlParser.SelectNodeNext("communication-interface");
             }
             while (c_CurNode == "communication-interface");
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interfaces");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interfaces");
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
       //openSYDE server settings
-      if (orc_XMLParser.SelectNodeChild("open-syde-server-settings") == "open-syde-server-settings")
+      if (orc_XmlParser.SelectNodeChild("open-syde-server-settings") == "open-syde-server-settings")
       {
-         if (orc_XMLParser.AttributeExists("max-clients") == true)
+         if (orc_XmlParser.AttributeExists("max-clients") == true)
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxClients =
-               static_cast<uint8>(orc_XMLParser.GetAttributeUint32("max-clients"));
+            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxClients =
+               static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("max-clients"));
          }
          else
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxClients = 1;
+            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxClients = 1;
          }
-         if (orc_XMLParser.AttributeExists("max-parallel-transmissions") == true)
+         if (orc_XmlParser.AttributeExists("max-parallel-transmissions") == true)
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions =
-               static_cast<uint8>(orc_XMLParser.GetAttributeUint32("max-parallel-transmissions"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions = 64;
-         }
-         if (orc_XMLParser.AttributeExists("application-index") == true)
-         {
-            orc_NodeProperties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex =
-               static_cast<sint16>(orc_XMLParser.GetAttributeSint32("application-index"));
+            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions =
+               static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("max-parallel-transmissions"));
          }
          else
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex = -1;
+            orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions = 64;
          }
-         if (orc_XMLParser.AttributeExists("max-tx-message-buffer") == true)
+         if (orc_XmlParser.AttributeExists("application-index") == true)
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx =
-               static_cast<uint16>(orc_XMLParser.GetAttributeUint32("max-tx-message-buffer"));
-         }
-         else
-         {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx = 585U;
-         }
-         if (orc_XMLParser.AttributeExists("max-rx-routing-message-buffer") == true)
-         {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u16_MaxRoutingMessageBufferRx =
-               static_cast<uint16>(orc_XMLParser.GetAttributeUint32("max-rx-routing-message-buffer"));
+            orc_NodeProperties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex =
+               static_cast<int16_t>(orc_XmlParser.GetAttributeSint32("application-index"));
          }
          else
          {
-            orc_NodeProperties.c_OpenSYDEServerSettings.u16_MaxRoutingMessageBufferRx = 585U;
+            orc_NodeProperties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex = -1;
+         }
+         if (orc_XmlParser.AttributeExists("max-tx-message-buffer") == true)
+         {
+            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx =
+               static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-tx-message-buffer"));
+         }
+         else
+         {
+            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx = 585U;
+         }
+         if (orc_XmlParser.AttributeExists("max-rx-routing-message-buffer") == true)
+         {
+            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx =
+               static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("max-rx-routing-message-buffer"));
+         }
+         else
+         {
+            orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx = 585U;
          }
 
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
       }
       else
       {
-         orc_NodeProperties.c_OpenSYDEServerSettings.Initialize();
+         orc_NodeProperties.c_OpenSydeServerSettings.Initialize();
       }
 
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = mh_LoadStwFlashloaderOptions(orc_NodeProperties.c_STWFlashloaderSettings, orc_XMLParser);
+         s32_Retval = mh_LoadStwFlashloaderOptions(orc_NodeProperties.c_StwFlashloaderSettings, orc_XmlParser);
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
    }
    else
    {
@@ -1167,90 +1172,91 @@ sint32 C_OSCNodeFilerV2::mh_LoadProperties(C_OSCNodeProperties & orc_NodePropert
    post-condition: the passed XML parser has the active node set to the same "core"
 
    \param[in]      orc_NodeProperties  data storage
-   \param[in,out]  orc_XMLParser       XML with core active
+   \param[in,out]  orc_XmlParser       XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::mh_SaveProperties(const C_OSCNodeProperties & orc_NodeProperties,
-                                         C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::mh_SaveProperties(const C_OscNodeProperties & orc_NodeProperties,
+                                         C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild("properties");
-   orc_XMLParser.CreateNodeChild("name", orc_NodeProperties.c_Name);
-   orc_XMLParser.CreateNodeChild("comment", orc_NodeProperties.c_Comment);
-   orc_XMLParser.CreateNodeChild("diagnostic-server",
+   orc_XmlParser.CreateAndSelectNodeChild("properties");
+   orc_XmlParser.CreateNodeChild("name", orc_NodeProperties.c_Name);
+   orc_XmlParser.CreateNodeChild("comment", orc_NodeProperties.c_Comment);
+   orc_XmlParser.CreateNodeChild("diagnostic-server",
                                  mh_DiagnosticServerToString(orc_NodeProperties.e_DiagnosticServer));
-   orc_XMLParser.CreateNodeChild("flash-loader", mh_FlashLoaderToString(orc_NodeProperties.e_FlashLoader));
+   orc_XmlParser.CreateNodeChild("flash-loader", mh_FlashLoaderToString(orc_NodeProperties.e_FlashLoader));
    //Com interfaces
-   orc_XMLParser.CreateAndSelectNodeChild("communication-interfaces");
-   for (uint32 u32_ItComInterface = 0; u32_ItComInterface < orc_NodeProperties.c_ComInterfaces.size();
+   orc_XmlParser.CreateAndSelectNodeChild("communication-interfaces");
+   for (uint32_t u32_ItComInterface = 0; u32_ItComInterface < orc_NodeProperties.c_ComInterfaces.size();
         ++u32_ItComInterface)
    {
-      const C_OSCNodeComInterfaceSettings & rc_CurComInterface = orc_NodeProperties.c_ComInterfaces[u32_ItComInterface];
+      const C_OscNodeComInterfaceSettings & rc_CurComInterface = orc_NodeProperties.c_ComInterfaces[u32_ItComInterface];
 
-      orc_XMLParser.CreateAndSelectNodeChild("communication-interface");
-      orc_XMLParser.SetAttributeUint32("interface-number", static_cast<uint32>(rc_CurComInterface.u8_InterfaceNumber));
-      orc_XMLParser.SetAttributeUint32("node-id", static_cast<uint32>(rc_CurComInterface.u8_NodeID));
-      orc_XMLParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
-      orc_XMLParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
-      orc_XMLParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
-      orc_XMLParser.CreateNodeChild("type",
-                                    C_OSCSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
-      if (rc_CurComInterface.e_InterfaceType == C_OSCSystemBus::eETHERNET)
+      orc_XmlParser.CreateAndSelectNodeChild("communication-interface");
+      orc_XmlParser.SetAttributeUint32("interface-number",
+                                       static_cast<uint32_t>(rc_CurComInterface.u8_InterfaceNumber));
+      orc_XmlParser.SetAttributeUint32("node-id", static_cast<uint32_t>(rc_CurComInterface.u8_NodeId));
+      orc_XmlParser.SetAttributeBool("update-available", rc_CurComInterface.q_IsUpdateEnabled);
+      orc_XmlParser.SetAttributeBool("routing-available", rc_CurComInterface.q_IsRoutingEnabled);
+      orc_XmlParser.SetAttributeBool("diagnosis-available", rc_CurComInterface.q_IsDiagnosisEnabled);
+      orc_XmlParser.CreateNodeChild("type",
+                                    C_OscSystemFilerUtil::h_BusTypeEnumToString(rc_CurComInterface.e_InterfaceType));
+      if (rc_CurComInterface.e_InterfaceType == C_OscSystemBus::eETHERNET)
       {
-         orc_XMLParser.CreateAndSelectNodeChild("ip-address");
-         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_IpAddress[0]);
-         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_IpAddress[1]);
-         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_IpAddress[2]);
-         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_IpAddress[3]);
+         orc_XmlParser.CreateAndSelectNodeChild("ip-address");
+         orc_XmlParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_IpAddress[0]);
+         orc_XmlParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_IpAddress[1]);
+         orc_XmlParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_IpAddress[2]);
+         orc_XmlParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_IpAddress[3]);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-         orc_XMLParser.CreateAndSelectNodeChild("net-mask");
-         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_NetMask[0]);
-         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_NetMask[1]);
-         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_NetMask[2]);
-         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_NetMask[3]);
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
+         orc_XmlParser.CreateAndSelectNodeChild("net-mask");
+         orc_XmlParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_NetMask[0]);
+         orc_XmlParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_NetMask[1]);
+         orc_XmlParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_NetMask[2]);
+         orc_XmlParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_NetMask[3]);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-         orc_XMLParser.CreateAndSelectNodeChild("default-gateway");
-         orc_XMLParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_DefaultGateway[0]);
-         orc_XMLParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_DefaultGateway[1]);
-         orc_XMLParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_DefaultGateway[2]);
-         orc_XMLParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_DefaultGateway[3]);
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
+         orc_XmlParser.CreateAndSelectNodeChild("default-gateway");
+         orc_XmlParser.SetAttributeUint32("byte1", rc_CurComInterface.c_Ip.au8_DefaultGateway[0]);
+         orc_XmlParser.SetAttributeUint32("byte2", rc_CurComInterface.c_Ip.au8_DefaultGateway[1]);
+         orc_XmlParser.SetAttributeUint32("byte3", rc_CurComInterface.c_Ip.au8_DefaultGateway[2]);
+         orc_XmlParser.SetAttributeUint32("byte4", rc_CurComInterface.c_Ip.au8_DefaultGateway[3]);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
       }
       //Create this section for compatibility reasons (had content and was required by previous openSYDE versions)
-      orc_XMLParser.CreateAndSelectNodeChild("communication-protocol");
+      orc_XmlParser.CreateAndSelectNodeChild("communication-protocol");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
-      orc_XMLParser.CreateAndSelectNodeChild("bus");
-      orc_XMLParser.SetAttributeBool("connected", rc_CurComInterface.GetBusConnectedRawValue());
-      orc_XMLParser.SetAttributeUint32("bus-index", rc_CurComInterface.u32_BusIndex);
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
+      orc_XmlParser.CreateAndSelectNodeChild("bus");
+      orc_XmlParser.SetAttributeBool("connected", rc_CurComInterface.GetBusConnectedRawValue());
+      orc_XmlParser.SetAttributeUint32("bus-index", rc_CurComInterface.u32_BusIndex);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interface");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interface");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "communication-interfaces");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "communication-interfaces");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
 
    //openSYDE server settings
-   orc_XMLParser.CreateAndSelectNodeChild("open-syde-server-settings");
-   orc_XMLParser.SetAttributeUint32("max-clients", orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxClients);
-   orc_XMLParser.SetAttributeUint32("max-parallel-transmissions",
-                                    orc_NodeProperties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions);
-   orc_XMLParser.SetAttributeSint32("application-index",
-                                    orc_NodeProperties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex);
-   orc_XMLParser.SetAttributeUint32("max-tx-message-buffer",
-                                    orc_NodeProperties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx);
-   orc_XMLParser.SetAttributeUint32("max-rx-routing-message-buffer",
-                                    orc_NodeProperties.c_OpenSYDEServerSettings.u16_MaxRoutingMessageBufferRx);
+   orc_XmlParser.CreateAndSelectNodeChild("open-syde-server-settings");
+   orc_XmlParser.SetAttributeUint32("max-clients", orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxClients);
+   orc_XmlParser.SetAttributeUint32("max-parallel-transmissions",
+                                    orc_NodeProperties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions);
+   orc_XmlParser.SetAttributeSint32("application-index",
+                                    orc_NodeProperties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex);
+   orc_XmlParser.SetAttributeUint32("max-tx-message-buffer",
+                                    orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx);
+   orc_XmlParser.SetAttributeUint32("max-rx-routing-message-buffer",
+                                    orc_NodeProperties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
 
-   mh_SaveStwFlashloaderOptions(orc_NodeProperties.c_STWFlashloaderSettings, orc_XMLParser);
+   mh_SaveStwFlashloaderOptions(orc_NodeProperties.c_StwFlashloaderSettings, orc_XmlParser);
 
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1261,25 +1267,25 @@ void C_OSCNodeFilerV2::mh_SaveProperties(const C_OSCNodeProperties & orc_NodePro
    post-condition: the passed XML parser has the active node set to the same "properties"
 
    \param[out]     orc_StwFlashloaderSettings   data storage
-   \param[in,out]  orc_XMLParser                XML with core active
+   \param[in,out]  orc_XmlParser                XML with core active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
-                                                      C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OscNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
+                                                       C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("stw-flashloader-settings") == "stw-flashloader-settings")
+   if (orc_XmlParser.SelectNodeChild("stw-flashloader-settings") == "stw-flashloader-settings")
    {
-      if (orc_XMLParser.SelectNodeChild("reset-message") == "reset-message")
+      if (orc_XmlParser.SelectNodeChild("reset-message") == "reset-message")
       {
-         if (orc_XMLParser.AttributeExists("active") == true)
+         if (orc_XmlParser.AttributeExists("active") == true)
          {
-            orc_StwFlashloaderSettings.q_ResetMessageActive = orc_XMLParser.GetAttributeBool("active");
+            orc_StwFlashloaderSettings.q_ResetMessageActive = orc_XmlParser.GetAttributeBool("active");
          }
          else
          {
@@ -1287,41 +1293,42 @@ sint32 C_OSCNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSet
                                 "Could not find \"active\" attribute in \"reset-message\" node.");
             s32_Retval = C_CONFIG;
          }
-         if (orc_XMLParser.AttributeExists("extended") == true)
+         if (orc_XmlParser.AttributeExists("extended") == true)
          {
-            orc_StwFlashloaderSettings.q_ResetMessageExtendedId = orc_XMLParser.GetAttributeBool("extended");
+            orc_StwFlashloaderSettings.q_ResetMessageExtendedId = orc_XmlParser.GetAttributeBool("extended");
          }
          else
          {
             orc_StwFlashloaderSettings.q_ResetMessageExtendedId = false;
          }
-         if (orc_XMLParser.AttributeExists("id") == true)
+         if (orc_XmlParser.AttributeExists("id") == true)
          {
-            orc_StwFlashloaderSettings.u32_ResetMessageId = orc_XMLParser.GetAttributeUint32("id");
+            orc_StwFlashloaderSettings.u32_ResetMessageId = orc_XmlParser.GetAttributeUint32("id");
          }
          else
          {
             orc_StwFlashloaderSettings.u32_ResetMessageId = 0;
          }
-         if (orc_XMLParser.AttributeExists("dlc") == true)
+         if (orc_XmlParser.AttributeExists("dlc") == true)
          {
-            orc_StwFlashloaderSettings.u8_ResetMessageDlc = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("dlc"));
+            orc_StwFlashloaderSettings.u8_ResetMessageDlc =
+               static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("dlc"));
          }
          else
          {
             orc_StwFlashloaderSettings.u8_ResetMessageDlc = 8;
          }
          orc_StwFlashloaderSettings.c_Data.clear();
-         if (orc_XMLParser.SelectNodeChild("data-bytes") == "data-bytes")
+         if (orc_XmlParser.SelectNodeChild("data-bytes") == "data-bytes")
          {
-            C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("data-byte");
+            C_SclString c_CurNode = orc_XmlParser.SelectNodeChild("data-byte");
             if (c_CurNode == "data-byte")
             {
                do
                {
-                  if (orc_XMLParser.AttributeExists("value") == true)
+                  if (orc_XmlParser.AttributeExists("value") == true)
                   {
-                     const uint8 u8_DataByte = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("value"));
+                     const uint8_t u8_DataByte = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("value"));
                      orc_StwFlashloaderSettings.c_Data.push_back(u8_DataByte);
                   }
                   else
@@ -1330,17 +1337,17 @@ sint32 C_OSCNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSet
                                          "Could not find \"value\" attribute in \"data-byte\" node.");
                      s32_Retval = C_CONFIG;
                   }
-                  c_CurNode = orc_XMLParser.SelectNodeNext("data-byte");
+                  c_CurNode = orc_XmlParser.SelectNodeNext("data-byte");
                }
                while ((c_CurNode == "data-byte") && (s32_Retval == C_NO_ERR));
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "data-bytes");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "data-bytes");
             }
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "reset-message");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "reset-message");
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "stw-flashloader-settings");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "stw-flashloader-settings");
       }
       else
       {
@@ -1348,7 +1355,7 @@ sint32 C_OSCNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSet
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
    }
    else
    {
@@ -1366,32 +1373,33 @@ sint32 C_OSCNodeFilerV2::mh_LoadStwFlashloaderOptions(C_OSCNodeStwFlashloaderSet
    post-condition: the passed XML parser has the active node set to the same "properties"
 
    \param[in]      orc_StwFlashloaderSettings   data storage
-   \param[in,out]  orc_XMLParser                XML with core active
+   \param[in,out]  orc_XmlParser                XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
-                                                    C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::mh_SaveStwFlashloaderOptions(const C_OscNodeStwFlashloaderSettings & orc_StwFlashloaderSettings,
+                                                    C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild("stw-flashloader-settings");
-   orc_XMLParser.CreateAndSelectNodeChild("reset-message");
-   orc_XMLParser.SetAttributeBool("active", orc_StwFlashloaderSettings.q_ResetMessageActive);
-   orc_XMLParser.SetAttributeBool("extended", orc_StwFlashloaderSettings.q_ResetMessageExtendedId);
-   orc_XMLParser.SetAttributeUint32("id", orc_StwFlashloaderSettings.u32_ResetMessageId);
-   orc_XMLParser.SetAttributeUint32("dlc", static_cast<uint32>(orc_StwFlashloaderSettings.u8_ResetMessageDlc));
-   orc_XMLParser.CreateAndSelectNodeChild("data-bytes");
-   for (uint32 u32_ItDataByte = 0; u32_ItDataByte < orc_StwFlashloaderSettings.c_Data.size(); ++u32_ItDataByte)
+   orc_XmlParser.CreateAndSelectNodeChild("stw-flashloader-settings");
+   orc_XmlParser.CreateAndSelectNodeChild("reset-message");
+   orc_XmlParser.SetAttributeBool("active", orc_StwFlashloaderSettings.q_ResetMessageActive);
+   orc_XmlParser.SetAttributeBool("extended", orc_StwFlashloaderSettings.q_ResetMessageExtendedId);
+   orc_XmlParser.SetAttributeUint32("id", orc_StwFlashloaderSettings.u32_ResetMessageId);
+   orc_XmlParser.SetAttributeUint32("dlc", static_cast<uint32_t>(orc_StwFlashloaderSettings.u8_ResetMessageDlc));
+   orc_XmlParser.CreateAndSelectNodeChild("data-bytes");
+   for (uint32_t u32_ItDataByte = 0; u32_ItDataByte < orc_StwFlashloaderSettings.c_Data.size(); ++u32_ItDataByte)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("data-byte");
-      orc_XMLParser.SetAttributeUint32("value", static_cast<uint32>(orc_StwFlashloaderSettings.c_Data[u32_ItDataByte]));
+      orc_XmlParser.CreateAndSelectNodeChild("data-byte");
+      orc_XmlParser.SetAttributeUint32("value",
+                                       static_cast<uint32_t>(orc_StwFlashloaderSettings.c_Data[u32_ItDataByte]));
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-bytes");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-bytes");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "reset-message");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "reset-message");
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "stw-flashloader-settings");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "stw-flashloader-settings");
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "properties");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "properties");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1402,50 +1410,50 @@ void C_OSCNodeFilerV2::mh_SaveStwFlashloaderOptions(const C_OSCNodeStwFlashloade
    post-condition: the passed XML parser has the active node set to the same "core"
 
    \param[out]     orc_NodeApplications   data storage
-   \param[in,out]  orc_XMLParser          XML with core active
+   \param[in,out]  orc_XmlParser          XML with core active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> & orc_NodeApplications,
-                                             C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::mh_LoadApplications(std::vector<C_OscNodeApplication> & orc_NodeApplications,
+                                              C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("applications") == "applications")
+   if (orc_XmlParser.SelectNodeChild("applications") == "applications")
    {
-      C_SCLString c_CurNode;
-      uint32 u32_ExpectedSize = 0UL;
-      const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+      C_SclString c_CurNode;
+      uint32_t u32_ExpectedSize = 0UL;
+      const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
       //Check optional length
       if (q_ExpectedSizeHere == true)
       {
-         u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+         u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
          orc_NodeApplications.reserve(u32_ExpectedSize);
       }
 
-      c_CurNode = orc_XMLParser.SelectNodeChild("application");
+      c_CurNode = orc_XmlParser.SelectNodeChild("application");
       if (c_CurNode == "application")
       {
          do
          {
-            C_OSCNodeApplication c_CurApplication;
+            C_OscNodeApplication c_CurApplication;
 
-            if (orc_XMLParser.AttributeExists("active") == true)
+            if (orc_XmlParser.AttributeExists("active") == true)
             {
-               c_CurApplication.q_Active = orc_XMLParser.GetAttributeBool("active");
+               c_CurApplication.q_Active = orc_XmlParser.GetAttributeBool("active");
             }
             else
             {
                s32_Retval = C_CONFIG;
             }
 
-            if (orc_XMLParser.AttributeExists("process-id") == true)
+            if (orc_XmlParser.AttributeExists("process-id") == true)
             {
-               c_CurApplication.u8_ProcessId = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("process-id"));
+               c_CurApplication.u8_ProcessId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("process-id"));
             }
             else
             {
@@ -1456,22 +1464,22 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             c_CurApplication.u16_GenCodeVersion = 1U;
 
             //Type
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("type") == "type"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("type") == "type"))
             {
-               C_OSCNodeApplication::h_StringToApplication(orc_XMLParser.GetNodeContent(), c_CurApplication.e_Type);
+               C_OscNodeApplication::h_StringToApplication(orc_XmlParser.GetNodeContent(), c_CurApplication.e_Type);
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
                s32_Retval = C_CONFIG;
             }
             //Name
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("name") == "name"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("name") == "name"))
             {
-               c_CurApplication.c_Name = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_Name = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
@@ -1479,22 +1487,22 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             }
 
             //Comment
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("comment") == "comment"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("comment") == "comment"))
             {
-               c_CurApplication.c_Comment = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_Comment = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
                s32_Retval = C_CONFIG;
             }
 
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("project-path") == "project-path"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("project-path") == "project-path"))
             {
-               c_CurApplication.c_ProjectPath = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_ProjectPath = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
@@ -1502,24 +1510,24 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
                c_CurApplication.c_ProjectPath = "";
             }
 
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("ide-call") == "ide-call"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("ide-call") == "ide-call"))
             {
-               c_CurApplication.c_IDECall = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_IdeCall = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
                // No error, if child does not exist.
-               c_CurApplication.c_IDECall = "";
+               c_CurApplication.c_IdeCall = "";
             }
 
             if ((s32_Retval == C_NO_ERR) &&
-                (orc_XMLParser.SelectNodeChild("code-generator-path") == "code-generator-path"))
+                (orc_XmlParser.SelectNodeChild("code-generator-path") == "code-generator-path"))
             {
-               c_CurApplication.c_CodeGeneratorPath = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_CodeGeneratorPath = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
@@ -1527,11 +1535,11 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
                c_CurApplication.c_CodeGeneratorPath = "";
             }
 
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("generate-path") == "generate-path"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("generate-path") == "generate-path"))
             {
-               c_CurApplication.c_GeneratePath = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_GeneratePath = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
@@ -1539,12 +1547,12 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
                c_CurApplication.c_GeneratePath = "";
             }
 
-            if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("result-path") == "result-path"))
+            if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("result-path") == "result-path"))
             {
                c_CurApplication.c_ResultPaths.resize(1);
-               c_CurApplication.c_ResultPaths[0] = orc_XMLParser.GetNodeContent();
+               c_CurApplication.c_ResultPaths[0] = orc_XmlParser.GetNodeContent();
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "application");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "application");
             }
             else
             {
@@ -1554,25 +1562,25 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
             }
 
             orc_NodeApplications.push_back(c_CurApplication);
-            c_CurNode = orc_XMLParser.SelectNodeNext("application");
+            c_CurNode = orc_XmlParser.SelectNodeNext("application");
          }
          while ((c_CurNode == "application") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "applications");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "applications");
       }
       //Compare length
       if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
       {
          if (u32_ExpectedSize != orc_NodeApplications.size())
          {
-            C_SCLString c_Tmp;
+            C_SclString c_Tmp;
             c_Tmp.PrintFormatted("Unexpected application count, expected: %i, got %i", u32_ExpectedSize,
                                  orc_NodeApplications.size());
             osc_write_log_warning("Load file", c_Tmp.c_str());
          }
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
    }
    else
    {
@@ -1590,33 +1598,33 @@ sint32 C_OSCNodeFilerV2::mh_LoadApplications(std::vector<C_OSCNodeApplication> &
    post-condition: the passed XML parser has the active node set to the same "core"
 
    \param[in]      orc_NodeApplications   data storage
-   \param[in,out]  orc_XMLParser          XML with core active
+   \param[in,out]  orc_XmlParser          XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::mh_SaveApplications(const std::vector<C_OSCNodeApplication> & orc_NodeApplications,
-                                           C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::mh_SaveApplications(const std::vector<C_OscNodeApplication> & orc_NodeApplications,
+                                           C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild("applications");
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeApplications.size());
-   for (uint32 u32_ItApplication = 0; u32_ItApplication < orc_NodeApplications.size(); ++u32_ItApplication)
+   orc_XmlParser.CreateAndSelectNodeChild("applications");
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeApplications.size()));
+   for (uint32_t u32_ItApplication = 0; u32_ItApplication < orc_NodeApplications.size(); ++u32_ItApplication)
    {
-      const C_OSCNodeApplication & rc_CurApplication = orc_NodeApplications[u32_ItApplication];
-      orc_XMLParser.CreateAndSelectNodeChild("application");
-      orc_XMLParser.SetAttributeBool("active", rc_CurApplication.q_Active);
-      orc_XMLParser.SetAttributeUint32("process-id", static_cast<uint32>(rc_CurApplication.u8_ProcessId));
-      orc_XMLParser.CreateNodeChild("type", C_OSCNodeApplication::h_ApplicationToString(rc_CurApplication.e_Type));
-      orc_XMLParser.CreateNodeChild("name", rc_CurApplication.c_Name);
-      orc_XMLParser.CreateNodeChild("comment", rc_CurApplication.c_Comment);
-      orc_XMLParser.CreateNodeChild("project-path", rc_CurApplication.c_ProjectPath);
-      orc_XMLParser.CreateNodeChild("ide-call", rc_CurApplication.c_IDECall);
-      orc_XMLParser.CreateNodeChild("code-generator-path", rc_CurApplication.c_CodeGeneratorPath);
-      orc_XMLParser.CreateNodeChild("generate-path", rc_CurApplication.c_GeneratePath);
-      orc_XMLParser.CreateNodeChild("result-path", rc_CurApplication.c_ResultPaths[0]);
+      const C_OscNodeApplication & rc_CurApplication = orc_NodeApplications[u32_ItApplication];
+      orc_XmlParser.CreateAndSelectNodeChild("application");
+      orc_XmlParser.SetAttributeBool("active", rc_CurApplication.q_Active);
+      orc_XmlParser.SetAttributeUint32("process-id", static_cast<uint32_t>(rc_CurApplication.u8_ProcessId));
+      orc_XmlParser.CreateNodeChild("type", C_OscNodeApplication::h_ApplicationToString(rc_CurApplication.e_Type));
+      orc_XmlParser.CreateNodeChild("name", rc_CurApplication.c_Name);
+      orc_XmlParser.CreateNodeChild("comment", rc_CurApplication.c_Comment);
+      orc_XmlParser.CreateNodeChild("project-path", rc_CurApplication.c_ProjectPath);
+      orc_XmlParser.CreateNodeChild("ide-call", rc_CurApplication.c_IdeCall);
+      orc_XmlParser.CreateNodeChild("code-generator-path", rc_CurApplication.c_CodeGeneratorPath);
+      orc_XmlParser.CreateNodeChild("generate-path", rc_CurApplication.c_GeneratePath);
+      orc_XmlParser.CreateNodeChild("result-path", rc_CurApplication.c_ResultPaths[0]);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "applications");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "applications");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1628,55 +1636,55 @@ void C_OSCNodeFilerV2::mh_SaveApplications(const std::vector<C_OSCNodeApplicatio
 
    \param[in]      ou16_XmlFormatVersion  version of XML format
    \param[out]     orc_Node               data storage
-   \param[in,out]  orc_XMLParser          XML with core active
+   \param[in,out]  orc_XmlParser          XML with core active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_LoadDataPools(const uint16 ou16_XmlFormatVersion, C_OSCNode & orc_Node,
-                                          C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeFilerV2::mh_LoadDataPools(const uint16_t ou16_XmlFormatVersion, C_OscNode & orc_Node,
+                                           C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Clear
    orc_Node.c_DataPools.clear();
-   if (orc_XMLParser.SelectNodeChild("data-pools") == "data-pools")
+   if (orc_XmlParser.SelectNodeChild("data-pools") == "data-pools")
    {
-      C_SCLString c_CurNode;
-      uint32 u32_ExpectedSize = 0UL;
-      const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+      C_SclString c_CurNode;
+      uint32_t u32_ExpectedSize = 0UL;
+      const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
       //Check optional length
       if (q_ExpectedSizeHere == true)
       {
-         u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+         u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
          orc_Node.c_DataPools.reserve(u32_ExpectedSize);
       }
 
-      c_CurNode = orc_XMLParser.SelectNodeChild("data-pool");
+      c_CurNode = orc_XmlParser.SelectNodeChild("data-pool");
       if (c_CurNode == "data-pool")
       {
          do
          {
-            C_OSCNodeDataPool c_CurDataPool;
+            C_OscNodeDataPool c_CurDataPool;
 
             s32_Retval =
-               C_OSCNodeDataPoolFilerV2::h_LoadDataPool(ou16_XmlFormatVersion, c_CurDataPool, orc_XMLParser);
+               C_OscNodeDataPoolFilerV2::h_LoadDataPool(ou16_XmlFormatVersion, c_CurDataPool, orc_XmlParser);
             if (s32_Retval != C_NO_ERR)
             {
                break;
             }
             orc_Node.c_DataPools.push_back(c_CurDataPool);
-            c_CurNode = orc_XMLParser.SelectNodeNext("data-pool");
+            c_CurNode = orc_XmlParser.SelectNodeNext("data-pool");
          }
          while (c_CurNode == "data-pool");
 
          if (s32_Retval == C_NO_ERR)
          {
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pools");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pools");
          }
       }
       if (s32_Retval == C_NO_ERR)
@@ -1685,14 +1693,14 @@ sint32 C_OSCNodeFilerV2::mh_LoadDataPools(const uint16 ou16_XmlFormatVersion, C_
          {
             if (u32_ExpectedSize != orc_Node.c_DataPools.size())
             {
-               C_SCLString c_Tmp;
+               C_SclString c_Tmp;
                c_Tmp.PrintFormatted("Unexpected Datapool count, expected: %i, got %i", u32_ExpectedSize,
                                     orc_Node.c_DataPools.size());
                osc_write_log_warning("Load file", c_Tmp.c_str());
             }
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
       }
    }
    else
@@ -1712,23 +1720,23 @@ sint32 C_OSCNodeFilerV2::mh_LoadDataPools(const uint16 ou16_XmlFormatVersion, C_
    post-condition: the passed XML parser has the active node set to the same "core"
 
    \param[in]      orc_NodeDataPools   data storage
-   \param[in,out]  orc_XMLParser       XML with core active
+   \param[in,out]  orc_XmlParser       XML with core active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & orc_NodeDataPools,
-                                        C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeFilerV2::mh_SaveDataPools(const std::vector<C_OscNodeDataPool> & orc_NodeDataPools,
+                                        C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild("data-pools");
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPools.size());
-   for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_NodeDataPools.size(); ++u32_ItDataPool)
+   orc_XmlParser.CreateAndSelectNodeChild("data-pools");
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeDataPools.size()));
+   for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < orc_NodeDataPools.size(); ++u32_ItDataPool)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("data-pool");
-      C_OSCNodeDataPoolFilerV2::h_SaveDataPool(orc_NodeDataPools[u32_ItDataPool], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("data-pool");
+      C_OscNodeDataPoolFilerV2::h_SaveDataPool(orc_NodeDataPools[u32_ItDataPool], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pools");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pools");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "core");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "core");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1740,20 +1748,20 @@ void C_OSCNodeFilerV2::mh_SaveDataPools(const std::vector<C_OSCNodeDataPool> & o
    Stringified diagnostic server type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeFilerV2::mh_DiagnosticServerToString(
-   const C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_DiagnosticProtocol)
+C_SclString C_OscNodeFilerV2::mh_DiagnosticServerToString(
+   const C_OscNodeProperties::E_DiagnosticServerProtocol & ore_DiagnosticProtocol)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_DiagnosticProtocol)
    {
-   case C_OSCNodeProperties::eDS_OPEN_SYDE:
+   case C_OscNodeProperties::eDS_OPEN_SYDE:
       c_Retval = "open-syde";
       break;
-   case C_OSCNodeProperties::eDS_KEFEX:
+   case C_OscNodeProperties::eDS_KEFEX:
       c_Retval = "kefex";
       break;
-   case C_OSCNodeProperties::eDS_NONE:
+   case C_OscNodeProperties::eDS_NONE:
       c_Retval = "none";
       break;
    default:
@@ -1774,22 +1782,22 @@ C_SCLString C_OSCNodeFilerV2::mh_DiagnosticServerToString(
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_StringToDiagnosticServer(const C_SCLString & orc_String,
-                                                     C_OSCNodeProperties::E_DiagnosticServerProtocol & ore_Type)
+int32_t C_OscNodeFilerV2::mh_StringToDiagnosticServer(const C_SclString & orc_String,
+                                                      C_OscNodeProperties::E_DiagnosticServerProtocol & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "kefex")
    {
-      ore_Type = C_OSCNodeProperties::eDS_KEFEX;
+      ore_Type = C_OscNodeProperties::eDS_KEFEX;
    }
    else if (orc_String == "open-syde")
    {
-      ore_Type = C_OSCNodeProperties::eDS_OPEN_SYDE;
+      ore_Type = C_OscNodeProperties::eDS_OPEN_SYDE;
    }
    else if (orc_String == "none")
    {
-      ore_Type = C_OSCNodeProperties::eDS_NONE;
+      ore_Type = C_OscNodeProperties::eDS_NONE;
    }
    else
    {
@@ -1810,19 +1818,19 @@ sint32 C_OSCNodeFilerV2::mh_StringToDiagnosticServer(const C_SCLString & orc_Str
    Stringified flash loader type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeFilerV2::mh_FlashLoaderToString(const C_OSCNodeProperties::E_FlashLoaderProtocol & ore_FlashLoader)
+C_SclString C_OscNodeFilerV2::mh_FlashLoaderToString(const C_OscNodeProperties::E_FlashLoaderProtocol & ore_FlashLoader)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_FlashLoader)
    {
-   case C_OSCNodeProperties::eFL_OPEN_SYDE:
+   case C_OscNodeProperties::eFL_OPEN_SYDE:
       c_Retval = "open-syde";
       break;
-   case C_OSCNodeProperties::eFL_STW:
+   case C_OscNodeProperties::eFL_STW:
       c_Retval = "stw";
       break;
-   case C_OSCNodeProperties::eFL_NONE:
+   case C_OscNodeProperties::eFL_NONE:
       c_Retval = "none";
       break;
    default:
@@ -1843,22 +1851,22 @@ C_SCLString C_OSCNodeFilerV2::mh_FlashLoaderToString(const C_OSCNodeProperties::
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_StringToFlashLoader(const C_SCLString & orc_String,
-                                                C_OSCNodeProperties::E_FlashLoaderProtocol & ore_Type)
+int32_t C_OscNodeFilerV2::mh_StringToFlashLoader(const C_SclString & orc_String,
+                                                 C_OscNodeProperties::E_FlashLoaderProtocol & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "stw")
    {
-      ore_Type = C_OSCNodeProperties::eFL_STW;
+      ore_Type = C_OscNodeProperties::eFL_STW;
    }
    else if (orc_String == "open-syde")
    {
-      ore_Type = C_OSCNodeProperties::eFL_OPEN_SYDE;
+      ore_Type = C_OscNodeProperties::eFL_OPEN_SYDE;
    }
    else if (orc_String == "none")
    {
-      ore_Type = C_OSCNodeProperties::eFL_NONE;
+      ore_Type = C_OscNodeProperties::eFL_NONE;
    }
    else
    {
@@ -1879,17 +1887,17 @@ sint32 C_OSCNodeFilerV2::mh_StringToFlashLoader(const C_SCLString & orc_String,
    Stringified node data pool communication byte order type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeFilerV2::mh_CommunicationByteOrderToString(
-   const C_OSCCanSignal::E_ByteOrderType & ore_CommunicationByteOrder)
+C_SclString C_OscNodeFilerV2::mh_CommunicationByteOrderToString(
+   const C_OscCanSignal::E_ByteOrderType & ore_CommunicationByteOrder)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_CommunicationByteOrder)
    {
-   case C_OSCCanSignal::eBYTE_ORDER_INTEL:
+   case C_OscCanSignal::eBYTE_ORDER_INTEL:
       c_Retval = "intel";
       break;
-   case C_OSCCanSignal::eBYTE_ORDER_MOTOROLA:
+   case C_OscCanSignal::eBYTE_ORDER_MOTOROLA:
       c_Retval = "motorola";
       break;
    default:
@@ -1910,18 +1918,18 @@ C_SCLString C_OSCNodeFilerV2::mh_CommunicationByteOrderToString(
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeFilerV2::mh_StringToCommunicationByteOrder(const C_SCLString & orc_String,
-                                                           C_OSCCanSignal::E_ByteOrderType & ore_Type)
+int32_t C_OscNodeFilerV2::mh_StringToCommunicationByteOrder(const C_SclString & orc_String,
+                                                            C_OscCanSignal::E_ByteOrderType & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "intel")
    {
-      ore_Type = C_OSCCanSignal::eBYTE_ORDER_INTEL;
+      ore_Type = C_OscCanSignal::eBYTE_ORDER_INTEL;
    }
    else if (orc_String == "motorola")
    {
-      ore_Type = C_OSCCanSignal::eBYTE_ORDER_MOTOROLA;
+      ore_Type = C_OscCanSignal::eBYTE_ORDER_MOTOROLA;
    }
    else
    {
@@ -1942,24 +1950,26 @@ sint32 C_OSCNodeFilerV2::mh_StringToCommunicationByteOrder(const C_SCLString & o
    Stringified node data pool communication message transmission method type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeFilerV2::mh_NodeComMessageTxMethodToString(
-   const C_OSCCanMessage::E_TxMethodType & ore_NodeComMessageTxMethod)
+C_SclString C_OscNodeFilerV2::mh_NodeComMessageTxMethodToString(
+   const C_OscCanMessage::E_TxMethodType & ore_NodeComMessageTxMethod)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_NodeComMessageTxMethod)
    {
-   case C_OSCCanMessage::eTX_METHOD_CYCLIC:
+   case C_OscCanMessage::eTX_METHOD_CYCLIC:
       c_Retval = "cyclic";
       break;
-   case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
+   case C_OscCanMessage::eTX_METHOD_ON_CHANGE:
       c_Retval = "on-data-change";
       break;
-   case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
+   case C_OscCanMessage::eTX_METHOD_ON_EVENT:
       c_Retval = "on-application-event";
       break;
-   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
-   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_0:
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_1_TO_240:
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
    default:
       c_Retval = "invalid";
       break;
@@ -1974,25 +1984,25 @@ C_SCLString C_OSCNodeFilerV2::mh_NodeComMessageTxMethodToString(
    \param[out]  ore_Type      Node data pool communication message transmission method type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeFilerV2::mh_StringToNodeComMessageTxMethod(const C_SCLString & orc_String,
-                                                         C_OSCCanMessage::E_TxMethodType & ore_Type)
+void C_OscNodeFilerV2::mh_StringToNodeComMessageTxMethod(const C_SclString & orc_String,
+                                                         C_OscCanMessage::E_TxMethodType & ore_Type)
 {
    if (orc_String == "cyclic")
    {
-      ore_Type = C_OSCCanMessage::eTX_METHOD_CYCLIC;
+      ore_Type = C_OscCanMessage::eTX_METHOD_CYCLIC;
    }
    else if (orc_String == "on-data-change")
    {
-      ore_Type = C_OSCCanMessage::eTX_METHOD_ON_CHANGE;
+      ore_Type = C_OscCanMessage::eTX_METHOD_ON_CHANGE;
    }
    else if (orc_String == "on-application-event")
    {
-      ore_Type = C_OSCCanMessage::eTX_METHOD_ON_EVENT;
+      ore_Type = C_OscCanMessage::eTX_METHOD_ON_EVENT;
    }
    else
    {
       //best guess:
-      ore_Type = C_OSCCanMessage::eTX_METHOD_ON_CHANGE;
+      ore_Type = C_OscCanMessage::eTX_METHOD_ON_CHANGE;
       osc_write_log_warning("Loading project file", "Invalid transmission type \"" + orc_String + "\" in file. " \
                             "Assuming \"on_change\".");
    }

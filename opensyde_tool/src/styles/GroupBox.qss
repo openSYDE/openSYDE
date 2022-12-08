@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbx
+stw--opensyde_gui_elements--C_OgeGbx
 {
 border-width: 1px;
 border-style: solid;
@@ -7,8 +7,8 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxNavigationSection,
-stw_opensyde_gui_elements--C_OgeGbxNavigationTab
+stw--opensyde_gui_elements--C_OgeGbxNavigationSection,
+stw--opensyde_gui_elements--C_OgeGbxNavigationTab
 {
 border-bottom-width: 0px;
 border-top-width: 1px;
@@ -18,20 +18,20 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxNavigationTab[IncludeLeftBorder="true"]
+stw--opensyde_gui_elements--C_OgeGbxNavigationTab[IncludeLeftBorder="true"]
 {
 border-left-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeGbxNavigationSection,
-stw_opensyde_gui_elements--C_OgeGbxNavigationTab[IncludeLeftBorder="false"]
+stw--opensyde_gui_elements--C_OgeGbxNavigationSection,
+stw--opensyde_gui_elements--C_OgeGbxNavigationTab[IncludeLeftBorder="false"]
 {
 border-left-width: 0px;
 }
 
 /* --------------------------------------------------------------------- */
 
-stw_opensyde_gui_elements--C_OgeGbxNavigationSection2
+stw--opensyde_gui_elements--C_OgeGbxNavigationSection2
 {
 border-left-width: 1px;
 border-bottom-width: 0px;
@@ -43,7 +43,7 @@ border-radius: 0px;
 
 /* --------------------------------------------------------------------- */
 
-stw_opensyde_gui_elements--C_OgeGbxNavigationSectionSelected
+stw--opensyde_gui_elements--C_OgeGbxNavigationSectionSelected
 {
 border-left-width: 0px;
 border-bottom-width: 2px;
@@ -54,10 +54,10 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxGrayed,
-stw_opensyde_gui_elements--C_OgeGbxTransparentToolBarSearch,
-stw_opensyde_gui_elements--C_OgeGbxHover,
-stw_opensyde_gui_elements--C_OgeGbxListHeader
+stw--opensyde_gui_elements--C_OgeGbxGrayed,
+stw--opensyde_gui_elements--C_OgeGbxTransparentToolBarSearch,
+stw--opensyde_gui_elements--C_OgeGbxHover,
+stw--opensyde_gui_elements--C_OgeGbxListHeader
 {
 border-style: solid;
 border-width: 1px;
@@ -65,7 +65,7 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxGrayedEdit
+stw--opensyde_gui_elements--C_OgeGbxGrayedEdit
 {
 border-style: solid;
 border-width: 1px;
@@ -73,10 +73,10 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxRead,
-stw_opensyde_gui_elements--C_OgeGbxTransparent,
-stw_opensyde_gui_elements--C_OgeGbxTransparentDashboard,
-stw_opensyde_gui_elements--C_OgeGbxNavigationHeadingBackground
+stw--opensyde_gui_elements--C_OgeGbxRead,
+stw--opensyde_gui_elements--C_OgeGbxTransparent,
+stw--opensyde_gui_elements--C_OgeGbxTransparentDashboard,
+stw--opensyde_gui_elements--C_OgeGbxNavigationHeadingBackground
 {
 border-style: solid;
 border-width: 0px;
@@ -84,7 +84,7 @@ border-radius: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxToolTip
+stw--opensyde_gui_elements--C_OgeGbxToolTip
 {
 border-style: solid;
 border-width: 1px;
@@ -95,7 +95,7 @@ padding-bottom:0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeGbxMouseMove
+stw--opensyde_gui_elements--C_OgeGbxMouseMove
 {
 border-style: solid;
 border-width: 3px;

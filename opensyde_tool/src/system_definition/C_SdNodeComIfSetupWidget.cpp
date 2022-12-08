@@ -8,24 +8,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdNodeComIfSetupWidget.h"
+#include "C_SdNodeComIfSetupWidget.hpp"
 #include "ui_C_SdNodeComIfSetupWidget.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdUtil.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdUtil.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
-using namespace stw_scl;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,9 +49,9 @@ using namespace stw_scl;
    \param[in]     ors32_SpecialInterface Special interface (Used in some cases to not disable any connected interface)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNodeComIfSetupWidget::C_SdNodeComIfSetupWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                   const uint32 & oru32_NodeIndex, const uint32 & oru32_BusIndex,
-                                                   const sint32 & ors32_SpecialInterface) :
+C_SdNodeComIfSetupWidget::C_SdNodeComIfSetupWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                   const uint32_t & oru32_NodeIndex, const uint32_t & oru32_BusIndex,
+                                                   const int32_t & ors32_SpecialInterface) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNodeComIfSetupWidget),
    mrc_ParentDialog(orc_Parent),
@@ -105,17 +104,17 @@ void C_SdNodeComIfSetupWidget::InitStaticNames(void) const
    Selected node interface (Not necessarily the index)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_SdNodeComIfSetupWidget::GetSelectedInterface(void) const
+uint8_t C_SdNodeComIfSetupWidget::GetSelectedInterface(void) const
 {
-   uint32 u32_Retval = 0;
-   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+   uint32_t u32_Retval = 0;
+   const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
 
    if (pc_Bus != NULL)
    {
       u32_Retval = C_SdUtil::h_GetActiveNodeInterface(*this->mpc_Ui->pc_ComboBoxComIntf, this->mu32_NodeIndex,
                                                       pc_Bus->e_Type);
    }
-   return static_cast<uint8>(u32_Retval);
+   return static_cast<uint8_t>(u32_Retval);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -144,8 +143,8 @@ void C_SdNodeComIfSetupWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -188,8 +187,8 @@ void C_SdNodeComIfSetupWidget::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNodeComIfSetupWidget::m_InitFromData(void)
 {
-   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if ((pc_Bus != NULL) && (pc_Node != NULL))
    {

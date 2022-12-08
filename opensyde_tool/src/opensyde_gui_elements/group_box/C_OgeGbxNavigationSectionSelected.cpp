@@ -13,13 +13,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeWiUtil.h"
-#include "C_OgeGbxNavigationSectionSelected.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeGbxNavigationSectionSelected.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,5 +55,5 @@ C_OgeGbxNavigationSectionSelected::C_OgeGbxNavigationSectionSelected(QWidget * c
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeGbxNavigationSectionSelected::SetActive(const bool oq_Active)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Active", oq_Active);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Active", oq_Active);
 }

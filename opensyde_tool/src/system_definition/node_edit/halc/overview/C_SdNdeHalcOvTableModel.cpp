@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCHALCMagicianUtil.h"
-#include "C_SdNdeHalcOvTableModel.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscHalcMagicianUtil.hpp"
+#include "C_SdNdeHalcOvTableModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,6 +56,7 @@ C_SdNdeHalcOvTableModel::C_SdNdeHalcOvTableModel(QObject * const opc_Parent) :
 void C_SdNdeHalcOvTableModel::UpdateData(void)
 {
    this->beginResetModel();
+   this->m_FillHalcInfo();
    this->endResetModel();
 }
 
@@ -67,7 +67,7 @@ void C_SdNdeHalcOvTableModel::UpdateData(void)
    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeHalcOvTableModel::GetNodeIndex(void) const
+uint32_t C_SdNdeHalcOvTableModel::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
@@ -78,69 +78,10 @@ uint32 C_SdNdeHalcOvTableModel::GetNodeIndex(void) const
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcOvTableModel::SetNodeIndex(const uint32 ou32_NodeIndex)
+void C_SdNdeHalcOvTableModel::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
-   this->beginResetModel();
    this->mu32_NodeIndex = ou32_NodeIndex;
-   this->endResetModel();
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Map row to data
-
-   \param[in]  os32_Index  Index
-
-   \return
-   NULL Data not found
-   Else Valid data
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const C_OSCHalcConfigChannel * C_SdNdeHalcOvTableModel::MapRowToChannel(const sint32 os32_Index) const
-{
-   const C_OSCHalcConfigChannel * pc_Retval = NULL;
-
-   if (os32_Index >= 0L)
-   {
-      const C_OSCNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
-      {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
-         {
-            const C_OSCHalcConfigDomain * const pc_Domain =
-               pc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            if (pc_Domain != NULL)
-            {
-               const uint32 u32_Start = u32_Counter;
-               if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-               {
-                  u32_Counter += pc_Domain->c_ChannelConfigs.size();
-               }
-               else
-               {
-                  u32_Counter += 1UL;
-               }
-               if (static_cast<uint32>(os32_Index) < u32_Counter)
-               {
-                  if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-                  {
-                     pc_Retval =
-                        &pc_Domain->c_ChannelConfigs[static_cast<std::vector<C_OSCHalcConfigChannel>::size_type>(
-                                                        static_cast<uint32>(os32_Index) - u32_Start)];
-                  }
-                  else
-                  {
-                     pc_Retval = &pc_Domain->c_DomainConfig;
-                  }
-                  //ensure stop, otherwise this won't work
-                  break;
-               }
-            }
-         }
-      }
-   }
-   return pc_Retval;
+   this->UpdateData();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,42 +95,16 @@ const C_OSCHalcConfigChannel * C_SdNdeHalcOvTableModel::MapRowToChannel(const si
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcOvTableModel::MapRowToDomainIndex(const sint32 os32_Index, uint32 & oru32_DomainIndex) const
+int32_t C_SdNdeHalcOvTableModel::MapRowToDomainIndex(const int32_t os32_Index, uint32_t & oru32_DomainIndex) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
-   if (os32_Index >= 0L)
+   if ((static_cast<uint32_t>(os32_Index) < this->mc_HalcInfoAll.size()) && (os32_Index >= 0))
    {
-      const C_OSCNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
-      {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
-         {
-            const C_OSCHalcConfigDomain * const pc_Domain =
-               pc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            if (pc_Domain != NULL)
-            {
-               if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-               {
-                  u32_Counter += pc_Domain->c_ChannelConfigs.size();
-               }
-               else
-               {
-                  u32_Counter += 1UL;
-               }
-               if (static_cast<uint32>(os32_Index) < u32_Counter)
-               {
-                  oru32_DomainIndex = u32_ItDomain;
-                  s32_Retval = C_NO_ERR;
-                  //ensure stop, otherwise this won't work
-                  break;
-               }
-            }
-         }
-      }
+      oru32_DomainIndex = this->mc_HalcInfoAll[os32_Index].u32_DomainIndex;
+      s32_Retval = C_NO_ERR;
    }
+
    return s32_Retval;
 }
 
@@ -204,180 +119,42 @@ sint32 C_SdNdeHalcOvTableModel::MapRowToDomainIndex(const sint32 os32_Index, uin
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcOvTableModel::MapRowToChannelNum(const sint32 os32_Index, uint32 & oru32_ChannelNum) const
+int32_t C_SdNdeHalcOvTableModel::MapRowToChannelNum(const int32_t os32_Index, uint32_t & oru32_ChannelNum) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
-   if (os32_Index >= 0L)
+   if ((static_cast<uint32_t>(os32_Index) < this->mc_HalcInfoAll.size()) && (os32_Index >= 0))
    {
-      const C_OSCNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
+      if (this->mc_HalcInfoAll[os32_Index].q_DomainOnly == false)
       {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
-         {
-            const C_OSCHalcConfigDomain * const pc_Domain =
-               pc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            if (pc_Domain != NULL)
-            {
-               const uint32 u32_Start = u32_Counter;
-               if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-               {
-                  u32_Counter += pc_Domain->c_ChannelConfigs.size();
-               }
-               else
-               {
-                  u32_Counter += 1UL;
-               }
-               if (static_cast<uint32>(os32_Index) < u32_Counter)
-               {
-                  if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-                  {
-                     oru32_ChannelNum = static_cast<uint32>(os32_Index) - u32_Start;
-                     s32_Retval = C_NO_ERR;
-                  }
-                  else
-                  {
-                     //None
-                  }
-                  //ensure stop, otherwise this won't work
-                  break;
-               }
-            }
-         }
+         oru32_ChannelNum = this->mc_HalcInfoAll[os32_Index].u32_ChannelIndex;
+         s32_Retval = C_NO_ERR;
       }
    }
+
    return s32_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Map row to channel def
-
-   \param[in]  os32_Index  Index
-
-   \return
-   NULL Data not found
-   Else Valid data
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const C_OSCHalcDefChannelDef * C_SdNdeHalcOvTableModel::MapRowToChannelDef(const sint32 os32_Index) const
-{
-   const C_OSCHalcDefChannelDef * pc_Retval = NULL;
-
-   if (os32_Index >= 0L)
-   {
-      const C_OSCNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
-      {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
-         {
-            const C_OSCHalcConfigDomain * const pc_Domain =
-               pc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            if (pc_Domain != NULL)
-            {
-               const uint32 u32_Start = u32_Counter;
-               if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-               {
-                  u32_Counter += pc_Domain->c_ChannelConfigs.size();
-               }
-               else
-               {
-                  u32_Counter += 1UL;
-               }
-               if (static_cast<uint32>(os32_Index) < u32_Counter)
-               {
-                  if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-                  {
-                     pc_Retval =
-                        &pc_Domain->c_Channels[static_cast<std::vector<C_OSCHalcDefChannelDef>::size_type>(
-                                                  static_cast<uint32>(os32_Index) - u32_Start)];
-                  }
-                  else
-                  {
-                     //None
-                  }
-                  //ensure stop, otherwise this won't work
-                  break;
-               }
-            }
-         }
-      }
-   }
-   return pc_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Map row to domain
-
-   \param[in]  os32_Index  Index
-
-   \return
-   NULL Data not found
-   Else Valid data
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const C_OSCHalcConfigDomain * C_SdNdeHalcOvTableModel::MapRowToDomain(const sint32 os32_Index) const
-{
-   const C_OSCHalcConfigDomain * pc_Retval = NULL;
-
-   if (os32_Index >= 0L)
-   {
-      const C_OSCNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
-      {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
-         {
-            const C_OSCHalcConfigDomain * const pc_Domain =
-               pc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            if (pc_Domain != NULL)
-            {
-               if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-               {
-                  u32_Counter += pc_Domain->c_ChannelConfigs.size();
-               }
-               else
-               {
-                  u32_Counter += 1UL;
-               }
-               if (static_cast<uint32>(os32_Index) < u32_Counter)
-               {
-                  pc_Retval = pc_Domain;
-
-                  //ensure stop, otherwise this won't work
-                  break;
-               }
-            }
-         }
-      }
-   }
-   return pc_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                             const sintn osn_Role) const
+QVariant C_SdNdeHalcOvTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                             const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_SdNdeHalcOvTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const C_SdNdeHalcOvTableModel::E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -418,7 +195,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          switch (e_Col)
          {
@@ -459,7 +236,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
@@ -500,7 +277,7 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -521,39 +298,15 @@ QVariant C_SdNdeHalcOvTableModel::headerData(const sintn osn_Section, const Qt::
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeHalcOvTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeHalcOvTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      if (pc_Node != NULL)
-      {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HALCConfig.GetDomainSize(); ++u32_ItDomain)
-         {
-            const C_OSCHalcConfigDomain * const pc_Domain =
-               pc_Node->c_HALCConfig.GetDomainConfigDataConst(u32_ItDomain);
-            if (pc_Domain != NULL)
-            {
-               if (pc_Domain->c_ChannelConfigs.size() > 0UL)
-               {
-                  u32_Counter += pc_Domain->c_ChannelConfigs.size();
-               }
-               else
-               {
-                  u32_Counter += 1UL;
-               }
-            }
-         }
-         sn_Retval = static_cast<sintn>(u32_Counter);
-      }
-      else
-      {
-         sn_Retval = 0;
-      }
+      s32_Retval = this->mc_HalcInfoAll.size();
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -565,328 +318,104 @@ sintn C_SdNdeHalcOvTableModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeHalcOvTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeHalcOvTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 11;
+      s32_Retval = 11;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
       const C_SdNdeHalcOvTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         const C_OSCHalcConfigDomain * pc_Domain;
-         const C_OSCHalcDefChannelDef * pc_Def;
-         const C_OSCHalcConfigChannel * pc_Data;
-         const C_OSCNode * pc_Node;
-         uint32 u32_DomainNum;
-         uint32 u32_ChanNum;
-         switch (e_Col)
+         const int32_t s32_Index = orc_Index.row();
+         if ((static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size()) && (s32_Index >= 0))
          {
-         case eINDEX:
-            c_Retval = orc_Index.row() + 1;
-            break;
-         case eDOMAIN:
-            pc_Domain = this->MapRowToDomain(orc_Index.row());
-            if (pc_Domain != NULL)
+            switch (e_Col)
             {
-               c_Retval = static_cast<QString>(pc_Domain->c_Name.c_str());
-            }
-            break;
-         case eCHANNEL:
-            pc_Def = this->MapRowToChannelDef(orc_Index.row());
-            if (pc_Def != NULL)
-            {
-               c_Retval = static_cast<QString>(pc_Def->c_Name.c_str());
-            }
-            else
-            {
-               c_Retval = "-";
-            }
-            break;
-         case eNAME:
-            pc_Data = this->MapRowToChannel(orc_Index.row());
-            if (pc_Data != NULL)
-            {
-               c_Retval = static_cast<QString>(pc_Data->c_Name.c_str());
-            }
-            break;
-         case eCOMMENT:
-            pc_Data = this->MapRowToChannel(orc_Index.row());
-            if (pc_Data != NULL)
-            {
-               c_Retval = static_cast<QString>(pc_Data->c_Comment.c_str());
-            }
-            break;
-         case eUSE_CASE:
-            pc_Domain = this->MapRowToDomain(orc_Index.row());
-            pc_Data = this->MapRowToChannel(orc_Index.row());
-            if ((pc_Data != NULL) && (pc_Domain != NULL))
-            {
-               if (pc_Data->u32_UseCaseIndex < pc_Domain->c_ChannelUseCases.size())
+            case eINDEX:
+               c_Retval = orc_Index.row() + 1;
+               break;
+            case eDOMAIN:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_DomainName;
+               break;
+            case eCHANNEL:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_ChannelName;
+               break;
+            case eNAME:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_CustomName;
+               break;
+            case eCOMMENT:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_Comment;
+               break;
+            case eUSE_CASE:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_UseCase;
+               break;
+            case eLINKED_WITH:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_LinkedWith;
+               break;
+            case eTYPE:
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                {
-                  const C_OSCHalcDefChannelUseCase & rc_UseCase =
-                     pc_Domain->c_ChannelUseCases[pc_Data->u32_UseCaseIndex];
-                  c_Retval = static_cast<QString>(rc_UseCase.c_Display.c_str());
+                  c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_Type;
                }
-               else
-               {
-                  c_Retval = "-";
-               }
+               break;
+            case eDATAPOOL:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_DatapoolName;
+               break;
+            case eDATABLOCK_ASSIGNMENT:
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_DatablockAssignment;
+               break;
+            case eSAFETY_RELEVANT:
+               // No text
+               break;
+            default:
+               break;
             }
-            else
-            {
-               c_Retval = "-";
-            }
-            break;
-         case eLINKED_WITH:
-            if (this->MapRowToDomainIndex(orc_Index.row(), u32_DomainNum) == C_NO_ERR)
-            {
-               bool q_Tmp;
-               std::vector<QString> c_LinkedChannelNames;
-               if (this->MapRowToChannelNum(orc_Index.row(), u32_ChanNum) == C_NO_ERR)
-               {
-                  C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex,
-                                                                                u32_DomainNum, u32_ChanNum,
-                                                                                true, q_Tmp,
-                                                                                &c_LinkedChannelNames);
-               }
-               else
-               {
-                  C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex,
-                                                                                u32_DomainNum, 0UL, false,
-                                                                                q_Tmp, &c_LinkedChannelNames);
-               }
-               if (c_LinkedChannelNames.size() > 0UL)
-               {
-                  QStringList c_Tmp;
-                  for (uint32 u32_ItLi = 0UL; u32_ItLi < c_LinkedChannelNames.size(); ++u32_ItLi)
-                  {
-                     if (c_Tmp.isEmpty() == false)
-                     {
-                        c_Tmp += ", ";
-                     }
-                     c_Tmp += c_LinkedChannelNames[u32_ItLi];
-                  }
-                  c_Retval = c_Tmp;
-               }
-               else
-               {
-                  c_Retval = "-";
-               }
-            }
-            else
-            {
-               c_Retval = "-";
-            }
-            break;
-         case eTYPE:
-            if (osn_Role == static_cast<sintn>(Qt::EditRole))
-            {
-               QStringList c_Tmp;
-               c_Tmp = this->data(orc_Index, msn_USER_ROLE_ICON).toStringList();
-               if (c_Tmp.size() > 1)
-               {
-                  c_Retval = c_Tmp.at(1);
-               }
-            }
-            break;
-         case eDATAPOOL:
-            pc_Data = this->MapRowToChannel(orc_Index.row());
-            if (pc_Data != NULL)
-            {
-               c_Retval = C_OSCHALCMagicianUtil::h_GetDatapoolName(pc_Data->q_SafetyRelevant).c_str();
-            }
-            break;
-         case eDATABLOCK_ASSIGNMENT:
-            pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-            pc_Data = this->MapRowToChannel(orc_Index.row());
-            if ((pc_Node != NULL) && (pc_Data != NULL))
-            {
-               const C_OSCNodeApplication * pc_Application = NULL;
-               const C_OSCNodeDataPool * const pc_Datapool =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDatapool(this->mu32_NodeIndex, pc_Data->q_SafetyRelevant);
-               if ((pc_Datapool != NULL) && (pc_Datapool->s32_RelatedDataBlockIndex >= 0))
-               {
-                  pc_Application =
-                     C_PuiSdHandler::h_GetInstance()->
-                     GetApplication(this->mu32_NodeIndex, static_cast<uint32>(pc_Datapool->s32_RelatedDataBlockIndex));
-               }
-
-               if (pc_Application != NULL)
-               {
-                  c_Retval = static_cast<QString>(pc_Application->c_Name.c_str());
-               }
-               else
-               {
-                  c_Retval = C_GtGetText::h_GetText("<not assigned>");
-               }
-            }
-            break;
-         case eSAFETY_RELEVANT:
-            // No text
-            break;
-         default:
-            break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
          if (e_Col == eSAFETY_RELEVANT)
          {
-            const C_OSCHalcConfigChannel * const pc_Data =
-               this->MapRowToChannel(orc_Index.row());
-            if (pc_Data != NULL)
+            const int32_t s32_Index = orc_Index.row();
+            if ((static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size()) && (s32_Index >= 0))
             {
-               if (pc_Data->q_SafetyRelevant == true)
-               {
-                  c_Retval = static_cast<sintn>(Qt::Checked);
-               }
-               else
-               {
-                  c_Retval = static_cast<sintn>(Qt::Unchecked);
-               }
+               c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.s32_SafetyRelevant;
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_ICON)
+      else if (os32_Role == ms32_USER_ROLE_ICON)
       {
-         uint32 u32_DomainNum;
-         uint32 u32_ChanNum;
-         const C_OSCHalcConfigDomain * pc_Domain;
          switch (e_Col)
          {
          case eTYPE:
-            pc_Domain = this->MapRowToDomain(orc_Index.row());
-            if ((pc_Domain != NULL) && (this->MapRowToDomainIndex(orc_Index.row(), u32_DomainNum) == C_NO_ERR))
             {
-               //Linked and error
-               bool q_IsLinked = false;
-               bool q_Error;
-               if (this->MapRowToChannelNum(orc_Index.row(), u32_ChanNum) == C_NO_ERR)
+               const int32_t s32_Index = orc_Index.row();
+               if ((static_cast<uint32_t>(s32_Index) < this->mc_HalcInfoAll.size()) && (s32_Index >= 0))
                {
-                  C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex,
-                                                                                u32_DomainNum, u32_ChanNum,
-                                                                                true, q_IsLinked, NULL);
-                  C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelError(this->mu32_NodeIndex,
-                                                                               u32_DomainNum, u32_ChanNum,
-                                                                               true, q_Error);
-               }
-               else
-               {
-                  C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelLinked(this->mu32_NodeIndex,
-                                                                                u32_DomainNum, 0UL,
-                                                                                false, q_IsLinked, NULL);
-                  C_PuiSdHandler::h_GetInstance()->CheckHALCDomainChannelError(this->mu32_NodeIndex,
-                                                                               u32_DomainNum, 0UL,
-                                                                               false, q_Error);
-               }
-               {
-                  QStringList c_Tmp;
-                  c_Tmp.push_back(QString::number(21)); // icon size
-                  {
-                     QString c_Path = "://images/system_definition/NodeEdit/halc/";
-                     switch (pc_Domain->e_Category)
-                     {
-                     case C_OSCHalcDefDomain::eCA_INPUT:
-                        if (q_IsLinked)
-                        {
-                           if (q_Error == true)
-                           {
-                              c_Path += "InputLargeLinkedError.svg";
-                           }
-                           else
-                           {
-                              c_Path += "InputLargeLinkedActive.svg";
-                           }
-                        }
-                        else
-                        {
-                           if (q_Error == true)
-                           {
-                              c_Path += "InputLargeError.svg";
-                           }
-                           else
-                           {
-                              c_Path += "InputLargeActive.svg";
-                           }
-                        }
-                        break;
-                     case C_OSCHalcDefDomain::eCA_OUTPUT:
-                        if (q_IsLinked == true)
-                        {
-                           if (q_Error == true)
-                           {
-                              c_Path += "OutputLargeLinkedError.svg";
-                           }
-                           else
-                           {
-                              c_Path += "OutputLargeLinkedActive.svg";
-                           }
-                        }
-                        else
-                        {
-                           if (q_Error == true)
-                           {
-                              c_Path += "OutputLargeError.svg";
-                           }
-                           else
-                           {
-                              c_Path += "OutputLargeActive.svg";
-                           }
-                        }
-                        break;
-                     case C_OSCHalcDefDomain::eCA_OTHER:
-                        if (q_IsLinked == true)
-                        {
-                           if (q_Error == true)
-                           {
-                              c_Path += "OtherLargeLinkedError.svg";
-                           }
-                           else
-                           {
-                              c_Path += "OtherLargeLinkedActive.svg";
-                           }
-                        }
-                        else
-                        {
-                           if (q_Error == true)
-                           {
-                              c_Path += "OtherLargeError.svg";
-                           }
-                           else
-                           {
-                              c_Path += "OtherLargeActive.svg";
-                           }
-                        }
-                        break;
-                     default:
-                        break;
-                     }
-                     c_Tmp.push_back(c_Path);
-                  }
-                  c_Retval = c_Tmp;
+                  c_Retval = this->mc_HalcInfoAll[s32_Index].c_Data.c_Icon;
                }
             }
             break;
@@ -905,7 +434,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
       {
          QFont c_Font;
          //Stylesheets do not allow access of specific columns so we need to set fonts manually
@@ -932,11 +461,11 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
          c_Font.setPixelSize(c_Font.pointSize());
          c_Retval = c_Font;
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          c_Retval = mc_STYLE_GUIDE_COLOR_8;
       }
@@ -945,6 +474,7 @@ QVariant C_SdNdeHalcOvTableModel::data(const QModelIndex & orc_Index, const sint
          //Unknown
       }
    }
+
    return c_Retval;
 }
 
@@ -992,7 +522,7 @@ Qt::ItemFlags C_SdNdeHalcOvTableModel::flags(const QModelIndex & orc_Index) cons
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeHalcOvTableModel::E_Columns C_SdNdeHalcOvTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_SdNdeHalcOvTableModel::E_Columns C_SdNdeHalcOvTableModel::h_ColumnToEnum(const int32_t & ors32_Column)
 {
    C_SdNdeHalcOvTableModel::E_Columns e_Retval = eNAME;
    switch (ors32_Column)
@@ -1048,9 +578,9 @@ C_SdNdeHalcOvTableModel::E_Columns C_SdNdeHalcOvTableModel::h_ColumnToEnum(const
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcOvTableModel::h_EnumToColumn(const C_SdNdeHalcOvTableModel::E_Columns & ore_Value)
+int32_t C_SdNdeHalcOvTableModel::h_EnumToColumn(const C_SdNdeHalcOvTableModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {
@@ -1093,4 +623,295 @@ sint32 C_SdNdeHalcOvTableModel::h_EnumToColumn(const C_SdNdeHalcOvTableModel::E_
    }
 
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Collects all HALC data for overview table
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcOvTableModel::m_FillHalcInfo(void)
+{
+   const C_OscNode * const pc_Node =
+      C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+
+   this->mc_HalcInfoAll.clear();
+
+   if (pc_Node != NULL)
+   {
+      uint32_t u32_ItDomain;
+      for (u32_ItDomain = 0UL; u32_ItDomain < pc_Node->c_HalcConfig.GetDomainSize(); ++u32_ItDomain)
+      {
+         const C_OscHalcConfigDomain * const pc_Domain =
+            pc_Node->c_HalcConfig.GetDomainConfigDataConst(u32_ItDomain);
+         if (pc_Domain != NULL)
+         {
+            C_HalcTableConfig c_Config;
+            c_Config.u32_DomainIndex = u32_ItDomain;
+
+            if (pc_Domain->c_ChannelConfigs.size() == 0UL)
+            {
+               C_HalcTableData c_Data;
+
+               // Domain only
+               c_Config.q_DomainOnly = true;
+               c_Config.u32_ChannelIndex = 0U;
+
+               // Channel specific part
+               c_Data.c_ChannelName = "-";
+
+               // Domain specific part
+               c_Data.c_DomainName = static_cast<QString>(pc_Domain->c_Name.c_str());
+
+               // Generic config part
+               m_FillHalcInfoData(*pc_Domain, pc_Domain->c_DomainConfig, c_Data);
+               this->m_FillHalcInfoLinked(u32_ItDomain, 0U, false, c_Data);
+               this->m_FillHalcInfoIcon(u32_ItDomain, 0U, false, pc_Domain->e_Category, c_Data);
+
+               // Save the row
+               c_Config.c_Data = c_Data;
+               this->mc_HalcInfoAll.push_back(c_Config);
+            }
+            else
+            {
+               uint32_t u32_ItChannel;
+
+               // Channel
+               c_Config.q_DomainOnly = false;
+
+               for (u32_ItChannel = 0U; u32_ItChannel < pc_Domain->c_ChannelConfigs.size(); ++u32_ItChannel)
+               {
+                  C_HalcTableData c_Data;
+
+                  // Channel specific part
+                  c_Config.u32_ChannelIndex = u32_ItChannel;
+                  c_Data.c_ChannelName = static_cast<QString>(pc_Domain->c_Channels[u32_ItChannel].c_Name.c_str());
+
+                  // Domain specific part
+                  c_Data.c_DomainName = static_cast<QString>(pc_Domain->c_Name.c_str());
+
+                  // Generic config part
+                  m_FillHalcInfoData(*pc_Domain, pc_Domain->c_ChannelConfigs[u32_ItChannel], c_Data);
+                  this->m_FillHalcInfoLinked(u32_ItDomain, u32_ItChannel, true, c_Data);
+                  this->m_FillHalcInfoIcon(u32_ItDomain, u32_ItChannel, true, pc_Domain->e_Category, c_Data);
+
+                  // Save the row
+                  c_Config.c_Data = c_Data;
+                  this->mc_HalcInfoAll.push_back(c_Config);
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Collects all HALC linked data for overview table
+
+   \param[in]       ou32_DomainIndex     Index of current domain
+   \param[in]       ou32_ChannelIndex    Index of current channel in domain (if oq_UseChannelIndex == true)
+   \param[in]       oq_UseChannelIndex   Flag if channel index is used
+   \param[in,out]   orc_Data             Row data for channel/domain for data function
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcOvTableModel::m_FillHalcInfoLinked(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
+                                                   const bool oq_UseChannelIndex,
+                                                   C_SdNdeHalcOvTableModel::C_HalcTableData & orc_Data)
+{
+   bool q_Tmp;
+
+   std::vector<QString> c_LinkedChannelNames;
+
+   C_PuiSdHandler::h_GetInstance()->CheckHalcDomainChannelLinked(this->mu32_NodeIndex,
+                                                                 ou32_DomainIndex, ou32_ChannelIndex,
+                                                                 oq_UseChannelIndex,
+                                                                 q_Tmp, &c_LinkedChannelNames);
+
+   if (c_LinkedChannelNames.size() > 0UL)
+   {
+      QStringList c_Tmp;
+      for (uint32_t u32_ItLi = 0UL; u32_ItLi < c_LinkedChannelNames.size(); ++u32_ItLi)
+      {
+         if (c_Tmp.isEmpty() == false)
+         {
+            c_Tmp += ", ";
+         }
+         c_Tmp += c_LinkedChannelNames[u32_ItLi];
+      }
+      orc_Data.c_LinkedWith = c_Tmp;
+   }
+   else
+   {
+      orc_Data.c_LinkedWith = "-";
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Collects all HALC icon data for overview table
+
+   \param[in]       ou32_DomainIndex     Index of current domain
+   \param[in]       ou32_ChannelIndex    Index of current channel in domain (if oq_UseChannelIndex == true)
+   \param[in]       oq_UseChannelIndex   Flag if channel index is used
+   \param[in]       oe_Category          Category of current domain
+   \param[in,out]   orc_Data             Row data for channel/domain for data function
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcOvTableModel::m_FillHalcInfoIcon(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,
+                                                 const bool oq_UseChannelIndex,
+                                                 const C_OscHalcDefDomain::E_Category oe_Category,
+                                                 C_SdNdeHalcOvTableModel::C_HalcTableData & orc_Data)
+{
+   //Linked and error
+   bool q_IsLinked = false;
+   bool q_Error;
+   QStringList c_Tmp;
+
+   C_PuiSdHandler::h_GetInstance()->CheckHalcDomainChannelLinked(this->mu32_NodeIndex,
+                                                                 ou32_DomainIndex, ou32_ChannelIndex,
+                                                                 oq_UseChannelIndex, q_IsLinked, NULL);
+   C_PuiSdHandler::h_GetInstance()->CheckHalcDomainChannelError(this->mu32_NodeIndex,
+                                                                ou32_DomainIndex, ou32_ChannelIndex,
+                                                                oq_UseChannelIndex, q_Error);
+
+   c_Tmp.push_back(QString::number(21)); // icon size
+   {
+      QString c_Path = "://images/system_definition/NodeEdit/halc/";
+      switch (oe_Category)
+      {
+      case C_OscHalcDefDomain::eCA_INPUT:
+         if (q_IsLinked)
+         {
+            if (q_Error == true)
+            {
+               c_Path += "InputLargeLinkedError.svg";
+            }
+            else
+            {
+               c_Path += "InputLargeLinkedActive.svg";
+            }
+         }
+         else
+         {
+            if (q_Error == true)
+            {
+               c_Path += "InputLargeError.svg";
+            }
+            else
+            {
+               c_Path += "InputLargeActive.svg";
+            }
+         }
+         break;
+      case C_OscHalcDefDomain::eCA_OUTPUT:
+         if (q_IsLinked == true)
+         {
+            if (q_Error == true)
+            {
+               c_Path += "OutputLargeLinkedError.svg";
+            }
+            else
+            {
+               c_Path += "OutputLargeLinkedActive.svg";
+            }
+         }
+         else
+         {
+            if (q_Error == true)
+            {
+               c_Path += "OutputLargeError.svg";
+            }
+            else
+            {
+               c_Path += "OutputLargeActive.svg";
+            }
+         }
+         break;
+      case C_OscHalcDefDomain::eCA_OTHER:
+         if (q_IsLinked == true)
+         {
+            if (q_Error == true)
+            {
+               c_Path += "OtherLargeLinkedError.svg";
+            }
+            else
+            {
+               c_Path += "OtherLargeLinkedActive.svg";
+            }
+         }
+         else
+         {
+            if (q_Error == true)
+            {
+               c_Path += "OtherLargeError.svg";
+            }
+            else
+            {
+               c_Path += "OtherLargeActive.svg";
+            }
+         }
+         break;
+      default:
+         break;
+      }
+      c_Tmp.push_back(c_Path);
+      orc_Data.c_Type = c_Path;
+   }
+   orc_Data.c_Icon = c_Tmp;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Collects all HALC data for overview table
+
+   \param[in]       orc_Domain    Domain specific configuration of current domain
+   \param[in]       orc_Config    Generic configuration of current channel (or domain if domain has no channels)
+   \param[in,out]   orc_Data      Row data for channel/domain for data function
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeHalcOvTableModel::m_FillHalcInfoData(const C_OscHalcConfigDomain & orc_Domain,
+                                                 const C_OscHalcConfigChannel & orc_Config,
+                                                 C_SdNdeHalcOvTableModel::C_HalcTableData & orc_Data)
+{
+   const C_OscNodeApplication * pc_Application = NULL;
+   const C_OscNodeDataPool * pc_Datapool;
+
+   orc_Data.c_CustomName = static_cast<QString>(orc_Config.c_Name.c_str());
+   orc_Data.c_Comment = static_cast<QString>(orc_Config.c_Comment.c_str());
+
+   if (orc_Config.u32_UseCaseIndex < orc_Domain.c_ChannelUseCases.size())
+   {
+      const C_OscHalcDefChannelUseCase & rc_UseCase = orc_Domain.c_ChannelUseCases[orc_Config.u32_UseCaseIndex];
+      orc_Data.c_UseCase = static_cast<QString>(rc_UseCase.c_Display.c_str());
+   }
+   else
+   {
+      orc_Data.c_UseCase = "-";
+   }
+
+   orc_Data.c_DatapoolName = C_OscHalcMagicianUtil::h_GetDatapoolName(orc_Config.q_SafetyRelevant).c_str();
+
+   if (orc_Config.q_SafetyRelevant == true)
+   {
+      orc_Data.s32_SafetyRelevant = static_cast<int32_t>(Qt::Checked);
+   }
+   else
+   {
+      orc_Data.s32_SafetyRelevant = static_cast<int32_t>(Qt::Unchecked);
+   }
+
+   // Datablock assignment
+   pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetHalcDatapool(this->mu32_NodeIndex, orc_Config.q_SafetyRelevant);
+   if ((pc_Datapool != NULL) && (pc_Datapool->s32_RelatedDataBlockIndex >= 0))
+   {
+      pc_Application =
+         C_PuiSdHandler::h_GetInstance()->
+         GetApplication(this->mu32_NodeIndex, static_cast<uint32_t>(pc_Datapool->s32_RelatedDataBlockIndex));
+   }
+
+   if (pc_Application != NULL)
+   {
+      orc_Data.c_DatablockAssignment = static_cast<QString>(pc_Application->c_Name.c_str());
+   }
+   else
+   {
+      orc_Data.c_DatablockAssignment = C_GtGetText::h_GetText("<not assigned>");
+   }
 }

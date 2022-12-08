@@ -10,30 +10,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDir>
 
-#include "C_Uti.h"
-#include "TGLFile.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_CamDbHandler.h"
-#include "C_OSCXMLParser.h"
-#include "C_CamProHandler.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_CamProHandlerFiler.h"
-#include "cam_constants.h"
-#include "CSCLChecksums.h"
+#include "C_Uti.hpp"
+#include "TglFile.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_OscXmlParser.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_CamProHandlerFiler.hpp"
+#include "cam_constants.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,7 +69,7 @@ const std::vector<C_CamProMessageData> & C_CamProHandler::GetMessages(void) cons
    Else Valid message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_CamProMessageData * C_CamProHandler::GetMessageConst(const uint32 ou32_Index) const
+const C_CamProMessageData * C_CamProHandler::GetMessageConst(const uint32_t ou32_Index) const
 {
    const C_CamProMessageData * pc_Retval = NULL;
 
@@ -100,11 +99,11 @@ const bool & C_CamProHandler::GetCyclicMessageTransmitActive(void) const
    \return CAN DLL Path string (Peak/Vector/Custom)
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QString C_CamProHandler::GetCANDllPath() const
+const QString C_CamProHandler::GetCanDllPath() const
 {
    QString c_Return;
 
-   switch (this->me_CANDllType)
+   switch (this->me_CanDllType)
    {
    case ePEAK:
       c_Return = mc_DLL_PATH_PEAK_CAM;
@@ -113,7 +112,7 @@ const QString C_CamProHandler::GetCANDllPath() const
       c_Return = mc_DLL_PATH_VECTOR_CAM;
       break;
    case eOTHER:
-      c_Return = this->mc_CustomCANDllPath;
+      c_Return = this->mc_CustomCanDllPath;
       break;
    default:
       c_Return = mc_DLL_PATH_PEAK_CAM;
@@ -129,9 +128,9 @@ const QString C_CamProHandler::GetCANDllPath() const
    \return CAN DLL Path string (custom)
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QString C_CamProHandler::GetCustomCANDllPath() const
+const QString C_CamProHandler::GetCustomCanDllPath() const
 {
-   return this->mc_CustomCANDllPath;
+   return this->mc_CustomCanDllPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -140,9 +139,9 @@ const QString C_CamProHandler::GetCustomCANDllPath() const
    \return   CAN Dll type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamProHandler::E_CANDllType C_CamProHandler::GetCANDllType() const
+C_CamProHandler::E_CanDllType C_CamProHandler::GetCanDllType() const
 {
-   return this->me_CANDllType;
+   return this->me_CanDllType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -215,9 +214,9 @@ void C_CamProHandler::SetMessages(const std::vector<C_CamProMessageData> & orc_M
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetMessageName(const uint32 ou32_Index, const QString & orc_Name)
+int32_t C_CamProHandler::SetMessageName(const uint32_t ou32_Index, const QString & orc_Name)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Messages.size())
    {
@@ -232,7 +231,7 @@ sint32 C_CamProHandler::SetMessageName(const uint32 ou32_Index, const QString & 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set message uint32 value
+/*! \brief  Set message uint32_t value
 
    \param[in]  ou32_Index     Message index
    \param[in]  oe_Selector    Data specifier
@@ -243,11 +242,11 @@ sint32 C_CamProHandler::SetMessageName(const uint32 ou32_Index, const QString & 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetMessageUint32Value(const uint32 ou32_Index,
-                                              const C_CamProMessageData::E_GenericUint32DataSelector oe_Selector,
-                                              const uint32 ou32_Value)
+int32_t C_CamProHandler::SetMessageUint32Value(const uint32_t ou32_Index,
+                                               const C_CamProMessageData::E_GenericUint32DataSelector oe_Selector,
+                                               const uint32_t ou32_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Messages.size())
    {
@@ -273,11 +272,11 @@ sint32 C_CamProHandler::SetMessageUint32Value(const uint32 ou32_Index,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetMessageBoolValue(const uint32 ou32_Index,
-                                            const C_CamProMessageData::E_GenericBoolDataSelector oe_Selector,
-                                            const bool oq_Value)
+int32_t C_CamProHandler::SetMessageBoolValue(const uint32_t ou32_Index,
+                                             const C_CamProMessageData::E_GenericBoolDataSelector oe_Selector,
+                                             const bool oq_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Messages.size())
    {
@@ -303,9 +302,9 @@ sint32 C_CamProHandler::SetMessageBoolValue(const uint32 ou32_Index,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetMessageKey(const uint32 ou32_Index, const QString & orc_Key, const uint32 ou32_Offset)
+int32_t C_CamProHandler::SetMessageKey(const uint32_t ou32_Index, const QString & orc_Key, const uint32_t ou32_Offset)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Messages.size())
    {
@@ -330,9 +329,9 @@ sint32 C_CamProHandler::SetMessageKey(const uint32 ou32_Index, const QString & o
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetMessageDataBytes(const uint32 ou32_Index, const std::vector<uint8> & orc_DataBytes)
+int32_t C_CamProHandler::SetMessageDataBytes(const uint32_t ou32_Index, const std::vector<uint8_t> & orc_DataBytes)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Messages.size())
    {
@@ -360,23 +359,23 @@ void C_CamProHandler::SetCyclicMessageTransmitActive(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set CAN DLL Path.
 
-   \param[in]  orc_CANDllPath    New CAN DLL path.
+   \param[in]  orc_CanDllPath    New CAN DLL path.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProHandler::SetCustomCANDllPath(const QString & orc_CANDllPath)
+void C_CamProHandler::SetCustomCanDllPath(const QString & orc_CanDllPath)
 {
-   this->mc_CustomCANDllPath = orc_CANDllPath;
+   this->mc_CustomCanDllPath = orc_CanDllPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set DLL type. See get for type definition.
 
-   \param[in]  oe_CANDllType  CAN DLL type
+   \param[in]  oe_CanDllType  CAN DLL type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProHandler::SetCANDllType(const E_CANDllType oe_CANDllType)
+void C_CamProHandler::SetCanDllType(const E_CanDllType oe_CanDllType)
 {
-   this->me_CANDllType = oe_CANDllType;
+   this->me_CanDllType = oe_CanDllType;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -401,9 +400,9 @@ void C_CamProHandler::SetFilters(const std::vector<C_CamProFilterData> & orc_Fil
    C_RANGE     specified index does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetFilter(const uint32 ou32_Index, const C_CamProFilterData & orc_NewFilter)
+int32_t C_CamProHandler::SetFilter(const uint32_t ou32_Index, const C_CamProFilterData & orc_NewFilter)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (ou32_Index < this->mc_Filters.size())
    {
@@ -424,7 +423,7 @@ sint32 C_CamProHandler::SetFilter(const uint32 ou32_Index, const C_CamProFilterD
    \param[in]  oq_Enable   true: enable; false: disable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProHandler::SetFilterEnabled(const uint32 ou32_Index, const bool oq_Enable)
+void C_CamProHandler::SetFilterEnabled(const uint32_t ou32_Index, const bool oq_Enable)
 {
    this->mc_Filters[ou32_Index].q_Enabled = oq_Enable;
 }
@@ -462,9 +461,9 @@ void C_CamProHandler::SetDatabases(const std::vector<C_CamProDatabaseData> & orc
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetDatabaseName(const uint32 ou32_Index, const QString & orc_NewName)
+int32_t C_CamProHandler::SetDatabaseName(const uint32_t ou32_Index, const QString & orc_NewName)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Databases.size())
    {
@@ -489,9 +488,9 @@ sint32 C_CamProHandler::SetDatabaseName(const uint32 ou32_Index, const QString &
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SetDatabaseOsySysDefBus(const uint32 ou32_Index, const sint32 os32_NewBusIndex)
+int32_t C_CamProHandler::SetDatabaseOsySysDefBus(const uint32_t ou32_Index, const int32_t os32_NewBusIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Databases.size())
    {
@@ -512,7 +511,7 @@ sint32 C_CamProHandler::SetDatabaseOsySysDefBus(const uint32 ou32_Index, const s
    \param[in]  oq_Enable   true: enable; false: disable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProHandler::SetDatabaseEnabled(const uint32 ou32_Index, const bool oq_Enable)
+void C_CamProHandler::SetDatabaseEnabled(const uint32_t ou32_Index, const bool oq_Enable)
 {
    this->mc_Databases[ou32_Index].q_Enabled = oq_Enable;
 }
@@ -591,7 +590,7 @@ void C_CamProHandler::SetLoggingFormat(const C_CamProLoggingData::E_Format oe_Ne
    \param[in]  oq_AllowAdaption  Optional flag to disable automatic adaption
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProHandler::InsertMessage(const uint32 ou32_Index, const C_CamProMessageData & orc_NewMessage,
+void C_CamProHandler::InsertMessage(const uint32_t ou32_Index, const C_CamProMessageData & orc_NewMessage,
                                     const bool oq_AllowAdaption)
 {
    C_CamProMessageData c_MessageData = orc_NewMessage;
@@ -647,7 +646,7 @@ void C_CamProHandler::AddDatabase(const C_CamProDatabaseData & orc_NewDatabase)
 void C_CamProHandler::ReplaceDatabaseName(const QString & orc_PrevName, const QString & orc_NewName)
 {
    //Messages
-   for (uint32 u32_It = 0UL; u32_It < this->mc_Messages.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->mc_Messages.size(); ++u32_It)
    {
       C_CamProMessageData & rc_Message = this->mc_Messages[u32_It];
       if (rc_Message.c_DataBaseFilePath == orc_PrevName.toStdString().c_str())
@@ -668,9 +667,9 @@ void C_CamProHandler::ReplaceDatabaseName(const QString & orc_PrevName, const QS
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::MoveMessage(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
+int32_t C_CamProHandler::MoveMessage(const uint32_t ou32_StartIndex, const uint32_t ou32_TargetIndex)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if ((ou32_StartIndex < this->mc_Messages.size()) && (ou32_TargetIndex < this->mc_Messages.size()))
    {
@@ -696,9 +695,9 @@ sint32 C_CamProHandler::MoveMessage(const uint32 ou32_StartIndex, const uint32 o
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::DeleteMessage(const uint32 ou32_Index)
+int32_t C_CamProHandler::DeleteMessage(const uint32_t ou32_Index)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_Index < this->mc_Messages.size())
    {
@@ -722,9 +721,9 @@ sint32 C_CamProHandler::DeleteMessage(const uint32 ou32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::DeleteFilter(const uint32 ou32_Index)
+int32_t C_CamProHandler::DeleteFilter(const uint32_t ou32_Index)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_Index < this->mc_Filters.size())
    {
@@ -748,9 +747,9 @@ sint32 C_CamProHandler::DeleteFilter(const uint32 ou32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::DeleteDatabase(const uint32 ou32_Index)
+int32_t C_CamProHandler::DeleteDatabase(const uint32_t ou32_Index)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_Index < this->mc_Databases.size())
    {
@@ -774,9 +773,9 @@ sint32 C_CamProHandler::DeleteDatabase(const uint32 ou32_Index)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamProHandler::GetAllMessagesFromDatabase(const QString & orc_File, QStringList * const opc_CompleteMessageNames,
-                                                 std::vector<uint32> * const opc_MessageIndices) const
+                                                 std::vector<uint32_t> * const opc_MessageIndices) const
 {
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
    {
       const C_CamProMessageData & rc_Message = this->mc_Messages[u32_ItMessage];
       //Check if same database
@@ -806,10 +805,10 @@ void C_CamProHandler::GetAllMessagesFromDatabase(const QString & orc_File, QStri
    Invalid messages from database
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamProHandler::GetInvalidMessagesFromDatabase(const QString & orc_File) const
+std::vector<uint32_t> C_CamProHandler::GetInvalidMessagesFromDatabase(const QString & orc_File) const
 {
-   std::vector<uint32> c_Retval;
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
+   std::vector<uint32_t> c_Retval;
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
    {
       const C_CamProMessageData & rc_Message = this->mc_Messages[u32_ItMessage];
       //Check if same database
@@ -846,17 +845,17 @@ std::vector<uint32> C_CamProHandler::GetInvalidMessagesFromDatabase(const QStrin
    Invalid messages with no database
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamProHandler::GetInvalidMessagesWithNoDatabase(void) const
+std::vector<uint32_t> C_CamProHandler::GetInvalidMessagesWithNoDatabase(void) const
 {
-   std::vector<uint32> c_Retval;
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
+   std::vector<uint32_t> c_Retval;
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
    {
       const C_CamProMessageData & rc_Message = this->mc_Messages[u32_ItMessage];
       //Check if database
       if (rc_Message.c_DataBaseFilePath.IsEmpty() == false)
       {
          bool q_Found = false;
-         for (uint32 u32_ItDb = 0UL; u32_ItDb < this->mc_Databases.size(); ++u32_ItDb)
+         for (uint32_t u32_ItDb = 0UL; u32_ItDb < this->mc_Databases.size(); ++u32_ItDb)
          {
             const C_CamProDatabaseData & rc_Db = this->mc_Databases[u32_ItDb];
             if (rc_Db.c_Name.compare(rc_Message.c_DataBaseFilePath.c_str()) == 0)
@@ -980,20 +979,20 @@ QString C_CamProHandler::GetCurrentProjDir(void) const
    C_CONFIG    content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::LoadFromFile(const stw_scl::C_SCLString & orc_Path)
+int32_t C_CamProHandler::LoadFromFile(const stw::scl::C_SclString & orc_Path)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   if (TGL_FileExists(orc_Path) == true)
+   if (TglFileExists(orc_Path) == true)
    {
-      C_OSCXMLParser c_XMLParser;
+      C_OscXmlParser c_XmlParser;
 
       Q_EMIT (this->SigClearOldConfiguration());
 
-      s32_Return = c_XMLParser.LoadFromFile(orc_Path);
+      s32_Return = c_XmlParser.LoadFromFile(orc_Path);
       if (s32_Return == C_NO_ERR)
       {
-         s32_Return = C_CamProHandlerFiler::h_Load(*this, c_XMLParser);
+         s32_Return = C_CamProHandlerFiler::h_Load(*this, c_XmlParser);
       }
       else
       {
@@ -1043,9 +1042,9 @@ sint32 C_CamProHandler::LoadFromFile(const stw_scl::C_SCLString & orc_Path)
    C_COM      could not create folder
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamProHandler::SaveToFile(const stw_scl::C_SCLString & orc_Path)
+int32_t C_CamProHandler::SaveToFile(const stw::scl::C_SclString & orc_Path)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    const QFileInfo c_File(orc_Path.c_str());
    const QDir c_Directory(c_File.absolutePath());
 
@@ -1062,12 +1061,12 @@ sint32 C_CamProHandler::SaveToFile(const stw_scl::C_SCLString & orc_Path)
    }
    if (s32_Return == C_NO_ERR)
    {
-      if (TGL_FileExists(orc_Path) == true)
+      if (TglFileExists(orc_Path) == true)
       {
          //erase it:
-         sintn sn_Return;
-         sn_Return = std::remove(orc_Path.c_str());
-         if (sn_Return != 0)
+         int32_t s32_ReturnRemove;
+         s32_ReturnRemove = std::remove(orc_Path.c_str());
+         if (s32_ReturnRemove != 0)
          {
             osc_write_log_error("Saving project",
                                 "Could not erase pre-existing file \"" + orc_Path + "\".");
@@ -1076,10 +1075,10 @@ sint32 C_CamProHandler::SaveToFile(const stw_scl::C_SCLString & orc_Path)
       }
       if (s32_Return == C_NO_ERR)
       {
-         C_OSCXMLParser c_XMLParser;
-         C_CamProHandlerFiler::h_Save(*this, c_XMLParser);
+         C_OscXmlParser c_XmlParser;
+         C_CamProHandlerFiler::h_Save(*this, c_XmlParser);
 
-         s32_Return = c_XMLParser.SaveToFile(orc_Path);
+         s32_Return = c_XmlParser.SaveToFile(orc_Path);
          if (s32_Return != C_NO_ERR)
          {
             osc_write_log_error("Saving Project", "Could not write to file \"" + orc_Path + "\".");
@@ -1108,7 +1107,7 @@ sint32 C_CamProHandler::SaveToFile(const stw_scl::C_SCLString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_CamProHandler::CheckChanges(void) const
 {
-   const uint32 u32_CurHas = this->m_GetHash();
+   const uint32_t u32_CurHas = this->m_GetHash();
 
    return u32_CurHas != this->mu32_FileHash;
 }
@@ -1129,8 +1128,8 @@ void C_CamProHandler::Clear(const bool oq_UpdateUserSettings)
    this->mq_FiltersActive = false;
    this->mc_Databases.clear();
    this->mc_File = "";
-   this->me_CANDllType = ePEAK;
-   this->mc_CustomCANDllPath = "";
+   this->me_CanDllType = ePEAK;
+   this->mc_CustomCanDllPath = "";
    this->mc_LoggingData.Clear();
 
    this->mu32_FileHash = this->m_GetHash();
@@ -1163,7 +1162,7 @@ C_CamProHandler::C_CamProHandler(void) :
    mu32_FileHash(0UL),
    mq_CyclicMessageTransmitActive(true),
    mq_FiltersActive(false),
-   me_CANDllType(ePEAK)
+   me_CanDllType(ePEAK)
 {
    //init hash
    Clear(false);
@@ -1176,9 +1175,9 @@ C_CamProHandler::C_CamProHandler(void) :
    possible return value(s) and description
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamProHandler::m_GetHash(void) const
+uint32_t C_CamProHandler::m_GetHash(void) const
 {
-   uint32 u32_Retval = 0xFFFFFFFFUL;
+   uint32_t u32_Retval = 0xFFFFFFFFUL;
 
    m_CalcHash(u32_Retval);
    return u32_Retval;
@@ -1192,32 +1191,32 @@ uint32 C_CamProHandler::m_GetHash(void) const
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamProHandler::m_CalcHash(uint32 & oru32_HashValue) const
+void C_CamProHandler::m_CalcHash(uint32_t & oru32_HashValue) const
 {
    // messages
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_CyclicMessageTransmitActive,
-                                      sizeof(this->mq_CyclicMessageTransmitActive),
-                                      oru32_HashValue);
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
+   stw::scl::C_SclChecksums::CalcCRC32(&this->mq_CyclicMessageTransmitActive,
+                                       sizeof(this->mq_CyclicMessageTransmitActive),
+                                       oru32_HashValue);
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
    {
       this->mc_Messages[u32_ItMessage].CalcHash(oru32_HashValue);
    }
 
    // settings
    // CAN DLL configuration
-   stw_scl::C_SCLChecksums::CalcCRC32(this->mc_CustomCANDllPath.toStdString().c_str(),
-                                      this->mc_CustomCANDllPath.size(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->me_CANDllType, sizeof(this->me_CANDllType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->mc_CustomCanDllPath.toStdString().c_str(),
+                                       this->mc_CustomCanDllPath.size(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->me_CanDllType, sizeof(this->me_CanDllType), oru32_HashValue);
 
    // filters
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_FiltersActive, sizeof(this->mq_FiltersActive), oru32_HashValue);
-   for (uint32 u32_ItFilters = 0UL; u32_ItFilters < this->mc_Filters.size(); ++u32_ItFilters)
+   stw::scl::C_SclChecksums::CalcCRC32(&this->mq_FiltersActive, sizeof(this->mq_FiltersActive), oru32_HashValue);
+   for (uint32_t u32_ItFilters = 0UL; u32_ItFilters < this->mc_Filters.size(); ++u32_ItFilters)
    {
       this->mc_Filters[u32_ItFilters].CalcHash(oru32_HashValue);
    }
 
    // databases
-   for (uint32 u32_ItDatabases = 0UL; u32_ItDatabases < this->mc_Databases.size(); ++u32_ItDatabases)
+   for (uint32_t u32_ItDatabases = 0UL; u32_ItDatabases < this->mc_Databases.size(); ++u32_ItDatabases)
    {
       this->mc_Databases[u32_ItDatabases].CalcHash(oru32_HashValue);
    }
@@ -1235,10 +1234,10 @@ void C_CamProHandler::m_CalcHash(uint32 & oru32_HashValue) const
    All current message names
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<stw_scl::C_SCLString, bool> C_CamProHandler::m_GetAllMessageNames(void) const
+std::map<stw::scl::C_SclString, bool> C_CamProHandler::m_GetAllMessageNames(void) const
 {
-   std::map<stw_scl::C_SCLString, bool> c_Retval;
-   for (uint32 u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
+   std::map<stw::scl::C_SclString, bool> c_Retval;
+   for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_Messages.size(); ++u32_ItMessage)
    {
       const C_CamProMessageData & rc_Message = this->mc_Messages[u32_ItMessage];
       c_Retval[rc_Message.c_Name] = true;

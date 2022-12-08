@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCHalcConfigStandalone.h"
+#include "C_OscHalcConfigStandalone.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,7 +34,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor/destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigStandalone::C_OSCHalcConfigStandalone(void) :
+C_OscHalcConfigStandalone::C_OscHalcConfigStandalone(void) :
    u32_DefinitionContentVersion(0UL)
 {
 }

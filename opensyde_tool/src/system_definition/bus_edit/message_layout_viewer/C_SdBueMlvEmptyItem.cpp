@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QIcon>
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_SdBueMlvEmptyItem.h"
+#include "C_SdBueMlvEmptyItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,7 +41,7 @@ using namespace stw_opensyde_gui;
    \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueMlvEmptyItem::C_SdBueMlvEmptyItem(const uint8 ou8_Index, QGraphicsItem * const opc_Parent) :
+C_SdBueMlvEmptyItem::C_SdBueMlvEmptyItem(const uint8_t ou8_Index, QGraphicsItem * const opc_Parent) :
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    C_SdBueMlvBaseItem(mc_STYLE_GUIDE_COLOR_11, mc_STYLE_GUIDE_COLOR_8, mc_STYLE_GUIDE_FONT_REGULAR_13,
                       QString::number(ou8_Index), false, opc_Parent),
@@ -72,7 +71,7 @@ C_SdBueMlvEmptyItem::~C_SdBueMlvEmptyItem()
    \param[in]  ou8_Index   Index number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvEmptyItem::SetIndex(const uint8 ou8_Index)
+void C_SdBueMlvEmptyItem::SetIndex(const uint8_t ou8_Index)
 {
    this->SetText(QString::number(ou8_Index));
 }
@@ -202,7 +201,7 @@ void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOption
    QPen c_Pen;
    QBrush c_Brush;
    QRectF c_Rect;
-   const uint32 u32_ALIGNMENT = static_cast<uint32>(Qt::AlignRight) | static_cast<uint32>(Qt::AlignTop);
+   const uint32_t u32_ALIGNMENT = static_cast<uint32_t>(Qt::AlignRight) | static_cast<uint32_t>(Qt::AlignTop);
 
    C_SdBueMlvBaseItem::paint(opc_Painter, opc_Option, opc_Widget);
 
@@ -221,14 +220,15 @@ void C_SdBueMlvEmptyItem::paint(QPainter * const opc_Painter, const QStyleOption
    c_Rect = this->boundingRect();
    // adapt the region
    c_Rect.setWidth(c_Rect.width() - 5.0);
-   opc_Painter->drawText(c_Rect, static_cast<sintn>(u32_ALIGNMENT), this->mc_Text);
+   opc_Painter->drawText(c_Rect, static_cast<int32_t>(u32_ALIGNMENT), this->mc_Text);
 
    // draw the error icon if an error was set
    if (this->mq_ErrorActive == true)
    {
-      const float64 f64_PosX = (this->mc_Size.width() / 2.0) - (static_cast<float64>(this->mc_ErrorIcon.width()) / 2.0);
-      const float64 f64_PosY = (this->mc_Size.height() / 2.0) -
-                               (static_cast<float64>(this->mc_ErrorIcon.height()) / 2.0);
-      opc_Painter->drawPixmap(QPointF(f64_PosX, f64_PosY), this->mc_ErrorIcon);
+      const float64_t f64_PosHorizontal = (this->mc_Size.width() / 2.0) -
+                                          (static_cast<float64_t>(this->mc_ErrorIcon.width()) / 2.0);
+      const float64_t f64_PosVertical = (this->mc_Size.height() / 2.0) -
+                                        (static_cast<float64_t>(this->mc_ErrorIcon.height()) / 2.0);
+      opc_Painter->drawPixmap(QPointF(f64_PosHorizontal, f64_PosVertical), this->mc_ErrorIcon);
    }
 }

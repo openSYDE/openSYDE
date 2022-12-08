@@ -8,19 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SdNdeHalcConfigTreeDelegate.h"
+#include "C_SdNdeHalcConfigTreeDelegate.hpp"
 
-#include "C_OgeCbxMultiSelectTableHalc.h"
-#include "C_OgeCbxTableHalc.h"
-#include "C_OgeSpxTableHalc.h"
+#include "C_OgeCbxMultiSelectTableHalc.hpp"
+#include "C_OgeCbxTableHalc.hpp"
+#include "C_OgeSpxTableHalc.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

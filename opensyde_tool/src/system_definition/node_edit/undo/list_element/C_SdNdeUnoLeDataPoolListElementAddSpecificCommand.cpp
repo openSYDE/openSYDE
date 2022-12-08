@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,18 +38,18 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     orc_Indices                      Node data pool list indices
-   \param[in]     orc_OSCData                      OSC node data pool list data
-   \param[in]     orc_UIData                       UI node data pool list data
+   \param[in]     orc_OscData                      OSC node data pool list data
+   \param[in]     orc_UiData                       UI node data pool list data
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementAddSpecificCommand::C_SdNdeUnoLeDataPoolListElementAddSpecificCommand(
-   const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
-   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_Indices,
-   const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement> & orc_OSCData,
-   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIData, QUndoCommand * const opc_Parent) :
+   const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex,
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32_t> & orc_Indices,
+   const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscData,
+   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiData, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementAddCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                              opc_DataPoolListModelViewManager, orc_Indices, opc_Parent)
 {
-   this->m_SetInitialData(orc_OSCData, orc_UIData);
+   this->m_SetInitialData(orc_OscData, orc_UiData);
 }

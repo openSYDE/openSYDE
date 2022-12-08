@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSpinBox>
 #include <QScrollBar>
 #include <QHeaderView>
-#include "C_OgeWiSpinBoxGroup.h"
+#include "C_OgeWiSpinBoxGroup.hpp"
 
-#include "stwtypes.h"
-#include "C_UsHandler.h"
-#include "C_CamGenSigTableView.h"
+#include "stwtypes.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamGenSigTableView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,7 +50,7 @@ C_CamGenSigTableView::C_CamGenSigTableView(QWidget * const opc_Parent) :
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
+   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::EditRole));
    this->C_CamGenSigTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -113,7 +112,7 @@ void C_CamGenSigTableView::TriggerSignalReload(void)
    \param[in] ou32_Message Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigTableView::SetMessage(const uint32 ou32_Message)
+void C_CamGenSigTableView::SetMessage(const uint32_t ou32_Message)
 {
    this->mc_Model.SetMessage(ou32_Message);
    m_SetPersistentEditorWidgets();
@@ -128,9 +127,9 @@ void C_CamGenSigTableView::SetMessage(const uint32 ou32_Message)
    \param[in] ou32_MessageIndex Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigTableView::UpdateMessageDLC(const uint32 ou32_MessageIndex)
+void C_CamGenSigTableView::UpdateMessageDlc(const uint32_t ou32_MessageIndex)
 {
-   this->mc_Model.UpdateMessageDLC(ou32_MessageIndex);
+   this->mc_Model.UpdateMessageDlc(ou32_MessageIndex);
    m_SetPersistentEditorWidgets();
 }
 
@@ -140,47 +139,47 @@ void C_CamGenSigTableView::UpdateMessageDLC(const uint32 ou32_MessageIndex)
    \param[in] orc_ColumnWidths Stored column widths (Restores default values if empty)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenSigTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+void C_CamGenSigTableView::SetCurrentColumnWidths(const std::vector<int32_t> & orc_ColumnWidths)
 {
-   sint32 s32_CurColIndex;
+   int32_t s32_CurColIndex;
 
    if (orc_ColumnWidths.size() > 0)
    {
       //Restore all saved values
-      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
       {
-         this->setColumnWidth(static_cast<sintn>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+         this->setColumnWidth(static_cast<int32_t>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
       }
       //Also handle the remaining ones
    }
    //Apply default wherever there was no stored value
    s32_CurColIndex = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::eBIT_POS);
-   if ((static_cast<uint32>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
-       (orc_ColumnWidths[static_cast<uint32>(s32_CurColIndex)] == 0))
+   if ((static_cast<uint32_t>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
+       (orc_ColumnWidths[static_cast<uint32_t>(s32_CurColIndex)] == 0))
    {
       this->setColumnWidth(s32_CurColIndex, 50);
    }
    s32_CurColIndex = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::eNAME);
-   if ((static_cast<uint32>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
-       (orc_ColumnWidths[static_cast<uint32>(s32_CurColIndex)] == 0))
+   if ((static_cast<uint32_t>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
+       (orc_ColumnWidths[static_cast<uint32_t>(s32_CurColIndex)] == 0))
    {
       this->setColumnWidth(s32_CurColIndex, 200);
    }
    s32_CurColIndex = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::eRAW);
-   if ((static_cast<uint32>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
-       (orc_ColumnWidths[static_cast<uint32>(s32_CurColIndex)] == 0))
+   if ((static_cast<uint32_t>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
+       (orc_ColumnWidths[static_cast<uint32_t>(s32_CurColIndex)] == 0))
    {
       this->setColumnWidth(s32_CurColIndex, 100);
    }
    s32_CurColIndex = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::ePHYSICAL);
-   if ((static_cast<uint32>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
-       (orc_ColumnWidths[static_cast<uint32>(s32_CurColIndex)] == 0))
+   if ((static_cast<uint32_t>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
+       (orc_ColumnWidths[static_cast<uint32_t>(s32_CurColIndex)] == 0))
    {
       this->setColumnWidth(s32_CurColIndex, 100);
    }
    s32_CurColIndex = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::eUNIT);
-   if ((static_cast<uint32>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
-       (orc_ColumnWidths[static_cast<uint32>(s32_CurColIndex)] == 0))
+   if ((static_cast<uint32_t>(s32_CurColIndex) >= orc_ColumnWidths.size()) ||
+       (orc_ColumnWidths[static_cast<uint32_t>(s32_CurColIndex)] == 0))
    {
       this->setColumnWidth(s32_CurColIndex, 100);
    }
@@ -193,11 +192,11 @@ void C_CamGenSigTableView::SetCurrentColumnWidths(const std::vector<sint32> & or
    Current column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamGenSigTableView::GetCurrentColumnWidths(void) const
+std::vector<int32_t> C_CamGenSigTableView::GetCurrentColumnWidths(void) const
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(this->model()->columnCount());
-   for (sint32 s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
+   for (int32_t s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
    {
       c_Retval.push_back(this->columnWidth(s32_ItCol));
    }
@@ -256,7 +255,7 @@ void C_CamGenSigTableView::keyPressEvent(QKeyEvent * const opc_Event)
    if ((((pc_SpinBox == NULL) && (pc_LineEdit == NULL)) && (pc_ComboBox == NULL)) && (pc_SpinBoxGroup == NULL))
    {
       //For some reason the tab key needs to be accepted to allow proper tab navigation
-      if (opc_Event->key() != static_cast<sintn>(Qt::Key_Tab))
+      if (opc_Event->key() != static_cast<int32_t>(Qt::Key_Tab))
       {
          //Ignore event if no widget can accept it
          opc_Event->ignore();
@@ -297,11 +296,11 @@ void C_CamGenSigTableView::m_RepositionButtons(void)
 void C_CamGenSigTableView::m_SetPersistentEditorWidgets(void)
 {
    //Set static editor widgets
-   for (sint32 s32_Row = 0; s32_Row < this->mc_Model.rowCount(); ++s32_Row)
+   for (int32_t s32_Row = 0; s32_Row < this->mc_Model.rowCount(); ++s32_Row)
    {
       //Each relevant column
-      const sint32 s32_Col1 = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::eRAW);
-      const sint32 s32_Col2 = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::ePHYSICAL);
+      const int32_t s32_Col1 = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::eRAW);
+      const int32_t s32_Col2 = C_CamGenSigTableModel::h_EnumToColumn(C_CamGenSigTableModel::ePHYSICAL);
       const QModelIndex c_Index1 = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_Row, s32_Col1));
       const QModelIndex c_Index2 = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(s32_Row, s32_Col2));
       this->openPersistentEditor(c_Index1);

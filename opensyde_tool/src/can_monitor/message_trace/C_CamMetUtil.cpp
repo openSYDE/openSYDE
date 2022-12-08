@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_CamMetUtil.h"
+#include "stwtypes.hpp"
+#include "C_CamMetUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,14 +48,15 @@ C_CamMetUtil::C_CamMetUtil()
    Multiplexer value ordering
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sintn> C_CamMetUtil::h_GetMultiplexerOrder(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals)
+std::vector<int32_t> C_CamMetUtil::h_GetMultiplexerOrder(
+   const std::vector<C_OscComMessageLoggerDataSignal> & orc_Signals)
 {
-   std::vector<sintn> c_Order;
+   std::vector<int32_t> c_Order;
    //Multiplexer order
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
+   for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
    {
-      const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSig];
-      if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      const C_OscComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSig];
+      if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          if (rc_SignalData.q_DlcError == false)
          {
@@ -84,14 +84,14 @@ std::vector<sintn> C_CamMetUtil::h_GetMultiplexerOrder(const std::vector<C_OSCCo
    else: found multiplexer value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetUtil::h_GetMultiplexerValue(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals)
+int32_t C_CamMetUtil::h_GetMultiplexerValue(const std::vector<C_OscComMessageLoggerDataSignal> & orc_Signals)
 {
-   sint32 s32_Value = -1;
+   int32_t s32_Value = -1;
 
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
+   for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
    {
-      const C_OSCComMessageLoggerDataSignal & rc_Sig = orc_Signals[u32_ItSig];
-      if ((rc_Sig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+      const C_OscComMessageLoggerDataSignal & rc_Sig = orc_Signals[u32_ItSig];
+      if ((rc_Sig.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
           (rc_Sig.q_DlcError == false))
       {
          s32_Value = rc_Sig.c_RawValueDec.ToInt();
@@ -112,17 +112,17 @@ sint32 C_CamMetUtil::h_GetMultiplexerValue(const std::vector<C_OSCComMessageLogg
    else: valid row (of message index)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetUtil::h_GetRowForMultiplexerValue(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
-                                                 const sint32 os32_MultiplexerValue)
+int32_t C_CamMetUtil::h_GetRowForMultiplexerValue(const std::vector<C_OscComMessageLoggerDataSignal> & orc_Signals,
+                                                  const int32_t os32_MultiplexerValue)
 {
-   sint32 s32_Retval = -1;
-   const std::vector<sintn> c_MuxValues = C_CamMetUtil::h_GetMultiplexerOrder(orc_Signals);
+   int32_t s32_Retval = -1;
+   const std::vector<int32_t> c_MuxValues = C_CamMetUtil::h_GetMultiplexerOrder(orc_Signals);
 
-   for (uint32 u32_It = 0UL; u32_It < c_MuxValues.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < c_MuxValues.size(); ++u32_It)
    {
       if (c_MuxValues[u32_It] == os32_MultiplexerValue)
       {
-         s32_Retval = static_cast<sint32>(u32_It);
+         s32_Retval = static_cast<int32_t>(u32_It);
       }
    }
    return s32_Retval;

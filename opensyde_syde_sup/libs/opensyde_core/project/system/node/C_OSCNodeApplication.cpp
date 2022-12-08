@@ -10,20 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OSCNodeApplication.h"
+#include "C_OscNodeApplication.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_OSCLoggingHandler.h"
+#include "C_SclChecksums.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,14 +41,14 @@ using namespace stw_scl;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeApplication::C_OSCNodeApplication(void) :
+C_OscNodeApplication::C_OscNodeApplication(void) :
    e_Type(eBINARY),
    c_Name(""),
    c_Comment(""),
    q_Active(true),
    u8_ProcessId(0),
    c_ProjectPath(""),
-   c_IDECall(""),
+   c_IdeCall(""),
    c_CodeGeneratorPath(""),
    c_GeneratePath(""),
    u16_GenCodeVersion(0)
@@ -67,23 +67,23 @@ C_OSCNodeApplication::C_OSCNodeApplication(void) :
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeApplication::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_Active, sizeof(this->q_Active), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_ProcessId, sizeof(this->u8_ProcessId), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ProjectPath.c_str(), this->c_ProjectPath.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_IDECall.c_str(), this->c_IDECall.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_CodeGeneratorPath.c_str(),
-                                      this->c_CodeGeneratorPath.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_GeneratePath.c_str(), this->c_GeneratePath.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_GenCodeVersion, sizeof(this->u16_GenCodeVersion), oru32_HashValue);
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_ResultPaths.size(); ++u32_Counter)
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_Active, sizeof(this->q_Active), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_ProcessId, sizeof(this->u8_ProcessId), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_ProjectPath.c_str(), this->c_ProjectPath.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_IdeCall.c_str(), this->c_IdeCall.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_CodeGeneratorPath.c_str(),
+                                       this->c_CodeGeneratorPath.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_GeneratePath.c_str(), this->c_GeneratePath.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_GenCodeVersion, sizeof(this->u16_GenCodeVersion), oru32_HashValue);
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_ResultPaths.size(); ++u32_Counter)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(this->c_ResultPaths[u32_Counter].c_str(),
-                                         this->c_ResultPaths[u32_Counter].Length(), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(this->c_ResultPaths[u32_Counter].c_str(),
+                                          this->c_ResultPaths[u32_Counter].Length(), oru32_HashValue);
    }
 }
 
@@ -96,19 +96,19 @@ void C_OSCNodeApplication::CalcHash(uint32 & oru32_HashValue) const
    Stringified application type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplication::E_Type & ore_Application)
+C_SclString C_OscNodeApplication::h_ApplicationToString(const C_OscNodeApplication::E_Type & ore_Application)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_Application)
    {
-   case C_OSCNodeApplication::eBINARY:
+   case C_OscNodeApplication::eBINARY:
       c_Retval = "binary";
       break;
-   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+   case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
       c_Retval = "programming_application";
       break;
-   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+   case C_OscNodeApplication::ePARAMETER_SET_HALC:
       c_Retval = "parameter_set_halc";
       break;
    default:
@@ -125,27 +125,27 @@ C_SCLString C_OSCNodeApplication::h_ApplicationToString(const C_OSCNodeApplicati
    \param[out] ore_Type   Application type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeApplication::h_StringToApplication(const C_SCLString & orc_String,
-                                                 C_OSCNodeApplication::E_Type & ore_Type)
+void C_OscNodeApplication::h_StringToApplication(const C_SclString & orc_String,
+                                                 C_OscNodeApplication::E_Type & ore_Type)
 {
    if (orc_String == "binary")
    {
-      ore_Type = C_OSCNodeApplication::eBINARY;
+      ore_Type = C_OscNodeApplication::eBINARY;
    }
    else if (orc_String == "programming_application")
    {
-      ore_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+      ore_Type = C_OscNodeApplication::ePROGRAMMABLE_APPLICATION;
    }
    else if (orc_String == "parameter_set_halc")
    {
-      ore_Type = C_OSCNodeApplication::ePARAMETER_SET_HALC;
+      ore_Type = C_OscNodeApplication::ePARAMETER_SET_HALC;
    }
    else
    {
       //set binary if unknown type read
-      ore_Type = C_OSCNodeApplication::eBINARY;
+      ore_Type = C_OscNodeApplication::eBINARY;
       osc_write_log_warning("Loading node definition",
                             "Invalid value for application type. Unknown type: " + orc_String + ". "
-                            "Type is replaced with: " + h_ApplicationToString(C_OSCNodeApplication::eBINARY));
+                            "Type is replaced with: " + h_ApplicationToString(C_OscNodeApplication::eBINARY));
    }
 }

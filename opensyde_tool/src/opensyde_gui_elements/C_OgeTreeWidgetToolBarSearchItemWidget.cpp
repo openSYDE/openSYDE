@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeTreeWidgetToolBarSearchItemWidget.h"
+#include "C_OgeTreeWidgetToolBarSearchItemWidget.hpp"
 
 #include "ui_C_OgeTreeWidgetToolBarSearchItemWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

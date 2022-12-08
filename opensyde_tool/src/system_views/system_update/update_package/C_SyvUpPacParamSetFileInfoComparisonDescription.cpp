@@ -7,14 +7,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_SyvUpPacParamSetFileInfoComparisonDescription.h"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvUpPacParamSetFileInfoComparisonDescription.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 

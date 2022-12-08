@@ -8,37 +8,36 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
 
-#include "C_SyvHandlerWidget.h"
+#include "C_SyvHandlerWidget.hpp"
 #include "ui_C_SyvHandlerWidget.h"
 
-#include "C_PopUtil.h"
-#include "C_GtGetText.h"
-#include "C_HeHandler.h"
-#include "C_PuiProject.h"
-#include "C_PuiSvHandler.h"
-#include "C_PopErrorHandling.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_TblTreDataElementModel.h"
+#include "C_PopUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_HeHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PopErrorHandling.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_TblTreDataElementModel.hpp"
 
-#include "constants.h"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_SETTINGS = 1U;
-const uint32 C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_DEVICECONFIG = 2U;
+const uint32_t C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_APPLY = 0U;
+const uint32_t C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_SETTINGS = 1U;
+const uint32_t C_SyvHandlerWidget::mhu32_USER_INPUT_FUNC_DEVICECONFIG = 2U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -120,7 +119,7 @@ C_SyvHandlerWidget::~C_SyvHandlerWidget(void)
    \param[in]  ou32_FuncNumber   Number of function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
+void C_SyvHandlerWidget::UserInputFunc(const uint32_t ou32_FuncNumber)
 {
    //Default
    Q_EMIT this->SigEnableUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, true);
@@ -165,7 +164,7 @@ void C_SyvHandlerWidget::UserInputFunc(const uint32 ou32_FuncNumber)
    \param[in]     ou32_Flag        Flag for special functionality
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32_Index, const uint32 ou32_Flag)
+void C_SyvHandlerWidget::SetSubMode(const int32_t os32_SubMode, const uint32_t ou32_Index, const uint32_t ou32_Flag)
 {
    //Change cursor
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -184,7 +183,7 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
    if (((os32_SubMode != this->ms32_SubMode) ||
         (ou32_Index != this->mu32_Index)) || (ou32_Flag == 1UL))
    {
-      sintn sn_Index;
+      int32_t s32_Index;
 
       // Deactivate all buttons in the first step
       Q_EMIT (this->SigShowUserInputFunc(mhu32_USER_INPUT_FUNC_SETTINGS, false));
@@ -261,8 +260,8 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
                  this, &C_SyvHandlerWidget::m_EnableConfiguration);
          this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_SetupWidget);
 
-         sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_SetupWidget);
-         this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+         s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_SetupWidget);
+         this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
 
          this->mpc_SetupWidget->LoadScene();
          this->mpc_SetupWidget->show();
@@ -279,8 +278,8 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
                  &C_SyvHandlerWidget::SigBlockDragAndDrop);
          this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_UpdateWidget);
 
-         sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_UpdateWidget);
-         this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+         s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_UpdateWidget);
+         this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
 
          this->mpc_UpdateWidget->LoadScene();
          this->mpc_UpdateWidget->show();
@@ -317,8 +316,8 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
                  this, &C_SyvHandlerWidget::SigBlockDragAndDrop);
          this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_DashboardsWidget);
 
-         sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_DashboardsWidget);
-         this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+         s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_DashboardsWidget);
+         this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
 
          this->mpc_DashboardsWidget->LoadDarkMode();
          //Do error check AFTER connections are up
@@ -340,7 +339,7 @@ void C_SyvHandlerWidget::SetSubMode(const sint32 os32_SubMode, const uint32 ou32
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvHandlerWidget::Save(void)
 {
-   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+   const uint16_t u16_Timer = osc_write_log_performance_start();
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -423,7 +422,7 @@ bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
 {
    bool q_Retval = false;
 
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       if (this->mpc_SetupWidget != NULL)
       {
@@ -446,12 +445,12 @@ bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
          }
       }
    }
-   else if ((opc_Event->key() == static_cast<sintn>(Qt::Key_S)) &&
+   else if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_S)) &&
             (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true))
    {
       this->Save();
    }
-   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F12))
+   else if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F12))
    {
       // Save as is not allowed for service projects
       if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
@@ -460,7 +459,7 @@ bool C_SyvHandlerWidget::GlobalUserKeyPress(QKeyEvent * const opc_Event)
          this->SaveAs();
       }
    }
-   else if (opc_Event->key() == static_cast<sintn>(Qt::Key_F8))
+   else if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F8))
    {
       // open color picker
       this->OpenColorPicker();
@@ -506,7 +505,7 @@ void C_SyvHandlerWidget::m_DashboardCountChanged(void)
    \param[in] ou32_Index Item index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvHandlerWidget::m_ErrorChanged(const uint32 ou32_Index)
+void C_SyvHandlerWidget::m_ErrorChanged(const uint32_t ou32_Index)
 {
    Q_EMIT this->SigErrorChanged(ou32_Index);
 }
@@ -580,18 +579,18 @@ void C_SyvHandlerWidget::CallHelp(void)
    //get sub mode
    if (this->ms32_SubMode == ms32_SUBMODE_SYSVIEW_SETUP)
    {
-      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-         "stw_opensyde_gui::C_SyvSeSetupWidget");
+      stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+         "stw::opensyde_gui::C_SyvSeSetupWidget");
    }
    else if (this->ms32_SubMode == ms32_SUBMODE_SYSVIEW_UPDATE)
    {
-      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-         "stw_opensyde_gui::C_SyvUpUpdateWidget");
+      stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+         "stw::opensyde_gui::C_SyvUpUpdateWidget");
    }
    else if (this->ms32_SubMode == ms32_SUBMODE_SYSVIEW_DASHBOARD)
    {
-      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
-         "stw_opensyde_gui::C_SyvDaDashboardsWidget");
+      stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+         "stw::opensyde_gui::C_SyvDaDashboardsWidget");
    }
    else
    {

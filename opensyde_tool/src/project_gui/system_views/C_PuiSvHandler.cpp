@@ -10,39 +10,38 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_Uti.h"
-#include "TGLFile.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "CSCLChecksums.h"
-#include "C_OSCXMLParser.h"
-#include "C_OSCXMLParserLog.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiSvHandler.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PuiSvHandlerFiler.h"
-#include "C_PuiSvHandlerFilerV1.h"
-#include "C_SyvRoRouteCalculation.h"
-#include "C_OSCRoutingCalculation.h"
-#include "C_OSCHALCMagicianUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_Uti.hpp"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscXmlParser.hpp"
+#include "C_OscXmlParserLog.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PuiSvHandlerFiler.hpp"
+#include "C_PuiSvHandlerFilerV1.hpp"
+#include "C_SyvRoRouteCalculation.hpp"
+#include "C_OscRoutingCalculation.hpp"
+#include "C_OscHalcMagicianUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -72,10 +71,10 @@ C_PuiSvHandler * C_PuiSvHandler::mhpc_Singleton = NULL;
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::LoadFromFile(const QString & orc_Path)
+int32_t C_PuiSvHandler::LoadFromFile(const QString & orc_Path)
 {
    return this->m_LoadFromFile(orc_Path,
-                               C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes);
+                               C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_Nodes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,18 +90,21 @@ sint32 C_PuiSvHandler::LoadFromFile(const QString & orc_Path)
    C_RD_WR    problems accessing file system (e.g. could not erase pre-existing file before saving)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SaveToFile(const QString & orc_Path, const bool oq_UseDeprecatedV1Format)
+int32_t C_PuiSvHandler::SaveToFile(const QString & orc_Path, const bool oq_UseDeprecatedV1Format)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   if (TGL_FileExists(orc_Path.toStdString().c_str()) == true)
+   if (TglFileExists(orc_Path.toStdString().c_str()) == true)
    {
       //erase it:
-      sintn sn_Return;
-      sn_Return = std::remove(orc_Path.toStdString().c_str());
-      if (sn_Return != 0)
+      s32_Return = std::remove(orc_Path.toStdString().c_str());
+      if (s32_Return != 0)
       {
          s32_Return = C_RD_WR;
+      }
+      else
+      {
+         s32_Return = C_NO_ERR;
       }
    }
    if (s32_Return == C_NO_ERR)
@@ -111,32 +113,32 @@ sint32 C_PuiSvHandler::SaveToFile(const QString & orc_Path, const bool oq_UseDep
       const QDir c_BasePath = c_Info.dir();
       if (c_BasePath.mkpath(".") == true)
       {
-         C_OSCXMLParser c_XMLParser;
-         c_XMLParser.CreateAndSelectNodeChild("opensyde-system-views");
+         C_OscXmlParser c_XmlParser;
+         c_XmlParser.CreateAndSelectNodeChild("opensyde-system-views");
          if (oq_UseDeprecatedV1Format == true)
          {
-            c_XMLParser.CreateNodeChild("file-version", "1");
-            C_PuiSvHandlerFilerV1::h_SaveViews(this->mc_Views, c_XMLParser);
+            c_XmlParser.CreateNodeChild("file-version", "1");
+            C_PuiSvHandlerFilerV1::h_SaveViews(this->mc_Views, c_XmlParser);
          }
          else
          {
-            c_XMLParser.CreateNodeChild("file-version", "2");
+            c_XmlParser.CreateNodeChild("file-version", "2");
             if (this->mq_IsServiceModeActive)
             {
-               tgl_assert(c_XMLParser.CreateAndSelectNodeChild("service-mode") == "service-mode");
-               c_XMLParser.SetAttributeBool("active", this->mq_IsServiceModeActive);
-               c_XMLParser.SelectNodeParent();
+               tgl_assert(c_XmlParser.CreateAndSelectNodeChild("service-mode") == "service-mode");
+               c_XmlParser.SetAttributeBool("active", this->mq_IsServiceModeActive);
+               c_XmlParser.SelectNodeParent();
             }
-            s32_Return = C_PuiSvHandlerFiler::h_SaveViews(this->mc_Views, c_XMLParser, &c_BasePath);
+            s32_Return = C_PuiSvHandlerFiler::h_SaveViews(this->mc_Views, c_XmlParser, &c_BasePath);
 
-            C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(this->mc_LastKnownHalcCrcs, c_XMLParser);
+            C_PuiSvHandlerFiler::h_SaveLastKnownHalcCrcs(this->mc_LastKnownHalcCrcs, c_XmlParser);
             //Only update hash in non deprecated mode
             //calculate the hash value and save it for comparing
             this->mu32_CalculatedHashSystemViews = this->m_CalcHashSystemViews();
          }
          if (s32_Return == C_NO_ERR)
          {
-            s32_Return = c_XMLParser.SaveToFile(orc_Path.toStdString().c_str());
+            s32_Return = c_XmlParser.SaveToFile(orc_Path.toStdString().c_str());
             if (s32_Return != C_NO_ERR)
             {
                s32_Return = C_RD_WR;
@@ -165,7 +167,7 @@ sint32 C_PuiSvHandler::SaveToFile(const QString & orc_Path, const bool oq_UseDep
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSvHandler::HasHashChanged(void) const
 {
-   const uint32 u32_NewHash = this->m_CalcHashSystemViews();
+   const uint32_t u32_NewHash = this->m_CalcHashSystemViews();
    bool q_Changed = true;
 
    if (u32_NewHash == this->mu32_CalculatedHashSystemViews)
@@ -186,7 +188,7 @@ bool C_PuiSvHandler::HasHashChanged(void) const
    Else Valid view
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvData * C_PuiSvHandler::GetView(const uint32 ou32_Index) const
+const C_PuiSvData * C_PuiSvHandler::GetView(const uint32_t ou32_Index) const
 {
    const C_PuiSvData * pc_Retval;
 
@@ -208,7 +210,7 @@ const C_PuiSvData * C_PuiSvHandler::GetView(const uint32 ou32_Index) const
    Number of views
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSvHandler::GetViewCount(void) const
+uint32_t C_PuiSvHandler::GetViewCount(void) const
 {
    return this->mc_Views.size();
 }
@@ -256,18 +258,18 @@ bool C_PuiSvHandler::GetServiceModeActive(void) const
    \retval   C_RANGE    Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_ViewIndex,
-                                                            std::vector<uint8> & orc_ActiveFlags)
+int32_t C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32_t ou32_ViewIndex,
+                                                             std::vector<uint8_t> & orc_ActiveFlags)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    orc_ActiveFlags.clear();
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      const uint32 u32_Hash = this->GetViewHash(ou32_ViewIndex);
-      const QMap<stw_types::uint32,
-                 std::vector<stw_types::uint8> >::const_iterator c_It =
+      const uint32_t u32_Hash = this->GetViewHash(ou32_ViewIndex);
+      const QMap<uint32_t,
+                 std::vector<uint8_t> >::const_iterator c_It =
          this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.find(u32_Hash);
 
       s32_Return = C_NO_ERR;
@@ -275,8 +277,8 @@ sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_Vi
       if (c_It == this->mc_PreviousNodeActiveFlagsWithSquadAdaptionsResults.end())
       {
          C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-         const C_OSCNodeSquad * pc_Squad = NULL;
-         uint32 u32_SquadCounter = 0U;
+         const C_OscNodeSquad * pc_Squad = NULL;
+         uint32_t u32_SquadCounter = 0U;
 
          // activate all where only one active
          rc_View.ActivateAllRelevantSubDevices();
@@ -287,13 +289,13 @@ sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_Vi
          // Search for squads
          do
          {
-            pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_SquadCounter);
+            pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_SquadCounter);
 
             if (pc_Squad != NULL)
             {
-               uint32 u32_SubNodeCounter;
+               uint32_t u32_SubNodeCounter;
                bool q_AtLeastOneSubNodeActive = false;
-               std::vector<uint8> c_SubNodeActiveFlags;
+               std::vector<uint8_t> c_SubNodeActiveFlags;
 
                c_SubNodeActiveFlags.resize(pc_Squad->c_SubNodeIndexes.size(), 0U);
 
@@ -301,23 +303,23 @@ sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_Vi
                for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < pc_Squad->c_SubNodeIndexes.size();
                     ++u32_SubNodeCounter)
                {
-                  const uint32 u32_NodeIndex = pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter];
+                  const uint32_t u32_NodeIndex = pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter];
 
                   // Check only necessary if node is active in the first place
                   if (orc_ActiveFlags[u32_NodeIndex] != 0U)
                   {
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+                     const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
                      tgl_assert(pc_Node != NULL);
                      if (pc_Node != NULL)
                      {
                         // Check for connected interfaces
-                        uint32 u32_IntfCounter;
+                        uint32_t u32_IntfCounter;
                         bool q_AtLeastOneInftConnected = false;
 
                         for (u32_IntfCounter = 0U; u32_IntfCounter < pc_Node->c_Properties.c_ComInterfaces.size();
                              ++u32_IntfCounter)
                         {
-                           const C_OSCNodeComInterfaceSettings & rc_Intf =
+                           const C_OscNodeComInterfaceSettings & rc_Intf =
                               pc_Node->c_Properties.c_ComInterfaces[u32_IntfCounter];
 
                            if (rc_Intf.GetBusConnected() == true)
@@ -332,7 +334,7 @@ sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_Vi
                            // Check for an existing valid route
                            const C_SyvRoRouteCalculation c_RouteCalcCheck(
                               ou32_ViewIndex, u32_NodeIndex,
-                              stw_opensyde_core::C_OSCRoutingCalculation::eROUTING_CHECK);
+                              stw::opensyde_core::C_OscRoutingCalculation::eROUTING_CHECK);
 
                            if (c_RouteCalcCheck.GetState() == C_NO_ERR)
                            {
@@ -353,7 +355,7 @@ sint32 C_PuiSvHandler::GetNodeActiveFlagsWithSquadAdaptions(const uint32 ou32_Vi
                   // to the output parameter
                   for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_SubNodeActiveFlags.size(); ++u32_SubNodeCounter)
                   {
-                     const uint32 u32_NodeIndex = pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter];
+                     const uint32_t u32_NodeIndex = pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter];
                      orc_ActiveFlags[u32_NodeIndex] = c_SubNodeActiveFlags[u32_SubNodeCounter];
                   }
                }
@@ -408,9 +410,9 @@ void C_PuiSvHandler::SetLastKnownHalcCrcs(const std::map<C_PuiSvDbNodeDataPoolLi
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewName(const uint32 ou32_Index, const QString & orc_Name)
+int32_t C_PuiSvHandler::SetViewName(const uint32_t ou32_Index, const QString & orc_Name)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -436,15 +438,15 @@ sint32 C_PuiSvHandler::SetViewName(const uint32 ou32_Index, const QString & orc_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewNodeCheckedState(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                               const bool oq_Checked)
+int32_t C_PuiSvHandler::SetViewNodeCheckedState(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                const bool oq_Checked)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      rc_View.SetNodeCheckedState(ou32_NodeIndex, static_cast<uint8>(oq_Checked));
+      rc_View.SetNodeCheckedState(ou32_NodeIndex, static_cast<uint8_t>(oq_Checked));
    }
    else
    {
@@ -464,14 +466,14 @@ sint32 C_PuiSvHandler::SetViewNodeCheckedState(const uint32 ou32_ViewIndex, cons
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewPCBox(const uint32 ou32_Index, const C_PuiBsBox & orc_Box)
+int32_t C_PuiSvHandler::SetViewPcBox(const uint32_t ou32_Index, const C_PuiBsBox & orc_Box)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_Index];
-      rc_View.SetPCBox(orc_Box);
+      rc_View.SetPcBox(orc_Box);
    }
    else
    {
@@ -491,14 +493,14 @@ sint32 C_PuiSvHandler::SetViewPCBox(const uint32 ou32_Index, const C_PuiBsBox & 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewPCConnection(const uint32 ou32_Index, const C_PuiBsLineBase & orc_Line)
+int32_t C_PuiSvHandler::SetViewPcConnection(const uint32_t ou32_Index, const C_PuiBsLineBase & orc_Line)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_Index];
-      rc_View.SetPCConnection(orc_Line);
+      rc_View.SetPcConnection(orc_Line);
    }
    else
    {
@@ -519,14 +521,15 @@ sint32 C_PuiSvHandler::SetViewPCConnection(const uint32 ou32_Index, const C_PuiB
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewPCConnected(const uint32 ou32_Index, const bool oq_Connected, const uint32 ou32_BusIndex)
+int32_t C_PuiSvHandler::SetViewPcConnected(const uint32_t ou32_Index, const bool oq_Connected,
+                                           const uint32_t ou32_BusIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_Index];
-      rc_View.SetPCConnected(oq_Connected, ou32_BusIndex);
+      rc_View.SetPcConnected(oq_Connected, ou32_BusIndex);
    }
    else
    {
@@ -547,16 +550,16 @@ sint32 C_PuiSvHandler::SetViewPCConnected(const uint32 ou32_Index, const bool oq
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewPCCANDll(const uint32 ou32_Index, const C_PuiSvPc::E_CANDllType oe_Type,
-                                       const QString & orc_DllPath)
+int32_t C_PuiSvHandler::SetViewPcCanDll(const uint32_t ou32_Index, const C_PuiSvPc::E_CanDllType oe_Type,
+                                        const QString & orc_DllPath)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if (ou32_Index < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_Index];
-      rc_View.SetPCCANDllType(oe_Type);
-      rc_View.SetPCCANDllPath(orc_DllPath);
+      rc_View.SetPcCanDllType(oe_Type);
+      rc_View.SetPcCanDllPath(orc_DllPath);
 
       s32_Retval = C_NO_ERR;
    }
@@ -575,9 +578,9 @@ sint32 C_PuiSvHandler::SetViewPCCANDll(const uint32 ou32_Index, const C_PuiSvPc:
    C_RANGE  View index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewServiceModeActive(const uint32 ou32_Index, const bool oq_NewValue)
+int32_t C_PuiSvHandler::SetViewServiceModeActive(const uint32_t ou32_Index, const bool oq_NewValue)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -600,9 +603,9 @@ sint32 C_PuiSvHandler::SetViewServiceModeActive(const uint32 ou32_Index, const b
    C_RANGE  View index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewServiceModeSetupActive(const uint32 ou32_Index, const bool oq_NewValue)
+int32_t C_PuiSvHandler::SetViewServiceModeSetupActive(const uint32_t ou32_Index, const bool oq_NewValue)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -625,9 +628,9 @@ sint32 C_PuiSvHandler::SetViewServiceModeSetupActive(const uint32 ou32_Index, co
    C_RANGE  View index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewServiceModeUpdateActive(const uint32 ou32_Index, const bool oq_NewValue)
+int32_t C_PuiSvHandler::SetViewServiceModeUpdateActive(const uint32_t ou32_Index, const bool oq_NewValue)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -650,9 +653,9 @@ sint32 C_PuiSvHandler::SetViewServiceModeUpdateActive(const uint32 ou32_Index, c
    C_RANGE  View index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewServiceModeDashboardActive(const uint32 ou32_Index, const bool oq_NewValue)
+int32_t C_PuiSvHandler::SetViewServiceModeDashboardActive(const uint32_t ou32_Index, const bool oq_NewValue)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -675,10 +678,10 @@ sint32 C_PuiSvHandler::SetViewServiceModeDashboardActive(const uint32 ou32_Index
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardName(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                        const QString & orc_Name)
+int32_t C_PuiSvHandler::SetDashboardName(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                         const QString & orc_Name)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -704,10 +707,10 @@ sint32 C_PuiSvHandler::SetDashboardName(const uint32 ou32_ViewIndex, const uint3
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardComment(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                           const QString & orc_Comment)
+int32_t C_PuiSvHandler::SetDashboardComment(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                            const QString & orc_Comment)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -733,10 +736,10 @@ sint32 C_PuiSvHandler::SetDashboardComment(const uint32 ou32_ViewIndex, const ui
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardType(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                        const C_PuiSvDashboard::E_TabType oe_Type)
+int32_t C_PuiSvHandler::SetDashboardType(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                         const C_PuiSvDashboard::E_TabType oe_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -762,10 +765,10 @@ sint32 C_PuiSvHandler::SetDashboardType(const uint32 ou32_ViewIndex, const uint3
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardActive(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                          const bool oq_Active)
+int32_t C_PuiSvHandler::SetDashboardActive(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                           const bool oq_Active)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -791,10 +794,10 @@ sint32 C_PuiSvHandler::SetDashboardActive(const uint32 ou32_ViewIndex, const uin
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardTabIndex(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                            const sint32 os32_Value)
+int32_t C_PuiSvHandler::SetDashboardTabIndex(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                             const int32_t os32_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -822,11 +825,11 @@ sint32 C_PuiSvHandler::SetDashboardTabIndex(const uint32 ou32_ViewIndex, const u
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                          const uint32 ou32_WidgetIndex, const C_PuiSvDbWidgetBase * const opc_Box,
-                                          const C_PuiSvDbDataElement::E_Type oe_Type)
+int32_t C_PuiSvHandler::SetDashboardWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                           const uint32_t ou32_WidgetIndex, const C_PuiSvDbWidgetBase * const opc_Box,
+                                           const C_PuiSvDbDataElement::E_Type oe_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -853,10 +856,10 @@ sint32 C_PuiSvHandler::SetDashboardWidget(const uint32 ou32_ViewIndex, const uin
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardBoundary(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                            const uint32 & oru32_Index, const C_PuiBsBoundary & orc_Data)
+int32_t C_PuiSvHandler::SetDashboardBoundary(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                             const uint32_t & oru32_Index, const C_PuiBsBoundary & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -883,10 +886,10 @@ sint32 C_PuiSvHandler::SetDashboardBoundary(const uint32 ou32_ViewIndex, const u
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardImage(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                         const uint32 & oru32_Index, const C_PuiBsImage & orc_Data)
+int32_t C_PuiSvHandler::SetDashboardImage(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                          const uint32_t & oru32_Index, const C_PuiBsImage & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -913,10 +916,10 @@ sint32 C_PuiSvHandler::SetDashboardImage(const uint32 ou32_ViewIndex, const uint
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardLineArrow(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                             const uint32 & oru32_Index, const C_PuiBsLineArrow & orc_Data)
+int32_t C_PuiSvHandler::SetDashboardLineArrow(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                              const uint32_t & oru32_Index, const C_PuiBsLineArrow & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -943,10 +946,10 @@ sint32 C_PuiSvHandler::SetDashboardLineArrow(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetDashboardTextElement(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                               const uint32 & oru32_Index, const C_PuiBsTextElement & orc_Data)
+int32_t C_PuiSvHandler::SetDashboardTextElement(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                const uint32_t & oru32_Index, const C_PuiBsTextElement & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -971,9 +974,9 @@ sint32 C_PuiSvHandler::SetDashboardTextElement(const uint32 ou32_ViewIndex, cons
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewUpdateRateFast(const uint32 ou32_ViewIndex, const uint16 ou16_Value)
+int32_t C_PuiSvHandler::SetViewUpdateRateFast(const uint32_t ou32_ViewIndex, const uint16_t ou16_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -998,9 +1001,9 @@ sint32 C_PuiSvHandler::SetViewUpdateRateFast(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewUpdateRateMedium(const uint32 ou32_ViewIndex, const uint16 ou16_Value)
+int32_t C_PuiSvHandler::SetViewUpdateRateMedium(const uint32_t ou32_ViewIndex, const uint16_t ou16_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1025,9 +1028,9 @@ sint32 C_PuiSvHandler::SetViewUpdateRateMedium(const uint32 ou32_ViewIndex, cons
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewUpdateRateSlow(const uint32 ou32_ViewIndex, const uint16 ou16_Value)
+int32_t C_PuiSvHandler::SetViewUpdateRateSlow(const uint32_t ou32_ViewIndex, const uint16_t ou16_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1052,9 +1055,9 @@ sint32 C_PuiSvHandler::SetViewUpdateRateSlow(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewDeviceConfigSelectedBitRate(const uint32 ou32_ViewIndex, const uint32 ou32_Value)
+int32_t C_PuiSvHandler::SetViewDeviceConfigSelectedBitRate(const uint32_t ou32_ViewIndex, const uint32_t ou32_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1079,10 +1082,10 @@ sint32 C_PuiSvHandler::SetViewDeviceConfigSelectedBitRate(const uint32 ou32_View
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewDeviceConfigMode(const uint32 ou32_ViewIndex,
-                                               const C_PuiSvData::E_DeviceConfigurationMode oe_Value)
+int32_t C_PuiSvHandler::SetViewDeviceConfigMode(const uint32_t ou32_ViewIndex,
+                                                const C_PuiSvData::E_DeviceConfigurationMode oe_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1107,9 +1110,9 @@ sint32 C_PuiSvHandler::SetViewDeviceConfigMode(const uint32 ou32_ViewIndex,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewDarkModeActive(const uint32 ou32_ViewIndex, const bool oq_Value)
+int32_t C_PuiSvHandler::SetViewDarkModeActive(const uint32_t ou32_ViewIndex, const bool oq_Value)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1135,11 +1138,11 @@ sint32 C_PuiSvHandler::SetViewDarkModeActive(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetViewReadRailAssignment(const uint32 ou32_ViewIndex,
-                                                 const C_OSCNodeDataPoolListElementId & orc_Id,
-                                                 const C_PuiSvReadDataConfiguration & orc_Config)
+int32_t C_PuiSvHandler::SetViewReadRailAssignment(const uint32_t ou32_ViewIndex,
+                                                  const C_OscNodeDataPoolListElementId & orc_Id,
+                                                  const C_PuiSvReadDataConfiguration & orc_Config)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1164,10 +1167,10 @@ sint32 C_PuiSvHandler::SetViewReadRailAssignment(const uint32 ou32_ViewIndex,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformation(const uint32 ou32_ViewIndex,
-                                                const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation)
+int32_t C_PuiSvHandler::SetNodeUpdateInformation(const uint32_t ou32_ViewIndex,
+                                                 const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1193,10 +1196,10 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformation(const uint32 ou32_ViewIndex,
    C_RANGE     Node index invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformation(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                const C_PuiSvNodeUpdate & orc_NodeUpdateInformation)
+int32_t C_PuiSvHandler::SetNodeUpdateInformation(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                 const C_PuiSvNodeUpdate & orc_NodeUpdateInformation)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1224,11 +1227,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformation(const uint32 ou32_ViewIndex, con
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationPath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                    const uint32 ou32_Index, const QString & orc_Value,
-                                                    const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                     const uint32_t ou32_Index, const QString & orc_Value,
+                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1255,11 +1258,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationPath(const uint32 ou32_ViewIndex,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfo(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                         const uint32 ou32_Index,
-                                                         const C_PuiSvNodeUpdateParamInfo & orc_Value)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_Index,
+                                                          const C_PuiSvNodeUpdateParamInfo & orc_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1285,10 +1288,10 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfo(const uint32 ou32_ViewI
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationPemFilePath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                           const QString & orc_Value)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationPemFilePath(const uint32_t ou32_ViewIndex,
+                                                            const uint32_t ou32_NodeIndex, const QString & orc_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1316,12 +1319,12 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationPemFilePath(const uint32 ou32_Vie
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPath(const uint32 ou32_ViewIndex,
-                                                                const uint32 ou32_NodeIndex, const uint32 ou32_Index,
-                                                                const bool oq_SkipFile,
-                                                                const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPath(const uint32_t ou32_ViewIndex,
+                                                                 const uint32_t ou32_NodeIndex,
+                                                                 const uint32_t ou32_Index, const bool oq_SkipFile,
+                                                                 const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1348,11 +1351,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPath(const uint32 ou3
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32 ou32_ViewIndex,
-                                                                     const uint32 ou32_NodeIndex,
-                                                                     const uint32 ou32_Index, const bool oq_SkipFile)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32_t ou32_ViewIndex,
+                                                                      const uint32_t ou32_NodeIndex,
+                                                                      const uint32_t ou32_Index, const bool oq_SkipFile)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1378,10 +1381,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint3
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32 ou32_ViewIndex,
-                                                                   const uint32 ou32_NodeIndex, const bool oq_SkipFile)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_t ou32_ViewIndex,
+                                                                    const uint32_t ou32_NodeIndex,
+                                                                    const bool oq_SkipFile)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1408,11 +1412,11 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationStates(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                      const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                      const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationStates(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                       const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                       const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1440,12 +1444,13 @@ sint32 C_PuiSvHandler::SetNodeUpdateInformationStates(const uint32 ou32_ViewInde
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetNodeUpdateInformationParamInfoContent(const uint32 ou32_ViewIndex,
-                                                                const uint32 ou32_NodeIndex, const uint32 ou32_Index,
-                                                                const QString & orc_FilePath,
-                                                                const uint32 ou32_LastKnownCrc)
+int32_t C_PuiSvHandler::SetNodeUpdateInformationParamInfoContent(const uint32_t ou32_ViewIndex,
+                                                                 const uint32_t ou32_NodeIndex,
+                                                                 const uint32_t ou32_Index,
+                                                                 const QString & orc_FilePath,
+                                                                 const uint32_t ou32_LastKnownCrc)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1486,9 +1491,9 @@ void C_PuiSvHandler::AddView(const C_PuiSvData & orc_View, const bool oq_AutoAda
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SetView(const uint32 ou32_Index, const C_PuiSvData & orc_View)
+int32_t C_PuiSvHandler::SetView(const uint32_t ou32_Index, const C_PuiSvData & orc_View)
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    if (ou32_Index <= this->mc_Views.size())
    {
@@ -1513,10 +1518,10 @@ sint32 C_PuiSvHandler::SetView(const uint32 ou32_Index, const C_PuiSvData & orc_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertView(const uint32 ou32_Index, const C_PuiSvData & orc_View, const bool oq_AutoAdaptName,
-                                  const bool oq_AutoAdaptContent)
+int32_t C_PuiSvHandler::InsertView(const uint32_t ou32_Index, const C_PuiSvData & orc_View, const bool oq_AutoAdaptName,
+                                   const bool oq_AutoAdaptContent)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index <= this->mc_Views.size())
    {
@@ -1528,7 +1533,7 @@ sint32 C_PuiSvHandler::InsertView(const uint32 ou32_Index, const C_PuiSvData & o
       }
       if (oq_AutoAdaptName == true)
       {
-         c_TmpView.SetName(C_Uti::h_GetUniqueNameQ(this->m_GetExistingViewNames(), c_TmpView.GetName()));
+         c_TmpView.SetName(C_Uti::h_GetUniqueNameQt(this->m_GetExistingViewNames(), c_TmpView.GetName()));
       }
       this->mc_Views.insert(this->mc_Views.begin() + ou32_Index, c_TmpView);
    }
@@ -1552,10 +1557,11 @@ sint32 C_PuiSvHandler::InsertView(const uint32 ou32_Index, const C_PuiSvData & o
    C_NOACT  Already exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddViewReadRailItem(const uint32 ou32_ViewIndex, const C_OSCNodeDataPoolListElementId & orc_Id,
-                                           const C_PuiSvReadDataConfiguration & orc_Config)
+int32_t C_PuiSvHandler::AddViewReadRailItem(const uint32_t ou32_ViewIndex,
+                                            const C_OscNodeDataPoolListElementId & orc_Id,
+                                            const C_PuiSvReadDataConfiguration & orc_Config)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1582,11 +1588,11 @@ sint32 C_PuiSvHandler::AddViewReadRailItem(const uint32 ou32_ViewIndex, const C_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddNodeUpdateInformationPath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                    const QString & orc_Value,
-                                                    const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+int32_t C_PuiSvHandler::AddNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                     const QString & orc_Value,
+                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1612,10 +1618,10 @@ sint32 C_PuiSvHandler::AddNodeUpdateInformationPath(const uint32 ou32_ViewIndex,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddNodeUpdateInformationParamInfo(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                         const C_PuiSvNodeUpdateParamInfo & orc_Value)
+int32_t C_PuiSvHandler::AddNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                          const C_PuiSvNodeUpdateParamInfo & orc_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1641,10 +1647,10 @@ sint32 C_PuiSvHandler::AddNodeUpdateInformationParamInfo(const uint32 ou32_ViewI
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddDashboard(const uint32 ou32_ViewIndex, const C_PuiSvDashboard & orc_Dashboard,
-                                    const bool oq_AutoAdapt)
+int32_t C_PuiSvHandler::AddDashboard(const uint32_t ou32_ViewIndex, const C_PuiSvDashboard & orc_Dashboard,
+                                     const bool oq_AutoAdapt)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1672,12 +1678,12 @@ sint32 C_PuiSvHandler::AddDashboard(const uint32 ou32_ViewIndex, const C_PuiSvDa
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertDashboard(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                       const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt,
-                                       const QMap<C_OSCNodeDataPoolListElementId,
-                                                  C_PuiSvReadDataConfiguration> * const opc_Rails)
+int32_t C_PuiSvHandler::InsertDashboard(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                        const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt,
+                                        const QMap<C_OscNodeDataPoolListElementId,
+                                                   C_PuiSvReadDataConfiguration> * const opc_Rails)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1704,11 +1710,11 @@ sint32 C_PuiSvHandler::InsertDashboard(const uint32 ou32_ViewIndex, const uint32
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                          const C_PuiSvDbWidgetBase * const opc_Box,
-                                          const C_PuiSvDbDataElement::E_Type oe_Type)
+int32_t C_PuiSvHandler::AddDashboardWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                           const C_PuiSvDbWidgetBase * const opc_Box,
+                                           const C_PuiSvDbDataElement::E_Type oe_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1736,11 +1742,12 @@ sint32 C_PuiSvHandler::AddDashboardWidget(const uint32 ou32_ViewIndex, const uin
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                             const uint32 ou32_WidgetIndex, const C_PuiSvDbWidgetBase * const opc_Box,
-                                             const C_PuiSvDbDataElement::E_Type oe_Type)
+int32_t C_PuiSvHandler::InsertDashboardWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                              const uint32_t ou32_WidgetIndex,
+                                              const C_PuiSvDbWidgetBase * const opc_Box,
+                                              const C_PuiSvDbDataElement::E_Type oe_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1766,10 +1773,10 @@ sint32 C_PuiSvHandler::InsertDashboardWidget(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddDashboardBoundary(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                            const C_PuiBsBoundary & orc_Data)
+int32_t C_PuiSvHandler::AddDashboardBoundary(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                             const C_PuiBsBoundary & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1796,10 +1803,10 @@ sint32 C_PuiSvHandler::AddDashboardBoundary(const uint32 ou32_ViewIndex, const u
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertDashboardBoundary(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                               const uint32 & oru32_Index, const C_PuiBsBoundary & orc_Data)
+int32_t C_PuiSvHandler::InsertDashboardBoundary(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                const uint32_t & oru32_Index, const C_PuiBsBoundary & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1825,10 +1832,10 @@ sint32 C_PuiSvHandler::InsertDashboardBoundary(const uint32 ou32_ViewIndex, cons
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddDashboardImage(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                         const C_PuiBsImage & orc_Data)
+int32_t C_PuiSvHandler::AddDashboardImage(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                          const C_PuiBsImage & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1855,10 +1862,10 @@ sint32 C_PuiSvHandler::AddDashboardImage(const uint32 ou32_ViewIndex, const uint
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertDashboardImage(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                            const uint32 & oru32_Index, const C_PuiBsImage & orc_Data)
+int32_t C_PuiSvHandler::InsertDashboardImage(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                             const uint32_t & oru32_Index, const C_PuiBsImage & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1884,10 +1891,10 @@ sint32 C_PuiSvHandler::InsertDashboardImage(const uint32 ou32_ViewIndex, const u
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddDashboardLineArrow(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                             const C_PuiBsLineArrow & orc_Data)
+int32_t C_PuiSvHandler::AddDashboardLineArrow(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                              const C_PuiBsLineArrow & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1914,10 +1921,10 @@ sint32 C_PuiSvHandler::AddDashboardLineArrow(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertDashboardLineArrow(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                                const uint32 & oru32_Index, const C_PuiBsLineArrow & orc_Data)
+int32_t C_PuiSvHandler::InsertDashboardLineArrow(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                 const uint32_t & oru32_Index, const C_PuiBsLineArrow & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1943,10 +1950,10 @@ sint32 C_PuiSvHandler::InsertDashboardLineArrow(const uint32 ou32_ViewIndex, con
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddDashboardTextElement(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                               const C_PuiBsTextElement & orc_Data)
+int32_t C_PuiSvHandler::AddDashboardTextElement(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                const C_PuiBsTextElement & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -1973,10 +1980,10 @@ sint32 C_PuiSvHandler::AddDashboardTextElement(const uint32 ou32_ViewIndex, cons
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::InsertDashboardTextElement(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                                  const uint32 & oru32_Index, const C_PuiBsTextElement & orc_Data)
+int32_t C_PuiSvHandler::InsertDashboardTextElement(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                   const uint32_t & oru32_Index, const C_PuiBsTextElement & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2000,9 +2007,9 @@ sint32 C_PuiSvHandler::InsertDashboardTextElement(const uint32 ou32_ViewIndex, c
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteView(const uint32 ou32_Index)
+int32_t C_PuiSvHandler::DeleteView(const uint32_t ou32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Views.size())
    {
@@ -2028,10 +2035,10 @@ sint32 C_PuiSvHandler::DeleteView(const uint32 ou32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::RemoveViewReadRailItem(const uint32 ou32_ViewIndex,
-                                              const C_OSCNodeDataPoolListElementId & orc_Id)
+int32_t C_PuiSvHandler::RemoveViewReadRailItem(const uint32_t ou32_ViewIndex,
+                                               const C_OscNodeDataPoolListElementId & orc_Id)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2058,11 +2065,11 @@ sint32 C_PuiSvHandler::RemoveViewReadRailItem(const uint32 ou32_ViewIndex,
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::RemoveNodeUpdateInformationPath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                       const uint32 ou32_Index,
-                                                       const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+int32_t C_PuiSvHandler::RemoveNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                        const uint32_t ou32_Index,
+                                                        const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2088,10 +2095,10 @@ sint32 C_PuiSvHandler::RemoveNodeUpdateInformationPath(const uint32 ou32_ViewInd
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::RemoveNodeUpdateInformationParamInfo(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                            const uint32 ou32_Index)
+int32_t C_PuiSvHandler::RemoveNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex,
+                                                             const uint32_t ou32_NodeIndex, const uint32_t ou32_Index)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2116,9 +2123,10 @@ sint32 C_PuiSvHandler::RemoveNodeUpdateInformationParamInfo(const uint32 ou32_Vi
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::RemoveNodeUpdateInformationPemFilePath(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex)
+int32_t C_PuiSvHandler::RemoveNodeUpdateInformationPemFilePath(const uint32_t ou32_ViewIndex,
+                                                               const uint32_t ou32_NodeIndex)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2144,10 +2152,11 @@ sint32 C_PuiSvHandler::RemoveNodeUpdateInformationPemFilePath(const uint32 ou32_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::ClearNodeUpdateInformationAsAppropriate(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                               const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+int32_t C_PuiSvHandler::ClearNodeUpdateInformationAsAppropriate(const uint32_t ou32_ViewIndex,
+                                                                const uint32_t ou32_NodeIndex,
+                                                                const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2172,9 +2181,10 @@ sint32 C_PuiSvHandler::ClearNodeUpdateInformationAsAppropriate(const uint32 ou32
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::ClearNodeUpdateInformationParamPaths(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex)
+int32_t C_PuiSvHandler::ClearNodeUpdateInformationParamPaths(const uint32_t ou32_ViewIndex,
+                                                             const uint32_t ou32_NodeIndex)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2199,9 +2209,9 @@ sint32 C_PuiSvHandler::ClearNodeUpdateInformationParamPaths(const uint32 ou32_Vi
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteDashboard(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex)
+int32_t C_PuiSvHandler::DeleteDashboard(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2228,10 +2238,11 @@ sint32 C_PuiSvHandler::DeleteDashboard(const uint32 ou32_ViewIndex, const uint32
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteDashboardWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                             const uint32 ou32_WidgetIndex, const C_PuiSvDbDataElement::E_Type oe_Type)
+int32_t C_PuiSvHandler::DeleteDashboardWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                              const uint32_t ou32_WidgetIndex,
+                                              const C_PuiSvDbDataElement::E_Type oe_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2257,10 +2268,10 @@ sint32 C_PuiSvHandler::DeleteDashboardWidget(const uint32 ou32_ViewIndex, const 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteDashboardBoundary(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                               const uint32 & oru32_Index)
+int32_t C_PuiSvHandler::DeleteDashboardBoundary(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2286,10 +2297,10 @@ sint32 C_PuiSvHandler::DeleteDashboardBoundary(const uint32 ou32_ViewIndex, cons
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteDashboardImage(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                            const uint32 & oru32_Index)
+int32_t C_PuiSvHandler::DeleteDashboardImage(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                             const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2315,10 +2326,10 @@ sint32 C_PuiSvHandler::DeleteDashboardImage(const uint32 ou32_ViewIndex, const u
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteDashboardLineArrow(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                                const uint32 & oru32_Index)
+int32_t C_PuiSvHandler::DeleteDashboardLineArrow(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                 const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2344,10 +2355,10 @@ sint32 C_PuiSvHandler::DeleteDashboardLineArrow(const uint32 ou32_ViewIndex, con
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::DeleteDashboardTextElement(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
-                                                  const uint32 & oru32_Index)
+int32_t C_PuiSvHandler::DeleteDashboardTextElement(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
+                                                   const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2389,9 +2400,9 @@ void C_PuiSvHandler::Clear(void)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
+int32_t C_PuiSvHandler::MoveView(const uint32_t ou32_StartIndex, const uint32_t ou32_TargetIndex)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
    const C_PuiSvData * const pc_View = this->GetView(ou32_StartIndex);
 
    if (pc_View != NULL)
@@ -2421,9 +2432,10 @@ sint32 C_PuiSvHandler::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::SyncDashboardScalingInformation(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex)
+int32_t C_PuiSvHandler::SyncDashboardScalingInformation(const uint32_t ou32_ViewIndex,
+                                                        const uint32_t ou32_DashboardIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -2443,7 +2455,7 @@ sint32 C_PuiSvHandler::SyncDashboardScalingInformation(const uint32 ou32_ViewInd
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::UpdateSystemDefintionErrors(void)
 {
-   const uint32 u32_SysDefHash = C_PuiSdHandler::h_GetInstance()->CalcHashSystemDefinition();
+   const uint32_t u32_SysDefHash = C_PuiSdHandler::h_GetInstance()->CalcHashSystemDefinition();
 
    if (u32_SysDefHash != this->mu32_PreviousSystemDefintionHash)
    {
@@ -2451,15 +2463,15 @@ void C_PuiSvHandler::UpdateSystemDefintionErrors(void)
       this->mc_SdNodeErrors.clear();
       this->mc_SdBusErrors.clear();
       //Node error
-      this->mc_SdNodeErrors.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
-      for (uint32 u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+      this->mc_SdNodeErrors.reserve(C_PuiSdHandler::h_GetInstance()->GetOscNodesSize());
+      for (uint32_t u32_ItNode = 0; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
       {
          const bool q_Error = C_PuiSdHandler::h_GetInstance()->CheckNodeConflict(u32_ItNode);
          this->mc_SdNodeErrors.push_back(q_Error);
       }
       //Bus error
-      this->mc_SdBusErrors.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
-      for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+      this->mc_SdBusErrors.reserve(C_PuiSdHandler::h_GetInstance()->GetOscBusesSize());
+      for (uint32_t u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_ItBus)
       {
          const bool q_Error = C_PuiSdHandler::h_GetInstance()->CheckBusConflict(u32_ItBus);
          this->mc_SdBusErrors.push_back(q_Error);
@@ -2479,7 +2491,7 @@ void C_PuiSvHandler::UpdateSystemDefintionErrors(void)
    Buffered error for node
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvHandler::GetErrorNode(const uint32 ou32_Index) const
+bool C_PuiSvHandler::GetErrorNode(const uint32_t ou32_Index) const
 {
    bool q_Retval = true;
 
@@ -2499,7 +2511,7 @@ bool C_PuiSvHandler::GetErrorNode(const uint32 ou32_Index) const
    Buffered error for bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
+bool C_PuiSvHandler::GetErrorBus(const uint32_t ou32_Index) const
 {
    bool q_Retval = true;
 
@@ -2515,7 +2527,7 @@ bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
 
    \param[in]      ou32_Index                            View index
    \param[in,out]  opq_NameInvalid                       Name conflict
-   \param[in,out]  opq_PCNotConnected                    PC not connected
+   \param[in,out]  opq_PcNotConnected                    PC not connected
    \param[in,out]  opq_RoutingInvalid                    Routing invalid
    \param[in,out]  opq_RoutingUpdateInvalid              Update routing invalid
    \param[in,out]  opq_RoutingDashboardInvalid           Dashboard routing invalid
@@ -2530,35 +2542,35 @@ bool C_PuiSvHandler::GetErrorBus(const uint32 ou32_Index) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_NameInvalid,
-                                      bool * const opq_PCNotConnected, bool * const opq_RoutingInvalid,
-                                      bool * const opq_RoutingUpdateInvalid, bool * const opq_RoutingDashboardInvalid,
-                                      bool * const opq_SysDefInvalid, bool * const opq_NoNodesActive,
-                                      std::vector<QString> * const opc_RoutingErrorDetails,
-                                      QString * const opc_SetupRoutingWarningDetails)
+int32_t C_PuiSvHandler::CheckViewError(const uint32_t ou32_Index, bool * const opq_NameInvalid,
+                                       bool * const opq_PcNotConnected, bool * const opq_RoutingInvalid,
+                                       bool * const opq_RoutingUpdateInvalid, bool * const opq_RoutingDashboardInvalid,
+                                       bool * const opq_SysDefInvalid, bool * const opq_NoNodesActive,
+                                       std::vector<QString> * const opc_RoutingErrorDetails,
+                                       QString * const opc_SetupRoutingWarningDetails)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < this->mc_Views.size())
    {
-      const uint32 u32_Hash = this->GetViewHash(ou32_Index);
-      const QMap<stw_types::uint32,
+      const uint32_t u32_Hash = this->GetViewHash(ou32_Index);
+      const QMap<uint32_t,
                  C_PuiSvViewErrorDetails>::const_iterator c_It = this->mc_PreviousErrorCheckResults.find(u32_Hash);
       if (c_It == this->mc_PreviousErrorCheckResults.end())
       {
          const C_PuiSvData & rc_CheckedData = this->mc_Views[ou32_Index];
          C_PuiSvViewErrorDetails c_Details;
          std::vector<QString> c_ErrorMessages;
-         std::set<uint32> c_NodesWithDashboardRoutingError;
-         std::set<uint32> c_NodesRelevantForDashboardRouting;
+         std::set<uint32_t> c_NodesWithDashboardRoutingError;
+         std::set<uint32_t> c_NodesRelevantForDashboardRouting;
          QString c_SetupWarningMessage;
-         std::vector<uint8> c_NodeActiveFlags;
+         std::vector<uint8_t> c_NodeActiveFlags;
 
          // Get the adapted node active flags in which the not reachable sub nodes of squads are deactivated
          this->GetNodeActiveFlagsWithSquadAdaptions(ou32_Index, c_NodeActiveFlags);
          //Name check
          c_Details.q_NameInvalid = false;
-         for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+         for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
          {
             if (u32_ItView != ou32_Index)
             {
@@ -2570,7 +2582,7 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
             }
          }
          //Check PC connected
-         c_Details.q_PCNotConnected = !rc_CheckedData.GetPcData().GetConnected();
+         c_Details.q_PcNotConnected = !rc_CheckedData.GetPcData().GetConnected();
          //Check all routing details
          tgl_assert(this->m_CheckRouting(ou32_Index, c_NodeActiveFlags, c_SetupWarningMessage, c_ErrorMessages,
                                          c_NodesWithDashboardRoutingError,
@@ -2583,9 +2595,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Check system definition
          c_Details.q_SysDefInvalid = false;
          //Node error
-         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
+         for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
          {
-            if (c_NodeActiveFlags[u32_ItNode] == true)
+            if (c_NodeActiveFlags[u32_ItNode] == 1)
             {
                if (this->GetErrorNode(u32_ItNode) == true)
                {
@@ -2597,7 +2609,7 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Bus error
          if (c_Details.q_SysDefInvalid == false)
          {
-            for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+            for (uint32_t u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_ItBus)
             {
                if (this->CheckBusDisabled(ou32_Index, u32_ItBus) == false)
                {
@@ -2612,9 +2624,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Check any nodes active
          c_Details.q_NoNodesActive = true;
          //Node error
-         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
+         for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
          {
-            if (c_NodeActiveFlags[u32_ItNode] == true)
+            if (c_NodeActiveFlags[u32_ItNode] == 1)
             {
                c_Details.q_NoNodesActive = false;
                break;
@@ -2623,7 +2635,7 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          c_Details.c_ResultingNodeActiveStatus = rc_CheckedData.GetNodeActiveFlags();
 
          //Return error details
-         c_Details.GetResults(opq_NameInvalid, opq_PCNotConnected, opq_RoutingInvalid,
+         c_Details.GetResults(opq_NameInvalid, opq_PcNotConnected, opq_RoutingInvalid,
                               opq_RoutingUpdateInvalid, opq_RoutingDashboardInvalid, opq_SysDefInvalid,
                               opq_NoNodesActive,
                               opc_RoutingErrorDetails, opc_SetupRoutingWarningDetails);
@@ -2635,7 +2647,7 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
          //Always update node active flags
          C_PuiSvData & rc_CheckedData = this->mc_Views[ou32_Index];
          rc_CheckedData.SetNodeActiveFlags(c_It.value().c_ResultingNodeActiveStatus);
-         c_It.value().GetResults(opq_NameInvalid, opq_PCNotConnected, opq_RoutingInvalid,
+         c_It.value().GetResults(opq_NameInvalid, opq_PcNotConnected, opq_RoutingInvalid,
                                  opq_RoutingUpdateInvalid, opq_RoutingDashboardInvalid, opq_SysDefInvalid,
                                  opq_NoNodesActive,
                                  opc_RoutingErrorDetails, opc_SetupRoutingWarningDetails);
@@ -2660,9 +2672,9 @@ sint32 C_PuiSvHandler::CheckViewError(const uint32 ou32_Index, bool * const opq_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, bool & orq_ReconnectNecessary)
+int32_t C_PuiSvHandler::CheckViewReconnectNecessary(const uint32_t ou32_ViewIndex, bool & orq_ReconnectNecessary)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orq_ReconnectNecessary = false;
 
@@ -2675,7 +2687,7 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
       //Check if bus exists
       if (rc_View.GetPcData().GetConnected() == true)
       {
-         if (rc_View.GetPcData().GetBusIndex() >= C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize())
+         if (rc_View.GetPcData().GetBusIndex() >= C_PuiSdHandler::h_GetInstance()->GetOscBusesSize())
          {
             orq_ReconnectNecessary = true;
          }
@@ -2691,7 +2703,7 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
       else
       {
          //Check if any bus enabled
-         for (uint32 u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+         for (uint32_t u32_ItBus = 0; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_ItBus)
          {
             if (this->CheckBusDisabled(ou32_ViewIndex, u32_ItBus) == false)
             {
@@ -2720,17 +2732,17 @@ sint32 C_PuiSvHandler::CheckViewReconnectNecessary(const uint32 ou32_ViewIndex, 
    C_CONFIG Operation failure: CheckViewError was not executed for the specific view with the current configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CheckViewNodeDashboardRoutingError(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                                          bool & orq_RoutingDashboardError)
+int32_t C_PuiSvHandler::CheckViewNodeDashboardRoutingError(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                           bool & orq_RoutingDashboardError)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orq_RoutingDashboardError = false;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      const uint32 u32_Hash = this->GetViewHash(ou32_ViewIndex);
-      QMap<stw_types::uint32, C_PuiSvViewErrorDetails>::const_iterator c_It = this->mc_PreviousErrorCheckResults.find(
+      const uint32_t u32_Hash = this->GetViewHash(ou32_ViewIndex);
+      QMap<uint32_t, C_PuiSvViewErrorDetails>::const_iterator c_It = this->mc_PreviousErrorCheckResults.find(
          u32_Hash);
       if (c_It != this->mc_PreviousErrorCheckResults.end())
       {
@@ -2782,15 +2794,15 @@ sint32 C_PuiSvHandler::CheckViewNodeDashboardRoutingError(const uint32 ou32_View
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::GetViewNodeDashboardRoutingErrors(const uint32 ou32_ViewIndex,
-                                                         std::set<stw_types::uint32> & orc_NodesWithErrors)
+int32_t C_PuiSvHandler::GetViewNodeDashboardRoutingErrors(const uint32_t ou32_ViewIndex,
+                                                          std::set<uint32_t> & orc_NodesWithErrors)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      const uint32 u32_Hash = this->GetViewHash(ou32_ViewIndex);
-      const QMap<stw_types::uint32,
+      const uint32_t u32_Hash = this->GetViewHash(ou32_ViewIndex);
+      const QMap<uint32_t,
                  C_PuiSvViewErrorDetails>::const_iterator c_It = this->mc_PreviousErrorCheckResults.find(u32_Hash);
       if (c_It != this->mc_PreviousErrorCheckResults.end())
       {
@@ -2818,15 +2830,15 @@ sint32 C_PuiSvHandler::GetViewNodeDashboardRoutingErrors(const uint32 ou32_ViewI
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::GetViewRelevantNodesForDashboardRouting(const uint32 ou32_ViewIndex,
-                                                               std::set<stw_types::uint32> & orc_RelevantNodes)
+int32_t C_PuiSvHandler::GetViewRelevantNodesForDashboardRouting(const uint32_t ou32_ViewIndex,
+                                                                std::set<uint32_t> & orc_RelevantNodes)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      const uint32 u32_Hash = this->GetViewHash(ou32_ViewIndex);
-      const QMap<stw_types::uint32,
+      const uint32_t u32_Hash = this->GetViewHash(ou32_ViewIndex);
+      const QMap<uint32_t,
                  C_PuiSvViewErrorDetails>::const_iterator c_It = this->mc_PreviousErrorCheckResults.find(u32_Hash);
       if (c_It != this->mc_PreviousErrorCheckResults.end())
       {
@@ -2851,34 +2863,34 @@ sint32 C_PuiSvHandler::GetViewRelevantNodesForDashboardRouting(const uint32 ou32
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListElementId & orc_NewId)
+int32_t C_PuiSvHandler::CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListElementId & orc_NewId)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_NewId.GetIsValid())
    {
-      C_OSCNodeDataPool::E_Type e_Type;
+      C_OscNodeDataPool::E_Type e_Type;
       if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(orc_NewId.u32_NodeIndex, orc_NewId.u32_DataPoolIndex,
                                                            e_Type) == C_NO_ERR)
       {
-         if ((e_Type == C_OSCNodeDataPool::eHALC) ||
-             (e_Type == C_OSCNodeDataPool::eHALC_NVM))
+         if ((e_Type == C_OscNodeDataPool::eHALC) ||
+             (e_Type == C_OscNodeDataPool::eHALC_NVM))
          {
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_NewId.u32_NodeIndex);
-            const C_OSCNodeDataPool * const pc_Dp =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_NewId.u32_NodeIndex,
+            const C_OscNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_NewId.u32_NodeIndex);
+            const C_OscNodeDataPool * const pc_Dp =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_NewId.u32_NodeIndex,
                                                                orc_NewId.u32_DataPoolIndex);
-            const C_OSCNodeDataPoolListElement * const pc_Element =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_NewId.u32_NodeIndex,
+            const C_OscNodeDataPoolListElement * const pc_Element =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_NewId.u32_NodeIndex,
                                                                           orc_NewId.u32_DataPoolIndex,
                                                                           orc_NewId.u32_ListIndex,
                                                                           orc_NewId.u32_ElementIndex);
             if ((pc_Node != NULL) && ((pc_Element != NULL) && (pc_Dp != NULL)))
             {
                const std::string c_Tmp = orc_NewId.GetHalChannelName().toStdString();
-               uint32 u32_Hash = 0UL;
-               if (pc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING)
+               uint32_t u32_Hash = 0UL;
+               if (pc_Node->c_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING)
                {
                   pc_Element->CalcHashElement(u32_Hash, orc_NewId.GetArrayElementIndexOrZero());
                }
@@ -2886,7 +2898,7 @@ sint32 C_PuiSvHandler::CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListE
                {
                   pc_Element->CalcHashStructure(u32_Hash);
                }
-               stw_scl::C_SCLChecksums::CalcCRC32(
+               stw::scl::C_SclChecksums::CalcCRC32(
                   c_Tmp.c_str(), c_Tmp.length(), u32_Hash);
                this->mc_LastKnownHalcCrcs[orc_NewId] = C_PuiSvLastKnownHalElementId(u32_Hash, pc_Dp->c_Name.c_str());
             }
@@ -2916,11 +2928,11 @@ sint32 C_PuiSvHandler::CheckAndHandleNewElement(const C_PuiSvDbNodeDataPoolListE
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CalcViewRoutingCrcName(const uint32 ou32_ViewIndex, const QString & orc_NodeName,
-                                              uint32 & oru32_Crc) const
+int32_t C_PuiSvHandler::CalcViewRoutingCrcName(const uint32_t ou32_ViewIndex, const QString & orc_NodeName,
+                                               uint32_t & oru32_Crc) const
 {
-   uint32 u32_NodeIndex;
-   sint32 s32_Retval = C_PuiSdHandler::h_GetInstance()->MapNodeNameToIndex(orc_NodeName, u32_NodeIndex);
+   uint32_t u32_NodeIndex;
+   int32_t s32_Retval = C_PuiSdHandler::h_GetInstance()->MapNodeNameToIndex(orc_NodeName, u32_NodeIndex);
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -2942,10 +2954,10 @@ sint32 C_PuiSvHandler::CalcViewRoutingCrcName(const uint32 ou32_ViewIndex, const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
-                                               uint32 & oru32_Crc) const
+int32_t C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
+                                                uint32_t & oru32_Crc) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    const C_PuiSvData * const pc_View = this->GetView(ou32_ViewIndex);
 
@@ -2953,17 +2965,17 @@ sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, cons
    {
       if (pc_View->GetNodeActive(ou32_NodeIndex))
       {
-         const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+         const stw::opensyde_core::C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
             ou32_NodeIndex);
 
          if (pc_Node != NULL)
          {
             // Check update routes
             const C_SyvRoRouteCalculation c_RouteCalcUpdate(ou32_ViewIndex, ou32_NodeIndex,
-                                                            stw_opensyde_core::C_OSCRoutingCalculation::eUPDATE);
+                                                            stw::opensyde_core::C_OscRoutingCalculation::eUPDATE);
             if (c_RouteCalcUpdate.GetState() == C_NO_ERR)
             {
-               const C_OSCRoutingRoute * const pc_Route = c_RouteCalcUpdate.GetBestRoute();
+               const C_OscRoutingRoute * const pc_Route = c_RouteCalcUpdate.GetBestRoute();
                if (pc_Route != NULL)
                {
                   QString c_Name;
@@ -2976,38 +2988,38 @@ sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, cons
                   if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetPcData().GetBusIndex(),
                                                                          c_Name) == C_NO_ERR)
                   {
-                     stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                     stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
                      if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(pc_Route->u32_TargetNodeIndex,
                                                                              c_Name) == C_NO_ERR)
                      {
-                        stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
+                        stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
 
-                        for (uint32 u32_ItRoute = 0UL;
+                        for (uint32_t u32_ItRoute = 0UL;
                              (u32_ItRoute < pc_Route->c_VecRoutePoints.size()) && (s32_Retval == C_NO_ERR);
                              ++u32_ItRoute)
                         {
-                           const C_OSCRoutingRoutePoint & rc_Route = pc_Route->c_VecRoutePoints[u32_ItRoute];
+                           const C_OscRoutingRoutePoint & rc_Route = pc_Route->c_VecRoutePoints[u32_ItRoute];
 
                            //Others
-                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_InInterfaceType,
-                                                              sizeof(rc_Route.e_InInterfaceType), oru32_Crc);
-                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.e_OutInterfaceType,
-                                                              sizeof(rc_Route.e_OutInterfaceType), oru32_Crc);
-                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InInterfaceNumber,
-                                                              sizeof(rc_Route.u8_InInterfaceNumber), oru32_Crc);
-                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutInterfaceNumber,
-                                                              sizeof(rc_Route.u8_OutInterfaceNumber), oru32_Crc);
-                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_InNodeID,
-                                                              sizeof(rc_Route.u8_InNodeID), oru32_Crc);
-                           stw_scl::C_SCLChecksums::CalcCRC32(&rc_Route.u8_OutNodeID,
-                                                              sizeof(rc_Route.u8_OutNodeID), oru32_Crc);
+                           stw::scl::C_SclChecksums::CalcCRC32(&rc_Route.e_InInterfaceType,
+                                                               sizeof(rc_Route.e_InInterfaceType), oru32_Crc);
+                           stw::scl::C_SclChecksums::CalcCRC32(&rc_Route.e_OutInterfaceType,
+                                                               sizeof(rc_Route.e_OutInterfaceType), oru32_Crc);
+                           stw::scl::C_SclChecksums::CalcCRC32(&rc_Route.u8_InInterfaceNumber,
+                                                               sizeof(rc_Route.u8_InInterfaceNumber), oru32_Crc);
+                           stw::scl::C_SclChecksums::CalcCRC32(&rc_Route.u8_OutInterfaceNumber,
+                                                               sizeof(rc_Route.u8_OutInterfaceNumber), oru32_Crc);
+                           stw::scl::C_SclChecksums::CalcCRC32(&rc_Route.u8_InNodeId,
+                                                               sizeof(rc_Route.u8_InNodeId), oru32_Crc);
+                           stw::scl::C_SclChecksums::CalcCRC32(&rc_Route.u8_OutNodeId,
+                                                               sizeof(rc_Route.u8_OutNodeId), oru32_Crc);
 
                            //Names
                            if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_InBusIndex,
                                                                                   c_Name) == C_NO_ERR)
                            {
-                              stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                 c_Name.length(), oru32_Crc);
+                              stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                  c_Name.length(), oru32_Crc);
                            }
                            else
                            {
@@ -3018,13 +3030,13 @@ sint32 C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32 ou32_ViewIndex, cons
                               if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(rc_Route.u32_OutBusIndex,
                                                                                      c_Name) == C_NO_ERR)
                               {
-                                 stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                    c_Name.length(), oru32_Crc);
+                                 stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                     c_Name.length(), oru32_Crc);
                                  if (C_PuiSdHandler::h_GetInstance()->MapNodeIndexToName(rc_Route.u32_NodeIndex,
                                                                                          c_Name) == C_NO_ERR)
                                  {
-                                    stw_scl::C_SCLChecksums::CalcCRC32(c_Name.toStdString().c_str(),
-                                                                       c_Name.length(), oru32_Crc);
+                                    stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(),
+                                                                        c_Name.length(), oru32_Crc);
                                  }
                                  else
                                  {
@@ -3088,12 +3100,12 @@ QString C_PuiSvHandler::h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId 
    {
       if (orc_Id.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
       {
-         C_OSCNodeDataPool::E_Type e_Type;
+         C_OscNodeDataPool::E_Type e_Type;
          if ((C_PuiSdHandler::h_GetInstance()->GetDataPoolType(orc_Id.u32_NodeIndex, orc_Id.u32_DataPoolIndex,
                                                                e_Type) == C_NO_ERR) &&
-             ((e_Type == C_OSCNodeDataPool::eHALC) || (e_Type == C_OSCNodeDataPool::eHALC_NVM)))
+             ((e_Type == C_OscNodeDataPool::eHALC) || (e_Type == C_OscNodeDataPool::eHALC_NVM)))
          {
-            c_Retval = C_PuiSdUtil::h_GetHALCNamespace(orc_Id);
+            c_Retval = C_PuiSdUtil::h_GetHalcNamespace(orc_Id);
          }
          else
          {
@@ -3125,19 +3137,19 @@ QString C_PuiSvHandler::h_GetNamespace(const C_PuiSvDbNodeDataPoolListElementId 
 QString C_PuiSvHandler::h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
 {
    QString c_Retval = C_GtGetText::h_GetText("Unknown HAL data element");
-   uint32 u32_DomainIndex;
+   uint32_t u32_DomainIndex;
    bool q_UseChannelIndex;
-   uint32 u32_ChannelIndex;
+   uint32_t u32_ChannelIndex;
 
-   C_OSCHalcDefDomain::E_VariableSelector e_Selector;
-   uint32 u32_ParameterIndex;
+   C_OscHalcDefDomain::E_VariableSelector e_Selector;
+   uint32_t u32_ParameterIndex;
    bool q_UseElementIndex;
-   uint32 u32_ParameterElementIndex;
+   uint32_t u32_ParameterElementIndex;
    bool q_IsUseCaseIndex;
    bool q_IsChanNumIndex;
    bool q_IsSafetyFlagIndex;
 
-   if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
+   if (C_PuiSdHandler::h_GetInstance()->TranslateToHalcIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
                                                              u32_DomainIndex, q_UseChannelIndex,
                                                              u32_ChannelIndex, e_Selector, u32_ParameterIndex,
                                                              q_UseElementIndex,
@@ -3145,17 +3157,17 @@ QString C_PuiSvHandler::h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListEleme
                                                              q_IsChanNumIndex, q_IsSafetyFlagIndex) == C_NO_ERR)
    {
       {
-         const C_OSCNodeDataPoolList * const pc_List =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(orc_Id.u32_NodeIndex,
+         const C_OscNodeDataPoolList * const pc_List =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(orc_Id.u32_NodeIndex,
                                                                 orc_Id.u32_DataPoolIndex,
                                                                 orc_Id.u32_ListIndex);
-         const C_OSCHalcConfigChannel * const pc_Config =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(orc_Id.u32_NodeIndex,
+         const C_OscHalcConfigChannel * const pc_Config =
+            C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(orc_Id.u32_NodeIndex,
                                                                             u32_DomainIndex,
                                                                             u32_ChannelIndex,
                                                                             q_UseChannelIndex);
-         const C_OSCHalcDefDomain * const pc_Domain =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(orc_Id.u32_NodeIndex,
+         const C_OscHalcDefDomain * const pc_Domain =
+            C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileDataConst(orc_Id.u32_NodeIndex,
                                                                         u32_DomainIndex);
 
          if ((((pc_List != NULL)) && (pc_Config != NULL)) && (pc_Domain != NULL))
@@ -3164,20 +3176,20 @@ QString C_PuiSvHandler::h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListEleme
 
             if (q_IsUseCaseIndex)
             {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(pc_Domain->c_SingularName).c_str();
+               c_ElementName = C_OscHalcMagicianUtil::h_GetUseCaseVariableName(pc_Domain->c_SingularName).c_str();
             }
             else if (q_IsChanNumIndex)
             {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
+               c_ElementName = C_OscHalcMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
             }
             else if (q_IsSafetyFlagIndex)
             {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(pc_Domain->c_SingularName).c_str();
+               c_ElementName = C_OscHalcMagicianUtil::h_GetSafetyFlagVariableName(pc_Domain->c_SingularName).c_str();
             }
             else
             {
-               const C_OSCHalcDefStruct * const pc_Param =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileVariableData(orc_Id.u32_NodeIndex,
+               const C_OscHalcDefStruct * const pc_Param =
+                  C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileVariableData(orc_Id.u32_NodeIndex,
                                                                                  u32_DomainIndex, e_Selector,
                                                                                  u32_ParameterIndex);
                c_ElementName = pc_Param->c_Display.c_str();
@@ -3185,7 +3197,7 @@ QString C_PuiSvHandler::h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListEleme
                {
                   if (u32_ParameterElementIndex < pc_Param->c_StructElements.size())
                   {
-                     const C_OSCHalcDefElement & rc_Param = pc_Param->c_StructElements[u32_ParameterElementIndex];
+                     const C_OscHalcDefElement & rc_Param = pc_Param->c_StructElements[u32_ParameterElementIndex];
                      c_ElementName = rc_Param.c_Display.c_str();
                   }
                }
@@ -3211,25 +3223,25 @@ QString C_PuiSvHandler::h_GetShortNamespace(const C_PuiSvDbNodeDataPoolListEleme
    False Enabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvHandler::CheckBusDisabled(const uint32 ou32_ViewIndex, const uint32 ou32_BusIndex) const
+bool C_PuiSvHandler::CheckBusDisabled(const uint32_t ou32_ViewIndex, const uint32_t ou32_BusIndex) const
 {
    bool q_Disabled = true;
 
-   std::vector<uint32> c_NodeIndexes;
-   std::vector<uint32> c_InterfaceIndexes;
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes,
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes,
                                                                                       c_InterfaceIndexes);
    if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
    {
       const C_PuiSvData * const pc_View = this->GetView(ou32_ViewIndex);
       if (pc_View != NULL)
       {
-         const std::vector<uint8> & rc_Nodes = pc_View->GetNodeActiveFlags();
-         for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+         const std::vector<uint8_t> & rc_Nodes = pc_View->GetNodeActiveFlags();
+         for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
          {
             if (c_NodeIndexes[u32_ItNode] < rc_Nodes.size())
             {
-               if (rc_Nodes[c_NodeIndexes[u32_ItNode]] == true)
+               if (rc_Nodes[c_NodeIndexes[u32_ItNode]] == 1)
                {
                   q_Disabled = false;
                }
@@ -3253,11 +3265,11 @@ bool C_PuiSvHandler::CheckBusDisabled(const uint32 ou32_ViewIndex, const uint32 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::ClearViewDashboardParamDataPoolElements(const uint32 ou32_ViewIndex,
-                                                               const uint32 ou32_DashboardIndex,
-                                                               const uint32 ou32_ParamWidgetIndex)
+int32_t C_PuiSvHandler::ClearViewDashboardParamDataPoolElements(const uint32_t ou32_ViewIndex,
+                                                                const uint32_t ou32_DashboardIndex,
+                                                                const uint32_t ou32_ParamWidgetIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -3285,13 +3297,13 @@ sint32 C_PuiSvHandler::ClearViewDashboardParamDataPoolElements(const uint32 ou32
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::AddViewDashboardParamNewDataPoolElement(const uint32 ou32_ViewIndex,
-                                                               const uint32 ou32_DashboardIndex,
-                                                               const uint32 ou32_ParamWidgetIndex,
-                                                               const C_OSCNodeDataPoolListElementId & orc_NewId,
-                                                               const C_OSCNodeDataPoolContent * const opc_Content)
+int32_t C_PuiSvHandler::AddViewDashboardParamNewDataPoolElement(const uint32_t ou32_ViewIndex,
+                                                                const uint32_t ou32_DashboardIndex,
+                                                                const uint32_t ou32_ParamWidgetIndex,
+                                                                const C_OscNodeDataPoolListElementId & orc_NewId,
+                                                                const C_OscNodeDataPoolContent * const opc_Content)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -3315,9 +3327,9 @@ sint32 C_PuiSvHandler::AddViewDashboardParamNewDataPoolElement(const uint32 ou32
    Hash for view
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSvHandler::GetViewHash(const uint32 ou32_ViewIndex) const
+uint32_t C_PuiSvHandler::GetViewHash(const uint32_t ou32_ViewIndex) const
 {
-   uint32 u32_Retval = 0xFFFFFFFFU;
+   uint32_t u32_Retval = 0xFFFFFFFFU;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
@@ -3360,7 +3372,7 @@ void C_PuiSvHandler::h_Destroy(void)
    Load system views and store in information in our instance data.
 
    \param[in] orc_Path     Path to system views file
-   \param[in] orc_OSCNodes OSC node information (Necessary for update information)
+   \param[in] orc_OscNodes OSC node information (Necessary for update information)
 
    \return
    C_NO_ERR   data read and placed into instance data
@@ -3370,32 +3382,33 @@ void C_PuiSvHandler::h_Destroy(void)
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
-                                      const std::vector<stw_opensyde_core::C_OSCNode> & orc_OSCNodes)
+int32_t C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
+                                       const std::vector<stw::opensyde_core::C_OscNode> & orc_OscNodes)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (TGL_FileExists(orc_Path.toStdString().c_str()) == true)
+   if (TglFileExists(orc_Path.toStdString().c_str()) == true)
    {
-      C_OSCXMLParserLog c_XMLParser;
-      c_XMLParser.SetLogHeading("Loading views");
-      s32_Retval = c_XMLParser.LoadFromFile(orc_Path.toStdString().c_str());
+      C_OscXmlParserLog c_XmlParser;
+      c_XmlParser.SetLogHeading("Loading views");
+      s32_Retval = c_XmlParser.LoadFromFile(orc_Path.toStdString().c_str());
       if (s32_Retval == C_NO_ERR)
       {
-         if (c_XMLParser.SelectRoot() == "opensyde-system-views")
+         if (c_XmlParser.SelectRoot() == "opensyde-system-views")
          {
-            if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+            if (c_XmlParser.SelectNodeChild("file-version") == "file-version")
             {
                bool q_Ok;
-               const sintn sn_FileVersion = static_cast<QString>(c_XMLParser.GetNodeContent().c_str()).toInt(&q_Ok, 0);
+               const int32_t s32_FileVersion =
+                  static_cast<QString>(c_XmlParser.GetNodeContent().c_str()).toInt(&q_Ok, 0);
 
                //is the file version one we know ?
                if (q_Ok)
                {
                   osc_write_log_info("Loading views", "Value of \"file-version\": " +
-                                     stw_scl::C_SCLString::IntToStr(sn_FileVersion));
+                                     stw::scl::C_SclString::IntToStr(s32_FileVersion));
                   //Check file version
-                  if ((sn_FileVersion != 1) && (sn_FileVersion != 2))
+                  if ((s32_FileVersion != 1) && (s32_FileVersion != 2))
                   {
                      osc_write_log_error("Loading views",
                                          "Version defined by \"file-version\" is not supported.");
@@ -3410,18 +3423,18 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
 
                if (s32_Retval == C_NO_ERR)
                {
-                  tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-views");
-                  if (sn_FileVersion == 1)
+                  tgl_assert(c_XmlParser.SelectNodeParent() == "opensyde-system-views");
+                  if (s32_FileVersion == 1)
                   {
-                     s32_Retval = C_PuiSvHandlerFilerV1::h_LoadViews(this->mc_Views, c_XMLParser);
+                     s32_Retval = C_PuiSvHandlerFilerV1::h_LoadViews(this->mc_Views, c_XmlParser);
                   }
                   else
                   {
-                     if (c_XMLParser.SelectNodeChild("service-mode") == "service-mode")
+                     if (c_XmlParser.SelectNodeChild("service-mode") == "service-mode")
                      {
-                        if (c_XMLParser.AttributeExists("active"))
+                        if (c_XmlParser.AttributeExists("active"))
                         {
-                           this->SetServiceModeActive(c_XMLParser.GetAttributeBool("active"));
+                           this->SetServiceModeActive(c_XmlParser.GetAttributeBool("active"));
                         }
                         else
                         {
@@ -3429,7 +3442,7 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
                            osc_write_log_error("Loading views",
                                                "Attribute \"active\" not found in node \"service-mode\".");
                         }
-                        tgl_assert(c_XMLParser.SelectNodeParent() == "opensyde-system-views");
+                        tgl_assert(c_XmlParser.SelectNodeParent() == "opensyde-system-views");
                      }
                      else
                      {
@@ -3440,12 +3453,12 @@ sint32 C_PuiSvHandler::m_LoadFromFile(const QString & orc_Path,
                      {
                         const QFileInfo c_Info(orc_Path);
                         const QDir c_BasePath = c_Info.dir();
-                        s32_Retval = C_PuiSvHandlerFiler::h_LoadViews(this->mc_Views, orc_OSCNodes,
-                                                                      c_XMLParser, &c_BasePath);
+                        s32_Retval = C_PuiSvHandlerFiler::h_LoadViews(this->mc_Views, orc_OscNodes,
+                                                                      c_XmlParser, &c_BasePath);
                         if (s32_Retval == C_NO_ERR)
                         {
                            s32_Retval = C_PuiSvHandlerFiler::h_LoadLastKnownHalcCrcs(this->mc_LastKnownHalcCrcs,
-                                                                                     c_XMLParser);
+                                                                                     c_XmlParser);
                            if (s32_Retval == C_NO_ERR)
                            {
                               //calculate the hash value and save it for comparing (only for new file version!)
@@ -3514,8 +3527,8 @@ C_PuiSvHandler::C_PuiSvHandler(QObject * const opc_Parent) :
    //Connects for synchronisation
    connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeAdded, this,
            &C_PuiSvHandler::m_OnSyncNodeAdded);
-   connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeHALC, this,
-           &C_PuiSvHandler::m_OnSyncNodeHALC);
+   connect(C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeHalc, this,
+           &C_PuiSvHandler::m_OnSyncNodeHalc);
    connect(
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeAboutToBeDeleted, this,
       &C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted);
@@ -3542,11 +3555,11 @@ C_PuiSvHandler::C_PuiSvHandler(QObject * const opc_Parent) :
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeApplicationAboutToBeDeleted, this,
       &C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeDeleted);
    connect(
-      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeApplicationAboutToBeChangedFromParamSetHALC, this,
-      &C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC);
+      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeApplicationAboutToBeChangedFromParamSetHalc, this,
+      &C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeChangedFromParamSetHalc);
    connect(
-      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeApplicationChangedToParamSetHALC, this,
-      &C_PuiSvHandler::m_OnSyncNodeApplicationChangedToParamSetHALC);
+      C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeApplicationChangedToParamSetHalc, this,
+      &C_PuiSvHandler::m_OnSyncNodeApplicationChangedToParamSetHalc);
    connect(
       C_PuiSdHandler::h_GetInstance(), &C_PuiSdHandler::SigSyncNodeApplicationResultPathSizeChanged, this,
       &C_PuiSvHandler::m_OnSyncNodeApplicationResultPathSizeChanged);
@@ -3601,9 +3614,9 @@ C_PuiSvHandler::~C_PuiSvHandler(void)
    \param[in]  ou32_Index  Added node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeAdded(const uint32 ou32_Index)
+void C_PuiSvHandler::m_OnSyncNodeAdded(const uint32_t ou32_Index)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeAdded(ou32_Index);
@@ -3616,43 +3629,43 @@ void C_PuiSvHandler::m_OnSyncNodeAdded(const uint32 ou32_Index)
    \param[in]  ou32_Index  Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
+void C_PuiSvHandler::m_OnSyncNodeHalc(const uint32_t ou32_Index)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_Index);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_Index);
 
    if (pc_Node != NULL)
    {
       std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId> c_NewMap;
       std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvDbNodeDataPoolListElementId> c_MapCurToNew;
-      for (uint32 u32_ItDp = 0UL; u32_ItDp < pc_Node->c_DataPools.size(); ++u32_ItDp)
+      for (uint32_t u32_ItDp = 0UL; u32_ItDp < pc_Node->c_DataPools.size(); ++u32_ItDp)
       {
-         const C_OSCNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDp];
-         if ((rc_Dp.e_Type == C_OSCNodeDataPool::eHALC) || (rc_Dp.e_Type == C_OSCNodeDataPool::eHALC_NVM))
+         const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDp];
+         if ((rc_Dp.e_Type == C_OscNodeDataPool::eHALC) || (rc_Dp.e_Type == C_OscNodeDataPool::eHALC_NVM))
          {
-            for (uint32 u32_ItLi = 0UL; u32_ItLi < rc_Dp.c_Lists.size(); ++u32_ItLi)
+            for (uint32_t u32_ItLi = 0UL; u32_ItLi < rc_Dp.c_Lists.size(); ++u32_ItLi)
             {
-               const C_OSCNodeDataPoolList & rc_Li = rc_Dp.c_Lists[u32_ItLi];
-               for (uint32 u32_ItEl = 0UL; u32_ItEl < rc_Li.c_Elements.size(); ++u32_ItEl)
+               const C_OscNodeDataPoolList & rc_Li = rc_Dp.c_Lists[u32_ItLi];
+               for (uint32_t u32_ItEl = 0UL; u32_ItEl < rc_Li.c_Elements.size(); ++u32_ItEl)
                {
-                  const C_OSCNodeDataPoolListElement & rc_El = rc_Li.c_Elements[u32_ItEl];
-                  for (uint32 u32_ItAr = 0UL; u32_ItAr < rc_El.GetArraySize(); ++u32_ItAr)
+                  const C_OscNodeDataPoolListElement & rc_El = rc_Li.c_Elements[u32_ItEl];
+                  for (uint32_t u32_ItAr = 0UL; u32_ItAr < rc_El.GetArraySize(); ++u32_ItAr)
                   {
                      C_PuiSvDbNodeDataPoolListElementId c_NewId(ou32_Index, u32_ItDp, u32_ItLi, u32_ItEl,
                                                                 C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT,
                                                                 rc_El.GetArraySize() != 1, u32_ItAr);
-                     uint32 u32_DomainIndex;
+                     uint32_t u32_DomainIndex;
                      bool q_UseChannelIndex;
-                     uint32 u32_ChannelIndex;
+                     uint32_t u32_ChannelIndex;
 
-                     C_OSCHalcDefDomain::E_VariableSelector e_Selector;
-                     uint32 u32_ParameterIndex;
+                     C_OscHalcDefDomain::E_VariableSelector e_Selector;
+                     uint32_t u32_ParameterIndex;
                      bool q_UseElementIndex;
-                     uint32 u32_ParameterElementIndex;
+                     uint32_t u32_ParameterElementIndex;
                      bool q_IsUseCaseIndex;
                      bool q_IsChanNumIndex;
                      bool q_IsSafetyFlagIndex;
 
-                     if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(c_NewId,
+                     if (C_PuiSdHandler::h_GetInstance()->TranslateToHalcIndex(c_NewId,
                                                                                c_NewId.GetArrayElementIndexOrZero(),
                                                                                u32_DomainIndex, q_UseChannelIndex,
                                                                                u32_ChannelIndex, e_Selector,
@@ -3670,8 +3683,8 @@ void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
                                                                                        c_Name) == C_NO_ERR)
                         {
                            const std::string c_Tmp = c_Name.toStdString();
-                           uint32 u32_Hash = 0UL;
-                           if (pc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING)
+                           uint32_t u32_Hash = 0UL;
+                           if (pc_Node->c_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING)
                            {
                               rc_El.CalcHashElement(u32_Hash, u32_ItAr);
                            }
@@ -3679,7 +3692,7 @@ void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
                            {
                               rc_El.CalcHashStructure(u32_Hash);
                            }
-                           stw_scl::C_SCLChecksums::CalcCRC32(
+                           stw::scl::C_SclChecksums::CalcCRC32(
                               c_Tmp.c_str(), c_Tmp.length(), u32_Hash);
                            c_NewId.SetHalChannelName(c_Name);
                            for (std::map<C_PuiSvDbNodeDataPoolListElementId,
@@ -3689,8 +3702,8 @@ void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
                            {
                               if (((c_ItCur->second.u32_Crc == u32_Hash) &&
                                    (c_ItCur->second.c_HalDpName.compare(rc_Dp.c_Name.c_str()) == 0)) &&
-                                  ((pc_Node->c_HALCConfig.e_SafetyMode ==
-                                    C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
+                                  ((pc_Node->c_HalcConfig.e_SafetyMode ==
+                                    C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
                                    (c_ItCur->first.GetArrayElementIndexOrZero() == u32_ParameterElementIndex)))
                               {
                                  c_NewMap[c_NewId] = C_PuiSvLastKnownHalElementId(u32_Hash, rc_Dp.c_Name.c_str());
@@ -3705,10 +3718,10 @@ void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
          }
       }
       //Check any removed elements
-      for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+      for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
       {
          C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
-         rc_View.OnSyncNodeHALC(ou32_Index, c_MapCurToNew);
+         rc_View.OnSyncNodeHalc(ou32_Index, c_MapCurToNew);
       }
       //Store new map
       this->mc_LastKnownHalcCrcs = c_NewMap;
@@ -3721,9 +3734,9 @@ void C_PuiSvHandler::m_OnSyncNodeHALC(const uint32 ou32_Index)
    \param[in]  ou32_Index  Deleted node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
+void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeAboutToBeDeleted(ou32_Index);
@@ -3749,9 +3762,9 @@ void C_PuiSvHandler::m_OnSyncNodeAboutToBeDeleted(const uint32 ou32_Index)
    \param[in]  ou32_Index  Added bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncBusAdded(const uint32 ou32_Index)
+void C_PuiSvHandler::m_OnSyncBusAdded(const uint32_t ou32_Index)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncBusAdded(ou32_Index);
@@ -3765,9 +3778,9 @@ void C_PuiSvHandler::m_OnSyncBusAdded(const uint32 ou32_Index)
    \param[in]  ou32_Index  Deleted bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncBusDeleted(const uint32 ou32_Index)
+void C_PuiSvHandler::m_OnSyncBusDeleted(const uint32_t ou32_Index)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncBusDeleted(ou32_Index);
@@ -3782,9 +3795,9 @@ void C_PuiSvHandler::m_OnSyncBusDeleted(const uint32 ou32_Index)
    \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolAdded(ou32_NodeIndex, ou32_DataPoolIndex);
@@ -3812,10 +3825,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolAdded(const uint32 ou32_NodeIndex, cons
    \param[in]  ou32_DataPoolTargetIndex   Target data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolSourceIndex,
-                                               const uint32 ou32_DataPoolTargetIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolSourceIndex,
+                                               const uint32_t ou32_DataPoolTargetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolMoved(ou32_NodeIndex, ou32_DataPoolSourceIndex, ou32_DataPoolTargetIndex);
@@ -3843,9 +3856,10 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolMoved(const uint32 ou32_NodeIndex, cons
    \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataPoolIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex);
@@ -3872,9 +3886,9 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolAboutToBeDeleted(const uint32 ou32_Node
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
+void C_PuiSvHandler::m_OnSyncNodeApplicationAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_ApplicationIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeApplicationAdded(ou32_NodeIndex, ou32_ApplicationIndex);
@@ -3890,10 +3904,11 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationAdded(const uint32 ou32_NodeIndex, c
    \param[in]  ou32_ApplicationTargetIndex   Application target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationSourceIndex,
-                                                  const uint32 ou32_ApplicationTargetIndex)
+void C_PuiSvHandler::m_OnSyncNodeApplicationMoved(const uint32_t ou32_NodeIndex,
+                                                  const uint32_t ou32_ApplicationSourceIndex,
+                                                  const uint32_t ou32_ApplicationTargetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeApplicationMoved(ou32_NodeIndex, ou32_ApplicationSourceIndex, ou32_ApplicationTargetIndex);
@@ -3908,10 +3923,10 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationMoved(const uint32 ou32_NodeIndex, c
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_NodeIndex,
-                                                             const uint32 ou32_ApplicationIndex)
+void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                             const uint32_t ou32_ApplicationIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeApplicationAboutToBeDeleted(ou32_NodeIndex, ou32_ApplicationIndex);
@@ -3926,13 +3941,13 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeDeleted(const uint32 ou32_N
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(const uint32 ou32_NodeIndex,
-                                                                             const uint32 ou32_ApplicationIndex)
+void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeChangedFromParamSetHalc(const uint32_t ou32_NodeIndex,
+                                                                             const uint32_t ou32_ApplicationIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
-      rc_View.OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(ou32_NodeIndex, ou32_ApplicationIndex);
+      rc_View.OnSyncNodeApplicationAboutToBeChangedFromParamSetHalc(ou32_NodeIndex, ou32_ApplicationIndex);
    }
    //HALC not affected
 }
@@ -3944,13 +3959,13 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationAboutToBeChangedFromParamSetHALC(con
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeApplicationChangedToParamSetHALC(const uint32 ou32_NodeIndex,
-                                                                  const uint32 ou32_ApplicationIndex)
+void C_PuiSvHandler::m_OnSyncNodeApplicationChangedToParamSetHalc(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_ApplicationIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
-      rc_View.OnSyncNodeApplicationChangedToParamSetHALC(ou32_NodeIndex, ou32_ApplicationIndex);
+      rc_View.OnSyncNodeApplicationChangedToParamSetHalc(ou32_NodeIndex, ou32_ApplicationIndex);
    }
    //HALC not affected
 }
@@ -3964,12 +3979,12 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationChangedToParamSetHALC(const uint32 o
    \param[in]  ou32_NewSize            Size of application result path after change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeApplicationResultPathSizeChanged(const uint32 ou32_NodeIndex,
-                                                                  const uint32 ou32_ApplicationIndex,
-                                                                  const stw_types::uint32 ou32_OldSize,
-                                                                  const stw_types::uint32 ou32_NewSize)
+void C_PuiSvHandler::m_OnSyncNodeApplicationResultPathSizeChanged(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_ApplicationIndex,
+                                                                  const uint32_t ou32_OldSize,
+                                                                  const uint32_t ou32_NewSize)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeApplicationResultPathSizeChanged(ou32_NodeIndex, ou32_ApplicationIndex, ou32_OldSize,
@@ -3986,10 +4001,10 @@ void C_PuiSvHandler::m_OnSyncNodeApplicationResultPathSizeChanged(const uint32 o
    \param[in]  ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                   const uint32 ou32_ListIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                   const uint32_t ou32_ListIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListAdded(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
@@ -4006,10 +4021,11 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListAdded(const uint32 ou32_NodeIndex, 
    \param[in]  ou32_ListTargetIndex    Target list index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                   const uint32 ou32_ListSourceIndex, const uint32 ou32_ListTargetIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
+                                                   const uint32_t ou32_ListSourceIndex,
+                                                   const uint32_t ou32_ListTargetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListMoved(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListSourceIndex,
@@ -4026,11 +4042,11 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListMoved(const uint32 ou32_NodeIndex, 
    \param[in]  ou32_ListIndex       List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_NodeIndex,
-                                                              const uint32 ou32_DataPoolIndex,
-                                                              const uint32 ou32_ListIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                              const uint32_t ou32_DataPoolIndex,
+                                                              const uint32_t ou32_ListIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex);
@@ -4047,10 +4063,12 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListAboutToBeDeleted(const uint32 ou32_
    \param[in]  ou32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                          const uint32 ou32_ListIndex, const uint32 ou32_DataSetIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAdded(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataPoolIndex,
+                                                          const uint32_t ou32_ListIndex,
+                                                          const uint32_t ou32_DataSetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListDataSetAdded(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_DataSetIndex);
@@ -4068,12 +4086,13 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAdded(const uint32 ou32_Node
    \param[in]  ou32_DataSetTargetIndex    Target data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                          const uint32 ou32_ListIndex,
-                                                          const uint32 ou32_DataSetSourceIndex,
-                                                          const uint32 ou32_DataSetTargetIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetMoved(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataPoolIndex,
+                                                          const uint32_t ou32_ListIndex,
+                                                          const uint32_t ou32_DataSetSourceIndex,
+                                                          const uint32_t ou32_DataSetTargetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListDataSetMoved(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
@@ -4091,12 +4110,12 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetMoved(const uint32 ou32_Node
    \param[in]  ou32_DataSetIndex    Data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32 ou32_NodeIndex,
-                                                                     const uint32 ou32_DataPoolIndex,
-                                                                     const uint32 ou32_ListIndex,
-                                                                     const uint32 ou32_DataSetIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                                     const uint32_t ou32_DataPoolIndex,
+                                                                     const uint32_t ou32_ListIndex,
+                                                                     const uint32_t ou32_DataSetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListDataSetAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
@@ -4114,10 +4133,12 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListDataSetAboutToBeDeleted(const uint3
    \param[in]  ou32_ElementIndex    Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAdded(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                          const uint32 ou32_ListIndex, const uint32 ou32_ElementIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAdded(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataPoolIndex,
+                                                          const uint32_t ou32_ListIndex,
+                                                          const uint32_t ou32_ElementIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListElementAdded(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex, ou32_ElementIndex);
@@ -4135,12 +4156,13 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAdded(const uint32 ou32_Node
    \param[in]  ou32_ElementTargetIndex    Target element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex,
-                                                          const uint32 ou32_ListIndex,
-                                                          const uint32 ou32_ElementSourceIndex,
-                                                          const uint32 ou32_ElementTargetIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_DataPoolIndex,
+                                                          const uint32_t ou32_ListIndex,
+                                                          const uint32_t ou32_ElementSourceIndex,
+                                                          const uint32_t ou32_ElementTargetIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListElementMoved(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
@@ -4162,15 +4184,15 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementMoved(const uint32 ou32_Node
    \param[in]  oq_IsString          Flag if new type is string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou32_NodeIndex,
-                                                                 const uint32 ou32_DataPoolIndex,
-                                                                 const uint32 ou32_ListIndex,
-                                                                 const uint32 ou32_ElementIndex,
-                                                                 const C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                                 const bool oq_IsArray, const uint32 ou32_ArraySize,
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32_t ou32_NodeIndex,
+                                                                 const uint32_t ou32_DataPoolIndex,
+                                                                 const uint32_t ou32_ListIndex,
+                                                                 const uint32_t ou32_ElementIndex,
+                                                                 const C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                                 const bool oq_IsArray, const uint32_t ou32_ArraySize,
                                                                  const bool oq_IsString)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListElementArrayChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
@@ -4190,13 +4212,13 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementArrayChanged(const uint32 ou
    \param[in]  oe_Access            New access type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAccessChanged(const uint32 ou32_NodeIndex,
-                                                                  const uint32 ou32_DataPoolIndex,
-                                                                  const uint32 ou32_ListIndex,
-                                                                  const uint32 ou32_ElementIndex,
-                                                                  const C_OSCNodeDataPoolListElement::E_Access oe_Access)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAccessChanged(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_DataPoolIndex,
+                                                                  const uint32_t ou32_ListIndex,
+                                                                  const uint32_t ou32_ElementIndex,
+                                                                  const C_OscNodeDataPoolListElement::E_Access oe_Access)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListElementAccessChanged(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
@@ -4214,12 +4236,12 @@ void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAccessChanged(const uint32 o
    \param[in]  ou32_ElementIndex    Element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32 ou32_NodeIndex,
-                                                                     const uint32 ou32_DataPoolIndex,
-                                                                     const uint32 ou32_ListIndex,
-                                                                     const uint32 ou32_ElementIndex)
+void C_PuiSvHandler::m_OnSyncNodeDataPoolListElementAboutToBeDeleted(const uint32_t ou32_NodeIndex,
+                                                                     const uint32_t ou32_DataPoolIndex,
+                                                                     const uint32_t ou32_ListIndex,
+                                                                     const uint32_t ou32_ElementIndex)
 {
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       C_PuiSvData & rc_View = this->mc_Views[u32_ItView];
       rc_View.OnSyncNodeDataPoolListElementAboutToBeDeleted(ou32_NodeIndex, ou32_DataPoolIndex, ou32_ListIndex,
@@ -4247,10 +4269,10 @@ void C_PuiSvHandler::m_OnSyncClear(void)
    Calculated hash value
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSvHandler::m_CalcHashSystemViews(void) const
+uint32_t C_PuiSvHandler::m_CalcHashSystemViews(void) const
 {
    // init value of CRC
-   uint32 u32_Hash = 0xFFFFFFFFU;
+   uint32_t u32_Hash = 0xFFFFFFFFU;
 
    for (std::map<C_PuiSvDbNodeDataPoolListElementId, C_PuiSvLastKnownHalElementId>::const_iterator c_It =
            this->mc_LastKnownHalcCrcs.begin();
@@ -4258,10 +4280,10 @@ uint32 C_PuiSvHandler::m_CalcHashSystemViews(void) const
    {
       c_It->first.CalcHash(u32_Hash);
       c_It->second.CalcHash(u32_Hash);
-      stw_scl::C_SCLChecksums::CalcCRC32(&c_It->second, sizeof(uint32), u32_Hash);
+      stw::scl::C_SclChecksums::CalcCRC32(&c_It->second, sizeof(uint32_t), u32_Hash);
    }
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
    {
       this->mc_Views[u32_Counter].CalcHash(u32_Hash);
    }
@@ -4277,7 +4299,7 @@ uint32 C_PuiSvHandler::m_CalcHashSystemViews(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_FixInvalidRailConfig(void)
 {
-   for (uint32 u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
    {
       this->mc_Views[u32_Counter].FixInvalidRailConfig();
    }
@@ -4289,7 +4311,7 @@ void C_PuiSvHandler::m_FixInvalidRailConfig(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandler::m_HandleCompatibilityChart(void)
 {
-   for (uint32 u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_Views.size(); ++u32_Counter)
    {
       this->mc_Views[u32_Counter].HandleCompatibilityChart();
    }
@@ -4314,31 +4336,29 @@ void C_PuiSvHandler::m_HandleCompatibilityChart(void)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::m_CheckRoutingDetails(const uint32 ou32_ViewIndex,
-                                             const std::vector<stw_types::uint8> & orc_CheckedNodeActiveFlags,
-                                             std::map<uint32,
-                                                      QString> & orc_SetupWarningRoutingDetails,
-                                             std::vector<std::map<uint32,
-                                                                  QString> > & orc_ErrorRoutingDetails,
-                                             std::set<uint32> & orc_NodesWithDashboardRoutingError,
-                                             std::set<uint32> & orc_NodesRelevantForDashboardRouting)
+int32_t C_PuiSvHandler::m_CheckRoutingDetails(const uint32_t ou32_ViewIndex,
+                                              const std::vector<uint8_t> & orc_CheckedNodeActiveFlags,
+                                              std::map<uint32_t, QString> & orc_SetupWarningRoutingDetails,
+                                              std::vector<std::map<uint32_t, QString> > & orc_ErrorRoutingDetails,
+                                              std::set<uint32_t> & orc_NodesWithDashboardRoutingError,
+                                              std::set<uint32_t> & orc_NodesRelevantForDashboardRouting)
 const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_ErrorRoutingDetails.clear();
    orc_ErrorRoutingDetails.resize(ms32_SUBMODE_SYSVIEW_DASHBOARD + 1);
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       // check connection state of all active nodes
       for (u32_Counter = 0U; u32_Counter < orc_CheckedNodeActiveFlags.size(); ++u32_Counter)
       {
-         if (orc_CheckedNodeActiveFlags[u32_Counter] == true)
+         if (orc_CheckedNodeActiveFlags[u32_Counter] == 1)
          {
-            const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            const stw::opensyde_core::C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                u32_Counter);
 
             if (pc_Node != NULL)
@@ -4346,13 +4366,13 @@ const
                // Check generic route independent of the specific functionality
                const C_SyvRoRouteCalculation c_RouteCalcCheck(
                   ou32_ViewIndex, u32_Counter,
-                  stw_opensyde_core::C_OSCRoutingCalculation::eROUTING_CHECK);
+                  stw::opensyde_core::C_OscRoutingCalculation::eROUTING_CHECK);
                // Check update routes
                const C_SyvRoRouteCalculation c_RouteCalcUpdate(ou32_ViewIndex, u32_Counter,
-                                                               stw_opensyde_core::C_OSCRoutingCalculation::eUPDATE);
+                                                               stw::opensyde_core::C_OscRoutingCalculation::eUPDATE);
                // Check diagnostic routes
                const C_SyvRoRouteCalculation c_RouteCalcDiag(ou32_ViewIndex, u32_Counter,
-                                                             stw_opensyde_core::C_OSCRoutingCalculation::eDIAGNOSTIC);
+                                                             stw::opensyde_core::C_OscRoutingCalculation::eDIAGNOSTIC);
 
                // Normally both variants must fail in this case on the same way
                if ((c_RouteCalcCheck.GetState() == C_CONFIG) ||
@@ -4407,8 +4427,8 @@ const
                      else
                      {
                         // No diagnostic error
-                        uint32 u32_RoutePointCounter;
-                        const std::vector<C_OSCRoutingRoutePoint> & rc_RoutePoints =
+                        uint32_t u32_RoutePointCounter;
+                        const std::vector<C_OscRoutingRoutePoint> & rc_RoutePoints =
                            c_RouteCalcDiag.GetBestRoute()->c_VecRoutePoints;
 
                         // Add the target node as relevant for dashboard communication
@@ -4492,45 +4512,45 @@ const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex,
-                                      const std::vector<uint8> & orc_CheckedNodeActiveFlags,
-                                      QString & orc_SetupWarningMessage, std::vector<QString> & orc_ErrorMessages,
-                                      std::set<uint32> & orc_NodesWithDashboardRoutingError,
-                                      std::set<uint32> & orc_NodesRelevantForDashboardRouting) const
+int32_t C_PuiSvHandler::m_CheckRouting(const uint32_t ou32_ViewIndex,
+                                       const std::vector<uint8_t> & orc_CheckedNodeActiveFlags,
+                                       QString & orc_SetupWarningMessage, std::vector<QString> & orc_ErrorMessages,
+                                       std::set<uint32_t> & orc_NodesWithDashboardRoutingError,
+                                       std::set<uint32_t> & orc_NodesRelevantForDashboardRouting) const
 {
-   std::map<uint32, QString> c_SetupWarningDetails;
-   std::vector<std::map<uint32, QString> > c_ErrorDetails;
-   const sint32 s32_Retval = this->m_CheckRoutingDetails(ou32_ViewIndex, orc_CheckedNodeActiveFlags,
-                                                         c_SetupWarningDetails, c_ErrorDetails,
-                                                         orc_NodesWithDashboardRoutingError,
-                                                         orc_NodesRelevantForDashboardRouting);
-   uintn un_ErrorCounter;
+   std::map<uint32_t, QString> c_SetupWarningDetails;
+   std::vector<std::map<uint32_t, QString> > c_ErrorDetails;
+   const int32_t s32_Retval = this->m_CheckRoutingDetails(ou32_ViewIndex, orc_CheckedNodeActiveFlags,
+                                                          c_SetupWarningDetails, c_ErrorDetails,
+                                                          orc_NodesWithDashboardRoutingError,
+                                                          orc_NodesRelevantForDashboardRouting);
+   uint32_t u32_ErrorCounter;
 
    orc_ErrorMessages.resize(c_ErrorDetails.size());
 
    //Error Messages
-   for (un_ErrorCounter = 0; un_ErrorCounter < c_ErrorDetails.size(); ++un_ErrorCounter)
+   for (u32_ErrorCounter = 0; u32_ErrorCounter < c_ErrorDetails.size(); ++u32_ErrorCounter)
    {
-      if (c_ErrorDetails[un_ErrorCounter].size() > 0)
+      if (c_ErrorDetails[u32_ErrorCounter].size() > 0)
       {
          QString c_Space = " ";
-         switch (un_ErrorCounter)
+         switch (u32_ErrorCounter)
          {
          case ms32_SUBMODE_SYSVIEW_SETUP:
-            orc_ErrorMessages[un_ErrorCounter] = C_GtGetText::h_GetText(
+            orc_ErrorMessages[u32_ErrorCounter] = C_GtGetText::h_GetText(
                "Following nodes can not be reached by the PC:");
             break;
          case ms32_SUBMODE_SYSVIEW_UPDATE:
             if (orc_ErrorMessages[ms32_SUBMODE_SYSVIEW_SETUP].size() == 0)
             {
                // Update view specific error
-               orc_ErrorMessages[un_ErrorCounter] = C_GtGetText::h_GetText(
+               orc_ErrorMessages[u32_ErrorCounter] = C_GtGetText::h_GetText(
                   "Following node communication interface flags are disabled for Update:");
             }
             else
             {
                // Generic routing error due to an error in the setup too
-               orc_ErrorMessages[un_ErrorCounter] = C_GtGetText::h_GetText(
+               orc_ErrorMessages[u32_ErrorCounter] = C_GtGetText::h_GetText(
                   "Following nodes can not be reached by the PC for Update:");
             }
             break;
@@ -4538,13 +4558,13 @@ sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex,
             if (orc_ErrorMessages[ms32_SUBMODE_SYSVIEW_SETUP].size() == 0)
             {
                // Update view specific error
-               orc_ErrorMessages[un_ErrorCounter] = C_GtGetText::h_GetText(
+               orc_ErrorMessages[u32_ErrorCounter] = C_GtGetText::h_GetText(
                   "Following node communication interface flags are disabled for Dashboard:");
             }
             else
             {
                // Generic routing error due to an error in the setup too
-               orc_ErrorMessages[un_ErrorCounter] = C_GtGetText::h_GetText(
+               orc_ErrorMessages[u32_ErrorCounter] = C_GtGetText::h_GetText(
                   "Following nodes can not be reached by the PC for Dashboard:");
             }
             break;
@@ -4552,12 +4572,12 @@ sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex,
             break;
          }
 
-         for (std::map<uint32, QString>::const_iterator c_It = c_ErrorDetails[un_ErrorCounter].begin();
-              c_It != c_ErrorDetails[un_ErrorCounter].end();
+         for (std::map<uint32_t, QString>::const_iterator c_It = c_ErrorDetails[u32_ErrorCounter].begin();
+              c_It != c_ErrorDetails[u32_ErrorCounter].end();
               ++c_It)
          {
-            orc_ErrorMessages[un_ErrorCounter] += c_Space;
-            orc_ErrorMessages[un_ErrorCounter] += c_It->second;
+            orc_ErrorMessages[u32_ErrorCounter] += c_Space;
+            orc_ErrorMessages[u32_ErrorCounter] += c_It->second;
             c_Space = ", ";
          }
       }
@@ -4570,7 +4590,7 @@ sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex,
       orc_SetupWarningMessage = C_GtGetText::h_GetText(
          "Following node communication interface flags are disabled:");
 
-      for (std::map<uint32, QString>::const_iterator c_It = c_SetupWarningDetails.begin();
+      for (std::map<uint32_t, QString>::const_iterator c_It = c_SetupWarningDetails.begin();
            c_It != c_SetupWarningDetails.end();
            ++c_It)
       {
@@ -4590,10 +4610,10 @@ sint32 C_PuiSvHandler::m_CheckRouting(const uint32 ou32_ViewIndex,
    Vector of pointers to all currently registered view names
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<stw_scl::C_SCLString, bool> C_PuiSvHandler::m_GetExistingViewNames(void) const
+std::map<stw::scl::C_SclString, bool> C_PuiSvHandler::m_GetExistingViewNames(void) const
 {
-   std::map<stw_scl::C_SCLString, bool> c_Retval;
-   for (uint32 u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
+   std::map<stw::scl::C_SclString, bool> c_Retval;
+   for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       const C_PuiSvData & rc_Data = this->mc_Views[u32_ItView];
       c_Retval[rc_Data.GetName().toStdString().c_str()] = true;
@@ -4605,7 +4625,7 @@ std::map<stw_scl::C_SCLString, bool> C_PuiSvHandler::m_GetExistingViewNames(void
 /*! \brief   Get error detail result.
 
    \param[out]     opq_NameInvalid                       Name invalid
-   \param[out]     opq_PCNotConnected                    PC not connected
+   \param[out]     opq_PcNotConnected                    PC not connected
    \param[out]     opq_RoutingInvalid                    Routing invalid
    \param[out]     opq_RoutingUpdateInvalid              Update routing invalid
    \param[out]     opq_RoutingDashboardInvalid           Dashboard routing invalid
@@ -4615,7 +4635,7 @@ std::map<stw_scl::C_SCLString, bool> C_PuiSvHandler::m_GetExistingViewNames(void
    \param[out]     opc_SetupRoutingWarningDetails        Setup specific warning details
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameInvalid, bool * const opq_PCNotConnected,
+void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameInvalid, bool * const opq_PcNotConnected,
                                                          bool * const opq_RoutingInvalid,
                                                          bool * const opq_RoutingUpdateInvalid,
                                                          bool * const opq_RoutingDashboardInvalid,
@@ -4627,9 +4647,9 @@ void C_PuiSvHandler::C_PuiSvViewErrorDetails::GetResults(bool * const opq_NameIn
    {
       *opq_NameInvalid = this->q_NameInvalid;
    }
-   if (opq_PCNotConnected != NULL)
+   if (opq_PcNotConnected != NULL)
    {
-      *opq_PCNotConnected = this->q_PCNotConnected;
+      *opq_PcNotConnected = this->q_PcNotConnected;
    }
 
    // Routing errors depending of the submode

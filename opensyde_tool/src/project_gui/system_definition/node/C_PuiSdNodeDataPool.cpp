@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdNodeDataPool.h"
+#include "C_PuiSdNodeDataPool.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,9 +46,9 @@ C_PuiSdNodeDataPool::C_PuiSdNodeDataPool(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdNodeDataPool::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSdNodeDataPool::CalcHash(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataPoolLists.size(); ++u32_Counter)
    {

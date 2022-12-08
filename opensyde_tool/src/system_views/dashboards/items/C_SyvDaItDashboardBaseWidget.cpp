@@ -8,15 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SyvDaItDashboardBaseWidget.h"
+#include "stwtypes.hpp"
+#include "C_SyvDaItDashboardBaseWidget.hpp"
 #include "ui_C_SyvDaItDashboardBaseWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -91,10 +90,10 @@ void C_SyvDaItDashboardBaseWidget::resizeEvent(QResizeEvent * const opc_Event)
    {
       const QMargins c_Margins1 = this->mpc_Ui->pc_VerticalLayout_2->contentsMargins();
       const QMargins c_Margins2 = this->mpc_Ui->pc_VerticalLayout->contentsMargins();
-      const sintn sn_Width = this->size().width() -
-                             (c_Margins1.right() + c_Margins1.left() + c_Margins2.right() + c_Margins2.left());
-      const sintn sn_Height = this->size().height() -
-                              (c_Margins1.top() + c_Margins1.bottom() + c_Margins2.top() + c_Margins2.bottom());
-      this->mpc_Widget->setMaximumSize(sn_Width, sn_Height);
+      const int32_t s32_Width = this->size().width() -
+                                (c_Margins1.right() + c_Margins1.left() + c_Margins2.right() + c_Margins2.left());
+      const int32_t s32_Height = this->size().height() -
+                                 (c_Margins1.top() + c_Margins1.bottom() + c_Margins2.top() + c_Margins2.bottom());
+      this->mpc_Widget->setMaximumSize(s32_Width, s32_Height);
    }
 }

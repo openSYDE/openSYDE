@@ -13,15 +13,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeWiUtil.h"
-#include "C_OgePubGenericTextWithBackground.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgePubGenericTextWithBackground.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,47 +50,48 @@ C_OgePubGenericTextWithBackground::C_OgePubGenericTextWithBackground(QWidget * c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set foreground color (stylesheet color index)
 
-   \param[in] osn_Value New value
+   \param[in] os32_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubGenericTextWithBackground::SetForegroundColor(const sintn osn_Value)
+void C_OgePubGenericTextWithBackground::SetForegroundColor(const int32_t os32_Value)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Foreground", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Foreground", os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set background color (stylesheet color index)
 
-   \param[in] osn_Value New value
+   \param[in] os32_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubGenericTextWithBackground::SetBackgroundColor(const sintn osn_Value)
+void C_OgePubGenericTextWithBackground::SetBackgroundColor(const int32_t os32_Value)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Background", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Background", os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set checked background color (stylesheet color index)
 
-   \param[in] osn_Value New value
+   \param[in] os32_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubGenericTextWithBackground::SetCheckedBackgroundColor(const sintn osn_Value)
+void C_OgePubGenericTextWithBackground::SetCheckedBackgroundColor(const int32_t os32_Value)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "CheckedBackground", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "CheckedBackground", os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set font in pixel
 
-   \param[in] osn_Value    New value
+   \param[in] os32_Value    New value
    \param[in] oq_SemiBold  Flag if semibold
    \param[in] oq_Bold      Flag if bold
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubGenericTextWithBackground::SetFontPixel(const sintn osn_Value, const bool oq_SemiBold, const bool oq_Bold)
+void C_OgePubGenericTextWithBackground::SetFontPixel(const int32_t os32_Value, const bool oq_SemiBold,
+                                                     const bool oq_Bold)
 {
-   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Font", osn_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Font", os32_Value);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "SemiBold", oq_SemiBold);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Bold", oq_Bold);
 }

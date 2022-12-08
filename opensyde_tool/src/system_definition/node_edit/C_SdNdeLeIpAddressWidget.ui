@@ -33,7 +33,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxGrayed" name="pc_GroupBox">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxGrayed" name="pc_GroupBox">
      <property name="title">
       <string/>
      </property>
@@ -54,7 +54,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart1">
+       <widget class="stw::opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart1">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -76,7 +76,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDot1">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDot1">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -104,7 +104,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart2">
+       <widget class="stw::opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart2">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -126,7 +126,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDot2">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDot2">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -151,7 +151,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart3">
+       <widget class="stw::opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart3">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -173,7 +173,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDot3">
+       <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDot3">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -198,7 +198,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart4">
+       <widget class="stw::opensyde_gui_elements::C_OgeLeIpAddress" name="pc_LineEditIpPart4">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -226,19 +226,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeIpAddress</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeIpAddress</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeIpAddress.h</header>
+   <header>C_OgeLeIpAddress.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxGrayed</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxGrayed</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxGrayed.h</header>
+   <header>C_OgeGbxGrayed.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

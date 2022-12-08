@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_OSCHalcDefElement.h"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscHalcDefElement.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefElement::C_OSCHalcDefElement(void)
+C_OscHalcDefElement::C_OscHalcDefElement(void)
 {
 }
 
@@ -45,7 +45,7 @@ C_OSCHalcDefElement::C_OSCHalcDefElement(void)
 /*! \brief  Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefElement::~C_OSCHalcDefElement(void)
+C_OscHalcDefElement::~C_OscHalcDefElement(void)
 {
 }
 
@@ -57,7 +57,7 @@ C_OSCHalcDefElement::~C_OSCHalcDefElement(void)
    \param[in]  oe_Value    Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefElement::SetType(const C_OSCNodeDataPoolContent::E_Type oe_Value)
+void C_OscHalcDefElement::SetType(const C_OscNodeDataPoolContent::E_Type oe_Value)
 {
    this->c_InitialValue.SetType(oe_Value);
    this->c_MinValue.SetType(oe_Value);
@@ -70,7 +70,7 @@ void C_OSCHalcDefElement::SetType(const C_OSCNodeDataPoolContent::E_Type oe_Valu
    \param[in]  oq_Value    New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefElement::SetArray(const bool oq_Value)
+void C_OscHalcDefElement::SetArray(const bool oq_Value)
 {
    this->c_InitialValue.SetArray(oq_Value);
    this->c_MinValue.SetArray(oq_Value);
@@ -83,7 +83,7 @@ void C_OSCHalcDefElement::SetArray(const bool oq_Value)
    \param[in]  oe_Type  Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefElement::SetComplexType(const C_OSCHalcDefContent::E_ComplexType oe_Type)
+void C_OscHalcDefElement::SetComplexType(const C_OscHalcDefContent::E_ComplexType oe_Type)
 {
    this->c_InitialValue.SetComplexType(oe_Type);
    this->c_MinValue.SetComplexType(oe_Type);
@@ -102,10 +102,11 @@ void C_OSCHalcDefElement::SetComplexType(const C_OSCHalcDefContent::E_ComplexTyp
    C_CONFIG Content type invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_OSCHalcDefElement::AddEnumItem(const stw_scl::C_SCLString & orc_DisplayName,
-                                                   const C_OSCNodeDataPoolContent & orc_Value)
+int32_t C_OscHalcDefElement::AddEnumItem(const stw::scl::C_SclString & orc_DisplayName,
+                                         const C_OscNodeDataPoolContent & orc_Value)
 {
-   stw_types::sint32 s32_Retval = this->c_InitialValue.AddEnumItem(orc_DisplayName, orc_Value);
+   int32_t s32_Retval = this->c_InitialValue.AddEnumItem(orc_DisplayName, orc_Value);
+
    if (s32_Retval == C_NO_ERR)
    {
       s32_Retval = this->c_MinValue.AddEnumItem(orc_DisplayName, orc_Value);
@@ -123,7 +124,7 @@ stw_types::sint32 C_OSCHalcDefElement::AddEnumItem(const stw_scl::C_SCLString & 
    \param[in]  orc_Value   New bitmask item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefElement::AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & orc_Value)
+void C_OscHalcDefElement::AddBitmaskItem(const C_OscHalcDefContentBitmaskItem & orc_Value)
 {
    this->c_InitialValue.AddBitmaskItem(orc_Value);
    this->c_MinValue.AddBitmaskItem(orc_Value);
@@ -137,7 +138,7 @@ void C_OSCHalcDefElement::AddBitmaskItem(const C_OSCHalcDefContentBitmaskItem & 
    Bitmask status
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefContent::E_ComplexType C_OSCHalcDefElement::GetComplexType() const
+C_OscHalcDefContent::E_ComplexType C_OscHalcDefElement::GetComplexType() const
 {
    return this->c_InitialValue.GetComplexType();
 }
@@ -149,7 +150,7 @@ C_OSCHalcDefContent::E_ComplexType C_OSCHalcDefElement::GetComplexType() const
    Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent::E_Type C_OSCHalcDefElement::GetType() const
+C_OscNodeDataPoolContent::E_Type C_OscHalcDefElement::GetType() const
 {
    return this->c_InitialValue.GetType();
 }
@@ -161,7 +162,7 @@ C_OSCNodeDataPoolContent::E_Type C_OSCHalcDefElement::GetType() const
    Array status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHalcDefElement::GetArray() const
+bool C_OscHalcDefElement::GetArray() const
 {
    return this->c_InitialValue.GetArray();
 }
@@ -173,8 +174,8 @@ bool C_OSCHalcDefElement::GetArray() const
    Enum items
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<std::pair<stw_scl::C_SCLString,
-                            C_OSCNodeDataPoolContent> > & C_OSCHalcDefElement::GetEnumItems() const
+const std::vector<std::pair<stw::scl::C_SclString,
+                            C_OscNodeDataPoolContent> > & C_OscHalcDefElement::GetEnumItems() const
 {
    return this->c_InitialValue.GetEnumItems();
 }
@@ -186,7 +187,7 @@ const std::vector<std::pair<stw_scl::C_SCLString,
    Bitmask items
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<C_OSCHalcDefContentBitmaskItem> & C_OSCHalcDefElement::GetBitmaskItems() const
+const std::vector<C_OscHalcDefContentBitmaskItem> & C_OscHalcDefElement::GetBitmaskItems() const
 {
    return this->c_InitialValue.GetBitmaskItems();
 }
@@ -200,19 +201,19 @@ const std::vector<C_OSCHalcDefContentBitmaskItem> & C_OSCHalcDefElement::GetBitm
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefElement::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_OscHalcDefElement::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Id.c_str(), this->c_Id.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Id.c_str(), this->c_Id.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
 
    this->c_InitialValue.CalcHash(oru32_HashValue);
    this->c_MinValue.CalcHash(oru32_HashValue);
    this->c_MaxValue.CalcHash(oru32_HashValue);
 
-   for (uint32 u32_It = 0UL; u32_It < this->c_UseCaseAvailabilities.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_UseCaseAvailabilities.size(); ++u32_It)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->c_UseCaseAvailabilities[u32_It],
-                                         sizeof(uint32), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->c_UseCaseAvailabilities[u32_It],
+                                          sizeof(uint32_t), oru32_HashValue);
    }
 }

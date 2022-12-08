@@ -10,20 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_OSCProject.h"
-#include "CSCLChecksums.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_OscProject.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_types;
+using namespace stw::opensyde_core;
+
 using namespace std;
-using namespace stw_scl;
-using namespace stw_errors;
+using namespace stw::scl;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,14 +43,14 @@ using namespace stw_errors;
    Initialize all elements with default values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProject::C_OSCProject(void) :
-   c_CreationTime(C_SCLDateTime::Now()),
-   c_ModificationTime(C_SCLDateTime::Now()),
-   c_OpenSYDEVersion("0.01r0"),
+C_OscProject::C_OscProject(void) :
+   c_CreationTime(C_SclDateTime::Now()),
+   c_ModificationTime(C_SclDateTime::Now()),
+   c_OpenSydeVersion("0.01r0"),
    c_Template("Empty project"),
    c_Version("0.01r0b0")
 {
-   stw_tgl::TGL_GetSystemUserName(c_Author);
+   stw::tgl::TglGetSystemUserName(c_Author);
    c_Editor = c_Author;
 }
 
@@ -58,7 +58,7 @@ C_OSCProject::C_OSCProject(void) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProject::~C_OSCProject(void)
+C_OscProject::~C_OscProject(void)
 {
 }
 
@@ -70,13 +70,13 @@ C_OSCProject::~C_OSCProject(void)
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProject::CalcHash(uint32 & oru32_HashValue) const
+void C_OscProject::CalcHash(uint32_t & oru32_HashValue) const
 {
-   C_SCLChecksums::CalcCRC32(this->c_Editor.c_str(), this->c_Editor.Length(), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(this->c_OpenSYDEVersion.c_str(), this->c_OpenSYDEVersion.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_Editor.c_str(), this->c_Editor.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_OpenSydeVersion.c_str(), this->c_OpenSydeVersion.Length(), oru32_HashValue);
    // no need to check c_Author, c_CreationTime & c_ModificationTime
-   C_SCLChecksums::CalcCRC32(this->c_Template.c_str(), this->c_Template.Length(), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(this->c_Version.c_str(), this->c_Version.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_Template.c_str(), this->c_Template.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_Version.c_str(), this->c_Version.Length(), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,9 +90,9 @@ void C_OSCProject::CalcHash(uint32 & oru32_HashValue) const
    Formatted date
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCProject::h_GetTimeFormatted(const C_SCLDateTime & orc_Time)
+C_SclString C_OscProject::h_GetTimeFormatted(const C_SclDateTime & orc_Time)
 {
-   const C_SCLString c_StrTime = orc_Time.DateTimeToString();
+   const C_SclString c_StrTime = orc_Time.DateTimeToString();
 
    //Remove seconds
    return c_StrTime.SubString(1, 16);
@@ -112,22 +112,22 @@ C_SCLString C_OSCProject::h_GetTimeFormatted(const C_SCLDateTime & orc_Time)
    Time (current time of orc_Str is invalid)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLDateTime C_OSCProject::h_GetTimeOfString(const C_SCLString & orc_Str)
+C_SclDateTime C_OscProject::h_GetTimeOfString(const C_SclString & orc_Str)
 {
-   C_SCLDateTime c_Retval;
+   C_SclDateTime c_Retval;
    bool q_Err = true;
 
-   SCLDynamicArray<C_SCLString> c_Dyn;
+   C_SclDynamicArray<C_SclString> c_Dyn;
    orc_Str.Tokenize(". :", c_Dyn);
    if (c_Dyn.GetLength() == 5)
    {
       try
       {
-         c_Retval.mu16_Day   = static_cast<uint16>(c_Dyn[0].ToInt());
-         c_Retval.mu16_Month = static_cast<uint16>(c_Dyn[1].ToInt());
-         c_Retval.mu16_Year  = static_cast<uint16>(c_Dyn[2].ToInt());
-         c_Retval.mu16_Hour  = static_cast<uint16>(c_Dyn[3].ToInt());
-         c_Retval.mu16_Minute = static_cast<uint16>(c_Dyn[4].ToInt());
+         c_Retval.mu16_Day   = static_cast<uint16_t>(c_Dyn[0].ToInt());
+         c_Retval.mu16_Month = static_cast<uint16_t>(c_Dyn[1].ToInt());
+         c_Retval.mu16_Year  = static_cast<uint16_t>(c_Dyn[2].ToInt());
+         c_Retval.mu16_Hour  = static_cast<uint16_t>(c_Dyn[3].ToInt());
+         c_Retval.mu16_Minute = static_cast<uint16_t>(c_Dyn[4].ToInt());
          c_Retval.mu16_Second = 0U;
          q_Err = false;
       }
@@ -138,7 +138,7 @@ C_SCLDateTime C_OSCProject::h_GetTimeOfString(const C_SCLString & orc_Str)
    }
    if (q_Err == true)
    {
-      c_Retval = C_SCLDateTime::Now();
+      c_Retval = C_SclDateTime::Now();
    }
    return c_Retval;
 }

@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QStyleOptionGraphicsItem>
-#include "C_GiInfo.h"
-#include "C_Uti.h"
+#include "C_GiInfo.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,7 +48,7 @@ C_GiInfo::C_GiInfo(const QRectF & orc_Rect, QGraphicsItem * const opc_Parent) :
    mc_BackgroundColor(Qt::transparent),
    mc_TextColor(Qt::transparent),
    ms32_IconSize(0),
-   ms32_TextAlignment(static_cast<sint32>(Qt::AlignCenter)),
+   ms32_TextAlignment(static_cast<int32_t>(Qt::AlignCenter)),
    mpc_SvgRenderer(NULL),
    mpc_Movie(NULL)
 {
@@ -157,7 +156,7 @@ void C_GiInfo::SetBackgroundColor(const QColor & orc_Value)
    \param[in] os32_Alignment  New text alignment
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiInfo::SetTextColor(const QColor & orc_Value, const sint32 os32_Alignment)
+void C_GiInfo::SetTextColor(const QColor & orc_Value, const int32_t os32_Alignment)
 {
    this->mc_TextColor = orc_Value;
    this->ms32_TextAlignment = os32_Alignment;
@@ -169,7 +168,7 @@ void C_GiInfo::SetTextColor(const QColor & orc_Value, const sint32 os32_Alignmen
    \param[in] os32_IconSize New icon size
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiInfo::SetIconSize(const sint32 os32_IconSize)
+void C_GiInfo::SetIconSize(const int32_t os32_IconSize)
 {
    this->ms32_IconSize = os32_IconSize;
 }
@@ -199,18 +198,18 @@ void C_GiInfo::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
                      QWidget * const opc_Widget)
 {
    const QFontMetrics c_Metrics(this->mc_TextFont);
-   const sint32 s32_TextOffset = static_cast<sint32>(opc_Option->rect.height() - c_Metrics.height()) / 2L;
-   sint32 s32_TextX = opc_Option->rect.topLeft().x() + s32_TextOffset;
-   const sint32 s32_TextY = opc_Option->rect.topLeft().y() + s32_TextOffset;
-   sint32 s32_TextWidth = static_cast<sint32>(opc_Option->rect.width()) - (2L * s32_TextOffset);
-   const sint32 s32_TextHeight = static_cast<sint32>(opc_Option->rect.height()) - (2L * s32_TextOffset);
-   const sint32 s32_IconOffset = (static_cast<sint32>(opc_Option->rect.height()) - this->ms32_IconSize) / 2;
-   const sint32 s32_IconRectX = static_cast<sint32>(opc_Option->rect.topLeft().x()) + s32_IconOffset;
-   const sint32 s32_IconRectY = static_cast<sint32>(opc_Option->rect.topLeft().y()) + s32_IconOffset;
-   const QRectF c_IconRect(static_cast<float64>(s32_IconRectX),
-                           static_cast<float64>(s32_IconRectY),
-                           static_cast<float64>(this->ms32_IconSize),
-                           static_cast<float64>(this->ms32_IconSize));
+   const int32_t s32_TextOffset = static_cast<int32_t>(opc_Option->rect.height() - c_Metrics.height()) / 2L;
+   int32_t s32_TextHorizontal = opc_Option->rect.topLeft().x() + s32_TextOffset;
+   const int32_t s32_TextVertical = opc_Option->rect.topLeft().y() + s32_TextOffset;
+   int32_t s32_TextWidth = static_cast<int32_t>(opc_Option->rect.width()) - (2L * s32_TextOffset);
+   const int32_t s32_TextHeight = static_cast<int32_t>(opc_Option->rect.height()) - (2L * s32_TextOffset);
+   const int32_t s32_IconOffset = (static_cast<int32_t>(opc_Option->rect.height()) - this->ms32_IconSize) / 2;
+   const int32_t s32_IconRectHorizontal = static_cast<int32_t>(opc_Option->rect.topLeft().x()) + s32_IconOffset;
+   const int32_t s32_IconRectVertical = static_cast<int32_t>(opc_Option->rect.topLeft().y()) + s32_IconOffset;
+   const QRectF c_IconRect(static_cast<float64_t>(s32_IconRectHorizontal),
+                           static_cast<float64_t>(s32_IconRectVertical),
+                           static_cast<float64_t>(this->ms32_IconSize),
+                           static_cast<float64_t>(this->ms32_IconSize));
 
    //Background
    if (this->mc_BackgroundColor.alpha() > 0)
@@ -219,16 +218,16 @@ void C_GiInfo::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
       opc_Painter->setBrush(static_cast<QBrush>(this->mc_BackgroundColor));
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->drawRoundedRect(opc_Option->rect,
-                                   std::min(static_cast<float64>(opc_Option->rect.width()) / 2.0,
-                                            static_cast<float64>(opc_Option->rect.height()) / 2.0),
-                                   static_cast<float64>(opc_Option->rect.height()) / 2.0);
+                                   std::min(static_cast<float64_t>(opc_Option->rect.width()) / 2.0,
+                                            static_cast<float64_t>(opc_Option->rect.height()) / 2.0),
+                                   static_cast<float64_t>(opc_Option->rect.height()) / 2.0);
       opc_Painter->restore();
    }
 
    //Icon
    if (this->mpc_SvgRenderer != NULL)
    {
-      s32_TextX += this->ms32_IconSize + s32_IconOffset;
+      s32_TextHorizontal += this->ms32_IconSize + s32_IconOffset;
       s32_TextWidth -= this->ms32_IconSize;
       this->mpc_SvgRenderer->render(opc_Painter, c_IconRect);
    }
@@ -250,9 +249,9 @@ void C_GiInfo::paint(QPainter * const opc_Painter, const QStyleOptionGraphicsIte
    opc_Painter->save();
    opc_Painter->setFont(this->mc_TextFont);
    opc_Painter->setPen(QPen(this->mc_TextColor, this->mc_TextFont.pointSizeF()));
-   opc_Painter->drawText(QRect(QPoint(s32_TextX, s32_TextY), QSize(s32_TextWidth,
-                                                                   s32_TextHeight)), ms32_TextAlignment,
-                         C_Uti::h_AdaptStringToSize(this->mc_Text, c_Metrics, static_cast<float64>(s32_TextWidth)));
+   opc_Painter->drawText(QRect(QPoint(s32_TextHorizontal, s32_TextVertical), QSize(s32_TextWidth,
+                                                                                   s32_TextHeight)), ms32_TextAlignment,
+                         C_Uti::h_AdaptStringToSize(this->mc_Text, c_Metrics, static_cast<float64_t>(s32_TextWidth)));
    opc_Painter->restore();
 }
 

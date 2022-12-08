@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_UsSystemViewNode.h"
-#include "constants.h"
+#include "C_UsSystemViewNode.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -71,7 +70,7 @@ void C_UsSystemViewNode::SetSectionsExpanded(const QVector<bool> & orc_SectionsE
    Update data rate history
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<uint32, float64> & C_UsSystemViewNode::GetUpdateDataRateHistory() const
+const QMap<uint32_t, float64_t> & C_UsSystemViewNode::GetUpdateDataRateHistory() const
 {
    return this->mc_UpdateDataRateHistory;
 }
@@ -83,7 +82,7 @@ const QMap<uint32, float64> & C_UsSystemViewNode::GetUpdateDataRateHistory() con
    \param[in]  of64_Value     Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsSystemViewNode::AddUpdateDataRate(const uint32 ou32_Checksum, const float64 of64_Value)
+void C_UsSystemViewNode::AddUpdateDataRate(const uint32_t ou32_Checksum, const float64_t of64_Value)
 {
    this->mc_UpdateDataRateHistory.insert(ou32_Checksum, of64_Value);
 }

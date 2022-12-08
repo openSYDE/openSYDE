@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLFile.h"
-#include "C_SYDEsupWindows.h"
+#include "stwerrors.hpp"
+#include "TglFile.hpp"
+#include "C_SydeSupWindows.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
-using namespace stw_can;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
+using namespace stw::can;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,8 +39,8 @@ using namespace stw_can;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsupWindows::C_SYDEsupWindows(void) :
-   C_SYDEsup(),
+C_SydeSupWindows::C_SydeSupWindows(void) :
+   C_SydeSup(),
    mq_CanDllLoaded(false)
 {
 }
@@ -50,7 +49,7 @@ C_SYDEsupWindows::C_SYDEsupWindows(void) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsupWindows::~C_SYDEsupWindows(void)
+C_SydeSupWindows::~C_SydeSupWindows(void)
 {
 }
 
@@ -71,10 +70,10 @@ C_SYDEsupWindows::~C_SYDEsupWindows(void)
    eERR_CAN_IF_LOAD_FAILED    driver load failed (details in log)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupWindows::m_OpenCan(const C_SCLString & orc_CanDriver, const uint64 ou64_BitrateBps)
+C_SydeSup::E_Result C_SydeSupWindows::m_OpenCan(const C_SclString & orc_CanDriver, const uint64_t ou64_BitrateBps)
 {
-   C_SYDEsup::E_Result e_Result = eOK;
-   sint32 s32_Return = C_NO_ERR;
+   C_SydeSup::E_Result e_Result = eOK;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mpc_CanDispatcher == NULL)
    {
@@ -82,7 +81,7 @@ C_SYDEsup::E_Result C_SYDEsupWindows::m_OpenCan(const C_SCLString & orc_CanDrive
    }
 
    // check if CAN DLL exists
-   if (TGL_FileExists(orc_CanDriver) == false)
+   if (TglFileExists(orc_CanDriver) == false)
    {
       e_Result = eERR_CAN_IF_NOT_FOUND;
    }
@@ -102,7 +101,7 @@ C_SYDEsup::E_Result C_SYDEsupWindows::m_OpenCan(const C_SCLString & orc_CanDrive
          h_WriteLog("Setup CAN", "CAN driver loaded.");
          mq_CanDllLoaded = true;
          // initialize CAN dispatcher
-         s32_Return = mc_CanDispatcher.CAN_Init(static_cast<sint32>(ou64_BitrateBps / 1000UL));
+         s32_Return = mc_CanDispatcher.CAN_Init(static_cast<int32_t>(ou64_BitrateBps / 1000UL));
          break;
       case CAN_COMP_ERR_DLL_ALREADY_OPENED:
          h_WriteLog("Setup CAN", "CAN opening failed because DLL is already opened.", true);
@@ -159,9 +158,9 @@ C_SYDEsup::E_Result C_SYDEsupWindows::m_OpenCan(const C_SCLString & orc_CanDrive
    Disconnect from CAN bus and CAN driver
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SYDEsupWindows::m_CloseCan(void)
+void C_SydeSupWindows::m_CloseCan(void)
 {
-   sint32 s32_Result;
+   int32_t s32_Result;
 
    (void)mc_CanDispatcher.CAN_Exit();
 
@@ -195,14 +194,14 @@ void C_SYDEsupWindows::m_CloseCan(void)
    eERR_ETH_IF_LOAD_FAILED    driver load failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SYDEsup::E_Result C_SYDEsupWindows::m_OpenEthernet(void)
+C_SydeSup::E_Result C_SydeSupWindows::m_OpenEthernet(void)
 {
    mpc_EthDispatcher = &mc_EthDispatcher;
    return eOK;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get name of application as an C_SCLString
+/*! \brief   Get name of application as an C_SclString
 
    Return the version number of the running application
     in the commonly used STW format: "Vx.yyrz".
@@ -215,30 +214,30 @@ C_SYDEsup::E_Result C_SYDEsupWindows::m_OpenEthernet(void)
    string with version information ("V?.??r?" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsupWindows::m_GetApplicationVersion(const C_SCLString & orc_ApplicationFileName) const
+C_SclString C_SydeSupWindows::m_GetApplicationVersion(const C_SclString & orc_ApplicationFileName) const
 {
-   VS_FIXEDFILEINFO * pt_Info;
-   uintn un_ValSize;
-   sint32 s32_InfoSize;
-   uint8 * pu8_Buffer;
-   C_SCLString c_Version;
+   VS_FIXEDFILEINFO * pc_Info;
+   uint32_t u32_ValSize;
+   int32_t s32_InfoSize;
+   uint8_t * pu8_Buffer;
+   C_SclString c_Version;
 
    c_Version = "V?.\?\?r?";
 
    s32_InfoSize = GetFileVersionInfoSizeA(orc_ApplicationFileName.c_str(), NULL);
    if (s32_InfoSize != 0)
    {
-      pu8_Buffer = new uint8[static_cast<uintn>(s32_InfoSize)];
+      pu8_Buffer = new uint8_t[static_cast<uint32_t>(s32_InfoSize)];
       if (GetFileVersionInfoA(orc_ApplicationFileName.c_str(), 0, s32_InfoSize, pu8_Buffer) != FALSE)
       {
          //reinterpret_cast required due to function interface
          if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929 !e9176
-                            &un_ValSize) != FALSE)
+                            reinterpret_cast<PVOID *>(&pc_Info), //lint !e929 !e9176
+                            &u32_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
-                                     pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                     (pt_Info->dwFileVersionLS >> 16U));
+            c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+                                     pc_Info->dwFileVersionMS & 0x0000FFFFUL,
+                                     (pc_Info->dwFileVersionLS >> 16U));
          }
       }
       delete[] pu8_Buffer;
@@ -253,7 +252,7 @@ C_SCLString C_SYDEsupWindows::m_GetApplicationVersion(const C_SCLString & orc_Ap
    Default log location
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsupWindows::m_GetDefaultLogLocation(void) const
+C_SclString C_SydeSupWindows::m_GetDefaultLogLocation(void) const
 {
    return ".\\Logs";
 }
@@ -265,7 +264,7 @@ C_SCLString C_SYDEsupWindows::m_GetDefaultLogLocation(void) const
    usage example
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SYDEsupWindows::m_GetCanInterfaceUsageExample(void) const
+C_SclString C_SydeSupWindows::m_GetCanInterfaceUsageExample(void) const
 {
    return "-i .\\MyCan.dll";
 }

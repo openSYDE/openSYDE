@@ -10,33 +10,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSpinBox>
 
-#include "stwerrors.h"
-#include "C_SdBueBusEditPropertiesWidget.h"
-#include "C_GtGetText.h"
-#include "C_OSCUtils.h"
-#include "C_SdUtil.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
+#include "stwerrors.hpp"
+#include "C_SdBueBusEditPropertiesWidget.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
 #include "ui_C_SdBueBusEditPropertiesWidget.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdUtil.h"
-#include "C_OgeWiCustomMessage.h"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -76,7 +75,7 @@ C_SdBueBusEditPropertiesWidget::C_SdBueBusEditPropertiesWidget(QWidget * const o
    InitStaticNames();
 
    //Name restriction
-   this->mpc_Ui->pc_LineEditBusName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+   this->mpc_Ui->pc_LineEditBusName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
 
    // connects
    connect(this->mpc_Ui->pc_LineEditBusName, &QLineEdit::textChanged, this,
@@ -103,7 +102,7 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelName->setText(C_GtGetText::h_GetText("Name"));
    this->mpc_Ui->pc_LabelComment->setText(C_GtGetText::h_GetText("Comment"));
    this->mpc_Ui->pc_LabelConfiguration->setText(C_GtGetText::h_GetText("Configuration"));
-   this->mpc_Ui->pc_LabelBusID->setText(C_GtGetText::h_GetText("Bus ID"));
+   this->mpc_Ui->pc_LabelBusId->setText(C_GtGetText::h_GetText("Bus ID"));
    this->mpc_Ui->pc_LabelBitRate->setText(C_GtGetText::h_GetText("Bitrate"));
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
@@ -119,7 +118,7 @@ void C_SdBueBusEditPropertiesWidget::InitStaticNames(void) const
                                                         "\n - should not be longer than 31 characters"));
    this->mpc_Ui->pc_LabelComment->SetToolTipInformation(C_GtGetText::h_GetText("Comment"),
                                                         C_GtGetText::h_GetText("Comment for this bus."));
-   this->mpc_Ui->pc_LabelBusID->SetToolTipInformation(C_GtGetText::h_GetText("Bus ID"),
+   this->mpc_Ui->pc_LabelBusId->SetToolTipInformation(C_GtGetText::h_GetText("Bus ID"),
                                                       C_GtGetText::h_GetText(
                                                          "Unique within Network Topology. Range: 0-15."
                                                          "\nThe ID is used for addressing in the communication protocol."));
@@ -144,7 +143,7 @@ void C_SdBueBusEditPropertiesWidget::SelectName(void) const
    \param[in] ou32_BusIndex New bus id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueBusEditPropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
+void C_SdBueBusEditPropertiesWidget::SetBusId(const uint32_t ou32_BusIndex)
 {
    this->mu32_BusIndex = ou32_BusIndex;
 
@@ -164,7 +163,7 @@ void C_SdBueBusEditPropertiesWidget::SetBusId(const uint32 ou32_BusIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
 {
-   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+   const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
 
    tgl_assert(pc_Bus != NULL);
 
@@ -177,11 +176,11 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
                  &C_SdBueBusEditPropertiesWidget::m_RegisterChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       disconnect(this->mpc_Ui->pc_SpinBoxBusId, static_cast<void (QSpinBox::*)(
-                                                               sintn)>(&C_OgeSpxNumber::valueChanged), this,
+                                                               int32_t)>(&C_OgeSpxNumber::valueChanged), this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       disconnect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
-                                                                  sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                                  int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
                  &C_SdBueBusEditPropertiesWidget::m_RegisterChange);
       disconnect(this->mpc_Ui->pc_ComboBoxBitRate, &C_OgeCbxText::SigErrorFixed, this,
                  &C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed);
@@ -193,20 +192,20 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
       this->mpc_Ui->pc_TextEditComment->setText(pc_Bus->c_Comment.c_str());
 
       //Bus id
-      this->mpc_Ui->pc_SpinBoxBusId->setValue(static_cast<sint32>(pc_Bus->u8_BusID));
+      this->mpc_Ui->pc_SpinBoxBusId->setValue(static_cast<int32_t>(pc_Bus->u8_BusId));
 
       //Bit rate
-      if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+      if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
       {
-         std::vector<uint32> c_ConnectedNodes;
-         std::vector<uint32> c_ConnectedInterfaces;
-         std::vector<uint32> c_SupportedBitrates;
-         uint32 u32_BitrateCounter;
-         const uint32 u32_CurrentSetBitrate = static_cast<uint32>(pc_Bus->u64_BitRate / 1000ULL);
+         std::vector<uint32_t> c_ConnectedNodes;
+         std::vector<uint32_t> c_ConnectedInterfaces;
+         std::vector<uint32_t> c_SupportedBitrates;
+         uint32_t u32_BitrateCounter;
+         const uint32_t u32_CurrentSetBitrate = static_cast<uint32_t>(pc_Bus->u64_BitRate / 1000ULL);
          const QString c_CurrentSetBitrate = this->m_GetComboBoxString(u32_CurrentSetBitrate);
          bool q_CurrentSetBitrateFound = false;
 
-         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
+         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
                                                                                             c_ConnectedNodes,
                                                                                             c_ConnectedInterfaces);
          C_PuiSdHandler::h_GetInstance()->GetSupportedCanBitrates(c_ConnectedNodes, c_SupportedBitrates);
@@ -245,7 +244,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
             std::vector<QString> c_InvalidNodesForBitRate;
             C_PuiSdHandler::h_GetInstance()->CheckBusConflictDetailed(this->mu32_BusIndex, NULL, NULL, NULL,
                                                                       &c_InvalidNodesForBitRate, NULL);
-            for (uint32 u32_ItNode = 0UL; (u32_ItNode < c_InvalidNodesForBitRate.size()) &&
+            for (uint32_t u32_ItNode = 0UL; (u32_ItNode < c_InvalidNodesForBitRate.size()) &&
                  (u32_ItNode < mu32_TOOL_TIP_MAXIMUM_ITEMS); ++u32_ItNode)
             {
                c_Content += "- " + c_InvalidNodesForBitRate[u32_ItNode] + "\n";
@@ -253,7 +252,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
             if (mu32_TOOL_TIP_MAXIMUM_ITEMS < c_InvalidNodesForBitRate.size())
             {
                c_Content += static_cast<QString>("+%1\n").arg(
-                  static_cast<uint32>(c_InvalidNodesForBitRate.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
+                  static_cast<uint32_t>(c_InvalidNodesForBitRate.size()) - mu32_TOOL_TIP_MAXIMUM_ITEMS);
             }
             this->mpc_Ui->pc_ComboBoxBitRate->SetToolTipInformation(c_Heading, c_Content, C_NagToolTip::eERROR);
          }
@@ -273,7 +272,7 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
 
       //Picture / text
       this->mpc_Ui->pc_BusType->setText(C_PuiSdUtil::h_ConvertBusTypeToStringUppercase(pc_Bus->e_Type));
-      if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+      if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
       {
          this->mpc_Ui->pc_LabBusImage->SetSvg("://images/system_definition/BusEdit/ImageBus.svg");
       }
@@ -289,11 +288,11 @@ void C_SdBueBusEditPropertiesWidget::m_LoadFromData(void)
               &C_SdBueBusEditPropertiesWidget::m_RegisterChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       connect(this->mpc_Ui->pc_SpinBoxBusId, static_cast<void (QSpinBox::*)(
-                                                            sintn)>(&C_OgeSpxNumber::valueChanged), this,
+                                                            int32_t)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterIdChange);
       //lint -e{929} Cast required to avoid ambiguous signal of qt interface
       connect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
-                                                               sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                               int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
               &C_SdBueBusEditPropertiesWidget::m_RegisterChange);
       connect(this->mpc_Ui->pc_ComboBoxBitRate, &C_OgeCbxText::SigErrorFixed, this,
               &C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed);
@@ -320,13 +319,13 @@ void C_SdBueBusEditPropertiesWidget::m_CanBitrateFixed(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
 {
-   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+   const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
 
    tgl_assert(pc_Bus != NULL);
    if (pc_Bus != NULL)
    {
       //copy current bus
-      C_OSCSystemBus c_NewBus = *pc_Bus;
+      C_OscSystemBus c_NewBus = *pc_Bus;
 
       //name
       //Only accept new name if not in conflict
@@ -345,14 +344,15 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
       c_NewBus.c_Comment = this->mpc_Ui->pc_TextEditComment->toPlainText().toStdString().c_str();
 
       //Bus id
-      c_NewBus.u8_BusID = static_cast<uint8>(this->mpc_Ui->pc_SpinBoxBusId->value());
+      c_NewBus.u8_BusId = static_cast<uint8_t>(this->mpc_Ui->pc_SpinBoxBusId->value());
 
       //Bit rate
-      if (c_NewBus.e_Type == C_OSCSystemBus::eCAN)
+      if (c_NewBus.e_Type == C_OscSystemBus::eCAN)
       {
          // Bitrate is shown as kbit/s
          c_NewBus.u64_BitRate =
-            static_cast<uint64>(this->m_GetBitrateFromComboBoxString(this->mpc_Ui->pc_ComboBoxBitRate->currentText())) *
+            static_cast<uint64_t>(this->m_GetBitrateFromComboBoxString(this->mpc_Ui->pc_ComboBoxBitRate->currentText()))
+            *
             1000ULL;
       }
       else
@@ -362,12 +362,12 @@ void C_SdBueBusEditPropertiesWidget::SaveToData(void) const
       }
 
       //save new bus
-      C_PuiSdHandler::h_GetInstance()->SetOSCBus(this->mu32_BusIndex, c_NewBus);
+      C_PuiSdHandler::h_GetInstance()->SetOscBus(this->mu32_BusIndex, c_NewBus);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
+QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32_t ou32_Bitrate) const
 {
    const QString c_Text = QString::number(ou32_Bitrate) + static_cast<QString>(" kbit/s");
 
@@ -375,11 +375,11 @@ QString C_SdBueBusEditPropertiesWidget::m_GetComboBoxString(const uint32 ou32_Bi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdBueBusEditPropertiesWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) const
+uint32_t C_SdBueBusEditPropertiesWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) const
 {
    QString c_Bitrate = orc_Entry;
    // In case of an error it returns 0
-   const uint32 u32_Bitrate = c_Bitrate.remove(" kbit/s").toInt();
+   const uint32_t u32_Bitrate = c_Bitrate.remove(" kbit/s").toInt();
 
    return u32_Bitrate;
 }
@@ -394,7 +394,7 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusName(void)
    const QString c_Text = this->mpc_Ui->pc_LineEditBusName->text();
    const bool q_NameIsUnique = C_PuiSdHandler::h_GetInstance()->CheckBusNameAvailable(
       c_Text.toStdString().c_str(), &this->mu32_BusIndex, NULL);
-   const bool q_NameIsValid = C_OSCUtils::h_CheckValidCName(
+   const bool q_NameIsValid = C_OscUtils::h_CheckValidCeName(
       this->mpc_Ui->pc_LineEditBusName->text().toStdString().c_str());
 
    //set invalid text property
@@ -434,7 +434,7 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusId(void) const
    bool q_IdIsValid;
 
    //check
-   tgl_assert(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().CheckErrorBus(this->mu32_BusIndex,
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().CheckErrorBus(this->mu32_BusIndex,
                                                                                            NULL,
                                                                                            NULL, &q_IdIsValid,
                                                                                            NULL) == C_NO_ERR);
@@ -450,7 +450,7 @@ void C_SdBueBusEditPropertiesWidget::m_CheckBusId(void) const
    }
    else
    {
-      const std::vector<uint32> c_UsedIds = C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(this->mu32_BusIndex);
+      const std::vector<uint32_t> c_UsedIds = C_SdUtil::h_GetUsedBusIdsUniqueAndSortedAscending(this->mu32_BusIndex);
       const QString c_Content = C_SdUtil::h_InitUsedIdsString(c_UsedIds, "", "", true);
       this->mpc_Ui->pc_SpinBoxBusId->SetToolTipAdditionalInfo(c_Content, C_NagToolTip::eERROR);
    }
@@ -491,7 +491,7 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
 
    if (hq_InProgress == false)
    {
-      std::vector<stw_scl::C_SCLString> c_ExistingNames;
+      std::vector<stw::scl::C_SclString> c_ExistingNames;
       hq_InProgress = true;
       if (C_PuiSdHandler::h_GetInstance()->CheckBusNameAvailable(this->mpc_Ui->pc_LineEditBusName->text().toStdString()
                                                                  .
@@ -507,9 +507,9 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
          c_Message.SetHeading(C_GtGetText::h_GetText("Bus naming"));
          c_Message.SetDescription(c_Description);
          c_Details.append(C_GtGetText::h_GetText("Used bus names:\n"));
-         for (uint32 u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingNames.size(); ++u32_ItExistingName)
+         for (uint32_t u32_ItExistingName = 0UL; u32_ItExistingName < c_ExistingNames.size(); ++u32_ItExistingName)
          {
-            const C_SCLString & rc_Name = c_ExistingNames[u32_ItExistingName];
+            const C_SclString & rc_Name = c_ExistingNames[u32_ItExistingName];
             c_Details.append(static_cast<QString>("\"%1\"\n").arg(rc_Name.c_str()));
          }
          c_Message.SetDetails(c_Details);
@@ -517,7 +517,7 @@ void C_SdBueBusEditPropertiesWidget::m_RegisterNameChange(void)
          c_Message.Execute();
          //Restore previous name
          {
-            const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+            const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
             if (pc_Bus != NULL)
             {
                this->mpc_Ui->pc_LineEditBusName->setText(pc_Bus->c_Name.c_str());

@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QBitArray>
 #include <QSvgRenderer>
 #include <QFontMetrics>
 #include <QStyleOptionViewItem>
 
-#include "C_Uti.h"
-#include "constants.h"
-#include "cam_constants.h"
-#include "C_OSCCanSignal.h"
-#include "C_TblDelegateUtil.h"
-#include "C_CamMetTreeDelegate.h"
-#include "TGLUtils.h"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "cam_constants.hpp"
+#include "C_OscCanSignal.hpp"
+#include "C_TblDelegateUtil.hpp"
+#include "C_CamMetTreeDelegate.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QColor C_CamMetTreeDelegate::mhc_HIGHLIGHT_BACKGROUND_COLOR = mc_STYLE_GUIDE_COLOR_27;
@@ -109,13 +108,13 @@ void C_CamMetTreeDelegate::paint(QPainter * const opc_Painter, const QStyleOptio
    {
       //Don't do anything else
       //Make sure text is not painted twice
-      tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());
+      tgl_assert(orc_Index.data(static_cast<int32_t>(Qt::DisplayRole)).toString().isEmpty());
    }
    else if (mh_PaintChildCell(opc_Painter, c_PaddedCellRect, orc_Index, q_Selected) == true)
    {
       //Don't do anything else
       // Make sure text is not painted twice
-      tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());
+      tgl_assert(orc_Index.data(static_cast<int32_t>(Qt::DisplayRole)).toString().isEmpty());
    }
    else
    {
@@ -162,7 +161,7 @@ QSize C_CamMetTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, co
 void C_CamMetTreeDelegate::m_PaintSelectedCellIcon(QPainter * const opc_Painter, const QRect & orc_CellRect,
                                                    const QModelIndex & orc_Index, const bool oq_Selected) const
 {
-   const QStringList c_IconPaths = orc_Index.data(msn_USER_ROLE_ICON).toStringList();
+   const QStringList c_IconPaths = orc_Index.data(ms32_USER_ROLE_ICON).toStringList();
 
    //Only handle if icons are set properly
    if (c_IconPaths.size() == 2)
@@ -221,8 +220,8 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
    if (orc_Index.parent().isValid() == true)
    {
       //Handle manually
-      const QStringList c_StringParts = orc_Index.data(msn_USER_ROLE_STRING_PARTS).toStringList();
-      const std::vector<sint32> c_ColSizes = mh_GetChildColWidths(orc_Index.parent().parent().isValid());
+      const QStringList c_StringParts = orc_Index.data(ms32_USER_ROLE_STRING_PARTS).toStringList();
+      const std::vector<int32_t> c_ColSizes = mh_GetChildColWidths(orc_Index.parent().parent().isValid());
       const std::vector<QString> c_Spaces = C_CamMetTreeDelegate::mh_GetTopSpaces();
       const std::vector<QFlags<Qt::AlignmentFlag> > c_Alignments = C_CamMetTreeDelegate::mh_GetTopAlignmentFlags();
       QRect c_CellRectAdapted;
@@ -231,10 +230,10 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
       c_CellRectAdapted = orc_CellRect.adjusted(20, 0, 0, 0);
 
       opc_Painter->save();
-      if (((c_ColSizes.size() == static_cast<uint32>(c_StringParts.size())) &&
+      if (((c_ColSizes.size() == static_cast<uint32_t>(c_StringParts.size())) &&
            (c_ColSizes.size() == c_Alignments.size())) && (c_ColSizes.size() == (c_Spaces.size() + 1UL)))
       {
-         uint32 u32_It = 0;
+         uint32_t u32_It = 0;
          QPoint c_TopLeft = c_CellRectAdapted.topLeft();
          QColor c_FontColor;
 
@@ -245,7 +244,7 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
          else
          {
             //Look for color in PARENT!
-            c_FontColor = orc_Index.data(static_cast<sint32>(Qt::ForegroundRole)).value<QColor>();
+            c_FontColor = orc_Index.data(static_cast<int32_t>(Qt::ForegroundRole)).value<QColor>();
          }
 
          for (QStringList::const_iterator c_It = c_StringParts.begin(); c_It != c_StringParts.end(); ++c_It)
@@ -310,9 +309,9 @@ bool C_CamMetTreeDelegate::mh_PaintChildCell(QPainter * const opc_Painter, const
    Vector of all restricted column sizes
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamMetTreeDelegate::mh_GetChildColWidths(const bool oq_IsThirdLayer)
+std::vector<int32_t> C_CamMetTreeDelegate::mh_GetChildColWidths(const bool oq_IsThirdLayer)
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(5);
    //Signal name
    if (oq_IsThirdLayer == false)
@@ -364,9 +363,9 @@ std::vector<QFlags<Qt::AlignmentFlag> > C_CamMetTreeDelegate::mh_GetTopAlignment
 std::vector<QString> C_CamMetTreeDelegate::mh_GetTopSpaces(void)
 {
    std::vector<QString> c_Retval;
-   c_Retval.push_back("");
-   c_Retval.push_back(" ");
-   c_Retval.push_back("");
-   c_Retval.push_back(" (raw)              ");
+   c_Retval.emplace_back("");
+   c_Retval.emplace_back(" ");
+   c_Retval.emplace_back("");
+   c_Retval.emplace_back(" (raw)              ");
    return c_Retval;
 }

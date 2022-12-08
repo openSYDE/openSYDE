@@ -43,7 +43,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelIcon">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelIcon">
      <property name="minimumSize">
       <size>
        <width>16</width>
@@ -92,7 +92,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_InfoLabel">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_InfoLabel">
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -130,14 +130,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

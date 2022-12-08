@@ -12,14 +12,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GiSyScreenColorPickingEventFilter.h"
-#include "C_GiSyColorSelectWidget.h"
+#include "C_GiSyScreenColorPickingEventFilter.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -69,17 +68,19 @@ C_GiSyScreenColorPickingEventFilter::~C_GiSyScreenColorPickingEventFilter(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSyScreenColorPickingEventFilter::eventFilter(QObject * const opc_Object, QEvent * const opc_Event)
 {
+   bool q_Result = false;
+
    Q_UNUSED(opc_Object)
    switch (opc_Event->type()) //lint !e788 //only selected events handled by us on purpose
    {
    case QEvent::MouseMove:
-      return mpc_ColorSelectWidget->HandleColorPickingMouseMove(dynamic_cast<QMouseEvent *>(opc_Event));
+      q_Result = mpc_ColorSelectWidget->HandleColorPickingMouseMove(dynamic_cast<QMouseEvent *>(opc_Event));
       break;
    case QEvent::MouseButtonRelease:
-      return mpc_ColorSelectWidget->HandleColorPickingMouseButtonRelease(dynamic_cast<QMouseEvent *>(opc_Event));
+      q_Result = mpc_ColorSelectWidget->HandleColorPickingMouseButtonRelease(dynamic_cast<QMouseEvent *>(opc_Event));
       break;
    default:
       break;
    }
-   return false;
+   return q_Result;
 }

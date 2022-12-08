@@ -10,43 +10,42 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 #include <QLabel>
 #include <QFileDialog>
 #include <QMimeData>
 #include <QBoxLayout>
 #include <QDebug>
 
-#include "TGLFile.h"
-#include "constants.h"
-#include "CSCLIniFile.h"
-#include "C_SdTopologyToolbox.h"
-#include "C_GtGetText.h"
+#include "TglFile.hpp"
+#include "constants.hpp"
+#include "C_SclIniFile.hpp"
+#include "C_SdTopologyToolbox.hpp"
+#include "C_GtGetText.hpp"
 #include "ui_C_SdTopologyToolbox.h"
-#include "C_SebToolboxUtil.h"
-#include "C_OSCSystemDefinition.h"
-#include "C_UsHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgePubIconOnly.h"
-#include "C_ImpUtil.h"
-#include "C_Uti.h"
-#include "C_OSCLoggingHandler.h"
+#include "C_SebToolboxUtil.hpp"
+#include "C_OscSystemDefinition.hpp"
+#include "C_UsHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgePubIconOnly.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_Uti.hpp"
+#include "C_OscLoggingHandler.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
-using namespace stw_types;
-using namespace stw_tgl;
-using namespace stw_scl;
-using namespace stw_errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::tgl;
+using namespace stw::scl;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -169,9 +168,9 @@ void C_SdTopologyToolbox::SearchChanged(const QString & orc_Text)
       }
    }
 
-   for (sintn sn_ItListWidget = 0; sn_ItListWidget < mc_ListWidgets.size(); ++sn_ItListWidget)
+   for (int32_t s32_ItListWidget = 0; s32_ItListWidget < mc_ListWidgets.size(); ++s32_ItListWidget)
    {
-      c_ListItems = mc_ListWidgets[sn_ItListWidget]->findItems(orc_Text, Qt::MatchContains);
+      c_ListItems = mc_ListWidgets[s32_ItListWidget]->findItems(orc_Text, Qt::MatchContains);
       for (c_ItItem = c_ListItems.begin(); c_ItItem != c_ListItems.end(); ++c_ItItem)
       {
          this->mpc_Ui->pc_ListWidgetSearch->addItem((*c_ItItem)->clone());
@@ -246,9 +245,9 @@ void C_SdTopologyToolbox::dragEnterEvent(QDragEnterEvent * const opc_Event)
 {
    if (opc_Event->mimeData()->hasUrls() == true)
    {
-      for (sintn sn_Counter = 0; sn_Counter < opc_Event->mimeData()->urls().size(); sn_Counter++)
+      for (int32_t s32_Counter = 0; s32_Counter < opc_Event->mimeData()->urls().size(); s32_Counter++)
       {
-         const QFileInfo c_File(opc_Event->mimeData()->urls().at(sn_Counter).toString());
+         const QFileInfo c_File(opc_Event->mimeData()->urls().at(s32_Counter).toString());
 
          // Accepting openSYDE device definition files as image
          if (c_File.completeSuffix().compare("syde_devdef") == 0)
@@ -288,20 +287,20 @@ void C_SdTopologyToolbox::dropEvent(QDropEvent * const opc_Event)
 {
    QStringList c_UserDeviceDefPaths;
    QStringList c_Errors;
-   sintn sn_DeviceCount = 0;
-   sintn sn_AddDeviceCount;
+   int32_t s32_DeviceCount = 0;
+   int32_t s32_AddDeviceCount;
 
-   for (sintn sn_Counter = 0; sn_Counter < opc_Event->mimeData()->urls().size(); sn_Counter++)
+   for (int32_t s32_Counter = 0; s32_Counter < opc_Event->mimeData()->urls().size(); s32_Counter++)
    {
-      QString c_Path = opc_Event->mimeData()->urls().at(sn_Counter).path();
+      QString c_Path = opc_Event->mimeData()->urls().at(s32_Counter).path();
       this->m_LoadUserDeviceDefinitionPaths(c_Path.remove(0, 1),
-                                            c_UserDeviceDefPaths, c_Errors, sn_DeviceCount);
+                                            c_UserDeviceDefPaths, c_Errors, s32_DeviceCount);
    }
 
    c_UserDeviceDefPaths = C_ImpUtil::h_AskUserToSaveRelativePath(this, c_UserDeviceDefPaths,
                                                                  C_Uti::h_GetExePath());
-   sn_AddDeviceCount = this->m_AddUserNodesToIni(c_UserDeviceDefPaths, c_Errors);
-   this->m_ErrorHandlingUserFeedback(c_Errors, sn_AddDeviceCount, sn_DeviceCount);
+   s32_AddDeviceCount = this->m_AddUserNodesToIni(c_UserDeviceDefPaths, c_Errors);
+   this->m_ErrorHandlingUserFeedback(c_Errors, s32_AddDeviceCount, s32_DeviceCount);
 
    QWidget::dropEvent(opc_Event);
 }
@@ -313,9 +312,9 @@ void C_SdTopologyToolbox::dropEvent(QDropEvent * const opc_Event)
 void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
 {
    std::vector<C_OgePubIconOnly *> c_Icons;
-   std::vector<C_OSCDeviceDefinition> c_Devices;
-   std::vector<C_OSCDeviceGroup> c_DeviceGroups = C_OSCSystemDefinition::hc_Devices.GetDeviceGroups();
-   for (uint32 u32_ItDeviceGroup = 0U; u32_ItDeviceGroup < c_DeviceGroups.size(); ++u32_ItDeviceGroup)
+   std::vector<C_OscDeviceDefinition> c_Devices;
+   std::vector<C_OscDeviceGroup> c_DeviceGroups = C_OscSystemDefinition::hc_Devices.GetDeviceGroups();
+   for (uint32_t u32_ItDeviceGroup = 0U; u32_ItDeviceGroup < c_DeviceGroups.size(); ++u32_ItDeviceGroup)
    {
       c_Devices = c_DeviceGroups[u32_ItDeviceGroup].GetDevices();
 
@@ -330,13 +329,13 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
 
          if (this->mpc_List != NULL)
          {
-            for (uint32 u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
+            for (uint32_t u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
                this->m_FillToolboxWithDynamicNodes(c_Devices[u32_ItDevice]);
             }
          }
       }
-      if (u32_ItDeviceGroup == static_cast<uint32>(c_DeviceGroups.size() - 1))
+      if (u32_ItDeviceGroup == static_cast<uint32_t>(c_DeviceGroups.size() - 1))
       {
          // Add final spacer
          C_SebToolboxUtil::h_AddFinalSpacer(this->mpc_Ui->pc_VerticalLayout1, this->mpc_List);
@@ -370,7 +369,7 @@ void C_SdTopologyToolbox::m_FillToolboxDynamic(void)
          // False: Set label no user devices existing
          if (c_DeviceGroups[u32_ItDeviceGroup].GetGroupName() == "User Nodes")
          {
-            for (uint32 u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
+            for (uint32_t u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
                this->m_FillToolboxWithDynamicNodes(c_Devices[u32_ItDevice]);
             }
@@ -416,15 +415,15 @@ void C_SdTopologyToolbox::m_FillToolboxStatic(void)
    C_SebToolboxUtil::h_InitFreeElements(this->mpc_Ui->pc_ListWidgetDrawing);
 
    // configure Headings
-   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add a device to toolbox
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyToolbox::m_FillToolboxWithDynamicNodes(const C_OSCDeviceDefinition & orc_Device)
+void C_SdTopologyToolbox::m_FillToolboxWithDynamicNodes(const C_OscDeviceDefinition & orc_Device)
 {
    const QString c_DeviceName = orc_Device.c_DeviceName.c_str();
    // Tooltip
@@ -435,12 +434,12 @@ void C_SdTopologyToolbox::m_FillToolboxWithDynamicNodes(const C_OSCDeviceDefinit
       QListWidgetItem * pc_Item;
       this->mpc_List->addItem(orc_Device.GetDisplayName().c_str());
       pc_Item = this->mpc_List->item(this->mpc_List->count() - 1);
-      pc_Item->setData(msn_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);
+      pc_Item->setData(ms32_USER_ROLE_ADDITIONAL_INFORMATION, c_DeviceName);
       // Toolbox icon
       pc_Item->setIcon(this->mc_Icon);
       // Tooltip
-      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_HEADING, orc_Device.GetDisplayName().c_str());
-      pc_Item->setData(msn_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
+      pc_Item->setData(ms32_USER_ROLE_TOOL_TIP_HEADING, orc_Device.GetDisplayName().c_str());
+      pc_Item->setData(ms32_USER_ROLE_TOOL_TIP_CONTENT, c_DeviceDescription);
    }
 }
 
@@ -456,8 +455,8 @@ void C_SdTopologyToolbox::m_IconClearAllClicked()
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Delete User Nodes"));
    c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                   "Do you really want to delete all user nodes?"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+   c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
    c_MessageBox.SetCustomMinHeight(180, 180);
 
    if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)
@@ -469,26 +468,27 @@ void C_SdTopologyToolbox::m_IconClearAllClicked()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handles all GUI Feedback regarding errors on adding user nodes to toolbox
 
-   \param[in]     orc_Errors              List of error messages
-   \param[in]     orsn_AddDeviceCount     Number of devices that could be added successfully
-   \param[in]     orsn_DeviceCount        Number of devices that were originally to be added
+   \param[in]     orc_Errors               List of error messages
+   \param[in]     ors32_AddDeviceCount     Number of devices that could be added successfully
+   \param[in]     ors32_DeviceCount        Number of devices that were originally to be added
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdTopologyToolbox::m_ErrorHandlingUserFeedback(const QStringList & orc_Errors, const sintn & orsn_AddDeviceCount,
-                                                      const sintn & orsn_DeviceCount)
+void C_SdTopologyToolbox::m_ErrorHandlingUserFeedback(const QStringList & orc_Errors,
+                                                      const int32_t & ors32_AddDeviceCount,
+                                                      const int32_t & ors32_DeviceCount)
 {
    C_OgeWiCustomMessage c_Message(this);
    QString c_Description;
    QString c_Details;
    const QString c_LogLink = C_GtGetText::h_GetText("For details and possible errors see ") +
                              C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."), mc_STYLE_GUIDE_COLOR_LINK,
-                                              C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+                                              C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
 
    // nodes could be added (possibly with errors) -> info box with count of added nodes
-   if (orsn_AddDeviceCount > 0)
+   if (ors32_AddDeviceCount > 0)
    {
-      c_Description = QString::number(orsn_AddDeviceCount) + C_GtGetText::h_GetText(" of ") + QString::number(
-         orsn_DeviceCount) + C_GtGetText::h_GetText(" node(s) successfully added to toolbox.<br/>");
+      c_Description = QString::number(ors32_AddDeviceCount) + C_GtGetText::h_GetText(" of ") + QString::number(
+         ors32_DeviceCount) + C_GtGetText::h_GetText(" node(s) successfully added to toolbox.<br/>");
       c_Message.SetType(C_OgeWiCustomMessage::eINFORMATION);
       c_Message.SetCustomMinHeight(180, 210);
    }
@@ -496,9 +496,9 @@ void C_SdTopologyToolbox::m_ErrorHandlingUserFeedback(const QStringList & orc_Er
    {
       // something went wrong. Wrong ini, broken xml, node already exists
       c_Description = C_GtGetText::h_GetText("Errors occured! See details for further information.");
-      for (sintn sn_Error = 0; sn_Error < orc_Errors.size(); ++sn_Error)
+      for (int32_t s32_Error = 0; s32_Error < orc_Errors.size(); ++s32_Error)
       {
-         c_Details += "* " + orc_Errors[sn_Error] + "<br/>";
+         c_Details += "* " + orc_Errors[s32_Error] + "<br/>";
          c_Message.SetType(C_OgeWiCustomMessage::eERROR);
          c_Message.SetCustomMinHeight(180, 410);
       }
@@ -519,8 +519,6 @@ void C_SdTopologyToolbox::m_ErrorHandlingUserFeedback(const QStringList & orc_Er
 void C_SdTopologyToolbox::m_FileBrowseDialog(void)
 {
    QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownDeviceDefPath();
-   sintn sn_DeviceCount = 0;
-   sintn sn_AddDeviceCount;
 
    if (c_Folder.compare("") == 0)
    {
@@ -535,24 +533,26 @@ void C_SdTopologyToolbox::m_FileBrowseDialog(void)
       c_Dialog.setDefaultSuffix("*.syde_devdef");
       c_Dialog.setFileMode(QFileDialog::ExistingFiles);
 
-      if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_Dialog.exec() == static_cast<int32_t>(QDialog::Accepted))
       {
+         int32_t s32_DeviceCount = 0;
+         int32_t s32_AddDeviceCount;
          QStringList c_Errors;
          QStringList c_UserDeviceDefPaths;
 
          c_Folder = c_Dialog.directory().absolutePath();
          C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownDeviceDefPath(c_Folder);
 
-         for (sintn sn_Counter = 0; sn_Counter < c_Dialog.selectedFiles().size(); ++sn_Counter)
+         for (int32_t s32_Counter = 0; s32_Counter < c_Dialog.selectedFiles().size(); ++s32_Counter)
          {
             this->m_LoadUserDeviceDefinitionPaths(c_Dialog.selectedFiles().at(
-                                                     sn_Counter), c_UserDeviceDefPaths, c_Errors, sn_DeviceCount);
+                                                     s32_Counter), c_UserDeviceDefPaths, c_Errors, s32_DeviceCount);
          }
 
          c_UserDeviceDefPaths =
             C_ImpUtil::h_AskUserToSaveRelativePath(this, c_UserDeviceDefPaths, C_Uti::h_GetExePath());
-         sn_AddDeviceCount = this->m_AddUserNodesToIni(c_UserDeviceDefPaths, c_Errors);
-         this->m_ErrorHandlingUserFeedback(c_Errors, sn_AddDeviceCount, sn_DeviceCount);
+         s32_AddDeviceCount = this->m_AddUserNodesToIni(c_UserDeviceDefPaths, c_Errors);
+         this->m_ErrorHandlingUserFeedback(c_Errors, s32_AddDeviceCount, s32_DeviceCount);
       }
    }
 }
@@ -563,37 +563,37 @@ void C_SdTopologyToolbox::m_FileBrowseDialog(void)
    \param[in]       orc_Path                path to file, chosen by user
    \param[in,out]   orc_UserDeviceDefPaths  paths to .syde_devdef files
    \param[in,out]   orc_Errors              error messages for GUI Feedback
-   \param[in,out]   orsn_DeviceCount        keeps track of how many devices are supposed to be added
+   \param[in,out]   ors32_DeviceCount       keeps track of how many devices are supposed to be added
 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyToolbox::m_LoadUserDeviceDefinitionPaths(const QString & orc_Path,
                                                           QStringList & orc_UserDeviceDefPaths,
-                                                          QStringList & orc_Errors, sintn & orsn_DeviceCount) const
+                                                          QStringList & orc_Errors, int32_t & ors32_DeviceCount) const
 {
    const QFileInfo c_FileInfo(orc_Path);
-   C_OSCDeviceManager c_UserDeviceManager;
-   sintn * const psn_PtrDeviceCount = &orsn_DeviceCount;
+   C_OscDeviceManager c_UserDeviceManager;
+   int32_t * const ps32_PtrDeviceCount = &ors32_DeviceCount;
 
    // user selected an ini file?
    if (c_FileInfo.completeSuffix().toLower().contains("ini") == true)
    {
       // load the file
-      const C_SCLString c_CheckString = "User Nodes";
-      std::vector<C_OSCDeviceGroup> c_DeviceGroups;
-      std::vector<C_OSCDeviceDefinition> c_UserDevices;
+      const C_SclString c_CheckString = "User Nodes";
+      std::vector<C_OscDeviceGroup> c_DeviceGroups;
+      std::vector<C_OscDeviceDefinition> c_UserDevices;
       bool q_IsValidUserIni = false;
 
-      c_UserDeviceManager.LoadFromFile(orc_Path.toStdString().c_str(), false, psn_PtrDeviceCount);
+      c_UserDeviceManager.LoadFromFile(orc_Path.toStdString().c_str(), false, ps32_PtrDeviceCount);
       c_DeviceGroups = c_UserDeviceManager.GetDeviceGroups();
 
       // get DeviceGroups from device manager
-      for (uint32 u32_ItGroup = 0U; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
+      for (uint32_t u32_ItGroup = 0U; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
       {
          if (c_DeviceGroups[u32_ItGroup].GetGroupName() == c_CheckString)
          {
             c_UserDevices = c_DeviceGroups[u32_ItGroup].GetDevices();
-            for (uint32 u32_ItDev = 0U; u32_ItDev < c_UserDevices.size(); ++u32_ItDev)
+            for (uint32_t u32_ItDev = 0U; u32_ItDev < c_UserDevices.size(); ++u32_ItDev)
             {
                const QString c_Path = static_cast<QString>(c_UserDevices[u32_ItDev].c_FilePath.c_str());
                orc_UserDeviceDefPaths.append(c_Path);
@@ -619,13 +619,13 @@ void C_SdTopologyToolbox::m_LoadUserDeviceDefinitionPaths(const QString & orc_Pa
                            orc_Path + c_ErrorDetails);
 
          osc_write_log_error("Loading from ini file",
-                             "File \"" + static_cast<C_SCLString>(orc_Path.toStdString().c_str()) +
+                             "File \"" + static_cast<C_SclString>(orc_Path.toStdString().c_str()) +
                              "\" contains no User Nodes.");
       }
    }
    else if (c_FileInfo.completeSuffix().toLower().contains("syde_devdef") == true)
    {
-      orsn_DeviceCount++;
+      ors32_DeviceCount++;
       orc_UserDeviceDefPaths.append(orc_Path);
    }
    else
@@ -633,7 +633,7 @@ void C_SdTopologyToolbox::m_LoadUserDeviceDefinitionPaths(const QString & orc_Pa
       orc_Errors.append(
          static_cast<QString>(C_GtGetText::h_GetText("File type '%1' not allowed.")).arg(c_FileInfo.completeSuffix()));
       osc_write_log_error("Loading file",
-                          "Wrong file suffix \"" + static_cast<stw_scl::C_SCLString>(orc_Path.toStdString().c_str()) +
+                          "Wrong file suffix \"" + static_cast<stw::scl::C_SclString>(orc_Path.toStdString().c_str()) +
                           "\".");
    }
 }
@@ -648,23 +648,22 @@ void C_SdTopologyToolbox::m_LoadUserDeviceDefinitionPaths(const QString & orc_Pa
    Number of devices that could be added successfully
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdTopologyToolbox::m_AddUserNodesToIni(const QStringList & orc_UserDeviceDefPaths, QStringList & orc_Errors)
+int32_t C_SdTopologyToolbox::m_AddUserNodesToIni(const QStringList & orc_UserDeviceDefPaths, QStringList & orc_Errors)
 {
-   sint32 s32_Result;
-   sintn sn_AddDeviceCount = 0;
+   int32_t s32_AddDeviceCount = 0;
 
    if (orc_UserDeviceDefPaths.size() > 0)
    {
-      for (sintn sn_ItPath = 0; sn_ItPath < orc_UserDeviceDefPaths.size(); ++sn_ItPath)
+      for (int32_t s32_ItPath = 0; s32_ItPath < orc_UserDeviceDefPaths.size(); ++s32_ItPath)
       {
-         s32_Result = C_OSCSystemDefinition::hc_Devices.AddDevice(
-            orc_UserDeviceDefPaths[sn_ItPath].toStdString().c_str(),
+         const int32_t s32_Result = C_OscSystemDefinition::hc_Devices.AddDevice(
+            orc_UserDeviceDefPaths[s32_ItPath].toStdString().c_str(),
             "User Nodes",
             "../devices/user_devices.ini");
 
          if (s32_Result != C_NO_ERR)
          {
-            QString c_Error = C_GtGetText::h_GetText("Could not add device: \"") + orc_UserDeviceDefPaths[sn_ItPath] +
+            QString c_Error = C_GtGetText::h_GetText("Could not add device: \"") + orc_UserDeviceDefPaths[s32_ItPath] +
                               ("\".<br/>");
             if (s32_Result == C_OVERFLOW)
             {
@@ -674,15 +673,15 @@ sintn C_SdTopologyToolbox::m_AddUserNodesToIni(const QStringList & orc_UserDevic
          }
          else
          {
-            ++sn_AddDeviceCount;
+            ++s32_AddDeviceCount;
          }
       }
    }
-   if (sn_AddDeviceCount > 0)
+   if (s32_AddDeviceCount > 0)
    {
       this->m_AddUserNodesToToolbox();
    }
-   return sn_AddDeviceCount;
+   return s32_AddDeviceCount;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -697,19 +696,19 @@ void C_SdTopologyToolbox::m_AddUserNodesToToolbox(void)
    // get names of all nodes, which already are in toolbox
    if (this->mpc_List != NULL)
    {
-      std::vector<C_OSCDeviceDefinition> c_UserDevices;
-      const std::vector<C_OSCDeviceGroup> c_DeviceGroups = C_OSCSystemDefinition::hc_Devices.GetDeviceGroups();
+      std::vector<C_OscDeviceDefinition> c_UserDevices;
+      const std::vector<C_OscDeviceGroup> c_DeviceGroups = C_OscSystemDefinition::hc_Devices.GetDeviceGroups();
 
       QStringList c_ToolboxItems;
-      const C_SCLString c_CheckString = "User Nodes";
+      const C_SclString c_CheckString = "User Nodes";
 
-      for (sintn sn_Counter = 0; sn_Counter < this->mpc_List->count(); ++sn_Counter)
+      for (int32_t s32_Counter = 0; s32_Counter < this->mpc_List->count(); ++s32_Counter)
       {
-         c_ToolboxItems.append(this->mpc_List->item(sn_Counter)->text());
+         c_ToolboxItems.append(this->mpc_List->item(s32_Counter)->text());
       }
 
       // get all user nodes
-      for (uint32 u32_ItGroup = 0U; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
+      for (uint32_t u32_ItGroup = 0U; u32_ItGroup < c_DeviceGroups.size(); ++u32_ItGroup)
       {
          if (c_DeviceGroups[u32_ItGroup].GetGroupName() == c_CheckString)
          {
@@ -724,7 +723,7 @@ void C_SdTopologyToolbox::m_AddUserNodesToToolbox(void)
          this->mpc_Ui->pc_VerticalLayout1->removeItem(this->mpc_Spacer);
       }
 
-      for (uint32 u32_ItDev = 0U; u32_ItDev < c_UserDevices.size(); ++u32_ItDev)
+      for (uint32_t u32_ItDev = 0U; u32_ItDev < c_UserDevices.size(); ++u32_ItDev)
       {
          // only add the nodes, which are not already in toolbox
          if (c_ToolboxItems.contains(static_cast<QString>(c_UserDevices[u32_ItDev].c_DeviceName.c_str())) == false)
@@ -746,19 +745,19 @@ void C_SdTopologyToolbox::m_AddUserNodesToToolbox(void)
    C_BUSY      Device always exits
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
+int32_t C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
 {
-   sint32 s32_Return = C_NO_ERR;
-   sint32 s32_Result = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
+   int32_t s32_Result = C_NO_ERR;
 
    if (this->mpc_List != NULL)
    {
       QListWidgetItem * const pc_Item = this->mpc_List->itemAt(orc_Pos);
 
-      std::vector<C_OSCDeviceDefinition> c_Devices;
-      std::vector<C_OSCDeviceDefinition>::iterator c_ItDevice;
-      std::vector<C_OSCDeviceDefinition>::iterator c_ItEraseDevice;
-      std::vector<C_OSCDeviceGroup> c_DeviceGroups = C_OSCSystemDefinition::hc_Devices.GetDeviceGroups();
+      std::vector<C_OscDeviceDefinition> c_Devices;
+      std::vector<C_OscDeviceDefinition>::iterator c_ItDevice;
+      std::vector<C_OscDeviceDefinition>::iterator c_ItEraseDevice;
+      std::vector<C_OscDeviceGroup> c_DeviceGroups = C_OscSystemDefinition::hc_Devices.GetDeviceGroups();
       c_Devices = c_DeviceGroups[c_DeviceGroups.size() - 1].GetDevices();
 
       // Search for the device which should be deleted
@@ -771,9 +770,9 @@ sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
       }
 
       // get all nodes, which are currently used in Network Topology
-      for (uint32 u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+      for (uint32_t u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
       {
-         C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
+         C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {
@@ -801,7 +800,7 @@ sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
          c_Devices.erase(c_ItEraseDevice);
 
          // Delete device from device group "User Nodes" in user_devices.ini-File
-         s32_Return = C_OSCSystemDefinition::hc_Devices.ChangeDevices(c_Devices,
+         s32_Return = C_OscSystemDefinition::hc_Devices.ChangeDevices(c_Devices,
                                                                       c_DeviceGroups[c_DeviceGroups.size() - 1].GetGroupName(),
                                                                       "../devices/user_devices.ini");
 
@@ -831,25 +830,25 @@ sint32 C_SdTopologyToolbox::m_DeleteUserNode(const QPoint & orc_Pos)
    C_DEFAULT  Nodes can not be deleted, because they are still used in Network Topology
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdTopologyToolbox::m_ClearAllUserNodes()
+int32_t C_SdTopologyToolbox::m_ClearAllUserNodes()
 {
-   sint32 s32_Return = C_NO_ERR;
-   sint32 s32_Result = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
+   int32_t s32_Result = C_NO_ERR;
 
    if (this->mpc_List != NULL)
    {
-      std::vector<C_OSCDeviceDefinition> c_Devices;
-      std::vector<C_OSCDeviceGroup> c_DeviceGroups = C_OSCSystemDefinition::hc_Devices.GetDeviceGroups();
+      std::vector<C_OscDeviceDefinition> c_Devices;
+      std::vector<C_OscDeviceGroup> c_DeviceGroups = C_OscSystemDefinition::hc_Devices.GetDeviceGroups();
       c_Devices = c_DeviceGroups[c_DeviceGroups.size() - 1].GetDevices();
 
       // get all nodes, which are currently used in Network Topology
-      for (uint32 u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+      for (uint32_t u32_ItNode = 0U; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
       {
-         C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(u32_ItNode);
+         C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(u32_ItNode);
 
          if (pc_Node != NULL)
          {
-            for (uint32 u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
+            for (uint32_t u32_ItDevice = 0U; u32_ItDevice < c_Devices.size(); ++u32_ItDevice)
             {
                // check if any of the User Nodes is currently used in Network Topology. If so the Nodes can't be
                // deleted.
@@ -876,7 +875,7 @@ sint32 C_SdTopologyToolbox::m_ClearAllUserNodes()
          //delete all devices from device definition vector
          c_Devices.clear();
          //delete devices from device group "User Nodes" in user_devices.ini
-         s32_Return = C_OSCSystemDefinition::hc_Devices.ChangeDevices(c_Devices,
+         s32_Return = C_OscSystemDefinition::hc_Devices.ChangeDevices(c_Devices,
                                                                       c_DeviceGroups[c_DeviceGroups.size() - 1].GetGroupName(),
                                                                       "../devices/user_devices.ini");
 

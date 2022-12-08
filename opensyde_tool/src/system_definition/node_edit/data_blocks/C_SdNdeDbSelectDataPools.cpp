@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDbSelectDataPools.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeDbSelectDataPools.hpp"
 #include "ui_C_SdNdeDbSelectDataPools.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,10 +52,10 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] orc_Parent                   Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDbSelectDataPools::C_SdNdeDbSelectDataPools(const stw_types::uint32 ou32_NodeIndex,
-                                                   const sint32 os32_SkipApplicationIndex,
-                                                   const std::vector<uint32> & orc_UsedDataPoolIndicesIndex,
-                                                   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_SdNdeDbSelectDataPools::C_SdNdeDbSelectDataPools(const uint32_t ou32_NodeIndex,
+                                                   const int32_t os32_SkipApplicationIndex,
+                                                   const std::vector<uint32_t> & orc_UsedDataPoolIndicesIndex,
+                                                   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbSelectDataPools),
    mrc_ParentDialog(orc_Parent),
@@ -74,7 +73,7 @@ C_SdNdeDbSelectDataPools::C_SdNdeDbSelectDataPools(const stw_types::uint32 ou32_
    //configure view
    this->mpc_Ui->pc_TreeView->setSelectionMode(QAbstractItemView::ExtendedSelection);
    this->mpc_Ui->pc_TreeView->SetUseInternalExpandedItems(false);
-   this->mpc_Ui->pc_TreeView->InitSD(ou32_NodeIndex, os32_SkipApplicationIndex, orc_UsedDataPoolIndicesIndex);
+   this->mpc_Ui->pc_TreeView->InitSd(ou32_NodeIndex, os32_SkipApplicationIndex, orc_UsedDataPoolIndicesIndex);
 
    //initially expand all
    this->mpc_Ui->pc_TreeView->expandAll();
@@ -146,8 +145,8 @@ void C_SdNdeDbSelectDataPools::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -248,10 +247,10 @@ void C_SdNdeDbSelectDataPools::m_OnSearch(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selected items
 
-   \param[in] osn_SelectionCount Number of selected items
+   \param[in] os32_SelectionCount Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbSelectDataPools::m_UpdateSelection(const sintn osn_SelectionCount) const
+void C_SdNdeDbSelectDataPools::m_UpdateSelection(const int32_t os32_SelectionCount) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
    {
@@ -260,13 +259,13 @@ void C_SdNdeDbSelectDataPools::m_UpdateSelection(const sintn osn_SelectionCount)
    else
    {
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
-      if (osn_SelectionCount > 0)
+      if (os32_SelectionCount > 0)
       {
-         if (osn_SelectionCount > 1)
+         if (os32_SelectionCount > 1)
          {
             this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                              "%1 selected Datapools")).arg(
-                                                        osn_SelectionCount));
+                                                        os32_SelectionCount));
          }
          else
          {
@@ -293,29 +292,29 @@ void C_SdNdeDbSelectDataPools::m_UpdateSelection(const sintn osn_SelectionCount)
 bool C_SdNdeDbSelectDataPools::m_IsCommDatapoolSelectionValid(void)
 {
    bool q_Return = true;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    QString c_Details = "";
 
-   std::map<C_OSCCanProtocol::E_Type, uint32> c_Counter;
-   std::map<C_OSCCanProtocol::E_Type, uint32>::const_iterator c_It;
+   std::map<C_OscCanProtocol::E_Type, uint32_t> c_Counter;
+   std::map<C_OscCanProtocol::E_Type, uint32_t>::const_iterator c_It;
 
    if (pc_Node != NULL)
    {
       // put already used and newly selected datapools together
       // note: in fact we only need to check COMM datapools, but differentiating also needs to check every DP (for type)
-      std::vector<stw_types::uint32> c_DatapoolIndices = this->mc_UsedDataPoolIndices;
+      std::vector<uint32_t> c_DatapoolIndices = this->mc_UsedDataPoolIndices;
       const std::vector<C_PuiSvDbNodeDataPoolListElementId> & rc_SelectedDatapoolElements =
          this->mpc_Ui->pc_TreeView->GetSelectedDataElements();
-      for (uint32 u32_It = 0UL; u32_It < rc_SelectedDatapoolElements.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < rc_SelectedDatapoolElements.size(); ++u32_It)
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_CurItem = rc_SelectedDatapoolElements[u32_It];
          c_DatapoolIndices.push_back(rc_CurItem.u32_DataPoolIndex);
       }
 
       // check all already owned and newly selected datapools
-      for (uint32 u32_It = 0UL; u32_It < c_DatapoolIndices.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < c_DatapoolIndices.size(); ++u32_It)
       {
-         const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetRelatedCANProtocolConst(c_DatapoolIndices[u32_It]);
+         const C_OscCanProtocol * const pc_Protocol = pc_Node->GetRelatedCanProtocolConst(c_DatapoolIndices[u32_It]);
          if (pc_Protocol != NULL)
          {
             c_Counter[pc_Protocol->e_Type] += 1;

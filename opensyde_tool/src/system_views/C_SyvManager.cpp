@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "C_SyvManager.h"
-#include "C_PuiSvHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "C_SyvManager.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -63,7 +62,7 @@ C_SyvManager::C_SyvManager(QObject * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvManager::AddView(const bool oq_SendSigChangeMode)
 {
-   const uint32 u32_NewViewIndex = C_PuiSvHandler::h_GetInstance()->GetViewCount();
+   const uint32_t u32_NewViewIndex = C_PuiSvHandler::h_GetInstance()->GetViewCount();
    QString c_SubMode;
    QString c_SubSubMode;
 
@@ -117,7 +116,7 @@ void C_SyvManager::HandleInitialSystemView(void)
    \param[in] orc_Name   New name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvManager::RenameView(const uint32 ou32_Index, const QString & orc_Name) const
+void C_SyvManager::RenameView(const uint32_t ou32_Index, const QString & orc_Name) const
 {
    tgl_assert(C_PuiSvHandler::h_GetInstance()->SetViewName(ou32_Index, orc_Name) == C_NO_ERR);
 }
@@ -129,7 +128,7 @@ void C_SyvManager::RenameView(const uint32 ou32_Index, const QString & orc_Name)
    \param[in] ou32_TargetIndex Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvManager::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
+void C_SyvManager::MoveView(const uint32_t ou32_StartIndex, const uint32_t ou32_TargetIndex)
 {
    if ((ou32_StartIndex < C_PuiSvHandler::h_GetInstance()->GetViewCount()) &&
        (ou32_TargetIndex < C_PuiSvHandler::h_GetInstance()->GetViewCount()))
@@ -154,13 +153,13 @@ void C_SyvManager::MoveView(const uint32 ou32_StartIndex, const uint32 ou32_Targ
    \param[in] ou32_Index System view index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvManager::DuplicateSysView(const uint32 ou32_Index)
+void C_SyvManager::DuplicateSysView(const uint32_t ou32_Index)
 {
    const C_PuiSvData * const pc_ViewPrev = C_PuiSvHandler::h_GetInstance()->GetView(ou32_Index);
 
    if (pc_ViewPrev != NULL)
    {
-      const uint32 u32_NewViewIndex = ou32_Index + 1UL;
+      const uint32_t u32_NewViewIndex = ou32_Index + 1UL;
       QString c_SubMode;
       QString c_SubSubMode;
       const C_PuiSvData * pc_ViewNew;
@@ -192,8 +191,8 @@ void C_SyvManager::DuplicateSysView(const uint32 ou32_Index)
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_SelectedSubMode,
-                                 const uint32 ou32_SelectedIndex, QWidget * const opc_Parent)
+void C_SyvManager::DeleteSysView(const uint32_t ou32_Index, const int32_t os32_SelectedSubMode,
+                                 const uint32_t ou32_SelectedIndex, QWidget * const opc_Parent)
 {
    if (C_PuiSvHandler::h_GetInstance()->GetViewCount() > 1UL)
    {
@@ -205,8 +204,8 @@ void C_SyvManager::DeleteSysView(const uint32 ou32_Index, const sint32 os32_Sele
          c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                                           "Do you really want to delete this view (%1)?")).arg(
                                      pc_View->GetName()));
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+         c_Message.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
          c_Message.SetCustomMinHeight(180, 180);
          if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
          {

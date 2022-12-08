@@ -8,26 +8,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "TGLUtils.h"
-#include "C_SyvDaPeSlider.h"
+#include "TglUtils.hpp"
+#include "C_SyvDaPeSlider.hpp"
 #include "ui_C_SyvDaPeSlider.h"
 
-#include "C_GiSvDaSliderBase.h"
-#include "C_GtGetText.h"
+#include "C_GiSvDaSliderBase.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1 = 0;
-const sintn C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2 = 1;
+const int32_t C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE1 = 0;
+const int32_t C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2 = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,11 +67,11 @@ C_SyvDaPeSlider::C_SyvDaPeSlider(C_SyvDaPeBase & orc_Parent, const bool oq_DarkM
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxTypeColor,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeSlider::m_UpdatePreview);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxTypeHandle,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeSlider::m_UpdatePreview);
    connect(this->mpc_Ui->pc_CheckBoxMinMax, &QCheckBox::toggled, this, &C_SyvDaPeSlider::m_UpdatePreview);
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeSlider::m_UpdatePreview);
@@ -152,10 +151,10 @@ C_PuiSvDbSlider::E_Type C_SyvDaPeSlider::GetType(void) const
 
    switch (this->mpc_Ui->pc_ComboBoxTypeColor->currentIndex())
    {
-   case C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2:
+   case C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2:
       switch (this->mpc_Ui->pc_ComboBoxTypeHandle->currentIndex())
       {
-      case C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2:
+      case C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2:
          e_Retval = C_PuiSvDbSlider::eTYPE_BIG_COLOR_2;
          break;
       default:
@@ -166,7 +165,7 @@ C_PuiSvDbSlider::E_Type C_SyvDaPeSlider::GetType(void) const
    default:
       switch (this->mpc_Ui->pc_ComboBoxTypeHandle->currentIndex())
       {
-      case C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2:
+      case C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2:
          e_Retval = C_PuiSvDbSlider::eTYPE_BIG_COLOR_1;
          break;
       default:
@@ -190,20 +189,20 @@ void C_SyvDaPeSlider::SetType(const C_PuiSvDbSlider::E_Type oe_Type) const
    switch (oe_Type)
    {
    case C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1:
-      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
-      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE1);
       break;
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_1:
-      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
-      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2);
       break;
    case C_PuiSvDbSlider::eTYPE_BIG_COLOR_2:
-      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2);
-      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2);
       break;
    case C_PuiSvDbSlider::eTYPE_SMALL_COLOR_2:
-      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE2);
-      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhsn_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxTypeColor->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxTypeHandle->setCurrentIndex(C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE1);
       break;
    default:
       tgl_assert(false);
@@ -219,14 +218,14 @@ void C_SyvDaPeSlider::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    //Also include the fix offset to the right
-   const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
+   const float64_t f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
    C_GiSvDaSliderBase * const pc_Item = new C_GiSvDaSliderBase(0UL, 0UL, -1L, 0ULL, NULL);
    //Do not use view center
-   const QSizeF c_ItemSize((static_cast<float64>(c_ViewSize.width()) / 1.2) + f64_IconOffset,
-                           static_cast<float64>(c_ViewSize.height()) / 5.0);
+   const QSizeF c_ItemSize((static_cast<float64_t>(c_ViewSize.width()) / 1.2) + f64_IconOffset,
+                           static_cast<float64_t>(c_ViewSize.height()) / 5.0);
    const QPointF c_ItemPos(
-      ((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
-      (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
+      ((static_cast<float64_t>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
+      (static_cast<float64_t>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
 
    pc_Item->ApplySizeChange(c_ItemPos, c_ItemSize);
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);

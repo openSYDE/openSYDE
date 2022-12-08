@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "CSCLChecksums.h"
-#include "C_OSCCanOpenManagerInfo.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscCanOpenManagerInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,16 +38,19 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanOpenManagerInfo::C_OSCCanOpenManagerInfo(void) :
-   q_UseOpenSYDENodeID(true),
-   u8_NodeIDValue(0),
-   u16_GlobalSDOTimeoutMs(100),
+C_OscCanOpenManagerInfo::C_OscCanOpenManagerInfo(void) :
+   q_UseOpenSydeNodeId(true),
+   u8_NodeIdValue(0),
+   u16_GlobalSdoTimeoutMs(100),
    q_AutostartCanOpenManager(true),
    q_StartDevices(true),
-   q_NMTStartAll(false),
-   e_NMTErrorBehaviour(eRESTART_ALL_DEVICES),
+   q_NmtStartAll(false),
+   e_NmtErrorBehaviour(eRESTART_ALL_DEVICES),
    q_EnableHeartbeatProducing(true),
-   u16_HeartbeatProducerTimeMs(100)
+   u16_HeartbeatProducerTimeMs(100),
+   q_ProduceSyncMessage(false),
+   u32_SyncCyclePeriodUs(20000UL),
+   u32_SyncWindowLengthUs(10000UL)
 {
 }
 
@@ -59,27 +62,34 @@ C_OSCCanOpenManagerInfo::C_OSCCanOpenManagerInfo(void) :
    \param[in,out]  oru32_HashValue  Hash value with unit [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenManagerInfo::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_OscCanOpenManagerInfo::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_UseOpenSYDENodeID, sizeof(this->q_UseOpenSYDENodeID),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_NodeIDValue, sizeof(this->u8_NodeIDValue),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_GlobalSDOTimeoutMs, sizeof(this->u16_GlobalSDOTimeoutMs),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_AutostartCanOpenManager, sizeof(this->q_AutostartCanOpenManager),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_StartDevices, sizeof(this->q_StartDevices),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_NMTStartAll, sizeof(this->q_NMTStartAll),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_NMTErrorBehaviour, sizeof(this->e_NMTErrorBehaviour),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_EnableHeartbeatProducing, sizeof(this->q_EnableHeartbeatProducing),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_HeartbeatProducerTimeMs, sizeof(this->u16_HeartbeatProducerTimeMs),
-                                      oru32_HashValue);
-   for (std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_It =
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_UseOpenSydeNodeId, sizeof(this->q_UseOpenSydeNodeId),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_NodeIdValue, sizeof(this->u8_NodeIdValue),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_GlobalSdoTimeoutMs, sizeof(this->u16_GlobalSdoTimeoutMs),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_AutostartCanOpenManager, sizeof(this->q_AutostartCanOpenManager),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_StartDevices, sizeof(this->q_StartDevices),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_NmtStartAll, sizeof(this->q_NmtStartAll),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_NmtErrorBehaviour, sizeof(this->e_NmtErrorBehaviour),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_EnableHeartbeatProducing, sizeof(this->q_EnableHeartbeatProducing),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_HeartbeatProducerTimeMs, sizeof(this->u16_HeartbeatProducerTimeMs),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_ProduceSyncMessage,
+                                       sizeof(this->q_ProduceSyncMessage),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_SyncCyclePeriodUs, sizeof(this->u32_SyncCyclePeriodUs),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_SyncWindowLengthUs, sizeof(this->u32_SyncWindowLengthUs),
+                                       oru32_HashValue);
+   for (std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_It =
            this->c_CanOpenDevices.begin();
         c_It != this->c_CanOpenDevices.end(); ++c_It)
    {
@@ -91,73 +101,73 @@ void C_OSCCanOpenManagerInfo::CalcHash(stw_types::uint32 & oru32_HashValue) cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check for errors of CANopen Manager
 
-   \param[out]     opq_CoNodeIDConflict           Duplicate error with CANopen Node ID detected
-   \param[out]     opq_CoManagerNodeIDInvalid     Invalid error with CANopen Node ID of Manager detected
-   \param[out]     opq_CoDevicesNodeIDInvalid     Invalid error with CANopen Node ID of at least one Device detected
+   \param[out]     opq_CoNodeIdConflict           Duplicate error with CANopen Node ID detected
+   \param[out]     opq_CoManagerNodeIdInvalid     Invalid error with CANopen Node ID of Manager detected
+   \param[out]     opq_CoDevicesNodeIdInvalid     Invalid error with CANopen Node ID of at least one Device detected
    \param[out]     opq_HearbeatTimeInvalid        Error with hearbeat time of Manager detected
    \param[in]      oq_CheckDeviceToDeviceErrors   true: run error checks between devices and between manager and devices
                                                   false: run error checks between manager and device only
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenManagerInfo::CheckErrorManager(bool * const opq_CoNodeIDConflict,
-                                                bool * const opq_CoManagerNodeIDInvalid,
-                                                bool * const opq_CoDevicesNodeIDInvalid,
+void C_OscCanOpenManagerInfo::CheckErrorManager(bool * const opq_CoNodeIdConflict,
+                                                bool * const opq_CoManagerNodeIdInvalid,
+                                                bool * const opq_CoDevicesNodeIdInvalid,
                                                 bool * const opq_HearbeatTimeInvalid,
                                                 const bool oq_CheckDeviceToDeviceErrors) const
 {
-   std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice;
+   std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice;
 
-   if (opq_CoManagerNodeIDInvalid != NULL)
+   if (opq_CoManagerNodeIdInvalid != NULL)
    {
       // Check for the valid range of the manager itself
-      if ((this->u8_NodeIDValue > 0U) &&
-          (this->u8_NodeIDValue <= 127))
+      if ((this->u8_NodeIdValue > 0U) &&
+          (this->u8_NodeIdValue <= 127))
       {
-         *opq_CoManagerNodeIDInvalid = false;
+         *opq_CoManagerNodeIdInvalid = false;
       }
       else
       {
-         *opq_CoManagerNodeIDInvalid = true;
+         *opq_CoManagerNodeIdInvalid = true;
       }
    }
 
    // Check the devices related errors
-   if ((opq_CoNodeIDConflict != NULL) || (opq_CoDevicesNodeIDInvalid != NULL))
+   if ((opq_CoNodeIdConflict != NULL) || (opq_CoDevicesNodeIdInvalid != NULL))
    {
-      bool q_TempCoNodeIDConflict = false;
-      bool q_TempCoDevicesNodeIDInvalid = false;
-      bool * pq_TempCoNodeIDConflict = NULL;
-      bool * pq_TempCoDevicesNodeIDInvalid = NULL;
+      bool q_TempCoNodeIdConflict = false;
+      bool q_TempCoDevicesNodeIdInvalid = false;
+      bool * pq_TempCoNodeIdConflict = NULL;
+      bool * pq_TempCoDevicesNodeIdInvalid = NULL;
 
       // Using temporary pointers to beware the optional character of the output parameters
-      if (opq_CoNodeIDConflict != NULL)
+      if (opq_CoNodeIdConflict != NULL)
       {
-         pq_TempCoNodeIDConflict = &q_TempCoNodeIDConflict;
-         *opq_CoNodeIDConflict = false;
+         pq_TempCoNodeIdConflict = &q_TempCoNodeIdConflict;
+         *opq_CoNodeIdConflict = false;
       }
-      if (opq_CoDevicesNodeIDInvalid != NULL)
+      if (opq_CoDevicesNodeIdInvalid != NULL)
       {
-         pq_TempCoDevicesNodeIDInvalid = &q_TempCoDevicesNodeIDInvalid;
-         *opq_CoDevicesNodeIDInvalid = false;
+         pq_TempCoDevicesNodeIdInvalid = &q_TempCoDevicesNodeIdInvalid;
+         *opq_CoDevicesNodeIdInvalid = false;
       }
 
       // Check all devices
       for (c_ItDevice = this->c_CanOpenDevices.begin(); c_ItDevice != this->c_CanOpenDevices.end(); ++c_ItDevice)
       {
-         tgl_assert(this->CheckErrorDeviceCoNodeId(c_ItDevice->first, pq_TempCoNodeIDConflict,
-                                                   pq_TempCoDevicesNodeIDInvalid,
+         tgl_assert(this->CheckErrorDeviceCoNodeId(c_ItDevice->first, pq_TempCoNodeIdConflict,
+                                                   pq_TempCoDevicesNodeIdInvalid,
                                                    oq_CheckDeviceToDeviceErrors) == C_NO_ERR);
 
          // Transfer to the output pointer only true result to not overwrite previous detections
-         if ((opq_CoNodeIDConflict != NULL) &&
-             (q_TempCoNodeIDConflict == true))
+         if ((opq_CoNodeIdConflict != NULL) &&
+             (q_TempCoNodeIdConflict == true))
          {
-            *opq_CoNodeIDConflict = q_TempCoNodeIDConflict;
+            *opq_CoNodeIdConflict = q_TempCoNodeIdConflict;
          }
-         if ((opq_CoDevicesNodeIDInvalid != NULL) &&
-             (q_TempCoDevicesNodeIDInvalid == true))
+         if ((opq_CoDevicesNodeIdInvalid != NULL) &&
+             (q_TempCoDevicesNodeIdInvalid == true))
          {
-            *opq_CoDevicesNodeIDInvalid = q_TempCoDevicesNodeIDInvalid;
+            *opq_CoDevicesNodeIdInvalid = q_TempCoDevicesNodeIdInvalid;
          }
       }
    }
@@ -184,8 +194,8 @@ void C_OSCCanOpenManagerInfo::CheckErrorManager(bool * const opq_CoNodeIDConflic
 /*! \brief   Checks if a device has an consumer heartbeat error
 
    \param[in]      orc_DeviceId                   CANopen device ID
-   \param[out]     opq_CoNodeIDConflict           Duplicate error with CANopen Node ID detected
-   \param[out]     opq_CoNodeIDInvalid            Invalid error with CANopen Node ID detected (only 1 - 127 are allowed)
+   \param[out]     opq_CoNodeIdConflict           Duplicate error with CANopen Node ID detected
+   \param[out]     opq_CoNodeIdInvalid            Invalid error with CANopen Node ID detected (only 1 - 127 are allowed)
    \param[in]      oq_CheckDeviceToDeviceErrors   true: run error checks between devices and between manager and devices
                                                   false: run error checks between manager and device only
 
@@ -193,34 +203,34 @@ void C_OSCCanOpenManagerInfo::CheckErrorManager(bool * const opq_CoNodeIDConflic
    \retval   C_RANGE    Parameters invalid, error check not executed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenManagerInfo::CheckErrorDeviceCoNodeId(const C_OSCCanInterfaceId & orc_DeviceId,
-                                                         bool * const opq_CoNodeIDConflict,
-                                                         bool * const opq_CoNodeIDInvalid,
-                                                         const bool oq_CheckDeviceToDeviceErrors) const
+int32_t C_OscCanOpenManagerInfo::CheckErrorDeviceCoNodeId(const C_OscCanInterfaceId & orc_DeviceId,
+                                                          bool * const opq_CoNodeIdConflict,
+                                                          bool * const opq_CoNodeIdInvalid,
+                                                          const bool oq_CheckDeviceToDeviceErrors) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
-   const std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+   const std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
       this->c_CanOpenDevices.find(orc_DeviceId);
 
    if (c_ItDevice != this->c_CanOpenDevices.end())
    {
-      const C_OSCCanOpenManagerDeviceInfo & rc_DevInfo = c_ItDevice->second;
+      const C_OscCanOpenManagerDeviceInfo & rc_DevInfo = c_ItDevice->second;
 
       s32_Return = C_NO_ERR;
 
-      if (opq_CoNodeIDConflict != NULL)
+      if (opq_CoNodeIdConflict != NULL)
       {
-         *opq_CoNodeIDConflict = false;
+         *opq_CoNodeIdConflict = false;
 
-         if (this->u8_NodeIDValue == rc_DevInfo.u8_NodeIDValue)
+         if (this->u8_NodeIdValue == rc_DevInfo.u8_NodeIdValue)
          {
             // Same as the manager -> error
-            *opq_CoNodeIDConflict = true;
+            *opq_CoNodeIdConflict = true;
          }
          else if (oq_CheckDeviceToDeviceErrors == true)
          {
-            std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDeviceComp;
+            std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDeviceComp;
 
             // Compare with all other devices
             for (c_ItDeviceComp = this->c_CanOpenDevices.begin(); c_ItDeviceComp != this->c_CanOpenDevices.end();
@@ -228,12 +238,12 @@ sint32 C_OSCCanOpenManagerInfo::CheckErrorDeviceCoNodeId(const C_OSCCanInterface
             {
                if (c_ItDevice != c_ItDeviceComp)
                {
-                  const C_OSCCanOpenManagerDeviceInfo & rc_DevInfoCompare = c_ItDeviceComp->second;
+                  const C_OscCanOpenManagerDeviceInfo & rc_DevInfoCompare = c_ItDeviceComp->second;
 
-                  if (rc_DevInfo.u8_NodeIDValue == rc_DevInfoCompare.u8_NodeIDValue)
+                  if (rc_DevInfo.u8_NodeIdValue == rc_DevInfoCompare.u8_NodeIdValue)
                   {
                      // error detected
-                     *opq_CoNodeIDConflict = true;
+                     *opq_CoNodeIdConflict = true;
                      break;
                   }
                }
@@ -245,17 +255,17 @@ sint32 C_OSCCanOpenManagerInfo::CheckErrorDeviceCoNodeId(const C_OSCCanInterface
          }
       }
 
-      if (opq_CoNodeIDInvalid != NULL)
+      if (opq_CoNodeIdInvalid != NULL)
       {
          // Check for the valid range
-         if ((rc_DevInfo.u8_NodeIDValue > 0U) &&
-             (rc_DevInfo.u8_NodeIDValue <= 127))
+         if ((rc_DevInfo.u8_NodeIdValue > 0U) &&
+             (rc_DevInfo.u8_NodeIdValue <= 127))
          {
-            *opq_CoNodeIDInvalid = false;
+            *opq_CoNodeIdInvalid = false;
          }
          else
          {
-            *opq_CoNodeIDInvalid = true;
+            *opq_CoNodeIdInvalid = true;
          }
       }
    }
@@ -273,18 +283,18 @@ sint32 C_OSCCanOpenManagerInfo::CheckErrorDeviceCoNodeId(const C_OSCCanInterface
    \retval   C_RANGE    Parameters invalid, error check not executed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenManagerInfo::CheckErrorDeviceHeartbeat(const C_OSCCanInterfaceId & orc_DeviceId,
-                                                          bool * const opq_HearbeatTimeInvalid) const
+int32_t C_OscCanOpenManagerInfo::CheckErrorDeviceHeartbeat(const C_OscCanInterfaceId & orc_DeviceId,
+                                                           bool * const opq_HearbeatTimeInvalid) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
-   const std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
+   const std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice =
       this->c_CanOpenDevices.find(orc_DeviceId);
 
    if ((c_ItDevice != this->c_CanOpenDevices.end()) &&
        (opq_HearbeatTimeInvalid != NULL))
    {
-      const C_OSCCanOpenManagerDeviceInfo & rc_DevInfo = c_ItDevice->second;
+      const C_OscCanOpenManagerDeviceInfo & rc_DevInfo = c_ItDevice->second;
 
       s32_Return = C_NO_ERR;
 

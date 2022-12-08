@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLFile.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_OSCSecurityPem.h"
-#include "C_SyvUpPacPemFileInfoPopUp.h"
+#include "TglFile.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscSecurityPem.hpp"
+#include "C_SyvUpPacPemFileInfoPopUp.hpp"
 #include "ui_C_SyvUpPacPemFileInfoPopUp.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,23 +49,23 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      orc_Path      Path for parameter set
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacPemFileInfoPopUp::C_SyvUpPacPemFileInfoPopUp(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+C_SyvUpPacPemFileInfoPopUp::C_SyvUpPacPemFileInfoPopUp(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                        const QString & orc_Path) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpPacPemFileInfoPopUp),
    mrc_ParentDialog(orc_Parent)
 {
    QString c_DisplayText;
-   C_OSCSecurityPem c_Pem;
+   C_OscSecurityPem c_Pem;
 
    std::string c_ErrorMessage;
-   const sint32 s32_Result = c_Pem.LoadFromFile(orc_Path.toStdString(), c_ErrorMessage);
+   const int32_t s32_Result = c_Pem.LoadFromFile(orc_Path.toStdString(), c_ErrorMessage);
 
    this->mpc_Ui->setupUi(this);
 
    InitStaticNames();
 
-   this->mrc_ParentDialog.SetSubTitle(TGL_ExtractFileName(orc_Path.toStdString().c_str()).c_str());
+   this->mrc_ParentDialog.SetSubTitle(TglExtractFileName(orc_Path.toStdString().c_str()).c_str());
 
    if (s32_Result == C_NO_ERR)
    {
@@ -120,8 +119,8 @@ void C_SyvUpPacPemFileInfoPopUp::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

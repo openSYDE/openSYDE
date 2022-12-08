@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QGraphicsSceneHoverEvent>
 
-#include "gitypes.h"
-#include "constants.h"
+#include "gitypes.hpp"
+#include "constants.hpp"
 
-#include "C_GtGetText.h"
-#include "C_GiTextElementBus.h"
-#include "C_PuiSdHandler.h"
-#include "C_Uti.h"
-#include "C_SdUtil.h"
-#include "C_PuiSdUtil.h"
+#include "C_GtGetText.hpp"
+#include "C_GiTextElementBus.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_Uti.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiSdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,13 +45,13 @@ using namespace stw_opensyde_gui_logic;
    Set up GUI with all elements.
 
    \param[in]       ors32_Index          Index of data element in system definition
-   \param[in]       oru64_ID             Unique ID
+   \param[in]       oru64_Id             Unique ID
    \param[in,out]   opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiTextElementBus::C_GiTextElementBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiTextElementBus::C_GiTextElementBus(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                                        QGraphicsItem * const opc_Parent) :
-   C_GiBiTextElement(oru64_ID, false, opc_Parent),
+   C_GiBiTextElement(oru64_Id, false, opc_Parent),
    C_PuiSdDataElement(ors32_Index, C_PuiSdDataElement::eTEXT_ELEMENT_BUS),
    C_GiBiCustomToolTip(),
    mq_ErrorIconHovered(false),
@@ -95,7 +94,7 @@ C_GiTextElementBus::~C_GiTextElementBus()
    \param[in]     ou32_BusIndex     Index of associated bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiTextElementBus::SetBusIndex(const uint32 ou32_BusIndex)
+void C_GiTextElementBus::SetBusIndex(const uint32_t ou32_BusIndex)
 {
    this->mu32_BusIndex = ou32_BusIndex;
 }
@@ -107,7 +106,7 @@ void C_GiTextElementBus::SetBusIndex(const uint32 ou32_BusIndex)
    Index of associated bus
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiTextElementBus::GetBusIndex(void) const
+uint32_t C_GiTextElementBus::GetBusIndex(void) const
 {
    return this->mu32_BusIndex;
 }
@@ -118,9 +117,9 @@ uint32 C_GiTextElementBus::GetBusIndex(void) const
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiTextElementBus::type(void) const
+int32_t C_GiTextElementBus::type(void) const
 {
-   return msn_GRAPHICS_ITEM_TEXTELEMENT_BUS;
+   return ms32_GRAPHICS_ITEM_TEXTELEMENT_BUS;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -129,14 +128,14 @@ sintn C_GiTextElementBus::type(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::LoadData(void)
 {
-   if (C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size() > static_cast<uint32>(this->ms32_Index))
+   if (C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size() > static_cast<uint32_t>(this->ms32_Index))
    {
-      C_PuiSdTextElementBus & rc_UITextElementData =
-         C_PuiSdHandler::h_GetInstance()->c_BusTextElements[static_cast<uint32>(this->ms32_Index)];
+      C_PuiSdTextElementBus & rc_UiTextElementData =
+         C_PuiSdHandler::h_GetInstance()->c_BusTextElements[static_cast<uint32_t>(this->ms32_Index)];
 
-      this->m_LoadTextElementData(&rc_UITextElementData, false);
+      this->m_LoadTextElementData(&rc_UiTextElementData, false);
 
-      this->mu32_BusIndex = rc_UITextElementData.u32_BusIndex;
+      this->mu32_BusIndex = rc_UiTextElementData.u32_BusIndex;
    }
 }
 
@@ -146,7 +145,7 @@ void C_GiTextElementBus::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiTextElementBus::UpdateData(void)
 {
-   if (C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size() > static_cast<uint32>(this->ms32_Index))
+   if (C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size() > static_cast<uint32_t>(this->ms32_Index))
    {
       C_PuiSdTextElementBus * const pc_Item = &C_PuiSdHandler::h_GetInstance()->c_BusTextElements[this->ms32_Index];
 
@@ -259,7 +258,7 @@ void C_GiTextElementBus::paint(QPainter * const opc_Painter, const QStyleOptionG
 
    if ((this->mq_ErrorState == true) && (this->mpc_SvgRenderer != NULL))
    {
-      //      opc_Painter->drawPixmap(static_cast<sintn>(this->boundingRect().width()) - 55, -6, this->mc_ErrorIcon);
+      //      opc_Painter->drawPixmap(static_cast<int32_t>(this->boundingRect().width()) - 55, -6, this->mc_ErrorIcon);
       this->mpc_SvgRenderer->render(opc_Painter, m_GetErrorIconRect());
    }
 }
@@ -290,12 +289,12 @@ void C_GiTextElementBus::HandleMouseMoveToolTip(const QPointF & orc_ScenePos)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiTextElementBus::SetZValueCustom(const float64 of64_ZValue)
+void C_GiTextElementBus::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiTextElement::SetZValueCustom(of64_ZValue);
+   C_GiBiTextElement::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }
@@ -324,5 +323,5 @@ void C_GiTextElementBus::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc_Ev
 //----------------------------------------------------------------------------------------------------------------------
 QRectF C_GiTextElementBus::m_GetErrorIconRect(void) const
 {
-   return QRectF(QPointF(static_cast<float64>(this->boundingRect().width()) - 55.0, -6.0), QSizeF(24.0, 24.0));
+   return QRectF(QPointF(static_cast<float64_t>(this->boundingRect().width()) - 55.0, -6.0), QSizeF(24.0, 24.0));
 }

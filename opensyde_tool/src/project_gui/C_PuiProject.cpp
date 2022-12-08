@@ -12,7 +12,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDir>
 #include <QWidget>
@@ -20,27 +20,26 @@
 #include <QPointer>
 #include <QApplication>
 
-#include "C_PuiProject.h"
-#include "C_OSCAesFile.h"
-#include "C_OSCZipFile.h"
-#include "C_OSCProjectFiler.h"
-#include "C_PuiSdHandler.h"
-#include "CSCLString.h"
-#include "TGLFile.h"
-#include "stwerrors.h"
-#include "C_Uti.h"
-#include "C_UsHandler.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
+#include "C_PuiProject.hpp"
+#include "C_OscAesFile.hpp"
+#include "C_OscZipFile.hpp"
+#include "C_OscProjectFiler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SclString.hpp"
+#include "TglFile.hpp"
+#include "stwerrors.hpp"
+#include "C_Uti.hpp"
+#include "C_UsHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_scl;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_PuiProject::mhc_TEMP_FOLDER = "service_project_temp";
@@ -72,9 +71,9 @@ C_PuiProject * C_PuiProject::mhpc_Singleton = NULL;
    C_COM      Bus sorting failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
+int32_t C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (this->m_IsServiceModeProject() == false)
    {
@@ -113,11 +112,11 @@ sint32 C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecate
    \retval   C_CONFIG   at least one expected input file for the project generation is missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::SaveCurrentProjectForServiceMode(const QString & orc_FilePath, const QString & orc_Password,
-                                                      const std::vector<std::array<bool, 3> > & orc_ViewConfigs)
+int32_t C_PuiProject::SaveCurrentProjectForServiceMode(const QString & orc_FilePath, const QString & orc_Password,
+                                                       const std::vector<std::array<bool, 3> > & orc_ViewConfigs)
 {
-   sint32 s32_Retval = C_RANGE;
-   const uint32 u32_ViewCount = C_PuiSvHandler::h_GetInstance()->GetViewCount();
+   int32_t s32_Retval = C_RANGE;
+   const uint32_t u32_ViewCount = C_PuiSvHandler::h_GetInstance()->GetViewCount();
    const QFileInfo c_TargetFileInfo(orc_FilePath);
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
@@ -125,7 +124,7 @@ sint32 C_PuiProject::SaveCurrentProjectForServiceMode(const QString & orc_FilePa
        (c_TargetFileInfo.suffix() == mhc_SERVICE_PROJECT_EXTENSION) &&
        (orc_ViewConfigs.size() == u32_ViewCount))
    {
-      uint32 u32_ViewCounter;
+      uint32_t u32_ViewCounter;
 
       s32_Retval = C_WARN;
 
@@ -186,9 +185,9 @@ sint32 C_PuiProject::SaveCurrentProjectForServiceMode(const QString & orc_FilePa
    C_BUSY      Problems with removing temporary folders
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::Load(uint16 * const opu16_FileVersion)
+int32_t C_PuiProject::Load(uint16_t * const opu16_FileVersion)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -216,7 +215,7 @@ sint32 C_PuiProject::Load(uint16 * const opu16_FileVersion)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiProject::HasHashChanged(void) const
 {
-   const uint32 u32_NewHash = this->m_CalcHashProject();
+   const uint32_t u32_NewHash = this->m_CalcHashProject();
    bool q_Changed = true;
 
    if (u32_NewHash == this->mu32_CalculatedProjectHash)
@@ -261,7 +260,7 @@ bool C_PuiProject::IsPasswordNecessary(void)
 
    if (this->m_IsServiceModeProject() == true)
    {
-      if (C_OSCZipFile::h_IsZipFile(this->GetPath().toStdString().c_str()) != C_NO_ERR)
+      if (C_OscZipFile::h_IsZipFile(this->GetPath().toStdString().c_str()) != C_NO_ERR)
       {
          // Not a zip file, so it is encrypted
          q_Return = true;
@@ -307,7 +306,7 @@ QString C_PuiProject::GetPath(void) const
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiProject::GetFolderPath(void) const
 {
-   const QString c_Path = TGL_ExtractFilePath(this->mc_Path.toStdString().c_str()).c_str();
+   const QString c_Path = TglExtractFilePath(this->mc_Path.toStdString().c_str()).c_str();
 
    return c_Path;
 }
@@ -384,9 +383,9 @@ void C_PuiProject::h_Destroy(void)
    Else Accumulated, relevant file sizes (Byte)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64 C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
+uint64_t C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
 {
-   uint64 u64_Retval = 0ULL;
+   uint64_t u64_Retval = 0ULL;
    QFileInfo c_ProjectFileInfo;
 
    c_ProjectFileInfo.setFile(orc_ProjectPath);
@@ -399,7 +398,7 @@ uint64 C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
       C_PuiProject::h_AdaptProjectPathToSystemDefinition(orc_ProjectPath, c_SystemDefinitionFilePath);
       c_SystemFileInfo.setFile(c_SystemDefinitionFilePath);
 
-      u64_Retval += static_cast<uint64>(c_SystemFileInfo.size());
+      u64_Retval += static_cast<uint64_t>(c_SystemFileInfo.size());
    }
    return u64_Retval;
 }
@@ -409,7 +408,7 @@ uint64 C_PuiProject::h_GetProjectSize(const QString & orc_ProjectPath)
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiProject::C_PuiProject(void) :
-   C_OSCProject(),
+   C_OscProject(),
    mu32_CalculatedProjectHash(),
    mq_SwitchToLastKnownUseCase(true)
 {
@@ -419,7 +418,7 @@ C_PuiProject::C_PuiProject(void) :
 /*! \brief   Standard destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiProject::~C_PuiProject(void)
+C_PuiProject::~C_PuiProject(void) noexcept
 {
    //Clean up singleton
    try
@@ -448,9 +447,9 @@ C_PuiProject::~C_PuiProject(void)
    C_CHECKSUM     Password necessary, no real error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::PrepareLoadInitialProject(void)
+int32_t C_PuiProject::PrepareLoadInitialProject(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    // Initial project from command line
    if (QApplication::arguments().size() > 1)
@@ -464,7 +463,7 @@ sint32 C_PuiProject::PrepareLoadInitialProject(void)
       const QStringList c_RecentProjects = C_UsHandler::h_GetInstance()->GetRecentProjects();
       this->mq_SwitchToLastKnownUseCase = false;
       SetPath("");
-      for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
+      for (int32_t s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
       {
          QFileInfo c_File;
          c_File.setFile(c_RecentProjects[s32_ItRecentProject]);
@@ -508,10 +507,10 @@ sint32 C_PuiProject::PrepareLoadInitialProject(void)
    C_BUSY      Problems with removing temporary folders
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QString & orc_LoadedProject)
+int32_t C_PuiProject::LoadInitialProject(uint16_t * const opu16_FileVersion, QString & orc_LoadedProject)
 {
    // Load it
-   const sint32 s32_Error = this->Load(opu16_FileVersion);
+   const int32_t s32_Error = this->Load(opu16_FileVersion);
 
    orc_LoadedProject = this->GetPath();
 
@@ -539,7 +538,7 @@ sint32 C_PuiProject::LoadInitialProject(uint16 * const opu16_FileVersion, QStrin
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::LoadEmpty(void)
 {
-   const C_OSCProject c_Tmp;
+   const C_OscProject c_Tmp;
 
    //Default values
    this->mc_Path = "";
@@ -574,7 +573,7 @@ bool C_PuiProject::IsEmptyProject(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiProject::h_HandlePendingEvents(void)
 {
-   QPointer<QWidget> const c_PreviousFocusWidget = QApplication::focusWidget();
+   const QPointer<QWidget> c_PreviousFocusWidget = QApplication::focusWidget();
 
    if (c_PreviousFocusWidget != NULL)
    {
@@ -616,9 +615,9 @@ void C_PuiProject::h_AdaptProjectPathToSystemDefinition(const QString & orc_Proj
    Calculated hash value
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiProject::m_CalcHashProject(void) const
+uint32_t C_PuiProject::m_CalcHashProject(void) const
 {
-   uint32 u32_Hash = 0xFFFFFFFFU;
+   uint32_t u32_Hash = 0xFFFFFFFFU;
 
    this->CalcHash(u32_Hash);
 
@@ -640,18 +639,18 @@ uint32 C_PuiProject::m_CalcHashProject(void) const
    C_COM      Bus sorting failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::m_Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
+int32_t C_PuiProject::m_Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
    const QFileInfo c_File(mc_Path);
    const QDir c_Directory(c_File.absolutePath());
 
    if (c_Directory.mkpath(".") == true)
    {
       C_PuiProject::h_HandlePendingEvents();
-      s32_Retval = C_OSCProjectFiler::h_Save(*this,
+      s32_Retval = C_OscProjectFiler::h_Save(*this,
                                              mc_Path.toStdString().c_str(),
-                                             stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion(
+                                             stw::opensyde_gui_logic::C_Uti::h_GetApplicationVersion(
                                                 false).toStdString().c_str());
       if (s32_Retval == C_NO_ERR)
       {
@@ -756,9 +755,9 @@ sint32 C_PuiProject::m_Save(const bool oq_ForceSaveAll, const bool oq_UseDepreca
    \retval   C_CONFIG   at least one expected input file for the project generation is missing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, const QString & orc_Password)
+int32_t C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, const QString & orc_Password)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    const QFileInfo c_TargetFileInfo(orc_FilePath);
    const QString c_CurrentProjectPath = this->GetPath();
@@ -766,7 +765,7 @@ sint32 C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, cons
    const QString c_ExePath = C_Uti::h_GetExePath();
    const QString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER + "/";
    const QString c_TemporaryProjectPath = c_TemporaryPath + c_TargetFileName + "/" + c_TargetFileName + ".syde";
-   C_SCLString c_ErrorString;
+   C_SclString c_ErrorString;
 
    // Save the entire project to a temporary folder
    this->SetPath(c_TemporaryProjectPath);
@@ -776,19 +775,19 @@ sint32 C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, cons
 
    if (s32_Retval == C_NO_ERR)
    {
-      std::vector<C_SCLString> c_AllFiles;
+      std::vector<C_SclString> c_AllFiles;
 
       C_Uti::h_GetAllFilePathsInFolder(c_TemporaryPath, c_AllFiles);
 
       // Create the encrypted zip file
-      s32_Retval = C_OSCAesFile::h_CreateEncryptedZipFile(c_TemporaryPath.toStdString().c_str(),
+      s32_Retval = C_OscAesFile::h_CreateEncryptedZipFile(c_TemporaryPath.toStdString().c_str(),
                                                           c_AllFiles,
                                                           orc_FilePath.toStdString().c_str(),
                                                           orc_Password.toStdString().c_str(), &c_ErrorString);
    }
 
    //erase temporary folder:
-   if (stw_tgl::TGL_RemoveDirectory(c_TemporaryPath.toStdString().c_str(), false) != 0)
+   if (stw::tgl::TglRemoveDirectory(c_TemporaryPath.toStdString().c_str(), false) != 0)
    {
       // Do not overwrite any other error
       if (s32_Retval == C_NO_ERR)
@@ -814,9 +813,9 @@ sint32 C_PuiProject::m_SaveServiceModeProject(const QString & orc_FilePath, cons
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::m_LoadProject(uint16 * const opu16_FileVersion)
+int32_t C_PuiProject::m_LoadProject(uint16_t * const opu16_FileVersion)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (this->mc_Path.compare("") == 0)
    {
@@ -826,7 +825,7 @@ sint32 C_PuiProject::m_LoadProject(uint16 * const opu16_FileVersion)
    else
    {
       //Load project file
-      s32_Retval = C_OSCProjectFiler::h_Load(*this, this->mc_Path.toStdString().c_str());
+      s32_Retval = C_OscProjectFiler::h_Load(*this, this->mc_Path.toStdString().c_str());
       if (s32_Retval == C_NO_ERR)
       {
          QString c_SystemDefintionPath;
@@ -897,19 +896,19 @@ sint32 C_PuiProject::m_LoadProject(uint16 * const opu16_FileVersion)
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiProject::m_LoadServiceModeProject(const QString & orc_Password, stw_types::uint16 * const opu16_FileVersion)
+int32_t C_PuiProject::m_LoadServiceModeProject(const QString & orc_Password, uint16_t * const opu16_FileVersion)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
    const QString c_OriginalPath = this->GetPath();
    const QFileInfo c_FileInfo(this->GetPath());
    const QString c_ProjectName = c_FileInfo.baseName();
    const QString c_ExePath = C_Uti::h_GetExePath();
    const QString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER + "/";
    const QString c_TemporaryProjectPath = c_TemporaryPath + c_ProjectName + "/" + c_ProjectName + ".syde";
-   C_SCLString c_ErrorString;
+   C_SclString c_ErrorString;
 
    // Decrypt the encrypted zip file
-   s32_Retval = C_OSCAesFile::h_UnpackEncryptedZipFile(c_OriginalPath.toStdString().c_str(),
+   s32_Retval = C_OscAesFile::h_UnpackEncryptedZipFile(c_OriginalPath.toStdString().c_str(),
                                                        c_TemporaryPath.toStdString().c_str(),
                                                        orc_Password.toStdString().c_str(), &c_ErrorString);
 
@@ -923,7 +922,7 @@ sint32 C_PuiProject::m_LoadServiceModeProject(const QString & orc_Password, stw_
    }
 
    //erase temporary folder in any case:
-   if (stw_tgl::TGL_RemoveDirectory(c_TemporaryPath.toStdString().c_str(), false) != 0)
+   if (stw::tgl::TglRemoveDirectory(c_TemporaryPath.toStdString().c_str(), false) != 0)
    {
       // Do not overwrite any other error
       if (s32_Retval == C_NO_ERR)

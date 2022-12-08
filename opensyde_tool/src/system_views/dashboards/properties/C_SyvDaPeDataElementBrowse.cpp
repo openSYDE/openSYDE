@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_SyvDaPeDataElementBrowse.h"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaPeDataElementBrowse.hpp"
 
 #include "ui_C_SyvDaPeDataElementBrowse.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT = 0;
-const sintn C_SyvDaPeDataElementBrowse::mhsn_INDEX_BUS_SIGNAL = 1;
-stw_types::sint32 C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 0;
+const int32_t C_SyvDaPeDataElementBrowse::mhs32_INDEX_DATAPOOL_ELEMENT = 0;
+const int32_t C_SyvDaPeDataElementBrowse::mhs32_INDEX_BUS_SIGNAL = 1;
+int32_t C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -41,24 +40,23 @@ stw_types::sint32 C_SyvDaPeDataElementBrowse::mhs32_LastSelectedComboBoxIndex = 
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent                Optional pointer to parent
-   \param[in]     ou32_ViewIndex            View index
-   \param[in]     oq_MultiSelect            Optional flag to allow multi selection
-   \param[in]     oq_ShowOnlyWriteElements  Optional flag to show only writable elements
-   \param[in]     oq_ShowArrayElements      Optional flag to hide all array elements (if false)
-   \param[in]     oq_ShowArrayIndexElements Optional flag to hide all array index elements (if false)
-   \param[in]     oq_Show64BitValues        Optional flag to hide all 64 bit elements (if false)
-   \param[in]     oq_ShowNVMLists           Optional flag to only show NVM LISTs
-   \param[in]     opc_AlreasyUsedElements   Optional pointer to vector with already used elements. All added elements
-                                            will be marked as used an will be disabled. Usable for non NVM list mode
-
+   \param[in,out]  orc_Parent                   Parent
+   \param[in]      ou32_ViewIndex               View index
+   \param[in]      oq_MultiSelect               Optional flag to allow multi selection
+   \param[in]      oq_ShowOnlyWriteElements     Optional flag to show only writable elements
+   \param[in]      oq_ShowArrayElements         Optional flag to hide all array elements (if false)
+   \param[in]      oq_ShowArrayIndexElements    Optional flag to hide all array index elements (if false)
+   \param[in]      oq_Show64BitValues           Optional flag to hide all 64 bit elements (if false)
+   \param[in]      oq_ShowNvmLists              Optional flag to only show NVM LISTs
+   \param[in]      opc_AlreasyUsedElements      Optional pointer to vector with already used elements. All added elements
+                                                will be marked as used an will be disabled. Usable for non NVM list mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32 ou32_ViewIndex,
+C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_ViewIndex,
                                                        const bool oq_MultiSelect, const bool oq_ShowOnlyWriteElements,
                                                        const bool oq_ShowArrayElements,
                                                        const bool oq_ShowArrayIndexElements,
-                                                       const bool oq_Show64BitValues, const bool oq_ShowNVMLists,
+                                                       const bool oq_Show64BitValues, const bool oq_ShowNvmLists,
                                                        const std::vector<C_PuiSvDbNodeDataPoolListElementId> * const opc_AlreasyUsedElements)
    :
    QWidget(&orc_Parent),
@@ -100,7 +98,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    this->mpc_AlreasyUsedElements = opc_AlreasyUsedElements;
 
    // set title
-   if (oq_ShowNVMLists == true)
+   if (oq_ShowNvmLists == true)
    {
       this->mrc_ParentDialog.SetTitle(static_cast<QString>(C_GtGetText::h_GetText("NVM List")));
       this->mpc_Ui->pc_ComboBoxType->setVisible(false);
@@ -128,10 +126,10 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
    //Avoid filling/resetting the tree if already set up (and user settings/ last known state takes priority)
    if (q_TreeFilled == false)
    {
-      this->mpc_Ui->pc_TreeView->InitSV(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
+      this->mpc_Ui->pc_TreeView->InitSv(ou32_ViewIndex, oq_ShowOnlyWriteElements, oq_ShowArrayElements,
                                         oq_ShowArrayIndexElements,
                                         oq_Show64BitValues,
-                                        oq_ShowNVMLists,
+                                        oq_ShowNvmLists,
                                         opc_AlreasyUsedElements);
    }
    //After tree was filled
@@ -154,7 +152,7 @@ C_SyvDaPeDataElementBrowse::C_SyvDaPeDataElementBrowse(C_OgePopUpDialog & orc_Pa
            &C_SyvDaPeDataElementBrowse::m_OnSearch);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType, static_cast<void (QComboBox::*)(
-                                                         sintn)>(&QComboBox::currentIndexChanged), this,
+                                                         int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SyvDaPeDataElementBrowse::m_SwitchType);
    connect(this->mpc_Ui->pc_TreeView, &C_TblTreDataElementView::SigAccept, this,
            &C_SyvDaPeDataElementBrowse::m_OkClicked);
@@ -230,7 +228,7 @@ void C_SyvDaPeDataElementBrowse::PrepareCleanUp(void)
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -238,8 +236,8 @@ void C_SyvDaPeDataElementBrowse::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -278,7 +276,7 @@ void C_SyvDaPeDataElementBrowse::m_HandleHiding(void) const
       this->mpc_Ui->pc_TreeView->setVisible(false);
       if (this->mpc_Ui->pc_LineEditSearch->text().isEmpty() == true)
       {
-         if (this->mpc_Ui->pc_ComboBoxType->currentIndex() == C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT)
+         if (this->mpc_Ui->pc_ComboBoxType->currentIndex() == C_SyvDaPeDataElementBrowse::mhs32_INDEX_DATAPOOL_ELEMENT)
          {
             this->mpc_Ui->pc_GroupBoxInitialDataElementNoElements->setVisible(true);
             this->mpc_Ui->pc_GroupBoxInitialSignalNoElements->setVisible(false);
@@ -318,7 +316,7 @@ void C_SyvDaPeDataElementBrowse::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Filter for string
 
-   \param[in] orc_Text String
+   \param[in]  orc_Text    String
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
@@ -349,19 +347,19 @@ void C_SyvDaPeDataElementBrowse::m_OnSearch(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Switch displayed type
 
-   \param[in] osn_Index Type index
+   \param[in]  os32_Index  Type index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
+void C_SyvDaPeDataElementBrowse::m_SwitchType(const int32_t os32_Index) const
 {
-   switch (osn_Index)
+   switch (os32_Index)
    {
-   case C_SyvDaPeDataElementBrowse::mhsn_INDEX_DATAPOOL_ELEMENT:
+   case C_SyvDaPeDataElementBrowse::mhs32_INDEX_DATAPOOL_ELEMENT:
       this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eDATAPOOL_ELEMENT, this->mq_ShowOnlyWriteElements,
                                             this->mq_ShowArrayElements, this->mq_ShowArrayIndexElements,
                                             this->mq_Show64BitValues, this->mpc_AlreasyUsedElements);
       break;
-   case C_SyvDaPeDataElementBrowse::mhsn_INDEX_BUS_SIGNAL:
+   case C_SyvDaPeDataElementBrowse::mhs32_INDEX_BUS_SIGNAL:
       this->mpc_Ui->pc_TreeView->SwitchMode(C_TblTreDataElementModel::eBUS_SIGNAL, false, false, false, true,
                                             this->mpc_AlreasyUsedElements);
       break;
@@ -375,10 +373,10 @@ void C_SyvDaPeDataElementBrowse::m_SwitchType(const sintn osn_Index) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selected items
 
-   \param[in] osn_SelectionCount Number of selected items
+   \param[in]  os32_SelectionCount  Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCount) const
+void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const int32_t os32_SelectionCount) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
    {
@@ -387,11 +385,11 @@ void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCoun
    else
    {
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
-      if (osn_SelectionCount > 0)
+      if (os32_SelectionCount > 0)
       {
          this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                           "%1 selected data element(s)")).
-                                                  arg(osn_SelectionCount));
+                                                  arg(os32_SelectionCount));
       }
       else
       {
@@ -403,6 +401,8 @@ void C_SyvDaPeDataElementBrowse::m_UpdateSelection(const sintn osn_SelectionCoun
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setup context menu entries
+
+   \param[in]  orq_MultiSelect   Multi select state
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_SetupContextMenu(const bool & orq_MultiSelect)
@@ -423,7 +423,7 @@ void C_SyvDaPeDataElementBrowse::m_SetupContextMenu(const bool & orq_MultiSelect
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select all"),
                                        this->mpc_Ui->pc_TreeView,
                                        &C_TblTreDataElementView::selectAll,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
    }
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -434,7 +434,7 @@ void C_SyvDaPeDataElementBrowse::m_SetupContextMenu(const bool & orq_MultiSelect
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaPeDataElementBrowse::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)

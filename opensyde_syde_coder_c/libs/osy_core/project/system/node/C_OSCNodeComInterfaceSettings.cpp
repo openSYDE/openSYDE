@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstring>
-#include "C_OSCNodeComInterfaceSettings.h"
+#include "C_OscNodeComInterfaceSettings.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_FIRST_BYTE = 192U;
-const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_SECOND_BYTE = 168U;
-const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_THIRD_BYTE = 0U;
-const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_FOURTH_BYTE = 2U;
+const uint8_t C_OscNodeComInterfaceSettings::C_IpAddress::hu8_IP_FIRST_BYTE = 192U;
+const uint8_t C_OscNodeComInterfaceSettings::C_IpAddress::hu8_IP_SECOND_BYTE = 168U;
+const uint8_t C_OscNodeComInterfaceSettings::C_IpAddress::hu8_IP_THIRD_BYTE = 0U;
+const uint8_t C_OscNodeComInterfaceSettings::C_IpAddress::hu8_IP_FOURTH_BYTE = 2U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -41,10 +41,10 @@ const stw_types::uint8 C_OSCNodeComInterfaceSettings::C_IpAddress::hu8_IP_FOURTH
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
-   e_InterfaceType(C_OSCSystemBus::eCAN),
+C_OscNodeComInterfaceSettings::C_OscNodeComInterfaceSettings(void) :
+   e_InterfaceType(C_OscSystemBus::eCAN),
    u8_InterfaceNumber(0),
-   u8_NodeID(0),
+   u8_NodeId(0),
    q_IsUpdateEnabled(false),
    q_IsRoutingEnabled(false),
    q_IsDiagnosisEnabled(false),
@@ -58,7 +58,7 @@ C_OSCNodeComInterfaceSettings::C_OSCNodeComInterfaceSettings(void) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeComInterfaceSettings::~C_OSCNodeComInterfaceSettings(void)
+C_OscNodeComInterfaceSettings::~C_OscNodeComInterfaceSettings(void)
 {
 }
 
@@ -71,20 +71,21 @@ C_OSCNodeComInterfaceSettings::~C_OSCNodeComInterfaceSettings(void)
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeComInterfaceSettings::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_InterfaceType, sizeof(this->e_InterfaceType), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_InterfaceNumber, sizeof(this->u8_InterfaceNumber), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_NodeID, sizeof(this->u8_NodeID), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->c_Ip.au8_IpAddress[0], sizeof(this->c_Ip.au8_IpAddress), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->c_Ip.au8_NetMask[0], sizeof(this->c_Ip.au8_NetMask), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->c_Ip.au8_DefaultGateway[0], sizeof(this->c_Ip.au8_DefaultGateway),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsUpdateEnabled, sizeof(this->q_IsUpdateEnabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsRoutingEnabled, sizeof(this->q_IsRoutingEnabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsDiagnosisEnabled, sizeof(this->q_IsDiagnosisEnabled), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->mq_IsBusConnected, sizeof(this->mq_IsBusConnected), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_BusIndex, sizeof(this->u32_BusIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_InterfaceType, sizeof(this->e_InterfaceType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_InterfaceNumber, sizeof(this->u8_InterfaceNumber), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_NodeId, sizeof(this->u8_NodeId), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->c_Ip.au8_IpAddress[0], sizeof(this->c_Ip.au8_IpAddress), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->c_Ip.au8_NetMask[0], sizeof(this->c_Ip.au8_NetMask), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->c_Ip.au8_DefaultGateway[0], sizeof(this->c_Ip.au8_DefaultGateway),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_IsUpdateEnabled, sizeof(this->q_IsUpdateEnabled), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_IsRoutingEnabled, sizeof(this->q_IsRoutingEnabled), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_IsDiagnosisEnabled, sizeof(this->q_IsDiagnosisEnabled),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->mq_IsBusConnected, sizeof(this->mq_IsBusConnected), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_BusIndex, sizeof(this->u32_BusIndex), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -93,7 +94,7 @@ void C_OSCNodeComInterfaceSettings::CalcHash(uint32 & oru32_HashValue) const
    \param[in]  oru32_BusIndex    Bus index to add
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
+void C_OscNodeComInterfaceSettings::AddConnection(const uint32_t & oru32_BusIndex)
 {
    this->u32_BusIndex = oru32_BusIndex;
    this->mq_IsBusConnected = true;
@@ -103,7 +104,7 @@ void C_OSCNodeComInterfaceSettings::AddConnection(const uint32 & oru32_BusIndex)
 /*! \brief   Clear existing connection
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
+void C_OscNodeComInterfaceSettings::RemoveConnection(void)
 {
    this->u32_BusIndex = 0;
    this->mq_IsBusConnected = false;
@@ -116,7 +117,7 @@ void C_OSCNodeComInterfaceSettings::RemoveConnection(void)
    Bus connected status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeComInterfaceSettings::GetBusConnected() const
+bool C_OscNodeComInterfaceSettings::GetBusConnected() const
 {
    return this->mq_IsBusConnected && this->mq_IsInterfaceConnectedInDevice;
 }
@@ -128,7 +129,7 @@ bool C_OSCNodeComInterfaceSettings::GetBusConnected() const
    Bus connected boolean raw value
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeComInterfaceSettings::GetBusConnectedRawValue() const
+bool C_OscNodeComInterfaceSettings::GetBusConnectedRawValue() const
 {
    return this->mq_IsBusConnected;
 }
@@ -139,7 +140,7 @@ bool C_OSCNodeComInterfaceSettings::GetBusConnectedRawValue() const
    \param[in]  oq_Value    Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeComInterfaceSettings::SetBusConnected(const bool oq_Value)
+void C_OscNodeComInterfaceSettings::SetBusConnected(const bool oq_Value)
 {
    this->mq_IsBusConnected = oq_Value;
 }
@@ -151,7 +152,7 @@ void C_OSCNodeComInterfaceSettings::SetBusConnected(const bool oq_Value)
    Status of interface connected in device
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeComInterfaceSettings::GetInterfaceConnectedInDeviceRawValue() const
+bool C_OscNodeComInterfaceSettings::GetInterfaceConnectedInDeviceRawValue() const
 {
    return this->mq_IsInterfaceConnectedInDevice;
 }
@@ -162,7 +163,7 @@ bool C_OSCNodeComInterfaceSettings::GetInterfaceConnectedInDeviceRawValue() cons
    \param[in]  oq_Value    Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeComInterfaceSettings::SetInterfaceConnectedInDevice(const bool oq_Value)
+void C_OscNodeComInterfaceSettings::SetInterfaceConnectedInDevice(const bool oq_Value)
 {
    this->mq_IsInterfaceConnectedInDevice = oq_Value;
 }
@@ -173,7 +174,7 @@ void C_OSCNodeComInterfaceSettings::SetInterfaceConnectedInDevice(const bool oq_
    Set defaults
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeComInterfaceSettings::C_IpAddress::C_IpAddress(void)
+C_OscNodeComInterfaceSettings::C_IpAddress::C_IpAddress(void)
 {
    au8_IpAddress[0] = hu8_IP_FIRST_BYTE;
    au8_IpAddress[1] = hu8_IP_SECOND_BYTE;

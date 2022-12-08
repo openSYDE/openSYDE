@@ -1,26 +1,26 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLePropertiesName,
-stw_opensyde_gui_elements--C_OgeLeNavigation,
-stw_opensyde_gui_elements--C_OgeLeDark,
-stw_opensyde_gui_elements--C_OgeLeProperties
+stw--opensyde_gui_elements--C_OgeLePropertiesName,
+stw--opensyde_gui_elements--C_OgeLeNavigation,
+stw--opensyde_gui_elements--C_OgeLeDark,
+stw--opensyde_gui_elements--C_OgeLeProperties
 {
 border-style: solid;
 border-width: 1px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLeDark,
-stw_opensyde_gui_elements--C_OgeLeNavigation,
-stw_opensyde_gui_elements--C_OgeLePropertiesName
+stw--opensyde_gui_elements--C_OgeLeDark,
+stw--opensyde_gui_elements--C_OgeLeNavigation,
+stw--opensyde_gui_elements--C_OgeLePropertiesName
 {
 padding-left: 10px;
 padding-right: 10px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLeProperties,
-stw_opensyde_gui_elements--C_OgeLeFilePath,
-stw_opensyde_gui_elements--C_OgeLePlaceholderVar
+stw--opensyde_gui_elements--C_OgeLeProperties,
+stw--opensyde_gui_elements--C_OgeLeFilePath,
+stw--opensyde_gui_elements--C_OgeLePlaceholderVar
 {
 padding-left: 6px;
 padding-right: 6px;
@@ -28,7 +28,7 @@ padding-bottom: 1px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLeListHeader
+stw--opensyde_gui_elements--C_OgeLeListHeader
 {
 border-style: solid;
 border-width: 1px;
@@ -37,14 +37,14 @@ border-width: 1px;
 /* --------------------------------------------------------------------- */
 QTextEdit#pc_TextEditDpName,
 QTextEdit#pc_TextEditDpComment,
-stw_opensyde_gui_elements--C_OgeLeIpAddress
+stw--opensyde_gui_elements--C_OgeLeIpAddress
 {
 border-style: none;
 border-width: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLeTable
+stw--opensyde_gui_elements--C_OgeLeTable
 {
 border-style: solid;
 border-width: 1px;
@@ -54,7 +54,7 @@ margin-bottom: 3px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLeParam
+stw--opensyde_gui_elements--C_OgeLeParam
 {
 border-style: solid;
 border-width: 1px;
@@ -64,9 +64,9 @@ margin-bottom: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeLeFilePath,
-stw_opensyde_gui_elements--C_OgeLePlaceholderVar,
-stw_opensyde_gui_elements--C_OgeLeProperties[NoRightBorder="true"]
+stw--opensyde_gui_elements--C_OgeLeFilePath,
+stw--opensyde_gui_elements--C_OgeLePlaceholderVar,
+stw--opensyde_gui_elements--C_OgeLeProperties[NoRightBorder="true"]
 {
 border-style:solid;
 border-width:1px;

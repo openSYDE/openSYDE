@@ -8,43 +8,42 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "constants.h"
-#include "C_Uti.h"
-#include "C_SyvDcWidget.h"
+#include "constants.hpp"
+#include "C_Uti.hpp"
+#include "C_SyvDcWidget.hpp"
 #include "ui_C_SyvDcWidget.h"
-#include "C_OSCNodeProperties.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "TGLUtils.h"
-#include "TGLTime.h"
-#include "CSCLString.h"
-#include "C_PuiSdUtil.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OSCUtils.h"
+#include "C_OscNodeProperties.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "TglUtils.hpp"
+#include "TglTime.hpp"
+#include "C_SclString.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ALL_CONNECTED_INTERFACES = 1;
-const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES = 0;
+const int32_t C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ALL_CONNECTED_INTERFACES = 1;
+const int32_t C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES = 0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,8 +64,7 @@ const sint32 C_SyvDcWidget::mhs32_INDEX_CONFIGURATION_ONLY_USED_INTERFACES = 0;
    \param[in,out]  ou32_ViewIndex   View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                             const stw_types::uint32 ou32_ViewIndex) :
+C_SyvDcWidget::C_SyvDcWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32_t ou32_ViewIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDcWidget),
    mpc_ParentDialog(&orc_Parent),
@@ -79,7 +77,7 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    mu8_BusId(0U),
    mu64_BitRate(0U),
    mq_DisconnectNecessary(false),
-   me_BusType(C_OSCSystemBus::eCAN),
+   me_BusType(C_OscSystemBus::eCAN),
    mq_SecurityFeatureUsed(false),
    me_Step(eSCANCANENTERFLASHLOADER),
    mc_ReportText("")
@@ -113,16 +111,16 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    {
       //No check for connected because error check passed
       this->mu32_BusIndex = pc_View->GetPcData().GetBusIndex();
-      const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(this->mu32_BusIndex);
+      const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
 
       if (pc_Bus != NULL)
       {
-         this->mu8_BusId = pc_Bus->u8_BusID;
+         this->mu8_BusId = pc_Bus->u8_BusId;
          this->me_BusType = pc_Bus->e_Type;
          this->mu64_BitRate = pc_Bus->u64_BitRate;
 
-         this->mpc_Ui->pc_ComboBoxBitRate->setVisible(this->me_BusType == C_OSCSystemBus::eCAN);
-         this->mpc_Ui->pc_LabelBitRate->setVisible(this->me_BusType == C_OSCSystemBus::eCAN);
+         this->mpc_Ui->pc_ComboBoxBitRate->setVisible(this->me_BusType == C_OscSystemBus::eCAN);
+         this->mpc_Ui->pc_LabelBitRate->setVisible(this->me_BusType == C_OscSystemBus::eCAN);
 
          //Update title
          this->mpc_ParentDialog->SetTitle(pc_Bus->c_Name.c_str());
@@ -147,27 +145,27 @@ C_SyvDcWidget::C_SyvDcWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_P
    // Progress signals
    // We need a signal which is Q_EMITted in the other thread
    // We have to register the type and use the queued connections. Auto is default, but did not work.
-   qRegisterMetaType<uint32>("uint32");
-   qRegisterMetaType<sint32>("sint32");
-   qRegisterMetaType<uint8>("uint8");
+   qRegisterMetaType<uint32_t>("uint32_t");
+   qRegisterMetaType<int32_t>("int32_t");
+   qRegisterMetaType<uint8_t>("uint8_t");
 
    connect(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment, &C_SyvDcExistingNodeList::SigConnect, this,
            &C_SyvDcWidget::m_AssignmentConnect);
    connect(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment, &C_SyvDcExistingNodeList::SigDisconnect, this,
            &C_SyvDcWidget::m_AssignmentDisconnect);
-   connect(this->mpc_Ui->pc_PushButtonScan, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonScan, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDcWidget::m_StartSearchProper);
-   connect(this->mpc_Ui->pc_PushButtonConfigure, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonConfigure, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDcWidget::m_StartConfigProper);
-   connect(this->mpc_Ui->pc_PbBackToScan, &stw_opensyde_gui_elements::C_OgePubCancel::clicked, this,
+   connect(this->mpc_Ui->pc_PbBackToScan, &stw::opensyde_gui_elements::C_OgePubCancel::clicked, this,
            &C_SyvDcWidget::m_BackToScan);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
-                                                            sintn)>(&QComboBox::currentIndexChanged), this,
+                                                            int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SyvDcWidget::m_OnBitRateChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxConfigurationMode, static_cast<void (QComboBox::*)(
-                                                                      sintn)>(&QComboBox::currentIndexChanged), this,
+                                                                      int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SyvDcWidget::m_OnDeviceConfigModeChanged);
    connect(this->mpc_ParentDialog, &C_OgePopUpDialog::SigCloseIgnored, this, &C_SyvDcWidget::m_OnCloseIgnored);
    connect(this->mpc_Ui->pc_ListWidgetConnectedNodesAssignment, &C_SyvDcConnectedNodeList::SigStartDrag,
@@ -287,7 +285,7 @@ void C_SyvDcWidget::InitText(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
    QWidget::paintEvent(opc_Event);
 }
 
@@ -301,7 +299,7 @@ void C_SyvDcWidget::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       if (m_CheckQuitPossible() == true)
       {
@@ -328,10 +326,10 @@ void C_SyvDcWidget::keyPressEvent(QKeyEvent * const opc_Event)
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcWidget::m_InitSequence(void)
+int32_t C_SyvDcWidget::m_InitSequence(void)
 {
    QString c_Message;
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    // Sequence initialization
    if (this->mpc_DcSequences == NULL)
@@ -438,7 +436,7 @@ sint32 C_SyvDcWidget::m_InitSequence(void)
 void C_SyvDcWidget::m_StartSearchProper(void)
 {
    //Init com driver
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -469,7 +467,7 @@ void C_SyvDcWidget::m_StartSearchProper(void)
          if (s32_Return == C_NO_ERR)
          {
             //Set step
-            if (this->me_BusType == C_OSCSystemBus::eCAN)
+            if (this->me_BusType == C_OscSystemBus::eCAN)
             {
                // Check if different bitrates are used
                this->mq_SameBitrates = (this->mu32_TempBitrate == (this->mu64_BitRate / 1000U));
@@ -532,7 +530,7 @@ void C_SyvDcWidget::m_StartSearchProper(void)
 void C_SyvDcWidget::m_CleanUpScan(void) const
 {
    this->mpc_Ui->pc_BushButtonCancel->setEnabled(true);
-   this->mpc_Ui->pc_ComboBoxBitRate->setEnabled(this->me_BusType == C_OSCSystemBus::eCAN);
+   this->mpc_Ui->pc_ComboBoxBitRate->setEnabled(this->me_BusType == C_OscSystemBus::eCAN);
    this->mpc_Ui->pc_ComboBoxConfigurationMode->setEnabled(true);
    this->mpc_Ui->pc_PushButtonScan->setEnabled(true);
    this->mpc_Ui->pc_PushButtonScan->setFocus();
@@ -546,7 +544,7 @@ void C_SyvDcWidget::m_CleanUpScan(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ScanFinished(void)
 {
-   C_SCLString c_NotTrimmedDevices = C_GtGetText::h_GetText("Not trimmed device types: \n");
+   C_SclString c_NotTrimmedDevices = C_GtGetText::h_GetText("Not trimmed device types: \n");
    bool q_NotTrimmedDevicesFound = false;
 
    //evaluate results
@@ -558,7 +556,7 @@ void C_SyvDcWidget::m_ScanFinished(void)
       m_InformUserAfterScan(C_GtGetText::h_GetText("No devices found! Check connection of connected devices and retry."));
    }
    else if (this->mc_FoundDevices.size() <
-            static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->GetCommunicatingNodeCount()))
+            static_cast<uint32_t>(this->mpc_Ui->pc_ListWidgetExistingNodes->GetCommunicatingNodeCount()))
    {
       //Less
       m_EnterScanErrorState();
@@ -566,7 +564,7 @@ void C_SyvDcWidget::m_ScanFinished(void)
                                                    " Check connection of connected devices and retry."));
    }
    else if (this->mc_FoundDevices.size() >
-            static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodes->GetCommunicatingNodeCount()))
+            static_cast<uint32_t>(this->mpc_Ui->pc_ListWidgetExistingNodes->GetCommunicatingNodeCount()))
    {
       //More
       m_EnterScanErrorState();
@@ -608,7 +606,7 @@ void C_SyvDcWidget::m_ScanFinished(void)
    m_CleanUpScan();
 
    //check if found device types are trimmed
-   for (uint32 u32_ItDevice1 = 0; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
+   for (uint32_t u32_ItDevice1 = 0; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
    {
       const C_SyvDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
 
@@ -651,10 +649,10 @@ bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
 
    //Match
    //Compare devices
-   for (uint32 u32_ItDevice1 = 0U; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
+   for (uint32_t u32_ItDevice1 = 0U; u32_ItDevice1 < this->mc_FoundDevices.size(); ++u32_ItDevice1)
    {
       const C_SyvDcDeviceInformation & rc_Device1 = this->mc_FoundDevices[u32_ItDevice1];
-      for (uint32 u32_ItDevice2 = u32_ItDevice1 + 1U; u32_ItDevice2 < this->mc_FoundDevices.size(); ++u32_ItDevice2)
+      for (uint32_t u32_ItDevice2 = u32_ItDevice1 + 1U; u32_ItDevice2 < this->mc_FoundDevices.size(); ++u32_ItDevice2)
       {
          const C_SyvDcDeviceInformation & rc_Device2 = this->mc_FoundDevices[u32_ItDevice2];
 
@@ -662,9 +660,9 @@ bool C_SyvDcWidget::m_CheckSameSerialNumber(void)
              (rc_Device2.c_SerialNumber.q_FsnSerialNumber == false))
          {
             // Old format
-            const sintn sn_Diff = std::memcmp(&rc_Device1.c_SerialNumber.au8_SerialNumber[0],
-                                              &rc_Device2.c_SerialNumber.au8_SerialNumber[0], 6U);
-            if (sn_Diff == 0)
+            const int32_t s32_Diff = std::memcmp(&rc_Device1.c_SerialNumber.au8_SerialNumber[0],
+                                                 &rc_Device2.c_SerialNumber.au8_SerialNumber[0], 6U);
+            if (s32_Diff == 0)
             {
                // Same serial number
                // Special case: Different sub node id can have same same serial number due to a multi CPU node
@@ -734,7 +732,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
 {
    if (this->mpc_DcSequences != NULL)
    {
-      sint32 s32_Result = C_NO_ERR;
+      int32_t s32_Result = C_NO_ERR;
 
       std::vector<C_SyvDcDeviceConfiguation> c_Configs =
          this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->GetConfigs();
@@ -743,21 +741,21 @@ void C_SyvDcWidget::m_StartConfigProper(void)
       this->mc_StwFlashloaderDeviceConfigurations.clear();
 
       //Append
-      for (uint32 u32_ItConfig = 0; (u32_ItConfig < c_Configs.size()) && (s32_Result == C_NO_ERR); ++u32_ItConfig)
+      for (uint32_t u32_ItConfig = 0; (u32_ItConfig < c_Configs.size()) && (s32_Result == C_NO_ERR); ++u32_ItConfig)
       {
-         C_OSCNodeProperties::E_FlashLoaderProtocol e_Flashloader;
+         C_OscNodeProperties::E_FlashLoaderProtocol e_Flashloader;
          C_SyvDcDeviceConfiguation & rc_Config = c_Configs[u32_ItConfig];
          s32_Result = this->mpc_DcSequences->FillDeviceConfig(rc_Config, e_Flashloader);
          if (s32_Result == C_NO_ERR)
          {
-            if (e_Flashloader == C_OSCNodeProperties::eFL_OPEN_SYDE)
+            if (e_Flashloader == C_OscNodeProperties::eFL_OPEN_SYDE)
             {
                this->mc_OpenSydeDeviceConfigurations.push_back(rc_Config);
             }
             else
             {
                //Flashloader type "none" is supported by the device structure, but not the UI
-               tgl_assert(e_Flashloader == C_OSCNodeProperties::eFL_STW);
+               tgl_assert(e_Flashloader == C_OscNodeProperties::eFL_STW);
                this->mc_StwFlashloaderDeviceConfigurations.push_back(rc_Config);
             }
          }
@@ -774,7 +772,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
          {
             if (this->mpc_DcSequences->IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus() == true)
             {
-               if (this->me_BusType == C_OSCSystemBus::eCAN)
+               if (this->me_BusType == C_OscSystemBus::eCAN)
                {
                   // Run and check the STW flashloader configuration
                   s32_Result =
@@ -802,7 +800,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
             else
             {
                // No STW flashloader devices. Run and check the openSYDE configuration
-               if (this->me_BusType == C_OSCSystemBus::eCAN)
+               if (this->me_BusType == C_OscSystemBus::eCAN)
                {
                   s32_Result =
                      this->mpc_DcSequences->ConfCanOpenSydeDevices(this->mc_OpenSydeDeviceConfigurations,
@@ -838,7 +836,7 @@ void C_SyvDcWidget::m_StartConfigProper(void)
                this->m_ClearReportText();
                m_HandleConfigurationStarted();
                //Start
-               if (this->me_BusType == C_OSCSystemBus::eCAN)
+               if (this->me_BusType == C_OscSystemBus::eCAN)
                {
                   if (this->mpc_DcSequences->IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus() == true)
                   {
@@ -896,10 +894,10 @@ void C_SyvDcWidget::m_StartConfigProper(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigResult(void)
 {
-   uint32 u32_DeviceMaxCount;
-   uint32 u32_DeviceCounter = 1UL;
+   uint32_t u32_DeviceMaxCount;
+   uint32_t u32_DeviceCounter = 1UL;
 
-   uint32 u32_ConfigCounter;
+   uint32_t u32_ConfigCounter;
    QString c_Text;
 
    std::vector<std::vector<C_SyvDcDeviceConfiguation> > c_SortedOpenSydeDeviceInfos;
@@ -912,7 +910,7 @@ void C_SyvDcWidget::m_ShowConfigResult(void)
    for (u32_ConfigCounter = 0U; u32_ConfigCounter < this->mc_OpenSydeDeviceConfigurations.size(); ++u32_ConfigCounter)
    {
       const C_SyvDcDeviceConfiguation & rc_Info = this->mc_OpenSydeDeviceConfigurations[u32_ConfigCounter];
-      uint32 u32_CompDeviceCounter;
+      uint32_t u32_CompDeviceCounter;
       bool q_SameSnr = false;
 
       for (u32_CompDeviceCounter = 0U; u32_CompDeviceCounter < c_SortedOpenSydeDeviceInfos.size();
@@ -939,8 +937,8 @@ void C_SyvDcWidget::m_ShowConfigResult(void)
       }
    }
 
-   u32_DeviceMaxCount = static_cast<uint32>(c_SortedOpenSydeDeviceInfos.size() +
-                                            this->mc_StwFlashloaderDeviceConfigurations.size());
+   u32_DeviceMaxCount = static_cast<uint32_t>(c_SortedOpenSydeDeviceInfos.size() +
+                                              this->mc_StwFlashloaderDeviceConfigurations.size());
 
    // Show configuration for all STW flashloader devices
    for (u32_ConfigCounter = 0U; u32_ConfigCounter < this->mc_StwFlashloaderDeviceConfigurations.size();
@@ -1006,7 +1004,7 @@ void C_SyvDcWidget::m_BackToScan(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConfiguation> & orc_Config,
-                                             const uint32 ou32_DeviceMaxCount, const uint32 ou32_DeviceCounter,
+                                             const uint32_t ou32_DeviceMaxCount, const uint32_t ou32_DeviceCounter,
                                              QString & orc_Text)
 {
    tgl_assert(orc_Config.size() > 0);
@@ -1016,8 +1014,8 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
        (orc_Config.size() > 0) &&
        (orc_Config[0].c_NodeIds.size() > 0))
    {
-      const C_OSCProtocolDriverOsyNode c_FirstServerId(this->mu8_BusId,  orc_Config[0].c_NodeIds[0]);
-      uint32 u32_FirstNodeIndex;
+      const C_OscProtocolDriverOsyNode c_FirstServerId(this->mu8_BusId,  orc_Config[0].c_NodeIds[0]);
+      uint32_t u32_FirstNodeIndex;
 
       // Counter of devices
       orc_Text += static_cast<QString>("%1 %2 %3 %4<br>").arg(
@@ -1032,22 +1030,22 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
 
       if (this->mpc_DcSequences->GetNodeIndex(c_FirstServerId, u32_FirstNodeIndex) == true)
       {
-         const C_OSCNode * const pc_FirstNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_FirstNodeIndex);
-         std::vector<uint32> c_SubNodeIndexes;
-         std::vector<const C_OSCNode *> c_SubNodes;
-         std::vector<C_OSCProtocolDriverOsyNode> c_ServerIds;
-         uint32 u32_SubNodeCounter;
+         const C_OscNode * const pc_FirstNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_FirstNodeIndex);
+         std::vector<uint32_t> c_SubNodeIndexes;
+         std::vector<const C_OscNode *> c_SubNodes;
+         std::vector<C_OscProtocolDriverOsyNode> c_ServerIds;
+         uint32_t u32_SubNodeCounter;
          bool q_NodeSquad = false;
 
          if (orc_Config.size() > 1)
          {
             // It is a node squad. Get all nodes
-            uint32 u32_SquadIndex;
-            const C_OSCNodeSquad * pc_Squad;
+            uint32_t u32_SquadIndex;
+            const C_OscNodeSquad * pc_Squad;
 
             tgl_assert(C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(u32_FirstNodeIndex,
                                                                                        u32_SquadIndex) == C_NO_ERR);
-            pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_SquadIndex);
+            pc_Squad = C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_SquadIndex);
 
             tgl_assert(pc_Squad != NULL);
             if (pc_Squad != NULL)
@@ -1060,12 +1058,12 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < pc_Squad->c_SubNodeIndexes.size();
                     ++u32_SubNodeCounter)
                {
-                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                  const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                      pc_Squad->c_SubNodeIndexes[u32_SubNodeCounter]);
 
                   c_SubNodes.push_back(pc_Node);
-                  c_ServerIds.push_back(C_OSCProtocolDriverOsyNode(this->mu8_BusId,
-                                                                   orc_Config[u32_SubNodeCounter].c_NodeIds[0]));
+                  c_ServerIds.emplace_back(C_OscProtocolDriverOsyNode(this->mu8_BusId,
+                                                                      orc_Config[u32_SubNodeCounter].c_NodeIds[0]));
                }
                c_SubNodeIndexes = pc_Squad->c_SubNodeIndexes;
                tgl_assert(pc_Squad->c_SubNodeIndexes.size() == c_SubNodes.size());
@@ -1083,10 +1081,10 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
          if ((pc_FirstNode != NULL) &&
              (c_SubNodes.size() > 0))
          {
-            uint32 u32_IntfCounter;
-            uint32 u32_CommunicationIntf = 0U;
-            std::vector<uint32> c_CanCounters;
-            std::vector<uint32> c_EthCounters;
+            uint32_t u32_IntfCounter;
+            uint32_t u32_CommunicationIntf = 0U;
+            std::vector<uint32_t> c_CanCounters;
+            std::vector<uint32_t> c_EthCounters;
 
             c_CanCounters.resize(c_SubNodes.size(), 0U);
             c_EthCounters.resize(c_SubNodes.size(), 0U);
@@ -1103,11 +1101,11 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                  ++u32_IntfCounter)
             {
                // Must be the same interface for all sub nodes
-               const C_OSCNodeComInterfaceSettings & rc_IntfSetting =
+               const C_OscNodeComInterfaceSettings & rc_IntfSetting =
                   pc_FirstNode->c_Properties.c_ComInterfaces[u32_IntfCounter];
 
                if ((rc_IntfSetting.GetBusConnected() == true) &&
-                   (static_cast<uint8>(rc_IntfSetting.u32_BusIndex) == this->mu32_BusIndex))
+                   (static_cast<uint8_t>(rc_IntfSetting.u32_BusIndex) == this->mu32_BusIndex))
                {
                   q_CummunicationBusFound = true;
                   u32_CommunicationIntf = u32_IntfCounter;
@@ -1122,7 +1120,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                // This interface is on the first position in the configuration vectors
                for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_SubNodes.size(); ++u32_SubNodeCounter)
                {
-                  const C_OSCNode * const pc_SubNode = c_SubNodes[u32_SubNodeCounter];
+                  const C_OscNode * const pc_SubNode = c_SubNodes[u32_SubNodeCounter];
 
                   if (pc_SubNode != NULL)
                   {
@@ -1131,7 +1129,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                      const bool q_FirstSubNode = (u32_SubNodeCounter == 0U);
                      QString c_SubNodeName = "";
                      // Use the previous found interface
-                     const C_OSCNodeComInterfaceSettings & rc_IntfSetting =
+                     const C_OscNodeComInterfaceSettings & rc_IntfSetting =
                         pc_SubNode->c_Properties.c_ComInterfaces[u32_CommunicationIntf];
 
                      if (q_NodeSquad == true)
@@ -1142,12 +1140,12 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                      }
 
                      if ((rc_IntfSetting.GetBusConnected() == true) &&
-                         (static_cast<uint8>(rc_IntfSetting.u32_BusIndex) == this->mu32_BusIndex))
+                         (static_cast<uint8_t>(rc_IntfSetting.u32_BusIndex) == this->mu32_BusIndex))
                      {
                         const C_SyvDcDeviceConfiguation & rc_CurConfig =  orc_Config[u32_SubNodeCounter];
-                        const C_OSCProtocolDriverOsyNode & rc_CurServerId = c_ServerIds[u32_SubNodeCounter];
+                        const C_OscProtocolDriverOsyNode & rc_CurServerId = c_ServerIds[u32_SubNodeCounter];
 
-                        if (rc_IntfSetting.e_InterfaceType == C_OSCSystemBus::eCAN)
+                        if (rc_IntfSetting.e_InterfaceType == C_OscSystemBus::eCAN)
                         {
                            this->m_ShowConfigInfoOfCanInterface(rc_IntfSetting, rc_CurServerId, rc_CurServerId,
                                                                 rc_CurConfig.c_CanBitrates[0], q_FirstSubNode,
@@ -1173,7 +1171,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                // Communication interface was already handled
                if (u32_CommunicationIntf != u32_IntfCounter)
                {
-                  const C_OSCNodeComInterfaceSettings & rc_IntfSettingFirstNode =
+                  const C_OscNodeComInterfaceSettings & rc_IntfSettingFirstNode =
                      pc_FirstNode->c_Properties.c_ComInterfaces[u32_IntfCounter];
 
                   bool q_BusConnected = false;
@@ -1181,7 +1179,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                   // Check if any sub node with this interface is connected
                   for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_SubNodes.size(); ++u32_SubNodeCounter)
                   {
-                     const C_OSCNode * const pc_SubNode = c_SubNodes[u32_SubNodeCounter];
+                     const C_OscNode * const pc_SubNode = c_SubNodes[u32_SubNodeCounter];
 
                      if (pc_SubNode != NULL)
                      {
@@ -1198,10 +1196,10 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                                                        orc_Text, false,
                                                        false);
                   }
-                  else if ((pc_FirstNode->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW) &&
-                           (((static_cast<uint8>(rc_IntfSettingFirstNode.u32_BusIndex) == this->mu32_BusIndex) &&
-                             (rc_IntfSettingFirstNode.u8_NodeID != c_FirstServerId.u8_NodeIdentifier)) ||
-                            (static_cast<uint8>(rc_IntfSettingFirstNode.u32_BusIndex) != this->mu32_BusIndex)))
+                  else if ((pc_FirstNode->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW) &&
+                           (((static_cast<uint8_t>(rc_IntfSettingFirstNode.u32_BusIndex) == this->mu32_BusIndex) &&
+                             (rc_IntfSettingFirstNode.u8_NodeId != c_FirstServerId.u8_NodeIdentifier)) ||
+                            (static_cast<uint8_t>(rc_IntfSettingFirstNode.u32_BusIndex) != this->mu32_BusIndex)))
                   {
                      // Any other interface than the communication interface of a STW flashloader device
                      // Can not be configured by the device configuration and can not be part of a node squad
@@ -1215,11 +1213,11 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                      bool q_FirstConnectedSubNode = true;
                      for (u32_SubNodeCounter = 0U; u32_SubNodeCounter < c_SubNodes.size(); ++u32_SubNodeCounter)
                      {
-                        const C_OSCNode * const pc_SubNode = c_SubNodes[u32_SubNodeCounter];
+                        const C_OscNode * const pc_SubNode = c_SubNodes[u32_SubNodeCounter];
 
                         if (pc_SubNode != NULL)
                         {
-                           const C_OSCNodeComInterfaceSettings & rc_IntfSetting =
+                           const C_OscNodeComInterfaceSettings & rc_IntfSetting =
                               pc_SubNode->c_Properties.c_ComInterfaces[u32_IntfCounter];
                            if (rc_IntfSetting.GetBusConnected() == true)
                            {
@@ -1231,24 +1229,24 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                                     c_SubNodeIndexes[u32_SubNodeCounter]);
                               }
 
-                              const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                              const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
                                  rc_IntfSetting.u32_BusIndex);
                               if (pc_Bus != NULL)
                               {
                                  const C_SyvDcDeviceConfiguation & rc_CurConfig =  orc_Config[u32_SubNodeCounter];
-                                 const uint32 u32_CurSubNodeConfigCounter = c_CanCounters[u32_SubNodeCounter] +
-                                                                            c_EthCounters[u32_SubNodeCounter];
+                                 const uint32_t u32_CurSubNodeConfigCounter = c_CanCounters[u32_SubNodeCounter] +
+                                                                              c_EthCounters[u32_SubNodeCounter];
 
-                                 if ((pc_Bus->u8_BusID == rc_CurConfig.c_BusIds[u32_CurSubNodeConfigCounter]) &&
-                                     (rc_IntfSetting.u8_NodeID == rc_CurConfig.c_NodeIds[u32_CurSubNodeConfigCounter]))
+                                 if ((pc_Bus->u8_BusId == rc_CurConfig.c_BusIds[u32_CurSubNodeConfigCounter]) &&
+                                     (rc_IntfSetting.u8_NodeId == rc_CurConfig.c_NodeIds[u32_CurSubNodeConfigCounter]))
                                  {
-                                    const C_OSCProtocolDriverOsyNode & rc_CurServerId = c_ServerIds[u32_SubNodeCounter];
-                                    if (rc_IntfSetting.e_InterfaceType == C_OSCSystemBus::eCAN)
+                                    const C_OscProtocolDriverOsyNode & rc_CurServerId = c_ServerIds[u32_SubNodeCounter];
+                                    if (rc_IntfSetting.e_InterfaceType == C_OscSystemBus::eCAN)
                                     {
                                        this->m_ShowConfigInfoOfCanInterface(
                                           rc_IntfSetting,
                                           rc_CurServerId,
-                                          C_OSCProtocolDriverOsyNode(pc_Bus->u8_BusID, rc_IntfSetting.u8_NodeID),
+                                          C_OscProtocolDriverOsyNode(pc_Bus->u8_BusId, rc_IntfSetting.u8_NodeId),
                                           rc_CurConfig.c_CanBitrates[c_CanCounters[u32_SubNodeCounter]],
                                           q_FirstConnectedSubNode, q_NodeSquad, c_SubNodeName,
                                           orc_Text);
@@ -1260,7 +1258,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
                                        this->m_ShowConfigInfoOfEthInterface(
                                           rc_IntfSetting,
                                           rc_CurServerId,
-                                          C_OSCProtocolDriverOsyNode(pc_Bus->u8_BusID, rc_IntfSetting.u8_NodeID),
+                                          C_OscProtocolDriverOsyNode(pc_Bus->u8_BusId, rc_IntfSetting.u8_NodeId),
                                           rc_CurConfig.c_IpAddresses[c_EthCounters[u32_SubNodeCounter]],
                                           q_FirstConnectedSubNode, q_NodeSquad, c_SubNodeName,
                                           orc_Text);
@@ -1292,10 +1290,10 @@ void C_SyvDcWidget::m_ShowConfigInfoOfDevice(const std::vector<C_SyvDcDeviceConf
    \param[in,out]  orc_Text                     Result text for the interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
-                                                   const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
-                                                   const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
-                                                   const uint32 ou32_Bitrate, const bool oq_SingleNodeOrFirstSubNode,
+void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OscNodeComInterfaceSettings & orc_IntfSetting,
+                                                   const C_OscProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
+                                                   const C_OscProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
+                                                   const uint32_t ou32_Bitrate, const bool oq_SingleNodeOrFirstSubNode,
                                                    const bool oq_NodeSquad, const QString & orc_SubNodeName,
                                                    QString & orc_Text)
 {
@@ -1330,10 +1328,10 @@ void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OSCNodeComInterfaceSe
    \param[in,out]  orc_Text                     Result text for the interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
-                                                   const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
-                                                   const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
-                                                   const C_OSCNodeComInterfaceSettings::C_IpAddress & orc_IpAddress,
+void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OscNodeComInterfaceSettings & orc_IntfSetting,
+                                                   const C_OscProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
+                                                   const C_OscProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
+                                                   const C_OscNodeComInterfaceSettings::C_IpAddress & orc_IpAddress,
                                                    const bool oq_SingleNodeOrFirstSubNode, const bool oq_NodeSquad,
                                                    const QString & orc_SubNodeName, QString & orc_Text)
 {
@@ -1377,9 +1375,9 @@ void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OSCNodeComInterfaceSe
    \param[in]      oq_Configured                Flag if the interface was configured by the device configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSettings & orc_IntfSetting,
-                                                const C_OSCProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
-                                                const C_OSCProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
+void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OscNodeComInterfaceSettings & orc_IntfSetting,
+                                                const C_OscProtocolDriverOsyNode & orc_ServerIdOnUsedBus,
+                                                const C_OscProtocolDriverOsyNode & orc_ServerIdOnConfiguredBus,
                                                 const bool oq_SingleNodeOrFirstSubNode, const bool oq_NodeSquad,
                                                 const QString & orc_SubNodeName, QString & orc_Text,
                                                 const bool oq_BusConnected, const bool oq_Configured)
@@ -1427,7 +1425,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OSCNodeComInterfaceSetti
       orc_Text += "<table width=\"100%\" style =\" margin-left:10px\">";
       orc_Text += "<tr>";
       orc_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Node ID: ")) +
-                  QString::number(static_cast<uint32>(orc_ServerIdOnConfiguredBus.u8_NodeIdentifier)) + "</td>";
+                  QString::number(static_cast<uint32_t>(orc_ServerIdOnConfiguredBus.u8_NodeIdentifier)) + "</td>";
       orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETNODEID,
                                                                             orc_ServerIdOnConfiguredBus,
                                                                             orc_IntfSetting.e_InterfaceType,
@@ -1459,17 +1457,16 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
 {
    if (this->mpc_DcSequences != NULL)
    {
-      sint32 s32_Return;
-      sint32 s32_ThreadResult;
+      int32_t s32_Return;
       bool q_Manual = false;
-      uint32 u32_NewBitrate;
-      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_OsyNodes;
+      uint32_t u32_NewBitrate;
+      std::vector<stw::opensyde_core::C_OscProtocolDriverOsyNode> c_OsyNodes;
       std::vector<bool> c_OsyNodesSnrExtFormat;
-      std::vector<stw_opensyde_core::C_OSCProtocolDriverOsyNode> c_StwNodes;
+      std::vector<stw::opensyde_core::C_OscProtocolDriverOsyNode> c_StwNodes;
       const QString c_Details = C_GtGetText::h_GetText("Your system uses at least one node with the STW Flashloader \n"
                                                        "and the bitrate of the CAN bus has changed. \n"
                                                        "In this case the reset cannot be performed automatically.");
-      uint32 u32_WaitTime = 0U;
+      uint32_t u32_WaitTime = 0U;
 
       if ((this->mc_StwFlashloaderDeviceConfigurations.size() > 0) &&
           (oq_SameBitrate == false))
@@ -1511,7 +1508,7 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
             C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
-            c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+            c_ConfirmationBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
             c_ConfirmationBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                                                      "Power OFF all nodes manually and press \"Continue\".")));
             c_ConfirmationBox.SetCustomMinHeight(180, 270);
@@ -1520,7 +1517,7 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
 
          //Before reinitializing the bus wait a little to make sure the CAN reset request broadcast(s) had the chance to
          // really be sent out on the bus
-         stw_tgl::TGL_Sleep(50U);
+         stw::tgl::TglSleep(50U);
 
          // Set the new bitrate for the new active configuration if the bitrate was changed
          s32_Return = this->mpc_DcSequences->InitCanAndSetCanBitrate(u32_NewBitrate);
@@ -1528,11 +1525,11 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
 
       if (s32_Return == C_NO_ERR)
       {
-         if (this->me_BusType == C_OSCSystemBus::eCAN)
+         if (this->me_BusType == C_OscSystemBus::eCAN)
          {
             // Get the minimum wait time
             u32_WaitTime = this->mpc_DcSequences->GetMinimumFlashloaderResetWaitTime(
-               C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN);
+               C_OscComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN);
 
             // Start sending the message for getting into flashloader for at least the configured minimum time
             // In case of a manual reset, this sequence must be executed till the next dialog will be closed by user
@@ -1542,36 +1539,38 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
          }
          else
          {
-            const uint32 u32_StartTime = stw_tgl::TGL_GetTickCount();
+            const uint32_t u32_StartTime = stw::tgl::TglGetTickCount();
             // Get the minimum wait time
             u32_WaitTime = this->mpc_DcSequences->GetMinimumFlashloaderResetWaitTime(
-               C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET);
+               C_OscComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET);
 
             do
             {
                //In case it takes longer do process events to handle cursor and proper show of message box
                QApplication::processEvents(QEventLoop::AllEvents, 50);
             }
-            while (stw_tgl::TGL_GetTickCount() < (u32_WaitTime + u32_StartTime));
+            while (stw::tgl::TglGetTickCount() < (u32_WaitTime + u32_StartTime));
          }
       }
       else
       {
          osc_write_log_error("Reset to flashloader",
-                             "Preparation for reset failed: " + C_SCLString::IntToStr(s32_Return));
+                             "Preparation for reset failed: " + C_SclString::IntToStr(s32_Return));
       }
 
       if (s32_Return == C_NO_ERR)
       {
+         int32_t s32_ThreadResult;
+
          if (q_Manual == true)
          {
             C_OgeWiCustomMessage c_ConfirmationBox(this, C_OgeWiCustomMessage::E_Type::eWARNING);
-            const uint32 u32_WaitTimeSec = (u32_WaitTime / 1000UL) +
-                                           (((u32_WaitTime % 1000UL) ==
-                                             0UL) ? static_cast<uint32>(0UL) : static_cast<uint32>(1UL));
+            const uint32_t u32_WaitTimeSec = (u32_WaitTime / 1000UL) +
+                                             (((u32_WaitTime % 1000UL) ==
+                                               0UL) ? static_cast<uint32_t>(0UL) : static_cast<uint32_t>(1UL));
             c_ConfirmationBox.SetHeading(C_GtGetText::h_GetText("Devices reset"));
             c_ConfirmationBox.SetDetails(c_Details);
-            c_ConfirmationBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+            c_ConfirmationBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
             c_ConfirmationBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
                                                                      "Turn ON all nodes manually, wait at least %1 "
                                                                      "second(s) due to Flashloader reset wait time"
@@ -1595,7 +1594,7 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
          m_HandleDeviceVerificationStart();
 
          // Start the read back of the devices
-         if (this->me_BusType == C_OSCSystemBus::eCAN)
+         if (this->me_BusType == C_OscSystemBus::eCAN)
          {
             this->me_Step = eREADBACKCAN;
             s32_Return = this->mpc_DcSequences->ReadBackCan(c_OsyNodes, c_OsyNodesSnrExtFormat, c_StwNodes);
@@ -1613,13 +1612,13 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
             // Error occurred
             this->mc_Timer.stop();
             osc_write_log_error("Reset to flashloader",
-                                "Reset to flashloader failed: " + C_SCLString::IntToStr(s32_Return));
+                                "Reset to flashloader failed: " + C_SclString::IntToStr(s32_Return));
          }
       }
       else
       {
          osc_write_log_error("Reset to flashloader",
-                             "Start of sending flashloader requests failed: " + C_SCLString::IntToStr(s32_Return));
+                             "Start of sending flashloader requests failed: " + C_SclString::IntToStr(s32_Return));
       }
    }
 }
@@ -1640,14 +1639,14 @@ void C_SyvDcWidget::m_ResetFlashloaderAfterConfig(const bool oq_SameBitrate)
    C_CONFIG    No dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsyNode> & orc_OpenSydeIds,
-                                              std::vector<bool> & orc_OpenSydeSnrExtFormat,
-                                              std::vector<C_OSCProtocolDriverOsyNode> & orc_StwIds,
-                                              uint32 & oru32_Bitrate)
+int32_t C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OscProtocolDriverOsyNode> & orc_OpenSydeIds,
+                                               std::vector<bool> & orc_OpenSydeSnrExtFormat,
+                                               std::vector<C_OscProtocolDriverOsyNode> & orc_StwIds,
+                                               uint32_t & oru32_Bitrate)
 {
-   uint32 u32_Counter;
-   sint32 s32_Return = C_NO_ERR;
-   C_OSCProtocolDriverOsyNode c_Id;
+   uint32_t u32_Counter;
+   int32_t s32_Return = C_NO_ERR;
+   C_OscProtocolDriverOsyNode c_Id;
 
    oru32_Bitrate = 0U;
    orc_OpenSydeIds.clear();
@@ -1668,7 +1667,7 @@ sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsy
          orc_OpenSydeIds.push_back(c_Id);
          orc_OpenSydeSnrExtFormat.push_back(rc_Config.c_SerialNumber.q_ExtFormatUsed);
 
-         if (this->me_BusType == C_OSCSystemBus::eCAN)
+         if (this->me_BusType == C_OscSystemBus::eCAN)
          {
             // Not necessary when using Ethernet
             if (rc_Config.c_CanBitrates.size() > 0)
@@ -1699,7 +1698,7 @@ sint32 C_SyvDcWidget::m_GetRelevantConfigInfo(std::vector<C_OSCProtocolDriverOsy
        (s32_Return == C_NO_ERR))
    {
       // Check all STW flashloader devices
-      if (this->me_BusType == C_OSCSystemBus::eCAN)
+      if (this->me_BusType == C_OscSystemBus::eCAN)
       {
          for (u32_Counter = 0U; u32_Counter < this->mc_StwFlashloaderDeviceConfigurations.size(); ++u32_Counter)
          {
@@ -1769,12 +1768,12 @@ void C_SyvDcWidget::m_ResetNetwork(const bool oq_ToFlashloader)
    \param[in]  os32_ActualResult    Detected error state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
+void C_SyvDcWidget::m_ShowReadInfo(const int32_t os32_ActualResult)
 {
    if (this->mpc_DcSequences != NULL)
    {
       std::vector<C_SyvDcDeviceInformation> c_DeviceInfos;
-      const sint32 s32_Return = this->mpc_DcSequences->GetDeviceInfosResult(c_DeviceInfos);
+      const int32_t s32_Return = this->mpc_DcSequences->GetDeviceInfosResult(c_DeviceInfos);
       QString c_Text;
 
       // Last step. Nothing more to poll
@@ -1782,23 +1781,23 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
 
       if (s32_Return == C_NO_ERR)
       {
-         uint32 u32_DeviceTotal;
-         uint32 u32_DeviceCounter;
+         uint32_t u32_DeviceTotal;
+         uint32_t u32_DeviceCounter;
          if (os32_ActualResult == C_NO_ERR)
          {
             u32_DeviceTotal = c_DeviceInfos.size();
          }
          else
          {
-            u32_DeviceTotal = static_cast<uint32>(this->mc_OpenSydeDeviceConfigurations.size() +
-                                                  this->mc_StwFlashloaderDeviceConfigurations.size());
+            u32_DeviceTotal = static_cast<uint32_t>(this->mc_OpenSydeDeviceConfigurations.size() +
+                                                    this->mc_StwFlashloaderDeviceConfigurations.size());
          }
 
          for (u32_DeviceCounter = 0U; u32_DeviceCounter < c_DeviceInfos.size(); ++u32_DeviceCounter)
          {
             const C_SyvDcDeviceInformation & rc_Info = c_DeviceInfos[u32_DeviceCounter];
-            const C_OSCProtocolDriverOsyNode c_ServerId(this->mu8_BusId, rc_Info.u8_NodeId);
-            uint32 u32_NodeIndex;
+            const C_OscProtocolDriverOsyNode c_ServerId(this->mu8_BusId, rc_Info.u8_NodeId);
+            uint32_t u32_NodeIndex;
             QString c_TopologyNodeName = "NA";
             QString c_TopologyDeviceType = "NA";
 
@@ -1823,7 +1822,7 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             // Get topology node name and device type
             if (this->mpc_DcSequences->GetNodeIndex(c_ServerId, u32_NodeIndex) == true)
             {
-               const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+               const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
 
                if (pc_Node != NULL)
                {
@@ -1899,9 +1898,9 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
             m_HandleMissingDevices(this->mc_OpenSydeDeviceConfigurations, c_DeviceInfos, c_Text);
             c_Text += static_cast<QString>(C_GtGetText::h_GetText("For more details see "));
             //Update log file
-            C_OSCLoggingHandler::h_Flush();
+            C_OscLoggingHandler::h_Flush();
             c_Text += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
-                      arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                      arg(C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                       arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                       arg(C_GtGetText::h_GetText("log file"));
             c_Text += "<br/>";
@@ -1922,9 +1921,9 @@ void C_SyvDcWidget::m_ShowReadInfo(const sint32 os32_ActualResult)
    \param[in]  ou32_Progress  Progress of sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig(const uint32 ou32_Progress) const
+void C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig(const uint32_t ou32_Progress) const
 {
-   uint32 u32_ShowProgress;
+   uint32_t u32_ShowProgress;
 
    if ((this->mpc_DcSequences != NULL) &&
        (this->mpc_DcSequences->IsAtLeastOneOpenSydeNodeActive() == true))
@@ -1946,9 +1945,9 @@ void C_SyvDcWidget::m_UpdateProgressOfStwFlashloaderConfig(const uint32 ou32_Pro
    \param[in]  ou32_Progress  Progress of sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig(const uint32 ou32_Progress) const
+void C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig(const uint32_t ou32_Progress) const
 {
-   uint32 u32_ShowProgress;
+   uint32_t u32_ShowProgress;
 
    if ((this->mpc_DcSequences != NULL) &&
        (this->mpc_DcSequences->IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus() == true))
@@ -1976,8 +1975,9 @@ void C_SyvDcWidget::m_UpdateProgressOfOpenSydeConfig(const uint32 ou32_Progress)
    \param[in]  ou8_NodeIdentifier   Configured node id of server interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig(const uint32 ou32_Step, const sint32 os32_Result,
-                                                        const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier)
+void C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig(const uint32_t ou32_Step, const int32_t os32_Result,
+                                                        const uint8_t ou8_BusIdentifier,
+                                                        const uint8_t ou8_NodeIdentifier)
 {
    // STW flashloader interface will be detected on an other position
    this->m_UpdateStateOfOpenSydeConfig(ou32_Step, os32_Result, ou8_BusIdentifier, ou8_NodeIdentifier, 0U, 0U);
@@ -1999,13 +1999,13 @@ void C_SyvDcWidget::m_UpdateStateOfStwFlashloaderConfig(const uint32 ou32_Step, 
    \param[in]  ou8_InterfaceNumber  Number of interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32 ou32_Step, const sint32 os32_Result,
-                                                  const uint8 ou8_BusIdentifier, const uint8 ou8_NodeIdentifier,
-                                                  const uint8 ou8_InterfaceType, const uint8 ou8_InterfaceNumber)
+void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32_t ou32_Step, const int32_t os32_Result,
+                                                  const uint8_t ou8_BusIdentifier, const uint8_t ou8_NodeIdentifier,
+                                                  const uint8_t ou8_InterfaceType, const uint8_t ou8_InterfaceNumber)
 {
-   const C_OSCProtocolDriverOsyNode c_Server(ou8_BusIdentifier, ou8_NodeIdentifier);
+   const C_OscProtocolDriverOsyNode c_Server(ou8_BusIdentifier, ou8_NodeIdentifier);
 
-   QMap<stw_opensyde_core::C_OSCProtocolDriverOsyNode, std::vector<C_ServerConfStepResult> >::iterator c_ItServer;
+   QMap<stw::opensyde_core::C_OscProtocolDriverOsyNode, std::vector<C_ServerConfStepResult> >::iterator c_ItServer;
    const C_ServerConfStepResult c_Result(ou32_Step, ou8_InterfaceType, ou8_InterfaceNumber, os32_Result);
 
    c_ItServer = this->mc_ServerStates.find(c_Server);
@@ -2041,28 +2041,29 @@ void C_SyvDcWidget::m_UpdateStateOfOpenSydeConfig(const uint32 ou32_Step, const 
    "FAIL"   State for server found with registered state error
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32 ou32_Step,
-                                                    const C_OSCProtocolDriverOsyNode & orc_Server,
-                                                    const C_OSCSystemBus::E_Type oe_InterfaceType,
-                                                    const uint8 ou8_InterfaceNumber)
+QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32_t ou32_Step,
+                                                    const C_OscProtocolDriverOsyNode & orc_Server,
+                                                    const C_OscSystemBus::E_Type oe_InterfaceType,
+                                                    const uint8_t ou8_InterfaceNumber)
 {
    // Default text if no concrete state is available
    QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (prev. failure)"));
 
-   QMap<stw_opensyde_core::C_OSCProtocolDriverOsyNode, std::vector<C_ServerConfStepResult> >::const_iterator c_ItServer;
+   QMap<stw::opensyde_core::C_OscProtocolDriverOsyNode,
+        std::vector<C_ServerConfStepResult> >::const_iterator c_ItServer;
 
    c_ItServer = this->mc_ServerStates.find(orc_Server);
 
    if (c_ItServer != this->mc_ServerStates.end())
    {
-      uint32 u32_StateCounter;
+      uint32_t u32_StateCounter;
       const std::vector<C_ServerConfStepResult> & rc_States = c_ItServer.value();
 
       for (u32_StateCounter = 0U; u32_StateCounter < rc_States.size(); ++u32_StateCounter)
       {
          if ((rc_States[u32_StateCounter].u32_ConfStep == ou32_Step) &&
              (rc_States[u32_StateCounter].u8_InterfaceNumber == ou8_InterfaceNumber) &&
-             (rc_States[u32_StateCounter].u8_InterfaceType == static_cast<uint8>(oe_InterfaceType)))
+             (rc_States[u32_StateCounter].u8_InterfaceType == static_cast<uint8_t>(oe_InterfaceType)))
          {
             // State found
             if (rc_States[u32_StateCounter].s32_Result == C_NO_ERR)
@@ -2124,7 +2125,7 @@ void C_SyvDcWidget::m_CancelClicked(void)
 void C_SyvDcWidget::m_InitScanScreen(void)
 {
    QString c_Heading;
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mpc_Ui->pc_PushButtonScan->setFocus();
 
@@ -2196,7 +2197,7 @@ void C_SyvDcWidget::m_InitBitRateComboBox(void)
    //Disconnect
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
-                                                               sintn)>(&QComboBox::currentIndexChanged), this,
+                                                               int32_t)>(&QComboBox::currentIndexChanged), this,
               &C_SyvDcWidget::m_OnBitRateChanged);
 
    // Bitrate
@@ -2204,26 +2205,26 @@ void C_SyvDcWidget::m_InitBitRateComboBox(void)
 
    if (pc_View != NULL)
    {
-      std::vector<uint32> c_ConnectedNodes;
-      std::vector<uint32> c_ConnectedInterfaces;
-      std::vector<uint32> c_SupportedBitrates;
-      uint32 u32_BitrateCounter;
-      const uint32 u32_CurrentSetBitrate = pc_View->GetDeviceConfigSelectedBitRate();
+      std::vector<uint32_t> c_ConnectedNodes;
+      std::vector<uint32_t> c_ConnectedInterfaces;
+      std::vector<uint32_t> c_SupportedBitrates;
+      uint32_t u32_BitrateCounter;
+      const uint32_t u32_CurrentSetBitrate = pc_View->GetDeviceConfigSelectedBitRate();
       const QString c_CurrentSetBitrate = this->m_GetComboBoxString(u32_CurrentSetBitrate);
       bool q_CurrentSetBitrateFound = false;
-      std::vector<uint8> c_ActiveNodes = pc_View->GetNodeActiveFlags();
-      uint32 u32_ActiveNodeIndex;
+      std::vector<uint8_t> c_ActiveNodes = pc_View->GetNodeActiveFlags();
+      uint32_t u32_ActiveNodeIndex;
 
-      C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
+      C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
                                                                                          c_ConnectedNodes,
                                                                                          c_ConnectedInterfaces);
 
       // Remove the nodes, which are not active in this view
       for (u32_ActiveNodeIndex = 0U; u32_ActiveNodeIndex < c_ActiveNodes.size(); ++u32_ActiveNodeIndex)
       {
-         if (c_ActiveNodes[u32_ActiveNodeIndex] == false)
+         if (c_ActiveNodes[u32_ActiveNodeIndex] == 0U)
          {
-            std::vector<uint32>::iterator c_ItNode;
+            std::vector<uint32_t>::iterator c_ItNode;
             for (c_ItNode = c_ConnectedNodes.begin(); c_ItNode != c_ConnectedNodes.end(); ++c_ItNode)
             {
                if (u32_ActiveNodeIndex == (*c_ItNode))
@@ -2261,7 +2262,7 @@ void C_SyvDcWidget::m_InitBitRateComboBox(void)
    //Reconnect
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxBitRate, static_cast<void (QComboBox::*)(
-                                                            sintn)>(&QComboBox::currentIndexChanged), this,
+                                                            int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SyvDcWidget::m_OnBitRateChanged);
 }
 
@@ -2276,7 +2277,8 @@ void C_SyvDcWidget::m_InitModeComboBox(void)
    //Disconnect
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxConfigurationMode, static_cast<void (QComboBox::*)(
-                                                                         sintn)>(&QComboBox::currentIndexChanged), this,
+                                                                         int32_t)>(&QComboBox::currentIndexChanged),
+              this,
               &C_SyvDcWidget::m_OnDeviceConfigModeChanged);
 
    //Apply value
@@ -2300,12 +2302,12 @@ void C_SyvDcWidget::m_InitModeComboBox(void)
    //Reconnect
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxConfigurationMode, static_cast<void (QComboBox::*)(
-                                                                      sintn)>(&QComboBox::currentIndexChanged), this,
+                                                                      int32_t)>(&QComboBox::currentIndexChanged), this,
            &C_SyvDcWidget::m_OnDeviceConfigModeChanged);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDcWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
+QString C_SyvDcWidget::m_GetComboBoxString(const uint32_t ou32_Bitrate) const
 {
    const QString c_Text = QString::number(ou32_Bitrate) + static_cast<QString>(" kbit/s");
 
@@ -2313,11 +2315,11 @@ QString C_SyvDcWidget::m_GetComboBoxString(const uint32 ou32_Bitrate) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDcWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) const
+uint32_t C_SyvDcWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) const
 {
    QString c_Bitrate = orc_Entry;
    // In case of an error it returns 0
-   const uint32 u32_Bitrate = c_Bitrate.remove(" kbit/s").toInt();
+   const uint32_t u32_Bitrate = c_Bitrate.remove(" kbit/s").toInt();
 
    return u32_Bitrate;
 }
@@ -2328,7 +2330,7 @@ uint32 C_SyvDcWidget::m_GetBitrateFromComboBoxString(const QString & orc_Entry) 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_OnBitRateChanged(void) const
 {
-   uint32 u32_BitRate;
+   uint32_t u32_BitRate;
 
    if (this->m_GetBitRateValue(u32_BitRate) == C_NO_ERR)
    {
@@ -2365,9 +2367,9 @@ void C_SyvDcWidget::m_OnDeviceConfigModeChanged(void) const
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDcWidget::m_GetBitRateValue(uint32 & oru32_Value) const
+int32_t C_SyvDcWidget::m_GetBitRateValue(uint32_t & oru32_Value) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    oru32_Value = this->m_GetBitrateFromComboBoxString(this->mpc_Ui->pc_ComboBoxBitRate->currentText());
 
@@ -2390,9 +2392,9 @@ sint32 C_SyvDcWidget::m_GetBitRateValue(uint32 & oru32_Value) const
                                           - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_AssignmentConnect(const uint32 ou32_NodeIndex,
-                                        const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                        const std::map<uint8,
+void C_SyvDcWidget::m_AssignmentConnect(const uint32_t ou32_NodeIndex,
+                                        const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber,
+                                        const std::map<uint8_t,
                                                        C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 const
 {
@@ -2409,8 +2411,8 @@ const
    \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcWidget::m_AssignmentDisconnect(const uint32 ou32_NodeIndex,
-                                           const C_OSCProtocolSerialNumber & orc_SerialNumber) const
+void C_SyvDcWidget::m_AssignmentDisconnect(const uint32_t ou32_NodeIndex,
+                                           const C_OscProtocolSerialNumber & orc_SerialNumber) const
 {
    this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->DisconnectSerialNumber(ou32_NodeIndex, orc_SerialNumber);
    this->mpc_Ui->pc_ListWidgetConnectedNodesAssignment->EnableSerialNumber(orc_SerialNumber);
@@ -2423,8 +2425,9 @@ void C_SyvDcWidget::m_AssignmentDisconnect(const uint32 ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcWidget::m_AssignmentUpdateProgress(void) const
 {
-   const uint32 u32_AssignedItemCount = this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->GetAssignmentCount();
-   const uint32 u32_OverallItemCount = static_cast<uint32>(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->count());
+   const uint32_t u32_AssignedItemCount = this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->GetAssignmentCount();
+   const uint32_t u32_OverallItemCount =
+      static_cast<uint32_t>(this->mpc_Ui->pc_ListWidgetExistingNodesAssignment->count());
    QString c_Text;
 
    c_Text = static_cast<QString>(C_GtGetText::h_GetText("Assigned: %1 of %2")).arg(u32_AssignedItemCount).arg(
@@ -2448,9 +2451,9 @@ void C_SyvDcWidget::m_Timer(void)
 {
    if (this->mpc_DcSequences != NULL)
    {
-      const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
-      sint32 s32_Result;
-      sint32 s32_SequenceResult;
+      const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+      int32_t s32_Result;
+      int32_t s32_SequenceResult;
       bool q_ShowFinalErrorMessage = false;
       QString c_ErrorDescription = "";
 
@@ -2540,7 +2543,7 @@ void C_SyvDcWidget::m_Timer(void)
 
                this->mc_FoundDevices.reserve(this->mc_FoundDevices.size() + c_DeviceInfo.size());
 
-               for (uint32 u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
+               for (uint32_t u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
                {
                   this->mc_FoundDevices.push_back(c_DeviceInfo[u32_SnCounter]);
                }
@@ -2594,7 +2597,7 @@ void C_SyvDcWidget::m_Timer(void)
 
                this->mc_FoundDevices.reserve(this->mc_FoundDevices.size() + c_DeviceInfo.size());
 
-               for (uint32 u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
+               for (uint32_t u32_SnCounter = 0U; u32_SnCounter < c_DeviceInfo.size(); ++u32_SnCounter)
                {
                   this->mc_FoundDevices.push_back(c_DeviceInfo[u32_SnCounter]);
                }
@@ -2682,9 +2685,9 @@ void C_SyvDcWidget::m_Timer(void)
 
                c_Text = static_cast<QString>(C_GtGetText::h_GetText("For more details see "));
                //Update log file
-               C_OSCLoggingHandler::h_Flush();
+               C_OscLoggingHandler::h_Flush();
                c_Text += static_cast<QString>("<a href=\"file:%1\"><span style=\"color: %2;\">%3</span></a>.").
-                         arg(C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
+                         arg(C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()).
                          arg(mc_STYLESHEET_GUIDE_COLOR_LINK).
                          arg(C_GtGetText::h_GetText("log file"));
                c_Text += "<br/>";
@@ -2701,7 +2704,7 @@ void C_SyvDcWidget::m_Timer(void)
                   C_OgeWiCustomMessage c_MessageAuth(this, C_OgeWiCustomMessage::E_Type::eERROR);
 
                   q_ShowFinalErrorMessage = false;
-                  C_OSCLoggingHandler::h_Flush();
+                  C_OscLoggingHandler::h_Flush();
                   c_MessageAuth.SetHeading(C_GtGetText::h_GetText("Device Configuration"));
                   c_MessageAuth.SetDescription(C_GtGetText::h_GetText(
                                                   "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
@@ -2768,7 +2771,7 @@ void C_SyvDcWidget::m_Timer(void)
                   C_OgeWiCustomMessage c_MessageAuth(this, C_OgeWiCustomMessage::E_Type::eERROR);
 
                   q_ShowFinalErrorMessage = false;
-                  C_OSCLoggingHandler::h_Flush();
+                  C_OscLoggingHandler::h_Flush();
                   c_MessageAuth.SetHeading(C_GtGetText::h_GetText("Device Configuration"));
                   c_MessageAuth.SetDescription(C_GtGetText::h_GetText(
                                                   "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
@@ -2788,7 +2791,7 @@ void C_SyvDcWidget::m_Timer(void)
             {
                //Before closing the bus wait a little to make sure the CAN reset request broadcast(s) had the chance to
                // really be sent out on the bus
-               stw_tgl::TGL_Sleep(50U);
+               stw::tgl::TglSleep(50U);
             }
 
             break;
@@ -2889,11 +2892,11 @@ void C_SyvDcWidget::m_HandleMissingDevices(const std::vector<C_SyvDcDeviceConfig
                                            const std::vector<C_SyvDcDeviceInformation> & orc_FoundDeviceInfos,
                                            QString & orc_ReportText) const
 {
-   for (uint32 u32_ItExpected = 0; u32_ItExpected < orc_AllDeviceInfos.size(); ++u32_ItExpected)
+   for (uint32_t u32_ItExpected = 0; u32_ItExpected < orc_AllDeviceInfos.size(); ++u32_ItExpected)
    {
       bool q_Found = false;
       const C_SyvDcDeviceConfiguation & rc_ExpectedDevice = orc_AllDeviceInfos[u32_ItExpected];
-      for (uint32 u32_ItFound = 0; u32_ItFound < orc_FoundDeviceInfos.size(); ++u32_ItFound)
+      for (uint32_t u32_ItFound = 0; u32_ItFound < orc_FoundDeviceInfos.size(); ++u32_ItFound)
       {
          const C_SyvDcDeviceInformation & rc_FoundDevice = orc_FoundDeviceInfos[u32_ItFound];
          if (rc_FoundDevice.c_SerialNumber == rc_ExpectedDevice.c_SerialNumber)
@@ -2951,17 +2954,17 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 
       if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
       {
-         const C_OSCSystemBus * const pc_Bus =
-            C_PuiSdHandler::h_GetInstance()->GetOSCBus(pc_View->GetPcData().GetBusIndex());
+         const C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetPcData().GetBusIndex());
          if ((this->mpc_DcSequences != NULL) &&
              (pc_Bus != NULL))
          {
             bool q_Osy = false;
             bool q_Stw = false;
             bool q_StartedAnything = false;
-            std::vector<uint32> c_NodeIndexes;
-            std::vector<uint32> c_InterfaceIndexes;
-            sint32 s32_Result;
+            std::vector<uint32_t> c_NodeIndexes;
+            std::vector<uint32_t> c_InterfaceIndexes;
+            int32_t s32_Result;
             C_OgeWiCustomMessage c_Message(this);
             QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -2979,27 +2982,27 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
             }
 
             //Check which nodes
-            C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(
+            C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(
                pc_View->GetPcData().GetBusIndex(), c_NodeIndexes, c_InterfaceIndexes);
-            for (uint32 u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+            for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
             {
                //Check if node active
-               const std::vector<uint8> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
-               if ((c_NodeIndexes[u32_ItNode] < rc_ActiveNodes.size()) && (rc_ActiveNodes[u32_ItNode] == true))
+               const std::vector<uint8_t> & rc_ActiveNodes = pc_View->GetNodeActiveFlags();
+               if ((c_NodeIndexes[u32_ItNode] < rc_ActiveNodes.size()) && (rc_ActiveNodes[u32_ItNode] == 1U))
                {
-                  const C_OSCNode * const pc_Node =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_ItNode]);
+                  const C_OscNode * const pc_Node =
+                     C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndexes[u32_ItNode]);
                   //Check which type of node
                   if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
                       (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
                   {
-                     if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+                     if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
                      {
-                        if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)
+                        if (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_OPEN_SYDE)
                         {
                            q_Osy = true;
                         }
-                        else if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+                        else if (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW)
                         {
                            q_Stw = true;
                         }
@@ -3010,7 +3013,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
                      }
                      else
                      {
-                        if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE) &&
+                        if ((pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_OPEN_SYDE) &&
                             (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
                              q_FlashloaderOpenSydeEthernet == true))
                         {
@@ -3041,7 +3044,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 
                //Before closing the bus wait a little to make sure the CAN reset request broadcast(s) had the chance to
                // really be sent out on the bus
-               stw_tgl::TGL_Sleep(50U);
+               stw::tgl::TglSleep(50U);
 
                q_StartedAnything = true;
             }
@@ -3072,7 +3075,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 bool C_SyvDcWidget::m_CheckQuitPossible(void) const
 {
    bool q_Retval = false;
-   sint32 s32_Result;
+   int32_t s32_Result;
 
    if ((this->mpc_DcSequences == NULL) ||
        (this->mpc_DcSequences->GetResults(s32_Result) == C_NO_ERR))

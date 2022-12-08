@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdNdeDpListEditWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdNdeDpListEditWidget.hpp"
 #include "ui_C_SdNdeDpListEditWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -126,8 +125,7 @@ void C_SdNdeDpListEditWidget::SetDefaultVisible(void) const
    \param[in]  os32_DataElementIndex   Data element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListEditWidget::OpenDetail(const stw_types::sint32 os32_ListIndex,
-                                         const stw_types::sint32 os32_DataElementIndex) const
+void C_SdNdeDpListEditWidget::OpenDetail(const int32_t os32_ListIndex, const int32_t os32_DataElementIndex) const
 {
    this->mpc_Ui->pc_ListsWidget->OpenDetail(os32_ListIndex, os32_DataElementIndex);
 }
@@ -139,8 +137,7 @@ void C_SdNdeDpListEditWidget::OpenDetail(const stw_types::sint32 os32_ListIndex,
    \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListEditWidget::SetDataPool(const stw_types::uint32 ou32_NodeIndex,
-                                          const stw_types::uint32 ou32_DataPoolIndex) const
+void C_SdNdeDpListEditWidget::SetDataPool(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex) const
 {
    this->mpc_Ui->pc_ListsWidget->SetDataPool(ou32_NodeIndex, ou32_DataPoolIndex);
    this->m_UpdateButtonTooltips(ou32_NodeIndex, ou32_DataPoolIndex);
@@ -156,7 +153,7 @@ void C_SdNdeDpListEditWidget::SetDataPool(const stw_types::uint32 ou32_NodeIndex
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListEditWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if (opc_Event->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       this->m_OnBack();
       opc_Event->accept();
@@ -200,11 +197,12 @@ void C_SdNdeDpListEditWidget::m_OnNext(void)
    \param[in]  ou32_DatapoolIndex   Datapool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListEditWidget::m_UpdateButtonTooltips(const uint32 ou32_NodeIndex, const uint32 ou32_DatapoolIndex) const
+void C_SdNdeDpListEditWidget::m_UpdateButtonTooltips(const uint32_t ou32_NodeIndex,
+                                                     const uint32_t ou32_DatapoolIndex) const
 {
-   const sint32 s32_Next = C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(ou32_NodeIndex, ou32_DatapoolIndex, true);
-   const sint32 s32_Prev = C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(ou32_NodeIndex, ou32_DatapoolIndex, false);
-   const C_OSCNodeDataPool * pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex, s32_Next);
+   const int32_t s32_Next = C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(ou32_NodeIndex, ou32_DatapoolIndex, true);
+   const int32_t s32_Prev = C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(ou32_NodeIndex, ou32_DatapoolIndex, false);
+   const C_OscNodeDataPool * pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(ou32_NodeIndex, s32_Next);
 
    // next
    if ((pc_Dp != NULL) && (s32_Next >= 0))
@@ -218,7 +216,7 @@ void C_SdNdeDpListEditWidget::m_UpdateButtonTooltips(const uint32 ou32_NodeIndex
    }
 
    // previous
-   pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex, s32_Prev);
+   pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(ou32_NodeIndex, s32_Prev);
    if ((pc_Dp != NULL) && (s32_Next >= 0))
    {
       this->mpc_Ui->pc_PubPrevious->

@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_SyvUpPacPemFileOptionsPopUp.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvUpPacPemFileOptionsPopUp.hpp"
 #include "ui_C_SyvUpPacPemFileOptionsPopUp.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_NO_CHANGE = 0;
-const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_ACTIVATE = 1;
-const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_DEACTIVATE = 2;
-const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_NO_CHANGE = 0;
-const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_ACTIVATE = 1;
-const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_DEACTIVATE = 2;
+const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_NO_CHANGE = 0;
+const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_ACTIVATE = 1;
+const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_DEACTIVATE = 2;
+const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_NO_CHANGE = 0;
+const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_ACTIVATE = 1;
+const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_DEACTIVATE = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -53,7 +52,7 @@ const stw_types::sintn C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_DEACTIVATE 
    \param[in]      oe_StateDebugger    State debugger
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacPemFileOptionsPopUp::C_SyvUpPacPemFileOptionsPopUp(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+C_SyvUpPacPemFileOptionsPopUp::C_SyvUpPacPemFileOptionsPopUp(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                                              const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
                                                              const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
    :
@@ -134,13 +133,13 @@ C_PuiSvNodeUpdate::E_StateSecurity C_SyvUpPacPemFileOptionsPopUp::GetComboBoxSec
    C_PuiSvNodeUpdate::E_StateSecurity e_Retval = C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE;
    switch (this->mpc_Ui->pc_ComboBoxSecurity->currentIndex())
    {
-   case C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_NO_CHANGE:
+   case C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_NO_CHANGE:
       e_Retval = C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE;
       break;
-   case C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_ACTIVATE:
+   case C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_ACTIVATE:
       e_Retval = C_PuiSvNodeUpdate::eST_SEC_ACTIVATE;
       break;
-   case C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_DEACTIVATE:
+   case C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_DEACTIVATE:
       e_Retval = C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE;
       break;
    default:
@@ -162,13 +161,13 @@ C_PuiSvNodeUpdate::E_StateDebugger C_SyvUpPacPemFileOptionsPopUp::GetComboBoxDeb
    C_PuiSvNodeUpdate::E_StateDebugger e_Retval = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
    switch (this->mpc_Ui->pc_ComboBoxDebugger->currentIndex())
    {
-   case C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_NO_CHANGE:
+   case C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_NO_CHANGE:
       e_Retval = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
       break;
-   case C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_ACTIVATE:
+   case C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_ACTIVATE:
       e_Retval = C_PuiSvNodeUpdate::eST_DEB_ACTIVATE;
       break;
-   case C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_DEACTIVATE:
+   case C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_DEACTIVATE:
       e_Retval = C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE;
       break;
    default:
@@ -191,8 +190,8 @@ void C_SyvUpPacPemFileOptionsPopUp::keyPressEvent(QKeyEvent * const opc_KeyEvent
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -241,13 +240,13 @@ void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxSec(const C_PuiSvNodeUpdate::E
    switch (oe_StateSecurity)
    {
    case C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE:
-      this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_NO_CHANGE);
+      this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_NO_CHANGE);
       break;
    case C_PuiSvNodeUpdate::eST_SEC_ACTIVATE:
-      this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_ACTIVATE);
+      this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_ACTIVATE);
       break;
    case C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE:
-      this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhsn_SEC_INDEX_DEACTIVATE);
+      this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_DEACTIVATE);
       break;
    }
 }
@@ -264,13 +263,13 @@ void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxDeb(const C_PuiSvNodeUpdate::E
    switch (oe_StateDebugger)
    {
    case C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE:
-      this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_NO_CHANGE);
+      this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_NO_CHANGE);
       break;
    case C_PuiSvNodeUpdate::eST_DEB_ACTIVATE:
-      this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_ACTIVATE);
+      this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_ACTIVATE);
       break;
    case C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE:
-      this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhsn_DEB_INDEX_DEACTIVATE);
+      this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_DEACTIVATE);
       break;
    }
 }

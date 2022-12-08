@@ -30,10 +30,10 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeWiSectionHeader" name="pc_WiTitle" native="true"/>
+    <widget class="stw::opensyde_gui_elements::C_CamOgeWiSectionHeader" name="pc_WiTitle" native="true"/>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiCollapsed" native="true">
+    <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiCollapsed" native="true">
      <property name="minimumSize">
       <size>
        <width>35</width>
@@ -63,7 +63,7 @@
        <number>1</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDatabase">
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDatabase">
         <property name="minimumSize">
          <size>
           <width>35</width>
@@ -82,7 +82,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbFilter">
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbFilter">
         <property name="minimumSize">
          <size>
           <width>35</width>
@@ -101,7 +101,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbLogging">
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbLogging">
         <property name="minimumSize">
          <size>
           <width>35</width>
@@ -120,7 +120,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDllConfig">
+       <widget class="stw::opensyde_gui_elements::C_CamOgePubSettingsAdd" name="pc_PbDllConfig">
         <property name="minimumSize">
          <size>
           <width>35</width>
@@ -142,7 +142,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiExpanded" native="true">
+    <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiExpanded" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>1</number>
@@ -160,16 +160,16 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui::C_CamMosDatabaseWidget" name="pc_WiDatabase" native="true"/>
+       <widget class="stw::opensyde_gui::C_CamMosDatabaseWidget" name="pc_WiDatabase" native="true"/>
       </item>
       <item>
-       <widget class="stw_opensyde_gui::C_CamMosFilterWidget" name="pc_WiFilter" native="true"/>
+       <widget class="stw::opensyde_gui::C_CamMosFilterWidget" name="pc_WiFilter" native="true"/>
       </item>
       <item>
-       <widget class="stw_opensyde_gui::C_CamMosLoggingWidget" name="pc_WiLogging" native="true"/>
+       <widget class="stw::opensyde_gui::C_CamMosLoggingWidget" name="pc_WiLogging" native="true"/>
       </item>
       <item>
-       <widget class="stw_opensyde_gui::C_CamMosDllWidget" name="pc_WiDllConfig" native="true"/>
+       <widget class="stw::opensyde_gui::C_CamMosDllWidget" name="pc_WiDllConfig" native="true"/>
       </item>
      </layout>
     </widget>
@@ -191,44 +191,44 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeWiSectionHeader</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeWiSectionHeader</class>
    <extends>QWidget</extends>
-   <header>C_CamOgeWiSectionHeader.h</header>
+   <header>C_CamOgeWiSectionHeader.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamMosDatabaseWidget</class>
+   <class>stw::opensyde_gui::C_CamMosDatabaseWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamMosDatabaseWidget.h</header>
+   <header>C_CamMosDatabaseWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamMosFilterWidget</class>
+   <class>stw::opensyde_gui::C_CamMosFilterWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamMosFilterWidget.h</header>
+   <header>C_CamMosFilterWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamMosLoggingWidget</class>
+   <class>stw::opensyde_gui::C_CamMosLoggingWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamMosLoggingWidget.h</header>
+   <header>C_CamMosLoggingWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamMosDllWidget</class>
+   <class>stw::opensyde_gui::C_CamMosDllWidget</class>
    <extends>QWidget</extends>
-   <header>C_CamMosDllWidget.h</header>
+   <header>C_CamMosDllWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
+   <class>stw::opensyde_gui_elements::C_CamOgePubSettingsAdd</class>
    <extends>QPushButton</extends>
-   <header>C_CamOgePubSettingsAdd.h</header>
+   <header>C_CamOgePubSettingsAdd.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -11,22 +11,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
-#include "constants.h"
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
+#include "precomp_headers.hpp"
+#include "constants.hpp"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
 #include <QGraphicsDropShadowEffect>
-#include "C_PopPasswordDialogWidget.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_PopPasswordDialogWidget.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 #include "ui_C_PopPasswordDialogWidget.h"
-#include "C_PuiProject.h"
+#include "C_PuiProject.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -215,8 +214,8 @@ void C_PopPasswordDialogWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == false) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -246,7 +245,7 @@ void C_PopPasswordDialogWidget::m_OkClicked(void)
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("Open Service Project"));
       c_Message.SetDescription(C_GtGetText::h_GetText("You must enter a password."));
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("OK"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("OK"));
       c_Message.SetCustomMinHeight(180, 180);
 
       if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)

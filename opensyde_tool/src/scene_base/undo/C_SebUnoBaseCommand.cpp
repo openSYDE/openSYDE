@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SebUnoBaseCommand.h"
-#include "C_SebScene.h"
+#include "C_SebUnoBaseCommand.hpp"
+#include "C_SebScene.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
 using namespace std;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,16 +35,16 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
-   \param[in]     orc_IDs    Affected unique IDs
+   \param[in]     orc_Ids    Affected unique IDs
    \param[in]     orc_Text   Command description
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SebUnoBaseCommand::C_SebUnoBaseCommand(QGraphicsScene * const opc_Scene, const vector<uint64> & orc_IDs,
+C_SebUnoBaseCommand::C_SebUnoBaseCommand(QGraphicsScene * const opc_Scene, const vector<uint64_t> & orc_Ids,
                                          const QString & orc_Text, QUndoCommand * const opc_Parent) :
    QUndoCommand(orc_Text, opc_Parent),
    mpc_Scene(opc_Scene),
-   mc_IDs(orc_IDs)
+   mc_Ids(orc_Ids)
 {
 }
 
@@ -59,7 +58,7 @@ C_SebUnoBaseCommand::C_SebUnoBaseCommand(QGraphicsScene * const opc_Scene, const
 C_SebUnoBaseCommand::C_SebUnoBaseCommand(const C_SebUnoBaseCommand * const opc_Prev, QUndoCommand * const opc_Parent) :
    QUndoCommand(opc_Prev->text(), opc_Parent),
    mpc_Scene(opc_Prev->mpc_Scene),
-   mc_IDs(opc_Prev->mc_IDs)
+   mc_Ids(opc_Prev->mc_Ids)
 {
 }
 
@@ -85,10 +84,10 @@ C_SebUnoBaseCommand::~C_SebUnoBaseCommand(void)
 vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void) const
 {
    vector<QGraphicsItem *> c_Retval;
-   c_Retval.resize(this->mc_IDs.size(), NULL);
-   for (uint32 u32_ItID = 0; u32_ItID < this->mc_IDs.size(); ++u32_ItID)
+   c_Retval.resize(this->mc_Ids.size(), NULL);
+   for (uint32_t u32_ItId = 0; u32_ItId < this->mc_Ids.size(); ++u32_ItId)
    {
-      c_Retval[u32_ItID] = m_GetSceneItem(this->mc_IDs[u32_ItID]);
+      c_Retval[u32_ItId] = m_GetSceneItem(this->mc_Ids[u32_ItId]);
    }
    return c_Retval;
 }
@@ -96,23 +95,23 @@ vector<QGraphicsItem *> C_SebUnoBaseCommand::m_GetSceneItems(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get pointer for connected item
 
-   \param[in] oru64_ID Unique ID
+   \param[in] oru64_Id Unique ID
 
    \return
    NULL: not found
    else: pointer to item
 */
 //----------------------------------------------------------------------------------------------------------------------
-QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64 & oru64_ID) const
+QGraphicsItem * C_SebUnoBaseCommand::m_GetSceneItem(const uint64_t & oru64_Id) const
 {
    QGraphicsItem * pc_Retval;
 
-   const stw_opensyde_gui::C_SebScene * const pc_DetailedScene =
-      dynamic_cast<const stw_opensyde_gui::C_SebScene * const>(mpc_Scene);
+   const stw::opensyde_gui::C_SebScene * const pc_DetailedScene =
+      dynamic_cast<const stw::opensyde_gui::C_SebScene * const>(mpc_Scene);
 
    if (pc_DetailedScene != NULL)
    {
-      pc_Retval = pc_DetailedScene->GetItemByID(oru64_ID);
+      pc_Retval = pc_DetailedScene->GetItemById(oru64_Id);
    }
    else
    {
@@ -135,17 +134,17 @@ bool C_SebUnoBaseCommand::m_MergePossible(const C_SebUnoBaseCommand * const opc_
 {
    bool q_Retval = true;
 
-   if (this->mc_IDs.size() == opc_Command->mc_IDs.size())
+   if (this->mc_Ids.size() == opc_Command->mc_Ids.size())
    {
-      vector<uint64>::const_iterator c_ItID2 = opc_Command->mc_IDs.begin();
-      for (vector<uint64>::const_iterator c_ItID1 = this->mc_IDs.begin(); c_ItID1 != this->mc_IDs.end();
-           ++c_ItID1)
+      vector<uint64_t>::const_iterator c_ItId2 = opc_Command->mc_Ids.begin();
+      for (vector<uint64_t>::const_iterator c_ItId1 = this->mc_Ids.begin(); c_ItId1 != this->mc_Ids.end();
+           ++c_ItId1)
       {
-         if (*c_ItID1 != *c_ItID2)
+         if (*c_ItId1 != *c_ItId2)
          {
             q_Retval = false;
          }
-         ++c_ItID2;
+         ++c_ItId2;
       }
    }
    else
@@ -162,7 +161,7 @@ bool C_SebUnoBaseCommand::m_MergePossible(const C_SebUnoBaseCommand * const opc_
    All unique IDs
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint64> C_SebUnoBaseCommand::m_GetIDs(void) const
+const std::vector<uint64_t> C_SebUnoBaseCommand::m_GetIds(void) const
 {
-   return this->mc_IDs;
+   return this->mc_Ids;
 }

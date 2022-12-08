@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCHALCMagicianDatapoolListHandler.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscHalcMagicianDatapoolListHandler.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,8 +42,8 @@ using namespace stw_opensyde_core;
    \param[in]  oq_IsSafe         Is safe
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHALCMagicianDatapoolListHandler::C_OSCHALCMagicianDatapoolListHandler(const C_OSCHalcConfig & orc_HalcConfig,
-                                                                           const C_OSCHalcDefDomain::E_VariableSelector oe_Selector,
+C_OscHalcMagicianDatapoolListHandler::C_OscHalcMagicianDatapoolListHandler(const C_OscHalcConfig & orc_HalcConfig,
+                                                                           const C_OscHalcDefDomain::E_VariableSelector oe_Selector,
                                                                            const bool oq_IsSafe) :
    mrc_HalcConfig(orc_HalcConfig),
    me_Selector(oe_Selector),
@@ -63,17 +63,17 @@ C_OSCHALCMagicianDatapoolListHandler::C_OSCHALCMagicianDatapoolListHandler(const
    List element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetListElement(const uint32 ou32_DomainIndex,
-                                                                                    const uint32 ou32_ParameterStructIndex, const uint32 ou32_ParameterStructElementIndex,
-                                                                                    C_OSCNodeDataPoolList & orc_List)
+C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetListElement(const uint32_t ou32_DomainIndex,
+                                                                                    const uint32_t ou32_ParameterStructIndex, const uint32_t ou32_ParameterStructElementIndex,
+                                                                                    C_OscNodeDataPoolList & orc_List)
 const
 {
-   C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  ou32_ParameterStructIndex,
-                                                  ou32_ParameterStructElementIndex,
-                                                  u32_Index, false, false, false);
+   C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex,
+                                                   ou32_ParameterStructIndex,
+                                                   ou32_ParameterStructElementIndex,
+                                                   u32_Index, false, false, false);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -95,16 +95,16 @@ const
    List element const
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetListElementConst(
-   const uint32 ou32_DomainIndex, const uint32 ou32_ParameterStructIndex, const uint32 ou32_ParameterStructElementIndex,
-   const C_OSCNodeDataPoolList & orc_List) const
+const C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetListElementConst(
+   const uint32_t ou32_DomainIndex, const uint32_t ou32_ParameterStructIndex,
+   const uint32_t ou32_ParameterStructElementIndex, const C_OscNodeDataPoolList & orc_List) const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  ou32_ParameterStructIndex,
-                                                  ou32_ParameterStructElementIndex,
-                                                  u32_Index, false, false, false);
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex,
+                                                   ou32_ParameterStructIndex,
+                                                   ou32_ParameterStructElementIndex,
+                                                   u32_Index, false, false, false);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -124,15 +124,15 @@ const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetLi
    List element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetUseCaseListElement(
-   const uint32 ou32_DomainIndex, C_OSCNodeDataPoolList & orc_List) const
+C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetUseCaseListElement(
+   const uint32_t ou32_DomainIndex, C_OscNodeDataPoolList & orc_List) const
 {
-   C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  0UL,
-                                                  0UL,
-                                                  u32_Index, true, false, false);
+   C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex,
+                                                   0UL,
+                                                   0UL,
+                                                   u32_Index, true, false, false);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -152,15 +152,15 @@ C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetUseCaseL
    List element const
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetUseCaseListElementConst(
-   const uint32 ou32_DomainIndex, const C_OSCNodeDataPoolList & orc_List) const
+const C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetUseCaseListElementConst(
+   const uint32_t ou32_DomainIndex, const C_OscNodeDataPoolList & orc_List) const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  0UL,
-                                                  0UL,
-                                                  u32_Index, true, false, false);
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex,
+                                                   0UL,
+                                                   0UL,
+                                                   u32_Index, true, false, false);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -180,13 +180,13 @@ const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetUs
    List element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetChanNumListElement(
-   const uint32 ou32_DomainIndex, C_OSCNodeDataPoolList & orc_List) const
+C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetChanNumListElement(
+   const uint32_t ou32_DomainIndex, C_OscNodeDataPoolList & orc_List) const
 {
-   C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex, 0UL, 0UL, u32_Index,
-                                                  false, true, false);
+   C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex, 0UL, 0UL, u32_Index,
+                                                   false, true, false);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -206,15 +206,15 @@ C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetChanNumL
    List element const
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetChanNumListElementConst(
-   const uint32 ou32_DomainIndex, const C_OSCNodeDataPoolList & orc_List) const
+const C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetChanNumListElementConst(
+   const uint32_t ou32_DomainIndex, const C_OscNodeDataPoolList & orc_List) const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  0UL,
-                                                  0UL,
-                                                  u32_Index,  false, true, false);
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex,
+                                                   0UL,
+                                                   0UL,
+                                                   u32_Index,  false, true, false);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -234,13 +234,13 @@ const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetCh
    List element
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetSafetyFlagListElement(
-   const uint32 ou32_DomainIndex, C_OSCNodeDataPoolList & orc_List) const
+C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetSafetyFlagListElement(
+   const uint32_t ou32_DomainIndex, C_OscNodeDataPoolList & orc_List) const
 {
-   C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex, 0UL, 0UL, u32_Index,
-                                                  false, false, true);
+   C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex, 0UL, 0UL, u32_Index,
+                                                   false, false, true);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -260,15 +260,15 @@ C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetSafetyFl
    List element const
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetSafetyFlagListElementConst(
-   const uint32 ou32_DomainIndex, const C_OSCNodeDataPoolList & orc_List) const
+const C_OscNodeDataPoolListElement * C_OscHalcMagicianDatapoolListHandler::GetSafetyFlagListElementConst(
+   const uint32_t ou32_DomainIndex, const C_OscNodeDataPoolList & orc_List) const
 {
-   const C_OSCNodeDataPoolListElement * pc_Retval = NULL;
-   uint32 u32_Index;
-   const sint32 s32_Result = this->m_GetListIndex(ou32_DomainIndex,
-                                                  0UL,
-                                                  0UL,
-                                                  u32_Index,  false, false, true);
+   const C_OscNodeDataPoolListElement * pc_Retval = NULL;
+   uint32_t u32_Index;
+   const int32_t s32_Result = this->m_GetListIndex(ou32_DomainIndex,
+                                                   0UL,
+                                                   0UL,
+                                                   u32_Index,  false, false, true);
 
    if ((s32_Result == C_NO_ERR) && (u32_Index < orc_List.c_Elements.size()))
    {
@@ -288,14 +288,14 @@ const C_OSCNodeDataPoolListElement * C_OSCHALCMagicianDatapoolListHandler::GetSa
    Number of relevant items
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHALCMagicianDatapoolListHandler::CountRelevantItems(
-   const std::vector<C_OSCHalcConfigChannel> & orc_Channels, const C_OSCHalcConfigChannel & orc_DomainConfig) const
+uint32_t C_OscHalcMagicianDatapoolListHandler::CountRelevantItems(
+   const std::vector<C_OscHalcConfigChannel> & orc_Channels, const C_OscHalcConfigChannel & orc_DomainConfig) const
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
    if (orc_Channels.size() == 0UL)
    {
-      if (this->mrc_HalcConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING)
+      if (this->mrc_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING)
       {
          if (orc_DomainConfig.q_SafetyRelevant == this->mq_IsSafe)
          {
@@ -311,26 +311,26 @@ uint32 C_OSCHALCMagicianDatapoolListHandler::CountRelevantItems(
    {
       switch (this->mrc_HalcConfig.e_SafetyMode)
       {
-      case C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING:
-         u32_Retval = orc_Channels.size();
+      case C_OscHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING:
+         u32_Retval = static_cast<uint32_t>(orc_Channels.size());
          break;
-      case C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE:
+      case C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE:
          if (this->mq_IsSafe == false)
          {
-            u32_Retval = orc_Channels.size();
+            u32_Retval = static_cast<uint32_t>(orc_Channels.size());
          }
          break;
-      case C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE:
+      case C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE:
          if (this->mq_IsSafe == true)
          {
-            u32_Retval = orc_Channels.size();
+            u32_Retval = static_cast<uint32_t>(orc_Channels.size());
          }
          break;
-      case C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING:
+      case C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING:
       default:
-         for (uint32 u32_ItChannel = 0UL; u32_ItChannel < orc_Channels.size(); ++u32_ItChannel)
+         for (uint32_t u32_ItChannel = 0UL; u32_ItChannel < orc_Channels.size(); ++u32_ItChannel)
          {
-            const C_OSCHalcConfigChannel & rc_Channel = orc_Channels[u32_ItChannel];
+            const C_OscHalcConfigChannel & rc_Channel = orc_Channels[u32_ItChannel];
             if (rc_Channel.q_SafetyRelevant == this->mq_IsSafe)
             {
                ++u32_Retval;
@@ -351,13 +351,13 @@ uint32 C_OSCHALCMagicianDatapoolListHandler::CountRelevantItems(
    Number of elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountElements(const std::vector<C_OSCHalcDefStruct> & orc_Structs)
+uint32_t C_OscHalcMagicianDatapoolListHandler::h_CountElements(const std::vector<C_OscHalcDefStruct> & orc_Structs)
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
-   for (uint32 u32_ItStruct = 0UL; u32_ItStruct < orc_Structs.size(); ++u32_ItStruct)
+   for (uint32_t u32_ItStruct = 0UL; u32_ItStruct < orc_Structs.size(); ++u32_ItStruct)
    {
-      u32_Retval += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(orc_Structs[u32_ItStruct]);
+      u32_Retval += C_OscHalcMagicianDatapoolListHandler::h_CountElements(orc_Structs[u32_ItStruct]);
    }
 
    return u32_Retval;
@@ -372,13 +372,13 @@ uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountElements(const std::vector<C
    Number of elements
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountElements(const C_OSCHalcDefStruct & orc_Struct)
+uint32_t C_OscHalcMagicianDatapoolListHandler::h_CountElements(const C_OscHalcDefStruct & orc_Struct)
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
 
    if (orc_Struct.c_StructElements.size() > 0UL)
    {
-      u32_Retval = orc_Struct.c_StructElements.size();
+      u32_Retval = static_cast<uint32_t>(orc_Struct.c_StructElements.size());
    }
    else
    {
@@ -396,7 +396,7 @@ uint32 C_OSCHALCMagicianDatapoolListHandler::h_CountElements(const C_OSCHalcDefS
    Flag if channel present
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianDatapoolListHandler::CheckChanPresent(const C_OSCHalcConfigChannel & orc_ChannelConfig) const
+bool C_OscHalcMagicianDatapoolListHandler::CheckChanPresent(const C_OscHalcConfigChannel & orc_ChannelConfig) const
 {
    return this->CheckChanRelevant(orc_ChannelConfig) || this->m_CheckIgnoreFlag();
 }
@@ -410,7 +410,7 @@ bool C_OSCHALCMagicianDatapoolListHandler::CheckChanPresent(const C_OSCHalcConfi
    Flag if channel relevant
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianDatapoolListHandler::CheckChanRelevant(const C_OSCHalcConfigChannel & orc_ChannelConfig) const
+bool C_OscHalcMagicianDatapoolListHandler::CheckChanRelevant(const C_OscHalcConfigChannel & orc_ChannelConfig) const
 {
    return (orc_ChannelConfig.q_SafetyRelevant == this->mq_IsSafe);
 }
@@ -426,12 +426,12 @@ bool C_OSCHALCMagicianDatapoolListHandler::CheckChanRelevant(const C_OSCHalcConf
    \retval   false  Not necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianDatapoolListHandler::CheckChanNumVariableNecessary(const C_OSCHalcConfigDomain & orc_ChannelConfig)
+bool C_OscHalcMagicianDatapoolListHandler::CheckChanNumVariableNecessary(const C_OscHalcConfigDomain & orc_ChannelConfig)
 const
 {
-   return (this->me_Selector == C_OSCHalcDefDomain::eVA_PARAM) && ((orc_ChannelConfig.c_ChannelConfigs.size() > 0UL) &&
+   return (this->me_Selector == C_OscHalcDefDomain::eVA_PARAM) && ((orc_ChannelConfig.c_ChannelConfigs.size() > 0UL) &&
                                                                    (this->mrc_HalcConfig.e_SafetyMode ==
-                                                                    C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING));
+                                                                    C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -443,10 +443,10 @@ const
    \retval   false  Not necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianDatapoolListHandler::CheckSafetyFlagVariableNecessary(void) const
+bool C_OscHalcMagicianDatapoolListHandler::CheckSafetyFlagVariableNecessary(void) const
 {
-   return (this->me_Selector == C_OSCHalcDefDomain::eVA_PARAM) &&
-          (this->mrc_HalcConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING);
+   return (this->me_Selector == C_OscHalcDefDomain::eVA_PARAM) &&
+          (this->mrc_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -460,9 +460,9 @@ bool C_OSCHALCMagicianDatapoolListHandler::CheckSafetyFlagVariableNecessary(void
    \retval   false  Not necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianDatapoolListHandler::CheckUseCaseVariableNecessary(const C_OSCHalcConfigDomain & orc_Domain) const
+bool C_OscHalcMagicianDatapoolListHandler::CheckUseCaseVariableNecessary(const C_OscHalcConfigDomain & orc_Domain) const
 {
-   return (this->me_Selector == C_OSCHalcDefDomain::eVA_PARAM) && (orc_Domain.c_ChannelUseCases.size() > 0UL);
+   return (this->me_Selector == C_OscHalcDefDomain::eVA_PARAM) && (orc_Domain.c_ChannelUseCases.size() > 0UL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -482,29 +482,29 @@ bool C_OSCHALCMagicianDatapoolListHandler::CheckUseCaseVariableNecessary(const C
    C_CONFIG Config is not in expected format
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHALCMagicianDatapoolListHandler::m_GetListIndex(const uint32 ou32_DomainIndex,
-                                                            const uint32 ou32_ParameterStructIndex,
-                                                            const uint32 ou32_ParameterStructElementIndex,
-                                                            uint32 & oru32_ListIndex, const bool oq_GetUseCaseIndex,
-                                                            const bool oq_GetChanNumIndex,
-                                                            const bool oq_GetSafetyFlagIndex)
+int32_t C_OscHalcMagicianDatapoolListHandler::m_GetListIndex(const uint32_t ou32_DomainIndex,
+                                                             const uint32_t ou32_ParameterStructIndex,
+                                                             const uint32_t ou32_ParameterStructElementIndex,
+                                                             uint32_t & oru32_ListIndex, const bool oq_GetUseCaseIndex,
+                                                             const bool oq_GetChanNumIndex,
+                                                             const bool oq_GetSafetyFlagIndex)
 const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    oru32_ListIndex = 0UL;
 
    if (ou32_DomainIndex < this->mrc_HalcConfig.GetDomainSize())
    {
       //Each passed domain
-      for (uint32 u32_ItDomain = 0UL; (u32_ItDomain < ou32_DomainIndex) && (s32_Retval == C_NO_ERR); ++u32_ItDomain)
+      for (uint32_t u32_ItDomain = 0UL; (u32_ItDomain < ou32_DomainIndex) && (s32_Retval == C_NO_ERR); ++u32_ItDomain)
       {
-         const C_OSCHalcDefDomain * const pc_DomainDef = this->mrc_HalcConfig.GetDomainDefDataConst(u32_ItDomain);
-         const C_OSCHalcConfigDomain * const pc_DomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
+         const C_OscHalcDefDomain * const pc_DomainDef = this->mrc_HalcConfig.GetDomainDefDataConst(u32_ItDomain);
+         const C_OscHalcConfigDomain * const pc_DomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
             u32_ItDomain);
          if ((pc_DomainDef != NULL) && (pc_DomainConfig != NULL))
          {
-            const uint32 u32_CountRelevantItems = this->CountRelevantItems(
+            const uint32_t u32_CountRelevantItems = this->CountRelevantItems(
                pc_DomainConfig->c_ChannelConfigs, pc_DomainConfig->c_DomainConfig);
 
             if (u32_CountRelevantItems > 0UL)
@@ -533,20 +533,20 @@ const
                   //domain values
                   switch (this->me_Selector)
                   {
-                  case C_OSCHalcDefDomain::eVA_PARAM:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_PARAM:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_Parameters);
                      break;
-                  case C_OSCHalcDefDomain::eVA_INPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_INPUT:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_InputValues);
                      break;
-                  case C_OSCHalcDefDomain::eVA_OUTPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_OUTPUT:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_OutputValues);
                      break;
-                  case C_OSCHalcDefDomain::eVA_STATUS:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_STATUS:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_DomainValues.c_StatusValues);
                      break;
                   default:
@@ -558,20 +558,20 @@ const
                   //channel values
                   switch (this->me_Selector)
                   {
-                  case C_OSCHalcDefDomain::eVA_PARAM:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_PARAM:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_Parameters);
                      break;
-                  case C_OSCHalcDefDomain::eVA_INPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_INPUT:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_InputValues);
                      break;
-                  case C_OSCHalcDefDomain::eVA_OUTPUT:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_OUTPUT:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_OutputValues);
                      break;
-                  case C_OSCHalcDefDomain::eVA_STATUS:
-                     oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+                  case C_OscHalcDefDomain::eVA_STATUS:
+                     oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
                         pc_DomainDef->c_ChannelValues.c_StatusValues);
                      break;
                   default:
@@ -588,19 +588,19 @@ const
 
       if (((oq_GetUseCaseIndex == false) && (oq_GetChanNumIndex == false)) && (oq_GetSafetyFlagIndex == false))
       {
-         const C_OSCHalcDefDomain * const pc_CurrentDomainDef =
+         const C_OscHalcDefDomain * const pc_CurrentDomainDef =
             this->mrc_HalcConfig.GetDomainDefDataConst(ou32_DomainIndex);
-         const C_OSCHalcConfigDomain * const pc_CurrentDomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
+         const C_OscHalcConfigDomain * const pc_CurrentDomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
             ou32_DomainIndex);
          //Current domain
          if ((pc_CurrentDomainDef != NULL) && (pc_CurrentDomainConfig != NULL))
          {
-            const uint32 u32_CountRelevantItems = C_OSCHALCMagicianDatapoolListHandler::CountRelevantItems(
+            const uint32_t u32_CountRelevantItems = C_OscHalcMagicianDatapoolListHandler::CountRelevantItems(
                pc_CurrentDomainConfig->c_ChannelConfigs, pc_CurrentDomainConfig->c_DomainConfig);
             if (u32_CountRelevantItems > 0UL)
             {
                //channels
-               if (C_OSCHALCMagicianDatapoolListHandler::CheckChanNumVariableNecessary(*pc_CurrentDomainConfig))
+               if (C_OscHalcMagicianDatapoolListHandler::CheckChanNumVariableNecessary(*pc_CurrentDomainConfig))
                {
                   oru32_ListIndex += 1UL;
                }
@@ -620,57 +620,57 @@ const
                //others
                switch (this->me_Selector)
                {
-               case C_OSCHalcDefDomain::eVA_PARAM:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+               case C_OscHalcDefDomain::eVA_PARAM:
+                  if (C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                          ou32_ParameterStructIndex,
                          ou32_ParameterStructElementIndex,
                          pc_CurrentDomainDef->c_DomainValues.c_Parameters,
                          oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                     s32_Retval = C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                         ou32_ParameterStructIndex,
                         ou32_ParameterStructElementIndex,
                         pc_CurrentDomainDef->c_ChannelValues.c_Parameters,
                         oru32_ListIndex);
                   }
                   break;
-               case C_OSCHalcDefDomain::eVA_INPUT:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+               case C_OscHalcDefDomain::eVA_INPUT:
+                  if (C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                          ou32_ParameterStructIndex,
                          ou32_ParameterStructElementIndex,
                          pc_CurrentDomainDef->c_DomainValues.c_InputValues,
                          oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                     s32_Retval = C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                         ou32_ParameterStructIndex,
                         ou32_ParameterStructElementIndex,
                         pc_CurrentDomainDef->c_ChannelValues.c_InputValues,
                         oru32_ListIndex);
                   }
                   break;
-               case C_OSCHalcDefDomain::eVA_OUTPUT:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+               case C_OscHalcDefDomain::eVA_OUTPUT:
+                  if (C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                          ou32_ParameterStructIndex,
                          ou32_ParameterStructElementIndex,
                          pc_CurrentDomainDef->c_DomainValues.
                          c_OutputValues,
                          oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                     s32_Retval = C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                         ou32_ParameterStructIndex,
                         ou32_ParameterStructElementIndex,
                         pc_CurrentDomainDef->c_ChannelValues.c_OutputValues,
                         oru32_ListIndex);
                   }
                   break;
-               case C_OSCHalcDefDomain::eVA_STATUS:
-                  if (C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+               case C_OscHalcDefDomain::eVA_STATUS:
+                  if (C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                          ou32_ParameterStructIndex,
                          ou32_ParameterStructElementIndex,
                          pc_CurrentDomainDef->c_DomainValues.c_StatusValues,
                          oru32_ListIndex) == C_RANGE)
                   {
-                     s32_Retval = C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(
+                     s32_Retval = C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(
                         ou32_ParameterStructIndex,
                         ou32_ParameterStructElementIndex,
                         pc_CurrentDomainDef->c_ChannelValues.c_StatusValues,
@@ -693,10 +693,10 @@ const
       }
       else if (((oq_GetUseCaseIndex == true) && (oq_GetChanNumIndex == false)) && (oq_GetSafetyFlagIndex == false))
       {
-         const C_OSCHalcConfigDomain * const pc_DomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
+         const C_OscHalcConfigDomain * const pc_DomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
             ou32_DomainIndex);
          if ((pc_DomainConfig != NULL) &&
-             (C_OSCHALCMagicianDatapoolListHandler::CheckChanNumVariableNecessary(*pc_DomainConfig)))
+             (C_OscHalcMagicianDatapoolListHandler::CheckChanNumVariableNecessary(*pc_DomainConfig)))
          {
             //channels
             oru32_ListIndex += 1UL;
@@ -709,10 +709,10 @@ const
       }
       else if (((oq_GetUseCaseIndex == false) && (oq_GetChanNumIndex == false)) && (oq_GetSafetyFlagIndex == true))
       {
-         const C_OSCHalcConfigDomain * const pc_DomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
+         const C_OscHalcConfigDomain * const pc_DomainConfig = this->mrc_HalcConfig.GetDomainConfigDataConst(
             ou32_DomainIndex);
          if ((pc_DomainConfig != NULL) &&
-             (C_OSCHALCMagicianDatapoolListHandler::CheckChanNumVariableNecessary(*pc_DomainConfig)))
+             (C_OscHalcMagicianDatapoolListHandler::CheckChanNumVariableNecessary(*pc_DomainConfig)))
          {
             //channels
             oru32_ListIndex += 1UL;
@@ -744,19 +744,19 @@ const
    C_RANGE  Parameter out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(const uint32 ou32_Index,
-                                                                   const uint32 ou32_ElementIndex,
-                                                                   const std::vector<C_OSCHalcDefStruct> & orc_Values,
-                                                                   uint32 & oru32_ListIndex)
+int32_t C_OscHalcMagicianDatapoolListHandler::mh_GetSubElementIndex(const uint32_t ou32_Index,
+                                                                    const uint32_t ou32_ElementIndex,
+                                                                    const std::vector<C_OscHalcDefStruct> & orc_Values,
+                                                                    uint32_t & oru32_ListIndex)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ou32_Index < orc_Values.size())
    {
       //Passed structs
-      for (uint32 u32_ItStruct = 0UL; u32_ItStruct < ou32_Index; ++u32_ItStruct)
+      for (uint32_t u32_ItStruct = 0UL; u32_ItStruct < ou32_Index; ++u32_ItStruct)
       {
-         oru32_ListIndex += C_OSCHALCMagicianDatapoolListHandler::h_CountElements(
+         oru32_ListIndex += C_OscHalcMagicianDatapoolListHandler::h_CountElements(
             orc_Values[u32_ItStruct]);
       }
       //Current struct
@@ -777,9 +777,9 @@ sint32 C_OSCHALCMagicianDatapoolListHandler::mh_GetSubElementIndex(const uint32 
    Is ignore flag scenario
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCHALCMagicianDatapoolListHandler::m_CheckIgnoreFlag(void) const
+bool C_OscHalcMagicianDatapoolListHandler::m_CheckIgnoreFlag(void) const
 {
-   return ((this->mrc_HalcConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING) ||
-           (this->mrc_HalcConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)) ||
-          (this->mrc_HalcConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE);
+   return ((this->mrc_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING) ||
+           (this->mrc_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)) ||
+          (this->mrc_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE);
 }

@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeSfoResetMessageTableModel.h"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeSfoResetMessageTableModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_STANDARD = 0;
-const sintn C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_EXTENDED = 1;
+const int32_t C_SdNdeSfoResetMessageTableModel::mhs32_INDEX_STANDARD = 0;
+const int32_t C_SdNdeSfoResetMessageTableModel::mhs32_INDEX_EXTENDED = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -58,7 +57,7 @@ C_SdNdeSfoResetMessageTableModel::C_SdNdeSfoResetMessageTableModel(QObject * con
    \param[in] ou32_NodeIndex Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeSfoResetMessageTableModel::SetIndex(const uint32 ou32_NodeIndex)
+void C_SdNdeSfoResetMessageTableModel::SetIndex(const uint32_t ou32_NodeIndex)
 {
    beginResetModel();
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -68,24 +67,24 @@ void C_SdNdeSfoResetMessageTableModel::SetIndex(const uint32 ou32_NodeIndex)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
+   \param[in] os32_Section    Section
    \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in] os32_Role       Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                                      const sintn osn_Role) const
+QVariant C_SdNdeSfoResetMessageTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                                      const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
       const C_SdNdeSfoResetMessageTableModel::E_Columns e_Col = C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(
-         osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+         os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -126,17 +125,17 @@ QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, c
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
-         c_Retval = static_cast<QVariant>(static_cast<sintn>(Qt::AlignCenter));
+         c_Retval = static_cast<QVariant>(static_cast<int32_t>(Qt::AlignCenter));
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_3;
          const QColor c_DISABLED = mc_STYLE_GUIDE_COLOR_10;
-         const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+         const C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
          c_Retval = c_ACTIVE;
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive == false))
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.q_ResetMessageActive == false))
          {
             c_Retval = c_DISABLED;
          }
@@ -158,15 +157,15 @@ QVariant C_SdNdeSfoResetMessageTableModel::headerData(const sintn osn_Section, c
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   const sintn sn_RETVAL = 0;
+   int32_t s32_RetVal = 0;
 
    if (orc_Parent.isValid() == false)
    {
-      return 1;
+      s32_RetVal = 1;
    }
-   return sn_RETVAL;
+   return s32_RetVal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -178,29 +177,29 @@ sintn C_SdNdeSfoResetMessageTableModel::rowCount(const QModelIndex & orc_Parent)
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeSfoResetMessageTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeSfoResetMessageTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 11;
+      s32_Retval = 11;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in] os32_Role  Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
@@ -208,34 +207,35 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
    {
       const C_SdNdeSfoResetMessageTableModel::E_Columns e_Col =
          C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         uint32 u32_ByteIndex;
-         const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if (pc_OSCNode != NULL)
+         const C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if (pc_OscNode != NULL)
          {
+            uint32_t u32_ByteIndex;
             switch (e_Col)
             {
             case eID:
-               if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+               if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                {
                   c_Retval =
-                     static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.
+                     static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.c_StwFlashloaderSettings.
                                                                       u32_ResetMessageId,
                                                                       16).toUpper());
                }
                else
                {
-                  c_Retval = static_cast<uintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u32_ResetMessageId);
+                  c_Retval =
+                     static_cast<uint32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.u32_ResetMessageId);
                }
                break;
             case eDLC:
-               c_Retval = static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc);
+               c_Retval = static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc);
                break;
             case eEXTENDED_FORMAT:
-               if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+               if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                {
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageExtendedId == true)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.q_ResetMessageExtendedId == true)
                   {
                      c_Retval = C_GtGetText::h_GetText("29 Bit");
                   }
@@ -246,36 +246,36 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                }
                else
                {
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageExtendedId == true)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.q_ResetMessageExtendedId == true)
                   {
-                     c_Retval = C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_EXTENDED;
+                     c_Retval = C_SdNdeSfoResetMessageTableModel::mhs32_INDEX_EXTENDED;
                   }
                   else
                   {
-                     c_Retval = C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_STANDARD;
+                     c_Retval = C_SdNdeSfoResetMessageTableModel::mhs32_INDEX_STANDARD;
                   }
                }
                break;
             case eBYTE1:
                u32_ByteIndex = 0;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -287,24 +287,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE2:
                u32_ByteIndex = 1;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -316,24 +316,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE3:
                u32_ByteIndex = 2;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -345,24 +345,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE4:
                u32_ByteIndex = 3;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -374,24 +374,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE5:
                u32_ByteIndex = 4;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -403,24 +403,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE6:
                u32_ByteIndex = 5;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -432,24 +432,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE7:
                u32_ByteIndex = 6;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -461,24 +461,24 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                break;
             case eBYTE8:
                u32_ByteIndex = 7;
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data.size() > u32_ByteIndex)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data.size() > u32_ByteIndex)
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval =
-                        static_cast<QString>("0x%1").arg(QString::number(pc_OSCNode->c_Properties.
-                                                                         c_STWFlashloaderSettings.c_Data[
+                        static_cast<QString>("0x%1").arg(QString::number(pc_OscNode->c_Properties.
+                                                                         c_StwFlashloaderSettings.c_Data[
                                                                             u32_ByteIndex], 16).toUpper());
                   }
                   else
                   {
                      c_Retval =
-                        static_cast<sintn>(pc_OSCNode->c_Properties.c_STWFlashloaderSettings.c_Data[u32_ByteIndex]);
+                        static_cast<int32_t>(pc_OscNode->c_Properties.c_StwFlashloaderSettings.c_Data[u32_ByteIndex]);
                   }
                }
                else
                {
-                  if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+                  if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
                   {
                      c_Retval = "0x0";
                   }
@@ -494,14 +494,14 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          const QColor c_ACTIVE = mc_STYLE_GUIDE_COLOR_6;
          const QColor c_DISABLED = mc_STYLE_GUIDE_COLOR_10;
-         const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if (pc_OSCNode != NULL)
+         const C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if (pc_OscNode != NULL)
          {
-            if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive == false)
+            if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.q_ResetMessageActive == false)
             {
                c_Retval = c_DISABLED;
             }
@@ -516,7 +516,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   c_Retval = c_ACTIVE;
                   break;
                case eBYTE1:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 0)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 0)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -526,7 +526,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE2:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 1)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 1)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -536,7 +536,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE3:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 2)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 2)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -546,7 +546,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE4:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 3)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 3)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -556,7 +556,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE5:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 4)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 4)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -566,7 +566,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE6:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 5)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 5)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -576,7 +576,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE7:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 6)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 6)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -586,7 +586,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
                   }
                   break;
                case eBYTE8:
-                  if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 7)
+                  if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 7)
                   {
                      c_Retval = c_ACTIVE;
                   }
@@ -602,18 +602,18 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
-         c_Retval = static_cast<QVariant>(static_cast<sintn>(Qt::AlignCenter));
+         c_Retval = static_cast<QVariant>(static_cast<int32_t>(Qt::AlignCenter));
       }
-      else if (osn_Role == msn_USER_ROLE_CONDITIONAL_VALUE)
+      else if (os32_Role == ms32_USER_ROLE_CONDITIONAL_VALUE)
       {
          if (e_Col == eID)
          {
-            const C_OSCNode * const pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-            if (pc_OSCNode != NULL)
+            const C_OscNode * const pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+            if (pc_OscNode != NULL)
             {
-               if (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.q_ResetMessageExtendedId == true)
+               if (pc_OscNode->c_Properties.c_StwFlashloaderSettings.q_ResetMessageExtendedId == true)
                {
                   c_Retval = 1;
                }
@@ -641,7 +641,7 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in] os32_Role  Data role
 
    \return
    true  success
@@ -649,18 +649,18 @@ QVariant C_SdNdeSfoResetMessageTableModel::data(const QModelIndex & orc_Index, c
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
-                                               const sintn osn_Role)
+                                               const int32_t os32_Role)
 {
    bool q_Retval = false;
 
-   if (data(orc_Index, osn_Role) != orc_Value)
+   if (data(orc_Index, os32_Role) != orc_Value)
    {
-      if (osn_Role == static_cast<sintn>(Qt::EditRole))
+      if (os32_Role == static_cast<int32_t>(Qt::EditRole))
       {
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
          if ((orc_Index.row() >= 0) && (pc_Node != NULL))
          {
-            C_OSCNodeStwFlashloaderSettings c_Settings = pc_Node->c_Properties.c_STWFlashloaderSettings;
+            C_OscNodeStwFlashloaderSettings c_Settings = pc_Node->c_Properties.c_StwFlashloaderSettings;
             const C_SdNdeSfoResetMessageTableModel::E_Columns e_Col = C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(
                orc_Index.column());
             switch (e_Col)
@@ -669,10 +669,10 @@ bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, co
                c_Settings.u32_ResetMessageId = orc_Value.toUInt();
                break;
             case eDLC:
-               c_Settings.u8_ResetMessageDlc = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.u8_ResetMessageDlc = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eEXTENDED_FORMAT:
-               if (orc_Value.toInt() == C_SdNdeSfoResetMessageTableModel::mhsn_INDEX_STANDARD)
+               if (orc_Value.toInt() == C_SdNdeSfoResetMessageTableModel::mhs32_INDEX_STANDARD)
                {
                   c_Settings.q_ResetMessageExtendedId = false;
                }
@@ -686,56 +686,56 @@ bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, co
                {
                   c_Settings.c_Data.resize(1, 0);
                }
-               c_Settings.c_Data[0] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[0] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE2:
                if (c_Settings.c_Data.size() <= 1)
                {
                   c_Settings.c_Data.resize(2, 0);
                }
-               c_Settings.c_Data[1] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[1] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE3:
                if (c_Settings.c_Data.size() <= 2)
                {
                   c_Settings.c_Data.resize(3, 0);
                }
-               c_Settings.c_Data[2] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[2] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE4:
                if (c_Settings.c_Data.size() <= 3)
                {
                   c_Settings.c_Data.resize(4, 0);
                }
-               c_Settings.c_Data[3] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[3] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE5:
                if (c_Settings.c_Data.size() <= 4)
                {
                   c_Settings.c_Data.resize(5, 0);
                }
-               c_Settings.c_Data[4] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[4] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE6:
                if (c_Settings.c_Data.size() <= 5)
                {
                   c_Settings.c_Data.resize(6, 0);
                }
-               c_Settings.c_Data[5] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[5] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE7:
                if (c_Settings.c_Data.size() <= 6)
                {
                   c_Settings.c_Data.resize(7, 0);
                }
-               c_Settings.c_Data[6] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[6] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             case eBYTE8:
                if (c_Settings.c_Data.size() <= 7)
                {
                   c_Settings.c_Data.resize(8, 0);
                }
-               c_Settings.c_Data[7] = static_cast<uint8>(orc_Value.toInt());
+               c_Settings.c_Data[7] = static_cast<uint8_t>(orc_Value.toInt());
                break;
             default:
                break;
@@ -743,7 +743,7 @@ bool C_SdNdeSfoResetMessageTableModel::setData(const QModelIndex & orc_Index, co
 
             C_PuiSdHandler::h_GetInstance()->SetStwFlashloaderSettings(this->mu32_NodeIndex, c_Settings);
 
-            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<int32_t>() << os32_Role);
             q_Retval = true;
          }
       }
@@ -765,7 +765,7 @@ Qt::ItemFlags C_SdNdeSfoResetMessageTableModel::flags(const QModelIndex & orc_In
    Qt::ItemFlags c_Retval;
    if (orc_Index.isValid() == true)
    {
-      const C_OSCNode * pc_OSCNode;
+      const C_OscNode * pc_OscNode;
       const C_SdNdeSfoResetMessageTableModel::E_Columns e_Col = C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(
          orc_Index.column());
       //Each item
@@ -779,57 +779,57 @@ Qt::ItemFlags C_SdNdeSfoResetMessageTableModel::flags(const QModelIndex & orc_In
          c_Retval = c_Retval | Qt::ItemIsEditable;
          break;
       case eBYTE1:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 0))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 0))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE2:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 1))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 1))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE3:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 2))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 2))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE4:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 3))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 3))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE5:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 4))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 4))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE6:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 5))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 5))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE7:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 6))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 6))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
          break;
       case eBYTE8:
-         pc_OSCNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         if ((pc_OSCNode != NULL) && (pc_OSCNode->c_Properties.c_STWFlashloaderSettings.u8_ResetMessageDlc > 7))
+         pc_OscNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         if ((pc_OscNode != NULL) && (pc_OscNode->c_Properties.c_StwFlashloaderSettings.u8_ResetMessageDlc > 7))
          {
             c_Retval = c_Retval | Qt::ItemIsEditable;
          }
@@ -854,7 +854,8 @@ Qt::ItemFlags C_SdNdeSfoResetMessageTableModel::flags(const QModelIndex & orc_In
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeSfoResetMessageTableModel::E_Columns C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_SdNdeSfoResetMessageTableModel::E_Columns C_SdNdeSfoResetMessageTableModel::h_ColumnToEnum(
+   const int32_t & ors32_Column)
 {
    C_SdNdeSfoResetMessageTableModel::E_Columns e_Retval;
    switch (ors32_Column)
@@ -910,9 +911,9 @@ C_SdNdeSfoResetMessageTableModel::E_Columns C_SdNdeSfoResetMessageTableModel::h_
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeSfoResetMessageTableModel::h_EnumToColumn(const C_SdNdeSfoResetMessageTableModel::E_Columns & ore_Value)
+int32_t C_SdNdeSfoResetMessageTableModel::h_EnumToColumn(const C_SdNdeSfoResetMessageTableModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {

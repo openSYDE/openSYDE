@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
 #include <QCursor>
-#include "C_GiLiLineConnection.h"
-#include "C_GiBiLineBounding.h"
+#include "C_GiLiLineConnection.hpp"
+#include "C_GiBiLineBounding.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +42,7 @@ using namespace stw_types;
    \param[in,out] opc_Parent      Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiLineConnection::C_GiLiLineConnection(const sint32 & ors32_LineIndex, QGraphicsItem * const opc_Parent) :
+C_GiLiLineConnection::C_GiLiLineConnection(const int32_t & ors32_LineIndex, QGraphicsItem * const opc_Parent) :
    C_GiLiSimpleLine(opc_Parent),
    ms32_LineIndex(ors32_LineIndex),
    mf64_InteractionWidth(0.0)
@@ -87,7 +86,7 @@ void C_GiLiLineConnection::AdaptLine(const QLineF & orc_Line)
    \param[in] ors32_LineIndex Index of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineConnection::SetLineIndex(const stw_types::sint32 & ors32_LineIndex)
+void C_GiLiLineConnection::SetLineIndex(const int32_t & ors32_LineIndex)
 {
    this->ms32_LineIndex = ors32_LineIndex;
 }
@@ -98,7 +97,7 @@ void C_GiLiLineConnection::SetLineIndex(const stw_types::sint32 & ors32_LineInde
    \return Index of line
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_GiLiLineConnection::GetLineIndex(void) const
+int32_t C_GiLiLineConnection::GetLineIndex(void) const
 {
    return this->ms32_LineIndex;
 }
@@ -164,8 +163,8 @@ void C_GiLiLineConnection::paint(QPainter * const opc_Painter, const QStyleOptio
 //----------------------------------------------------------------------------------------------------------------------
 QPainterPath C_GiLiLineConnection::shape() const
 {
-   stw_opensyde_gui_logic::C_GiBiLineBounding c_LineBounding(this->line(), static_cast<float64>(this->GetWidth()),
-                                                             this->mf64_InteractionWidth);
+   stw::opensyde_gui_logic::C_GiBiLineBounding c_LineBounding(this->line(), static_cast<float64_t>(this->GetWidth()),
+                                                              this->mf64_InteractionWidth);
    return c_LineBounding.GetShape();
 }
 
@@ -189,7 +188,7 @@ void C_GiLiLineConnection::FindClosestPoint(const QPointF & orc_ScenePoint, QPoi
    \param[out] orf64_Relative Relative position
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineConnection::FindClosestPointRelative(const QPointF & orc_ScenePoint, float64 & orf64_Relative) const
+void C_GiLiLineConnection::FindClosestPointRelative(const QPointF & orc_ScenePoint, float64_t & orf64_Relative) const
 {
    C_GiBiConnectableItem::h_DistToLine(this->mapToScene(this->line().p1()), this->mapToScene(this->line().p2()),
                                        orc_ScenePoint, NULL, NULL, &orf64_Relative);
@@ -218,7 +217,7 @@ QVariant C_GiLiLineConnection::itemChange(const GraphicsItemChange oe_Change, co
    \param[in] orf64_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiLineConnection::SetInteractionWidth(const stw_types::float64 & orf64_Value)
+void C_GiLiLineConnection::SetInteractionWidth(const float64_t & orf64_Value)
 {
    this->prepareGeometryChange();
    this->mf64_InteractionWidth = orf64_Value;

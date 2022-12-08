@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
 
 #include <QElapsedTimer>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SdBueMessageTableModel.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SdBueMessageTableModel.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -86,23 +85,23 @@ void C_SdBueMessageTableModel::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                              const sintn osn_Role) const
+QVariant C_SdBueMessageTableModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                              const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const C_SdBueMessageTableModel::E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const C_SdBueMessageTableModel::E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          switch (e_Col)
          {
@@ -158,7 +157,7 @@ QVariant C_SdBueMessageTableModel::headerData(const sintn osn_Section, const Qt:
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -179,14 +178,15 @@ QVariant C_SdBueMessageTableModel::headerData(const sintn osn_Section, const Qt:
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdBueMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdBueMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      sn_Retval = this->mc_MsgInfoAll.size();
+      s32_Retval = this->mc_MsgInfoAll.size();
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -198,39 +198,39 @@ sintn C_SdBueMessageTableModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdBueMessageTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdBueMessageTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 16;
+      s32_Retval = 16;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
       const C_SdBueMessageTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
-         const sintn sn_Index = orc_Index.row();
-         if ((static_cast<uintn>(sn_Index) < this->mc_MsgInfoAll.size()) && (sn_Index >= 0))
+         const int32_t s32_Index = orc_Index.row();
+         if ((static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size()) && (s32_Index >= 0))
          {
             switch (e_Col)
             {
@@ -241,19 +241,19 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                c_Retval = QIcon(":images/system_definition/IconMessage.svg");
                break;
             case eNAME:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_Name;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Name;
                break;
             case eCOMMENT:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_Comment;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Comment;
                break;
             case eCAN_OPEN_INDEX:
-               if (osn_Role == static_cast<sintn>(Qt::EditRole))
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CoIndexEditRole;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CoIndexEditRole;
                }
                else
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CoIndex;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CoIndex;
                }
                break;
             case eENABLED:
@@ -261,80 +261,80 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
                c_Retval = "";
                break;
             case eCOB_ID:
-               if (osn_Role == static_cast<sintn>(Qt::EditRole))
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CobIdEditRole;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CobIdEditRole;
                }
                else
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CobId;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CobId;
                }
                break;
             case eCAN_ID:
-               if (osn_Role == static_cast<sintn>(Qt::EditRole))
+               if (os32_Role == static_cast<int32_t>(Qt::EditRole))
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CanIdEditRole;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CanIdEditRole;
                }
                else
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CanId;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CanId;
                }
                break;
             case eDLC:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.u16_Dlc;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.u16_Dlc;
                break;
             case eTX_METHOD:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_TxMethod;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_TxMethod;
                break;
             case eCYCLE_TIME:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_CycleTime;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_CycleTime;
 
                break;
             case eNOT_EARLIER_THAN:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_NotEarlierThan;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_NotEarlierThan;
                break;
             case eNOT_LATER_THAN:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_NotLaterThan;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_NotLaterThan;
                break;
             case eTRANSMITTER:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_Transmitter;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Transmitter;
                break;
             case eRECEIVER:
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_Receiver;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Receiver;
                break;
             default:
                break;
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
       {
-         const sintn sn_Index = orc_Index.row();
-         if ((static_cast<uintn>(sn_Index) < this->mc_MsgInfoAll.size()) && (sn_Index >= 0))
+         const int32_t s32_Index = orc_Index.row();
+         if ((static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size()) && (s32_Index >= 0))
          {
             if (e_Col == eEXTENDED)
             {
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.sn_Extended;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.s32_Extended;
             }
             else if (e_Col == eENABLED)
             {
-               c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.sn_Enabled;
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.s32_Enabled;
             }
             else
             {
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_ICON)
+      else if (os32_Role == ms32_USER_ROLE_ICON)
       {
          switch (e_Col)
          {
          case eICON:
             {
-               const sintn sn_Index = orc_Index.row();
-               if ((static_cast<uintn>(sn_Index) < this->mc_MsgInfoAll.size()) && (sn_Index >= 0))
+               const int32_t s32_Index = orc_Index.row();
+               if ((static_cast<uint32_t>(s32_Index) < this->mc_MsgInfoAll.size()) && (s32_Index >= 0))
                {
-                  c_Retval = this->mc_MsgInfoAll[sn_Index].c_MessageData.c_Icon;
+                  c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Icon;
                }
                break;
             }
@@ -358,7 +358,7 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
             break;
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
       {
          QFont c_Font;
          //Stylesheets do not allow access of specific columns so we need to set fonts manually
@@ -390,11 +390,11 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const sin
          c_Font.setPixelSize(c_Font.pointSize());
          c_Retval = c_Font;
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          c_Retval = mc_STYLE_GUIDE_COLOR_8;
       }
@@ -451,7 +451,7 @@ Qt::ItemFlags C_SdBueMessageTableModel::flags(const QModelIndex & orc_Index) con
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueMessageTableModel::E_Columns C_SdBueMessageTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_SdBueMessageTableModel::E_Columns C_SdBueMessageTableModel::h_ColumnToEnum(const int32_t & ors32_Column)
 {
    C_SdBueMessageTableModel::E_Columns e_Retval = eNAME;
    switch (ors32_Column)
@@ -522,9 +522,9 @@ C_SdBueMessageTableModel::E_Columns C_SdBueMessageTableModel::h_ColumnToEnum(con
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueMessageTableModel::h_EnumToColumn(const C_SdBueMessageTableModel::E_Columns & ore_Value)
+int32_t C_SdBueMessageTableModel::h_EnumToColumn(const C_SdBueMessageTableModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {
@@ -595,14 +595,14 @@ sint32 C_SdBueMessageTableModel::h_EnumToColumn(const C_SdBueMessageTableModel::
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueMessageTableModel::ConvertRowToMessage(const sint32 & ors32_Row,
-                                                     C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+int32_t C_SdBueMessageTableModel::ConvertRowToMessage(const int32_t & ors32_Row,
+                                                      C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ors32_Row >= 0)
    {
-      const uint32 u32_Row = static_cast<uint32>(ors32_Row);
+      const uint32_t u32_Row = static_cast<uint32_t>(ors32_Row);
       if (u32_Row < this->mc_MsgInfoAll.size())
       {
          orc_MessageId = this->mc_MsgInfoAll[u32_Row].c_MessageId;
@@ -634,13 +634,13 @@ sint32 C_SdBueMessageTableModel::ConvertRowToMessage(const sint32 & ors32_Row,
    Name string       Examples: MyNode / MyNode (CAN1) / MyNode (MyDatapool, CAN1)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueMessageTableModel::m_CreateNodeName(const C_OSCCanMessageIdentificationIndices & orc_CurMatchingId,
-                                                   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_AllMatchingIds)
+QString C_SdBueMessageTableModel::m_CreateNodeName(const C_OscCanMessageIdentificationIndices & orc_CurMatchingId,
+                                                   const std::vector<C_OscCanMessageIdentificationIndices> & orc_AllMatchingIds)
 const
 {
    QString c_Return = "";
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_CurMatchingId.u32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_CurMatchingId.u32_NodeIndex);
 
    if (pc_Node != NULL)
    {
@@ -649,7 +649,7 @@ const
       c_Return += static_cast<QString>(pc_Node->c_Properties.c_Name.c_str());
 
       // Add additional info about Datapool and/or Interface if ambiguous
-      if (pc_Node->GetCANProtocolsConst(orc_CurMatchingId.e_ComProtocol).size() > 1)
+      if (pc_Node->GetCanProtocolsConst(orc_CurMatchingId.e_ComProtocol).size() > 1)
       {
          // Add datapool name if datapool of this protocol type is ambiguous
          c_AdditionalInfo +=
@@ -658,11 +658,11 @@ const
 
       // Add CAN interface name if two CAN interfaces of one node participate
 
-      for (uint32 u32_ItOtherIds = 0; u32_ItOtherIds < orc_AllMatchingIds.size();
+      for (uint32_t u32_ItOtherIds = 0; u32_ItOtherIds < orc_AllMatchingIds.size();
            ++u32_ItOtherIds) // re-iterate all corresponding message indices to check for
                              // same node and same datapool but different CAN interface
       {
-         const C_OSCCanMessageIdentificationIndices & rc_OtherMatchingId =
+         const C_OscCanMessageIdentificationIndices & rc_OtherMatchingId =
             orc_AllMatchingIds[u32_ItOtherIds];
          if ((orc_CurMatchingId.u32_NodeIndex == rc_OtherMatchingId.u32_NodeIndex) &&
              (orc_CurMatchingId.u32_DatapoolIndex == rc_OtherMatchingId.u32_DatapoolIndex) &&
@@ -673,8 +673,8 @@ const
                c_AdditionalInfo += ", ";
             }
             c_AdditionalInfo +=
-               C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
-                                               static_cast<uint8> (orc_CurMatchingId.u32_InterfaceIndex));
+               C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN,
+                                               static_cast<uint8_t> (orc_CurMatchingId.u32_InterfaceIndex));
             break;
          }
       }
@@ -702,7 +702,7 @@ QString C_SdBueMessageTableModel::m_GetNotEarlierThanHeaderName() const
 
    if (this->mpc_SyncManager != NULL)
    {
-      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)
+      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
       {
          c_Retval = C_GtGetText::h_GetText("Inhibit Time [ms]");
       }
@@ -723,7 +723,7 @@ QString C_SdBueMessageTableModel::m_GetNotLaterThanHeaderName() const
 
    if (this->mpc_SyncManager != NULL)
    {
-      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)
+      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
       {
          c_Retval = C_GtGetText::h_GetText("Event Time [ms]");
       }
@@ -737,23 +737,23 @@ QString C_SdBueMessageTableModel::m_GetNotLaterThanHeaderName() const
 
    \param[in]  orc_Id         Id
    \param[in]  orc_Message    Message
-   \param[in]  osn_Role       Role
+   \param[in]  os32_Role       Role
 
    \return
    CANopen index
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::m_GetCanOpenIndex(const C_OSCCanMessageIdentificationIndices & orc_Id,
-                                                     const C_OSCCanMessage & orc_Message, const sintn osn_Role) const
+QVariant C_SdBueMessageTableModel::m_GetCanOpenIndex(const C_OscCanMessageIdentificationIndices & orc_Id,
+                                                     const C_OscCanMessage & orc_Message, const int32_t os32_Role) const
 {
-   const uint32 u32_ObjectIndex =
-      C_OSCCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(
+   const uint32_t u32_ObjectIndex =
+      C_OscCanOpenObjectDictionary::h_GetCanOpenObjectDictionaryIndexForPdo(
          orc_Message.u16_CanOpenManagerPdoIndex, !orc_Id.q_MessageIsTx);
    QVariant c_Retval;
 
-   if (osn_Role == static_cast<sintn>(Qt::EditRole))
+   if (os32_Role == static_cast<int32_t>(Qt::EditRole))
    {
-      c_Retval = static_cast<sintn>(u32_ObjectIndex);
+      c_Retval = static_cast<int32_t>(u32_ObjectIndex);
    }
    else
    {
@@ -767,24 +767,24 @@ QVariant C_SdBueMessageTableModel::m_GetCanOpenIndex(const C_OSCCanMessageIdenti
 /*! \brief  Get COB-ID
 
    \param[in]  orc_Message    Message
-   \param[in]  osn_Role       Role
+   \param[in]  os32_Role       Role
 
    \return
    COB-ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::m_GetCobId(const C_OSCCanMessage & orc_Message, const sintn osn_Role) const
+QVariant C_SdBueMessageTableModel::m_GetCobId(const C_OscCanMessage & orc_Message, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
-   if (osn_Role == static_cast<sintn>(Qt::EditRole))
+   if (os32_Role == static_cast<int32_t>(Qt::EditRole))
    {
-      c_Retval = static_cast<sint64>(orc_Message.u32_CanId);
+      c_Retval = static_cast<int64_t>(orc_Message.u32_CanId);
    }
    else
    {
       const QString c_CanId = "0x" + QString::number(orc_Message.u32_CanId, 16).toUpper();
-      if (orc_Message.q_CanOpenManagerCobIdIncludesNodeID)
+      if (orc_Message.q_CanOpenManagerCobIdIncludesNodeId)
       {
          const QString c_CobId = "0x" + QString::number(orc_Message.u32_CanOpenManagerCobIdOffset, 16).toUpper();
          c_Retval = static_cast<QString>("%1 ($CANopenNodeID + %2)").arg(c_CanId, c_CobId);
@@ -806,13 +806,13 @@ QVariant C_SdBueMessageTableModel::m_GetCobId(const C_OSCCanMessage & orc_Messag
    Not earlier than value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::m_GetNotEarlierThanValue(const C_OSCCanMessage & orc_Message) const
+QVariant C_SdBueMessageTableModel::m_GetNotEarlierThanValue(const C_OscCanMessage & orc_Message) const
 {
    QVariant c_Retval;
 
-   if ((orc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE) ||
+   if ((orc_Message.e_TxMethod == C_OscCanMessage::eTX_METHOD_ON_CHANGE) ||
        ((this->mpc_SyncManager != NULL) &&
-        (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)))
+        (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)))
    {
       c_Retval = orc_Message.u16_DelayTimeMs;
    }
@@ -832,15 +832,15 @@ QVariant C_SdBueMessageTableModel::m_GetNotEarlierThanValue(const C_OSCCanMessag
    Not later than value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::m_GetNotLaterThanValue(const C_OSCCanMessage & orc_Message) const
+QVariant C_SdBueMessageTableModel::m_GetNotLaterThanValue(const C_OscCanMessage & orc_Message) const
 {
    QVariant c_Retval;
 
-   if ((orc_Message.e_TxMethod == C_OSCCanMessage::eTX_METHOD_ON_CHANGE) ||
+   if ((orc_Message.e_TxMethod == C_OscCanMessage::eTX_METHOD_ON_CHANGE) ||
        ((this->mpc_SyncManager != NULL) &&
-        (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)))
+        (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)))
    {
-      c_Retval = static_cast<uint64>(orc_Message.u32_CycleTimeMs);
+      c_Retval = static_cast<uint64_t>(orc_Message.u32_CycleTimeMs);
    }
    else
    {
@@ -859,24 +859,24 @@ QVariant C_SdBueMessageTableModel::m_GetNotLaterThanValue(const C_OSCCanMessage 
    Transmitter
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueMessageTableModel::m_GetTransmitter(const C_OSCCanMessageIdentificationIndices & orc_Id,
-                                                   const C_OSCCanMessage & orc_Message) const
+QString C_SdBueMessageTableModel::m_GetTransmitter(const C_OscCanMessageIdentificationIndices & orc_Id,
+                                                   const C_OscCanMessage & orc_Message) const
 {
    QString c_Retval;
 
    if (this->mpc_SyncManager != NULL)
    {
-      const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingIds =
+      const std::vector<C_OscCanMessageIdentificationIndices> c_MatchingIds =
          this->mpc_SyncManager->GetMatchingMessageVector(orc_Id);
       bool q_Found = false;
-      for (uint32 u32_ItMatchingId = 0; u32_ItMatchingId < c_MatchingIds.size(); ++u32_ItMatchingId)
+      for (uint32_t u32_ItMatchingId = 0; u32_ItMatchingId < c_MatchingIds.size(); ++u32_ItMatchingId)
       {
-         const C_OSCCanMessageIdentificationIndices & rc_CurMatchingId =
+         const C_OscCanMessageIdentificationIndices & rc_CurMatchingId =
             c_MatchingIds[u32_ItMatchingId];
          //Transmitter
          if (rc_CurMatchingId.q_MessageIsTx == true)
          {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+            const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                rc_CurMatchingId.u32_NodeIndex);
             if (pc_Node != NULL)
             {
@@ -887,7 +887,7 @@ QString C_SdBueMessageTableModel::m_GetTransmitter(const C_OSCCanMessageIdentifi
       }
       if (q_Found == false)
       {
-         if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)
+         if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
          {
             c_Retval = this->m_GetCanOpenNode(orc_Message);
          }
@@ -910,20 +910,20 @@ QString C_SdBueMessageTableModel::m_GetTransmitter(const C_OSCCanMessageIdentifi
    Receiver
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueMessageTableModel::m_GetReceiver(const C_OSCCanMessageIdentificationIndices & orc_Id,
-                                                const C_OSCCanMessage & orc_Message) const
+QString C_SdBueMessageTableModel::m_GetReceiver(const C_OscCanMessageIdentificationIndices & orc_Id,
+                                                const C_OscCanMessage & orc_Message) const
 {
    QString c_Retval;
 
    if (this->mpc_SyncManager != NULL)
    {
-      const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingIds =
+      const std::vector<C_OscCanMessageIdentificationIndices> c_MatchingIds =
          this->mpc_SyncManager->GetMatchingMessageVector(orc_Id);
       QString c_Output = "";
       bool q_Found = false;
-      for (uint32 u32_ItMatchingId = 0; u32_ItMatchingId < c_MatchingIds.size(); ++u32_ItMatchingId)
+      for (uint32_t u32_ItMatchingId = 0; u32_ItMatchingId < c_MatchingIds.size(); ++u32_ItMatchingId)
       {
-         const C_OSCCanMessageIdentificationIndices & rc_CurMatchingId =
+         const C_OscCanMessageIdentificationIndices & rc_CurMatchingId =
             c_MatchingIds[u32_ItMatchingId];
          //Receiver
          if (rc_CurMatchingId.q_MessageIsTx == false)
@@ -938,7 +938,7 @@ QString C_SdBueMessageTableModel::m_GetReceiver(const C_OSCCanMessageIdentificat
       }
       if (q_Found == false)
       {
-         if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)
+         if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
          {
             c_Output = this->m_GetCanOpenNode(orc_Message);
          }
@@ -961,10 +961,10 @@ QString C_SdBueMessageTableModel::m_GetReceiver(const C_OSCCanMessageIdentificat
    CANopen node
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueMessageTableModel::m_GetCanOpenNode(const C_OSCCanMessage & orc_Message) const
+QString C_SdBueMessageTableModel::m_GetCanOpenNode(const C_OscCanMessage & orc_Message) const
 {
    QString c_Retval = "-";
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       orc_Message.c_CanOpenManagerOwnerNodeIndex.u32_NodeIndex);
 
    if (pc_Node != NULL)
@@ -983,10 +983,10 @@ QString C_SdBueMessageTableModel::m_GetCanOpenNode(const C_OSCCanMessage & orc_M
    Message icon
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdBueMessageTableModel::m_GetMessageIcon(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+QVariant C_SdBueMessageTableModel::m_GetMessageIcon(const C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
    QVariant c_Retval;
-   const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(
+   const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(
       orc_MessageId);
 
    if (pc_Message != NULL)
@@ -1000,15 +1000,15 @@ QVariant C_SdBueMessageTableModel::m_GetMessageIcon(const C_OSCCanMessageIdentif
          QStringList c_Tmp;
 
          this->mpc_SyncManager->CheckMessageNameBus(pc_Message->c_Name, q_NameValid, &orc_MessageId);
-         this->mpc_SyncManager->CheckMessageIdBus(C_OSCCanMessageUniqueId(pc_Message->u32_CanId,
+         this->mpc_SyncManager->CheckMessageIdBus(C_OscCanMessageUniqueId(pc_Message->u32_CanId,
                                                                           pc_Message->q_IsExtended), q_IdValid,
                                                   &orc_MessageId);
          this->mpc_SyncManager->CheckMessageHasTx(q_HasTx, orc_MessageId);
          //Check signals
          if (pc_Message->c_Signals.size() > 0)
          {
-            const C_OSCNodeDataPoolList * const pc_List =
-               C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolList(
+            const C_OscNodeDataPoolList * const pc_List =
+               C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolList(
                   orc_MessageId.u32_NodeIndex,
                   orc_MessageId.e_ComProtocol,
                   orc_MessageId.u32_InterfaceIndex,
@@ -1016,15 +1016,15 @@ QVariant C_SdBueMessageTableModel::m_GetMessageIcon(const C_OSCCanMessageIdentif
                   orc_MessageId.q_MessageIsTx);
             if (pc_List != NULL)
             {
-               for (uint32 u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
+               for (uint32_t u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                {
                   if (pc_Message->CheckErrorSignal(
                          pc_List, u32_ItSignal,
-                         C_OSCCanProtocol::h_GetCANMessageValidSignalsDLCOffset(
+                         C_OscCanProtocol::h_GetCanMessageValidSignalsDlcOffset(
                             orc_MessageId.e_ComProtocol),
-                         C_OSCCanProtocol::h_GetCANMessageSignalGapsValid(
+                         C_OscCanProtocol::h_GetCanMessageSignalGapsValid(
                             orc_MessageId.e_ComProtocol),
-                         C_OSCCanProtocol::h_GetCANMessageSignalByteAlignmentRequired(
+                         C_OscCanProtocol::h_GetCanMessageSignalByteAlignmentRequired(
                             orc_MessageId.e_ComProtocol)))
                   {
                      q_SignalsValid = false;
@@ -1054,21 +1054,21 @@ QVariant C_SdBueMessageTableModel::m_GetMessageIcon(const C_OSCCanMessageIdentif
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableModel::m_FillMsgInfo(void)
 {
-   std::vector<C_OSCCanMessageIdentificationIndices> c_MessageIds =
+   std::vector<C_OscCanMessageIdentificationIndices> c_MessageIds =
       this->mpc_SyncManager->GetUniqueMessages();
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    this->mc_MsgInfoAll.clear();
    this->mc_MsgInfoAll.resize(c_MessageIds.size());
 
    for (u32_Counter = 0U; u32_Counter < c_MessageIds.size(); ++u32_Counter)
    {
-      const C_OSCCanMessageIdentificationIndices & rc_Id = c_MessageIds[u32_Counter];
+      const C_OscCanMessageIdentificationIndices & rc_Id = c_MessageIds[u32_Counter];
 
       // Copy the original message id
       this->mc_MsgInfoAll[u32_Counter].c_MessageId = rc_Id;
 
-      const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_Id);
+      const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(rc_Id);
       if (pc_Message != NULL)
       {
          C_MsgTableData & rc_Data = this->mc_MsgInfoAll[u32_Counter].c_MessageData;
@@ -1076,34 +1076,34 @@ void C_SdBueMessageTableModel::m_FillMsgInfo(void)
          rc_Data.c_Name = static_cast<QString>(pc_Message->c_Name.c_str());
          rc_Data.c_Comment = static_cast<QString>(pc_Message->c_Comment.c_str());
          rc_Data.c_CoIndex = m_GetCanOpenIndex(rc_Id, *pc_Message, 0);
-         rc_Data.c_CoIndexEditRole = m_GetCanOpenIndex(rc_Id, *pc_Message, static_cast<sintn>(Qt::EditRole));
+         rc_Data.c_CoIndexEditRole = m_GetCanOpenIndex(rc_Id, *pc_Message, static_cast<int32_t>(Qt::EditRole));
 
          if (pc_Message->q_CanOpenManagerMessageActive == true)
          {
-            rc_Data.sn_Enabled = static_cast<sintn>(Qt::Checked);
+            rc_Data.s32_Enabled = static_cast<int32_t>(Qt::Checked);
          }
          else
          {
-            rc_Data.sn_Enabled = static_cast<sintn>(Qt::Unchecked);
+            rc_Data.s32_Enabled = static_cast<int32_t>(Qt::Unchecked);
          }
 
          if (pc_Message->q_IsExtended == true)
          {
-            rc_Data.sn_Extended = static_cast<sintn>(Qt::Checked);
+            rc_Data.s32_Extended = static_cast<int32_t>(Qt::Checked);
          }
          else
          {
-            rc_Data.sn_Extended = static_cast<sintn>(Qt::Unchecked);
+            rc_Data.s32_Extended = static_cast<int32_t>(Qt::Unchecked);
          }
 
          rc_Data.c_CobId = this->m_GetCobId(*pc_Message, 0);
-         rc_Data.c_CobIdEditRole = this->m_GetCobId(*pc_Message, static_cast<sintn>(Qt::EditRole));
+         rc_Data.c_CobIdEditRole = this->m_GetCobId(*pc_Message, static_cast<int32_t>(Qt::EditRole));
          rc_Data.c_CanId = "0x" + QString::number(pc_Message->u32_CanId, 16).toUpper();
          rc_Data.c_CanIdEditRole = QString::number(pc_Message->u32_CanId);
          rc_Data.u16_Dlc = pc_Message->u16_Dlc;
          rc_Data.c_TxMethod = C_SdUtil::h_ConvertTxMethodToName(pc_Message->e_TxMethod);
 
-         if (pc_Message->IsTransmissionTypeACyclicType())
+         if (pc_Message->IsTransmissionTypeOfCyclicType())
          {
             rc_Data.c_CycleTime = QString::number(pc_Message->u32_CycleTimeMs);
          }

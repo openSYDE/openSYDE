@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCCanSignal.h"
-#include "CSCLChecksums.h"
+#include "C_OscCanSignal.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanSignal::C_OSCCanSignal(void) :
+C_OscCanSignal::C_OscCanSignal(void) :
    e_ComByteOrder(eBYTE_ORDER_INTEL),
    u16_ComBitLength(8),
    u16_ComBitStart(0),
@@ -57,7 +57,7 @@ C_OSCCanSignal::C_OSCCanSignal(void) :
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
+bool C_OscCanSignal::operator !=(const C_OscCanSignal & orc_Cmp) const
 {
    bool q_Return = false;
 
@@ -86,7 +86,7 @@ bool C_OSCCanSignal::operator !=(const C_OSCCanSignal & orc_Cmp) const
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanSignal::operator ==(const C_OSCCanSignal & orc_Cmp) const
+bool C_OscCanSignal::operator ==(const C_OscCanSignal & orc_Cmp) const
 {
    return !(*this != orc_Cmp);
 }
@@ -101,7 +101,7 @@ bool C_OSCCanSignal::operator ==(const C_OSCCanSignal & orc_Cmp) const
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanSignal::operator <(const C_OSCCanSignal & orc_Cmp) const
+bool C_OscCanSignal::operator <(const C_OscCanSignal & orc_Cmp) const
 {
    bool q_Return = false;
 
@@ -124,21 +124,21 @@ bool C_OSCCanSignal::operator <(const C_OSCCanSignal & orc_Cmp) const
                                        to allow compatibility with existing hash values from R20 release
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compatible) const
+void C_OscCanSignal::CalcHash(uint32_t & oru32_HashValue, const bool oq_R20Compatible) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ComByteOrder, sizeof(this->e_ComByteOrder), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_MultiplexerType, sizeof(this->e_MultiplexerType), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_ComBitLength, sizeof(this->u16_ComBitLength), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_ComBitStart, sizeof(this->u16_ComBitStart), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_ComDataElementIndex, sizeof(this->u32_ComDataElementIndex),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_MultiplexValue, sizeof(this->u16_MultiplexValue), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_ComByteOrder, sizeof(this->e_ComByteOrder), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_MultiplexerType, sizeof(this->e_MultiplexerType), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_ComBitLength, sizeof(this->u16_ComBitLength), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_ComBitStart, sizeof(this->u16_ComBitStart), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_ComDataElementIndex, sizeof(this->u32_ComDataElementIndex),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_MultiplexValue, sizeof(this->u16_MultiplexValue), oru32_HashValue);
    if (oq_R20Compatible == false)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_CanOpenManagerObjectDictionaryIndex,
-                                         sizeof(this->u16_CanOpenManagerObjectDictionaryIndex), oru32_HashValue);
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_CanOpenManagerObjectDictionarySubIndex,
-                                         sizeof(this->u8_CanOpenManagerObjectDictionarySubIndex), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->u16_CanOpenManagerObjectDictionaryIndex,
+                                          sizeof(this->u16_CanOpenManagerObjectDictionaryIndex), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->u8_CanOpenManagerObjectDictionarySubIndex,
+                                          sizeof(this->u8_CanOpenManagerObjectDictionarySubIndex), oru32_HashValue);
    }
 }
 
@@ -151,7 +151,7 @@ void C_OSCCanSignal::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compati
    Data bytes bit position
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBitPosition) const
+uint16_t C_OscCanSignal::GetDataBytesBitPosOfSignalBit(const uint16_t ou16_SignalBitPosition) const
 {
    return this->GetDataBytesBitPosOfSignalBit(this->u16_ComBitStart, ou16_SignalBitPosition);
 }
@@ -166,12 +166,12 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_SignalBit
    Data bytes bit position
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
-                                                     const uint16 ou16_SignalBitPosition) const
+uint16_t C_OscCanSignal::GetDataBytesBitPosOfSignalBit(const uint16_t ou16_StartBit,
+                                                       const uint16_t ou16_SignalBitPosition) const
 {
-   uint16 u16_DataBytesBitPos;
+   uint16_t u16_DataBytesBitPos;
 
-   if (this->e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+   if (this->e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
    {
       // Intel byte order has an 1:1 mapping
       u16_DataBytesBitPos = (ou16_StartBit + ou16_SignalBitPosition);
@@ -183,7 +183,7 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
 
       if (ou16_SignalBitPosition > 0U)
       {
-         uint16 u16_Counter;
+         uint16_t u16_Counter;
 
          // calculate the position
          for (u16_Counter = 1U; u16_Counter <= ou16_SignalBitPosition; ++u16_Counter)
@@ -211,17 +211,17 @@ uint16 C_OSCCanSignal::GetDataBytesBitPosOfSignalBit(const uint16 ou16_StartBit,
    \param[out]  orc_SetPositions    Signal bit positions
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_SetPositions) const
+void C_OscCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16_t> & orc_SetPositions) const
 {
-   uint16 u16_Counter;
-   uint16 u16_DataBytesBitPos = this->u16_ComBitStart;
+   uint16_t u16_Counter;
+   uint16_t u16_DataBytesBitPos = this->u16_ComBitStart;
 
    // start bit is the only one bit with the "correct" index and the start value for calculation at the same time
    orc_SetPositions.insert(u16_DataBytesBitPos);
 
    for (u16_Counter = 1U; u16_Counter < this->u16_ComBitLength; ++u16_Counter)
    {
-      if (this->e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+      if (this->e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
       {
          // Intel byte order has an 1:1 mapping
          ++u16_DataBytesBitPos;
@@ -253,11 +253,11 @@ void C_OSCCanSignal::GetDataBytesBitPositionsOfSignal(std::set<uint16> & orc_Set
    \retval   False      Bit in message is not part of signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanSignal::IsBitPosPartOfSignal(const uint16 ou16_MessageBitPosition) const
+bool C_OscCanSignal::IsBitPosPartOfSignal(const uint16_t ou16_MessageBitPosition) const
 {
    bool q_Return = false;
 
-   if (this->e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+   if (this->e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
    {
       // Intel byte order has an 1:1 mapping
       // Check if the bit is in range
@@ -269,7 +269,7 @@ bool C_OSCCanSignal::IsBitPosPartOfSignal(const uint16 ou16_MessageBitPosition) 
    }
    else
    {
-      std::set<uint16> c_SetPositions;
+      std::set<uint16_t> c_SetPositions;
 
       this->GetDataBytesBitPositionsOfSignal(c_SetPositions);
       if (c_SetPositions.find(ou16_MessageBitPosition) != c_SetPositions.end())

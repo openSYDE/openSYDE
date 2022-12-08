@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QString>
 #include <QPainter>
@@ -18,28 +18,27 @@
 #include <QFileInfo>
 #include <cmath>
 
-#include "C_SebGraphicsView.h"
+#include "C_SebGraphicsView.hpp"
 
-#include "constants.h"
-#include "C_SebScene.h"
-#include "C_SebStyle.h"
-#include "C_OgePubZoomNotification.h"
-#include "C_Uti.h"
-#include "C_OSCUtils.h"
-#include "C_OgeWiUtil.h"
+#include "constants.hpp"
+#include "C_SebScene.hpp"
+#include "C_SebStyle.hpp"
+#include "C_OgePubZoomNotification.hpp"
+#include "C_Uti.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn msn_WHITE_EDGE_WIDTH = 100;
+const int32_t ms32_WHITE_EDGE_WIDTH = 100;
 //zoom parameters
-const stw_types::sintn msn_MIN_ZOOM_IN_PERCENT = 10;
-const stw_types::sintn msn_MAX_ZOOM_IN_PERCENT = 1000;
-const stw_types::sintn msn_ZOOM_STEP_IN_PERCENT = 5;
+const int32_t ms32_MIN_ZOOM_IN_PERCENT = 10;
+const int32_t ms32_MAX_ZOOM_IN_PERCENT = 1000;
+const int32_t ms32_ZOOM_STEP_IN_PERCENT = 5;
 //Background
 const QColor C_SebGraphicsView::mhc_GRADIENT_COLOR_LIGHT = mc_STYLE_GUIDE_COLOR_0;
 const QColor C_SebGraphicsView::mhc_GRADIENT_COLOR_DARK = mc_STYLE_GUIDE_COLOR_52;
@@ -70,7 +69,7 @@ C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
    mq_DarkMode(false),
    mc_LastMouseEvent(QEvent::None, QPointF(), QPointF(), QPointF(), Qt::NoButton, Qt::NoButton, Qt::NoModifier),
    mc_DragMoveDistance(0.0, 0.0),
-   msn_ZoomValue(100),
+   ms32_ZoomValue(100),
    mq_SubtleSurroundGradient(false),
    mq_DrawBackground(true)
 {
@@ -83,7 +82,7 @@ C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
    this->setTransformationAnchor(AnchorUnderMouse);
 
    //create zoom notification button
-   this->mpc_ZoomButton = new stw_opensyde_gui_elements::C_OgePubZoomNotification(this);
+   this->mpc_ZoomButton = new stw::opensyde_gui_elements::C_OgePubZoomNotification(this);
    this->mpc_ZoomButton->setEnabled(false);
    this->mpc_ZoomButton->hide();
    this->mpc_ZoomButton->setGeometry(0, 0, 190, 40);
@@ -126,14 +125,14 @@ C_SebGraphicsView::~C_SebGraphicsView()
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets the actual zoom value as percent
 
-   \param[in]  osn_Percent    Percent
+   \param[in]  os32_Percent   Percent
    \param[in]  orq_Silent     Flag if user notification should be shown
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebGraphicsView::SetZoomValue(const sintn osn_Percent, const bool & orq_Silent)
+void C_SebGraphicsView::SetZoomValue(const int32_t os32_Percent, const bool & orq_Silent)
 {
-   const float64 f64_TargetScale = static_cast<float64>(osn_Percent) / 100.0;
-   const float64 f64_ScaleFactor = f64_TargetScale / transform().m11();
+   const float64_t f64_TargetScale = static_cast<float64_t>(os32_Percent) / 100.0;
+   const float64_t f64_ScaleFactor = f64_TargetScale / transform().m11();
 
    m_ScaleBy(f64_ScaleFactor, orq_Silent);
 }
@@ -144,9 +143,9 @@ void C_SebGraphicsView::SetZoomValue(const sintn osn_Percent, const bool & orq_S
    \return  Actual zoom value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SebGraphicsView::GetZoomValue(void) const
+int32_t C_SebGraphicsView::GetZoomValue(void) const
 {
-   return this->msn_ZoomValue;
+   return this->ms32_ZoomValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -208,7 +207,7 @@ void C_SebGraphicsView::SetDrawingBackground(const bool oq_Active)
 {
    this->mq_DrawBackground = oq_Active;
 
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "STYLE_GUIDE_COLOR_12", !oq_Active);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this, "STYLE_GUIDE_COLOR_12", !oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -325,15 +324,15 @@ void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRect
       QPen c_Pen;
       QRectF c_Rect;
       QLinearGradient c_Gradient;
-      float64 f64_RectWidth;
+      float64_t f64_RectWidth;
 
       if (mq_SubtleSurroundGradient == false)
       {
-         f64_RectWidth = static_cast<float64>(msn_WHITE_EDGE_WIDTH);
+         f64_RectWidth = static_cast<float64_t>(ms32_WHITE_EDGE_WIDTH);
       }
       else
       {
-         f64_RectWidth = static_cast<float64>(msn_WHITE_EDGE_WIDTH) / 2.0;
+         f64_RectWidth = static_cast<float64_t>(ms32_WHITE_EDGE_WIDTH) / 2.0;
       }
 
       if (this->mq_DarkMode == false)
@@ -357,7 +356,7 @@ void C_SebGraphicsView::drawBackground(QPainter * const opc_Painter, const QRect
 
       // draw the first rectangle
       c_Gradient.setStart(0.0, 0.0);
-      c_Gradient.setFinalStop(static_cast<float64>(f64_RectWidth), 0.0);
+      c_Gradient.setFinalStop(static_cast<float64_t>(f64_RectWidth), 0.0);
       opc_Painter->setBrush(c_Gradient);
 
       c_Rect.setX(orc_Rect.x());
@@ -487,7 +486,7 @@ void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
       this->mc_LastMouseEvent = *opc_Event;
 
       // using buttonS to make sure that really only one of the button is clicked
-      if (opc_Event->buttons() == static_cast<sintn>(Qt::RightButton))
+      if (opc_Event->buttons() == static_cast<int32_t>(Qt::RightButton))
       {
          // deactivate rubberband functionality
          this->setDragMode(QGraphicsView::NoDrag);
@@ -495,7 +494,7 @@ void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
       }
       else if (q_RubberBandModeAvailable == true)
       {
-         if (opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton))
+         if (opc_Event->buttons() == static_cast<int32_t>(Qt::LeftButton))
          {
             // activate rubberband functionality
             this->setDragMode(QGraphicsView::RubberBandDrag);
@@ -715,65 +714,64 @@ void C_SebGraphicsView::m_ZoomNotificationTimerEvent()
    \param[in]  orq_Silent        Flag if user notification should be shown
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & orq_Silent)
+void C_SebGraphicsView::m_ScaleBy(const float64_t of64_ScaleFactor, const bool & orq_Silent)
 {
    QTransform c_Tranform = this->transform();
 
    //get absolute factor
-   const float64 f64_Factor =
+   const float64_t f64_Factor =
       c_Tranform.scale(of64_ScaleFactor, of64_ScaleFactor).mapRect(QRectF(0.0, 0.0, 1.0, 1.0)).width();
-   const float64 f64_Value = f64_Factor * 100.0;
+   const float64_t f64_Value = f64_Factor * 100.0;
 
    //min limit reached?
-   if (f64_Value < static_cast<float64>(msn_MIN_ZOOM_IN_PERCENT))
+   if (f64_Value < static_cast<float64_t>(ms32_MIN_ZOOM_IN_PERCENT))
    {
-      if (C_OSCUtils::h_IsFloat64NearlyEqual(f64_Value, static_cast<float64>(msn_MIN_ZOOM_IN_PERCENT)) == false)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(f64_Value, static_cast<float64_t>(ms32_MIN_ZOOM_IN_PERCENT)) == false)
       {
          //set min and return
-         SetZoomValue(msn_MIN_ZOOM_IN_PERCENT, orq_Silent);
-         return;
+         SetZoomValue(ms32_MIN_ZOOM_IN_PERCENT, orq_Silent);
       }
    }
-
    //max limit reached?
-   if ((f64_Factor * 100.0) > static_cast<float64>(msn_MAX_ZOOM_IN_PERCENT))
+   else if ((f64_Factor * 100.0) > static_cast<float64_t>(ms32_MAX_ZOOM_IN_PERCENT))
    {
-      if (C_OSCUtils::h_IsFloat64NearlyEqual(f64_Value, static_cast<float64>(msn_MAX_ZOOM_IN_PERCENT)) == false)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(f64_Value, static_cast<float64_t>(ms32_MAX_ZOOM_IN_PERCENT)) == false)
       {
          //set max and return
-         SetZoomValue(msn_MAX_ZOOM_IN_PERCENT, orq_Silent);
-         return;
+         SetZoomValue(ms32_MAX_ZOOM_IN_PERCENT, orq_Silent);
       }
    }
-
-   //zoom it
-   scale(of64_ScaleFactor, of64_ScaleFactor);
-
+   else
    {
-      // adapt the scene rectangle
-      C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
-      if (pc_Scene != NULL)
+      //zoom it
+      scale(of64_ScaleFactor, of64_ScaleFactor);
+
       {
-         QPointF c_Point;
-         QRectF c_Rect = this->scene()->sceneRect();
-
-         //Register new scaling factor
-         pc_Scene->UpdateTransform(this->transform());
-
-         // add this to the rectangle to avoid the view move to left border first
-         c_Point = this->mapToScene(this->rect().bottomRight());
-         c_Rect.setBottomRight(c_Point);
-
-         // check if new rectangle is bigger than minimum required scene rectangle
-         if (c_Rect.contains(pc_Scene->GetMinimumSceneRect()) == true)
+         // adapt the scene rectangle
+         C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+         if (pc_Scene != NULL)
          {
-            this->scene()->setSceneRect(c_Rect);
+            QPointF c_Point;
+            QRectF c_Rect = this->scene()->sceneRect();
+
+            //Register new scaling factor
+            pc_Scene->UpdateTransform(this->transform());
+
+            // add this to the rectangle to avoid the view move to left border first
+            c_Point = this->mapToScene(this->rect().bottomRight());
+            c_Rect.setBottomRight(c_Point);
+
+            // check if new rectangle is bigger than minimum required scene rectangle
+            if (c_Rect.contains(pc_Scene->GetMinimumSceneRect()) == true)
+            {
+               this->scene()->setSceneRect(c_Rect);
+            }
          }
       }
-   }
 
-   //update zoom value
-   m_UpdateZoomValue(orq_Silent);
+      //update zoom value
+      m_UpdateZoomValue(orq_Silent);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -782,7 +780,7 @@ void C_SebGraphicsView::m_ScaleBy(const float64 of64_ScaleFactor, const bool & o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomIn(void)
 {
-   SetZoomValue(this->msn_ZoomValue + msn_ZOOM_STEP_IN_PERCENT);
+   SetZoomValue(this->ms32_ZoomValue + ms32_ZOOM_STEP_IN_PERCENT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -791,7 +789,7 @@ void C_SebGraphicsView::m_ZoomIn(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_ZoomOut(void)
 {
-   SetZoomValue(this->msn_ZoomValue - msn_ZOOM_STEP_IN_PERCENT);
+   SetZoomValue(this->ms32_ZoomValue - ms32_ZOOM_STEP_IN_PERCENT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -802,13 +800,13 @@ void C_SebGraphicsView::m_ZoomOut(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::m_UpdateZoomValue(const bool & orq_Silent)
 {
-   msn_ZoomValue = static_cast<sintn>(round(transform().m11() * 100.0));
+   ms32_ZoomValue = static_cast<int32_t>(round(transform().m11() * 100.0));
 
    if (orq_Silent == false)
    {
       QString c_ZoomString = "Zoom: ";
       //update zoomtext
-      c_ZoomString = c_ZoomString + QString::number(msn_ZoomValue) + " %";
+      c_ZoomString = c_ZoomString + QString::number(ms32_ZoomValue) + " %";
       this->mpc_ZoomButton->setText(c_ZoomString);
 
       //show notification and start timer
@@ -848,23 +846,23 @@ void C_SebGraphicsView::m_DragMove(const QMouseEvent * const opc_Event)
 
    if (q_RightToLeft == true)
    {
-      pc_HorBar->setValue(pc_HorBar->value() + static_cast<sintn>(c_Delta.x()));
+      pc_HorBar->setValue(pc_HorBar->value() + static_cast<int32_t>(c_Delta.x()));
    }
    else
    {
-      pc_HorBar->setValue(pc_HorBar->value() - static_cast<sintn>(c_Delta.x()));
+      pc_HorBar->setValue(pc_HorBar->value() - static_cast<int32_t>(c_Delta.x()));
    }
 
-   pc_VerBar->setValue(pc_VerBar->value() - static_cast<sintn>(c_Delta.y()));
+   pc_VerBar->setValue(pc_VerBar->value() - static_cast<int32_t>(c_Delta.y()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebGraphicsView::m_HorScrollbarChanged(const sintn osn_Min, const sintn osn_Max)
+void C_SebGraphicsView::m_HorScrollbarChanged(const int32_t os32_Min, const int32_t os32_Max)
 {
    // The position of the viewport with the scrollbars can be changed only if the scrollbars are already
    // visible. Check if position shall be changed and if the minimum and maximum of the scrollbars are different.
    // This is an indicator for visible scroll bars.
-   if ((this->mq_ViewPortPosHorSet == true) && (osn_Min != osn_Max))
+   if ((this->mq_ViewPortPosHorSet == true) && (os32_Min != os32_Max))
    {
       this->mq_ViewPortPosHorSet = false;
 
@@ -873,12 +871,12 @@ void C_SebGraphicsView::m_HorScrollbarChanged(const sintn osn_Min, const sintn o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebGraphicsView::m_VerScrollbarChanged(const sintn osn_Min, const sintn osn_Max)
+void C_SebGraphicsView::m_VerScrollbarChanged(const int32_t os32_Min, const int32_t os32_Max)
 {
    // The position of the viewport with the scrollbars can be changed only if the scrollbars are already
    // visible. Check if position shall be changed and if the minimum and maximum of the scrollbars are different.
    // This is an indicator for visible scroll bars.
-   if ((this->mq_ViewPortPosVerSet == true) && (osn_Min != osn_Max))
+   if ((this->mq_ViewPortPosVerSet == true) && (os32_Min != os32_Max))
    {
       this->mq_ViewPortPosVerSet = false;
 

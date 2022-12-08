@@ -8,21 +8,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsItem>
 
-#include "stwtypes.h"
-#include "C_OSCUtils.h"
-#include "C_GiCustomFunctions.h"
+#include "stwtypes.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GiCustomFunctions.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const float64 C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE = 6.0;
+const float64_t C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE = 6.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -63,26 +62,26 @@ QVariant C_GiCustomFunctions::h_ItemChange(const QGraphicsItem::GraphicsItemChan
    //Return value for ItemPositionHasChanged has no effect
    if (oe_Change == QGraphicsItem::ItemPositionChange)
    {
-      const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
-      const float64 f64_MinY = orc_Offset.y() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
+      const float64_t f64_MinHorizontal = orc_Offset.x() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
+      const float64_t f64_MinVertical = orc_Offset.y() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
       //Scene boundaries check only makes sense in scene coordinates
       QPointF c_NewPos = opc_GraphicsItem->mapToScene(orc_Value.toPointF());
       const QPointF c_SceneTopLeftOld = opc_GraphicsItem->mapToScene(opc_GraphicsItem->boundingRect().topLeft());
       const QPointF c_DiffPrev = orc_Value.toPointF() - opc_GraphicsItem->pos();
       const QPointF c_SceneTopLeftNew = c_SceneTopLeftOld + c_DiffPrev;
-      if (c_SceneTopLeftNew.x() < f64_MinX)
+      if (c_SceneTopLeftNew.x() < f64_MinHorizontal)
       {
          //Adapt current x by offset of top left corner to minimum position
-         c_NewPos.setX(c_NewPos.x() + (f64_MinX - c_SceneTopLeftNew.x()));
+         c_NewPos.setX(c_NewPos.x() + (f64_MinHorizontal - c_SceneTopLeftNew.x()));
          if (opq_Changed != NULL)
          {
             *opq_Changed = true;
          }
       }
-      if (c_SceneTopLeftNew.y() < f64_MinY)
+      if (c_SceneTopLeftNew.y() < f64_MinVertical)
       {
          //Adapt current y by offset of top left corner to minimum position
-         c_NewPos.setY(c_NewPos.y() + (f64_MinY - c_SceneTopLeftNew.y()));
+         c_NewPos.setY(c_NewPos.y() + (f64_MinVertical - c_SceneTopLeftNew.y()));
          if (opq_Changed != NULL)
          {
             *opq_Changed = true;
@@ -105,25 +104,25 @@ QVariant C_GiCustomFunctions::h_ItemChange(const QGraphicsItem::GraphicsItemChan
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiCustomFunctions::h_AdaptMouseRangePos(QPointF & orc_Pos, const QPointF & orc_Offset, bool * const opq_Changed)
 {
-   const float64 f64_MinX = orc_Offset.x() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
-   const float64 f64_MinY = orc_Offset.y() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
+   const float64_t f64_MinHorizontal = orc_Offset.x() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
+   const float64_t f64_MinVertical = orc_Offset.y() + C_GiCustomFunctions::hf64_SCENE_MIN_BORDER_SIZE;
 
    if (opq_Changed != NULL)
    {
       *opq_Changed = false;
    }
 
-   if (orc_Pos.x() < f64_MinX)
+   if (orc_Pos.x() < f64_MinHorizontal)
    {
-      orc_Pos.setX(f64_MinX);
+      orc_Pos.setX(f64_MinHorizontal);
       if (opq_Changed != NULL)
       {
          *opq_Changed = true;
       }
    }
-   if (orc_Pos.y() < f64_MinY)
+   if (orc_Pos.y() < f64_MinVertical)
    {
-      orc_Pos.setY(f64_MinY);
+      orc_Pos.setY(f64_MinVertical);
       if (opq_Changed != NULL)
       {
          *opq_Changed = true;
@@ -142,7 +141,7 @@ void C_GiCustomFunctions::h_AdaptMouseRangePos(QPointF & orc_Pos, const QPointF 
    Adapted delta
 */
 //----------------------------------------------------------------------------------------------------------------------
-QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64 of64_AspectRatio,
+QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64_t of64_AspectRatio,
                                                         const C_GiCustomFunctions::E_AspectRatioMovement oe_AspectRatioMovement,
                                                         const QPointF & orc_Delta)
 {
@@ -154,7 +153,7 @@ QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64 of64_Aspec
       // adapt the difference to the aspect ratio
       if ((c_Delta.x() * -1.0) > c_Delta.y())
       {
-         if (C_OSCUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
+         if (C_OscUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
          {
             c_Delta.setY((c_Delta.x() * -1.0) / of64_AspectRatio);
          }
@@ -168,7 +167,7 @@ QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64 of64_Aspec
       // adapt the difference to the aspect ratio
       if (c_Delta.x() > (c_Delta.y() * -1.0))
       {
-         if (C_OSCUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
+         if (C_OscUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
          {
             c_Delta.setY((c_Delta.x() * -1.0) / of64_AspectRatio);
          }
@@ -182,7 +181,7 @@ QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64 of64_Aspec
       // adapt the difference to the aspect ratio
       if (c_Delta.x() < c_Delta.y())
       {
-         if (C_OSCUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
+         if (C_OscUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
          {
             c_Delta.setY(c_Delta.x() / of64_AspectRatio);
          }
@@ -196,7 +195,7 @@ QPointF C_GiCustomFunctions::h_AdaptDeltaForAspectRatio(const float64 of64_Aspec
       // adapt the difference to the aspect ratio
       if (c_Delta.x() > c_Delta.y())
       {
-         if (C_OSCUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
+         if (C_OscUtils::h_IsFloat64NearlyEqual(of64_AspectRatio, 0.0) == false)
          {
             c_Delta.setY(c_Delta.x() / of64_AspectRatio);
          }

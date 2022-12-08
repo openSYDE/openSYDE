@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "C_SdBueUnoMessageBaseCommand.h"
+#include "TglUtils.hpp"
+#include "C_SdBueUnoMessageBaseCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,7 +44,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoMessageBaseCommand::C_SdBueUnoMessageBaseCommand(
-   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageId,
+   const std::vector<C_OscCanMessageIdentificationIndices> & orc_MessageId,
    C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, const QString & orc_Text,
    QUndoCommand * const opc_Parent) :
@@ -56,7 +55,7 @@ C_SdBueUnoMessageBaseCommand::C_SdBueUnoMessageBaseCommand(
    if (this->mpc_MessageSyncManager != NULL)
    {
       this->mc_UniqueId.reserve(orc_MessageId.size());
-      for (uint32 u32_It = 0UL; u32_It < orc_MessageId.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < orc_MessageId.size(); ++u32_It)
       {
          this->mc_UniqueId.push_back(this->mpc_MessageSyncManager->GetUniqueId(orc_MessageId[u32_It]));
       }
@@ -80,11 +79,11 @@ bool C_SdBueUnoMessageBaseCommand::m_CheckMessagesSortedAscending() const
    tgl_assert(this->mpc_MessageSyncManager != NULL);
    if (this->mpc_MessageSyncManager != NULL)
    {
-      C_OSCCanMessageIdentificationIndices c_PrevId;
+      C_OscCanMessageIdentificationIndices c_PrevId;
       bool q_PrevIdValid = false;
-      for (uint32 u32_It = 0UL; u32_It < this->mc_UniqueId.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < this->mc_UniqueId.size(); ++u32_It)
       {
-         const C_OSCCanMessageIdentificationIndices c_Id = this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
+         const C_OscCanMessageIdentificationIndices c_Id = this->mpc_MessageSyncManager->GetMessageIdForUniqueId(
             this->mc_UniqueId[u32_It]);
          if (q_PrevIdValid)
          {

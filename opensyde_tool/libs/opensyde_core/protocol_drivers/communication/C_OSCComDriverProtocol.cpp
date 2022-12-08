@@ -15,30 +15,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "TGLUtils.h"
-#include "C_OSCComDriverProtocol.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCDiagProtocolOsy.h"
-#include "C_OSCProtocolDriverOsyTpCan.h"
-#include "C_OSCProtocolDriverOsyTpIp.h"
-#include "C_OSCRoutingCalculation.h"
-#include "C_OSCSecurityRsa.h"
-#include "TGLUtils.h"
-#include "TGLTime.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
+#include "C_OscComDriverProtocol.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscDiagProtocolOsy.hpp"
+#include "C_OscProtocolDriverOsyTpCan.hpp"
+#include "C_OscProtocolDriverOsyTpIp.hpp"
+#include "C_OscRoutingCalculation.hpp"
+#include "C_OscSecurityRsa.hpp"
+#include "TglUtils.hpp"
+#include "TglTime.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_can;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::can;
+using namespace stw::scl;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -58,8 +58,8 @@ using namespace stw_opensyde_core;
    Initialize all members based on view
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComDriverProtocol::C_OSCComDriverProtocol(void) :
-   C_OSCComDriverBase(),
+C_OscComDriverProtocol::C_OscComDriverProtocol(void) :
+   C_OscComDriverBase(),
    mq_Initialized(false),
    mpc_CanTransportProtocolBroadcast(NULL),
    mpc_IpTransportProtocolBroadcast(NULL),
@@ -77,9 +77,9 @@ C_OSCComDriverProtocol::C_OSCComDriverProtocol(void) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
+C_OscComDriverProtocol::~C_OscComDriverProtocol(void)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0; u32_Counter < this->mc_TransportProtocols.size(); ++u32_Counter)
    {
@@ -127,14 +127,14 @@ C_OSCComDriverProtocol::~C_OSCComDriverProtocol(void)
    C_RANGE       Routing configuration failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefinition,
-                                    const uint32 ou32_ActiveBusIndex, const std::vector<uint8> & orc_ActiveNodes,
-                                    C_CAN_Dispatcher * const opc_CanDispatcher,
-                                    C_OSCIpDispatcher * const opc_IpDispatcher,
-                                    C_OSCSecurityPemDatabase * const opc_SecurityPemDb)
+int32_t C_OscComDriverProtocol::Init(const C_OscSystemDefinition & orc_SystemDefinition,
+                                     const uint32_t ou32_ActiveBusIndex, const std::vector<uint8_t> & orc_ActiveNodes,
+                                     C_CanDispatcher * const opc_CanDispatcher,
+                                     C_OscIpDispatcher * const opc_IpDispatcher,
+                                     C_OscSecurityPemDatabase * const opc_SecurityPemDb)
 {
-   sint32 s32_Retval = C_NOACT;
-   uint32 u32_Counter;
+   int32_t s32_Retval = C_NOACT;
+   uint32_t u32_Counter;
 
    // Check the parameters
    // At least one node active ?
@@ -169,7 +169,7 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
       if (this->mpc_SecurityPemDb != NULL)
       {
          // Initialization of RSA library
-         C_OSCSecurityRsa::h_Init();
+         C_OscSecurityRsa::h_Init();
       }
 
       //No check for connected because error check passed
@@ -182,15 +182,15 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
             if (s32_Retval == C_NO_ERR)
             {
                //Init client ID
-               this->mc_ClientID.u8_NodeIdentifier = mhu8_NODE_ID_CLIENT;
-               this->mc_ClientID.u8_BusIdentifier = orc_SystemDefinition.c_Buses[this->mu32_ActiveBusIndex].u8_BusID;
+               this->mc_ClientId.u8_NodeIdentifier = mhu8_NODE_ID_CLIENT;
+               this->mc_ClientId.u8_BusIdentifier = orc_SystemDefinition.c_Buses[this->mu32_ActiveBusIndex].u8_BusId;
                //Detect communication type
                switch (orc_SystemDefinition.c_Buses[this->mu32_ActiveBusIndex].e_Type)
                {
-               case C_OSCSystemBus::eCAN:
-                  s32_Retval = m_InitForCAN();
+               case C_OscSystemBus::eCAN:
+                  s32_Retval = m_InitForCan();
                   break;
-               case C_OSCSystemBus::eETHERNET:
+               case C_OscSystemBus::eETHERNET:
                   s32_Retval = m_InitForEthernet();
                   break;
                default:
@@ -228,13 +228,13 @@ sint32 C_OSCComDriverProtocol::Init(const C_OSCSystemDefinition & orc_SystemDefi
    C_COM       Error of service
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const opc_SkipNodes)
+int32_t C_OscComDriverProtocol::SendTesterPresent(const std::set<uint32_t> * const opc_SkipNodes)
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
       {
@@ -242,7 +242,7 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
          if ((opc_SkipNodes == NULL) ||
              (opc_SkipNodes->find(u32_Counter) == opc_SkipNodes->end()))
          {
-            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
+            C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
             if (pc_ProtocolOsy != NULL)
             {
                // Send tester present message without expecting a response
@@ -273,14 +273,14 @@ sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::set<uint32> * const 
    C_COM       Error of service
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::SendTesterPresent(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId)
+int32_t C_OscComDriverProtocol::SendTesterPresent(const stw::opensyde_core::C_OscProtocolDriverOsyNode & orc_ServerId)
 const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->m_GetOsyProtocol(orc_ServerId);
+      C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->m_GetOsyProtocol(orc_ServerId);
       if (pc_ProtocolOsy != NULL)
       {
          // Send tester present message without expecting a response
@@ -308,21 +308,21 @@ const
    C_COM       Error of service
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::SendTesterPresent(const std::vector<stw_types::uint32> & orc_ActiveNodes)
+int32_t C_OscComDriverProtocol::SendTesterPresent(const std::vector<uint32_t> & orc_ActiveNodes)
 const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < orc_ActiveNodes.size(); ++u32_Counter)
       {
-         const uint32 u32_ActiveNode = orc_ActiveNodes[u32_Counter];
+         const uint32_t u32_ActiveNode = orc_ActiveNodes[u32_Counter];
          if (u32_ActiveNode < this->mc_OsyProtocols.size())
          {
-            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNode];
+            C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNode];
             if (pc_ProtocolOsy != NULL)
             {
                // Send tester present message without expecting a response
@@ -376,10 +376,10 @@ const
    C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::StartRouting(const uint32 ou32_NodeIndex, uint32 * const opu32_ErrorNodeIndex)
+int32_t C_OscComDriverProtocol::StartRouting(const uint32_t ou32_NodeIndex, uint32_t * const opu32_ErrorNodeIndex)
 {
-   sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   int32_t s32_Return;
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
    {
@@ -419,10 +419,10 @@ sint32 C_OSCComDriverProtocol::StartRouting(const uint32 ou32_NodeIndex, uint32 
    C_RANGE    node index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::StopRouting(const uint32 ou32_NodeIndex)
+int32_t C_OscComDriverProtocol::StopRouting(const uint32_t ou32_NodeIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   int32_t s32_Return = C_NO_ERR;
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
    {
@@ -447,11 +447,11 @@ sint32 C_OSCComDriverProtocol::StopRouting(const uint32 ou32_NodeIndex)
    C_RANGE      Node index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::IsRoutingNecessary(const uint32 ou32_NodeIndex)
+int32_t C_OscComDriverProtocol::IsRoutingNecessary(const uint32_t ou32_NodeIndex)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
    bool q_Found;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Found);
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Found);
 
    if (q_Found == true)
    {
@@ -486,26 +486,26 @@ sint32 C_OSCComDriverProtocol::IsRoutingNecessary(const uint32 ou32_NodeIndex)
    \retval   false    Ethernet to Ethernet Routing must not be supported by router node
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComDriverProtocol::IsEthToEthRoutingNecessary(const uint32 ou32_RouterNodeIndex) const
+bool C_OscComDriverProtocol::IsEthToEthRoutingNecessary(const uint32_t ou32_RouterNodeIndex) const
 {
    bool q_Return = false;
-   uint32 u32_RouteCounter;
+   uint32_t u32_RouteCounter;
 
    // Check all routes
    for (u32_RouteCounter = 0U; u32_RouteCounter < this->mc_Routes.size(); ++u32_RouteCounter)
    {
-      const C_OSCRoutingRoute & rc_Route = this->mc_Routes[u32_RouteCounter];
-      uint32 u32_RoutePointCounter;
+      const C_OscRoutingRoute & rc_Route = this->mc_Routes[u32_RouteCounter];
+      uint32_t u32_RoutePointCounter;
 
       // Check all points
       for (u32_RoutePointCounter = 0U; u32_RoutePointCounter < rc_Route.c_VecRoutePoints.size();
            ++u32_RoutePointCounter)
       {
-         const C_OSCRoutingRoutePoint & rc_Point = rc_Route.c_VecRoutePoints[u32_RoutePointCounter];
+         const C_OscRoutingRoutePoint & rc_Point = rc_Route.c_VecRoutePoints[u32_RoutePointCounter];
 
          if ((rc_Point.u32_NodeIndex == ou32_RouterNodeIndex) &&
-             (rc_Point.e_InInterfaceType == C_OSCSystemBus::eETHERNET) &&
-             (rc_Point.e_OutInterfaceType == C_OSCSystemBus::eETHERNET))
+             (rc_Point.e_InInterfaceType == C_OscSystemBus::eETHERNET) &&
+             (rc_Point.e_OutInterfaceType == C_OscSystemBus::eETHERNET))
          {
             // Ethernet routing is necessary for this node for at least one route
             q_Return = true;
@@ -534,11 +534,11 @@ bool C_OSCComDriverProtocol::IsEthToEthRoutingNecessary(const uint32 ou32_Router
    C_RANGE      Node index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::GetBusIndexOfRoutingNode(const uint32 ou32_NodeIndex, uint32 & oru32_BusIndex)
+int32_t C_OscComDriverProtocol::GetBusIndexOfRoutingNode(const uint32_t ou32_NodeIndex, uint32_t & oru32_BusIndex)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
    bool q_Found;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Found);
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Found);
 
    if (q_Found == true)
    {
@@ -574,17 +574,17 @@ sint32 C_OSCComDriverProtocol::GetBusIndexOfRoutingNode(const uint32 ou32_NodeIn
    Maximum number of route points
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComDriverProtocol::GetRoutingPointMaximum(void) const
+uint32_t C_OscComDriverProtocol::GetRoutingPointMaximum(void) const
 {
-   uint32 u32_Maximum = 0U;
-   uint32 u32_Counter;
+   uint32_t u32_Maximum = 0U;
+   uint32_t u32_Counter;
 
    // Search the longest route
    for (u32_Counter = 0U; u32_Counter < this->mc_Routes.size(); ++u32_Counter)
    {
       if (this->mc_Routes[u32_Counter].c_VecRoutePoints.size() > u32_Maximum)
       {
-         u32_Maximum = this->mc_Routes[u32_Counter].c_VecRoutePoints.size();
+         u32_Maximum = static_cast<uint32_t>(this->mc_Routes[u32_Counter].c_VecRoutePoints.size());
       }
    }
 
@@ -601,16 +601,16 @@ uint32 C_OSCComDriverProtocol::GetRoutingPointMaximum(void) const
    Number of route points
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComDriverProtocol::GetRoutingPointCount(const uint32 ou32_NodeIndex, bool & orq_Active) const
+uint32_t C_OscComDriverProtocol::GetRoutingPointCount(const uint32_t ou32_NodeIndex, bool & orq_Active) const
 {
-   uint32 u32_Count = 0U;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &orq_Active);
+   uint32_t u32_Count = 0U;
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &orq_Active);
 
    if (orq_Active == true)
    {
       if (u32_ActiveIndex < this->mc_Routes.size())
       {
-         u32_Count = this->mc_Routes[u32_ActiveIndex].c_VecRoutePoints.size();
+         u32_Count = static_cast<uint32_t>(this->mc_Routes[u32_ActiveIndex].c_VecRoutePoints.size());
       }
       else
       {
@@ -628,10 +628,10 @@ uint32 C_OSCComDriverProtocol::GetRoutingPointCount(const uint32 ou32_NodeIndex,
    \param[out]    orc_Route              Route of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::GetRouteOfNode(const uint32 ou32_NodeIndex, C_OSCRoutingRoute & orc_Route) const
+void C_OscComDriverProtocol::GetRouteOfNode(const uint32_t ou32_NodeIndex, C_OscRoutingRoute & orc_Route) const
 {
    bool q_Active;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Active);
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex, &q_Active);
 
    if (q_Active == true)
    {
@@ -653,11 +653,11 @@ void C_OSCComDriverProtocol::GetRouteOfNode(const uint32 ou32_NodeIndex, C_OSCRo
    \retval   C_CONFIG   Route of node is not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::GetRoutingTargetInterfaceType(const uint32 ou32_NodeIndex,
-                                                             C_OSCSystemBus::E_Type & ore_InterfaceType) const
+int32_t C_OscComDriverProtocol::GetRoutingTargetInterfaceType(const uint32_t ou32_NodeIndex,
+                                                              C_OscSystemBus::E_Type & ore_InterfaceType) const
 {
-   sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   int32_t s32_Return;
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
    {
@@ -665,7 +665,7 @@ sint32 C_OSCComDriverProtocol::GetRoutingTargetInterfaceType(const uint32 ou32_N
    }
    else
    {
-      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
+      const C_OscRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
 
       if (rc_ActRoute.c_VecRoutePoints.size() > 0)
       {
@@ -695,11 +695,11 @@ sint32 C_OSCComDriverProtocol::GetRoutingTargetInterfaceType(const uint32 ou32_N
    \retval   C_CONFIG   Route of node is not valid or has no route points
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::GetServerIdOfLastRouter(const uint32 ou32_NodeIndex,
-                                                       C_OSCProtocolDriverOsyNode & orc_RouterServerId) const
+int32_t C_OscComDriverProtocol::GetServerIdOfLastRouter(const uint32_t ou32_NodeIndex,
+                                                        C_OscProtocolDriverOsyNode & orc_RouterServerId) const
 {
-   sint32 s32_Return;
-   const uint32 u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
+   int32_t s32_Return;
+   const uint32_t u32_ActiveIndex = this->m_GetActiveIndex(ou32_NodeIndex);
 
    if (u32_ActiveIndex >= this->mc_ActiveNodesIndexes.size())
    {
@@ -707,15 +707,15 @@ sint32 C_OSCComDriverProtocol::GetServerIdOfLastRouter(const uint32 ou32_NodeInd
    }
    else
    {
-      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
+      const C_OscRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveIndex];
 
       if (rc_ActRoute.c_VecRoutePoints.size() > 0)
       {
          // Get the next to last routing point. That is the last router.
-         const uint32 u32_RouterNodeIndex =
+         const uint32_t u32_RouterNodeIndex =
             rc_ActRoute.c_VecRoutePoints[rc_ActRoute.c_VecRoutePoints.size() - 1].u32_NodeIndex;
 
-         orc_RouterServerId = this->mc_ServerIDs[this->m_GetActiveIndex(u32_RouterNodeIndex)];
+         orc_RouterServerId = this->mc_ServerIds[this->m_GetActiveIndex(u32_RouterNodeIndex)];
 
          s32_Return = C_NO_ERR;
       }
@@ -735,9 +735,9 @@ sint32 C_OSCComDriverProtocol::GetServerIdOfLastRouter(const uint32 ou32_NodeInd
    Client id
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCProtocolDriverOsyNode & C_OSCComDriverProtocol::GetClientId(void) const
+const C_OscProtocolDriverOsyNode & C_OscComDriverProtocol::GetClientId(void) const
 {
-   return this->mc_ClientID;
+   return this->mc_ClientId;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -751,17 +751,17 @@ const C_OSCProtocolDriverOsyNode & C_OSCComDriverProtocol::GetClientId(void) con
    false    Node index not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComDriverProtocol::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                          uint32 & oru32_NodeIndex) const
+bool C_OscComDriverProtocol::GetNodeIndex(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                          uint32_t & oru32_NodeIndex) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
    bool q_Found = false;
 
-   tgl_assert(this->mc_ServerIDs.size() == this->mc_ActiveNodesIndexes.size());
+   tgl_assert(this->mc_ServerIds.size() == this->mc_ActiveNodesIndexes.size());
 
-   for (u32_Counter = 0U; u32_Counter < this->mc_ServerIDs.size(); ++u32_Counter)
+   for (u32_Counter = 0U; u32_Counter < this->mc_ServerIds.size(); ++u32_Counter)
    {
-      if (orc_ServerId == this->mc_ServerIDs[u32_Counter])
+      if (orc_ServerId == this->mc_ServerIds[u32_Counter])
       {
          oru32_NodeIndex = this->mc_ActiveNodesIndexes[u32_Counter];
          q_Found = true;
@@ -776,12 +776,11 @@ bool C_OSCComDriverProtocol::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc
 /*! \brief   Dump all messages of receive queue of CAN dispatcher
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::ClearDispatcherQueue(void)
+void C_OscComDriverProtocol::ClearDispatcherQueue(void)
 {
-   uint32 u32_Counter;
-
    if (this->mq_Initialized == true)
    {
+      uint32_t u32_Counter;
       // Get all messages for clearing them
       if (this->mpc_CanDispatcher != NULL)
       {
@@ -790,8 +789,8 @@ void C_OSCComDriverProtocol::ClearDispatcherQueue(void)
 
       for (u32_Counter = 0U; u32_Counter < this->mc_TransportProtocols.size(); ++u32_Counter)
       {
-         C_OSCProtocolDriverOsyTpCan * const pc_CanTp =
-            dynamic_cast<C_OSCProtocolDriverOsyTpCan *>(this->mc_TransportProtocols[u32_Counter]);
+         C_OscProtocolDriverOsyTpCan * const pc_CanTp =
+            dynamic_cast<C_OscProtocolDriverOsyTpCan *>(this->mc_TransportProtocols[u32_Counter]);
 
          if (pc_CanTp != NULL)
          {
@@ -813,7 +812,7 @@ void C_OSCComDriverProtocol::ClearDispatcherQueue(void)
    Is initialized flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComDriverProtocol::IsInitialized(void) const
+bool C_OscComDriverProtocol::IsInitialized(void) const
 {
    return this->mq_Initialized;
 }
@@ -835,15 +834,15 @@ bool C_OSCComDriverProtocol::IsInitialized(void) const
    C_CONFIG   no transport protocol installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId) const
+int32_t C_OscComDriverProtocol::ReConnectNode(const stw::opensyde_core::C_OscProtocolDriverOsyNode & orc_ServerId) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
    bool q_Found;
-   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+   const uint32_t u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
 
    if (q_Found == true)
    {
-      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeIndex];
+      C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeIndex];
       if (pc_ProtocolOsy != NULL)
       {
          s32_Return = pc_ProtocolOsy->ReConnect();
@@ -863,15 +862,15 @@ sint32 C_OSCComDriverProtocol::ReConnectNode(const stw_opensyde_core::C_OSCProto
    C_RANGE    node not found or no openSYDE protocol installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::DisconnectNode(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
+int32_t C_OscComDriverProtocol::DisconnectNode(const C_OscProtocolDriverOsyNode & orc_ServerId) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
    bool q_Found;
-   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+   const uint32_t u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
 
    if (q_Found == true)
    {
-      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeIndex];
+      C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeIndex];
       if (pc_ProtocolOsy != NULL)
       {
          s32_Return = pc_ProtocolOsy->Disconnect();
@@ -884,13 +883,13 @@ sint32 C_OSCComDriverProtocol::DisconnectNode(const C_OSCProtocolDriverOsyNode &
 /*! \brief   Disconnecting from all openSYDE nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::DisconnectNodes(void) const
+void C_OscComDriverProtocol::DisconnectNodes(void) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->mc_OsyProtocols.size(); ++u32_Counter)
    {
-      C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
+      C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_Counter];
       if (pc_ProtocolOsy != NULL)
       {
          pc_ProtocolOsy->Disconnect();
@@ -904,13 +903,13 @@ void C_OSCComDriverProtocol::DisconnectNodes(void) const
    To be called by child classes on shutdown, before they destroy all owned class instances
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::PrepareForDestruction(void)
+void C_OscComDriverProtocol::PrepareForDestruction(void)
 {
    //go through TP instances and let them know there will be no more dispatcher ...
-   for (uint32 u32_ItTp = 0; u32_ItTp < this->mc_TransportProtocols.size(); ++u32_ItTp)
+   for (uint32_t u32_ItTp = 0; u32_ItTp < this->mc_TransportProtocols.size(); ++u32_ItTp)
    {
-      C_OSCProtocolDriverOsyTpCan * const pc_Tp =
-         dynamic_cast<C_OSCProtocolDriverOsyTpCan *>(this->mc_TransportProtocols[u32_ItTp]);
+      C_OscProtocolDriverOsyTpCan * const pc_Tp =
+         dynamic_cast<C_OscProtocolDriverOsyTpCan *>(this->mc_TransportProtocols[u32_ItTp]);
       //do we have a CAN TP ?
       if (pc_Tp != NULL)
       {
@@ -918,8 +917,8 @@ void C_OSCComDriverProtocol::PrepareForDestruction(void)
       }
       else
       {
-         C_OSCProtocolDriverOsyTpIp * const pc_TpIp =
-            dynamic_cast<C_OSCProtocolDriverOsyTpIp *>(this->mc_TransportProtocols[u32_ItTp]);
+         C_OscProtocolDriverOsyTpIp * const pc_TpIp =
+            dynamic_cast<C_OscProtocolDriverOsyTpIp *>(this->mc_TransportProtocols[u32_ItTp]);
          if (pc_TpIp != NULL)
          {
             pc_TpIp->SetDispatcher(NULL, 0U);
@@ -937,7 +936,7 @@ void C_OSCComDriverProtocol::PrepareForDestruction(void)
       this->mpc_IpTransportProtocolBroadcast->SetDispatcher(NULL, 0U);
    }
 
-   C_OSCComDriverBase::PrepareForDestruction();
+   C_OscComDriverBase::PrepareForDestruction();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -952,11 +951,11 @@ void C_OSCComDriverProtocol::PrepareForDestruction(void)
    else: pointer to openSYDE transport protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProtocolDriverOsyTpBase * C_OSCComDriverProtocol::GetOsyTransportProtocol(const uint32 ou32_NodeIndex)
+C_OscProtocolDriverOsyTpBase * C_OscComDriverProtocol::GetOsyTransportProtocol(const uint32_t ou32_NodeIndex)
 {
-   C_OSCProtocolDriverOsyTpBase * pc_Tp = NULL;
+   C_OscProtocolDriverOsyTpBase * pc_Tp = NULL;
 
-   for (uint16 u16_Index = 0U; u16_Index < mc_TransportProtocols.size(); u16_Index++)
+   for (uint16_t u16_Index = 0U; u16_Index < mc_TransportProtocols.size(); u16_Index++)
    {
       if (mc_ActiveNodesIndexes[u16_Index] == ou32_NodeIndex)
       {
@@ -974,7 +973,7 @@ C_OSCProtocolDriverOsyTpBase * C_OSCComDriverProtocol::GetOsyTransportProtocol(c
    Count of active registered nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComDriverProtocol::m_GetActiveNodeCount(void) const
+uint32_t C_OscComDriverProtocol::m_GetActiveNodeCount(void) const
 {
    return this->mu32_ActiveNodeCount;
 }
@@ -990,9 +989,9 @@ uint32 C_OSCComDriverProtocol::m_GetActiveNodeCount(void) const
    \return   index of node within list of active nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const uint32 ou32_NodeIndex, bool * const opq_Found) const
+uint32_t C_OscComDriverProtocol::m_GetActiveIndex(const uint32_t ou32_NodeIndex, bool * const opq_Found) const
 {
-   uint32 u32_Index;
+   uint32_t u32_Index;
    bool q_Found = false;
 
    for (u32_Index = 0U; u32_Index < this->mc_ActiveNodesIndexes.size(); ++u32_Index)
@@ -1027,16 +1026,16 @@ uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const uint32 ou32_NodeIndex, boo
    \return   index of node within list of active nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                bool & orq_Found) const
+uint32_t C_OscComDriverProtocol::m_GetActiveIndex(const stw::opensyde_core::C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                  bool & orq_Found) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    orq_Found = false;
 
-   for (u32_Counter = 0U; u32_Counter < this->mc_ServerIDs.size(); ++u32_Counter)
+   for (u32_Counter = 0U; u32_Counter < this->mc_ServerIds.size(); ++u32_Counter)
    {
-      if (orc_ServerId == this->mc_ServerIDs[u32_Counter])
+      if (orc_ServerId == this->mc_ServerIds[u32_Counter])
       {
          // Index found
          orq_Found = true;
@@ -1054,7 +1053,7 @@ uint32 C_OSCComDriverProtocol::m_GetActiveIndex(const stw_opensyde_core::C_OSCPr
    Pointer to CAN dispatcher
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CAN_Dispatcher * C_OSCComDriverProtocol::m_GetCanDispatcher(void)
+C_CanDispatcher * C_OscComDriverProtocol::m_GetCanDispatcher(void)
 {
    return this->mpc_CanDispatcher;
 }
@@ -1066,7 +1065,7 @@ C_CAN_Dispatcher * C_OSCComDriverProtocol::m_GetCanDispatcher(void)
    Pointer to IP dispatcher
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCIpDispatcher * C_OSCComDriverProtocol::m_GetIpDispatcher(void)
+C_OscIpDispatcher * C_OscComDriverProtocol::m_GetIpDispatcher(void)
 {
    return this->mpc_IpDispatcher;
 }
@@ -1081,14 +1080,14 @@ C_OSCIpDispatcher * C_OSCComDriverProtocol::m_GetIpDispatcher(void)
    NULL           No protocol for server found
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProtocolDriverOsy * C_OSCComDriverProtocol::m_GetOsyProtocol(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
+C_OscProtocolDriverOsy * C_OscComDriverProtocol::m_GetOsyProtocol(const C_OscProtocolDriverOsyNode & orc_ServerId) const
 {
-   C_OSCProtocolDriverOsy * pc_Return = NULL;
-   uint32 u32_Counter;
+   C_OscProtocolDriverOsy * pc_Return = NULL;
+   uint32_t u32_Counter;
 
-   for (u32_Counter = 0U; u32_Counter < this->mc_ServerIDs.size(); ++u32_Counter)
+   for (u32_Counter = 0U; u32_Counter < this->mc_ServerIds.size(); ++u32_Counter)
    {
-      if (orc_ServerId == this->mc_ServerIDs[u32_Counter])
+      if (orc_ServerId == this->mc_ServerIds[u32_Counter])
       {
          // Index found
          if ((u32_Counter < this->mc_OsyProtocols.size()) &&
@@ -1112,13 +1111,13 @@ C_OSCProtocolDriverOsy * C_OSCComDriverProtocol::m_GetOsyProtocol(const C_OSCPro
    Node name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_ActiveNodeIndex) const
+C_SclString C_OscComDriverProtocol::m_GetActiveNodeName(const uint32_t ou32_ActiveNodeIndex) const
 {
-   C_SCLString c_Retval = "Unknown";
+   C_SclString c_Retval = "Unknown";
 
    if (ou32_ActiveNodeIndex < this->mc_ActiveNodesIndexes.size())
    {
-      const uint32 u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
+      const uint32_t u32_NodeIndex = this->mc_ActiveNodesIndexes[ou32_ActiveNodeIndex];
       if ((this->mpc_SysDef != NULL) &&
           (u32_NodeIndex < this->mpc_SysDef->c_Nodes.size()))
       {
@@ -1147,11 +1146,11 @@ C_SCLString C_OSCComDriverProtocol::m_GetActiveNodeName(const uint32 ou32_Active
    C_TIMEOUT   Expected response not received within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, const uint8 ou8_SessionId,
-                                                  const bool oq_CheckForSession, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverProtocol::m_SetNodeSessionId(const uint32_t ou32_ActiveNode, const uint8_t ou8_SessionId,
+                                                   const bool oq_CheckForSession, uint8_t * const opu8_NrCode) const
 {
-   C_OSCProtocolDriverOsy * pc_ProtocolOsy = NULL;
-   sint32 s32_Return;
+   C_OscProtocolDriverOsy * pc_ProtocolOsy = NULL;
+   int32_t s32_Return;
 
    if (ou32_ActiveNode < this->mc_OsyProtocols.size())
    {
@@ -1184,11 +1183,11 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(const uint32 ou32_ActiveNode, 
    C_TIMEOUT   Expected response not received within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(C_OSCProtocolDriverOsy * const opc_ExistingProtocol,
-                                                  const uint8 ou8_SessionId, const bool oq_CheckForSession,
-                                                  uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverProtocol::m_SetNodeSessionId(C_OscProtocolDriverOsy * const opc_ExistingProtocol,
+                                                   const uint8_t ou8_SessionId, const bool oq_CheckForSession,
+                                                   uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
@@ -1198,7 +1197,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(C_OSCProtocolDriverOsy * const
 
          if (oq_CheckForSession == true)
          {
-            uint8 u8_CurrentSession;
+            uint8_t u8_CurrentSession;
 
             // Get the current session
             s32_Return = opc_ExistingProtocol->OsyReadActiveDiagnosticSession(u8_CurrentSession, opu8_NrCode);
@@ -1275,11 +1274,11 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionId(C_OSCProtocolDriverOsy * const
                or at least one node was registered in orc_DefectNodeIndices
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, const bool oq_CheckForSession,
-                                                   std::set<uint32> & orc_DefectNodeIndices) const
+int32_t C_OscComDriverProtocol::m_SetNodesSessionId(const uint8_t ou8_SessionId, const bool oq_CheckForSession,
+                                                    std::set<uint32_t> & orc_DefectNodeIndices) const
 {
-   std::vector<uint32> c_AllActiveNodes;
-   uint32 u32_Counter;
+   std::vector<uint32_t> c_AllActiveNodes;
+   uint32_t u32_Counter;
 
    c_AllActiveNodes.resize(this->mc_ActiveNodesIndexes.size());
    for (u32_Counter = 0U; u32_Counter < c_AllActiveNodes.size(); ++u32_Counter)
@@ -1310,24 +1309,25 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const uint8 ou8_SessionId, co
                or at least one node was registered in orc_DefectNodeIndices
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const std::vector<stw_types::uint32> & orc_ActiveNodes,
-                                                   const uint8 ou8_SessionId, const bool oq_CheckForSession,
-                                                   std::set<uint32> & orc_DefectNodeIndices) const
+int32_t C_OscComDriverProtocol::m_SetNodesSessionId(const std::vector<uint32_t> & orc_ActiveNodes,
+                                                    const uint8_t ou8_SessionId, const bool oq_CheckForSession,
+                                                    std::set<uint32_t> & orc_DefectNodeIndices) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->mq_Initialized == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < orc_ActiveNodes.size(); ++u32_Counter)
       {
-         const uint32 u32_ActiveNode = orc_ActiveNodes[u32_Counter];
+         const uint32_t u32_ActiveNode = orc_ActiveNodes[u32_Counter];
          // Search the input values for a previous problem with the node
          // Further communication is only necessary if the node was ok in the first place
          if (orc_DefectNodeIndices.find(u32_ActiveNode) == orc_DefectNodeIndices.end())
          {
-            const sint32 s32_Return = this->m_SetNodeSessionId(u32_ActiveNode, ou8_SessionId, oq_CheckForSession, NULL);
+            const int32_t s32_Return =
+               this->m_SetNodeSessionId(u32_ActiveNode, ou8_SessionId, oq_CheckForSession, NULL);
 
             if ((s32_Return != C_NO_ERR) && (s32_Return != C_NOACT))
             {
@@ -1383,25 +1383,25 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSessionId(const std::vector<stw_types::
    C_TIMEOUT   Expected response not received within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32 ou32_ActiveNode,
-                                                                 const uint8 ou8_ExpectedNeededSession) const
+int32_t C_OscComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32_t ou32_ActiveNode,
+                                                                  const uint8_t ou8_ExpectedNeededSession) const
 {
    // We need a new session
-   sint32 s32_Return = this->m_SetNodeSessionId(ou32_ActiveNode, ou8_ExpectedNeededSession, true, NULL);
+   int32_t s32_Return = this->m_SetNodeSessionId(ou32_ActiveNode, ou8_ExpectedNeededSession, true, NULL);
 
    if (s32_Return == C_WARN)
    {
-      uint8 u8_NewExpectedNeededSession;
+      uint8_t u8_NewExpectedNeededSession;
 
       if (ou8_ExpectedNeededSession ==
-          C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING)
+          C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING)
       {
          u8_NewExpectedNeededSession =
-            C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_EXTENDED_DIAGNOSIS;
+            C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_EXTENDED_DIAGNOSIS;
       }
       else
       {
-         u8_NewExpectedNeededSession = C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING;
+         u8_NewExpectedNeededSession = C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING;
       }
 
       // Special case: It is possible, that the routing node is not in the
@@ -1432,11 +1432,11 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSessionIdWithExpectation(const uint32 ou
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveNode, const uint8 ou8_SecurityLevel,
-                                                       stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(const uint32_t ou32_ActiveNode, const uint8_t ou8_SecurityLevel,
+                                                        uint8_t * const opu8_NrCode) const
 {
-   C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
-   const sint32 s32_Return = this->m_SetNodeSecurityAccess(pc_ProtocolOsy, ou8_SecurityLevel, opu8_NrCode);
+   C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[ou32_ActiveNode];
+   const int32_t s32_Return = this->m_SetNodeSecurityAccess(pc_ProtocolOsy, ou8_SecurityLevel, opu8_NrCode);
 
    return s32_Return;
 }
@@ -1460,11 +1460,11 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(const uint32 ou32_ActiveN
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * const opc_ExistingProtocol,
-                                                       const uint8 ou8_SecurityLevel,
-                                                       stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy * const opc_ExistingProtocol,
+                                                        const uint8_t ou8_SecurityLevel,
+                                                        uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
@@ -1472,8 +1472,8 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
       {
          // Set the security level
          bool q_SecureMode;
-         uint64 u64_Seed;
-         uint8 ou8_SecurityAlgorithm;
+         uint64_t u64_Seed;
+         uint8_t ou8_SecurityAlgorithm;
 
          s32_Return = opc_ExistingProtocol->OsySecurityAccessRequestSeed(ou8_SecurityLevel, q_SecureMode, u64_Seed,
                                                                          ou8_SecurityAlgorithm, opu8_NrCode);
@@ -1482,10 +1482,10 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
          {
             if (q_SecureMode == false)
             {
-               const uint32 u32_KEY = 23U; // fixed in UDS stack for non secure mode
+               const uint32_t u32_KEY = 23U; // fixed in UDS stack for non secure mode
                if (u64_Seed != 42U)
                {
-                  C_SCLString c_Tmp;
+                  C_SclString c_Tmp;
                   c_Tmp.PrintFormatted("Received seed in non secure mode does not match the "
                                        "expected value, expected: 42, got %i", u64_Seed);
                   // Should be a fixed value too
@@ -1500,41 +1500,41 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
                if (mpc_SecurityPemDb != NULL)
                {
                   //we need the server's certificate snr to look up the correct key
-                  std::vector<uint8> c_CertSnr;
+                  std::vector<uint8_t> c_CertSnr;
                   s32_Return = opc_ExistingProtocol->OsyReadCertificateSerialNumber(c_CertSnr, opu8_NrCode);
 
                   if (s32_Return == C_NO_ERR)
                   {
                      //get PEM file by serial number from database
-                     const C_OSCSecurityPemKeyInfo * const pc_PemKeyInfo =
+                     const C_OscSecurityPemKeyInfo * const pc_PemKeyInfo =
                         this->mpc_SecurityPemDb->GetPemFileBySerialNumber(c_CertSnr);
 
                      if (pc_PemKeyInfo != NULL)
                      {
-                        std::vector<uint8> c_Signature;
-                        std::vector<uint8> c_RandomValue;
-                        std::vector<uint8> c_PrivKey;
+                        std::vector<uint8_t> c_Signature;
+                        std::vector<uint8_t> c_RandomValue;
+                        std::vector<uint8_t> c_PrivKey;
                         c_Signature.resize(128, 0U);
                         c_RandomValue.resize(8, 0U);
 
-                        c_RandomValue[0] = static_cast<uint8>(u64_Seed >> 56U);
-                        c_RandomValue[1] = static_cast<uint8>(u64_Seed >> 48U);
-                        c_RandomValue[2] = static_cast<uint8>(u64_Seed >> 40U);
-                        c_RandomValue[3] = static_cast<uint8>(u64_Seed >> 32U);
-                        c_RandomValue[4] = static_cast<uint8>(u64_Seed >> 24U);
-                        c_RandomValue[5] = static_cast<uint8>(u64_Seed >> 16U);
-                        c_RandomValue[6] = static_cast<uint8>(u64_Seed >> 8U);
-                        c_RandomValue[7] = static_cast<uint8>(u64_Seed);
+                        c_RandomValue[0] = static_cast<uint8_t>(u64_Seed >> 56U);
+                        c_RandomValue[1] = static_cast<uint8_t>(u64_Seed >> 48U);
+                        c_RandomValue[2] = static_cast<uint8_t>(u64_Seed >> 40U);
+                        c_RandomValue[3] = static_cast<uint8_t>(u64_Seed >> 32U);
+                        c_RandomValue[4] = static_cast<uint8_t>(u64_Seed >> 24U);
+                        c_RandomValue[5] = static_cast<uint8_t>(u64_Seed >> 16U);
+                        c_RandomValue[6] = static_cast<uint8_t>(u64_Seed >> 8U);
+                        c_RandomValue[7] = static_cast<uint8_t>(u64_Seed);
 
                         //get private key from PEM file
                         c_PrivKey = pc_PemKeyInfo->GetPrivKeyTextDecoded();
 
                         //calculate RSA signature with private key and random value from server (u64_Seed)
-                        s32_Return = C_OSCSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);
+                        s32_Return = C_OscSecurityRsa::h_SignSignature(c_PrivKey, c_RandomValue, c_Signature);
 
                         if (s32_Return != C_NO_ERR)
                         {
-                           C_SCLString c_Tmp;
+                           C_SclString c_Tmp;
                            c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
                            osc_write_log_error("Security Access", c_Tmp.c_str());
                            s32_Return = C_CHECKSUM;
@@ -1550,7 +1550,7 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
                                                                                           opu8_NrCode);
                               if (s32_Return != C_NO_ERR)
                               {
-                                 C_SCLString c_Tmp;
+                                 C_SclString c_Tmp;
                                  c_Tmp.PrintFormatted("Error on calculating RSA signature: %d", s32_Return);
                                  osc_write_log_error("Security Access", c_Tmp.c_str());
                                  s32_Return = C_CHECKSUM;
@@ -1606,11 +1606,11 @@ sint32 C_OSCComDriverProtocol::m_SetNodeSecurityAccess(C_OSCProtocolDriverOsy * 
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_SecurityLevel,
-                                                        std::set<uint32> & orc_ErrorActiveNodes) const
+int32_t C_OscComDriverProtocol::m_SetNodesSecurityAccess(const uint8_t ou8_SecurityLevel,
+                                                         std::set<uint32_t> & orc_ErrorActiveNodes) const
 {
-   std::vector<uint32> c_AllActiveNodes;
-   uint32 u32_Counter;
+   std::vector<uint32_t> c_AllActiveNodes;
+   uint32_t u32_Counter;
 
    c_AllActiveNodes.resize(this->mc_ActiveNodesIndexes.size());
    for (u32_Counter = 0U; u32_Counter < c_AllActiveNodes.size(); ++u32_Counter)
@@ -1638,21 +1638,21 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const uint8 ou8_Security
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const std::vector<stw_types::uint32> & orc_ActiveNodes,
-                                                        const uint8 ou8_SecurityLevel,
-                                                        std::set<uint32> & orc_ErrorActiveNodes) const
+int32_t C_OscComDriverProtocol::m_SetNodesSecurityAccess(const std::vector<uint32_t> & orc_ActiveNodes,
+                                                         const uint8_t ou8_SecurityLevel,
+                                                         std::set<uint32_t> & orc_ErrorActiveNodes) const
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       s32_Return = C_NOACT;
 
       for (u32_Counter = 0U; u32_Counter < orc_ActiveNodes.size(); ++u32_Counter)
       {
-         const uint32 u32_ActiveNode = orc_ActiveNodes[u32_Counter];
+         const uint32_t u32_ActiveNode = orc_ActiveNodes[u32_Counter];
          s32_Return = this->m_SetNodeSecurityAccess(u32_ActiveNode, ou8_SecurityLevel, NULL);
 
          if ((s32_Return != C_NO_ERR) &&
@@ -1708,21 +1708,21 @@ sint32 C_OSCComDriverProtocol::m_SetNodesSecurityAccess(const std::vector<stw_ty
    C_NOACT     At least one node does not support Ethernet to Ethernet routing
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
-                                                   uint32 * const opu32_ErrorActiveNodeIndex)
+int32_t C_OscComDriverProtocol::m_StartRoutingIp2Ip(const uint32_t ou32_ActiveNode,
+                                                    uint32_t * const opu32_ErrorActiveNodeIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    bool q_Started = false;
 
-   const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[ou32_ActiveNode];
+   const C_OscRoutingRoute & rc_ActRoute = this->mc_Routes[ou32_ActiveNode];
 
    if (rc_ActRoute.c_VecRoutePoints.size() > 0)
    {
       if ((this->mpc_SysDef != NULL) &&
           (this->mc_ActiveNodesIndexes[ou32_ActiveNode] < this->mpc_SysDef->c_Nodes.size()))
       {
-         C_OSCProtocolDriverOsy * pc_ProtocolOsy = NULL;
-         uint32 u32_OsyRoutingTarget;
+         C_OscProtocolDriverOsy * pc_ProtocolOsy = NULL;
+         uint32_t u32_OsyRoutingTarget;
          bool q_Found;
 
          if (this->m_IsRoutingSpecificNecessary(this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]])
@@ -1745,13 +1745,13 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
          {
             // Using the same connection for configuring the router and the final openSYDE target
             pc_ProtocolOsy =
-               dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_OsyRoutingTarget]);
+               dynamic_cast<C_OscProtocolDriverOsy *>(this->mc_OsyProtocols[u32_OsyRoutingTarget]);
          }
 
          if (pc_ProtocolOsy != NULL)
          {
             // In case of Ethernet save the number of protocols which use the same TCP connection
-            const std::map<uint32, uint32>::const_iterator c_Iter =
+            const std::map<uint32_t, uint32_t>::const_iterator c_Iter =
                this->mc_ActiveNodeIp2IpDispatcher.find(ou32_ActiveNode);
 
             if ((c_Iter != this->mc_ActiveNodeIp2IpDispatcher.end()) &&
@@ -1766,32 +1766,32 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
          if ((pc_ProtocolOsy != NULL) &&
              (pc_ProtocolOsy->IsConnected() != C_NO_ERR))
          {
-            uint32 u32_RoutePoint;
+            uint32_t u32_RoutePoint;
 
             for (u32_RoutePoint = 0U; u32_RoutePoint < rc_ActRoute.c_VecRoutePoints.size(); ++u32_RoutePoint)
             {
-               const C_OSCRoutingRoutePoint & rc_RoutePoint = rc_ActRoute.c_VecRoutePoints[u32_RoutePoint];
+               const C_OscRoutingRoutePoint & rc_RoutePoint = rc_ActRoute.c_VecRoutePoints[u32_RoutePoint];
 
                // Start routing for each hop with IP to IP routing
-               if ((rc_RoutePoint.e_InInterfaceType == C_OSCSystemBus::eETHERNET) &&
-                   (rc_RoutePoint.e_OutInterfaceType == C_OSCSystemBus::eETHERNET))
+               if ((rc_RoutePoint.e_InInterfaceType == C_OscSystemBus::eETHERNET) &&
+                   (rc_RoutePoint.e_OutInterfaceType == C_OscSystemBus::eETHERNET))
                {
-                  const uint32 u32_RouterActiveIndex =
+                  const uint32_t u32_RouterActiveIndex =
                      this->m_GetActiveIndex(rc_RoutePoint.u32_NodeIndex, &q_Found);
-                  uint32 u32_NextEthernetNode = 0U;
+                  uint32_t u32_NextEthernetNode = 0U;
                   bool q_NextOneError = false;
 
                   if (q_Found == true)
                   {
-                     const uint32 u32_NextRoutePoint = u32_RoutePoint + 1U;
+                     const uint32_t u32_NextRoutePoint = u32_RoutePoint + 1U;
 
                      // Clear all queues. In case of CAN tp the change causes that more than one queue receives
                      // service responses
                      this->ClearDispatcherQueue();
                      // Because of using the same TCP connection with the IP of the router,
                      // the transport protocol must be adapted to configure the router
-                     pc_ProtocolOsy->SetNodeIdentifiers(this->mc_ClientID,
-                                                        this->mc_ServerIDs[u32_RouterActiveIndex]);
+                     pc_ProtocolOsy->SetNodeIdentifiers(this->mc_ClientId,
+                                                        this->mc_ServerIds[u32_RouterActiveIndex]);
 
                      if (u32_NextRoutePoint < rc_ActRoute.c_VecRoutePoints.size())
                      {
@@ -1825,7 +1825,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                   // Check if node supports IP to IP routing
                   if (s32_Return == C_NO_ERR)
                   {
-                     C_OSCProtocolDriverOsy::C_ListOfFeatures c_Features;
+                     C_OscProtocolDriverOsy::C_ListOfFeatures c_Features;
                      s32_Return = pc_ProtocolOsy->OsyReadListOfFeatures(c_Features);
 
                      if (s32_Return == C_NO_ERR)
@@ -1856,14 +1856,14 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                      if ((rc_RoutePoint.u32_InBusIndex < this->mpc_SysDef->c_Buses.size()) &&
                          (rc_RoutePoint.u32_OutBusIndex < this->mpc_SysDef->c_Buses.size()))
                      {
-                        const uint8 u8_SourceBusId =
-                           this->mpc_SysDef->c_Buses[rc_RoutePoint.u32_InBusIndex].u8_BusID;
-                        const uint8 u8_TargetBusId =
-                           this->mpc_SysDef->c_Buses[rc_RoutePoint.u32_OutBusIndex].u8_BusID;
+                        const uint8_t u8_SourceBusId =
+                           this->mpc_SysDef->c_Buses[rc_RoutePoint.u32_InBusIndex].u8_BusId;
+                        const uint8_t u8_TargetBusId =
+                           this->mpc_SysDef->c_Buses[rc_RoutePoint.u32_OutBusIndex].u8_BusId;
 
                         // Configuration of the routing to the next Ethernet node
                         s32_Return = pc_ProtocolOsy->OsySetRouteIp2IpCommunication(
-                           static_cast<uint8>(rc_RoutePoint.e_OutInterfaceType),
+                           static_cast<uint8_t>(rc_RoutePoint.e_OutInterfaceType),
                            rc_RoutePoint.u8_OutInterfaceNumber,
                            u8_SourceBusId,
                            u8_TargetBusId,
@@ -1878,21 +1878,21 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                   // Poll for success
                   if (s32_Return == C_NO_ERR)
                   {
-                     const uint32 u32_StartTime = TGL_GetTickCount();
+                     const uint32_t u32_StartTime = TglGetTickCount();
 
                      do
                      {
-                        uint8 u8_Status;
+                        uint8_t u8_Status;
                         s32_Return = pc_ProtocolOsy->OsyCheckRouteIp2IpCommunication(u8_Status);
 
                         if ((s32_Return != C_NO_ERR) ||
-                            (u8_Status >= C_OSCProtocolDriverOsy::hu8_OSY_IP_2_IP_STATUS_ERROR))
+                            (u8_Status >= C_OscProtocolDriverOsy::hu8_OSY_IP_2_IP_STATUS_ERROR))
                         {
                            // Finished or error
                            q_Started = true;
 
                            if ((s32_Return == C_NO_ERR) &&
-                               (u8_Status == C_OSCProtocolDriverOsy::hu8_OSY_IP_2_IP_STATUS_ERROR))
+                               (u8_Status == C_OscProtocolDriverOsy::hu8_OSY_IP_2_IP_STATUS_ERROR))
                            {
                               // Error of service
                               s32_Return = C_WARN;
@@ -1914,11 +1914,11 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                            // the target of the next point is not reachable
                            q_NextOneError = true;
                            // Let the node do its work
-                           TGL_Sleep(20);
+                           TglSleep(20);
                         }
                      }
                      // TODO BAY: Timeout time!
-                     while (TGL_GetTickCount() < (u32_StartTime + 1000U));
+                     while (TglGetTickCount() < (u32_StartTime + 1000U));
                   }
 
                   if ((s32_Return != C_NO_ERR) && (opu32_ErrorActiveNodeIndex != NULL))
@@ -1939,7 +1939,7 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
                   // service responses
                   this->ClearDispatcherQueue();
                   // Configuring IP to IP routing finished, reset the transport protocol configuration
-                  pc_ProtocolOsy->SetNodeIdentifiers(this->mc_ClientID, this->mc_ServerIDs[u32_OsyRoutingTarget]);
+                  pc_ProtocolOsy->SetNodeIdentifiers(this->mc_ClientId, this->mc_ServerIds[u32_OsyRoutingTarget]);
                }
             }
          }
@@ -1955,16 +1955,16 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
    {
       osc_write_log_info("Start IP to IP Routing",
                          "IP to IP Routing to node " +
-                         C_SCLString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
-                         " over " + C_SCLString::IntToStr(this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size()) +
+                         C_SclString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
+                         " over " + C_SclString::IntToStr(this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size()) +
                          " routing points started.");
    }
    else if (s32_Return != C_NO_ERR)
    {
       osc_write_log_error("Start IP to IP Routing",
-                          "Error on starting IP to IP routing to node " + C_SCLString::IntToStr(
+                          "Error on starting IP to IP routing to node " + C_SclString::IntToStr(
                              this->mc_ActiveNodesIndexes[ou32_ActiveNode]) + " with error " +
-                          C_OSCLoggingHandler::h_StwError(s32_Return));
+                          C_OscLoggingHandler::h_StwError(s32_Return));
    }
    else
    {
@@ -2010,9 +2010,10 @@ sint32 C_OSCComDriverProtocol::m_StartRoutingIp2Ip(const uint32 ou32_ActiveNode,
    C_CHECKSUM Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint32 * const opu32_ErrorActiveNodeIndex)
+int32_t C_OscComDriverProtocol::m_StartRouting(const uint32_t ou32_ActiveNode,
+                                               uint32_t * const opu32_ErrorActiveNodeIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() > 0)
    {
@@ -2021,20 +2022,20 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
 
       if (this->mpc_SysDef != NULL)
       {
-         const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
+         const C_OscNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
 
          if (this->mc_ActiveNodesIndexes[ou32_ActiveNode] < this->mpc_SysDef->c_Nodes.size())
          {
             bool q_OsyRouting = false;
-            C_OSCRoutingRoute c_ActRoute = this->mc_Routes[ou32_ActiveNode];
-            C_OSCCanDispatcherOsyRouter * pc_RoutingDispatcher = NULL;
-            const C_OSCRoutingRoutePoint c_LastNodeOfRouting =
+            C_OscRoutingRoute c_ActRoute = this->mc_Routes[ou32_ActiveNode];
+            C_OscCanDispatcherOsyRouter * pc_RoutingDispatcher = NULL;
+            const C_OscRoutingRoutePoint c_LastNodeOfRouting =
                c_ActRoute.c_VecRoutePoints[c_ActRoute.c_VecRoutePoints.size() - 1];
-            const uint32 u32_ActiveLastNode = this->m_GetActiveIndex(c_LastNodeOfRouting.u32_NodeIndex);
-            C_OSCProtocolDriverOsy * pc_ProtocolOsyOfLastNodeOfRouting =
-               dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveLastNode]);
+            const uint32_t u32_ActiveLastNode = this->m_GetActiveIndex(c_LastNodeOfRouting.u32_NodeIndex);
+            C_OscProtocolDriverOsy * pc_ProtocolOsyOfLastNodeOfRouting =
+               dynamic_cast<C_OscProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveLastNode]);
             bool q_EthernetRouter = false;
-            uint32 u32_ActiveOsyTargetNode = ou32_ActiveNode;
+            uint32_t u32_ActiveOsyTargetNode = ou32_ActiveNode;
 
             s32_Return = this->m_StartRoutingSpecific(ou32_ActiveNode, pc_Node, c_LastNodeOfRouting,
                                                       pc_ProtocolOsyOfLastNodeOfRouting,
@@ -2071,22 +2072,22 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                 (q_OsyRouting == true))
             {
                // Setup and start openSYDE routing configuration
-               uint32 u32_CounterRoutePoints;
-               const uint32 u32_SourceBusIndex = c_ActRoute.c_VecRoutePoints[0].u32_InBusIndex;
+               uint32_t u32_CounterRoutePoints;
+               const uint32_t u32_SourceBusIndex = c_ActRoute.c_VecRoutePoints[0].u32_InBusIndex;
 
                for (u32_CounterRoutePoints = 0U;
                     u32_CounterRoutePoints < c_ActRoute.c_VecRoutePoints.size();
                     ++u32_CounterRoutePoints)
                {
-                  const C_OSCRoutingRoutePoint & rc_Point = c_ActRoute.c_VecRoutePoints[u32_CounterRoutePoints];
+                  const C_OscRoutingRoutePoint & rc_Point = c_ActRoute.c_VecRoutePoints[u32_CounterRoutePoints];
 
                   // In case of Ethernet as out interface the ip to ip routing handles this server
-                  if (rc_Point.e_OutInterfaceType != C_OSCSystemBus::eETHERNET)
+                  if (rc_Point.e_OutInterfaceType != C_OscSystemBus::eETHERNET)
                   {
-                     const uint32 u32_ActiveRouterNode = this->m_GetActiveIndex(rc_Point.u32_NodeIndex);
+                     const uint32_t u32_ActiveRouterNode = this->m_GetActiveIndex(rc_Point.u32_NodeIndex);
 
-                     C_OSCProtocolDriverOsy * const pc_ProtocolOsyTarget =
-                        dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveOsyTargetNode]);
+                     C_OscProtocolDriverOsy * const pc_ProtocolOsyTarget =
+                        dynamic_cast<C_OscProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveOsyTargetNode]);
 
                      if (pc_ProtocolOsyTarget != NULL)
                      {
@@ -2095,8 +2096,8 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                         this->ClearDispatcherQueue();
                         // Because of using the same connection,
                         // the protocol must be adapted to configure the router
-                        pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientID,
-                                                                 this->mc_ServerIDs[u32_ActiveRouterNode]);
+                        pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientId,
+                                                                 this->mc_ServerIds[u32_ActiveRouterNode]);
 
                         if (q_EthernetRouter == false)
                         {
@@ -2120,27 +2121,27 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
 
                         if (s32_Return == C_NO_ERR)
                         {
-                           uint32 u32_CounterTargetPoint;
+                           uint32_t u32_CounterTargetPoint;
                            for (u32_CounterTargetPoint = u32_CounterRoutePoints;
                                 u32_CounterTargetPoint < c_ActRoute.c_VecRoutePoints.size();
                                 ++u32_CounterTargetPoint)
                            {
-                              const C_OSCRoutingRoutePoint & rc_PointTarget =
+                              const C_OscRoutingRoutePoint & rc_PointTarget =
                                  c_ActRoute.c_VecRoutePoints[u32_CounterTargetPoint];
 
                               // Get the Bus IDs
                               if ((u32_SourceBusIndex < this->mpc_SysDef->c_Buses.size()) &&
                                   (rc_PointTarget.u32_OutBusIndex < this->mpc_SysDef->c_Buses.size()))
                               {
-                                 const uint8 u8_SourceBusId = this->mpc_SysDef->c_Buses[u32_SourceBusIndex].u8_BusID;
-                                 const uint8 u8_TargetBusId =
-                                    this->mpc_SysDef->c_Buses[rc_PointTarget.u32_OutBusIndex].u8_BusID;
+                                 const uint8_t u8_SourceBusId = this->mpc_SysDef->c_Buses[u32_SourceBusIndex].u8_BusId;
+                                 const uint8_t u8_TargetBusId =
+                                    this->mpc_SysDef->c_Buses[rc_PointTarget.u32_OutBusIndex].u8_BusId;
 
                                  // Configure the real node for each layer
                                  s32_Return = pc_ProtocolOsyTarget->OsySetRouteDiagnosisCommunication(
-                                    static_cast<uint8>(rc_Point.e_InInterfaceType),
+                                    static_cast<uint8_t>(rc_Point.e_InInterfaceType),
                                     rc_Point.u8_InInterfaceNumber,
-                                    static_cast<uint8>(rc_Point.e_OutInterfaceType),
+                                    static_cast<uint8_t>(rc_Point.e_OutInterfaceType),
                                     rc_Point.u8_OutInterfaceNumber,
                                     u8_SourceBusId,
                                     u8_TargetBusId);
@@ -2166,8 +2167,8 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                         // service responses
                         this->ClearDispatcherQueue();
                         // Configuring of routing finished, reset the protocol configuration
-                        pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientID,
-                                                                 this->mc_ServerIDs[u32_ActiveOsyTargetNode]);
+                        pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientId,
+                                                                 this->mc_ServerIds[u32_ActiveOsyTargetNode]);
                      }
                      else
                      {
@@ -2196,8 +2197,8 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
                if ((q_OsyRouting == false) &&
                    (c_ActRoute.c_VecRoutePoints.size() == 1))
                {
-                  C_OSCProtocolDriverOsy * const pc_ProtocolOsyRouter =
-                     dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveLastNode]);
+                  C_OscProtocolDriverOsy * const pc_ProtocolOsyRouter =
+                     dynamic_cast<C_OscProtocolDriverOsy *>(this->mc_OsyProtocols[u32_ActiveLastNode]);
 
                   if ((pc_ProtocolOsyRouter != NULL) &&
                       (q_EthernetRouter == false))
@@ -2234,7 +2235,8 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
 
             if (s32_Return == C_NO_ERR)
             {
-               const std::map<uint32, uint32>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
+               const std::map<uint32_t,
+                              uint32_t>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
                   ou32_ActiveNode);
 
                if (c_ItRouterNode != this->mc_ActiveNodeIp2CanDispatcher.end())
@@ -2261,16 +2263,16 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
    if (s32_Return == C_NO_ERR)
    {
       osc_write_log_info("Start Routing",
-                         "Routing to node " + C_SCLString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
-                         " over " + C_SCLString::IntToStr(this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size()) +
+                         "Routing to node " + C_SclString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
+                         " over " + C_SclString::IntToStr(this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size()) +
                          " routing points started.");
    }
    else
    {
       osc_write_log_error("Start Routing",
-                          "Error on starting routing to node " + C_SCLString::IntToStr(
+                          "Error on starting routing to node " + C_SclString::IntToStr(
                              this->mc_ActiveNodesIndexes[ou32_ActiveNode]) + " with error " +
-                          C_OSCLoggingHandler::h_StwError(s32_Return));
+                          C_OscLoggingHandler::h_StwError(s32_Return));
    }
 
    return s32_Return;
@@ -2286,17 +2288,16 @@ sint32 C_OSCComDriverProtocol::m_StartRouting(const uint32 ou32_ActiveNode, uint
    C_RANGE    node index out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
+void C_OscComDriverProtocol::m_StopRouting(const uint32_t ou32_ActiveNode)
 {
    if ((ou32_ActiveNode < this->mc_Routes.size()) &&
        (this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() > 0) &&
        (this->mpc_SysDef != NULL))
    {
-      const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
-      sint32 s32_CounterRoutePoints;
-      const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[ou32_ActiveNode];
-      const uintn un_LastRoutePointIndex = rc_ActRoute.c_VecRoutePoints.size() - 1;
-      uint32 u32_ActiveOsyTargetNode;
+      const C_OscNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
+      const C_OscRoutingRoute & rc_ActRoute = this->mc_Routes[ou32_ActiveNode];
+      const uint32_t u32_LastRoutePointIndex = static_cast<uint32_t>(rc_ActRoute.c_VecRoutePoints.size() - 1);
+      uint32_t u32_ActiveOsyTargetNode;
       bool q_Found;
 
       // Stop specific routing first. It needs the openSYDE routing if configured
@@ -2318,7 +2319,9 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
 
       if (q_Found == true)
       {
-         for (s32_CounterRoutePoints = static_cast<sint32>(un_LastRoutePointIndex);
+         int32_t s32_CounterRoutePoints;
+
+         for (s32_CounterRoutePoints = static_cast<int32_t>(u32_LastRoutePointIndex);
               s32_CounterRoutePoints >= 0;
               --s32_CounterRoutePoints)
          {
@@ -2333,7 +2336,7 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
       }
 
       osc_write_log_info("Stop Routing",
-                         "Routing to node " + C_SCLString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
+                         "Routing to node " + C_SclString::IntToStr(this->mc_ActiveNodesIndexes[ou32_ActiveNode]) +
                          " stopped.");
    }
 
@@ -2367,25 +2370,25 @@ void C_OSCComDriverProtocol::m_StopRouting(const uint32 ou32_ActiveNode)
    For example closing A - B will close A - C as well. C - E could no be stopped properly.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
+void C_OscComDriverProtocol::m_StopRoutingOfActiveNodes(void)
 {
    if (this->mpc_SysDef != NULL)
    {
-      uint32 u32_ActiveNode;
-      sint32 s32_LastRouteHop = 0U;
-      sint32 s32_RouteHopCounter;
+      uint32_t u32_ActiveNode;
+      int32_t s32_LastRouteHop = 0U;
+      int32_t s32_RouteHopCounter;
 
-      std::vector<sint32> c_ActiveOsyTargetNodes;
+      std::vector<int32_t> c_ActiveOsyTargetNodes;
 
       c_ActiveOsyTargetNodes.resize(this->mc_ActiveNodesIndexes.size(), -1);
 
       for (u32_ActiveNode = 0U; u32_ActiveNode < this->mc_ActiveNodesIndexes.size(); ++u32_ActiveNode)
       {
-         const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveNode];
+         const C_OscRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveNode];
 
          if (rc_ActRoute.c_VecRoutePoints.size() > 0)
          {
-            const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ActiveNode]];
+            const C_OscNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ActiveNode]];
 
             // Stop specific routing of all nodes first. It needs the openSYDE routing if configured
             this->m_StopRoutingSpecific(u32_ActiveNode);
@@ -2397,7 +2400,7 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
 
                // Specific protocol necessary. Routing dispatcher necessary.
                // Use the last openSYDE node protocol instance for the IP to IP routing
-               const uint32 u32_Index = this->m_GetActiveIndex(
+               const uint32_t u32_Index = this->m_GetActiveIndex(
                   rc_ActRoute.c_VecRoutePoints[rc_ActRoute.c_VecRoutePoints.size() - 1].u32_NodeIndex, &q_Found);
 
                if (q_Found == true)
@@ -2412,9 +2415,9 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
             }
 
             // Get the most far route hop
-            if (rc_ActRoute.c_VecRoutePoints.size() > static_cast<uint32>(s32_LastRouteHop))
+            if (rc_ActRoute.c_VecRoutePoints.size() > static_cast<uint32_t>(s32_LastRouteHop))
             {
-               s32_LastRouteHop = rc_ActRoute.c_VecRoutePoints.size();
+               s32_LastRouteHop = static_cast<uint32_t>(rc_ActRoute.c_VecRoutePoints.size());
             }
          }
       }
@@ -2426,9 +2429,9 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
          {
             if (c_ActiveOsyTargetNodes[u32_ActiveNode] >= 0)
             {
-               const C_OSCRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveNode];
+               const C_OscRoutingRoute & rc_ActRoute = this->mc_Routes[u32_ActiveNode];
 
-               if (static_cast<uint32>(s32_RouteHopCounter) < rc_ActRoute.c_VecRoutePoints.size())
+               if (static_cast<uint32_t>(s32_RouteHopCounter) < rc_ActRoute.c_VecRoutePoints.size())
                {
                   if (this->m_StopRoutingOfRoutingPoint(u32_ActiveNode, c_ActiveOsyTargetNodes[u32_ActiveNode],
                                                         rc_ActRoute.c_VecRoutePoints[s32_RouteHopCounter],
@@ -2462,33 +2465,33 @@ void C_OSCComDriverProtocol::m_StopRoutingOfActiveNodes(void)
    C_CHECKSUM  Security related error (something went wrong while handshaking with the server)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_ActiveNode,
-                                                           const uint32 ou32_ActiveOsyTargetNode,
-                                                           const C_OSCRoutingRoutePoint & orc_Point,
-                                                           const bool oq_FirstPoint)
+int32_t C_OscComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32_t ou32_ActiveNode,
+                                                            const uint32_t ou32_ActiveOsyTargetNode,
+                                                            const C_OscRoutingRoutePoint & orc_Point,
+                                                            const bool oq_FirstPoint)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    // Using the same connection for configuring the router and the final openSYDE target
-   C_OSCProtocolDriverOsy * const pc_ProtocolOsyTarget =
-      dynamic_cast<C_OSCProtocolDriverOsy *>(this->mc_OsyProtocols[ou32_ActiveOsyTargetNode]);
+   C_OscProtocolDriverOsy * const pc_ProtocolOsyTarget =
+      dynamic_cast<C_OscProtocolDriverOsy *>(this->mc_OsyProtocols[ou32_ActiveOsyTargetNode]);
 
    if (pc_ProtocolOsyTarget != NULL)
    {
       bool q_DoDisconnect = true;
 
-      if (orc_Point.e_OutInterfaceType == C_OSCSystemBus::eCAN)
+      if (orc_Point.e_OutInterfaceType == C_OscSystemBus::eCAN)
       {
-         const uint32 u32_CurrentNode = this->m_GetActiveIndex(orc_Point.u32_NodeIndex);
-         sint32 s32_Retval;
+         const uint32_t u32_CurrentNode = this->m_GetActiveIndex(orc_Point.u32_NodeIndex);
+         int32_t s32_Retval;
 
          // Clear all queues. In case of CAN tp the change causes that more than one queue receives
          // service responses
          this->ClearDispatcherQueue();
          // Because of using the same connection,
          // the protocol must be adapted to configure the router
-         pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientID,
-                                                  this->mc_ServerIDs[u32_CurrentNode]);
+         pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientId,
+                                                  this->mc_ServerIds[u32_CurrentNode]);
 
          // We need an other security level
          s32_Retval = this->m_SetNodeSecurityAccess(ou32_ActiveOsyTargetNode, 5, NULL);
@@ -2500,24 +2503,25 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
             if (s32_Retval != C_NO_ERR)
             {
                osc_write_log_error("Stop Routing",
-                                   "Error on stopping routing to node " + C_SCLString::IntToStr(
+                                   "Error on stopping routing to node " + C_SclString::IntToStr(
                                       orc_Point.u32_NodeIndex) + " with error " +
-                                   C_OSCLoggingHandler::h_StwError(s32_Retval));
+                                   C_OscLoggingHandler::h_StwError(s32_Retval));
             }
          }
          else
          {
             osc_write_log_error("Stop Routing",
-                                "Error on setting security access on node " + C_SCLString::IntToStr(
+                                "Error on setting security access on node " + C_SclString::IntToStr(
                                    orc_Point.u32_NodeIndex) + " with error " +
-                                C_OSCLoggingHandler::h_StwError(s32_Retval));
+                                C_OscLoggingHandler::h_StwError(s32_Retval));
          }
 
          if (oq_FirstPoint == true)
          {
             // In case of Ethernet to CAN routing check the number of protocols which use the same TCP connection
             // Disconnect only if no one is left
-            const std::map<uint32, uint32>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
+            const std::map<uint32_t,
+                           uint32_t>::const_iterator c_ItRouterNode = this->mc_ActiveNodeIp2CanDispatcher.find(
                ou32_ActiveNode);
 
             if ((c_ItRouterNode != this->mc_ActiveNodeIp2CanDispatcher.end()) &&
@@ -2546,13 +2550,13 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
          // service responses
          this->ClearDispatcherQueue();
          // Configuring of routing finished, reset the protocol configuration
-         pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientID,
-                                                  this->mc_ServerIDs[ou32_ActiveOsyTargetNode]);
+         pc_ProtocolOsyTarget->SetNodeIdentifiers(this->mc_ClientId,
+                                                  this->mc_ServerIds[ou32_ActiveOsyTargetNode]);
       }
 
       // In case of Ethernet as out interface the ip to ip routing is active and will be closed
       // by closing the TCP connection with the disconnect
-      if (orc_Point.e_InInterfaceType == C_OSCSystemBus::eETHERNET)
+      if (orc_Point.e_InInterfaceType == C_OscSystemBus::eETHERNET)
       {
          // Ethernet routing to this point
 
@@ -2561,7 +2565,7 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
 
          // In case of Ethernet check the number of protocols which use the same TCP connection
          // Disconnect only if no one is left
-         const std::map<uint32, uint32>::const_iterator c_Iter =
+         const std::map<uint32_t, uint32_t>::const_iterator c_Iter =
             this->mc_ActiveNodeIp2IpDispatcher.find(ou32_ActiveNode);
 
          if ((c_Iter != this->mc_ActiveNodeIp2IpDispatcher.end()) &&
@@ -2600,7 +2604,7 @@ sint32 C_OSCComDriverProtocol::m_StopRoutingOfRoutingPoint(const uint32 ou32_Act
    \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverProtocol::m_StopRoutingSpecific(const stw_types::uint32 ou32_ActiveNode)
+void C_OscComDriverProtocol::m_StopRoutingSpecific(const uint32_t ou32_ActiveNode)
 {
    // Close the tunneling and clean up the routing dispatcher
    if ((ou32_ActiveNode < this->mc_LegacyRouterDispatchers.size()) &&
@@ -2609,10 +2613,10 @@ void C_OSCComDriverProtocol::m_StopRoutingSpecific(const stw_types::uint32 ou32_
       if (this->mc_Routes[ou32_ActiveNode].c_VecRoutePoints.size() > 0)
       {
          // For the exit we need an other security level
-         const uint32 u32_ActiveRouterNode = this->m_GetActiveIndex(this->mc_Routes[ou32_ActiveNode].
-                                                                    c_VecRoutePoints[this->mc_Routes[ou32_ActiveNode].
-                                                                                     c_VecRoutePoints.size() -
-                                                                                     1].u32_NodeIndex);
+         const uint32_t u32_ActiveRouterNode = this->m_GetActiveIndex(this->mc_Routes[ou32_ActiveNode].
+                                                                      c_VecRoutePoints[this->mc_Routes[ou32_ActiveNode].
+                                                                                       c_VecRoutePoints.size() -
+                                                                                       1].u32_NodeIndex);
 
          this->m_SetNodeSecurityAccess(u32_ActiveRouterNode, 5, NULL);
       }
@@ -2635,14 +2639,14 @@ void C_OSCComDriverProtocol::m_StopRoutingSpecific(const stw_types::uint32 ou32_
    C_COM         For minimum one target no routes were found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_InitRoutesAndActiveNodes(void)
+int32_t C_OscComDriverProtocol::m_InitRoutesAndActiveNodes(void)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->mpc_SysDef != NULL)
    {
       //Count active nodes
-      C_OSCRoutingCalculation::E_Mode e_Mode;
+      C_OscRoutingCalculation::E_Mode e_Mode;
       const bool q_RoutingUsed = this->m_GetRoutingMode(e_Mode);
 
       this->mu32_ActiveNodeCount = 0;
@@ -2650,19 +2654,19 @@ sint32 C_OSCComDriverProtocol::m_InitRoutesAndActiveNodes(void)
       this->mc_Routes.clear();
 
       //Init routes
-      for (uint32 u32_ItActiveFlag = 0; u32_ItActiveFlag < this->mc_ActiveNodesSystem.size(); ++u32_ItActiveFlag)
+      for (uint32_t u32_ItActiveFlag = 0; u32_ItActiveFlag < this->mc_ActiveNodesSystem.size(); ++u32_ItActiveFlag)
       {
          if (this->mc_ActiveNodesSystem[u32_ItActiveFlag] == 1U)
          {
             //Calculate all routes
-            const C_OSCRoutingCalculation c_RouteCalculation(this->mpc_SysDef->c_Nodes, this->mc_ActiveNodesSystem,
+            const C_OscRoutingCalculation c_RouteCalculation(this->mpc_SysDef->c_Nodes, this->mc_ActiveNodesSystem,
                                                              this->mu32_ActiveBusIndex,
                                                              u32_ItActiveFlag, e_Mode);
             s32_Retval = c_RouteCalculation.GetState();
             if (s32_Retval == C_NO_ERR)
             {
                // Get the best route for this node
-               const C_OSCRoutingRoute * const pc_Route = c_RouteCalculation.GetBestRoute();
+               const C_OscRoutingRoute * const pc_Route = c_RouteCalculation.GetBestRoute();
                if (pc_Route != NULL)
                {
                   // If no routing shall be used, register only nodes which are connected to the PC bus directly
@@ -2711,25 +2715,25 @@ sint32 C_OSCComDriverProtocol::m_InitRoutesAndActiveNodes(void)
    C_CONFIG Invalid initialization
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
+int32_t C_OscComDriverProtocol::m_InitServerIds(void)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if ((this->mpc_SysDef != NULL) &&
        (this->mc_Routes.size() == this->mu32_ActiveNodeCount))
    {
       //Init routes
-      this->mc_ServerIDs.clear();
+      this->mc_ServerIds.clear();
       this->mc_ServerIpAddresses.clear();
-      this->mc_ServerIDs.reserve(this->mu32_ActiveNodeCount);
+      this->mc_ServerIds.reserve(this->mu32_ActiveNodeCount);
       this->mc_ServerIpAddresses.reserve(this->mu32_ActiveNodeCount);
-      for (uint32 u32_ItActiveNode = 0;
+      for (uint32_t u32_ItActiveNode = 0;
            (u32_ItActiveNode < this->mc_ActiveNodesIndexes.size()) && (s32_Retval == C_NO_ERR);
            ++u32_ItActiveNode)
       {
-         const C_OSCSystemBus * pc_Bus;
-         uint32 u32_BusIndex = 0xFFFFFFFFU;
-         C_OSCRoutingRoute & rc_Route = this->mc_Routes[u32_ItActiveNode];
+         const C_OscSystemBus * pc_Bus;
+         uint32_t u32_BusIndex = 0xFFFFFFFFU;
+         C_OscRoutingRoute & rc_Route = this->mc_Routes[u32_ItActiveNode];
          //Get bus index
          if (rc_Route.c_VecRoutePoints.size() == 0)
          {
@@ -2738,14 +2742,14 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
          }
          else
          {
-            const C_OSCRoutingRoutePoint & rc_LastHop =
+            const C_OscRoutingRoutePoint & rc_LastHop =
                rc_Route.c_VecRoutePoints[rc_Route.c_VecRoutePoints.size() - 1U];
 
             if (rc_LastHop.u32_NodeIndex < this->mpc_SysDef->c_Nodes.size())
             {
-               const C_OSCNode * const pc_LastHopNode = &this->mpc_SysDef->c_Nodes[rc_LastHop.u32_NodeIndex];
+               const C_OscNode * const pc_LastHopNode = &this->mpc_SysDef->c_Nodes[rc_LastHop.u32_NodeIndex];
 
-               const C_OSCNodeComInterfaceSettings * const pc_Interface =
+               const C_OscNodeComInterfaceSettings * const pc_Interface =
                   pc_LastHopNode->c_Properties.GetComInterface(rc_LastHop.e_OutInterfaceType,
                                                                rc_LastHop.u8_OutInterfaceNumber);
                if (pc_Interface != NULL)
@@ -2778,19 +2782,19 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
 
             if (u32_ItActiveNode < this->mpc_SysDef->c_Nodes.size())
             {
-               const C_OSCNode * const pc_Node =
+               const C_OscNode * const pc_Node =
                   &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ItActiveNode]];
 
-               const std::vector<C_OSCNodeComInterfaceSettings> & rc_ComInterfaces =
+               const std::vector<C_OscNodeComInterfaceSettings> & rc_ComInterfaces =
                   pc_Node->c_Properties.c_ComInterfaces;
                bool q_Found = false;
-               C_OSCProtocolDriverOsyNode c_NewServerId;
-               C_OSCNodeComInterfaceSettings::C_IpAddress c_IpAddress;
+               C_OscProtocolDriverOsyNode c_NewServerId;
+               C_OscNodeComInterfaceSettings::C_IpAddress c_IpAddress;
 
-               for (uint32 u32_ItComInterface = 0; u32_ItComInterface < rc_ComInterfaces.size();
+               for (uint32_t u32_ItComInterface = 0; u32_ItComInterface < rc_ComInterfaces.size();
                     ++u32_ItComInterface)
                {
-                  const C_OSCNodeComInterfaceSettings & rc_CurComInterface =
+                  const C_OscNodeComInterfaceSettings & rc_CurComInterface =
                      rc_ComInterfaces[u32_ItComInterface];
                   if (rc_CurComInterface.GetBusConnected() == true)
                   {
@@ -2798,8 +2802,8 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
                      {
                         q_Found = true;
                         //Extract relevant information
-                        c_NewServerId.u8_NodeIdentifier = rc_CurComInterface.u8_NodeID;
-                        c_NewServerId.u8_BusIdentifier = pc_Bus->u8_BusID;
+                        c_NewServerId.u8_NodeIdentifier = rc_CurComInterface.u8_NodeId;
+                        c_NewServerId.u8_BusIdentifier = pc_Bus->u8_BusId;
                         c_IpAddress = rc_CurComInterface.c_Ip;
 
                         // The first interface with at least one activated feature is enough
@@ -2817,7 +2821,7 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
 
                if (q_Found == true)
                {
-                  this->mc_ServerIDs.push_back(c_NewServerId);
+                  this->mc_ServerIds.push_back(c_NewServerId);
                   this->mc_ServerIpAddresses.push_back(c_IpAddress);
                }
                else
@@ -2855,35 +2859,35 @@ sint32 C_OSCComDriverProtocol::m_InitServerIds(void)
    C_RANGE       Count of server ids does not match to the count of nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
+int32_t C_OscComDriverProtocol::m_InitForCan(void)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (this->mc_ServerIDs.size() == this->mu32_ActiveNodeCount)
+   if (this->mc_ServerIds.size() == this->mu32_ActiveNodeCount)
    {
-      C_OSCProtocolDriverOsyTpCan * pc_TransportProtocol;
+      C_OscProtocolDriverOsyTpCan * pc_TransportProtocol;
 
       if (this->mpc_CanDispatcher != NULL)
       {
          //Transport protocols
-         this->mc_TransportProtocols.resize(static_cast<uintn>(this->mu32_ActiveNodeCount), NULL);
-         this->mc_LegacyRouterDispatchers.resize(static_cast<uintn>(this->mu32_ActiveNodeCount), NULL);
-         for (uint32 u32_ItActiveNode = 0;
+         this->mc_TransportProtocols.resize(static_cast<uint32_t>(this->mu32_ActiveNodeCount), NULL);
+         this->mc_LegacyRouterDispatchers.resize(static_cast<uint32_t>(this->mu32_ActiveNodeCount), NULL);
+         for (uint32_t u32_ItActiveNode = 0;
               (u32_ItActiveNode < this->mu32_ActiveNodeCount) && (s32_Retval == C_NO_ERR);
               ++u32_ItActiveNode)
          {
-            pc_TransportProtocol = new C_OSCProtocolDriverOsyTpCan();
-            s32_Retval = pc_TransportProtocol->SetNodeIdentifiers(this->mc_ClientID,
-                                                                  this->mc_ServerIDs[u32_ItActiveNode]);
+            pc_TransportProtocol = new C_OscProtocolDriverOsyTpCan();
+            s32_Retval = pc_TransportProtocol->SetNodeIdentifiers(this->mc_ClientId,
+                                                                  this->mc_ServerIds[u32_ItActiveNode]);
             if (s32_Retval == C_NO_ERR)
             {
                s32_Retval = pc_TransportProtocol->SetDispatcher(this->mpc_CanDispatcher);
                if (s32_Retval != C_NO_ERR)
                {
-                  C_SCLString c_Text = "Node \"";
+                  C_SclString c_Text = "Node \"";
                   c_Text += this->m_GetActiveNodeName(u32_ItActiveNode);
                   c_Text += "\" - SetDispatcher - error: ";
-                  c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
+                  c_Text += C_OscLoggingHandler::h_StwError(s32_Retval);
                   c_Text += "\nC_CONFIG   could not register with dispatcher\n"
                             "C_NOACT    could not configure Rx filter\n";
                   osc_write_log_warning("Asynchronous communication", c_Text.c_str());
@@ -2892,10 +2896,10 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
             }
             else
             {
-               C_SCLString c_Text = "Node \"";
+               C_SclString c_Text = "Node \"";
                c_Text += this->m_GetActiveNodeName(u32_ItActiveNode);
                c_Text += "\" - SetNodeIdentifiers - error: ";
-               c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
+               c_Text += C_OscLoggingHandler::h_StwError(s32_Retval);
                c_Text += "\nC_RANGE    client and/or server identifier out of range\n"
                          "C_NOACT    could not reconfigure Rx filters\n";
                osc_write_log_warning("Asynchronous communication", c_Text.c_str());
@@ -2906,15 +2910,15 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
          if (s32_Retval == C_NO_ERR)
          {
             //Broadcast
-            mpc_CanTransportProtocolBroadcast = new C_OSCProtocolDriverOsyTpCan();
-            s32_Retval = this->mpc_CanTransportProtocolBroadcast->SetNodeIdentifiersForBroadcasts(this->mc_ClientID);
+            mpc_CanTransportProtocolBroadcast = new C_OscProtocolDriverOsyTpCan();
+            s32_Retval = this->mpc_CanTransportProtocolBroadcast->SetNodeIdentifiersForBroadcasts(this->mc_ClientId);
             if (s32_Retval == C_NO_ERR)
             {
                s32_Retval = this->mpc_CanTransportProtocolBroadcast->SetDispatcher(this->mpc_CanDispatcher);
                if (s32_Retval != C_NO_ERR)
                {
-                  C_SCLString c_Text = "Broadcast - SetDispatcher - error: ";
-                  c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
+                  C_SclString c_Text = "Broadcast - SetDispatcher - error: ";
+                  c_Text += C_OscLoggingHandler::h_StwError(s32_Retval);
                   c_Text += "\nC_CONFIG   could not register with dispatcher\n"
                             "C_NOACT    could not configure Rx filter\n";
                   osc_write_log_warning("Asynchronous communication", c_Text.c_str());
@@ -2923,8 +2927,8 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
             }
             else
             {
-               C_SCLString c_Text = "Broadcast - SetNodeIdentifiers - error: ";
-               c_Text += C_OSCLoggingHandler::h_StwError(s32_Retval);
+               C_SclString c_Text = "Broadcast - SetNodeIdentifiers - error: ";
+               c_Text += C_OscLoggingHandler::h_StwError(s32_Retval);
                c_Text += "\nC_RANGE    client and/or server identifier out of range\n"
                          "C_NOACT    could not reconfigure Rx filters\n";
                osc_write_log_warning("Asynchronous communication", c_Text.c_str());
@@ -2959,14 +2963,14 @@ sint32 C_OSCComDriverProtocol::m_InitForCAN(void)
    C_RANGE       Count of server ids does not match to the count of nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
+int32_t C_OscComDriverProtocol::m_InitForEthernet(void)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (this->mc_ServerIDs.size() == this->mu32_ActiveNodeCount)
+   if (this->mc_ServerIds.size() == this->mu32_ActiveNodeCount)
    {
-      C_OSCProtocolDriverOsyTpIp * pc_TransportProtocol;
-      std::vector<stw_types::uint32> c_IpDispatcherHandles;
+      C_OscProtocolDriverOsyTpIp * pc_TransportProtocol;
+      std::vector<uint32_t> c_IpDispatcherHandles;
 
       //Dispatcher
       c_IpDispatcherHandles.resize(this->mu32_ActiveNodeCount, 0U);
@@ -2979,8 +2983,8 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
       if (this->mpc_IpDispatcher != NULL)
       {
-         uint32 u32_ItActiveNode;
-         std::map<uint32, uint32> c_ActiveNodeIp2IpRouters;
+         uint32_t u32_ItActiveNode;
+         std::map<uint32_t, uint32_t> c_ActiveNodeIp2IpRouters;
 
          // We can communicate only with 'direct' connected Ethernet devices. All other devices will be
          // reached by routing and shall use the IP of the first router node.
@@ -3011,8 +3015,8 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
             {
                if (this->mc_Routes[u32_ItActiveNode].c_VecRoutePoints.size() != 0)
                {
-                  uint32 u32_Ip2IpRouterActiveNodeClientSide;
-                  uint32 u32_Ip2IpRouterActiveNodeTargetSide;
+                  uint32_t u32_Ip2IpRouterActiveNodeClientSide;
+                  uint32_t u32_Ip2IpRouterActiveNodeTargetSide;
 
                   s32_Retval = m_GetActiveIndexOfIp2IpRouter(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeClientSide,
                                                              u32_Ip2IpRouterActiveNodeTargetSide);
@@ -3020,8 +3024,8 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                   if (s32_Retval == C_NO_ERR)
                   {
                      // Exist a dispatcher handle for this router server
-                     const std::map<uint32,
-                                    uint32>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
+                     const std::map<uint32_t,
+                                    uint32_t>::const_iterator c_IterUniqueIp2IpRouters = c_ActiveNodeIp2IpRouters.find(
                         u32_Ip2IpRouterActiveNodeTargetSide);
 
                      if (c_IterUniqueIp2IpRouters == c_ActiveNodeIp2IpRouters.end())
@@ -3033,11 +3037,11 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
                         // Save the associated position of the dispatcher handle for this specific router
                         c_ActiveNodeIp2IpRouters.insert(
-                           std::pair<uint32, uint32>(u32_Ip2IpRouterActiveNodeTargetSide, u32_ItActiveNode));
+                           std::pair<uint32_t, uint32_t>(u32_Ip2IpRouterActiveNodeTargetSide, u32_ItActiveNode));
                      }
                      else
                      {
-                        uint32 u32_Handle;
+                        uint32_t u32_Handle;
 
                         // Reuse the dispatcher handle of the same router
                         tgl_assert(c_IterUniqueIp2IpRouters->second < c_IpDispatcherHandles.size());
@@ -3048,18 +3052,18 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
                      // Save the associated IP to IP router of the active node for later stopping the route
                      this->mc_ActiveNodeIp2IpDispatcher.insert(
-                        std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeTargetSide));
+                        std::pair<uint32_t, uint32_t>(u32_ItActiveNode, u32_Ip2IpRouterActiveNodeTargetSide));
                   }
                   else if (s32_Retval == C_NOACT)
                   {
-                     uint32 u32_Ip2CanRouterActiveNode;
+                     uint32_t u32_Ip2CanRouterActiveNode;
 
                      // No error, no IP to IP routing, check for IP to CAN routing
                      s32_Retval = this->m_GetActiveIndexOfIp2CanRouter(u32_ItActiveNode, u32_Ip2CanRouterActiveNode);
 
                      if (s32_Retval == C_NO_ERR)
                      {
-                        uint32 u32_Handle;
+                        uint32_t u32_Handle;
 
                         // Reuse the dispatcher handle of the same router
                         tgl_assert(u32_Ip2CanRouterActiveNode < c_IpDispatcherHandles.size());
@@ -3070,7 +3074,7 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
 
                         // Save the associated IP to CAN router of the active node for later stopping the route
                         this->mc_ActiveNodeIp2CanDispatcher.insert(
-                           std::pair<uint32, uint32>(u32_ItActiveNode, u32_Ip2CanRouterActiveNode));
+                           std::pair<uint32_t, uint32_t>(u32_ItActiveNode, u32_Ip2CanRouterActiveNode));
                      }
                      else if (s32_Retval == C_NOACT)
                      {
@@ -3081,14 +3085,14 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                      {
                         osc_write_log_error("Ethernet initialization",
                                             "Could not get index of IP to CAN router. Error Code: " +
-                                            C_SCLString::IntToStr(s32_Retval));
+                                            C_SclString::IntToStr(s32_Retval));
                      }
                   }
                   else
                   {
                      osc_write_log_error("Ethernet initialization",
                                          "Could not get index of IP to IP router. Error Code: " +
-                                         C_SCLString::IntToStr(s32_Retval));
+                                         C_SclString::IntToStr(s32_Retval));
                   }
 
                   if (s32_Retval != C_NO_ERR)
@@ -3107,16 +3111,16 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
             if (s32_Retval == C_NO_ERR)
             {
                //Transport protocols
-               this->mc_TransportProtocols.resize(static_cast<uintn>(this->mu32_ActiveNodeCount), NULL);
-               this->mc_LegacyRouterDispatchers.resize(static_cast<uintn>(this->mu32_ActiveNodeCount), NULL);
+               this->mc_TransportProtocols.resize(static_cast<uint32_t>(this->mu32_ActiveNodeCount), NULL);
+               this->mc_LegacyRouterDispatchers.resize(static_cast<uint32_t>(this->mu32_ActiveNodeCount), NULL);
 
                for (u32_ItActiveNode = 0;
                     (u32_ItActiveNode < this->mu32_ActiveNodeCount) && (s32_Retval == C_NO_ERR);
                     ++u32_ItActiveNode)
                {
-                  pc_TransportProtocol = new C_OSCProtocolDriverOsyTpIp();
-                  s32_Retval = pc_TransportProtocol->SetNodeIdentifiers(this->mc_ClientID,
-                                                                        this->mc_ServerIDs[u32_ItActiveNode]);
+                  pc_TransportProtocol = new C_OscProtocolDriverOsyTpIp();
+                  s32_Retval = pc_TransportProtocol->SetNodeIdentifiers(this->mc_ClientId,
+                                                                        this->mc_ServerIds[u32_ItActiveNode]);
                   if (s32_Retval == C_NO_ERR)
                   {
                      s32_Retval = pc_TransportProtocol->SetDispatcher(this->mpc_IpDispatcher,
@@ -3124,7 +3128,7 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                      if (s32_Retval != C_NO_ERR)
                      {
                         osc_write_log_error("Ethernet initialization", "Could not set IP dispatcher. Error Code: " +
-                                            C_SCLString::IntToStr(s32_Retval));
+                                            C_SclString::IntToStr(s32_Retval));
 
                         //Invalid configuration = programming error
                         s32_Retval = C_OVERFLOW;
@@ -3133,7 +3137,7 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                   else
                   {
                      osc_write_log_error("Ethernet initialization", "Could not set node identifiers. Error Code: " +
-                                         C_SCLString::IntToStr(s32_Retval));
+                                         C_SclString::IntToStr(s32_Retval));
 
                      //Invalid configuration = programming error
                      s32_Retval = C_OVERFLOW;
@@ -3143,13 +3147,13 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
                if (s32_Retval == C_NO_ERR)
                {
                   //Broadcast
-                  mpc_IpTransportProtocolBroadcast = new C_OSCProtocolDriverOsyTpIp();
+                  mpc_IpTransportProtocolBroadcast = new C_OscProtocolDriverOsyTpIp();
                   s32_Retval = this->mpc_IpTransportProtocolBroadcast->SetDispatcher(this->mpc_IpDispatcher, 0U);
                   if (s32_Retval != C_NO_ERR)
                   {
                      //Invalid configuration = programming error
                      osc_write_log_error("Ethernet initialization", "Could not set broadcast dispatcher. Error Code: " +
-                                         C_SCLString::IntToStr(s32_Retval));
+                                         C_SclString::IntToStr(s32_Retval));
 
                      s32_Retval = C_OVERFLOW;
                   }
@@ -3158,7 +3162,7 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
             else
             {
                osc_write_log_error("Ethernet initialization", "Could not initialize UDP. Error Code: " +
-                                   C_SCLString::IntToStr(s32_Retval));
+                                   C_SclString::IntToStr(s32_Retval));
                s32_Retval = C_COM;
             }
          }
@@ -3200,18 +3204,18 @@ sint32 C_OSCComDriverProtocol::m_InitForEthernet(void)
    C_CONFIG    Route of ou32_ActiveIndexTarget is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_ActiveIndexTarget,
-                                                             uint32 & oru32_ActiveIndexRouterClient,
-                                                             uint32 & oru32_ActiveIndexRouterTarget)
+int32_t C_OscComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32_t ou32_ActiveIndexTarget,
+                                                              uint32_t & oru32_ActiveIndexRouterClient,
+                                                              uint32_t & oru32_ActiveIndexRouterTarget)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    oru32_ActiveIndexRouterClient = 0U;
    oru32_ActiveIndexRouterTarget = 0U;
 
    if (ou32_ActiveIndexTarget < this->mc_Routes.size())
    {
-      const C_OSCRoutingRoute & rc_Route = this->mc_Routes[ou32_ActiveIndexTarget];
+      const C_OscRoutingRoute & rc_Route = this->mc_Routes[ou32_ActiveIndexTarget];
       if (rc_Route.c_VecRoutePoints.size() == 0)
       {
          // No routing necessary for the target, but Ethernet connection is necessary
@@ -3219,8 +3223,8 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
       }
       else
       {
-         if ((rc_Route.c_VecRoutePoints[0].e_InInterfaceType == C_OSCSystemBus::eETHERNET) &&
-             (rc_Route.c_VecRoutePoints[0].e_OutInterfaceType == C_OSCSystemBus::eETHERNET))
+         if ((rc_Route.c_VecRoutePoints[0].e_InInterfaceType == C_OscSystemBus::eETHERNET) &&
+             (rc_Route.c_VecRoutePoints[0].e_OutInterfaceType == C_OscSystemBus::eETHERNET))
          {
             bool q_Found;
 
@@ -3238,17 +3242,17 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
 
             if (s32_Return == C_NO_ERR)
             {
-               sint32 s32_RoutePointCounter;
-               const sint32 s32_LastRoutePoint = static_cast<sint32>(rc_Route.c_VecRoutePoints.size()) - 1;
+               int32_t s32_RoutePointCounter;
+               const int32_t s32_LastRoutePoint = static_cast<int32_t>(rc_Route.c_VecRoutePoints.size()) - 1;
 
                // Search the other 'side'
                for (s32_RoutePointCounter = s32_LastRoutePoint; s32_RoutePointCounter >= 0; --s32_RoutePointCounter)
                {
-                  if (rc_Route.c_VecRoutePoints[s32_RoutePointCounter].e_InInterfaceType == C_OSCSystemBus::eETHERNET)
+                  if (rc_Route.c_VecRoutePoints[s32_RoutePointCounter].e_InInterfaceType == C_OscSystemBus::eETHERNET)
                   {
                      if ((s32_RoutePointCounter == s32_LastRoutePoint) &&
                          (rc_Route.c_VecRoutePoints[s32_RoutePointCounter].e_OutInterfaceType ==
-                          C_OSCSystemBus::eETHERNET))
+                          C_OscSystemBus::eETHERNET))
                      {
                         // Special case: The concrete target is the last Ethernet target
                         oru32_ActiveIndexRouterTarget = ou32_ActiveIndexTarget;
@@ -3301,16 +3305,16 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2IpRouter(const uint32 ou32_A
    C_CONFIG    Route of ou32_ActiveIndexTarget is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32 ou32_ActiveIndexTarget,
-                                                              uint32 & oru32_ActiveIndexRouter)
+int32_t C_OscComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32_t ou32_ActiveIndexTarget,
+                                                               uint32_t & oru32_ActiveIndexRouter)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    oru32_ActiveIndexRouter = 0U;
 
    if (ou32_ActiveIndexTarget < this->mc_Routes.size())
    {
-      const C_OSCRoutingRoute & rc_Route = this->mc_Routes[ou32_ActiveIndexTarget];
+      const C_OscRoutingRoute & rc_Route = this->mc_Routes[ou32_ActiveIndexTarget];
       if (rc_Route.c_VecRoutePoints.size() == 0)
       {
          // No routing necessary for the target, but Ethernet connection is necessary
@@ -3318,8 +3322,8 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32 ou32_
       }
       else
       {
-         if ((rc_Route.c_VecRoutePoints[0].e_InInterfaceType == C_OSCSystemBus::eETHERNET) &&
-             (rc_Route.c_VecRoutePoints[0].e_OutInterfaceType == C_OSCSystemBus::eCAN))
+         if ((rc_Route.c_VecRoutePoints[0].e_InInterfaceType == C_OscSystemBus::eETHERNET) &&
+             (rc_Route.c_VecRoutePoints[0].e_OutInterfaceType == C_OscSystemBus::eCAN))
          {
             bool q_Found;
 
@@ -3341,9 +3345,9 @@ sint32 C_OSCComDriverProtocol::m_GetActiveIndexOfIp2CanRouter(const uint32 ou32_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverProtocol::m_InitTcp(const uint8 (&orau8_Ip)[4], uint32 & oru32_Handle)
+int32_t C_OscComDriverProtocol::m_InitTcp(const uint8_t (&orau8_Ip)[4], uint32_t & oru32_Handle)
 {
-   sint32 s32_Retval = C_COM;
+   int32_t s32_Retval = C_COM;
 
    if (this->mpc_IpDispatcher != NULL)
    {
@@ -3351,7 +3355,7 @@ sint32 C_OSCComDriverProtocol::m_InitTcp(const uint8 (&orau8_Ip)[4], uint32 & or
 
       if (s32_Retval != C_NO_ERR)
       {
-         C_SCLString c_Text;
+         C_SclString c_Text;
 
          // Using the IP address of the router if IP to IP routing is used.
          // In case of no routing u32_Ip2IpRouterActiveNode equals u32_ItActiveNode

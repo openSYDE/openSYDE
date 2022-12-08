@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_UsCommunication.h"
+#include "C_UsCommunication.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +35,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_UsCommunication::C_UsCommunication(void) :
-   me_SelectedProtocol(C_OSCCanProtocol::eLAYER2),
+   me_SelectedProtocol(C_OscCanProtocol::eLAYER2),
    mq_MessageSelected(false),
    mq_SignalSelected(false)
 {
@@ -49,7 +48,7 @@ C_UsCommunication::C_UsCommunication(void) :
    Overview column width
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<stw_types::sint32> & C_UsCommunication::GetMessageOverviewColumnWidth(void) const
+const std::vector<int32_t> & C_UsCommunication::GetMessageOverviewColumnWidth(void) const
 {
    return this->mc_MessageOverviewColumnWidth;
 }
@@ -61,7 +60,7 @@ const std::vector<stw_types::sint32> & C_UsCommunication::GetMessageOverviewColu
    Overview column width
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<sint32> & C_UsCommunication::GetSignalOverviewColumnWidth(void) const
+const std::vector<int32_t> & C_UsCommunication::GetSignalOverviewColumnWidth(void) const
 {
    return this->mc_SignalOverviewColumnWidth;
 }
@@ -72,7 +71,7 @@ const std::vector<sint32> & C_UsCommunication::GetSignalOverviewColumnWidth(void
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsCommunication::SetMessageOverviewColumnWidth(const std::vector<stw_types::sint32> & orc_Value)
+void C_UsCommunication::SetMessageOverviewColumnWidth(const std::vector<int32_t> & orc_Value)
 {
    this->mc_MessageOverviewColumnWidth = orc_Value;
 }
@@ -83,7 +82,7 @@ void C_UsCommunication::SetMessageOverviewColumnWidth(const std::vector<stw_type
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsCommunication::SetSignalOverviewColumnWidth(const std::vector<sint32> & orc_Value)
+void C_UsCommunication::SetSignalOverviewColumnWidth(const std::vector<int32_t> & orc_Value)
 {
    this->mc_SignalOverviewColumnWidth = orc_Value;
 }
@@ -98,7 +97,7 @@ void C_UsCommunication::SetSignalOverviewColumnWidth(const std::vector<sint32> &
    \param[in]  orc_SelectedSignalName     Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsCommunication::SetMessageSelected(const C_OSCCanProtocol::E_Type oe_SelectedProtocol,
+void C_UsCommunication::SetMessageSelected(const C_OscCanProtocol::E_Type oe_SelectedProtocol,
                                            const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
                                            const bool oq_SignalSelected, const QString & orc_SelectedSignalName)
 {
@@ -119,7 +118,7 @@ void C_UsCommunication::SetMessageSelected(const C_OSCCanProtocol::E_Type oe_Sel
    \param[out]  orc_SelectedSignalName    Selected signal name if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsCommunication::GetLastSelectedMessage(C_OSCCanProtocol::E_Type & ore_SelectedProtocol,
+void C_UsCommunication::GetLastSelectedMessage(C_OscCanProtocol::E_Type & ore_SelectedProtocol,
                                                bool & orq_MessageSelected, QString & orc_SelectedMessageName,
                                                bool & orq_SignalSelected, QString & orc_SelectedSignalName) const
 {

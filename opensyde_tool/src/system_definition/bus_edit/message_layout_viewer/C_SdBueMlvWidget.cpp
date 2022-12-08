@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_OgeCbxText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdBueMlvWidget.h"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeCbxText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdBueMlvWidget.hpp"
 #include "ui_C_SdBueMlvWidget.h"
 
-#include "C_SdBueMlvGraphicsView.h"
+#include "C_SdBueMlvGraphicsView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,7 +54,7 @@ using namespace stw_opensyde_core;
 C_SdBueMlvWidget::C_SdBueMlvWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMlvWidget),
-   me_Protocol(C_OSCCanProtocol::eLAYER2)
+   me_Protocol(C_OscCanProtocol::eLAYER2)
 {
    mpc_Ui->setupUi(this);
 
@@ -64,8 +63,8 @@ C_SdBueMlvWidget::C_SdBueMlvWidget(QWidget * const opc_Parent) :
 
    this->mpc_Ui->pc_GraphicsView->setScene(this->mpc_Scene);
 
-   this->mpc_Scene->setSceneRect(0.0, 0.0, static_cast<float64>(this->mpc_Ui->pc_GraphicsView->width()),
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->height()));
+   this->mpc_Scene->setSceneRect(0.0, 0.0, static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->width()),
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->height()));
 
    this->mpc_Ui->pc_GraphicsView->horizontalScrollBar()->setValue(0);
    this->mpc_Ui->pc_GraphicsView->verticalScrollBar()->setValue(0);
@@ -122,7 +121,7 @@ void C_SdBueMlvWidget::InitStaticNames(void) const
    \param[in,out] opc_Value Message sync manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
+void C_SdBueMlvWidget::SetMessageSyncManager(stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    if (this->mpc_Scene != NULL)
    {
@@ -136,12 +135,12 @@ void C_SdBueMlvWidget::SetMessageSyncManager(stw_opensyde_gui_logic::C_PuiSdNode
    \param[in] ore_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
+void C_SdBueMlvWidget::SetComProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Value)
 {
    this->me_Protocol = ore_Value;
 
    // Multiplexer is only relevant and used by layer 2 protocol
-   this->mpc_Ui->pc_GroupBoxMultiplexer->setVisible(this->me_Protocol == C_OSCCanProtocol::eLAYER2);
+   this->mpc_Ui->pc_GroupBoxMultiplexer->setVisible(this->me_Protocol == C_OscCanProtocol::eLAYER2);
 
    if (this->mpc_Scene != NULL)
    {
@@ -155,7 +154,7 @@ void C_SdBueMlvWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol:
    \param[in] orc_MessageId Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMlvWidget::SelectMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    // Fill the message multiplexer signal combo box
    this->m_UpdateMultiplexerValues(orc_MessageId, false, 0);
@@ -170,16 +169,16 @@ void C_SdBueMlvWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices 
    \param[in] ou32_SignalIndex  Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                    const uint32 ou32_SignalIndex)
+void C_SdBueMlvWidget::SelectSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                    const uint32_t ou32_SignalIndex)
 {
-   const C_OSCCanSignal * const pc_Signal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(orc_MessageId,
+   const C_OscCanSignal * const pc_Signal = C_PuiSdHandler::h_GetInstance()->GetCanSignal(orc_MessageId,
                                                                                           ou32_SignalIndex);
-   uint16 u16_MultiplexerValue = 0;
+   uint16_t u16_MultiplexerValue = 0;
    bool q_SetMultiplexerValue = false;
 
    if ((pc_Signal != NULL) &&
-       (pc_Signal->e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL))
+       (pc_Signal->e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL))
    {
       // Change the multiplexer value only if it is a multiplexed signal. All other types are always visible for
       // the concrete CAN message
@@ -222,8 +221,8 @@ void C_SdBueMlvWidget::resizeEvent(QResizeEvent * const opc_Event)
    if (this->mpc_Scene != NULL)
    {
       this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                    static_cast<float64>(this->mpc_Ui->pc_GraphicsView->width()),
-                                    static_cast<float64>(this->mpc_Ui->pc_GraphicsView->height()));
+                                    static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->width()),
+                                    static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->height()));
    }
 }
 
@@ -233,14 +232,14 @@ void C_SdBueMlvWidget::resizeEvent(QResizeEvent * const opc_Event)
    \param[in] orc_MessageId Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::m_SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMlvWidget::m_SelectMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    if (this->mpc_Scene != NULL)
    {
       bool q_MultiplexedMsg = false;
-      uint16 u16_MultiplexerValue = 0;
+      uint16_t u16_MultiplexerValue = 0;
 
-      if ((this->me_Protocol == C_OSCCanProtocol::eLAYER2) &&
+      if ((this->me_Protocol == C_OscCanProtocol::eLAYER2) &&
           (this->mpc_Ui->pc_ComboBoxMultiplexer->isEnabled() == true))
       {
          q_MultiplexedMsg = true;
@@ -276,7 +275,7 @@ void C_SdBueMlvWidget::m_OnMessageUpdated(void)
 void C_SdBueMlvWidget::m_OnMultiplexerValueChanged(void)
 {
    if ((this->mpc_Scene != NULL) &&
-       (this->me_Protocol == C_OSCCanProtocol::eLAYER2) &&
+       (this->me_Protocol == C_OscCanProtocol::eLAYER2) &&
        (this->mpc_Ui->pc_ComboBoxMultiplexer->isEnabled() == true))
    {
       this->mpc_Scene->SetMultiplexValue(this->m_GetSelectedMultiplexerValues());
@@ -289,7 +288,7 @@ void C_SdBueMlvWidget::m_OnMultiplexerValueChanged(void)
    \param[in] ou32_SignalIndex Active signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::m_OnSignalActivated(const uint32 ou32_SignalIndex)
+void C_SdBueMlvWidget::m_OnSignalActivated(const uint32_t ou32_SignalIndex)
 {
    Q_EMIT (this->SigSignalActivated(ou32_SignalIndex));
 }
@@ -307,22 +306,22 @@ void C_SdBueMlvWidget::m_OnSignalActivated(const uint32 ou32_SignalIndex)
    \param[in] ou16_MultiplexerValue             Multiplexer value to set if oq_SetSpecificMultiplexerValue is true
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
+void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OscCanMessageIdentificationIndices & orc_MessageId,
                                                  const bool oq_SetSpecificMultiplexerValue,
-                                                 const uint16 ou16_MultiplexerValue)
+                                                 const uint16_t ou16_MultiplexerValue)
 {
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    disconnect(this->mpc_Ui->pc_ComboBoxMultiplexer, static_cast<void (QComboBox::*)(
-                                                                   sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                                   int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
               &C_SdBueMlvWidget::m_OnMultiplexerValueChanged);
 
    // Only relevant and used by layer 2 protocol
-   if (this->me_Protocol == C_OSCCanProtocol::eLAYER2)
+   if (this->me_Protocol == C_OscCanProtocol::eLAYER2)
    {
       bool q_TryToSetPreviousValue = false;
-      uint16 u16_PreviousValue = 0;
-      const C_OSCCanMessage * const pc_Message =
-         stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
+      uint16_t u16_PreviousValue = 0;
+      const C_OscCanMessage * const pc_Message =
+         stw::opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
 
       if ((orc_MessageId == this->mc_PreviousMessageId) &&
           (this->mpc_Ui->pc_ComboBoxMultiplexer->isEnabled() == true))
@@ -338,7 +337,7 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
       tgl_assert(pc_Message != NULL);
       if (pc_Message != NULL)
       {
-         uint32 u32_MultiplexerIndex;
+         uint32_t u32_MultiplexerIndex;
 
          // Check the message
          if (pc_Message->IsMultiplexed(&u32_MultiplexerIndex) == false)
@@ -349,9 +348,9 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
          }
          else
          {
-            std::set<uint16> c_MultiplexerValues;
-            const C_OSCNodeDataPoolListElement * const pc_MultiplexerElement =
-               stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(
+            std::set<uint16_t> c_MultiplexerValues;
+            const C_OscNodeDataPoolListElement * const pc_MultiplexerElement =
+               stw::opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolListElement(
                   orc_MessageId,
                   u32_MultiplexerIndex);
             tgl_assert(pc_MultiplexerElement != NULL);
@@ -362,7 +361,7 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
                 (c_MultiplexerValues.size() > 0))
             {
                // Selection possible
-               std::set<uint16>::const_iterator c_ItValue;
+               std::set<uint16_t>::const_iterator c_ItValue;
                const QString c_SignalName = static_cast<QString>(pc_MultiplexerElement->c_Name.c_str()) +
                                             static_cast<QString>(" = ");
                QString c_SpecificEntry = "";
@@ -372,7 +371,7 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
                {
                   QString c_ComboBoxEntry = c_SignalName + QString::number(*c_ItValue);
                   this->mpc_Ui->pc_ComboBoxMultiplexer->addItem(c_ComboBoxEntry);
-                  this->mc_MultiplexerValues.insert(std::pair<QString, stw_types::uint16>(c_ComboBoxEntry, *c_ItValue));
+                  this->mc_MultiplexerValues.insert(std::pair<QString, uint16_t>(c_ComboBoxEntry, *c_ItValue));
                }
 
                this->mpc_Ui->pc_ComboBoxMultiplexer->setEnabled(true);
@@ -412,7 +411,7 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxMultiplexer, static_cast<void (QComboBox::*)(
-                                                                sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+                                                                int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SdBueMlvWidget::m_OnMultiplexerValueChanged);
 }
 
@@ -423,11 +422,11 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OSCCanMessageIdentifica
    Selected multiplexer value
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint16 C_SdBueMlvWidget::m_GetSelectedMultiplexerValues(void) const
+uint16_t C_SdBueMlvWidget::m_GetSelectedMultiplexerValues(void) const
 {
-   uint16 u16_Value = 0U;
+   uint16_t u16_Value = 0U;
 
-   const std::map<QString, stw_types::uint16>::const_iterator c_ItValue =
+   const std::map<QString, uint16_t>::const_iterator c_ItValue =
       this->mc_MultiplexerValues.find(this->mpc_Ui->pc_ComboBoxMultiplexer->currentText());
 
    if (c_ItValue != this->mc_MultiplexerValues.end())
@@ -451,11 +450,11 @@ uint16 C_SdBueMlvWidget::m_GetSelectedMultiplexerValues(void) const
    \retval   Not empty string   Combo box entry string for ou16_Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdBueMlvWidget::m_GetComboBoxEntryByMultiplexerValue(const uint16 ou16_Value) const
+QString C_SdBueMlvWidget::m_GetComboBoxEntryByMultiplexerValue(const uint16_t ou16_Value) const
 {
    QString c_Entry = "";
 
-   std::map<QString, stw_types::uint16>::const_iterator c_ItValue;
+   std::map<QString, uint16_t>::const_iterator c_ItValue;
 
    for (c_ItValue = this->mc_MultiplexerValues.begin(); c_ItValue != this->mc_MultiplexerValues.end(); ++c_ItValue)
    {

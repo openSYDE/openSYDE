@@ -8,16 +8,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwtypes.h"
-#include "C_SyvUpPacListDelegate.h"
+#include "stwtypes.hpp"
+#include "C_SyvUpPacListDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,7 +64,7 @@ void C_SyvUpPacListDelegate::paint(QPainter * const opc_Painter, const QStyleOpt
    {
       if ((orc_Index.isValid() == true) && (orc_Index.parent().isValid() == false))
       {
-         uint32 u32_Count;
+         uint32_t u32_Count;
 
          // creating local QWidget (that's why i think it should be fasted, cause we
          // don't touch the heap and don't deal with a QWidget except painting)
@@ -104,7 +103,7 @@ void C_SyvUpPacListDelegate::paint(QPainter * const opc_Painter, const QStyleOpt
    \param[in,out]  opc_Widget    Actual widget which will be moved
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListDelegate::StartPaint(const sint32 os32_Index, C_SyvUpPacNodeWidget * const opc_Widget)
+void C_SyvUpPacListDelegate::StartPaint(const int32_t os32_Index, C_SyvUpPacNodeWidget * const opc_Widget)
 {
    this->ms32_IndexPaint = os32_Index;
    this->mpc_ActualWidget = opc_Widget;

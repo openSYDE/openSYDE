@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_OSCSecurityPemKeyInfo.h"
+#include "stwtypes.hpp"
+#include "C_OscSecurityPemKeyInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSecurityPemKeyInfo::C_OSCSecurityPemKeyInfo()
+C_OscSecurityPemKeyInfo::C_OscSecurityPemKeyInfo()
 {
 }
 
@@ -43,7 +43,7 @@ C_OSCSecurityPemKeyInfo::C_OSCSecurityPemKeyInfo()
 /*! \brief  Clear
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSecurityPemKeyInfo::Clear()
+void C_OscSecurityPemKeyInfo::Clear()
 {
    this->mc_PrivKeyTextDecoded.clear();
    this->mc_PubKeySerialNumber.clear();
@@ -57,7 +57,7 @@ void C_OSCSecurityPemKeyInfo::Clear()
    Priv key text decoded
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8> & C_OSCSecurityPemKeyInfo::GetPrivKeyTextDecoded() const
+const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPrivKeyTextDecoded() const
 {
    return this->mc_PrivKeyTextDecoded;
 }
@@ -69,7 +69,7 @@ const std::vector<uint8> & C_OSCSecurityPemKeyInfo::GetPrivKeyTextDecoded() cons
    Pub key text decoded
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8> & C_OSCSecurityPemKeyInfo::GetPubKeyTextDecoded() const
+const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPubKeyTextDecoded() const
 {
    return this->mc_PubKeyTextDecoded;
 }
@@ -81,7 +81,7 @@ const std::vector<uint8> & C_OSCSecurityPemKeyInfo::GetPubKeyTextDecoded() const
    Pub key serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8> & C_OSCSecurityPemKeyInfo::GetPubKeySerialNumber() const
+const std::vector<uint8_t> & C_OscSecurityPemKeyInfo::GetPubKeySerialNumber() const
 {
    return this->mc_PubKeySerialNumber;
 }
@@ -92,7 +92,7 @@ const std::vector<uint8> & C_OSCSecurityPemKeyInfo::GetPubKeySerialNumber() cons
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSecurityPemKeyInfo::SetPrivKeyTextDecoded(const std::vector<uint8> & orc_Value)
+void C_OscSecurityPemKeyInfo::SetPrivKeyTextDecoded(const std::vector<uint8_t> & orc_Value)
 {
    this->mc_PrivKeyTextDecoded = orc_Value;
 }
@@ -103,7 +103,7 @@ void C_OSCSecurityPemKeyInfo::SetPrivKeyTextDecoded(const std::vector<uint8> & o
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSecurityPemKeyInfo::SetPubKeyTextDecoded(const std::vector<uint8> & orc_Value)
+void C_OscSecurityPemKeyInfo::SetPubKeyTextDecoded(const std::vector<uint8_t> & orc_Value)
 {
    this->mc_PubKeyTextDecoded = orc_Value;
 }
@@ -114,7 +114,7 @@ void C_OSCSecurityPemKeyInfo::SetPubKeyTextDecoded(const std::vector<uint8> & or
    \param[in]  orc_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSecurityPemKeyInfo::SetPubKeySerialNumber(const std::vector<uint8> & orc_Value)
+void C_OscSecurityPemKeyInfo::SetPubKeySerialNumber(const std::vector<uint8_t> & orc_Value)
 {
    this->mc_PubKeySerialNumber = orc_Value;
 }

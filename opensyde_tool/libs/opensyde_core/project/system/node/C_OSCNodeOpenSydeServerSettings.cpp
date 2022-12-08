@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCNodeOpenSydeServerSettings.h"
+#include "C_OscNodeOpenSydeServerSettings.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +36,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeOpenSYDEServerSettings::C_OSCNodeOpenSYDEServerSettings(void)
+C_OscNodeOpenSydeServerSettings::C_OscNodeOpenSydeServerSettings(void)
 {
    this->Initialize();
 }
@@ -47,11 +47,11 @@ C_OSCNodeOpenSYDEServerSettings::C_OSCNodeOpenSYDEServerSettings(void)
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeOpenSYDEServerSettings::Initialize(void)
+void C_OscNodeOpenSydeServerSettings::Initialize(void)
 {
    u8_MaxClients = 1U;
    u8_MaxParallelTransmissions = 64U;
-   s16_DPDDataBlockIndex = -1;
+   s16_DpdDataBlockIndex = -1;
    u16_MaxMessageBufferTx = 585U;
    u16_MaxRoutingMessageBufferRx = 585U;
 }
@@ -64,15 +64,16 @@ void C_OSCNodeOpenSYDEServerSettings::Initialize(void)
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeOpenSYDEServerSettings::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeOpenSydeServerSettings::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_MaxClients, sizeof(this->u8_MaxClients), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_MaxParallelTransmissions, sizeof(this->u8_MaxParallelTransmissions),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->s16_DPDDataBlockIndex, sizeof(this->s16_DPDDataBlockIndex),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_MaxMessageBufferTx, sizeof(this->u16_MaxMessageBufferTx),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_MaxRoutingMessageBufferRx, sizeof(this->u16_MaxRoutingMessageBufferRx),
-                                      oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_MaxClients, sizeof(this->u8_MaxClients), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_MaxParallelTransmissions, sizeof(this->u8_MaxParallelTransmissions),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->s16_DpdDataBlockIndex, sizeof(this->s16_DpdDataBlockIndex),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_MaxMessageBufferTx, sizeof(this->u16_MaxMessageBufferTx),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_MaxRoutingMessageBufferRx,
+                                       sizeof(this->u16_MaxRoutingMessageBufferRx),
+                                       oru32_HashValue);
 }

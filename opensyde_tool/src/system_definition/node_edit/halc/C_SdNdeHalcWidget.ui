@@ -51,7 +51,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PubImportConfig">
+      <widget class="stw::opensyde_gui_elements::C_OgePubUpdate" name="pc_PubImportConfig">
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
@@ -61,7 +61,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubUpdate" name="pc_PubExportConfig">
+      <widget class="stw::opensyde_gui_elements::C_OgePubUpdate" name="pc_PubExportConfig">
        <property name="focusPolicy">
         <enum>Qt::NoFocus</enum>
        </property>
@@ -78,7 +78,7 @@
       <number>8</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiHalcDefFilePanel" native="true">
+      <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_WiHalcDefFilePanel" native="true">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -108,14 +108,14 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileTitle">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileTitle">
           <property name="text">
            <string>-Hardware Description File:</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileCurrent">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabFileCurrent">
           <property name="text">
            <string>-my_description.xyz</string>
           </property>
@@ -138,7 +138,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubSelect">
+         <widget class="stw::opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubSelect">
           <property name="focusPolicy">
            <enum>Qt::NoFocus</enum>
           </property>
@@ -148,7 +148,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubUpdate">
+         <widget class="stw::opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubUpdate">
           <property name="focusPolicy">
            <enum>Qt::NoFocus</enum>
           </property>
@@ -158,7 +158,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubCleanUp">
+         <widget class="stw::opensyde_gui_elements::C_OgePubHalcPanel" name="pc_PubCleanUp">
           <property name="focusPolicy">
            <enum>Qt::NoFocus</enum>
           </property>
@@ -173,7 +173,7 @@
     </layout>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
+    <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
@@ -198,7 +198,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
+        <widget class="stw::opensyde_gui_elements::C_OgePubHalcOverview" name="pc_PubOverview">
          <property name="minimumSize">
           <size>
            <width>300</width>
@@ -217,7 +217,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui::C_SdNdeHalcChannelTreeView" name="pc_TreeChannels"/>
+        <widget class="stw::opensyde_gui::C_SdNdeHalcChannelTreeView" name="pc_TreeChannels"/>
        </item>
       </layout>
      </widget>
@@ -236,10 +236,10 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui::C_SdNdeHalcOvWidget" name="pc_WiOverviewTable" native="true"/>
+        <widget class="stw::opensyde_gui::C_SdNdeHalcOvWidget" name="pc_WiOverviewTable" native="true"/>
        </item>
        <item>
-        <widget class="stw_opensyde_gui::C_SdNdeHalcChannelWidget" name="pc_WiChannelEdit" native="true"/>
+        <widget class="stw::opensyde_gui::C_SdNdeHalcChannelWidget" name="pc_WiChannelEdit" native="true"/>
        </item>
       </layout>
      </widget>
@@ -249,53 +249,53 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
-   <header>C_OgeSpiStandard.h</header>
+   <header>C_OgeSpiStandard.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.h</header>
+   <header>C_OgeWiOnlyBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeHalcChannelTreeView</class>
+   <class>stw::opensyde_gui::C_SdNdeHalcChannelTreeView</class>
    <extends>QTreeView</extends>
-   <header>C_SdNdeHalcChannelTreeView.h</header>
+   <header>C_SdNdeHalcChannelTreeView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeHalcChannelWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeHalcChannelWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeHalcChannelWidget.h</header>
+   <header>C_SdNdeHalcChannelWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubHalcPanel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubHalcPanel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubHalcPanel.h</header>
+   <header>C_OgePubHalcPanel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeHalcOvWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeHalcOvWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeHalcOvWidget.h</header>
+   <header>C_SdNdeHalcOvWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubHalcOverview</class>
+   <class>stw::opensyde_gui_elements::C_OgePubHalcOverview</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubHalcOverview.h</header>
+   <header>C_OgePubHalcOverview.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubUpdate</class>
+   <class>stw::opensyde_gui_elements::C_OgePubUpdate</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubUpdate.h</header>
+   <header>C_OgePubUpdate.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

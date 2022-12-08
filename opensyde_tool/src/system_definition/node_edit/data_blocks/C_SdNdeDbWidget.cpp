@@ -8,36 +8,35 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiUtil.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDbWidget.h"
-#include "C_OgePopUpDialog.h"
+#include "C_Uti.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiUtil.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDbWidget.hpp"
+#include "C_OgePopUpDialog.hpp"
 #include "ui_C_SdNdeDbWidget.h"
-#include "C_PuiProject.h"
-#include "constants.h"
-#include "C_SdUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SdNdeDbProperties.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_ImpUtil.h"
+#include "C_PuiProject.hpp"
+#include "constants.hpp"
+#include "C_SdUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SdNdeDbProperties.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_ImpUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_scl;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -59,7 +58,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex,
+C_SdNdeDbWidget::C_SdNdeDbWidget(const uint32_t ou32_NodeIndex, const uint32_t ou32_ApplicationIndex,
                                  QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbWidget),
@@ -184,7 +183,7 @@ void C_SdNdeDbWidget::UpdateApplication(void)
    \param[in]  ou32_ApplicationIndex   New index of the application
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32 ou32_ApplicationIndex)
+void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32_t ou32_ApplicationIndex)
 {
    this->mu32_ApplicationIndex = ou32_ApplicationIndex;
    this->m_LoadData();
@@ -197,7 +196,7 @@ void C_SdNdeDbWidget::UpdateApplicationIndex(const uint32 ou32_ApplicationIndex)
    Current node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDbWidget::GetNodeIndex(void) const
+uint32_t C_SdNdeDbWidget::GetNodeIndex(void) const
 {
    return this->mu32_NodeIndex;
 }
@@ -209,7 +208,7 @@ uint32 C_SdNdeDbWidget::GetNodeIndex(void) const
    Current application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDbWidget::GetApplicationIndex(void) const
+uint32_t C_SdNdeDbWidget::GetApplicationIndex(void) const
 {
    return this->mu32_ApplicationIndex;
 }
@@ -222,9 +221,9 @@ void C_SdNdeDbWidget::CheckProcessIdError(void) const
 {
    QString c_Info;
    bool q_Valid = false;
-   const std::vector<uint32> c_UsedIds = C_SdUtil::h_GetUsedProcessIdsForApplicationUniqueAndSortedAscending(
+   const std::vector<uint32_t> c_UsedIds = C_SdUtil::h_GetUsedProcessIdsForApplicationUniqueAndSortedAscending(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
@@ -266,8 +265,8 @@ void C_SdNdeDbWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_LoadData(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-   const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+   const C_OscNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
    if ((pc_Application != NULL) && (pc_Node != NULL))
@@ -284,7 +283,7 @@ void C_SdNdeDbWidget::m_LoadData(void)
          this->mpc_Ui->pc_TedComment->setText(pc_Application->c_Comment.c_str());
       }
 
-      if (pc_Application->e_Type == C_OSCNodeApplication::eBINARY)
+      if (pc_Application->e_Type == C_OscNodeApplication::eBINARY)
       {
          this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Disabled"));
          this->mpc_Ui->pc_LabFileGenActive->setDisabled(true);
@@ -297,7 +296,7 @@ void C_SdNdeDbWidget::m_LoadData(void)
       }
       else
       {
-         if (pc_Application->e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+         if (pc_Application->e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
          {
             this->mpc_Ui->pc_LabFileGenActive->setText(C_GtGetText::h_GetText("File Generation: Source Code"));
          }
@@ -321,7 +320,7 @@ void C_SdNdeDbWidget::m_LoadData(void)
          this->m_GetAllOutputFiles());
 
       // Datapool count
-      const uint32 u32_DpCount = this->m_CountAllAssociatedDataPools();
+      const uint32_t u32_DpCount = this->m_CountAllAssociatedDataPools();
       this->mpc_Ui->pc_LabOwnedCount->setText(static_cast<QString>("%1").arg(u32_DpCount));
       if (u32_DpCount > 0)
       {
@@ -341,17 +340,17 @@ void C_SdNdeDbWidget::m_LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnEdit(void)
 {
-   const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
+   const C_OscNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
    if (pc_Application != NULL)
    {
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex,
                                                                       this->mu32_ApplicationIndex, *c_New);
 
       //Resize
-      if (pc_Application->e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+      if (pc_Application->e_Type != C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
       {
          c_New->SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());
       }
@@ -360,9 +359,9 @@ void C_SdNdeDbWidget::m_OnEdit(void)
          c_New->SetSize(C_SdNdeDbProperties::h_GetDefaultWindowSize());
       }
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
-         C_OSCNodeApplication c_Copy = *pc_Application;
+         C_OscNodeApplication c_Copy = *pc_Application;
 
          // get new data
          pc_Dialog->ApplyNewData(c_Copy);
@@ -392,7 +391,7 @@ void C_SdNdeDbWidget::m_OnDelete(void)
 {
    bool q_DeletePoosible = false;
 
-   if (m_GetType() != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+   if (m_GetType() != C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
    {
       q_DeletePoosible = true;
    }
@@ -408,8 +407,8 @@ void C_SdNdeDbWidget::m_OnDelete(void)
          c_Message.SetDescription(C_GtGetText::h_GetText(
                                      "Do you really want to delete this Data Block?\n"
                                      "All owned Datapools will become unassigned."));
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+         c_Message.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
          c_Message.SetCustomMinHeight(180, 180);
          if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
          {
@@ -434,8 +433,8 @@ void C_SdNdeDbWidget::m_OnDelete(void)
       //Detected change from programmable application to other type so ask user to confirm
       c_Message.SetHeading(C_GtGetText::h_GetText("Data Block delete "));
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you really want to delete this Data Block?"));
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
       c_Message.SetCustomMinHeight(180, 180);
       if (c_Message.Execute() == C_OgeWiCustomMessage::eYES)
       {
@@ -451,17 +450,17 @@ void C_SdNdeDbWidget::m_OnDelete(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
 {
-   const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
+   const C_OscNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
    if (pc_Application != NULL)
    {
-      const QString c_IDECall =
+      const QString c_IdeCall =
          static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(
-                                 pc_Application->c_IDECall.c_str(),
+                                 pc_Application->c_IdeCall.c_str(),
                                  C_PuiUtil::h_GetResolvedAbsPathFromProject(pc_Application->c_ProjectPath.c_str())));
 
-      if (c_IDECall == "")
+      if (c_IdeCall == "")
       {
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
                                            C_GtGetText::h_GetText("No IDE provided. Edit Data Block properties and "
@@ -470,7 +469,7 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
          c_MessageBox.SetCustomMinHeight(180, 180);
          c_MessageBox.Execute();
       }
-      else if (C_ImpUtil::h_OpenIDE(c_IDECall) != C_NO_ERR)
+      else if (C_ImpUtil::h_OpenIde(c_IdeCall) != C_NO_ERR)
       {
          C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR,
                                            C_GtGetText::h_GetText("Could not start IDE. Possible reasons: "
@@ -478,7 +477,7 @@ void C_SdNdeDbWidget::m_OnOpenIdeClicked(void)
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("Open IDE"));
          c_MessageBox.SetDetails(static_cast<QString>(C_GtGetText::h_GetText(
                                                          "The following call returned an error: \n%1")).
-                                 arg(c_IDECall));
+                                 arg(c_IdeCall));
          c_MessageBox.SetCustomMinHeight(200, 270);
          c_MessageBox.Execute();
       }
@@ -506,15 +505,15 @@ void C_SdNdeDbWidget::m_OnCommentToggled(const bool oq_Checked)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbWidget::m_UnassignAllAssociatedDataPools(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
-         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
+             (static_cast<uint32_t>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
          {
             tgl_assert(C_PuiSdHandler::h_GetInstance()->UnassignDataPoolApplication(this->mu32_NodeIndex,
                                                                                     u32_ItDataPool) == C_NO_ERR);
@@ -530,10 +529,10 @@ void C_SdNdeDbWidget::m_UnassignAllAssociatedDataPools(void) const
    Current application type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeApplication::E_Type C_SdNdeDbWidget::m_GetType(void) const
+C_OscNodeApplication::E_Type C_SdNdeDbWidget::m_GetType(void) const
 {
-   C_OSCNodeApplication::E_Type e_Retval = C_OSCNodeApplication::eBINARY;
-   const C_OSCNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
+   C_OscNodeApplication::E_Type e_Retval = C_OscNodeApplication::eBINARY;
+   const C_OscNodeApplication * const pc_Application = C_PuiSdHandler::h_GetInstance()->GetApplication(
       this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
    if (pc_Application != NULL)
@@ -551,18 +550,18 @@ C_OSCNodeApplication::E_Type C_SdNdeDbWidget::m_GetType(void) const
    Number of data pools which are associated with this application (0 in error case)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
+uint32_t C_SdNdeDbWidget::m_CountAllAssociatedDataPools(void) const
 {
-   uint32 u32_Retval = 0;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   uint32_t u32_Retval = 0;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
-         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
+             (static_cast<uint32_t>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
          {
             ++u32_Retval;
          }
@@ -582,24 +581,24 @@ QString C_SdNdeDbWidget::m_GetAllAssociatedDataPoolNames(void) const
 {
    QString c_Retval = "";
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      for (uint32 u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
-         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
-             (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
+             (static_cast<uint32_t>(rc_DataPool.s32_RelatedDataBlockIndex) == this->mu32_ApplicationIndex))
          {
             c_Retval += rc_DataPool.c_Name.c_str();
             c_Retval += " (";
             c_Retval += C_PuiSdUtil::h_ConvertDataPoolTypeToString(rc_DataPool.e_Type);
-            if (rc_DataPool.e_Type == C_OSCNodeDataPool::eCOM)
+            if (rc_DataPool.e_Type == C_OscNodeDataPool::eCOM)
             {
                c_Retval += ", ";
                c_Retval += C_GtGetText::h_GetText("Protocol: ");
-               c_Retval += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCANProtocolType(
+               c_Retval += C_PuiSdUtil::h_ConvertProtocolTypeToString(C_PuiSdUtil::h_GetRelatedCanProtocolType(
                                                                          this->mu32_NodeIndex, u32_ItDataPool));
             }
             c_Retval += ")\n";
@@ -621,12 +620,13 @@ QString C_SdNdeDbWidget::m_GetAllOutputFiles(void) const
 {
    QString c_Retval;
 
-   const C_OSCNodeApplication * const pc_Application =
+   const C_OscNodeApplication * const pc_Application =
       C_PuiSdHandler::h_GetInstance()->GetApplication(this->mu32_NodeIndex, this->mu32_ApplicationIndex);
 
    if (pc_Application != NULL)
    {
-      for (uint32 u32_ItOutputFiles = 0; u32_ItOutputFiles < pc_Application->c_ResultPaths.size(); u32_ItOutputFiles++)
+      for (uint32_t u32_ItOutputFiles = 0; u32_ItOutputFiles < pc_Application->c_ResultPaths.size();
+           u32_ItOutputFiles++)
       {
          c_Retval += static_cast<QString>(C_GtGetText::h_GetText("Output File"));
          if (pc_Application->c_ResultPaths.size() > 1)

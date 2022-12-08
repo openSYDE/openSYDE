@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMetTreeLoggerDataGreyOutInformation.h"
+#include "C_CamMetTreeLoggerDataGreyOutInformation.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeLoggerDataGreyOutInformation::C_CamMetTreeLoggerDataGreyOutInformation(void) :
-   sn_GrayOutValueMsg(0),
+   s32_GrayOutValueMsg(0),
    u32_DataChangedTimeStamp(0U)
 {
    // Handling of maximum 8 data bytes

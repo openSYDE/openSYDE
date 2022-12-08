@@ -10,40 +10,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileDialog>
 
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_ImpUtil.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDbProperties.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDbProperties.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 #include "ui_C_SdNdeDbProperties.h"
-#include "C_SdNdeDbSelectDataPools.h"
-#include "C_Uti.h"
-#include "C_PuiUtil.h"
-#include "C_OgeWiUtil.h"
+#include "C_SdNdeDbSelectDataPools.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V1 = 0;
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V2 = 1;
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V3 = 2;
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V4 = 3;
-const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V5 = 4;
+const int32_t C_SdNdeDbProperties::mhs32_VERSION_INDEX_V1 = 0;
+const int32_t C_SdNdeDbProperties::mhs32_VERSION_INDEX_V2 = 1;
+const int32_t C_SdNdeDbProperties::mhs32_VERSION_INDEX_V3 = 2;
+const int32_t C_SdNdeDbProperties::mhs32_VERSION_INDEX_V4 = 3;
+const int32_t C_SdNdeDbProperties::mhs32_VERSION_INDEX_V5 = 4;
+const int32_t C_SdNdeDbProperties::mhs32_VERSION_INDEX_V6 = 5;
 // when adding new versions do not forget to update mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -67,13 +67,13 @@ const stw_types::sintn C_SdNdeDbProperties::mhsn_VERSION_INDEX_V5 = 4;
    \param[in,out]  orc_Parent             Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex, const sint32 os32_ApplicationIndex,
-                                         stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_SdNdeDbProperties::C_SdNdeDbProperties(const uint32_t ou32_NodeIndex, const int32_t os32_ApplicationIndex,
+                                         stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbProperties),
    mu32_NodeIndex(ou32_NodeIndex),
    ms32_ApplicationIndex(os32_ApplicationIndex),
-   me_Type(C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION),
+   me_Type(C_OscNodeApplication::ePROGRAMMABLE_APPLICATION),
    mrc_ParentDialog(orc_Parent)
 {
    QStringList c_CodeGeneratorSupportedFiles;
@@ -97,7 +97,7 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    this->mpc_Ui->pc_PubMenuCodeGenerate->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuCodeGenerator->AddDatablockSection();
    this->mpc_Ui->pc_PubMenuIDE->AddDatablockSection();
-   this->mpc_Ui->pc_LineEditName->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT); // name restriction
+   this->mpc_Ui->pc_LineEditName->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT); // name restriction
 
    //Remove debug labels
    this->mpc_Ui->pc_GroupBoxDataPoolsNotEmpty->setTitle("");
@@ -145,8 +145,8 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    connect(this->mpc_Ui->pc_LineEditName, &C_OgeLePropertiesName::textChanged,
            this, &C_SdNdeDbProperties::m_OnNameEdited);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxProcessID, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged), this,
-           &C_SdNdeDbProperties::m_OnProcessIDChanged);
+   connect(this->mpc_Ui->pc_SpinBoxProcessID, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged), this,
+           &C_SdNdeDbProperties::m_OnProcessIdChanged);
    connect(this->mpc_Ui->pc_PushButtonAddDataPool, &QPushButton::clicked, this,
            &C_SdNdeDbProperties::m_HandleAddDataPools);
    connect(this->mpc_Ui->pc_PushButtonRevertToDefault, &QPushButton::clicked, this,
@@ -163,7 +163,7 @@ C_SdNdeDbProperties::C_SdNdeDbProperties(const stw_types::uint32 ou32_NodeIndex,
    connect(this->mpc_Ui->pc_PushButtonCodeGenerator, &QPushButton::clicked,
            this, &C_SdNdeDbProperties::m_OnClickGenerator);
    connect(this->mpc_Ui->pc_PushButtonOutputFile, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickOutput);
-   connect(this->mpc_Ui->pc_PushButtonIDE, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickIDE);
+   connect(this->mpc_Ui->pc_PushButtonIDE, &QPushButton::clicked, this, &C_SdNdeDbProperties::m_OnClickIde);
 
    // path variables actions
    connect(this->mpc_Ui->pc_PubMenuProject, &C_OgePubPathVariables::SigVariableSelected,
@@ -265,11 +265,13 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
-   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V1, C_GtGetText::h_GetText("Version 1"));
-   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
-   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V3, C_GtGetText::h_GetText("Version 3"));
-   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V4, C_GtGetText::h_GetText("Version 4"));
-   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhsn_VERSION_INDEX_V5, C_GtGetText::h_GetText("Version 5"));
+   this->mpc_Ui->pc_ComboBoxCode->addItem("dummy");
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhs32_VERSION_INDEX_V1, C_GtGetText::h_GetText("Version 1"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhs32_VERSION_INDEX_V2, C_GtGetText::h_GetText("Version 2"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhs32_VERSION_INDEX_V3, C_GtGetText::h_GetText("Version 3"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhs32_VERSION_INDEX_V4, C_GtGetText::h_GetText("Version 4"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhs32_VERSION_INDEX_V5, C_GtGetText::h_GetText("Version 5"));
+   this->mpc_Ui->pc_ComboBoxCode->setItemText(mhs32_VERSION_INDEX_V6, C_GtGetText::h_GetText("Version 6"));
    this->mpc_Ui->pc_LabelHeadingDatapools->setText(C_GtGetText::h_GetText("Owned Datapools"));
    this->mpc_Ui->pc_LabelDataPoolsEmpty->setText("No assigned Datapools, \nadd any via the '+' button");
    this->mpc_Ui->pc_CommentText->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
@@ -349,12 +351,14 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
                               " - %2: Support of COMM messages with multiplexing\n"
                               " - %3: Support for flexible placement of embedded RAM variables\n"
                               " - %4: Support for public scope of Datapool content\n"
-                              " - %5: Optimization of sequences where the openSYDE server keeps a thread/process lock on "))
-      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V1),
-           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V2),
-           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V3),
-           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V4),
-           this->mpc_Ui->pc_ComboBoxCode->itemText(mhsn_VERSION_INDEX_V5)));
+                              " - %5: Optimization of sequences where the openSYDE server keeps a thread/process lock on\n"
+                              " - %6: CANopen configuration: Support for SYNC PDOs and restoring device configuration at startup"))
+      .arg(this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V1),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V2),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V3),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V4),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V5),
+           this->mpc_Ui->pc_ComboBoxCode->itemText(mhs32_VERSION_INDEX_V6)));
    this->mpc_Ui->pc_LabelIDE->SetToolTipInformation(
       C_GtGetText::h_GetText("IDE Call"),
       C_GtGetText::h_GetText("Command line IDE call. Absolute or relative to working directory. Make sure to escape "
@@ -390,21 +394,21 @@ void C_SdNdeDbProperties::InitStaticNames(void) const
    \param[in,out]  orc_Application  Application to apply to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) const
+void C_SdNdeDbProperties::ApplyNewData(C_OscNodeApplication & orc_Application) const
 {
    orc_Application.c_Name = this->mpc_Ui->pc_LineEditName->text().toStdString().c_str();
    orc_Application.c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
    orc_Application.e_Type = this->me_Type;
-   orc_Application.u8_ProcessId = static_cast<uint8>(this->mpc_Ui->pc_SpinBoxProcessID->value());
+   orc_Application.u8_ProcessId = static_cast<uint8_t>(this->mpc_Ui->pc_SpinBoxProcessID->value());
    switch (this->me_Type)
    {
-   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
-   case C_OSCNodeApplication::eBINARY:
+   case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
+   case C_OscNodeApplication::eBINARY:
       orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditProject->GetPath().toStdString().c_str();
       orc_Application.c_ResultPaths.resize(1);
       orc_Application.c_ResultPaths[0] = this->mpc_Ui->pc_LineEditOutputFile->GetPath().toStdString().c_str();
       break;
-   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+   case C_OscNodeApplication::ePARAMETER_SET_HALC:
       orc_Application.c_ProjectPath = this->mpc_Ui->pc_LineEditFileGenerate->GetPath().toStdString().c_str();
 
       if (this->mpc_Ui->pc_LabelSafeFileValue->text() == "")
@@ -431,29 +435,32 @@ void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) c
       tgl_assert(false);
       break;
    }
-   orc_Application.c_IDECall = this->mpc_Ui->pc_LineEditIDE->text().toStdString().c_str();
+   orc_Application.c_IdeCall = this->mpc_Ui->pc_LineEditIDE->text().toStdString().c_str();
    orc_Application.c_CodeGeneratorPath =
       this->mpc_Ui->pc_LineEditCodeGenerator->GetPath().toStdString().c_str();
    orc_Application.c_GeneratePath = this->mpc_Ui->pc_LineEditCodeGenerate->GetPath().toStdString().c_str();
    switch (this->mpc_Ui->pc_ComboBoxCode->currentIndex())
    {
-   case mhsn_VERSION_INDEX_V1:
+   case mhs32_VERSION_INDEX_V1:
       orc_Application.u16_GenCodeVersion = 1U;
       break;
-   case mhsn_VERSION_INDEX_V2:
+   case mhs32_VERSION_INDEX_V2:
       orc_Application.u16_GenCodeVersion = 2U;
       break;
-   case mhsn_VERSION_INDEX_V3:
+   case mhs32_VERSION_INDEX_V3:
       orc_Application.u16_GenCodeVersion = 3U;
       break;
-   case mhsn_VERSION_INDEX_V4:
+   case mhs32_VERSION_INDEX_V4:
       orc_Application.u16_GenCodeVersion = 4U;
       break;
-   case mhsn_VERSION_INDEX_V5:
+   case mhs32_VERSION_INDEX_V5:
       orc_Application.u16_GenCodeVersion = 5U;
       break;
+   case mhs32_VERSION_INDEX_V6:
+      orc_Application.u16_GenCodeVersion = 6U;
+      break;
    default:
-      orc_Application.u16_GenCodeVersion = 5U;
+      orc_Application.u16_GenCodeVersion = 6U;
       tgl_assert(false); // combo box has unknown index should never happen
       break;
    }
@@ -465,17 +472,17 @@ void C_SdNdeDbProperties::ApplyNewData(C_OSCNodeApplication & orc_Application) c
    \param[in]  ou32_ApplicationIndex   Index of application to apply data pools to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) const
+void C_SdNdeDbProperties::HandleDataPools(const uint32_t ou32_ApplicationIndex) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      for (uint32 u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      for (uint32_t u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
          bool q_Found = false;
-         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
-         for (std::set<uint32>::const_iterator c_ItSelect = this->mc_SelectedDataPools.begin();
+         const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         for (std::set<uint32_t>::const_iterator c_ItSelect = this->mc_SelectedDataPools.begin();
               c_ItSelect != this->mc_SelectedDataPools.end(); ++c_ItSelect)
          {
             if (*c_ItSelect == u32_ItDataPool)
@@ -489,12 +496,12 @@ void C_SdNdeDbProperties::HandleDataPools(const uint32 ou32_ApplicationIndex) co
             //Always assign this one
             tgl_assert(C_PuiSdHandler::h_GetInstance()->
                        AssignDataPoolApplication(this->mu32_NodeIndex, u32_ItDataPool,
-                                                 static_cast<sint32>(ou32_ApplicationIndex)) == C_NO_ERR);
+                                                 static_cast<int32_t>(ou32_ApplicationIndex)) == C_NO_ERR);
          }
          else
          {
             if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
-                (static_cast<uint32>(rc_DataPool.s32_RelatedDataBlockIndex) == ou32_ApplicationIndex))
+                (static_cast<uint32_t>(rc_DataPool.s32_RelatedDataBlockIndex) == ou32_ApplicationIndex))
             {
                //Unassign this one
                tgl_assert(C_PuiSdHandler::h_GetInstance()->UnassignDataPoolApplication(this->mu32_NodeIndex,
@@ -518,8 +525,8 @@ void C_SdNdeDbProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -547,24 +554,24 @@ void C_SdNdeDbProperties::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 void C_SdNdeDbProperties::m_OkClicked(void)
 {
    const QString c_ErrorName = this->m_CheckName();
-   const QString c_ErrorID = this->m_CheckID();
+   const QString c_ErrorId = this->m_CheckId();
    const QString c_ErrorPaths = this->m_CheckPaths();
 
    const bool q_NameIsValid = (c_ErrorName == "");
-   const bool q_IDIsValid = (c_ErrorID == "");
+   const bool q_IdIsValid = (c_ErrorId == "");
    const bool q_PathsAreValid = (c_ErrorPaths == "");
 
-   if ((q_NameIsValid == true) && (q_IDIsValid == true) && (q_PathsAreValid == true))
+   if ((q_NameIsValid == true) && (q_IdIsValid == true) && (q_PathsAreValid == true))
    {
       // clear unused data
       switch (this->me_Type)
       {
-      case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+      case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
          this->mpc_Ui->pc_LabelSafeFileValue->setText("");
          this->mpc_Ui->pc_LabelNonSafeFileValue->setText("");
          this->mpc_Ui->pc_LineEditFileGenerate->SetPath("");
          break;
-      case C_OSCNodeApplication::eBINARY:
+      case C_OscNodeApplication::eBINARY:
          this->mc_SelectedDataPools.clear();
          this->mpc_Ui->pc_LineEditCodeGenerator->SetPath("");
          this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(0);
@@ -573,7 +580,7 @@ void C_SdNdeDbProperties::m_OkClicked(void)
          this->mpc_Ui->pc_LabelSafeFileValue->setText("");
          this->mpc_Ui->pc_LabelNonSafeFileValue->setText("");
          break;
-      case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+      case C_OscNodeApplication::ePARAMETER_SET_HALC:
          this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(0);
          this->mpc_Ui->pc_SpinBoxProcessID->setValue(0);
          this->mpc_Ui->pc_LineEditCodeGenerate->SetPath("");
@@ -604,11 +611,11 @@ void C_SdNdeDbProperties::m_OkClicked(void)
          c_Details += c_ErrorName;
          c_Details += "\n\n";
       }
-      if (q_IDIsValid == false)
+      if (q_IdIsValid == false)
       {
          c_Details += C_GtGetText::h_GetText("Process ID is already used. ");
          c_Details += "\n";
-         c_Details += c_ErrorID;
+         c_Details += c_ErrorId;
          c_Details += "\n\n";
       }
       if (q_PathsAreValid == false)
@@ -645,26 +652,26 @@ QString C_SdNdeDbProperties::m_CheckName() const
 {
    QString c_Return = "";
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
       //Check Name
       bool q_DuplicateNameError = false;
       const bool q_InvalidNameError =
-         !C_OSCUtils::h_CheckValidCName(this->mpc_Ui->pc_LineEditName->text().toStdString().c_str());
+         !C_OscUtils::h_CheckValidCeName(this->mpc_Ui->pc_LineEditName->text().toStdString().c_str());
 
-      for (uint32 u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
+      for (uint32_t u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
       {
          //Avoid conflict with itself
          if ((this->ms32_ApplicationIndex >= 0) &&
-             (static_cast<uint32>(this->ms32_ApplicationIndex) == u32_ItApplication))
+             (static_cast<uint32_t>(this->ms32_ApplicationIndex) == u32_ItApplication))
          {
             //Skip itself
          }
          else
          {
-            const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
+            const C_OscNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
             //Check name
             if (this->mpc_Ui->pc_LineEditName->text().compare(rc_Application.c_Name.c_str()) == 0)
             {
@@ -694,37 +701,37 @@ QString C_SdNdeDbProperties::m_CheckName() const
    error text of process ID check (empty if no error occured)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdNdeDbProperties::m_CheckID(void) const
+QString C_SdNdeDbProperties::m_CheckId(void) const
 {
    QString c_Return = "";
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
       //Check ID
       bool q_ProcessIDError = false;
-      std::vector<uint32> c_UsedProcessIds;
-      for (uint32 u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
+      std::vector<uint32_t> c_UsedProcessIds;
+      for (uint32_t u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
       {
          //Avoid conflict with itself
          if ((this->ms32_ApplicationIndex >= 0) &&
-             (static_cast<uint32>(this->ms32_ApplicationIndex) == u32_ItApplication))
+             (static_cast<uint32_t>(this->ms32_ApplicationIndex) == u32_ItApplication))
          {
             //Skip itself
          }
          else
          {
-            const C_OSCNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
+            const C_OscNodeApplication & rc_Application = pc_Node->c_Applications[u32_ItApplication];
             //Only check programmable applications
-            if (rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+            if (rc_Application.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
             {
                //Only check process IDs if current application is programmable
-               if (this->me_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+               if (this->me_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
                {
                   //Check process ID
                   c_UsedProcessIds.push_back(rc_Application.u8_ProcessId);
-                  if (static_cast<uint8>(this->mpc_Ui->pc_SpinBoxProcessID->value()) == rc_Application.u8_ProcessId)
+                  if (static_cast<uint8_t>(this->mpc_Ui->pc_SpinBoxProcessID->value()) == rc_Application.u8_ProcessId)
                   {
                      q_ProcessIDError = true;
                   }
@@ -737,13 +744,13 @@ QString C_SdNdeDbProperties::m_CheckID(void) const
          if (c_UsedProcessIds.size() > 0)
          {
             QString c_Ids;
-            for (uint32 u32_ItId = 0; u32_ItId < (static_cast<uint32>(c_UsedProcessIds.size()) - 1UL); ++u32_ItId)
+            for (uint32_t u32_ItId = 0; u32_ItId < (static_cast<uint32_t>(c_UsedProcessIds.size()) - 1UL); ++u32_ItId)
             {
                c_Ids += static_cast<QString>("%1,").arg(c_UsedProcessIds[u32_ItId]);
             }
             c_Ids +=
-               QString::number(c_UsedProcessIds[static_cast<std::vector<uint32>::size_type>(c_UsedProcessIds.size() -
-                                                                                            1UL)]);
+               QString::number(c_UsedProcessIds[static_cast<std::vector<uint32_t>::size_type>(c_UsedProcessIds.size() -
+                                                                                              1UL)]);
             c_Return += static_cast<QString>(C_GtGetText::h_GetText("Already used Process IDs: %1")).arg(c_Ids);
          }
       }
@@ -775,7 +782,7 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
    // PSI File Generation Directory
    c_Return += this->m_CheckPath(this->mpc_Ui->pc_LineEditFileGenerate->GetPath());
    // empty path not allowed for PSI file generation
-   if ((this->me_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC) &&
+   if ((this->me_Type == C_OscNodeApplication::ePARAMETER_SET_HALC) &&
        (this->mpc_Ui->pc_LineEditFileGenerate->GetPath().isEmpty() == true))
    {
       c_Return += C_GtGetText::h_GetText("Generation directory path must not be empty.\n");
@@ -793,7 +800,7 @@ QString C_SdNdeDbProperties::m_CheckPaths(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check path for invalid characters
 
-   See C_OSCUtils for details about valid characters.
+   See C_OscUtils for details about valid characters.
 
    \param[in]  orc_Path    Path
 
@@ -814,7 +821,7 @@ QString C_SdNdeDbProperties::m_CheckPath(const QString & orc_Path) const
       const QString c_ResolvedPath = C_PuiUtil::h_ResolvePlaceholderVariables(orc_Path, c_ProjectPath);
 
       // use resolve engine to check resulting path
-      if (C_OSCUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
+      if (C_OscUtils::h_CheckValidFilePath(c_ResolvedPath.toStdString().c_str()) == false)
       {
          c_Return = orc_Path;
          if (orc_Path != c_ResolvedPath)
@@ -921,15 +928,15 @@ QString C_SdNdeDbProperties::m_GetDialogPath(const QString & orc_CurrentPath) co
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_LoadData(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
       //Add existing selected datapools
       this->mc_SelectedDataPools.clear();
-      for (uint32 u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+      for (uint32_t u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
       {
-         const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+         const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
          if ((rc_DataPool.s32_RelatedDataBlockIndex >= 0) &&
              (this->ms32_ApplicationIndex >= 0) &&
              (rc_DataPool.s32_RelatedDataBlockIndex == this->ms32_ApplicationIndex))
@@ -948,16 +955,16 @@ void C_SdNdeDbProperties::m_LoadData(void)
             q_FileGenEnabled = false;
 
             // check for HALC NVM file generation (psi files)
-            if ((pc_Node->c_HALCConfig.q_NvMBasedConfig == true) && (pc_Node->c_HALCConfig.IsClear() == false))
+            if ((pc_Node->c_HalcConfig.q_NvmBasedConfig == true) && (pc_Node->c_HalcConfig.IsClear() == false))
             {
                q_FileGenEnabled = true;
 
                // check if there already exists a Data Block of type PSI generation
-               for (uint32 u32_ItDataBlock = 0UL; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
+               for (uint32_t u32_ItDataBlock = 0UL; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
                {
-                  const C_OSCNodeApplication & rc_CurDataBlock = pc_Node->c_Applications[u32_ItDataBlock];
-                  if ((rc_CurDataBlock.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC) &&
-                      (u32_ItDataBlock != static_cast<uint32>(this->ms32_ApplicationIndex)))
+                  const C_OscNodeApplication & rc_CurDataBlock = pc_Node->c_Applications[u32_ItDataBlock];
+                  if ((rc_CurDataBlock.e_Type == C_OscNodeApplication::ePARAMETER_SET_HALC) &&
+                      (u32_ItDataBlock != static_cast<uint32_t>(this->ms32_ApplicationIndex)))
                   {
                      q_FileGenEnabled = false;
                      break;
@@ -965,7 +972,7 @@ void C_SdNdeDbProperties::m_LoadData(void)
                }
 
                // set visibility of output file labels
-               if (pc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+               if (pc_Node->c_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
                {
                   // no safe file
                   this->mpc_Ui->pc_LabelSafeFileValue->setVisible(false);
@@ -977,7 +984,7 @@ void C_SdNdeDbProperties::m_LoadData(void)
                   this->mpc_Ui->pc_LabelSafeFileValue->setVisible(true);
                }
 
-               if (pc_Node->c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+               if (pc_Node->c_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE)
                {
                   // no non-safe file
                   this->mpc_Ui->pc_LabelNonSafeFileValue->setVisible(false);
@@ -1023,9 +1030,9 @@ void C_SdNdeDbProperties::m_LoadData(void)
 void C_SdNdeDbProperties::m_LoadDataBlock(void)
 {
    // get application / use default
-   const C_OSCNodeApplication * const pc_Appl =
+   const C_OscNodeApplication * const pc_Appl =
       C_PuiSdHandler::h_GetInstance()->GetApplication(this->mu32_NodeIndex, this->ms32_ApplicationIndex);
-   C_OSCNodeApplication c_Default;
+   C_OscNodeApplication c_Default;
 
    if (this->ms32_ApplicationIndex < 0)
    {
@@ -1034,13 +1041,13 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
       c_Default.u8_ProcessId = C_PuiSdHandler::h_GetInstance()->GetUniqueApplicationProcessId(this->mu32_NodeIndex, 0);
       c_Default.q_Active = true;
    }
-   const C_OSCNodeApplication & rc_Application = (pc_Appl != NULL) ? *pc_Appl : c_Default;
+   const C_OscNodeApplication & rc_Application = (pc_Appl != NULL) ? *pc_Appl : c_Default;
 
    //Section Name and Comment
    this->mpc_Ui->pc_LineEditName->setText(rc_Application.c_Name.c_str());
    this->mpc_Ui->pc_CommentText->setText(rc_Application.c_Comment.c_str());
    this->me_Type = rc_Application.e_Type;
-   this->mpc_Ui->pc_CheckBoxFileGen->setChecked(rc_Application.e_Type != C_OSCNodeApplication::eBINARY);
+   this->mpc_Ui->pc_CheckBoxFileGen->setChecked(rc_Application.e_Type != C_OscNodeApplication::eBINARY);
 
    //Section Content (order is relevant: first set project path and then output file and gen. source code directory)
    this->mpc_Ui->pc_LineEditProject->SetPath(rc_Application.c_ProjectPath.c_str(),
@@ -1052,7 +1059,7 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
    this->mpc_Ui->pc_SpinBoxProcessID->setValue(rc_Application.u8_ProcessId);
    this->mpc_Ui->pc_LineEditOutputFile->SetDbProjectPath(c_ProjectPath);
    this->m_LoadOutputFilePaths(rc_Application, c_ProjectPath);
-   this->mpc_Ui->pc_LineEditIDE->setText(rc_Application.c_IDECall.c_str());
+   this->mpc_Ui->pc_LineEditIDE->setText(rc_Application.c_IdeCall.c_str());
    this->mpc_Ui->pc_LineEditCodeGenerator->SetDbProjectPath(c_ProjectPath);
    this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(rc_Application.c_CodeGeneratorPath.c_str(), C_Uti::h_GetExePath());
    this->mpc_Ui->pc_LineEditCodeGenerate->SetDbProjectPath(c_ProjectPath);
@@ -1062,23 +1069,26 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
    switch (rc_Application.u16_GenCodeVersion)
    {
    case 1U:
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V1);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V1);
       break;
    case 2U:
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V2);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V2);
       break;
    case 3U:
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V3);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V3);
       break;
    case 4U:
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V4);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V4);
       break;
    case 5U:
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V5);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V5);
+      break;
+   case 6U:
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V6);
       break;
    default:
       // latest is greatest
-      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhsn_VERSION_INDEX_V5);
+      this->mpc_Ui->pc_ComboBoxCode->setCurrentIndex(mhs32_VERSION_INDEX_V6);
       break;
    }
 
@@ -1089,7 +1099,7 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
 
    // initial check
    this->m_CheckName();
-   this->m_CheckID();
+   this->m_CheckId();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1099,42 +1109,42 @@ void C_SdNdeDbProperties::m_LoadDataBlock(void)
    \param[in]  orc_ProjectPath   Project path
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OSCNodeApplication & orc_Application,
+void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OscNodeApplication & orc_Application,
                                                 const QString & orc_ProjectPath)
 {
    // get HALC information (necessary for PSI file generation)
-   const C_OSCHalcConfig * const pc_Halc = C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OscHalcConfig * const pc_Halc = C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
    switch (orc_Application.e_Type)
    {
-   case C_OSCNodeApplication::eBINARY:
-   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+   case C_OscNodeApplication::eBINARY:
+   case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
       if (orc_Application.c_ResultPaths.size() > 0) // defensive check
       {
          this->mpc_Ui->pc_LineEditOutputFile->SetPath(orc_Application.c_ResultPaths[0].c_str(), orc_ProjectPath);
       }
       break;
-   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+   case C_OscNodeApplication::ePARAMETER_SET_HALC:
       if (pc_Halc != NULL)
       {
          QString c_SafeFile = "";
          QString c_NonSafeFile = "";
          switch (pc_Halc->e_SafetyMode)
          {
-         case C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE:
+         case C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE:
             if (orc_Application.c_ResultPaths.size() > 0) // defensive check
             {
                c_SafeFile = orc_Application.c_ResultPaths[0].c_str();
             }
             break;
-         case C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE:
+         case C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE:
             if (orc_Application.c_ResultPaths.size() > 0) // defensive check
             {
                c_NonSafeFile = orc_Application.c_ResultPaths[0].c_str();
             }
             break;
-         case C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING:
-         case C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING:
+         case C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING:
+         case C_OscHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING:
             if (orc_Application.c_ResultPaths.size() > 1) // defensive check
             {
                c_SafeFile = orc_Application.c_ResultPaths[0].c_str();
@@ -1161,12 +1171,12 @@ void C_SdNdeDbProperties::m_LoadOutputFilePaths(const C_OSCNodeApplication & orc
    \param[in]  ore_Type    Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OSCNodeApplication::E_Type & ore_Type) const
+void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OscNodeApplication::E_Type & ore_Type) const
 {
    // first set all invisible and then all visible items
    switch (ore_Type)
    {
-   case C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION:
+   case C_OscNodeApplication::ePROGRAMMABLE_APPLICATION:
       this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
       this->mpc_Ui->pc_WidgetPsiFiles->setVisible(false);
       this->mpc_Ui->pc_PushButtonAddDataPool->setVisible(true);
@@ -1174,12 +1184,12 @@ void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OSCNodeApplica
       this->mpc_Ui->pc_WidgetFileGenContent->setVisible(true);
       this->mpc_Ui->pc_WidgetCode->setVisible(true);
       break;
-   case C_OSCNodeApplication::eBINARY:
+   case C_OscNodeApplication::eBINARY:
       this->mpc_Ui->pc_WidgetFileGenContent->setVisible(false);
       this->mpc_Ui->pc_GroupBoxProject->setVisible(true);
       this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(true);
       break;
-   case C_OSCNodeApplication::ePARAMETER_SET_HALC:
+   case C_OscNodeApplication::ePARAMETER_SET_HALC:
       this->mpc_Ui->pc_GroupBoxProject->setVisible(false);
       this->mpc_Ui->pc_WidgetCode->setVisible(false);
       this->mpc_Ui->pc_LabelFileGenerationDisabled->setVisible(false);
@@ -1196,17 +1206,17 @@ void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OSCNodeApplica
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  On file generation checked
 
-   \param[in]  osn_State   State
+   \param[in]  os32_State   State
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_OnFileGenerationChanged(const sintn osn_State)
+void C_SdNdeDbProperties::m_OnFileGenerationChanged(const int32_t os32_State)
 {
    // reset
-   this->me_Type = C_OSCNodeApplication::eBINARY;
+   this->me_Type = C_OscNodeApplication::eBINARY;
 
-   if (static_cast<Qt::CheckState>(osn_State) == Qt::Checked)
+   if (static_cast<Qt::CheckState>(os32_State) == Qt::Checked)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
       if (pc_Node != NULL)
       {
@@ -1217,22 +1227,22 @@ void C_SdNdeDbProperties::m_OnFileGenerationChanged(const sintn osn_State)
             bool q_FileGenerationType = false;
             if (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_ProgrammingSupport == true)
             {
-               this->me_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+               this->me_Type = C_OscNodeApplication::ePROGRAMMABLE_APPLICATION;
                q_FileGenerationType = true;
             }
             else
             {
-               if ((pc_Node->c_HALCConfig.q_NvMBasedConfig == true) && (pc_Node->c_HALCConfig.IsClear() == false))
+               if ((pc_Node->c_HalcConfig.q_NvmBasedConfig == true) && (pc_Node->c_HalcConfig.IsClear() == false))
                {
                   // set type
-                  this->me_Type = C_OSCNodeApplication::ePARAMETER_SET_HALC;
+                  this->me_Type = C_OscNodeApplication::ePARAMETER_SET_HALC;
                   q_FileGenerationType = true;
 
                   // set default file names
                   if (this->mpc_Ui->pc_LabelSafeFileValue->text() == "")
                   {
                      // only if safe data is allowed
-                     if (pc_Node->c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+                     if (pc_Node->c_HalcConfig.e_SafetyMode != C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
                      {
                         this->mpc_Ui->pc_LabelSafeFileValue->setText("halc_parameters_safe.syde_psi");
                      }
@@ -1240,7 +1250,7 @@ void C_SdNdeDbProperties::m_OnFileGenerationChanged(const sintn osn_State)
                   if (this->mpc_Ui->pc_LabelNonSafeFileValue->text() == "")
                   {
                      // only if non-safe data is allowed
-                     if (pc_Node->c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+                     if (pc_Node->c_HalcConfig.e_SafetyMode != C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE)
                      {
                         this->mpc_Ui->pc_LabelNonSafeFileValue->setText("halc_parameters_non_safe.syde_psi");
                      }
@@ -1259,10 +1269,10 @@ void C_SdNdeDbProperties::m_OnFileGenerationChanged(const sintn osn_State)
 
                   // add all NVM HALC Datapools for displaying
                   // those can be kept even if type is changed back again - they will be removed on dialog ok click
-                  for (uint32 u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
+                  for (uint32_t u32_ItDataPool = 0UL; u32_ItDataPool < pc_Node->c_DataPools.size(); ++u32_ItDataPool)
                   {
-                     const C_OSCNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
-                     if (rc_DataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM)
+                     const C_OscNodeDataPool & rc_DataPool = pc_Node->c_DataPools[u32_ItDataPool];
+                     if (rc_DataPool.e_Type == C_OscNodeDataPool::eHALC_NVM)
                      {
                         this->mc_SelectedDataPools.insert(u32_ItDataPool);
                      }
@@ -1342,7 +1352,7 @@ void C_SdNdeDbProperties::m_OnClickOutput(void)
 
    c_Dialog.setDefaultSuffix("hex");
 
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Dialog.exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       QString c_FilePath;
       c_FilePath = c_Dialog.selectedFiles().at(0); // multi-selection is not possible
@@ -1473,12 +1483,12 @@ void C_SdNdeDbProperties::m_OnDroppedFileGeneration(void)
    Replaces current IDE call with selected executable path. It is ok to eventually forget flags.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_OnClickIDE(void)
+void C_SdNdeDbProperties::m_OnClickIde(void)
 {
    const QString c_ProjectPath =
       C_PuiUtil::h_GetResolvedAbsPathFromProject(this->mpc_Ui->pc_LineEditProject->GetPath());
    const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("Executable (*.exe);;Others (*.*)"));
-   QString c_IDECall =
+   QString c_IdeCall =
       static_cast<QString>(C_PuiUtil::h_ResolvePlaceholderVariables(this->mpc_Ui->pc_LineEditIDE->text(),
                                                                     c_ProjectPath));
    QString c_Path;
@@ -1486,24 +1496,24 @@ void C_SdNdeDbProperties::m_OnClickIDE(void)
    QStringList c_SplittedString;
 
    // get path from command line call for browse location start
-   if (c_IDECall.startsWith('\"'))
+   if (c_IdeCall.startsWith('\"'))
    {
-      c_SplittedString = c_IDECall.split('\"', Qt::SplitBehaviorFlags::SkipEmptyParts);
+      c_SplittedString = c_IdeCall.split('\"', Qt::SplitBehaviorFlags::SkipEmptyParts);
       if (c_SplittedString.size() > 0)
       {
-         c_IDECall = c_SplittedString[0];
+         c_IdeCall = c_SplittedString[0];
       }
    }
    else
    {
-      c_SplittedString = c_IDECall.split(' ');
+      c_SplittedString = c_IdeCall.split(' ');
       if (c_SplittedString.size() > 0)
       {
-         c_IDECall = c_SplittedString[0];
+         c_IdeCall = c_SplittedString[0];
       }
    }
 
-   c_FolderName = this->m_GetDialogPath(c_IDECall);
+   c_FolderName = this->m_GetDialogPath(c_IdeCall);
    // File path check is done by h_AskUserToSaveRelativePath(), so no need to use C_OgeWiUtil::h_GetOpenFileName()
    c_Path = QFileDialog::getOpenFileName(this, C_GtGetText::h_GetText("Select IDE Executable"), c_FolderName,
                                          c_FilterName, NULL);
@@ -1548,9 +1558,9 @@ void C_SdNdeDbProperties::m_OnNameEdited(void) const
 /*! \brief   Slot for value changed signal of process ID spin box
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_OnProcessIDChanged(void) const
+void C_SdNdeDbProperties::m_OnProcessIdChanged(void) const
 {
-   const QString c_ErrorText = this->m_CheckID();
+   const QString c_ErrorText = this->m_CheckId();
    const bool q_Error = (c_ErrorText == "");
 
    //set valid text property flag
@@ -1654,11 +1664,11 @@ void C_SdNdeDbProperties::m_UpdatePathsRelativeToGeneratedDir(void) const
 void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
 {
    m_CleanUpDataPoolWidgets();
-   sint32 s32_Count = 0;
-   for (std::set<uint32>::const_iterator c_It = this->mc_SelectedDataPools.begin();
+   int32_t s32_Count = 0;
+   for (std::set<uint32_t>::const_iterator c_It = this->mc_SelectedDataPools.begin();
         c_It != this->mc_SelectedDataPools.end(); ++c_It)
    {
-      const uint32 u32_Val = *c_It;
+      const uint32_t u32_Val = *c_It;
       C_SdNdeDbDataPoolEntry * const pc_Entry = new C_SdNdeDbDataPoolEntry(this->mu32_NodeIndex, u32_Val, this);
 
       connect(pc_Entry, &C_SdNdeDbDataPoolEntry::SigDeleteDataPool, this, &C_SdNdeDbProperties::m_HandleDeleteDataPool);
@@ -1688,8 +1698,9 @@ void C_SdNdeDbProperties::m_InitDataPoolsSection(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleAddDataPools(void)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
-   const std::vector<uint32> c_SelectedDatapools(this->mc_SelectedDataPools.begin(), this->mc_SelectedDataPools.end());
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   const std::vector<uint32_t> c_SelectedDatapools(this->mc_SelectedDataPools.begin(),
+                                                   this->mc_SelectedDataPools.end());
    const C_SdNdeDbSelectDataPools * const pc_Dialog = new C_SdNdeDbSelectDataPools(this->mu32_NodeIndex,
                                                                                    this->ms32_ApplicationIndex,
                                                                                    c_SelectedDatapools, *c_New);
@@ -1697,10 +1708,10 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
    //Resize
    c_New->SetSize(QSize(800, 800));
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       const std::vector<C_PuiSvDbNodeDataPoolListElementId> c_SelectedDataPools = pc_Dialog->GetSelectedDataPools();
-      for (uint32 u32_It = 0UL; u32_It < c_SelectedDataPools.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < c_SelectedDataPools.size(); ++u32_It)
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_CurItem = c_SelectedDataPools[u32_It];
          this->mc_SelectedDataPools.insert(rc_CurItem.u32_DataPoolIndex);
@@ -1721,7 +1732,7 @@ void C_SdNdeDbProperties::m_HandleAddDataPools(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_HandleRevertCodeGenerator(void) const
 {
-   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(C_ImpUtil::h_GetSydeCoderCPath(), C_Uti::h_GetExePath());
+   this->mpc_Ui->pc_LineEditCodeGenerator->SetPath(C_ImpUtil::h_GetSydeCoderCePath(), C_Uti::h_GetExePath());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1731,11 +1742,11 @@ void C_SdNdeDbProperties::m_HandleRevertCodeGenerator(void) const
    \param[in]      ou32_Index    Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const opc_Source, const uint32 ou32_Index)
+void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const opc_Source, const uint32_t ou32_Index)
 {
    if (opc_Source != NULL)
    {
-      for (std::set<uint32>::iterator c_It = this->mc_SelectedDataPools.begin();
+      for (std::set<uint32_t>::iterator c_It = this->mc_SelectedDataPools.begin();
            c_It != this->mc_SelectedDataPools.end(); ++c_It)
       {
          if (*c_It == ou32_Index)
@@ -1785,7 +1796,7 @@ void C_SdNdeDbProperties::m_HandleDeleteDataPool(C_SdNdeDbDataPoolEntry * const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbProperties::m_AskUserToSaveRelativePath(const QString & orc_Path,
                                                       const QString & orc_AbsoluteReferenceDir,
-                                                      stw_opensyde_gui_elements::C_OgeLeFilePath * const opc_PathLineEdit)
+                                                      stw::opensyde_gui_elements::C_OgeLeFilePath * const opc_PathLineEdit)
 {
    if (orc_Path != "")
    {

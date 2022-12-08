@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamMetSettingsPopup.h"
+#include "C_CamMetSettingsPopup.hpp"
 #include "ui_C_CamMetSettingsPopup.h"
 
-#include "C_GtGetText.h"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +42,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  orc_Parent       Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamMetSettingsPopup::C_CamMetSettingsPopup(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_CamMetSettingsPopup::C_CamMetSettingsPopup(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CamMetSettingsPopup),
    mrc_ParentDialog(orc_Parent)
@@ -57,7 +56,7 @@ C_CamMetSettingsPopup::C_CamMetSettingsPopup(stw_opensyde_gui_elements::C_OgePop
    this->m_InitStaticNames();
 
    // initialize GUI
-   this->m_InitStaticGUIElements();
+   this->m_InitStaticGuiElements();
 
    this->mpc_Ui->pc_SpinBoxTraceBuffer->SetMinimumCustom(500);
    this->mpc_Ui->pc_SpinBoxTraceBuffer->SetMaximumCustom(50000);
@@ -86,7 +85,7 @@ C_CamMetSettingsPopup::~C_CamMetSettingsPopup(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetSettingsPopup::SetValues(const bool oq_DisplayTimestampAbsoluteTimeOfDay,
-                                      const uint32 ou32_TraceBufferSize) const
+                                      const uint32_t ou32_TraceBufferSize) const
 {
    this->mpc_Ui->pc_SpinBoxTraceBuffer->setValue(ou32_TraceBufferSize);
 
@@ -132,9 +131,9 @@ bool C_CamMetSettingsPopup::GetDisplayTimestampAbsoluteTimeOfDay(void) const
    Configured buffer size
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_CamMetSettingsPopup::GetTraceBufferSize(void) const
+uint32_t C_CamMetSettingsPopup::GetTraceBufferSize(void) const
 {
-   return static_cast<uint32>(this->mpc_Ui->pc_SpinBoxTraceBuffer->value());
+   return static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxTraceBuffer->value());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -150,8 +149,8 @@ void C_CamMetSettingsPopup::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -203,7 +202,7 @@ void C_CamMetSettingsPopup::m_InitStaticNames(void) const
 /*! \brief   Initialize colors, fonts, ...
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetSettingsPopup::m_InitStaticGUIElements(void) const
+void C_CamMetSettingsPopup::m_InitStaticGuiElements(void) const
 {
    // label "Settings"
    this->mpc_Ui->pc_LabelSettings->SetForegroundColor(4);

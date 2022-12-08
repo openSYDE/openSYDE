@@ -10,59 +10,58 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QGraphicsSceneMouseEvent>
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GiLiBusConnector.h"
-#include "C_GiNodeBoundary.h"
-#include "C_GiNode.h"
-#include "C_GtGetText.h"
-#include "C_SdTopologyScene.h"
-#include "C_PuiSdDataElement.h"
-#include "C_PuiSdHandler.h"
-#include "gitypes.h"
-#include "C_SdUtil.h"
-#include "C_PuiSdUtil.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GiLiBusConnector.hpp"
+#include "C_GiNodeBoundary.hpp"
+#include "C_GiNode.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdTopologyScene.hpp"
+#include "C_PuiSdDataElement.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "gitypes.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiSdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sint32 ms32_INDEX_ABOVE = 0;
-const sint32 ms32_INDEX_RIGHT = 1;
-const sint32 ms32_INDEX_LEFT = 2;
-const sint32 ms32_INDEX_BOTTOM = 3;
+const int32_t ms32_INDEX_ABOVE = 0;
+const int32_t ms32_INDEX_RIGHT = 1;
+const int32_t ms32_INDEX_LEFT = 2;
+const int32_t ms32_INDEX_BOTTOM = 3;
 
-const float64 mf64_ACTION_POINT_OFFSET_NODE = 15.0;
+const float64_t mf64_ACTION_POINT_OFFSET_NODE = 15.0;
 
-const float64 C_GiNode::mhf64_MIN_WIDTH_NODE = 107.0;
-const float64 C_GiNode::mhf64_MIN_HEIGHT_NODE = 71.0;
-const float64 C_GiNode::mhf64_INITIAL_WIDTH_NODE = 165.0;
-const float64 C_GiNode::mhf64_INITIAL_HEIGHT_NODE = 110.0;
+const float64_t C_GiNode::mhf64_MIN_WIDTH_NODE = 107.0;
+const float64_t C_GiNode::mhf64_MIN_HEIGHT_NODE = 71.0;
+const float64_t C_GiNode::mhf64_INITIAL_WIDTH_NODE = 165.0;
+const float64_t C_GiNode::mhf64_INITIAL_HEIGHT_NODE = 110.0;
 
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_0 = 7U;
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_1 = 0U; // no scaling -> default
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_2 = 1U;
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_3 = 2U;
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_4 = 3U;
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_5 = 4U;
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_6 = 5U;
-const uint32 C_GiNode::mhu32_SCALE_CATEGORY_7 = 6U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_0 = 7U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_1 = 0U; // no scaling -> default
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_2 = 1U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_3 = 2U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_4 = 3U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_5 = 4U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_6 = 5U;
+const uint32_t C_GiNode::mhu32_SCALE_CATEGORY_7 = 6U;
 
-const float64 C_GiNode::mhaf64_SCALE_MIN_WIDTH_NODE[7] =
+const float64_t C_GiNode::mhaf64_SCALE_MIN_WIDTH_NODE[7] =
 {
    150.0, 200.0, 250.0, 300.0, 350.0, 400.0, 450.0
 };
-const float64 C_GiNode::mhaf64_SCALE_MIN_HEIGHT_NODE[7] =
+const float64_t C_GiNode::mhaf64_SCALE_MIN_HEIGHT_NODE[7] =
 {
    100.0, 130.0, 165.0, 200.0, 230.0, 265.0, 300.0
 };
@@ -83,16 +82,16 @@ const float64 C_GiNode::mhaf64_SCALE_MIN_HEIGHT_NODE[7] =
    Set up GUI with all elements.
 
    \param[in]      ors32_Index   Index of data element in system definition
-   \param[in]      oru64_ID      Unique ID
+   \param[in]      oru64_Id      Unique ID
    \param[in]      orf64_Width   Width of node
    \param[in]      orf64_Height  Height of node
    \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const float64 & orf64_Width,
-                   const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
+C_GiNode::C_GiNode(const int32_t & ors32_Index, const uint64_t & oru64_Id, const float64_t & orf64_Width,
+                   const float64_t & orf64_Height, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiRectBaseGroup(ors32_Index, C_PuiSdDataElement::eNODE, oru64_ID, mhf64_MIN_WIDTH_NODE,
+   C_GiRectBaseGroup(ors32_Index, C_PuiSdDataElement::eNODE, oru64_Id, mhf64_MIN_WIDTH_NODE,
                      mhf64_MIN_HEIGHT_NODE, mf64_ACTION_POINT_OFFSET_NODE, false, opc_Parent),
    mq_ErrorIconHovered(false),
    mq_Valid(true),
@@ -100,12 +99,12 @@ C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const fl
    ms32_IconSize(24)
 {
    QString c_Name = "Node";
-   uint32 u32_SubNodesCount = 0;
-   uint32 u32_NodeSquadIndex;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+   uint32_t u32_SubNodesCount = 0;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->ms32_Index);
 
    if (pc_Node != NULL)
    {
+      uint32_t u32_NodeSquadIndex;
       c_Name = C_PuiSdUtil::h_GetNodeBaseNameOrName(this->ms32_Index);
 
       //is part of squad?
@@ -113,11 +112,11 @@ C_GiNode::C_GiNode(const sint32 & ors32_Index, const uint64 & oru64_ID, const fl
                                                                           u32_NodeSquadIndex) == C_NO_ERR)
       {
          //squad node
-         const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+         const stw::opensyde_core::C_OscNodeSquad * const pc_NodeSquad =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_NodeSquadIndex);
          if (pc_NodeSquad != NULL)
          {
-            u32_SubNodesCount = static_cast<uint32>(pc_NodeSquad->c_SubNodeIndexes.size());
+            u32_SubNodesCount = static_cast<uint32_t>(pc_NodeSquad->c_SubNodeIndexes.size());
          }
       }
       else
@@ -223,13 +222,15 @@ void C_GiNode::m_InitPorts()
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_InitConflictIcon(void)
 {
-   const float64 f64_PosX = (this->mpc_Boundary->boundingRect().width() - 33.0) - // static offset for correct position
-                            (static_cast<float64>(this->ms32_IconSize) - 24.0);   // offset of scaled icon
+   const float64_t f64_PosHorizontal = (this->mpc_Boundary->boundingRect().width() - 33.0) - // static offset for
+                                                                                             // correct
+                                                                                             // position
+                                       (static_cast<float64_t>(this->ms32_IconSize) - 24.0); // offset of scaled icon
 
    // create the conflict icon
-   this->mpc_ConflictIcon = new C_GiRectPixmap(QRectF(f64_PosX, 9.0,
-                                                      static_cast<float64>(this->ms32_IconSize),
-                                                      static_cast<float64>(this->ms32_IconSize)));
+   this->mpc_ConflictIcon = new C_GiRectPixmap(QRectF(f64_PosHorizontal, 9.0,
+                                                      static_cast<float64_t>(this->ms32_IconSize),
+                                                      static_cast<float64_t>(this->ms32_IconSize)));
 
    this->mpc_ConflictIcon->SetSvg("://images/Error_iconV2.svg");
 
@@ -243,7 +244,7 @@ void C_GiNode::m_InitConflictIcon(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_DetectIconSize(void)
 {
-   const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
+   const uint32_t u32_ScaleCategory = this->m_GetScaleCategory();
 
    switch (u32_ScaleCategory)
    {
@@ -279,11 +280,11 @@ void C_GiNode::m_DetectIconSize(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight, const bool oq_Initial)
+void C_GiNode::m_UpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight, const bool oq_Initial)
 {
-   const uint32 u32_ScaleCategory = this->m_GetScaleCategory();
+   const uint32_t u32_ScaleCategory = this->m_GetScaleCategory();
    QFont c_BoundaryFont;
-   const sint32 s32_OldIconSize = this->ms32_IconSize;
+   const int32_t s32_OldIconSize = this->ms32_IconSize;
 
    // update the scale category
    this->m_DetectIconSize();
@@ -293,10 +294,10 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
    // move the ports to the center of the respective side
    if (oq_Initial == false)
    {
-      const sint32 s32_IconSizeDiff = this->ms32_IconSize - s32_OldIconSize;
-      this->mpc_ConflictIcon->moveBy(of64_DiffWidth - static_cast<float64>(s32_IconSizeDiff), 0.0);
-      this->mpc_ConflictIcon->SetNewSize(QSizeF(static_cast<float64>(this->ms32_IconSize),
-                                                static_cast<float64>(this->ms32_IconSize)));
+      const int32_t s32_IconSizeDiff = this->ms32_IconSize - s32_OldIconSize;
+      this->mpc_ConflictIcon->moveBy(of64_DiffWidth - static_cast<float64_t>(s32_IconSizeDiff), 0.0);
+      this->mpc_ConflictIcon->SetNewSize(QSizeF(static_cast<float64_t>(this->ms32_IconSize),
+                                                static_cast<float64_t>(this->ms32_IconSize)));
       this->mpc_ConflictIcon->update();
 
       // move only by mouse movements
@@ -379,7 +380,7 @@ void C_GiNode::m_UpdateItems(const float64 of64_DiffWidth, const float64 of64_Di
 //----------------------------------------------------------------------------------------------------------------------
 C_GiNode::~C_GiNode()
 {
-   for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
+   for (int32_t s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
    {
       this->mc_Connections[s32_ItConn]->DeleteConnection();
       if (this->scene() != NULL)
@@ -406,10 +407,10 @@ void C_GiNode::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
 {
    //
    QPointF c_CurClosest;
-   float64 f64_CurDist;
-   float64 f64_Best = std::numeric_limits<float64>::max();
+   float64_t f64_CurDist;
+   float64_t f64_Best = std::numeric_limits<float64_t>::max();
 
-   for (sint32 s32_ItPort = 0; s32_ItPort < this->mc_Ports.size(); ++s32_ItPort)
+   for (int32_t s32_ItPort = 0; s32_ItPort < this->mc_Ports.size(); ++s32_ItPort)
    {
       this->mc_Ports[s32_ItPort]->FindClosestPoint(orc_ScenePoint, c_CurClosest);
       C_GiBiConnectableItem::h_DistToPoint(orc_ScenePoint, c_CurClosest, f64_CurDist);
@@ -431,10 +432,10 @@ void C_GiNode::FindClosestPoint(const QPointF & orc_ScenePoint, QPointF & orc_Cl
 void C_GiNode::FindClosestPort(const QPointF & orc_ScenePoint, C_GiPort * (&orpc_Closest)) const
 {
    QPointF c_CurClosest;
-   float64 f64_CurDist;
-   float64 f64_Best = std::numeric_limits<float64>::max();
+   float64_t f64_CurDist;
+   float64_t f64_Best = std::numeric_limits<float64_t>::max();
 
-   for (sint32 s32_ItPort = 0; s32_ItPort < this->mc_Ports.size(); ++s32_ItPort)
+   for (int32_t s32_ItPort = 0; s32_ItPort < this->mc_Ports.size(); ++s32_ItPort)
    {
       this->mc_Ports[s32_ItPort]->FindClosestPoint(orc_ScenePoint, c_CurClosest);
       C_GiBiConnectableItem::h_DistToPoint(orc_ScenePoint, c_CurClosest, f64_CurDist);
@@ -452,9 +453,9 @@ void C_GiNode::FindClosestPort(const QPointF & orc_ScenePoint, C_GiPort * (&orpc
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiNode::type() const
+int32_t C_GiNode::type() const
 {
-   return msn_GRAPHICS_ITEM_NODE;
+   return ms32_GRAPHICS_ITEM_NODE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -467,11 +468,11 @@ sintn C_GiNode::type() const
    false    Node has not a connection of this type
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiNode::HasConnectionType(const C_OSCSystemBus::E_Type oe_Type) const
+bool C_GiNode::HasConnectionType(const C_OscSystemBus::E_Type oe_Type) const
 {
    bool q_Return = false;
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->ms32_Index);
 
    if (pc_Node != NULL)
    {
@@ -490,11 +491,11 @@ bool C_GiNode::HasConnectionType(const C_OSCSystemBus::E_Type oe_Type) const
    \retval  false  connection not available
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiNode::CheckConnectionAvailable(const C_OSCSystemBus::E_Type & ore_Type) const
+bool C_GiNode::CheckConnectionAvailable(const C_OscSystemBus::E_Type & ore_Type) const
 {
    bool q_Retval = false;
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->ms32_Index);
 
    if (pc_Node != NULL)
    {
@@ -514,17 +515,17 @@ bool C_GiNode::CheckConnectionAvailable(const C_OSCSystemBus::E_Type & ore_Type)
    \retval  false  interface not available
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiNode::CheckInterfaceAvailable(const C_OSCSystemBus::E_Type & ore_Type, const uint8 & oru8_Interface)
+bool C_GiNode::CheckInterfaceAvailable(const C_OscSystemBus::E_Type & ore_Type, const uint8_t & oru8_Interface)
 {
    bool q_Retval = CheckConnectionAvailable(ore_Type);
 
    if (q_Retval == true)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->ms32_Index);
       this->UpdateData();
       if (pc_Node != NULL)
       {
-         const C_OSCNodeComInterfaceSettings * const pc_ComInterface = pc_Node->c_Properties.GetComInterface(ore_Type,
+         const C_OscNodeComInterfaceSettings * const pc_ComInterface = pc_Node->c_Properties.GetComInterface(ore_Type,
                                                                                                              oru8_Interface);
          if (pc_ComInterface != NULL)
          {
@@ -544,13 +545,13 @@ bool C_GiNode::CheckInterfaceAvailable(const C_OSCSystemBus::E_Type & ore_Type, 
    index of specified connection
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connection) const
+int32_t C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connection) const
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
 
    if (opc_Connection != NULL)
    {
-      for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
+      for (int32_t s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
       {
          if (opc_Connection == this->mc_Connections[s32_ItConn])
          {
@@ -567,9 +568,9 @@ sint32 C_GiNode::GetIndexOfConnector(const C_GiLiBusConnector * const opc_Connec
    \param[out]  orpc_Node  Node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::GetOSCNodeConst(const C_OSCNode * (&orpc_Node)) const
+void C_GiNode::GetOscNodeConst(const C_OscNode * (&orpc_Node)) const
 {
-   orpc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(static_cast<uint32>(this->ms32_Index));
+   orpc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(static_cast<uint32_t>(this->ms32_Index));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -606,13 +607,13 @@ void C_GiNode::GenerateHint(void)
    }
    else
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->ms32_Index);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->ms32_Index);
 
       this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
 
       if (pc_Node != NULL)
       {
-         const C_OSCDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
+         const C_OscDeviceDefinition * const pc_Device = pc_Node->pc_DeviceDefinition;
          if (pc_Device != NULL)
          {
             bool q_Found;
@@ -640,29 +641,29 @@ void C_GiNode::GenerateHint(void)
             //CAN
             if (pc_Device->u8_NumCanBusses > 0)
             {
-               for (uint8 u8_ItInterface = 0; u8_ItInterface < pc_Device->u8_NumCanBusses; ++u8_ItInterface)
+               for (uint8_t u8_ItInterface = 0; u8_ItInterface < pc_Device->u8_NumCanBusses; ++u8_ItInterface)
                {
                   q_Found = false;
-                  for (uint32 u32_ItBusConnection = 0;
+                  for (uint32_t u32_ItBusConnection = 0;
                        (u32_ItBusConnection < pc_Node->c_Properties.c_ComInterfaces.size()) && (q_Found == false);
                        ++u32_ItBusConnection)
                   {
-                     const C_OSCNodeComInterfaceSettings & rc_Conn =
+                     const C_OscNodeComInterfaceSettings & rc_Conn =
                         pc_Node->c_Properties.c_ComInterfaces[u32_ItBusConnection];
-                     if (rc_Conn.e_InterfaceType == C_OSCSystemBus::E_Type::eCAN)
+                     if (rc_Conn.e_InterfaceType == C_OscSystemBus::E_Type::eCAN)
                      {
                         if (rc_Conn.u8_InterfaceNumber == u8_ItInterface)
                         {
                            if (rc_Conn.GetBusConnectedRawValue() == true)
                            {
-                              const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                              const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
                                  rc_Conn.u32_BusIndex);
                               if (pc_Bus != NULL)
                               {
                                  c_BusName = C_GtGetText::h_GetText("Linked to ");
                                  c_BusName.append(pc_Bus->c_Name.c_str());
                                  //Bus + Node Id Info
-                                 if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+                                 if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
                                  {
                                     c_BusName.append(static_cast<QString>(" (Bitrate: %1 kbit/s)").
                                                      arg(QString::number(pc_Bus->u64_BitRate / 1000ULL)));
@@ -688,7 +689,7 @@ void C_GiNode::GenerateHint(void)
                      c_Entry = "\n";
                   }
                   c_ToolTip.append(c_Entry);
-                  c_Entry =  static_cast<QString>("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eCAN,
+                  c_Entry =  static_cast<QString>("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eCAN,
                                                                                                 u8_ItInterface),
                                                                 c_BusName);
                   c_ToolTip.append(c_Entry);
@@ -697,22 +698,22 @@ void C_GiNode::GenerateHint(void)
             //Ethernet
             if (pc_Device->u8_NumEthernetBusses > 0)
             {
-               for (uint8 u8_ItInterface = 0; u8_ItInterface < pc_Device->u8_NumEthernetBusses; ++u8_ItInterface)
+               for (uint8_t u8_ItInterface = 0; u8_ItInterface < pc_Device->u8_NumEthernetBusses; ++u8_ItInterface)
                {
                   q_Found = false;
-                  for (uint32 u32_ItBusConnection = 0;
+                  for (uint32_t u32_ItBusConnection = 0;
                        (u32_ItBusConnection < pc_Node->c_Properties.c_ComInterfaces.size()) && (q_Found == false);
                        ++u32_ItBusConnection)
                   {
-                     const C_OSCNodeComInterfaceSettings & rc_Conn =
+                     const C_OscNodeComInterfaceSettings & rc_Conn =
                         pc_Node->c_Properties.c_ComInterfaces[u32_ItBusConnection];
-                     if (rc_Conn.e_InterfaceType == C_OSCSystemBus::E_Type::eETHERNET)
+                     if (rc_Conn.e_InterfaceType == C_OscSystemBus::E_Type::eETHERNET)
                      {
                         if (rc_Conn.u8_InterfaceNumber == u8_ItInterface)
                         {
                            if (rc_Conn.GetBusConnectedRawValue() == true)
                            {
-                              const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+                              const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
                                  rc_Conn.u32_BusIndex);
                               if (pc_Bus != NULL)
                               {
@@ -740,7 +741,7 @@ void C_GiNode::GenerateHint(void)
                   }
                   c_ToolTip.append(c_Entry);
                   c_Entry =
-                     static_cast<QString>("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OSCSystemBus::eETHERNET,
+                     static_cast<QString>("%1: %2").arg(C_PuiSdUtil::h_GetInterfaceName(C_OscSystemBus::eETHERNET,
                                                                                         u8_ItInterface),
                                                         c_BusName);
                   c_ToolTip.append(c_Entry);
@@ -890,7 +891,7 @@ bool C_GiNode::m_UpdateError(void)
 {
    bool q_ErrorDetected;
 
-   C_SdUtil::h_GetErrorToolTipNode(static_cast<uint32>(this->ms32_Index), this->mc_ErrorText, q_ErrorDetected, true);
+   C_SdUtil::h_GetErrorToolTipNode(static_cast<uint32_t>(this->ms32_Index), this->mc_ErrorText, q_ErrorDetected, true);
    return q_ErrorDetected;
 }
 
@@ -913,7 +914,7 @@ bool C_GiNode::m_GetErrorStatus(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 of64_DiffHeight)
+void C_GiNode::m_ResizeUpdateItems(const float64_t of64_DiffWidth, const float64_t of64_DiffHeight)
 {
    this->m_UpdateItems(of64_DiffWidth, of64_DiffHeight, false);
 }
@@ -921,11 +922,11 @@ void C_GiNode::m_ResizeUpdateItems(const float64 of64_DiffWidth, const float64 o
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::m_SetDrawBorder(const bool oq_Active)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0U; sn_Counter < this->mc_Ports.size(); ++sn_Counter)
+   for (s32_Counter = 0U; s32_Counter < this->mc_Ports.size(); ++s32_Counter)
    {
-      this->mc_Ports[sn_Counter]->SetDrawBorder(oq_Active);
+      this->mc_Ports[s32_Counter]->SetDrawBorder(oq_Active);
    }
 
    this->mpc_Boundary->SetDrawBorder(oq_Active);
@@ -938,16 +939,16 @@ const C_GiNodeBoundary * C_GiNode::m_GetBoundary(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiNode::m_GetIconSize(void) const
+int32_t C_GiNode::m_GetIconSize(void) const
 {
    return this->ms32_IconSize;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiNode::m_GetScaleCategory(void) const
+uint32_t C_GiNode::m_GetScaleCategory(void) const
 {
    const QSizeF c_ActSize = this->mpc_Boundary->boundingRect().size();
-   uint32 u32_ScaleCategory = mhu32_SCALE_CATEGORY_0;
+   uint32_t u32_ScaleCategory = mhu32_SCALE_CATEGORY_0;
 
    // check first scaling
    if ((c_ActSize.width() >= mhaf64_SCALE_MIN_WIDTH_NODE[mhu32_SCALE_CATEGORY_1]) &&
@@ -1034,13 +1035,13 @@ bool C_GiNode::GetValid(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    this->mq_DrawWhiteFilter = oq_Active;
 
-   for (sn_Counter = 0U; sn_Counter < this->mc_Ports.size(); ++sn_Counter)
+   for (s32_Counter = 0U; s32_Counter < this->mc_Ports.size(); ++s32_Counter)
    {
-      this->mc_Ports[sn_Counter]->SetDrawWhiteFilter(oq_Active);
+      this->mc_Ports[s32_Counter]->SetDrawWhiteFilter(oq_Active);
    }
 
    this->mpc_Boundary->SetDrawWhiteFilter(oq_Active);
@@ -1051,13 +1052,13 @@ void C_GiNode::SetDrawWhiteFilter(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in]  of64_ZValue    New Z value
+   \param[in]  of64_ZetValue    New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::SetZValueCustom(const float64 of64_ZValue)
+void C_GiNode::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiRectBaseGroup::SetZValueCustom(of64_ZValue);
-   Q_EMIT this->SigChangedZOrder();
+   C_GiRectBaseGroup::SetZetValueCustom(of64_ZetValue);
+   Q_EMIT this->SigChangedZeOrder();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1070,7 +1071,7 @@ QString C_GiNode::GetText(void) const
 {
    QString c_Name = "Node";
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ms32_Index);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ms32_Index);
 
    if (pc_Node != NULL)
    {
@@ -1086,7 +1087,7 @@ QString C_GiNode::GetText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::LoadData(void)
 {
-   const C_PuiSdNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetUINode(ms32_Index);
+   const C_PuiSdNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetUiNode(ms32_Index);
 
    if (pc_Node != NULL)
    {
@@ -1104,19 +1105,19 @@ void C_GiNode::UpdateData(void)
 {
    C_PuiBsBox c_BoxData;
 
-   stw_opensyde_gui_logic::C_PuiSdNodeConnection c_Conn;
+   stw::opensyde_gui_logic::C_PuiSdNodeConnection c_Conn;
    std::vector<C_PuiSdNodeConnection> c_BusConnections;
 
    this->UpdateBasicData(c_BoxData);
 
    //Connections
-   for (sint32 s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
+   for (int32_t s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
    {
       this->mc_Connections[s32_ItConn]->UpdateData(&c_Conn);
       c_BusConnections.push_back(c_Conn);
    }
-   C_PuiSdHandler::h_GetInstance()->SetUINodeBox(ms32_Index, c_BoxData);
-   C_PuiSdHandler::h_GetInstance()->SetUINodeConnections(ms32_Index, c_BusConnections);
+   C_PuiSdHandler::h_GetInstance()->SetUiNodeBox(ms32_Index, c_BoxData);
+   C_PuiSdHandler::h_GetInstance()->SetUiNodeConnections(ms32_Index, c_BusConnections);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1127,7 +1128,7 @@ void C_GiNode::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnectorGraphicsItem)
 {
-   sint32 s32_ItConn;
+   int32_t s32_ItConn;
 
    const C_PuiSdNodeConnectionId * const pc_ConnId = this->GetNodeConnectionId(opc_BusConnectorGraphicsItem);
 
@@ -1137,7 +1138,7 @@ void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnector
       // sub node remove can cause a change the value pc_ConnId points at. All following deletions of the other sub
       // nodes in RemoveConnection could have wrong values where pc_ConnId is pointing at
       const C_PuiSdNodeConnectionId c_ConnIdCopy = *pc_ConnId;
-      C_PuiSdHandler::h_GetInstance()->RemoveConnection(static_cast<uint32>(this->ms32_Index), c_ConnIdCopy);
+      C_PuiSdHandler::h_GetInstance()->RemoveConnection(static_cast<uint32_t>(this->ms32_Index), c_ConnIdCopy);
    }
 
    for (s32_ItConn = 0; s32_ItConn < this->mc_Connections.size(); ++s32_ItConn)
@@ -1159,7 +1160,7 @@ void C_GiNode::RemoveConnector(const C_GiLiBusConnector * const opc_BusConnector
    Is index relevant for this node
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiNode::CheckIndexRelevantForThisNode(const uint32 ou32_NodeIndex) const
+bool C_GiNode::CheckIndexRelevantForThisNode(const uint32_t ou32_NodeIndex) const
 {
    bool q_Retval = false;
 
@@ -1167,7 +1168,7 @@ bool C_GiNode::CheckIndexRelevantForThisNode(const uint32 ou32_NodeIndex) const
    {
       q_Retval =
          C_PuiSdHandler::h_GetInstance()->CheckNodeIndexAssociatedWithAnotherNodeIndex(
-            static_cast<uint32>(this->ms32_Index), ou32_NodeIndex);
+            static_cast<uint32_t>(this->ms32_Index), ou32_NodeIndex);
    }
    return q_Retval;
 }
@@ -1205,13 +1206,13 @@ void C_GiNode::AddConnection(C_GiLiBusConnector * const opc_Connection)
 void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
                                     const C_PuiSdNodeConnectionId & orc_NodeConnection,
                                     const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
-                                    const uint32 & oru32_BusIndex)
+                                    const uint32_t & oru32_BusIndex)
 {
    if (opc_Connection != NULL)
    {
       this->AddConnection(opc_Connection);
       C_PuiSdHandler::h_GetInstance()->AddConnection(
-         static_cast<uint32>(this->GetIndex()), orc_NodeConnection.u8_InterfaceNumber, orc_Properties,
+         static_cast<uint32_t>(this->GetIndex()), orc_NodeConnection.u8_InterfaceNumber, orc_Properties,
          oru32_BusIndex);
    }
 }
@@ -1228,13 +1229,13 @@ void C_GiNode::AddConnectionAndData(C_GiLiBusConnector * const opc_Connection,
 void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
                                 const C_PuiSdNodeConnectionId & orc_NodeConnection,
                                 const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
-                                const uint32 & oru32_BusIndex) const
+                                const uint32_t & oru32_BusIndex) const
 {
    const C_PuiSdNodeConnectionId * const pc_PrevConn = this->GetNodeConnectionId(opc_Connection);
 
    if (pc_PrevConn != NULL)
    {
-      C_PuiSdHandler::h_GetInstance()->ChangeCompleteConnection(static_cast<uint32>(this->ms32_Index), *pc_PrevConn,
+      C_PuiSdHandler::h_GetInstance()->ChangeCompleteConnection(static_cast<uint32_t>(this->ms32_Index), *pc_PrevConn,
                                                                 orc_NodeConnection, orc_Properties,
                                                                 oru32_BusIndex);
    }
@@ -1248,7 +1249,7 @@ void C_GiNode::UpdateConnection(const C_GiLiBusConnector * const opc_Connection,
    \param[in]  orc_Properties    Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
+void C_GiNode::ChangeInterface(const uint8_t ou8_Interface, const C_GiLiBusConnector * const opc_Connection,
                                const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties) const
 {
    if (opc_Connection != NULL)
@@ -1259,7 +1260,7 @@ void C_GiNode::ChangeInterface(const uint8 ou8_Interface, const C_GiLiBusConnect
          const C_PuiSdNodeConnectionId * const pc_ConnectionId = this->GetNodeConnectionId(opc_Connection);
          if (pc_ConnectionId != NULL)
          {
-            C_PuiSdHandler::h_GetInstance()->ChangeConnection(static_cast<uint32>(this->ms32_Index), *pc_ConnectionId,
+            C_PuiSdHandler::h_GetInstance()->ChangeConnection(static_cast<uint32_t>(this->ms32_Index), *pc_ConnectionId,
                                                               ou8_Interface, orc_Properties);
          }
          pc_Bus->GetType();
@@ -1284,16 +1285,16 @@ const C_PuiSdNodeConnectionId * C_GiNode::GetNodeConnectionId(const C_GiLiBusCon
    if (opc_Connection != NULL)
    {
       const C_PuiSdNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetUINode(static_cast<uint32>(this->ms32_Index));
+         C_PuiSdHandler::h_GetInstance()->GetUiNode(static_cast<uint32_t>(this->ms32_Index));
       if (pc_Node != NULL)
       {
-         const sint32 s32_Index = GetIndexOfConnector(opc_Connection);
+         const int32_t s32_Index = GetIndexOfConnector(opc_Connection);
          if (s32_Index >= 0)
          {
-            const uint32 u32_Index = static_cast<uint32>(s32_Index);
-            if (u32_Index < pc_Node->c_UIBusConnections.size())
+            const uint32_t u32_Index = static_cast<uint32_t>(s32_Index);
+            if (u32_Index < pc_Node->c_UiBusConnections.size())
             {
-               pc_Retval = &(pc_Node->c_UIBusConnections[u32_Index].c_ConnectionID);
+               pc_Retval = &(pc_Node->c_UiBusConnections[u32_Index].c_ConnectionId);
             }
          }
       }

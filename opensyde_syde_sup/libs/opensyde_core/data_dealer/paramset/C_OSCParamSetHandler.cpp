@@ -10,23 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "TGLFile.h"
-#include "stwerrors.h"
-#include "C_OSCChecksummedXML.h"
-#include "C_OSCParamSetHandler.h"
-#include "C_OSCParamSetRawNodeFiler.h"
-#include "C_OSCParamSetInterpretedNodeFiler.h"
-#include "C_OSCLoggingHandler.h"
+#include "TglUtils.hpp"
+#include "TglFile.hpp"
+#include "stwerrors.hpp"
+#include "C_OscChecksummedXml.hpp"
+#include "C_OscParamSetHandler.hpp"
+#include "C_OscParamSetRawNodeFiler.hpp"
+#include "C_OscParamSetInterpretedNodeFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,7 +44,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetHandler::C_OSCParamSetHandler(void)
+C_OscParamSetHandler::C_OscParamSetHandler(void)
 {
 }
 
@@ -60,35 +60,35 @@ C_OSCParamSetHandler::C_OSCParamSetHandler(void)
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::CreateCleanFileWithoutCRC(const C_SCLString & orc_FilePath,
-                                                       const bool oq_InterpretedDataOnly)
+int32_t C_OscParamSetHandler::CreateCleanFileWithoutCrc(const C_SclString & orc_FilePath,
+                                                        const bool oq_InterpretedDataOnly)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   if (TGL_FileExists(orc_FilePath.c_str()) == false)
+   if (TglFileExists(orc_FilePath.c_str()) == false)
    {
       if ((oq_InterpretedDataOnly == true) ||
           (this->mc_RawNodes.size() == this->mc_Data.c_InterpretedNodes.size()))
       {
-         C_OSCXMLParser c_XMLParser;
-         tgl_assert(c_XMLParser.CreateAndSelectNodeChild("opensyde-parameter-sets") == "opensyde-parameter-sets");
-         C_OSCParamSetFilerBase::h_SaveFileVersion(c_XMLParser);
-         C_OSCParamSetFilerBase::h_SaveFileInfo(c_XMLParser, this->mc_Data.c_FileInfo);
-         tgl_assert(c_XMLParser.CreateAndSelectNodeChild("nodes") == "nodes");
-         for (uint32 u32_ItNode = 0; u32_ItNode < this->mc_Data.c_InterpretedNodes.size(); ++u32_ItNode)
+         C_OscXmlParser c_XmlParser;
+         tgl_assert(c_XmlParser.CreateAndSelectNodeChild("opensyde-parameter-sets") == "opensyde-parameter-sets");
+         C_OscParamSetFilerBase::h_SaveFileVersion(c_XmlParser);
+         C_OscParamSetFilerBase::h_SaveFileInfo(c_XmlParser, this->mc_Data.c_FileInfo);
+         tgl_assert(c_XmlParser.CreateAndSelectNodeChild("nodes") == "nodes");
+         for (uint32_t u32_ItNode = 0; u32_ItNode < this->mc_Data.c_InterpretedNodes.size(); ++u32_ItNode)
          {
-            tgl_assert(c_XMLParser.CreateAndSelectNodeChild("node") == "node");
+            tgl_assert(c_XmlParser.CreateAndSelectNodeChild("node") == "node");
             if (oq_InterpretedDataOnly == false)
             {
-               C_OSCParamSetRawNodeFiler::h_SaveRawNode(this->mc_RawNodes[u32_ItNode], c_XMLParser);
+               C_OscParamSetRawNodeFiler::h_SaveRawNode(this->mc_RawNodes[u32_ItNode], c_XmlParser);
             }
-            C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(this->mc_Data.c_InterpretedNodes[u32_ItNode],
-                                                                     c_XMLParser);
+            C_OscParamSetInterpretedNodeFiler::h_SaveInterpretedNode(this->mc_Data.c_InterpretedNodes[u32_ItNode],
+                                                                     c_XmlParser);
             //Return
-            tgl_assert(c_XMLParser.SelectNodeParent() == "nodes");
+            tgl_assert(c_XmlParser.SelectNodeParent() == "nodes");
          }
 
-         s32_Return = c_XMLParser.SaveToFile(orc_FilePath);
+         s32_Return = c_XmlParser.SaveToFile(orc_FilePath);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_RD_WR;
@@ -125,23 +125,23 @@ sint32 C_OSCParamSetHandler::CreateCleanFileWithoutCRC(const C_SCLString & orc_F
    C_CONFIG   file does not contain essential information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bool oq_IgnoreCrc,
-                                      const bool oq_InterpretedDataOnly, uint16 * const opu16_FileCrc,
-                                      bool * const opq_MissingOptionalContent)
+int32_t C_OscParamSetHandler::ReadFile(const C_SclString & orc_FilePath, const bool oq_IgnoreCrc,
+                                       const bool oq_InterpretedDataOnly, uint16_t * const opu16_FileCrc,
+                                       bool * const opq_MissingOptionalContent)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    this->ClearContent();
-   if (TGL_FileExists(orc_FilePath) == true)
+   if (TglFileExists(orc_FilePath) == true)
    {
-      C_OSCXMLParser * pc_Parser;
+      C_OscXmlParser * pc_Parser;
       if (oq_IgnoreCrc == true)
       {
-         pc_Parser = new C_OSCXMLParser();
+         pc_Parser = new C_OscXmlParser();
       }
       else
       {
-         pc_Parser = new C_OSCChecksummedXML();
+         pc_Parser = new C_OscChecksummedXml();
       }
 
       s32_Retval = pc_Parser->LoadFromFile(orc_FilePath);
@@ -149,16 +149,16 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
       {
          if (pc_Parser->SelectRoot() == "opensyde-parameter-sets")
          {
-            s32_Retval = C_OSCParamSetRawNodeFiler::h_CheckFileVersion(*pc_Parser);
+            s32_Retval = C_OscParamSetRawNodeFiler::h_CheckFileVersion(*pc_Parser);
             if (s32_Retval == C_NO_ERR)
             {
                bool q_MissingOptionalContent = false;
-               C_OSCParamSetRawNodeFiler::h_LoadFileInfo(*pc_Parser, this->mc_Data.c_FileInfo,
+               C_OscParamSetRawNodeFiler::h_LoadFileInfo(*pc_Parser, this->mc_Data.c_FileInfo,
                                                          q_MissingOptionalContent);
                s32_Retval = this->m_LoadNodes(*pc_Parser, oq_InterpretedDataOnly, q_MissingOptionalContent);
                if ((opu16_FileCrc != NULL) && (s32_Retval == C_NO_ERR))
                {
-                  *opu16_FileCrc = static_cast<uint16>(pc_Parser->GetAttributeUint32("file_crc"));
+                  *opu16_FileCrc = static_cast<uint16_t>(pc_Parser->GetAttributeUint32("file_crc"));
                }
                if (opq_MissingOptionalContent != NULL)
                {
@@ -187,8 +187,8 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
    }
    if (s32_Retval != C_NO_ERR)
    {
-      const C_SCLString c_Text = "Could not load file \"" + orc_FilePath + "\". Error code: " +
-                                 C_SCLString::IntToStr(s32_Retval);
+      const C_SclString c_Text = "Could not load file \"" + orc_FilePath + "\". Error code: " +
+                                 C_SclString::IntToStr(s32_Retval);
       osc_write_log_error("Loading Dataset data", c_Text);
    }
 
@@ -207,16 +207,16 @@ sint32 C_OSCParamSetHandler::ReadFile(const C_SCLString & orc_FilePath, const bo
    C_RANGE  File does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::h_UpdateCRCForFile(const C_SCLString & orc_FilePath)
+int32_t C_OscParamSetHandler::h_UpdateCrcForFile(const C_SclString & orc_FilePath)
 {
-   return C_OSCParamSetFilerBase::h_AddCRC(orc_FilePath);
+   return C_OscParamSetFilerBase::h_AddCrc(orc_FilePath);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clear internally stored content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetHandler::ClearContent(void)
+void C_OscParamSetHandler::ClearContent(void)
 {
    this->mc_RawNodes.clear();
    this->mc_Data.Clear();
@@ -232,13 +232,13 @@ void C_OSCParamSetHandler::ClearContent(void)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::AddRawDataForNode(const C_OSCParamSetRawNode & orc_Content)
+int32_t C_OscParamSetHandler::AddRawDataForNode(const C_OscParamSetRawNode & orc_Content)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   for (uint32 u32_ItRawNode = 0; u32_ItRawNode < this->mc_RawNodes.size(); ++u32_ItRawNode)
+   for (uint32_t u32_ItRawNode = 0; u32_ItRawNode < this->mc_RawNodes.size(); ++u32_ItRawNode)
    {
-      const C_OSCParamSetRawNode & rc_CurRawNode = this->mc_RawNodes[u32_ItRawNode];
+      const C_OscParamSetRawNode & rc_CurRawNode = this->mc_RawNodes[u32_ItRawNode];
       if (rc_CurRawNode.c_Name == orc_Content.c_Name)
       {
          s32_Retval = C_RANGE;
@@ -257,7 +257,7 @@ sint32 C_OSCParamSetHandler::AddRawDataForNode(const C_OSCParamSetRawNode & orc_
    \param[in] orc_FileInfo Optional general file information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetHandler::AddInterpretedFileData(const C_OSCParamSetInterpretedFileInfoData & orc_FileInfo)
+void C_OscParamSetHandler::AddInterpretedFileData(const C_OscParamSetInterpretedFileInfoData & orc_FileInfo)
 {
    this->mc_Data.AddInterpretedFileData(orc_FileInfo);
 }
@@ -272,14 +272,14 @@ void C_OSCParamSetHandler::AddInterpretedFileData(const C_OSCParamSetInterpreted
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::AddInterpretedDataForNode(const C_OSCParamSetInterpretedNode & orc_Content)
+int32_t C_OscParamSetHandler::AddInterpretedDataForNode(const C_OscParamSetInterpretedNode & orc_Content)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   for (uint32 u32_ItInterpretedNode = 0; u32_ItInterpretedNode < this->mc_Data.c_InterpretedNodes.size();
+   for (uint32_t u32_ItInterpretedNode = 0; u32_ItInterpretedNode < this->mc_Data.c_InterpretedNodes.size();
         ++u32_ItInterpretedNode)
    {
-      const C_OSCParamSetInterpretedNode & rc_CurInterpretedNode =
+      const C_OscParamSetInterpretedNode & rc_CurInterpretedNode =
          this->mc_Data.c_InterpretedNodes[u32_ItInterpretedNode];
       if (rc_CurInterpretedNode.c_Name == orc_Content.c_Name)
       {
@@ -303,13 +303,13 @@ sint32 C_OSCParamSetHandler::AddInterpretedDataForNode(const C_OSCParamSetInterp
    Else Valid raw node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const C_SCLString & orc_NodeName) const
+const C_OscParamSetRawNode * C_OscParamSetHandler::GetRawDataForNode(const C_SclString & orc_NodeName) const
 {
-   const C_OSCParamSetRawNode * pc_Retval = NULL;
+   const C_OscParamSetRawNode * pc_Retval = NULL;
 
-   for (uint32 u32_ItRawNode = 0; u32_ItRawNode < this->mc_RawNodes.size(); ++u32_ItRawNode)
+   for (uint32_t u32_ItRawNode = 0; u32_ItRawNode < this->mc_RawNodes.size(); ++u32_ItRawNode)
    {
-      const C_OSCParamSetRawNode & rc_CurRawNode = this->mc_RawNodes[u32_ItRawNode];
+      const C_OscParamSetRawNode & rc_CurRawNode = this->mc_RawNodes[u32_ItRawNode];
       if (rc_CurRawNode.c_Name == orc_NodeName)
       {
          pc_Retval = &this->mc_RawNodes[u32_ItRawNode];
@@ -326,7 +326,7 @@ const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const C_SCL
    Pointer to vector with interpreted data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCParamSetInterpretedData & C_OSCParamSetHandler::GetInterpretedData(void) const
+const C_OscParamSetInterpretedData & C_OscParamSetHandler::GetInterpretedData(void) const
 {
    return this->mc_Data;
 }
@@ -340,9 +340,9 @@ const C_OSCParamSetInterpretedData & C_OSCParamSetHandler::GetInterpretedData(vo
    Number of nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCParamSetHandler::GetNumberOfNodes(void) const
+uint32_t C_OscParamSetHandler::GetNumberOfNodes(void) const
 {
-   return this->mc_RawNodes.size();
+   return static_cast<uint32_t>(this->mc_RawNodes.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -357,9 +357,9 @@ uint32 C_OSCParamSetHandler::GetNumberOfNodes(void) const
    Else  Valid raw node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const uint32 ou32_NodeIndex) const
+const C_OscParamSetRawNode * C_OscParamSetHandler::GetRawDataForNode(const uint32_t ou32_NodeIndex) const
 {
-   const C_OSCParamSetRawNode * pc_Result = NULL;
+   const C_OscParamSetRawNode * pc_Result = NULL;
 
    if (ou32_NodeIndex < this->mc_RawNodes.size())
    {
@@ -375,7 +375,7 @@ const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const uint3
    pre-condition: the passed XML parser has the active node set to "opensyde-parameter-sets"
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
-   \param[in,out] orc_XMLParser              XML with specified node active
+   \param[in,out] orc_XmlParser              XML with specified node active
    \param[in]     oq_InterpretedDataOnly     Flag to load only the interpreted data and not the raw data
    \param[in,out] orq_MissingOptionalContent Flag for indication of optional content missing
                                              Warning: flag is never set to false if optional content is present
@@ -385,25 +385,25 @@ const C_OSCParamSetRawNode * C_OSCParamSetHandler::GetRawDataForNode(const uint3
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const bool oq_InterpretedDataOnly,
-                                         bool & orq_MissingOptionalContent)
+int32_t C_OscParamSetHandler::m_LoadNodes(C_OscXmlParser & orc_XmlParser, const bool oq_InterpretedDataOnly,
+                                          bool & orq_MissingOptionalContent)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("nodes") == "nodes")
+   if (orc_XmlParser.SelectNodeChild("nodes") == "nodes")
    {
-      C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("node");
+      C_SclString c_SelectedNode = orc_XmlParser.SelectNodeChild("node");
 
       if (c_SelectedNode == "node")
       {
          do
          {
-            C_OSCParamSetInterpretedNode c_InterpretedItem;
-            C_OSCParamSetRawNode c_RawItem;
+            C_OscParamSetInterpretedNode c_InterpretedItem;
+            C_OscParamSetRawNode c_RawItem;
             //Content
             if (oq_InterpretedDataOnly == false)
             {
-               s32_Retval = C_OSCParamSetRawNodeFiler::h_LoadRawNode(c_RawItem, orc_XMLParser,
+               s32_Retval = C_OscParamSetRawNodeFiler::h_LoadRawNode(c_RawItem, orc_XmlParser,
                                                                      orq_MissingOptionalContent);
                if (s32_Retval == C_NO_ERR)
                {
@@ -418,7 +418,7 @@ sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const b
 
             if (s32_Retval == C_NO_ERR)
             {
-               s32_Retval = C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(c_InterpretedItem, orc_XMLParser,
+               s32_Retval = C_OscParamSetInterpretedNodeFiler::h_LoadInterpretedNode(c_InterpretedItem, orc_XmlParser,
                                                                                      orq_MissingOptionalContent);
                if (s32_Retval == C_NO_ERR)
                {
@@ -427,11 +427,11 @@ sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const b
             }
 
             //Next
-            c_SelectedNode = orc_XMLParser.SelectNodeNext("node");
+            c_SelectedNode = orc_XmlParser.SelectNodeNext("node");
          }
          while ((c_SelectedNode == "node") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "nodes");
       }
       else
       {
@@ -439,7 +439,7 @@ sint32 C_OSCParamSetHandler::m_LoadNodes(C_OSCXMLParser & orc_XMLParser, const b
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-parameter-sets");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-parameter-sets");
    }
    else
    {

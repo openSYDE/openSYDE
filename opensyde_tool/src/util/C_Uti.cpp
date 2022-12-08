@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <sstream>
@@ -20,23 +20,22 @@
 #include <QFileInfo>
 #include <QStorageInfo>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_Uti.h"
-#include "TGLTime.h"
-#include "C_OSCUtils.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCBinaryHash.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_Uti.hpp"
+#include "TglTime.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscBinaryHash.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -58,9 +57,9 @@ using namespace stw_opensyde_gui_logic;
    \param[in]  orc_Indices    Input to uniqueify
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
+void C_Uti::h_Uniqueify(std::vector<uint32_t> & orc_Indices)
 {
-   std::vector<uint32>::const_iterator c_Last;
+   std::vector<uint32_t>::const_iterator c_Last;
    std::sort(orc_Indices.begin(), orc_Indices.end());
 
    c_Last = std::unique(orc_Indices.begin(), orc_Indices.end());
@@ -78,18 +77,18 @@ void C_Uti::h_Uniqueify(std::vector<uint32> & orc_Indices)
    Input as contiguous sections
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<std::vector<uint32> > C_Uti::h_GetContiguousSectionsAscending(const std::vector<uint32> & orc_Indices)
+std::vector<std::vector<uint32_t> > C_Uti::h_GetContiguousSectionsAscending(const std::vector<uint32_t> & orc_Indices)
 {
-   std::vector<std::vector<uint32> > c_Retval;
-   std::vector<uint32> c_InProgress;
-   std::vector<uint32> c_Copy = orc_Indices;
+   std::vector<std::vector<uint32_t> > c_Retval;
+   std::vector<uint32_t> c_InProgress;
+   std::vector<uint32_t> c_Copy = orc_Indices;
    C_Uti::h_Uniqueify(c_Copy);
-   for (uint32 u32_It = 0UL; u32_It < c_Copy.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < c_Copy.size(); ++u32_It)
    {
       if (c_InProgress.size() > 0UL)
       {
          if (c_Copy[u32_It] ==
-             (c_InProgress[static_cast<std::vector<uint32>::size_type>(c_InProgress.size() - 1UL)] + 1UL))
+             (c_InProgress[static_cast<std::vector<uint32_t>::size_type>(c_InProgress.size() - 1UL)] + 1UL))
          {
             //Contiguous
             c_InProgress.push_back(c_Copy[u32_It]);
@@ -125,7 +124,7 @@ std::vector<std::vector<uint32> > C_Uti::h_GetContiguousSectionsAscending(const 
    False Fraction part exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_Uti::h_CheckFloatHasNoFractionPart(const float64 of64_Value)
+bool C_Uti::h_CheckFloatHasNoFractionPart(const float64_t of64_Value)
 {
    bool q_Retval;
 
@@ -147,12 +146,12 @@ bool C_Uti::h_CheckFloatHasNoFractionPart(const float64 of64_Value)
 
    \return
    -1   Decimals could not be determined
-   Else Detected number of decimals (Restricted to maximum msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT)
+   Else Detected number of decimals (Restricted to maximum ms32_DOUBLE_SPIN_BOX_DECIMAL_COUNT)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
+int32_t C_Uti::h_GetNumberOfDecimals(const float64_t of64_Value)
 {
-   sint32 s32_Retval = -1;
+   int32_t s32_Retval = -1;
    const QString c_String = h_GetStringFromDouble(of64_Value);
 
    //Guaranteed
@@ -162,12 +161,12 @@ sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
       const QStringList c_List = c_String.split(".");
       if (c_List.size() == 2)
       {
-         sint32 s32_ItFromEnd;
+         int32_t s32_ItFromEnd;
          const QString & rc_Str = c_List.at(1);
          //Start from end and iterate over all zeros until first valid number
          for (s32_ItFromEnd = rc_Str.size(); s32_ItFromEnd > 0; --s32_ItFromEnd)
          {
-            if (rc_Str.at(static_cast<sintn>(s32_ItFromEnd - 1L)) != QChar('0'))
+            if (rc_Str.at(static_cast<int32_t>(s32_ItFromEnd - 1L)) != QChar('0'))
             {
                break;
             }
@@ -191,7 +190,7 @@ sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
 /*! \brief   Get a string from a double with reasonable decimals.
 
    Cut annoying trailing zeros but show many leading zeros if necessary.
-   Maximum number of decimals is msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT.
+   Maximum number of decimals is ms32_DOUBLE_SPIN_BOX_DECIMAL_COUNT.
    Examples for strings:
    2.0
    11.1234567898765
@@ -206,20 +205,19 @@ sint32 C_Uti::h_GetNumberOfDecimals(const float64 of64_Value)
    Obtained QString.
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
+QString C_Uti::h_GetStringFromDouble(const float64_t of64_Value)
 {
    QString c_StringFromValue;
    QStringList c_SplitString;
 
-   sintn sn_Precision = std::numeric_limits<float64>::digits10 - 1;
+   int32_t s32_Precision = std::numeric_limits<float64_t>::digits10 - 1;
+
    // -1 because of:
    // at maximum precision the last decimal digit may be rounded because of first meaningless digit
    // this leads to cases like 2.00000000000001 which we do not want
-   sintn sn_DigitsWithoutDecimals;
-   sintn sn_Index;
 
    // first get a string with very much decimals
-   c_StringFromValue = QString::number(of64_Value, 'f', msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
+   c_StringFromValue = QString::number(of64_Value, 'f', ms32_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
 
    // split string at decimal point
    c_SplitString = c_StringFromValue.split(".");
@@ -227,13 +225,14 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
    // precaution
    if (c_SplitString.size() == 2)
    {
+      int32_t s32_Index;
       // count digits left of decimal point
-      sn_DigitsWithoutDecimals = c_SplitString.at(0).length();
+      const int32_t s32_DigitsWithoutDecimals = c_SplitString.at(0).length();
 
       // more than one or one that is not zero --> substract from decimal precision
-      if ((sn_DigitsWithoutDecimals > 0) && (c_SplitString.at(0) != "0"))
+      if ((s32_DigitsWithoutDecimals > 0) && (c_SplitString.at(0) != "0"))
       {
-         sn_Precision -= sn_DigitsWithoutDecimals;
+         s32_Precision -= s32_DigitsWithoutDecimals;
       }
       // one that is zero --> count zeros right of decimal point and add to decimal precision
       else if (c_SplitString.at(0) == "0")
@@ -241,16 +240,16 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
          // example:
          // 0,0000321 --> 0000321 --> 321 --> 3 --> index of 3 in 0000321 is 4 and this is exactly what should be added
          const QString c_HelpString = c_SplitString.at(1);
-         sn_Index = c_HelpString.length() - 1;
-         for (sintn sn_Pos = 0; sn_Pos < c_HelpString.length(); sn_Pos++)
+         s32_Index = c_HelpString.length() - 1;
+         for (int32_t s32_Pos = 0; s32_Pos < c_HelpString.length(); s32_Pos++)
          {
-            if (c_HelpString.at(sn_Pos) != '0')
+            if (c_HelpString.at(s32_Pos) != '0')
             {
-               sn_Index = sn_Pos;
+               s32_Index = s32_Pos;
                break;
             }
          }
-         sn_Precision += sn_Index;
+         s32_Precision += s32_Index;
       }
       else
       {
@@ -258,25 +257,25 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
       }
 
       // do not allow precisions less than 1
-      if (sn_Precision < 1)
+      if (s32_Precision < 1)
       {
-         sn_Precision = 1;
+         s32_Precision = 1;
       }
 
       // take the double and convert it again with the calculated precision
-      c_StringFromValue = QString::number(of64_Value, 'f', sn_Precision);
+      c_StringFromValue = QString::number(of64_Value, 'f', s32_Precision);
 
       // remove trailing zeros
-      sn_Index = c_StringFromValue.length() - 1;
-      for (sintn sn_Pos = c_StringFromValue.length() - 1; sn_Pos > 0; sn_Pos--)
+      s32_Index = c_StringFromValue.length() - 1;
+      for (int32_t s32_Pos = c_StringFromValue.length() - 1; s32_Pos > 0; s32_Pos--)
       {
-         if (c_StringFromValue.at(sn_Pos) != '0')
+         if (c_StringFromValue.at(s32_Pos) != '0')
          {
-            sn_Index = sn_Pos;
+            s32_Index = s32_Pos;
             break;
          }
       }
-      c_StringFromValue.truncate(sn_Index + 1);
+      c_StringFromValue.truncate(s32_Index + 1);
 
       // replace cases like "1." with "1.0"
       if (c_StringFromValue.endsWith("."))
@@ -299,9 +298,9 @@ QString C_Uti::h_GetStringFromDouble(const float64 of64_Value)
    Items uniquified and sorted ascending
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32> & orc_Items)
+std::vector<uint32_t> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32_t> & orc_Items)
 {
-   std::vector<uint32> c_Retval = orc_Items;
+   std::vector<uint32_t> c_Retval = orc_Items;
    h_Uniqueify(c_Retval);
    return c_Retval;
 }
@@ -317,16 +316,16 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortAscending(const std::vector<uint32> 
    Items uniquified and sorted descending
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32> & orc_Items)
+std::vector<uint32_t> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32_t> & orc_Items)
 {
-   std::vector<uint32> c_Retval;
-   std::vector<uint32> c_Ascending = h_UniquifyAndSortAscending(orc_Items);
+   std::vector<uint32_t> c_Retval;
+   std::vector<uint32_t> c_Ascending = h_UniquifyAndSortAscending(orc_Items);
 
    //Reverse order
    c_Retval.reserve(c_Ascending.size());
-   for (uint32 u32_It = c_Ascending.size(); u32_It > 0UL; --u32_It)
+   for (uint32_t u32_It = c_Ascending.size(); u32_It > 0UL; --u32_It)
    {
-      c_Retval.push_back(c_Ascending[static_cast<uintn>(u32_It - 1UL)]);
+      c_Retval.push_back(c_Ascending[static_cast<uint32_t>(u32_It - 1UL)]);
    }
    return c_Retval;
 }
@@ -344,52 +343,52 @@ std::vector<uint32> C_Uti::h_UniquifyAndSortDescending(const std::vector<uint32>
    Adapted color
 */
 //----------------------------------------------------------------------------------------------------------------------
-QColor C_Uti::h_ScaleColor(const QColor & orc_Color, const uint32 ou32_Percentage)
+QColor C_Uti::h_ScaleColor(const QColor & orc_Color, const uint32_t ou32_Percentage)
 {
    QColor c_AdaptedColor;
-   sintn sn_DeltaColor;
-   const sintn sn_MAX_VALUE_COLOR = 255;
+   const int32_t s32_MAX_VALUE_COLOR = 255;
 
    if (ou32_Percentage != 100U)
    {
+      int32_t s32_DeltaColor;
       // the difference for red
-      sn_DeltaColor = sn_MAX_VALUE_COLOR - orc_Color.red();
+      s32_DeltaColor = s32_MAX_VALUE_COLOR - orc_Color.red();
       // the relative difference by the percentage
       if (ou32_Percentage > 0)
       {
-         sn_DeltaColor = (sn_DeltaColor * 100) / (10000 / static_cast<sintn>(ou32_Percentage));
+         s32_DeltaColor = (s32_DeltaColor * 100) / (10000 / static_cast<int32_t>(ou32_Percentage));
       }
       else
       {
-         sn_DeltaColor = 0;
+         s32_DeltaColor = 0;
       }
-      c_AdaptedColor.setRed(sn_MAX_VALUE_COLOR - sn_DeltaColor);
+      c_AdaptedColor.setRed(s32_MAX_VALUE_COLOR - s32_DeltaColor);
 
       // the difference for green
-      sn_DeltaColor = sn_MAX_VALUE_COLOR - orc_Color.green();
+      s32_DeltaColor = s32_MAX_VALUE_COLOR - orc_Color.green();
       // the relative difference by the percentage
       if (ou32_Percentage > 0)
       {
-         sn_DeltaColor = (sn_DeltaColor * 100) / (10000 / static_cast<sintn>(ou32_Percentage));
+         s32_DeltaColor = (s32_DeltaColor * 100) / (10000 / static_cast<int32_t>(ou32_Percentage));
       }
       else
       {
-         sn_DeltaColor = 0;
+         s32_DeltaColor = 0;
       }
-      c_AdaptedColor.setGreen(sn_MAX_VALUE_COLOR - sn_DeltaColor);
+      c_AdaptedColor.setGreen(s32_MAX_VALUE_COLOR - s32_DeltaColor);
 
       // the difference for blue
-      sn_DeltaColor = sn_MAX_VALUE_COLOR - orc_Color.blue();
+      s32_DeltaColor = s32_MAX_VALUE_COLOR - orc_Color.blue();
       // the relative difference by the percentage
       if (ou32_Percentage > 0)
       {
-         sn_DeltaColor = (sn_DeltaColor * 100) / (10000 / static_cast<sintn>(ou32_Percentage));
+         s32_DeltaColor = (s32_DeltaColor * 100) / (10000 / static_cast<int32_t>(ou32_Percentage));
       }
       else
       {
-         sn_DeltaColor = 0;
+         s32_DeltaColor = 0;
       }
-      c_AdaptedColor.setBlue(sn_MAX_VALUE_COLOR - sn_DeltaColor);
+      c_AdaptedColor.setBlue(s32_MAX_VALUE_COLOR - s32_DeltaColor);
    }
    else
    {
@@ -411,10 +410,10 @@ QColor C_Uti::h_ScaleColor(const QColor & orc_Color, const uint32 ou32_Percentag
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_Uti::h_GetDisabledColorLook(const QColor & orc_DefaultColorLook)
 {
-   const sintn sn_Red = orc_DefaultColorLook.red() + ((255 - orc_DefaultColorLook.red()) / 2);
-   const sintn sn_Green = orc_DefaultColorLook.green() + ((255 - orc_DefaultColorLook.green()) / 2);
-   const sintn sn_Blue = orc_DefaultColorLook.blue() + ((255 - orc_DefaultColorLook.blue()) / 2);
-   const QColor c_Retval(sn_Red, sn_Green, sn_Blue, orc_DefaultColorLook.alpha());
+   const int32_t s32_Red = orc_DefaultColorLook.red() + ((255 - orc_DefaultColorLook.red()) / 2);
+   const int32_t s32_Green = orc_DefaultColorLook.green() + ((255 - orc_DefaultColorLook.green()) / 2);
+   const int32_t s32_Blue = orc_DefaultColorLook.blue() + ((255 - orc_DefaultColorLook.blue()) / 2);
+   const QColor c_Retval(s32_Red, s32_Green, s32_Blue, orc_DefaultColorLook.alpha());
 
    return c_Retval;
 }
@@ -424,16 +423,16 @@ QColor C_Uti::h_GetDisabledColorLook(const QColor & orc_DefaultColorLook)
 
    \param[in]  orc_String        Input string
    \param[in]  orc_FontMetrics   Used font configuration
-   \param[in]  osn_Width         Available space
+   \param[in]  os32_Width        Available space
 
    \return
    Adapted string
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetrics & orc_FontMetrics,
-                                   const sintn osn_Width)
+                                   const int32_t os32_Width)
 {
-   return orc_FontMetrics.elidedText(orc_String, Qt::ElideRight, osn_Width);
+   return orc_FontMetrics.elidedText(orc_String, Qt::ElideRight, os32_Width);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -448,9 +447,9 @@ QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetric
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetrics & orc_FontMetrics,
-                                   const float64 of64_Width)
+                                   const float64_t of64_Width)
 {
-   return C_Uti::h_AdaptStringToSize(orc_String, orc_FontMetrics, static_cast<sintn>(of64_Width));
+   return C_Uti::h_AdaptStringToSize(orc_String, orc_FontMetrics, static_cast<int32_t>(of64_Width));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -462,7 +461,7 @@ QString C_Uti::h_AdaptStringToSize(const QString & orc_String, const QFontMetric
    String: 1 Byte or ou32_ByteCount Bytes
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetByteCountAsString(const stw_types::uint32 ou32_ByteCount)
+QString C_Uti::h_GetByteCountAsString(const uint32_t ou32_ByteCount)
 {
    QString c_Text = QString::number(ou32_ByteCount);
 
@@ -546,46 +545,46 @@ QString C_Uti::h_GetPemDbPath()
    This function is Windows specific and needs to be replaced by another solution
     when porting to a non-Windows system
 
-   \param[in]  oq_UseSTWFormat   Optional flag to output STW format
+   \param[in]  oq_UseStwFormat   Optional flag to output STW format
 
    \return
    string with version information ("V?.??r?" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetApplicationVersion(const bool oq_UseSTWFormat)
+QString C_Uti::h_GetApplicationVersion(const bool oq_UseStwFormat)
 {
    const QFileInfo c_FileInfo(QApplication::applicationFilePath());
    const QString c_FileName = c_FileInfo.fileName();
-   VS_FIXEDFILEINFO * pt_Info;
-   uintn un_ValSize;
-   sint32 s32_InfoSize;
-   C_SCLString c_Version;
+   VS_FIXEDFILEINFO * pc_Info;
+   uint32_t u32_ValSize;
+   int32_t s32_InfoSize;
+   C_SclString c_Version;
 
    c_Version = "V?.\?\?r?";
 
    s32_InfoSize = GetFileVersionInfoSizeA(c_FileName.toStdString().c_str(), NULL);
    if (s32_InfoSize != 0)
    {
-      uint8 * pu8_Buffer;
-      pu8_Buffer = new uint8[static_cast<uintn>(s32_InfoSize)];
+      uint8_t * pu8_Buffer;
+      pu8_Buffer = new uint8_t[static_cast<uint32_t>(s32_InfoSize)];
       if (GetFileVersionInfoA(c_FileName.toStdString().c_str(), 0, s32_InfoSize, pu8_Buffer) != FALSE)
       {
          //reinterpret_cast required due to function interface
          if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e929 !e9176
-                            &un_ValSize) != FALSE)
+                            reinterpret_cast<PVOID *>(&pc_Info), //lint !e929 !e9176
+                            &u32_ValSize) != FALSE)
          {
-            if (oq_UseSTWFormat)
+            if (oq_UseStwFormat)
             {
-               c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
-                                        pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                        (pt_Info->dwFileVersionLS >> 16U));
+               c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+                                        pc_Info->dwFileVersionMS & 0x0000FFFFUL,
+                                        (pc_Info->dwFileVersionLS >> 16U));
             }
             else
             {
-               c_Version.PrintFormatted("%d.%02d.%d", (pt_Info->dwFileVersionMS >> 16U),
-                                        pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                        (pt_Info->dwFileVersionLS >> 16U));
+               c_Version.PrintFormatted("%d.%02d.%d", (pc_Info->dwFileVersionMS >> 16U),
+                                        pc_Info->dwFileVersionMS & 0x0000FFFFUL,
+                                        (pc_Info->dwFileVersionLS >> 16U));
             }
          }
       }
@@ -659,11 +658,11 @@ QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
 {
    QString c_Retval;
    //Set up logging (FIRST)
-   C_TGLDateTime c_DateTime;
+   C_TglDateTime c_DateTime;
 
-   TGL_GetDateTimeNow(c_DateTime);
+   TglGetDateTimeNow(c_DateTime);
    //Format:2017-08-29 07:32:19.123
-   QString c_FileBaseName = C_OSCLoggingHandler::h_UtilConvertDateTimeToString(
+   QString c_FileBaseName = C_OscLoggingHandler::h_UtilConvertDateTimeToString(
       c_DateTime).c_str();
 
    //Replace invalid characters
@@ -690,9 +689,9 @@ QString C_Uti::h_GetCompleteLogFileLocation(const QString & orc_Extension)
    STW error string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_StwError(const sint32 os32_Error)
+QString C_Uti::h_StwError(const int32_t os32_Error)
 {
-   const QString c_Retval = C_OSCLoggingHandler::h_StwError(os32_Error).c_str();
+   const QString c_Retval = C_OscLoggingHandler::h_StwError(os32_Error).c_str();
 
    return c_Retval;
 }
@@ -731,8 +730,8 @@ QString C_Uti::h_StwError(const sint32 os32_Error)
    minimized file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, const uint32 ou32_Width,
-                              const uint32 ou32_Buffer)
+QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, const uint32_t ou32_Width,
+                              const uint32_t ou32_Buffer)
 {
    QString c_MinimizedPath = orc_Path; // result
 
@@ -764,8 +763,8 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
       const QString c_Placeholder = static_cast<QString>(static_cast<QChar>(0x2026)) + "/"; // with horizontal ellipsis
                                                                                             // "..."
 
-      sintn sn_CurrentWidth;
-      uint32 u32_AvailableWidth; // width excluding text margins
+      int32_t s32_CurrentWidth;
+      uint32_t u32_AvailableWidth; // width excluding text margins
 
       if (ou32_Width > ou32_Buffer)
       {
@@ -778,40 +777,40 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
 
       // does the full path fit?
       c_MinimizedPath = c_Path;
-      sn_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
-      if (sn_CurrentWidth > static_cast<sintn>(u32_AvailableWidth))
+      s32_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
+      if (s32_CurrentWidth > static_cast<int32_t>(u32_AvailableWidth))
       {
          // no, full path does not fit
 
          // does the drive and file name alone with placeholder string fit?
          // check length of drive and file name plus placeholder
          c_MinimizedPath = c_DriveName + c_Placeholder + c_FileName;
-         sn_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
-         if (sn_CurrentWidth < static_cast<sintn>(u32_AvailableWidth))
+         s32_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
+         if (s32_CurrentWidth < static_cast<int32_t>(u32_AvailableWidth))
          {
             // yes, try to reduce folders recursively
             c_MinimizedPath = c_Path;
-            sintn sn_DelimPos = c_MinimizedPath.indexOf("/", 0); // first delimiter
+            int32_t s32_DelimPos = c_MinimizedPath.indexOf("/", 0); // first delimiter
             do
             {
                // get next folder
-               sn_DelimPos = c_MinimizedPath.indexOf("/", sn_DelimPos + 1); // next delimiter
+               s32_DelimPos = c_MinimizedPath.indexOf("/", s32_DelimPos + 1); // next delimiter
 
                c_MinimizedPath = c_DriveName + c_Placeholder +
-                                 c_MinimizedPath.right((c_MinimizedPath.length() - sn_DelimPos) - 1);
+                                 c_MinimizedPath.right((c_MinimizedPath.length() - s32_DelimPos) - 1);
 
-               sn_DelimPos = static_cast<QString>(c_DriveName + c_Placeholder).length();
-               sn_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
+               s32_DelimPos = static_cast<QString>(c_DriveName + c_Placeholder).length();
+               s32_CurrentWidth = c_FontMetrics.horizontalAdvance(c_MinimizedPath);
             }
             // second condition should not occur and is only defensive
-            while ((sn_CurrentWidth > (static_cast<sintn>(u32_AvailableWidth))) || (sn_DelimPos == -1));
+            while ((s32_CurrentWidth > (static_cast<int32_t>(u32_AvailableWidth))) || (s32_DelimPos == -1));
          }
          else
          {
             // drive and filename does not fit for minimizing therefore we do a hard cut of the full path
             c_MinimizedPath = c_FontMetrics.elidedText(c_Path, Qt::ElideMiddle,
-                                                       static_cast<sintn>(u32_AvailableWidth),
-                                                       static_cast<sintn>(Qt::TextSingleLine));
+                                                       static_cast<int32_t>(u32_AvailableWidth),
+                                                       static_cast<int32_t>(Qt::TextSingleLine));
          }
       }
    }
@@ -830,7 +829,7 @@ QString C_Uti::h_MinimizePath(const QString & orc_Path, const QFont & orc_Font, 
    String with IP address
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_IpAddressToString(const uint8 (&orau8_IpAddress)[4])
+QString C_Uti::h_IpAddressToString(const uint8_t (&orau8_IpAddress)[4])
 {
    QString c_Result;
 
@@ -871,7 +870,7 @@ QFont C_Uti::h_GetFontPixel(const QFont & orc_Font)
       else orc_Version as it is
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_ConvertVersionToSTWStyle(const QString & orc_Version)
+QString C_Uti::h_ConvertVersionToStwStyle(const QString & orc_Version)
 {
    QString c_Return = orc_Version;
    QStringList c_Temp;
@@ -943,16 +942,16 @@ QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QStrin
    Unique node name
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & orc_ExistingStrings,
-                                            const stw_scl::C_SCLString & orc_ProposedName,
-                                            const stw_scl::C_SCLString & orc_SkipName)
+stw::scl::C_SclString C_Uti::h_GetUniqueName(const std::map<C_SclString, bool> & orc_ExistingStrings,
+                                             const stw::scl::C_SclString & orc_ProposedName,
+                                             const stw::scl::C_SclString & orc_SkipName)
 {
-   C_SCLString c_Retval = orc_ProposedName;
+   C_SclString c_Retval = orc_ProposedName;
    bool q_Conflict;
-   sint32 s32_MaxDeviation;
-   C_SCLString c_BaseStr;
+   int32_t s32_MaxDeviation;
+   C_SclString c_BaseStr;
 
-   std::map<C_SCLString, bool>::const_iterator c_ItString;
+   std::map<C_SclString, bool>::const_iterator c_ItString;
 
    do
    {
@@ -960,9 +959,9 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
       c_ItString = orc_ExistingStrings.find(c_Retval);
       if (c_ItString != orc_ExistingStrings.end())
       {
-         const C_SCLString & rc_ConflictingValue = c_ItString->first;
+         const C_SclString & rc_ConflictingValue = c_ItString->first;
          //Search for the SkipName if the skip name is a valid string
-         const uint32 u32_Pos = orc_SkipName.IsEmpty() ? 0UL : rc_ConflictingValue.LastPos(orc_SkipName);
+         const uint32_t u32_Pos = orc_SkipName.IsEmpty() ? 0UL : rc_ConflictingValue.LastPos(orc_SkipName);
          q_Conflict = true;
          if (u32_Pos == 0UL)
          {
@@ -972,12 +971,12 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
          else
          {
             //Hint: SubString and LastPos start counting at 1
-            const uint32 u32_ZeroBasedpos = u32_Pos - 1UL;
+            const uint32_t u32_ZeroBasedpos = u32_Pos - 1UL;
             //Extract the part of the string that may be adapted
-            const C_SCLString c_StringAfterSkip = rc_ConflictingValue.SubString(
+            const C_SclString c_StringAfterSkip = rc_ConflictingValue.SubString(
                (u32_ZeroBasedpos + orc_SkipName.Length()) + 1UL,
                (rc_ConflictingValue.Length() - orc_SkipName.Length()) - u32_ZeroBasedpos);
-            const C_SCLString c_SkippedPart =
+            const C_SclString c_SkippedPart =
                rc_ConflictingValue.SubString(1UL, u32_ZeroBasedpos + orc_SkipName.Length());
             //Search remaining part for any number
             h_GetNumberAtStringEnd(c_StringAfterSkip, c_BaseStr, s32_MaxDeviation);
@@ -989,7 +988,7 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
          {
             s32_MaxDeviation = 1;
          }
-         c_Retval = c_BaseStr + '_' + C_SCLString::IntToStr(s32_MaxDeviation + static_cast<sint32>(1));
+         c_Retval = c_BaseStr + '_' + C_SclString::IntToStr(s32_MaxDeviation + static_cast<int32_t>(1));
       }
    }
    while (q_Conflict == true);
@@ -1006,10 +1005,10 @@ stw_scl::C_SCLString C_Uti::h_GetUniqueName(const std::map<C_SCLString, bool> & 
    Unique node name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_ExistingStrings,
-                                const QString & orc_ProposedName)
+QString C_Uti::h_GetUniqueNameQt(const std::map<C_SclString, bool> & orc_ExistingStrings,
+                                 const QString & orc_ProposedName)
 {
-   const C_SCLString c_Result = C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str());
+   const C_SclString c_Result = C_Uti::h_GetUniqueName(orc_ExistingStrings, orc_ProposedName.toStdString().c_str());
 
    return c_Result.c_str();
 }
@@ -1022,13 +1021,13 @@ QString C_Uti::h_GetUniqueNameQ(const std::map<C_SCLString, bool> & orc_Existing
    \param[out]  ors32_Number        Number at end (else -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLString & orc_CutString,
-                                   sint32 & ors32_Number)
+void C_Uti::h_GetNumberAtStringEnd(const C_SclString & orc_ProposedName, C_SclString & orc_CutString,
+                                   int32_t & ors32_Number)
 {
-   C_SCLString c_Number;
+   C_SclString c_Number;
    bool q_UnderscoreDetected = false;
    bool q_NumberDetected = false;
-   uint32 u32_ItStr;
+   uint32_t u32_ItStr;
 
    //Default return
    orc_CutString = orc_ProposedName;
@@ -1095,15 +1094,15 @@ void C_Uti::h_GetNumberAtStringEnd(const C_SCLString & orc_ProposedName, C_SCLSt
    Ascending sorted index map
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> & orc_UnsortedIndices)
+std::vector<int32_t> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32_t> & orc_UnsortedIndices)
 {
-   std::vector<sint32> c_IndexMap;
+   std::vector<int32_t> c_IndexMap;
    c_IndexMap.resize(orc_UnsortedIndices.size(), -1);
-   for (uint32 u32_Index = 0; u32_Index < orc_UnsortedIndices.size(); ++u32_Index)
+   for (uint32_t u32_Index = 0; u32_Index < orc_UnsortedIndices.size(); ++u32_Index)
    {
       if (orc_UnsortedIndices[u32_Index] >= c_IndexMap.size())
       {
-         const uint32 u32_NewSize = orc_UnsortedIndices[u32_Index] + 1U;
+         const uint32_t u32_NewSize = orc_UnsortedIndices[u32_Index] + 1U;
          c_IndexMap.resize(u32_NewSize, -1);
       }
       c_IndexMap[orc_UnsortedIndices[u32_Index]] = u32_Index;
@@ -1121,15 +1120,15 @@ std::vector<sint32> C_Uti::h_CreateAscendingIndexMap(const std::vector<uint32> &
    false: Unsorted
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_Uti::h_CheckSortedAscending(const std::vector<uint32> & orc_Indices)
+bool C_Uti::h_CheckSortedAscending(const std::vector<uint32_t> & orc_Indices)
 {
    bool q_Retval = true;
 
    if (orc_Indices.size() > 1)
    {
-      uint32 u32_PrevVal = orc_Indices[0];
+      uint32_t u32_PrevVal = orc_Indices[0];
 
-      for (uint32 u32_It = 1; u32_It < orc_Indices.size(); ++u32_It)
+      for (uint32_t u32_It = 1; u32_It < orc_Indices.size(); ++u32_It)
       {
          if (u32_PrevVal <= orc_Indices[u32_It])
          {
@@ -1226,7 +1225,7 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
 QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_Path)
 {
    QString c_Return = orc_Path;
-   C_SCLString c_Help;
+   C_SclString c_Help;
 
    if (c_Return.contains(mc_PATH_VARIABLE_OPENSYDE_BIN) == true)
    {
@@ -1235,7 +1234,7 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
 
    if (c_Return.contains(mc_PATH_VARIABLE_USER_NAME) == true)
    {
-      tgl_assert(TGL_GetSystemUserName(c_Help));
+      tgl_assert(TglGetSystemUserName(c_Help));
       c_Return.replace(mc_PATH_VARIABLE_USER_NAME, c_Help.c_str());
    }
 
@@ -1243,10 +1242,10 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
    {
       // find out computer name is analogue to find out user name, but TGLUtils do not offer this
       QString c_UserName;
-      charn acn_WinUserName[255];
+      char_t acn_WinUserName[255];
       //lint -e{8080} //using type expected by the library for compatibility
-      DWORD u32_Size = sizeof(acn_WinUserName);
-      const bool q_Return = (GetComputerNameA(acn_WinUserName, &u32_Size) == 0) ? false : true;
+      DWORD x_Size = sizeof(acn_WinUserName);
+      const bool q_Return = (GetComputerNameA(acn_WinUserName, &x_Size) == 0) ? false : true;
       if (q_Return == true)
       {
          c_UserName = acn_WinUserName;
@@ -1263,14 +1262,14 @@ QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Casting the MD5-Checksum from C_SCLString to QString
+/*! \brief  Casting the MD5-Checksum from C_SclString to QString
 
    \return  MD5-Checksum
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetHashValueAsQString(void)
+QString C_Uti::h_GetHashValueAsQtString(void)
 {
-   return QString::fromStdString(stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash().c_str());
+   return QString::fromStdString(stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash().c_str());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1283,7 +1282,7 @@ QString C_Uti::h_GetHashValueAsQString(void)
    Hexadecimal representation of value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetValueAsHex(const uint64 ou64_Value, const uint8 ou8_FieldWidth)
+QString C_Uti::h_GetValueAsHex(const uint64_t ou64_Value, const uint8_t ou8_FieldWidth)
 {
    return "0x" + static_cast<QString>("%1").arg(ou64_Value, ou8_FieldWidth, 16, QChar('0')).toUpper();
 }
@@ -1298,9 +1297,9 @@ QString C_Uti::h_GetValueAsHex(const uint64 ou64_Value, const uint8 ou8_FieldWid
    Hexadecimal representation of value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_GetValueAsHex(const uint32 ou32_Value, const uint8 ou8_FieldWidth)
+QString C_Uti::h_GetValueAsHex(const uint32_t ou32_Value, const uint8_t ou8_FieldWidth)
 {
-   return C_Uti::h_GetValueAsHex(static_cast<uint64>(ou32_Value), ou8_FieldWidth);
+   return C_Uti::h_GetValueAsHex(static_cast<uint64_t>(ou32_Value), ou8_FieldWidth);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1313,15 +1312,15 @@ QString C_Uti::h_GetValueAsHex(const uint32 ou32_Value, const uint8 ou8_FieldWid
    \param[in,out]  orc_FilePaths    Found file paths with absolute paths
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_Uti::h_GetAllFilePathsInFolder(const QString & orc_FolderPath, std::vector<C_SCLString> & orc_FilePaths)
+void C_Uti::h_GetAllFilePathsInFolder(const QString & orc_FolderPath, std::vector<C_SclString> & orc_FilePaths)
 {
    const QDir c_Dir(orc_FolderPath);
    const QStringList c_AllFiles = c_Dir.entryList(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < c_AllFiles.size(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < c_AllFiles.size(); ++s32_Counter)
    {
-      const QString c_Path = orc_FolderPath + c_AllFiles[sn_Counter];
+      const QString c_Path = orc_FolderPath + c_AllFiles[s32_Counter];
       const QFileInfo c_File(c_Path);
 
       if (c_File.isDir() == true)
@@ -1330,7 +1329,7 @@ void C_Uti::h_GetAllFilePathsInFolder(const QString & orc_FolderPath, std::vecto
       }
       else if (c_File.isFile() == true)
       {
-         orc_FilePaths.push_back(c_Path.toStdString().c_str());
+         orc_FilePaths.emplace_back(c_Path.toStdString().c_str());
       }
       else
       {
@@ -1350,23 +1349,23 @@ void C_Uti::h_GetAllFilePathsInFolder(const QString & orc_FolderPath, std::vecto
 */
 //----------------------------------------------------------------------------------------------------------------------
 template <typename T>
-void C_Uti::h_SortIndicesAscendingAndSync(std::vector<uint32> & orc_IndicesTmp, std::vector<T> & orc_SyncContent)
+void C_Uti::h_SortIndicesAscendingAndSync(std::vector<uint32_t> & orc_IndicesTmp, std::vector<T> & orc_SyncContent)
 {
    if (C_Uti::h_CheckSortedAscending(orc_IndicesTmp) == false)
    {
-      std::vector<stw_types::uint32> c_IndicesTmp;
+      std::vector<uint32_t> c_IndicesTmp;
       //lint -e{8080} //template naming not correctly handled by naming convention checker
       std::vector<T> c_SyncContentTmp;
       //Step 1: Fill new vector in sorted order with which element should be copied to which position
-      const std::vector<stw_types::sint32> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
+      const std::vector<int32_t> c_IndexMap = C_Uti::h_CreateAscendingIndexMap(orc_IndicesTmp);
       //Step 2: Copy existing elements to new structures according to plan
       c_IndicesTmp.reserve(orc_IndicesTmp.size());
       c_SyncContentTmp.reserve(orc_SyncContent.size());
-      for (stw_types::uint32 u32_ItIndex = 0; u32_ItIndex < c_IndexMap.size(); ++u32_ItIndex)
+      for (uint32_t u32_ItIndex = 0; u32_ItIndex < c_IndexMap.size(); ++u32_ItIndex)
       {
          if (c_IndexMap[u32_ItIndex] >= 0)
          {
-            const stw_types::uint32 u32_CurIndex = static_cast<stw_types::uint32>(c_IndexMap[u32_ItIndex]);
+            const uint32_t u32_CurIndex = static_cast<uint32_t>(c_IndexMap[u32_ItIndex]);
             if ((u32_CurIndex < orc_IndicesTmp.size()) &&
                 (u32_CurIndex < orc_SyncContent.size()))
             {
@@ -1382,10 +1381,10 @@ void C_Uti::h_SortIndicesAscendingAndSync(std::vector<uint32> & orc_IndicesTmp, 
 }
 
 //Explicit declaration of every type usage is necessary for templates to allow split of declaration and implementation
-//lint -esym(754,stw_opensyde_gui_logic::C_Uti::h_SortIndicesAscendingAndSync*)
+//lint -esym(754,stw::opensyde_gui_logic::C_Uti::h_SortIndicesAscendingAndSync*)
 template
-void C_Uti::h_SortIndicesAscendingAndSync<stw_types::uint32>(std::vector<stw_types::uint32> & orc_IndicesTmp,
-                                                             std::vector<uint32> & orc_SyncContent);
+void C_Uti::h_SortIndicesAscendingAndSync<uint32_t>(std::vector<uint32_t> & orc_IndicesTmp,
+                                                    std::vector<uint32_t> & orc_SyncContent);
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor

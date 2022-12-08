@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral">
      <property name="title">
       <string/>
      </property>
@@ -50,7 +50,7 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelGeneral">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelGeneral">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -104,7 +104,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_Frame_2">
+         <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_Frame_2">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -133,14 +133,14 @@
          <number>5</number>
         </property>
         <item row="0" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelScaling">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelScaling">
           <property name="text">
            <string>TextLabel</string>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxScaling">
+         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxScaling">
           <property name="minimumSize">
            <size>
             <width>160</width>
@@ -190,7 +190,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxDPD">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxDPD">
      <property name="title">
       <string/>
      </property>
@@ -213,7 +213,7 @@
          <number>6</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelDPDHeading">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelDPDHeading">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -267,7 +267,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_Frame">
+         <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_Frame">
           <property name="minimumSize">
            <size>
             <width>0</width>
@@ -299,21 +299,21 @@
          <number>10</number>
         </property>
         <item row="2" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNBR">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNBR">
           <property name="text">
            <string>TextLabel</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMNO">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMNO">
           <property name="text">
            <string>TextLabel</string>
           </property>
          </widget>
         </item>
         <item row="2" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxNBR">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxNBR">
           <property name="minimumSize">
            <size>
             <width>160</width>
@@ -329,7 +329,7 @@
          </widget>
         </item>
         <item row="3" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxParallelTransmissions">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxParallelTransmissions">
           <property name="minimumSize">
            <size>
             <width>160</width>
@@ -345,21 +345,21 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNBT">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelNBT">
           <property name="text">
            <string>TextLabel</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDPD">
+         <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDPD">
           <property name="text">
            <string>TextLabel</string>
           </property>
          </widget>
         </item>
         <item row="0" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxDPD">
+         <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxDPD">
           <property name="minimumSize">
            <size>
             <width>160</width>
@@ -375,7 +375,7 @@
          </widget>
         </item>
         <item row="1" column="2">
-         <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxNBT">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxNBT">
           <property name="minimumSize">
            <size>
             <width>160</width>
@@ -443,7 +443,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
+      <widget class="stw::opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -484,7 +484,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -530,46 +530,46 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxNumber</class>
    <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.h</header>
+   <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

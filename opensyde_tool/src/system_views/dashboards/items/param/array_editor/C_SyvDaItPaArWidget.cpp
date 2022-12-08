@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_GtGetText.h"
-#include "C_GiSvDaParam.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDaItPaArWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaParam.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDaItPaArWidget.hpp"
 #include "ui_C_SyvDaItPaArWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -42,28 +41,28 @@ using namespace stw_opensyde_core;
    \param[in,out] orc_Parent         Reference to parent
    \param[in]     oru32_ElementIndex Element index
    \param[in]     opc_DataWidget     Data widget
-   \param[in]     oq_ECUValues       Optional flag if the shown values are ECU values
+   \param[in]     oq_EcuValues       Optional flag if the shown values are ECU values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaItPaArWidget::C_SyvDaItPaArWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                         const uint32 & oru32_ElementIndex,
-                                         C_PuiSvDbDataElementHandler * const opc_DataWidget, const bool oq_ECUValues) :
+C_SyvDaItPaArWidget::C_SyvDaItPaArWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                         const uint32_t & oru32_ElementIndex,
+                                         C_PuiSvDbDataElementHandler * const opc_DataWidget, const bool oq_EcuValues) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvDaItPaArWidget),
    mrc_Parent(orc_Parent),
-   mq_ECUValues(oq_ECUValues),
+   mq_EcuValues(oq_EcuValues),
    mu32_ElementIndex(oru32_ElementIndex),
    mpc_DataWidget(opc_DataWidget)
 {
    this->mpc_Ui->setupUi(this);
    this->mrc_Parent.SetWidget(this);
    InitStaticNames();
-   this->mpc_Ui->pc_TableView->SetElement(oru32_ElementIndex, opc_DataWidget, oq_ECUValues);
+   this->mpc_Ui->pc_TableView->SetElement(oru32_ElementIndex, opc_DataWidget, oq_EcuValues);
 
    //Connects
-   connect(this->mpc_Ui->pc_BushButtonOk, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_BushButtonOk, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDaItPaArWidget::m_OkClicked);
-   connect(this->mpc_Ui->pc_BushButtonCancel, &stw_opensyde_gui_elements::C_OgePubDialog::clicked, this,
+   connect(this->mpc_Ui->pc_BushButtonCancel, &stw::opensyde_gui_elements::C_OgePubDialog::clicked, this,
            &C_SyvDaItPaArWidget::m_CancelClicked);
 }
 
@@ -84,7 +83,7 @@ C_SyvDaItPaArWidget::~C_SyvDaItPaArWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItPaArWidget::InitStaticNames(void)
 {
-   sint32 s32_DataSetIndex = -1;
+   int32_t s32_DataSetIndex = -1;
    const C_PuiSvDbNodeDataPoolListElementId * pc_Id = NULL;
 
    const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
@@ -108,10 +107,10 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
    }
    if (pc_Id != NULL)
    {
-      const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          pc_Id->u32_NodeIndex, pc_Id->u32_DataPoolIndex);
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
             pc_Id->u32_NodeIndex, pc_Id->u32_DataPoolIndex, pc_Id->u32_ListIndex, pc_Id->u32_ElementIndex);
 
       //Build title
@@ -119,7 +118,7 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
       {
          QString c_EditType;
          const QString c_Type = C_PuiSdHandler::h_GetElementTypeName(pc_DataPool->e_Type);
-         if (this->mq_ECUValues == true)
+         if (this->mq_EcuValues == true)
          {
             c_EditType = C_GtGetText::h_GetText("Device Value");
          }
@@ -134,7 +133,7 @@ void C_SyvDaItPaArWidget::InitStaticNames(void)
       }
    }
 
-   if ((this->mq_ECUValues == true) || (s32_DataSetIndex >= 0L))
+   if ((this->mq_EcuValues == true) || (s32_DataSetIndex >= 0L))
    {
       this->mrc_Parent.SetSubTitle(static_cast<QString>(C_GtGetText::h_GetText("Array Editor (Read Only)")));
    }
@@ -157,8 +156,8 @@ void C_SyvDaItPaArWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

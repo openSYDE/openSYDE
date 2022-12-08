@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeLeSearch.h"
+#include "C_OgeLeSearch.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,7 +49,7 @@ C_OgeLeSearch::C_OgeLeSearch(QWidget * const opc_Parent) :
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLeSearch::SetDarkTheme()
 {
-   this->setStyleSheet("stw_opensyde_gui_elements--C_OgeLeSearch {"
+   this->setStyleSheet("stw--opensyde_gui_elements--C_OgeLeSearch {"
                        "background-color:transparent;"
                        "color:rgb(211, 211, 216);"
                        "}");

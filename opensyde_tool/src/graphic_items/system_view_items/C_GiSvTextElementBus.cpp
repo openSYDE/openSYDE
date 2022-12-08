@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_GiSvTextElementBus.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSvTextElementBus.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,13 +38,13 @@ using namespace stw_opensyde_gui_logic;
    Set up GUI with all elements.
 
    \param[in]       ors32_Index          Index of data element in system definition
-   \param[in]       oru64_ID             Unique ID
+   \param[in]       oru64_Id             Unique ID
    \param[in,out]   opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvTextElementBus::C_GiSvTextElementBus(const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiSvTextElementBus::C_GiSvTextElementBus(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                                            QGraphicsItem * const opc_Parent) :
-   C_GiTextElementBus(ors32_Index, oru64_ID, opc_Parent)
+   C_GiTextElementBus(ors32_Index, oru64_Id, opc_Parent)
 {
 }
 

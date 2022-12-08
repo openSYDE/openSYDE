@@ -6,16 +6,16 @@ outline: none;
 
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubIconOnly,
-stw_opensyde_gui_elements--C_OgePubToggleBold,
-stw_opensyde_gui_elements--C_OgePubToggle
+stw--opensyde_gui_elements--C_OgePubIconOnly,
+stw--opensyde_gui_elements--C_OgePubToggleBold,
+stw--opensyde_gui_elements--C_OgePubToggle
 {
 border-style: solid;
 text-align: center;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubColorOnly
+stw--opensyde_gui_elements--C_OgePubColorOnly
 {
 border-style: solid;
 border-width: 1px;
@@ -24,7 +24,7 @@ text-align: center;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubCancel
+stw--opensyde_gui_elements--C_OgePubCancel
 {
 border-style: solid;
 border-radius:  4px;
@@ -36,14 +36,14 @@ padding: 0px;
 text-align: center;
 }
 
-stw_opensyde_gui_elements--C_OgePubCancel:focus
+stw--opensyde_gui_elements--C_OgePubCancel:focus
 {
 text-decoration: underline;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubUpdate,
-stw_opensyde_gui_elements--C_OgePubAddChartDataElement
+stw--opensyde_gui_elements--C_OgePubUpdate,
+stw--opensyde_gui_elements--C_OgePubAddChartDataElement
 {
 border-style: solid;
 border-radius: 0px;
@@ -56,45 +56,45 @@ width: 126px; /* 126 (width) + 22 (padding) + 2x1 (Border) = 150 (real width) */
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubDialog
+stw--opensyde_gui_elements--C_OgePubDialog
 {
 border-style: solid;
 border-radius: 4px;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubConfigure:enabled,
-stw_opensyde_gui_elements--C_OgePubGenericTextWithBackground
+stw--opensyde_gui_elements--C_OgePubConfigure:enabled,
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground
 {
 border-style: none;
 }
 
-stw_opensyde_gui_elements--C_OgePubConfigure:!enabled
+stw--opensyde_gui_elements--C_OgePubConfigure:!enabled
 {
 border-style: solid;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubDialog,
-stw_opensyde_gui_elements--C_OgePubConfigure
+stw--opensyde_gui_elements--C_OgePubDialog,
+stw--opensyde_gui_elements--C_OgePubConfigure
 {
 padding: 5px;
 text-align: center;
 }
 
-stw_opensyde_gui_elements--C_OgePubDialog:focus
+stw--opensyde_gui_elements--C_OgePubDialog:focus
 {
 text-decoration: underline;
 }
 
-stw_opensyde_gui_elements--C_OgePubOpen
+stw--opensyde_gui_elements--C_OgePubOpen
 {
 border-style: solid;
 border-width: 1px;
 border-left-width: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgePubPathVariables
+stw--opensyde_gui_elements--C_OgePubPathVariables
 {
 border-style: solid;
 border-width: 1px;
@@ -102,21 +102,21 @@ border-left-width: 0px;
 border-right-width: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgePubPathVariables::menu-indicator
+stw--opensyde_gui_elements--C_OgePubPathVariables::menu-indicator
 {
 width: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubNavigation,
-stw_opensyde_gui_elements--C_OgePubNavigationHover,
-stw_opensyde_gui_elements--C_OgePubTextOnlyEdit,
-stw_opensyde_gui_elements--C_OgePubTextOnly
+stw--opensyde_gui_elements--C_OgePubNavigation,
+stw--opensyde_gui_elements--C_OgePubNavigationHover,
+stw--opensyde_gui_elements--C_OgePubTextOnlyEdit,
+stw--opensyde_gui_elements--C_OgePubTextOnly
 {
 border-style: none;
 }
 
-stw_opensyde_gui_elements--C_OgePubTextWithBorderEdit
+stw--opensyde_gui_elements--C_OgePubTextWithBorderEdit
 {
 border-style: solid;
 border-radius: 0px;
@@ -126,7 +126,7 @@ padding-bottom: 1px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubZoomNotification
+stw--opensyde_gui_elements--C_OgePubZoomNotification
 {
 border-radius: 20px;
 border-width: 0px;
@@ -134,9 +134,9 @@ text-align: center;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubOptions,
-stw_opensyde_gui_elements--C_OgePubToolBar,
-stw_opensyde_gui_elements--C_OgePubToolBar:pressed
+stw--opensyde_gui_elements--C_OgePubOptions,
+stw--opensyde_gui_elements--C_OgePubToolBar,
+stw--opensyde_gui_elements--C_OgePubToolBar:pressed
 {
 border-style: none;
 text-align: left;
@@ -144,20 +144,20 @@ padding-left: 20px;
 padding-right: 20px;
 }
 
-stw_opensyde_gui_elements--C_OgePubOptions
+stw--opensyde_gui_elements--C_OgePubOptions
 {
 padding-left: 40px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubTextOnlyUnderline
+stw--opensyde_gui_elements--C_OgePubTextOnlyUnderline
 {
 border-style: solid;
 border-width: 0px;
 border-bottom-width: 2px;
 }
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubProjAction
+stw--opensyde_gui_elements--C_OgePubProjAction
 {
 border-style: none;
 padding: 10px;
@@ -165,40 +165,40 @@ padding-right: 16px;
 padding-left: 54px;
 }
 
-stw_opensyde_gui_elements--C_OgePubProjAction[Border="true"]
+stw--opensyde_gui_elements--C_OgePubProjAction[Border="true"]
 {
 border-style: solid;
 border-radius: 0px;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubProjAction[CanMonitorButton="true"]
+stw--opensyde_gui_elements--C_OgePubProjAction[CanMonitorButton="true"]
 {
 border-style: none;
 text-align: left;
 padding-left: 43px;
 }
 
-stw_opensyde_gui_elements--C_OgePubProjAction[NoIcon="true"]
+stw--opensyde_gui_elements--C_OgePubProjAction[NoIcon="true"]
 {
 padding: 10px;
 }
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubNavigation
+stw--opensyde_gui_elements--C_OgePubNavigation
 {
 padding-left: 26px;
 text-align: left;
 }
 
-stw_opensyde_gui_elements--C_OgePubNavigationHover
+stw--opensyde_gui_elements--C_OgePubNavigationHover
 {
 padding-left: 27px;
 text-align: left;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubMessageOk,
-stw_opensyde_gui_elements--C_OgePubMessageCancel
+stw--opensyde_gui_elements--C_OgePubMessageOk,
+stw--opensyde_gui_elements--C_OgePubMessageCancel
 {
 border-style: solid;
 border-radius: 2px;
@@ -210,15 +210,15 @@ padding-left: 15px;
 padding-right: 15px;
 }
 
-stw_opensyde_gui_elements--C_OgePubMessageOk:focus,
-stw_opensyde_gui_elements--C_OgePubMessageCancel:focus,
-stw_opensyde_gui_elements--C_OgePubHalcPanel:focus
+stw--opensyde_gui_elements--C_OgePubMessageOk:focus,
+stw--opensyde_gui_elements--C_OgePubMessageCancel:focus,
+stw--opensyde_gui_elements--C_OgePubHalcPanel:focus
 {
 text-decoration: underline;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubColor
+stw--opensyde_gui_elements--C_OgePubColor
 {
 border-style: solid;
 border-width: 0.5px;
@@ -227,7 +227,7 @@ padding: 5px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_GiSyColorShower
+stw--opensyde_gui--C_GiSyColorShower
 {
 border-style: solid;
 border-width: 1px;
@@ -235,15 +235,15 @@ border-radius: 14px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubHalcOverview,
-stw_opensyde_gui_elements--C_OgePubGenericTextWithBackground
+stw--opensyde_gui_elements--C_OgePubHalcOverview,
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground
 {
 text-align: left;
 padding-left: 19px;
 padding-right: 19px;
 }
 
-stw_opensyde_gui_elements--C_OgePubHalcOverview
+stw--opensyde_gui_elements--C_OgePubHalcOverview
 {
 border-style: solid;
 border-width: 1px;
@@ -251,7 +251,7 @@ border-bottom-width: 0px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubHalcPanel
+stw--opensyde_gui_elements--C_OgePubHalcPanel
 {
 border-style: solid;
 border-width: 1px;
@@ -262,28 +262,28 @@ height: 28px; /*2px border*/
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgePubIconChart
+stw--opensyde_gui_elements--C_OgePubIconChart
 {
 border-style: solid;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgePubIconChart:menu-indicator[Style="OPENSYDE_DARK"]
+stw--opensyde_gui_elements--C_OgePubIconChart:menu-indicator[Style="OPENSYDE_DARK"]
 {
 image: url(:/images/system_views/dashboards/tab_chart/IconArrowBottomDark.svg);
 }
 
-stw_opensyde_gui_elements--C_OgePubIconChart:menu-indicator[Style="OPENSYDE_BRIGHT"]
+stw--opensyde_gui_elements--C_OgePubIconChart:menu-indicator[Style="OPENSYDE_BRIGHT"]
 {
 image: url(:/images/system_views/dashboards/tab_chart/IconArrowBottom.svg);
 }
 
-stw_opensyde_gui_elements--C_OgePubIconChart:menu-indicator:!enabled
+stw--opensyde_gui_elements--C_OgePubIconChart:menu-indicator:!enabled
 {
 image: url(:/images/system_views/dashboards/tab_chart/IconArrowBottomDisabled.svg);
 }
 
-stw_opensyde_gui_elements--C_OgePubIconChart:menu-indicator
+stw--opensyde_gui_elements--C_OgePubIconChart:menu-indicator
 {
 subcontrol-position: right center;
 subcontrol-origin: padding;

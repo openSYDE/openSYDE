@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiBsImage.h"
+#include "C_PuiBsImage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,9 +46,9 @@ C_PuiBsImage::C_PuiBsImage() :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsImage::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiBsImage::CalcHash(uint32_t & oru32_HashValue) const
 {
-   // No calculation of c_UIImagePixmap necessary. Image can not be changed after creating it and
+   // No calculation of c_UiImagePixmap necessary. Image can not be changed after creating it and
    // size is checked by base class
 
    C_PuiBsBox::CalcHash(oru32_HashValue);

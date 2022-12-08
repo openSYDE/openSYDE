@@ -10,36 +10,35 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaChaWidget.h"
+#include "C_SyvDaChaWidget.hpp"
 #include "ui_C_SyvDaChaWidget.h"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_SyvDaPeBase.h"
-#include "C_OSCNodeDataPoolListElement.h"
-#include "C_SyvDaPeDataElementBrowse.h"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SyvDaPeBase.hpp"
+#include "C_OscNodeDataPoolListElement.hpp"
+#include "C_SyvDaPeDataElementBrowse.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SyvDaChaWidget::mhu32_MAXIMUM_DATA_ELEMENTS = 0xFFFFU;
+const uint32_t C_SyvDaChaWidget::mhu32_MAXIMUM_DATA_ELEMENTS = 0xFFFFU;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -61,7 +60,7 @@ const uint32 C_SyvDaChaWidget::mhu32_MAXIMUM_DATA_ELEMENTS = 0xFFFFU;
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaChaWidget::C_SyvDaChaWidget(const uint32 ou32_ViewIndex, const uint32 ou32_DashboardIndex,
+C_SyvDaChaWidget::C_SyvDaChaWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
                                    QWidget * const opc_Parent) :
    C_SyvDaDashboardContentBaseWidget(opc_Parent),
    C_PuiSvDbDataElementHandler(ou32_ViewIndex, ou32_DashboardIndex, 0, C_PuiSvDbDataElement::eTAB_CHART,
@@ -111,7 +110,7 @@ C_SyvDaChaWidget::~C_SyvDaChaWidget(void)
    \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaWidget::SetDashboardIndex(const uint32 ou32_Value)
+void C_SyvDaChaWidget::SetDashboardIndex(const uint32_t ou32_Value)
 {
    C_PuiSvDbDataElement::SetDashboardIndex(ou32_Value);
 }
@@ -183,7 +182,7 @@ void C_SyvDaChaWidget::Save(void)
 void C_SyvDaChaWidget::RegisterWidgets(C_SyvComDriverDiag & orc_ComDriver)
 {
    const std::vector<C_SyvComDataDealer *> & rc_AllDataDealer = orc_ComDriver.GetAllDataDealer();
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Registration of Datapool elements
    for (u32_Counter = 0U; u32_Counter < rc_AllDataDealer.size(); ++u32_Counter)
@@ -224,16 +223,17 @@ void C_SyvDaChaWidget::ConnectionActiveChanged(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::UpdateShowValues(void)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->GetWidgetDataPoolElementCount(); ++u32_Counter)
    {
-      sint32 s32_Return;
-      QVector<float64> oc_Values;
-      QVector<uint32> oc_Timestamps;
+      int32_t s32_Return;
+      QString c_LastValue;
+      QVector<float64_t> oc_ScaledValues;
+      QVector<uint32_t> oc_Timestamps;
 
       // Get all values
-      s32_Return = this->m_GetAllValues(u32_Counter, oc_Values, oc_Timestamps, false);
+      s32_Return = this->m_GetAllValues(u32_Counter, c_LastValue, oc_ScaledValues, oc_Timestamps);
 
       if (s32_Return == C_NO_ERR)
       {
@@ -247,7 +247,7 @@ void C_SyvDaChaWidget::UpdateShowValues(void)
             if (s32_Return == C_NO_ERR)
             {
                // Update the chart
-               this->mpc_Ui->pc_ChartWidget->AddGraphContent(c_ElementId, oc_Values, oc_Timestamps);
+               this->mpc_Ui->pc_ChartWidget->AddGraphContent(c_ElementId, c_LastValue, oc_ScaledValues, oc_Timestamps);
             }
          }
       }
@@ -267,24 +267,25 @@ void C_SyvDaChaWidget::UpdateTransmissionConfiguration(void)
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
+void C_SyvDaChaWidget::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc)
 {
    if (this->mu32_ManualOperationActionIndex > 0U)
    {
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
-      const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_ManualOperationActionIndex - 1UL, c_ElementId);
+      const int32_t s32_Return =
+         this->GetDataPoolElementIndex(this->mu32_ManualOperationActionIndex - 1UL, c_ElementId);
       //Response error handling
       if (os32_Result != C_NO_ERR)
       {
          QString c_Description;
          QString c_Details;
-         sint32 s32_MaxHeight = 0;
+         int32_t s32_MaxHeight = 0;
 
-         this->m_GetErrorDescriptionForManualOperation(os32_Result, ou8_NRC, c_Description, c_Details, s32_MaxHeight);
+         this->m_GetErrorDescriptionForManualOperation(os32_Result, ou8_Nrc, c_Description, c_Details, s32_MaxHeight);
 
          osc_write_log_info("Manual operation",
                             static_cast<QString>("The C_SyvComDataDealer function ended with error code \"%1\"").arg(
@@ -337,7 +338,7 @@ void C_SyvDaChaWidget::HandleManualOperationFinished(const sint32 os32_Result, c
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::RegisterDataPoolElementCyclicError(
-   const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8 ou8_ErrorCode)
+   const C_PuiSvDbNodeDataPoolListElementId & orc_WidgetDataPoolElementId, const uint8_t ou8_ErrorCode)
 {
    if (this->mq_ReadItem == true)
    {
@@ -393,7 +394,7 @@ void C_SyvDaChaWidget::UpdateData(void)
 
       tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                      this->mu32_DashboardIndex,
-                                                                     static_cast<uint32>(this->ms32_Index),
+                                                                     static_cast<uint32_t>(this->ms32_Index),
                                                                      &c_Box, this->me_Type) == C_NO_ERR);
    }
 }
@@ -414,13 +415,40 @@ void C_SyvDaChaWidget::DeleteData(void)
 /*! \brief   Set DLC error for specified element id
 
    \param[in]  orc_ElementId  Element ID
-   \param[in]  ou8_DLC        DLC
+   \param[in]  ou8_Dlc        DLC
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaWidget::SetErrorForInvalidDlc(const C_OSCNodeDataPoolListElementId & orc_ElementId, const uint8 ou8_DLC)
+void C_SyvDaChaWidget::SetErrorForInvalidDlc(const C_OscNodeDataPoolListElementId & orc_ElementId,
+                                             const uint8_t ou8_Dlc)
 {
-   this->mc_InvalidDlcSignals.insert(orc_ElementId, ou8_DLC);
+   this->mc_InvalidDlcSignals.insert(orc_ElementId, ou8_Dlc);
    m_UpdateErrorIcon();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Function for handling a new registered data element
+
+   Called at the end of RegisterDataPoolElement after registration of a specific Datapool element
+
+   \param[in]       ou32_WidgetDataPoolElementIndex     Index of new registered element
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaChaWidget::m_OnDataElementRegistered(const uint32_t ou32_WidgetDataPoolElementIndex)
+{
+   // Get the associated id
+   C_PuiSvDbNodeDataPoolListElementId c_ElementId;
+   int32_t s32_Return = this->GetDataPoolElementIndex(ou32_WidgetDataPoolElementIndex, c_ElementId);
+
+   if (s32_Return == C_NO_ERR)
+   {
+      C_PuiSvDbDataElementDisplayFormatterConfig c_Config;
+      s32_Return = this->GetDataPoolElementFormatterConfig(ou32_WidgetDataPoolElementIndex, c_Config);
+
+      if (s32_Return == C_NO_ERR)
+      {
+         this->mpc_Ui->pc_ChartWidget->SetDisplayFormatterConfig(c_ElementId, c_Config);
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -470,17 +498,17 @@ void C_SyvDaChaWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    // Actions only allowed if service mode is deactivated
    if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
    {
-      if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F5))
+      if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F5))
       {
          this->mpc_Ui->pc_ChartWidget->RefreshColors();
       }
-      else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Delete))
+      else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Delete))
       {
          this->m_RemoveDataElement();
       }
       else if ((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
-               ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Plus)) ||
-                (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_BracketRight))))
+               ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Plus)) ||
+                (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_BracketRight))))
       {
          this->m_AddNewDataElement();
       }
@@ -506,7 +534,7 @@ void C_SyvDaChaWidget::paintEvent(QPaintEvent * const opc_Event)
 {
    if (this->mq_DrawingActive == true)
    {
-      stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+      stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
       QWidget::paintEvent(opc_Event);
    }
 }
@@ -528,7 +556,7 @@ void C_SyvDaChaWidget::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
       if (q_AtLeastOneElementExist == true)
       {
          // Check position of cursor
-         const bool q_ElementUnderCursor = this->mpc_Ui->pc_ChartWidget->IsADataSerieOnPosition(opc_Event->pos());
+         const bool q_ElementUnderCursor = this->mpc_Ui->pc_ChartWidget->IsAnyDataSerieOnPosition(opc_Event->pos());
 
          if (q_ElementUnderCursor == true)
          {
@@ -556,19 +584,29 @@ void C_SyvDaChaWidget::m_LoadChartData(void)
       tgl_assert(pc_Dashboard != NULL);
       if (pc_Dashboard != NULL)
       {
+         uint32_t u32_ElementConfigCounter;
          const C_PuiSvDbTabChart & rc_Box = pc_Dashboard->GetTabChart();
 
          this->ClearDataPoolElements();
-         for (uint32 u32_It = 0; u32_It < rc_Box.c_DataPoolElementsConfig.size(); ++u32_It)
+         for (uint32_t u32_It = 0; u32_It < rc_Box.c_DataPoolElementsConfig.size(); ++u32_It)
          {
             if (rc_Box.c_DataPoolElementsConfig[u32_It].c_ElementId.GetIsValid() == true)
             {
                this->RegisterDataPoolElement(rc_Box.c_DataPoolElementsConfig[u32_It].c_ElementId,
-                                             rc_Box.c_DataPoolElementsConfig[u32_It].c_ElementScaling);
+                                             rc_Box.c_DataPoolElementsConfig[u32_It].c_ElementScaling,
+                                             rc_Box.c_DataPoolElementsConfig[u32_It].c_DisplayFormatter);
             }
          }
 
          this->mpc_Ui->pc_ChartWidget->SetData(rc_Box, this->mu32_ViewIndex);
+
+         // Special case: The display formatter could not be set by m_OnDataElementRegistered in RegisterDataPoolElement
+         // due to the call of SetData after it. They must be registered initial manually
+         for (u32_ElementConfigCounter = 0U; u32_ElementConfigCounter < this->GetWidgetDataPoolElementCount();
+              ++u32_ElementConfigCounter)
+         {
+            this->m_OnDataElementRegistered(u32_ElementConfigCounter);
+         }
       }
    }
 }
@@ -583,8 +621,8 @@ void C_SyvDaChaWidget::m_SetupContextMenu(void)
 
    this->mpc_ActionAdd = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add data element(s)"),
                                                           this, &C_SyvDaChaWidget::m_AddNewDataElement,
-                                                          static_cast<sintn>(Qt::CTRL) +
-                                                          static_cast<sintn>(Qt::Key_Plus));
+                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                          static_cast<int32_t>(Qt::Key_Plus));
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionConfigDataElement =
@@ -594,7 +632,7 @@ void C_SyvDaChaWidget::m_SetupContextMenu(void)
 
    this->mpc_ActionRemove = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Remove"),
                                                              this, &C_SyvDaChaWidget::m_RemoveDataElement,
-                                                             static_cast<sintn>(Qt::Key_Delete));
+                                                             static_cast<int32_t>(Qt::Key_Delete));
    this->mpc_ActionRemoveAll = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Remove all"),
                                                                 this, &C_SyvDaChaWidget::m_RemoveAllDataElements);
 
@@ -618,7 +656,7 @@ void C_SyvDaChaWidget::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
       if (q_AtLeastOneElementExist == true)
       {
          // Check position of cursor. Selection is already done of C_SyvDaChaDataItemWidget itself
-         const bool q_ElementUnderCursor = this->mpc_Ui->pc_ChartWidget->IsADataSerieOnPosition(orc_Pos);
+         const bool q_ElementUnderCursor = this->mpc_Ui->pc_ChartWidget->IsAnyDataSerieOnPosition(orc_Pos);
 
          if (q_ElementUnderCursor == true)
          {
@@ -652,7 +690,7 @@ void C_SyvDaChaWidget::m_AddNewDataElement(void)
    this->m_GetAllRegisteredElements(c_RegisteredElements);
 
    {
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvDaPeDataElementBrowse * const pc_Dialog = new C_SyvDaPeDataElementBrowse(*c_New, this->mu32_ViewIndex, true,
                                                                                     false, false, true, true, false,
                                                                                     &c_RegisteredElements);
@@ -660,22 +698,23 @@ void C_SyvDaChaWidget::m_AddNewDataElement(void)
       //Resize
       c_New->SetSize(QSize(800, 800));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          const std::vector<C_PuiSvDbNodeDataPoolListElementId> c_DataElements = pc_Dialog->GetSelectedDataElements();
          //Cursor
          QApplication::setOverrideCursor(Qt::WaitCursor);
          if (c_DataElements.size() > 0)
          {
-            uint32 u32_Counter;
+            uint32_t u32_Counter;
 
             for (u32_Counter = 0U; u32_Counter < c_DataElements.size(); ++u32_Counter)
             {
                if (c_DataElements[u32_Counter].GetIsValid() == true)
                {
                   C_PuiSvDbDataElementScaling c_Scaling;
-                  const C_OSCNodeDataPoolListElement * const pc_Element =
-                     C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+
+                  const C_OscNodeDataPoolListElement * const pc_Element =
+                     C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                         c_DataElements[u32_Counter].u32_NodeIndex,
                         c_DataElements[u32_Counter].u32_DataPoolIndex,
                         c_DataElements[u32_Counter].u32_ListIndex,
@@ -701,7 +740,8 @@ void C_SyvDaChaWidget::m_AddNewDataElement(void)
                   // Apply to the project data
                   tgl_assert(this->m_SetChangedChartData() == C_NO_ERR);
 
-                  this->RegisterDataPoolElement(c_DataElements[u32_Counter], c_Scaling);
+                  this->RegisterDataPoolElement(c_DataElements[u32_Counter], c_Scaling,
+                                                C_PuiSvDbDataElementDisplayFormatter());
 
                   //Handle new display region
                   this->mpc_Ui->pc_ChartWidget->FitDefault();
@@ -777,7 +817,7 @@ void C_SyvDaChaWidget::m_RemoveDataElement(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::m_RemoveAllDataElements(void)
 {
-   uint32 u32_NumberDataElementsLeft = this->GetWidgetDataPoolElementCount();
+   uint32_t u32_NumberDataElementsLeft = this->GetWidgetDataPoolElementCount();
 
    if (u32_NumberDataElementsLeft > 0U)
    {
@@ -820,12 +860,12 @@ void C_SyvDaChaWidget::m_RemoveAllDataElements(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::m_RegisterDataElementRail(
-   const stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
+   const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId) const
 {
    if (orc_DataPoolElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_DataPoolElementId.u32_NodeIndex,
                                                                     orc_DataPoolElementId.u32_DataPoolIndex,
                                                                     orc_DataPoolElementId.u32_ListIndex,
                                                                     orc_DataPoolElementId.u32_ElementIndex);
@@ -834,9 +874,9 @@ void C_SyvDaChaWidget::m_RegisterDataElementRail(
       {
          C_PuiSvReadDataConfiguration c_Config;
          c_Config.u8_RailIndex = 1;
-         if (pc_Element->GetArray() || (((pc_Element->GetType() == C_OSCNodeDataPoolContent::eFLOAT64) ||
-                                         (pc_Element->GetType() == C_OSCNodeDataPoolContent::eSINT64)) ||
-                                        (pc_Element->GetType() == C_OSCNodeDataPoolContent::eUINT64)))
+         if (pc_Element->GetArray() || (((pc_Element->GetType() == C_OscNodeDataPoolContent::eFLOAT64) ||
+                                         (pc_Element->GetType() == C_OscNodeDataPoolContent::eSINT64)) ||
+                                        (pc_Element->GetType() == C_OscNodeDataPoolContent::eUINT64)))
          {
             c_Config.e_TransmissionMode = C_PuiSvReadDataConfiguration::eTM_ON_TRIGGER;
          }
@@ -857,7 +897,7 @@ void C_SyvDaChaWidget::m_RegisterDataElementRail(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::m_CallProperties(void)
 {
-   uint32 u32_ConfigIndex;
+   uint32_t u32_ConfigIndex;
 
    if (this->mpc_Ui->pc_ChartWidget->GetCurrentGraph(u32_ConfigIndex) == true)
    {
@@ -867,22 +907,25 @@ void C_SyvDaChaWidget::m_CallProperties(void)
       {
          C_PuiSvDbNodeDataPoolListElementId c_ElementId;
          C_PuiSvDbDataElementScaling c_Scaling;
+         C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig;
          QString c_DisplayName;
-         QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
          C_SyvDaPeBase * pc_Dialog;
          c_ElementId = rc_Box.c_DataPoolElementsConfig[u32_ConfigIndex].c_ElementId;
          c_Scaling = rc_Box.c_DataPoolElementsConfig[u32_ConfigIndex].c_ElementScaling;
+         c_FormatterConfig = rc_Box.c_DataPoolElementsConfig[u32_ConfigIndex].c_DisplayFormatter;
          c_DisplayName = rc_Box.c_DataPoolElementsConfig[u32_ConfigIndex].c_DisplayName;
 
          pc_Dialog = new C_SyvDaPeBase(*c_New, this->mu32_ViewIndex, this->mu32_DashboardIndex, "Chart",
-                                       c_ElementId, c_Scaling, true, this->mq_DarkMode, false, false, c_DisplayName);
+                                       c_ElementId, c_Scaling, true, c_FormatterConfig, true, this->mq_DarkMode, false,
+                                       false, c_DisplayName);
 
          pc_Dialog->SetTheme(rc_Box.e_DisplayStyle);
 
          //Resize
          c_New->SetSize(QSize(800, 500));
 
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             QString c_WidgetName;
             C_PuiSvDbNodeDataElementConfig c_Tmp;
@@ -890,30 +933,31 @@ void C_SyvDaChaWidget::m_CallProperties(void)
             c_Tmp.c_ElementId = c_ElementId;
             tgl_assert(c_ElementId == pc_Dialog->GetDataElementId());
             c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
+            c_Tmp.c_DisplayFormatter = pc_Dialog->GetFormatterInformation();
             c_Tmp.c_DisplayName = pc_Dialog->GetDisplayName();
             rc_Box.c_DataPoolElementsConfig[u32_ConfigIndex] = c_Tmp;
 
             //Apply
             this->RemoveDataPoolElement(c_ElementId);
-            this->RegisterDataPoolElement(c_Tmp.c_ElementId, c_Tmp.c_ElementScaling);
+            this->RegisterDataPoolElement(c_Tmp.c_ElementId, c_Tmp.c_ElementScaling, c_Tmp.c_DisplayFormatter);
 
             if (c_Tmp.c_DisplayName.compare("") == 0)
             {
-               const C_OSCNodeDataPoolListElement * const pc_OscElement =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+               const C_OscNodeDataPoolListElement * const pc_OscElement =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
                      c_ElementId.u32_NodeIndex, c_ElementId.u32_DataPoolIndex, c_ElementId.u32_ListIndex,
                      c_ElementId.u32_ElementIndex);
 
-               const C_OSCNodeDataPool * const pc_Datapool =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(c_ElementId.u32_NodeIndex,
+               const C_OscNodeDataPool * const pc_Datapool =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPool(c_ElementId.u32_NodeIndex,
                                                                   c_ElementId.u32_DataPoolIndex);
 
                if (pc_OscElement != NULL)
                {
                   if (pc_Datapool != NULL)
                   {
-                     if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
-                         (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
+                     if ((pc_Datapool->e_Type == C_OscNodeDataPool::eHALC) ||
+                         (pc_Datapool->e_Type == C_OscNodeDataPool::eHALC_NVM))
                      {
                         c_WidgetName = C_PuiSvHandler::h_GetShortNamespace(c_ElementId);
                      }
@@ -934,7 +978,7 @@ void C_SyvDaChaWidget::m_CallProperties(void)
             tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
-                                                                           static_cast<uint32>(this->ms32_Index),
+                                                                           static_cast<uint32_t>(this->ms32_Index),
                                                                            &rc_Box,
                                                                            this->me_Type) == C_NO_ERR);
          }
@@ -958,9 +1002,9 @@ void C_SyvDaChaWidget::m_CallProperties(void)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaChaWidget::m_SetChangedChartData(void)
+int32_t C_SyvDaChaWidget::m_SetChangedChartData(void)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->ms32_Index >= 0)
    {
@@ -970,13 +1014,13 @@ sint32 C_SyvDaChaWidget::m_SetChangedChartData(void)
                  rc_Data.c_DataPoolElementsConfig.size());
       tgl_assert(rc_Data.c_DataPoolElementsActive.size() ==
                  rc_Data.c_DataPoolElementsColorIndex.size());
-      for (uint32 u32_ItEl = 0UL; u32_ItEl < rc_Data.c_DataPoolElementsConfig.size(); ++u32_ItEl)
+      for (uint32_t u32_ItEl = 0UL; u32_ItEl < rc_Data.c_DataPoolElementsConfig.size(); ++u32_ItEl)
       {
          const C_PuiSvDbNodeDataElementConfig & rc_Config = rc_Data.c_DataPoolElementsConfig[u32_ItEl];
          tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(rc_Config.c_ElementId) == C_NO_ERR);
       }
       s32_Retval = C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                       static_cast<uint32>(this->ms32_Index),
+                                                                       static_cast<uint32_t>(this->ms32_Index),
                                                                        &rc_Data, C_PuiSvDbDataElement::eTAB_CHART);
    }
    else
@@ -992,7 +1036,7 @@ sint32 C_SyvDaChaWidget::m_SetChangedChartData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaWidget::m_UpdateErrorIcon(void)
 {
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->GetWidgetDataPoolElementCount(); ++u32_ItItem)
    {
       C_PuiSvDbNodeDataPoolListElementId c_Id;
       if (this->GetDataPoolElementIndex(u32_ItItem, c_Id) == C_NO_ERR)
@@ -1000,8 +1044,8 @@ void C_SyvDaChaWidget::m_UpdateErrorIcon(void)
          if (c_Id.GetIsValid())
          {
             bool q_FoundError = false;
-            QMap<stw_opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString>::const_iterator c_ItError;
-            QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, stw_types::uint8>::const_iterator c_ItSigError;
+            QMap<stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId, QString>::const_iterator c_ItError;
+            QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId, uint8_t>::const_iterator c_ItSigError;
 
             //Errors
             for (c_ItError = this->mc_CommmunicationErrors.begin(); c_ItError != this->mc_CommmunicationErrors.end();
@@ -1063,7 +1107,7 @@ void C_SyvDaChaWidget::m_ManualRead(void)
    {
       C_PuiSvDbNodeDataPoolListElementId c_ElementId;
 
-      const sint32 s32_Return = this->GetDataPoolElementIndex(this->mu32_ManualOperationActionIndex, c_ElementId);
+      const int32_t s32_Return = this->GetDataPoolElementIndex(this->mu32_ManualOperationActionIndex, c_ElementId);
 
       tgl_assert(s32_Return == C_NO_ERR);
       if (s32_Return == C_NO_ERR)

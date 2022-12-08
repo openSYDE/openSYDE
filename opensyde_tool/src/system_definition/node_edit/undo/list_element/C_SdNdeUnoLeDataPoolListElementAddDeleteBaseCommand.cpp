@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdUtil.h"
-#include "C_SdNdeDpListTableView.h"
-#include "TGLUtils.h"
-#include "C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdUtil.hpp"
+#include "C_SdNdeDpListTableView.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,8 +53,8 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(
-   const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex,
-   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_Indices,
+   const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex,
+   C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32_t> & orc_Indices,
    const QString & orc_Text, QUndoCommand * const opc_Parent) :
    C_SdNdeUnoLeDataPoolListElementBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                               opc_DataPoolListModelViewManager,
@@ -70,7 +69,7 @@ C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::C_SdNdeUnoLeDataPoolListEle
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Add(void)
 {
-   const uint16 u16_TimerId = osc_write_log_performance_start();
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
 
    //Sort
    m_SortAscending();
@@ -80,9 +79,9 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Add(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
-         std::vector<std::vector<uint32> > c_Continous;
+         std::vector<std::vector<uint32_t> > c_Continous;
          //Insert
-         c_Continous = pc_Model->DoInsertRows(this->mc_OSCContent, this->mc_UIContent, this->mc_Indices);
+         c_Continous = pc_Model->DoInsertRows(this->mc_OscContent, this->mc_UiContent, this->mc_Indices);
          m_ReSelect(c_Continous, true);
       }
    }
@@ -96,10 +95,10 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Add(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Delete(void)
 {
-   const uint16 u16_TimerId = osc_write_log_performance_start();
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
 
-   this->mc_OSCContent.resize(this->mc_Indices.size());
-   this->mc_UIContent.resize(this->mc_Indices.size());
+   this->mc_OscContent.resize(this->mc_Indices.size());
+   this->mc_UiContent.resize(this->mc_Indices.size());
    m_SortAscending();
    if (this->mpc_DataPoolListModelViewManager != NULL)
    {
@@ -115,14 +114,15 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Delete(void)
             pc_View->clearSelection();
          }
          //Store last
-         for (uint32 u32_Index = this->mc_Indices.size(); u32_Index > 0UL; --u32_Index)
+         for (uint32_t u32_Index = this->mc_Indices.size(); u32_Index > 0UL; --u32_Index)
          {
             tgl_assert(C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(
                           this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex,
-                          this->mc_Indices[static_cast<std::vector<stw_types::uint32>::size_type >(u32_Index - 1UL)],
-                          this->mc_OSCContent[static_cast<std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElement>::
+                          this->mc_Indices[static_cast<std::vector<uint32_t>::size_type >(u32_Index - 1UL)],
+                          this->mc_OscContent[static_cast<std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement>
+                                                          ::
                                                           size_type >(u32_Index - 1UL)],
-                          this->mc_UIContent[static_cast<std::vector<C_PuiSdNodeDataPoolListElement>::size_type >(
+                          this->mc_UiContent[static_cast<std::vector<C_PuiSdNodeDataPoolListElement>::size_type >(
                                                 u32_Index - 1UL)]) ==
                        C_NO_ERR);
          }
@@ -134,7 +134,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Delete(void)
          {
             if (this->mc_Indices.size() > 0)
             {
-               sint32 s32_NewSelection = this->mc_Indices[this->mc_Indices.size() - 1];
+               int32_t s32_NewSelection = this->mc_Indices[this->mc_Indices.size() - 1];
                if ((pc_Model->rowCount() > s32_NewSelection) && (s32_NewSelection >= 0))
                {
                   pc_View->selectRow(s32_NewSelection);
@@ -162,7 +162,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_Delete(void)
    \param[in] orc_Value Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetIndices(const std::vector<stw_types::uint32> & orc_Value)
+void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetIndices(const std::vector<uint32_t> & orc_Value)
 {
    this->mc_Indices = orc_Value;
 }
@@ -170,33 +170,34 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetIndices(const std
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set initial data
 
-   \param[in] orc_OSCContent Initial OSC content
-   \param[in] orc_UIContent  Initial UI content
+   \param[in] orc_OscContent Initial OSC content
+   \param[in] orc_UiContent  Initial UI content
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetInitialData(
-   const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCContent,
-   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIContent)
+   const std::vector<C_OscNodeDataPoolListElement> & orc_OscContent,
+   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent)
 {
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
 
-   this->mc_OSCContent = orc_OSCContent;
-   this->mc_UIContent = orc_UIContent;
+   this->mc_OscContent = orc_OscContent;
+   this->mc_UiContent = orc_UiContent;
    //Adapt data set size to requirement
    if (pc_List != NULL)
    {
-      const uint32 u32_DataSetSize = pc_List->c_DataSets.size();
-      for (uint32 u32_ItOSCData = 0; u32_ItOSCData < this->mc_OSCContent.size(); ++u32_ItOSCData)
+      const uint32_t u32_DataSetSize = pc_List->c_DataSets.size();
+      for (uint32_t u32_ItOscData = 0; u32_ItOscData < this->mc_OscContent.size(); ++u32_ItOscData)
       {
-         C_OSCNodeDataPoolListElement & rc_OSCData = this->mc_OSCContent[u32_ItOSCData];
-         const uint32 u32_InitialDataSetSize = rc_OSCData.c_DataSetValues.size();
-         rc_OSCData.c_DataSetValues.resize(u32_DataSetSize);
+         C_OscNodeDataPoolListElement & rc_OscData = this->mc_OscContent[u32_ItOscData];
+         const uint32_t u32_InitialDataSetSize = rc_OscData.c_DataSetValues.size();
+         rc_OscData.c_DataSetValues.resize(u32_DataSetSize);
          //Initialize data set content
-         for (uint32 u32_ItNewDataSet = u32_InitialDataSetSize; u32_ItNewDataSet < u32_DataSetSize; ++u32_ItNewDataSet)
+         for (uint32_t u32_ItNewDataSet = u32_InitialDataSetSize; u32_ItNewDataSet < u32_DataSetSize;
+              ++u32_ItNewDataSet)
          {
-            C_OSCNodeDataPoolContent & rc_DataSetContent = rc_OSCData.c_DataSetValues[u32_ItNewDataSet];
-            rc_DataSetContent = rc_OSCData.c_MinValue;
+            C_OscNodeDataPoolContent & rc_DataSetContent = rc_OscData.c_DataSetValues[u32_ItNewDataSet];
+            rc_DataSetContent = rc_OscData.c_MinValue;
          }
       }
    }
@@ -210,7 +211,7 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SetInitialData(
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
-   const std::vector<std::vector<uint32> > & orc_Items, const bool oq_ScrollToLast)
+   const std::vector<std::vector<uint32_t> > & orc_Items, const bool oq_ScrollToLast)
 {
    C_SdNdeDpListTableView * const pc_View = this->mpc_DataPoolListModelViewManager->GetElementView(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
@@ -219,27 +220,27 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
    {
       pc_View->clearSelection();
       //New selection
-      for (uint32 u32_ItSection = 0UL; u32_ItSection < orc_Items.size(); ++u32_ItSection)
+      for (uint32_t u32_ItSection = 0UL; u32_ItSection < orc_Items.size(); ++u32_ItSection)
       {
-         const std::vector<uint32> & rc_Section = orc_Items[u32_ItSection];
+         const std::vector<uint32_t> & rc_Section = orc_Items[u32_ItSection];
          if (rc_Section.size() > 0UL)
          {
-            pc_View->SelectRange(rc_Section[0UL], rc_Section[static_cast<std::vector<stw_types::uint32>::
-                                                                         size_type>(static_cast<uint32>(rc_Section
-                                                                                                        .size())
+            pc_View->SelectRange(rc_Section[0UL], rc_Section[static_cast<std::vector<uint32_t>::
+                                                                         size_type>(static_cast<uint32_t>(rc_Section
+                                                                                                          .size())
                                                                                     -
                                                                                     1UL)]);
             //scroll to last
-            if ((oq_ScrollToLast) && (u32_ItSection == (static_cast<uint32>(orc_Items.size()) - 1UL)))
+            if ((oq_ScrollToLast) && (u32_ItSection == (static_cast<uint32_t>(orc_Items.size()) - 1UL)))
             {
                C_SdNdeDpListTableModel * const pc_Model =
                   this->mpc_DataPoolListModelViewManager->GetElementModel(
                      this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
                if (pc_Model != NULL)
                {
-                  pc_View->scrollTo(pc_Model->index(rc_Section[static_cast<std::vector<stw_types::uint32>::
-                                                                           size_type>(static_cast<uint32>(rc_Section
-                                                                                                          .size())
+                  pc_View->scrollTo(pc_Model->index(rc_Section[static_cast<std::vector<uint32_t>::
+                                                                           size_type>(static_cast<uint32_t>(rc_Section
+                                                                                                            .size())
                                                                                       -
                                                                                       1UL)], 0));
                }
@@ -255,8 +256,8 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_ReSelect(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SortDescending(void)
 {
-   C_SdUtil::h_SortIndicesDescendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
-      this->mc_Indices, this->mc_OSCContent, this->mc_UIContent);
+   C_SdUtil::h_SortIndicesDescendingAndSync<C_OscNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
+      this->mc_Indices, this->mc_OscContent, this->mc_UiContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -265,6 +266,6 @@ void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SortDescending(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand::m_SortAscending(void)
 {
-   C_SdUtil::h_SortIndicesAscendingAndSync<C_OSCNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
-      this->mc_Indices, this->mc_OSCContent, this->mc_UIContent);
+   C_SdUtil::h_SortIndicesAscendingAndSync<C_OscNodeDataPoolListElement, C_PuiSdNodeDataPoolListElement>(
+      this->mc_Indices, this->mc_OscContent, this->mc_UiContent);
 }

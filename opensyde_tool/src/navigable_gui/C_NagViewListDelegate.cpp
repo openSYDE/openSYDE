@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_NagViewList.h"
-#include "C_NagViewListDelegate.h"
+#include "stwtypes.hpp"
+#include "C_NagViewList.hpp"
+#include "C_NagViewListDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -80,7 +79,7 @@ void C_NagViewListDelegate::RegisterExpand(const QModelIndex & orc_Index)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_NagViewListDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, const QModelIndex & orc_Index) const
 {
-   sintn sn_Height = 1;
+   int32_t s32_Height = 1;
    QSize c_Retval = QStyledItemDelegate::sizeHint(orc_Option, orc_Index);
 
    if (orc_Index.isValid() == true)
@@ -92,10 +91,10 @@ QSize C_NagViewListDelegate::sizeHint(const QStyleOptionViewItem & orc_Option, c
          const C_NagViewItem * const pc_Item = pc_View->GetItemAt(orc_Index.row());
          if (pc_Item != NULL)
          {
-            sn_Height += pc_Item->sizeHint().height();
+            s32_Height += pc_Item->sizeHint().height();
          }
       }
    }
-   c_Retval.setHeight(sn_Height);
+   c_Retval.setHeight(s32_Height);
    return c_Retval;
 }

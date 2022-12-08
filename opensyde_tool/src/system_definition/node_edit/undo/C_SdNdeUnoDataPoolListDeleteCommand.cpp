@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoDataPoolListDeleteCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoDataPoolListDeleteCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,10 +40,10 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent                  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoDataPoolListDeleteCommand::C_SdNdeUnoDataPoolListDeleteCommand(const uint32 & oru32_NodeIndex,
-                                                                         const uint32 & oru32_DataPoolIndex,
-                                                                         stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
-                                                                         const std::vector<uint32> & orc_Indices,
+C_SdNdeUnoDataPoolListDeleteCommand::C_SdNdeUnoDataPoolListDeleteCommand(const uint32_t & oru32_NodeIndex,
+                                                                         const uint32_t & oru32_DataPoolIndex,
+                                                                         stw::opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                                                         const std::vector<uint32_t> & orc_Indices,
                                                                          QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex,
                                               opc_DataPoolListsTreeWidget, orc_Indices,

@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMimeData>
-#include "C_NagViewListModel.h"
+#include "C_NagViewListModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,23 +40,23 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_NagViewListModel::C_NagViewListModel(QObject * const opc_Parent) :
    QAbstractListModel(opc_Parent),
-   msn_Rows(0)
+   ms32_Rows(0)
 {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set new number of rows
 
-   \param[in]  osn_Rows    Set new number of rows
+   \param[in]  os32_Rows    Set new number of rows
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
+void C_NagViewListModel::SetNumRows(const int32_t os32_Rows)
 {
-   if ((this->msn_Rows != osn_Rows) && (osn_Rows >= 0))
+   if ((this->ms32_Rows != os32_Rows) && (os32_Rows >= 0))
    {
       bool q_Insert;
 
-      if (this->msn_Rows <= osn_Rows)
+      if (this->ms32_Rows <= os32_Rows)
       {
          q_Insert = true;
       }
@@ -68,15 +67,15 @@ void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
       //For performance
       if (q_Insert == true)
       {
-         //First new index msn_Rows, last new index: osn_Rows - 1
-         this->beginInsertRows(QModelIndex(), this->msn_Rows, osn_Rows - 1);
+         //First new index ms32_Rows, last new index: os32_Rows - 1
+         this->beginInsertRows(QModelIndex(), this->ms32_Rows, os32_Rows - 1);
       }
       else
       {
-         //First removed index osn_Rows, last removed index: msn_Rows - 1
-         this->beginRemoveRows(QModelIndex(), osn_Rows, this->msn_Rows - 1);
+         //First removed index os32_Rows, last removed index: ms32_Rows - 1
+         this->beginRemoveRows(QModelIndex(), os32_Rows, this->ms32_Rows - 1);
       }
-      this->msn_Rows = osn_Rows;
+      this->ms32_Rows = os32_Rows;
       //For performance
       if (q_Insert == true)
       {
@@ -98,33 +97,34 @@ void C_NagViewListModel::SetNumRows(const sintn osn_Rows)
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_NagViewListModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_NagViewListModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      sn_Retval = this->msn_Rows;
+      s32_Retval = this->ms32_Rows;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_NagViewListModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_NagViewListModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    //No content
    Q_UNUSED(orc_Index)
-   Q_UNUSED(osn_Role)
+   Q_UNUSED(os32_Role)
    return c_Retval;
 }
 

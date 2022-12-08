@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_SdBueNodeSelectorCheckBoxItemWidget.h"
+#include "C_SdBueNodeSelectorCheckBoxItemWidget.hpp"
 #include "ui_C_SdBueNodeSelectorCheckBoxItemWidget.h"
 
-#include "stwerrors.h"
-#include "C_OSCNode.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_GtGetText.h"
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_SdUtil.h"
+#include "stwerrors.hpp"
+#include "C_OscNode.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,14 +50,15 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(const stw_types::uint32 ou32_NodeIndex,
-                                                                             const stw_types::uint32 ou32_InterfaceIndex, const QString & orc_Name,
+C_SdBueNodeSelectorCheckBoxItemWidget::C_SdBueNodeSelectorCheckBoxItemWidget(const uint32_t ou32_NodeIndex,
+                                                                             const uint32_t ou32_InterfaceIndex,
+                                                                             const QString & orc_Name,
                                                                              QWidget * const opc_Parent) :
    C_OgeWiWithToolTip(opc_Parent),
    mpc_Ui(new Ui::C_SdBueNodeSelectorCheckBoxItemWidget),
    mc_IconActive(":/images/system_definition/IconNode.svg"),
    mc_IconInactive(":/images/system_definition/IconNodeInactive.svg"),
-   me_ProtocolType(stw_opensyde_core::C_OSCCanProtocol::eLAYER2),
+   me_ProtocolType(stw::opensyde_core::C_OscCanProtocol::eLAYER2),
    mq_IsManager(false),
    mq_IsDevice(false),
    mu32_ManagerNodeIndex(0U),
@@ -106,8 +106,7 @@ C_SdBueNodeSelectorCheckBoxItemWidget::~C_SdBueNodeSelectorCheckBoxItemWidget()
    \param[out]  oru32_SubIndex   Second index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxItemWidget::GetIndexes(stw_types::uint32 & oru32_Index,
-                                                       stw_types::uint32 & oru32_SubIndex) const
+void C_SdBueNodeSelectorCheckBoxItemWidget::GetIndexes(uint32_t & oru32_Index, uint32_t & oru32_SubIndex) const
 {
    this->mpc_CheckBox->GetIndexes(oru32_Index, oru32_SubIndex);
 }
@@ -143,9 +142,9 @@ bool C_SdBueNodeSelectorCheckBoxItemWidget::IsChecked(void) const
    \param[in]  oe_Protocol    Protocol id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxItemWidget::SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
+void C_SdBueNodeSelectorCheckBoxItemWidget::SetProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol)
 {
-   const bool oq_CanOpen = (oe_Protocol == C_OSCCanProtocol::eCAN_OPEN);
+   const bool oq_CanOpen = (oe_Protocol == C_OscCanProtocol::eCAN_OPEN);
 
    this->me_ProtocolType = oe_Protocol;
 
@@ -195,8 +194,8 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::SetNodeAsManager(const bool oq_Manag
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::SetNodeAsDevice(const bool oq_Device,
-                                                            const stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceId, const uint32 ou32_ManagerNodeIndex,
-                                                            const uint32 ou32_ManagerIntfIndex)
+                                                            const stw::opensyde_core::C_OscCanInterfaceId * const opc_DeviceId, const uint32_t ou32_ManagerNodeIndex,
+                                                            const uint32_t ou32_ManagerIntfIndex)
 {
    if (this->mq_IsDevice != oq_Device)
    {
@@ -219,23 +218,23 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::SetNodeAsDevice(const bool oq_Device
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
 {
-   uint32 u32_NodeIndex;
-   uint32 u32_InterfaceIndex;
-   const C_OSCNode * pc_Node;
-   const bool q_CanOpenActive = (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN);
+   uint32_t u32_NodeIndex;
+   uint32_t u32_InterfaceIndex;
+   const C_OscNode * pc_Node;
+   const bool q_CanOpenActive = (this->me_ProtocolType == C_OscCanProtocol::eCAN_OPEN);
 
    this->mpc_CheckBox->GetIndexes(u32_NodeIndex, u32_InterfaceIndex);
-   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+   pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
       // Prepare tooltip
       QString c_Content = "";
-      uint32 u32_RxMessageCount = 0U;
-      uint32 u32_TxMessageCount = 0U;
-      uint32 u32_SignalCount = 0U;
-      const stw_opensyde_core::C_OSCCanInterfaceId * pc_DeviceId = NULL;
+      uint32_t u32_RxMessageCount = 0U;
+      uint32_t u32_TxMessageCount = 0U;
+      uint32_t u32_SignalCount = 0U;
+      const stw::opensyde_core::C_OscCanInterfaceId * pc_DeviceId = NULL;
 
       // Get the interface name
       c_Content += C_GtGetText::h_GetText("Interface: ");
@@ -306,8 +305,8 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::UpdateToolTip(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                                          const bool oq_Checked)
+void C_SdBueNodeSelectorCheckBoxItemWidget::m_NodeToggled(const uint32_t ou32_NodeIndex,
+                                                          const uint32_t ou32_InterfaceIndex, const bool oq_Checked)
 {
    this->m_AdaptIcon(oq_Checked);
 
@@ -340,15 +339,15 @@ void C_SdBueNodeSelectorCheckBoxItemWidget::m_AdaptIcon(const bool oq_Checked)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxItemWidget::m_OnLinkSwitchToManager(const QString & orc_Link) const
 {
-   uint32 u32_ManagerNodeIndex;
-   uint32 u32_ManagerIntfIndex;
-   const C_OSCNode * pc_ManagerNode;
+   uint32_t u32_ManagerNodeIndex;
+   uint32_t u32_ManagerIntfIndex;
+   const C_OscNode * pc_ManagerNode;
 
    Q_UNUSED(orc_Link)
 
    this->GetIndexes(u32_ManagerNodeIndex, u32_ManagerIntfIndex);
 
-   pc_ManagerNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ManagerNodeIndex);
+   pc_ManagerNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ManagerNodeIndex);
    tgl_assert(pc_ManagerNode != NULL);
    if (pc_ManagerNode != NULL)
    {

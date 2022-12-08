@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_OSCNodeDataPoolList.h"
-#include "C_OSCUtils.h"
-#include "CSCLChecksums.h"
+#include "stwerrors.hpp"
+#include "C_OscNodeDataPoolList.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_errors;
+
+using namespace stw::opensyde_core;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,13 +38,13 @@ using namespace stw_errors;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolList::C_OSCNodeDataPoolList(void) :
+C_OscNodeDataPoolList::C_OscNodeDataPoolList(void) :
    c_Name("NewList"),
    c_Comment(""),
-   q_NvMCRCActive(false),
-   u32_NvMCRC(0),
-   u32_NvMStartAddress(0),
-   u32_NvMSize(100),
+   q_NvmCrcActive(false),
+   u32_NvmCrc(0),
+   u32_NvmStartAddress(0),
+   u32_NvmSize(100),
    c_Elements(),
    c_DataSets()
 {
@@ -60,15 +60,15 @@ C_OSCNodeDataPoolList::C_OSCNodeDataPoolList(void) :
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::CalcHash(uint32 & oru32_HashValue) const
+void C_OscNodeDataPoolList::CalcHash(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMCRC, sizeof(this->u32_NvMCRC), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMStartAddress, sizeof(this->u32_NvMStartAddress), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NvMSize, sizeof(this->u32_NvMSize), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmCrc, sizeof(this->u32_NvmCrc), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmStartAddress, sizeof(this->u32_NvmStartAddress), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NvmSize, sizeof(this->u32_NvmSize), oru32_HashValue);
 
    for (u32_Counter = 0U; u32_Counter < this->c_Elements.size(); ++u32_Counter)
    {
@@ -85,20 +85,20 @@ void C_OSCNodeDataPoolList::CalcHash(uint32 & oru32_HashValue) const
 /*! \brief   Recalculate data pool list element addresses
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::RecalculateAddress(void)
+void C_OscNodeDataPoolList::RecalculateAddress(void)
 {
-   uint32 u32_Offset = this->u32_NvMStartAddress;
+   uint32_t u32_Offset = this->u32_NvmStartAddress;
 
    //If there is a CRC two bytes are reserved at the start
-   if (this->q_NvMCRCActive == true)
+   if (this->q_NvmCrcActive == true)
    {
       u32_Offset += 2;
    }
 
-   for (uint32 u32_ItDataElement = 0; u32_ItDataElement < this->c_Elements.size(); ++u32_ItDataElement)
+   for (uint32_t u32_ItDataElement = 0; u32_ItDataElement < this->c_Elements.size(); ++u32_ItDataElement)
    {
-      C_OSCNodeDataPoolListElement & rc_CurElem = this->c_Elements[u32_ItDataElement];
-      rc_CurElem.u32_NvMStartAddress = u32_Offset;
+      C_OscNodeDataPoolListElement & rc_CurElem = this->c_Elements[u32_ItDataElement];
+      rc_CurElem.u32_NvmStartAddress = u32_Offset;
       u32_Offset += rc_CurElem.GetSizeByte();
    }
 }
@@ -109,12 +109,12 @@ void C_OSCNodeDataPoolList::RecalculateAddress(void)
    \param[in] oru32_Target Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::MoveElement(const stw_types::uint32 & oru32_Start, const stw_types::uint32 & oru32_Target)
+void C_OscNodeDataPoolList::MoveElement(const uint32_t & oru32_Start, const uint32_t & oru32_Target)
 {
    if ((oru32_Start < this->c_Elements.size()) && (oru32_Target < this->c_Elements.size()))
    {
       //Copy
-      const C_OSCNodeDataPoolListElement c_ListElementData = this->c_Elements[oru32_Start];
+      const C_OscNodeDataPoolListElement c_ListElementData = this->c_Elements[oru32_Start];
       //Erase
       this->c_Elements.erase(this->c_Elements.begin() + oru32_Start);
       //Insert
@@ -134,17 +134,17 @@ void C_OSCNodeDataPoolList::MoveElement(const stw_types::uint32 & oru32_Start, c
    Number of bytes occupied by variables (including CRC space)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCNodeDataPoolList::GetNumBytesUsed(void) const
+uint32_t C_OscNodeDataPoolList::GetNumBytesUsed(void) const
 {
-   uint32 u32_Retval = 0;
+   uint32_t u32_Retval = 0;
 
-   if (this->q_NvMCRCActive == true)
+   if (this->q_NvmCrcActive == true)
    {
       u32_Retval += 2;
    }
-   for (uint32 u32_ItListElement = 0; u32_ItListElement < this->c_Elements.size(); ++u32_ItListElement)
+   for (uint32_t u32_ItListElement = 0; u32_ItListElement < this->c_Elements.size(); ++u32_ItListElement)
    {
-      const C_OSCNodeDataPoolListElement & rc_NodeDataPoolListElement = this->c_Elements[u32_ItListElement];
+      const C_OscNodeDataPoolListElement & rc_NodeDataPoolListElement = this->c_Elements[u32_ItListElement];
       u32_Retval += rc_NodeDataPoolListElement.GetSizeByte();
    }
    return u32_Retval;
@@ -157,9 +157,9 @@ uint32 C_OSCNodeDataPoolList::GetNumBytesUsed(void) const
    Number of bytes not occupied by variables
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolList::GetFreeBytes(void) const
+int32_t C_OscNodeDataPoolList::GetFreeBytes(void) const
 {
-   return static_cast<sint32>(static_cast<sint64>(u32_NvMSize) - static_cast<sint64>(GetNumBytesUsed()));
+   return static_cast<int32_t>(static_cast<int64_t>(u32_NvmSize) - static_cast<int64_t>(GetNumBytesUsed()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -170,17 +170,17 @@ sint32 C_OSCNodeDataPoolList::GetFreeBytes(void) const
    \param[out] opq_NameInvalid     Name not usable as variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::CheckErrorDataSet(const uint32 & oru32_DataSetIndex, bool * const opq_NameConflict,
+void C_OscNodeDataPoolList::CheckErrorDataSet(const uint32_t & oru32_DataSetIndex, bool * const opq_NameConflict,
                                               bool * const opq_NameInvalid) const
 {
    //Init
    if (oru32_DataSetIndex < this->c_DataSets.size())
    {
-      const C_OSCNodeDataPoolDataSet & rc_CurrentElement = this->c_DataSets[oru32_DataSetIndex];
+      const C_OscNodeDataPoolDataSet & rc_CurrentElement = this->c_DataSets[oru32_DataSetIndex];
       //Check variable name
       if (opq_NameInvalid != NULL)
       {
-         if (C_OSCUtils::h_CheckValidCName(rc_CurrentElement.c_Name) == false)
+         if (C_OscUtils::h_CheckValidCeName(rc_CurrentElement.c_Name) == false)
          {
             *opq_NameInvalid = true;
          }
@@ -193,12 +193,12 @@ void C_OSCNodeDataPoolList::CheckErrorDataSet(const uint32 & oru32_DataSetIndex,
       if (opq_NameConflict != NULL)
       {
          *opq_NameConflict = false;
-         for (uint32 u32_ItDataSet = 0; (u32_ItDataSet < this->c_DataSets.size()) && (*opq_NameConflict == false);
+         for (uint32_t u32_ItDataSet = 0; (u32_ItDataSet < this->c_DataSets.size()) && (*opq_NameConflict == false);
               ++u32_ItDataSet)
          {
             if (u32_ItDataSet != oru32_DataSetIndex)
             {
-               const C_OSCNodeDataPoolDataSet & rc_DataSet = this->c_DataSets[u32_ItDataSet];
+               const C_OscNodeDataPoolDataSet & rc_DataSet = this->c_DataSets[u32_ItDataSet];
                if (rc_CurrentElement.c_Name.LowerCase() == rc_DataSet.c_Name.LowerCase())
                {
                   *opq_NameConflict = true;
@@ -231,19 +231,19 @@ void C_OSCNodeDataPoolList::CheckErrorDataSet(const uint32 & oru32_DataSetIndex,
    \param[out] opc_InvalidDataSetIndices  List of indexes of troublesome data sets
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::CheckErrorElement(const uint32 & oru32_ElementIndex, bool * const opq_NameConflict,
+void C_OscNodeDataPoolList::CheckErrorElement(const uint32_t & oru32_ElementIndex, bool * const opq_NameConflict,
                                               bool * const opq_NameInvalid, bool * const opq_MinOverMax,
                                               bool * const opq_DataSetValueInvalid,
-                                              std::vector<uint32> * const opc_InvalidDataSetIndices) const
+                                              std::vector<uint32_t> * const opc_InvalidDataSetIndices) const
 {
    //Init
    if (oru32_ElementIndex < this->c_Elements.size())
    {
-      const C_OSCNodeDataPoolListElement & rc_CurrentElement = this->c_Elements[oru32_ElementIndex];
+      const C_OscNodeDataPoolListElement & rc_CurrentElement = this->c_Elements[oru32_ElementIndex];
       //Check variable name
       if (opq_NameInvalid != NULL)
       {
-         if (C_OSCUtils::h_CheckValidCName(rc_CurrentElement.c_Name) == false)
+         if (C_OscUtils::h_CheckValidCeName(rc_CurrentElement.c_Name) == false)
          {
             *opq_NameInvalid = true;
          }
@@ -256,12 +256,12 @@ void C_OSCNodeDataPoolList::CheckErrorElement(const uint32 & oru32_ElementIndex,
       if (opq_NameConflict != NULL)
       {
          *opq_NameConflict = false;
-         for (uint32 u32_ItElement = 0; (u32_ItElement < this->c_Elements.size()) && (*opq_NameConflict == false);
+         for (uint32_t u32_ItElement = 0; (u32_ItElement < this->c_Elements.size()) && (*opq_NameConflict == false);
               ++u32_ItElement)
          {
             if (u32_ItElement != oru32_ElementIndex)
             {
-               const C_OSCNodeDataPoolListElement & rc_ListElement = this->c_Elements[u32_ItElement];
+               const C_OscNodeDataPoolListElement & rc_ListElement = this->c_Elements[u32_ItElement];
                if (rc_CurrentElement.c_Name.LowerCase() == rc_ListElement.c_Name.LowerCase())
                {
                   *opq_NameConflict = true;
@@ -285,7 +285,7 @@ void C_OSCNodeDataPoolList::CheckErrorElement(const uint32 & oru32_ElementIndex,
       if (opq_DataSetValueInvalid != NULL)
       {
          *opq_DataSetValueInvalid = false;
-         for (uint32 u32_ItDataSet = 0; u32_ItDataSet < rc_CurrentElement.c_DataSetValues.size(); ++u32_ItDataSet)
+         for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < rc_CurrentElement.c_DataSetValues.size(); ++u32_ItDataSet)
          {
             bool q_ValueBelowMin = false;
             bool q_ValueOverMax = false;
@@ -328,9 +328,10 @@ void C_OSCNodeDataPoolList::CheckErrorElement(const uint32 & oru32_ElementIndex,
    \param[in] opu32_ArrayIndex   Optional parameter to check only a single data set array index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::CheckErrorDataSetValue(const uint32 & oru32_ElementIndex, const uint32 & oru32_DataSetIndex,
-                                                   bool * const opq_ValueBelowMin, bool * const opq_ValueOverMax,
-                                                   const uint32 * const opu32_ArrayIndex) const
+void C_OscNodeDataPoolList::CheckErrorDataSetValue(const uint32_t & oru32_ElementIndex,
+                                                   const uint32_t & oru32_DataSetIndex, bool * const opq_ValueBelowMin,
+                                                   bool * const opq_ValueOverMax,
+                                                   const uint32_t * const opu32_ArrayIndex) const
 {
    if (opq_ValueBelowMin != NULL)
    {
@@ -342,10 +343,10 @@ void C_OSCNodeDataPoolList::CheckErrorDataSetValue(const uint32 & oru32_ElementI
    }
    if (oru32_ElementIndex < this->c_Elements.size())
    {
-      const C_OSCNodeDataPoolListElement & rc_CurrentElement = this->c_Elements[oru32_ElementIndex];
+      const C_OscNodeDataPoolListElement & rc_CurrentElement = this->c_Elements[oru32_ElementIndex];
       if (oru32_DataSetIndex < rc_CurrentElement.c_DataSetValues.size())
       {
-         const C_OSCNodeDataPoolContent & rc_DataSetValue = rc_CurrentElement.c_DataSetValues[oru32_DataSetIndex];
+         const C_OscNodeDataPoolContent & rc_DataSetValue = rc_CurrentElement.c_DataSetValues[oru32_DataSetIndex];
          if (opq_ValueBelowMin != NULL)
          {
             *opq_ValueBelowMin = false;
@@ -399,13 +400,13 @@ void C_OSCNodeDataPoolList::CheckErrorDataSetValue(const uint32 & oru32_ElementI
    C_RANGE    size of orc_Data does not match our size
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolList::SetCRCFromBigEndianBlob(const std::vector<uint8> & orc_Data)
+int32_t C_OscNodeDataPoolList::SetCrcFromBigEndianBlob(const std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_Data.size() == 2)
    {
-      this->u32_NvMCRC = static_cast<uint32>((static_cast<uint32>(orc_Data[0]) << 8U)) + orc_Data[1];
+      this->u32_NvmCrc = static_cast<uint32_t>((static_cast<uint32_t>(orc_Data[0]) << 8U)) + orc_Data[1];
    }
    else
    {
@@ -427,13 +428,13 @@ sint32 C_OSCNodeDataPoolList::SetCRCFromBigEndianBlob(const std::vector<uint8> &
    C_RANGE    size of orc_Data does not match our size
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolList::SetCRCFromLittleEndianBlob(const std::vector<uint8> & orc_Data)
+int32_t C_OscNodeDataPoolList::SetCrcFromLittleEndianBlob(const std::vector<uint8_t> & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_Data.size() == 2)
    {
-      this->u32_NvMCRC = static_cast<uint32>((static_cast<uint32>(orc_Data[1]) << 8U)) + orc_Data[0];
+      this->u32_NvmCrc = static_cast<uint32_t>((static_cast<uint32_t>(orc_Data[1]) << 8U)) + orc_Data[0];
    }
    else
    {
@@ -451,13 +452,13 @@ sint32 C_OSCNodeDataPoolList::SetCRCFromLittleEndianBlob(const std::vector<uint8
    \param[out]     orc_Data    data to set
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::GetCRCAsBigEndianBlob(std::vector<uint8> & orc_Data) const
+void C_OscNodeDataPoolList::GetCrcAsBigEndianBlob(std::vector<uint8_t> & orc_Data) const
 {
-   const uint16 u16_Value = static_cast<uint16>(this->u32_NvMCRC);
+   const uint16_t u16_Value = static_cast<uint16_t>(this->u32_NvmCrc);
 
    orc_Data.resize(2);
-   orc_Data[0] = static_cast<uint8>(u16_Value >> 8U);
-   orc_Data[1] = static_cast<uint8>(u16_Value);
+   orc_Data[0] = static_cast<uint8_t>(u16_Value >> 8U);
+   orc_Data[1] = static_cast<uint8_t>(u16_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -469,11 +470,11 @@ void C_OSCNodeDataPoolList::GetCRCAsBigEndianBlob(std::vector<uint8> & orc_Data)
    \param[out]     orc_Data    data to set
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolList::GetCRCAsLittleEndianBlob(std::vector<uint8> & orc_Data) const
+void C_OscNodeDataPoolList::GetCrcAsLittleEndianBlob(std::vector<uint8_t> & orc_Data) const
 {
-   const uint16 u16_Value = static_cast<uint16>(this->u32_NvMCRC);
+   const uint16_t u16_Value = static_cast<uint16_t>(this->u32_NvmCrc);
 
    orc_Data.resize(2);
-   orc_Data[1] = static_cast<uint8>(u16_Value >> 8U);
-   orc_Data[0] = static_cast<uint8>(u16_Value);
+   orc_Data[1] = static_cast<uint8_t>(u16_Value >> 8U);
+   orc_Data[0] = static_cast<uint8_t>(u16_Value);
 }

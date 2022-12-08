@@ -47,7 +47,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelShowUnit">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelShowUnit">
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -57,7 +57,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelShowValue">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelShowValue">
          <property name="text">
           <string>TextLabel</string>
          </property>
@@ -87,7 +87,7 @@
         <number>8</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeChxTristateTransparentToggle" name="pc_CheckBoxUnit">
+        <widget class="stw::opensyde_gui_elements::C_OgeChxTristateTransparentToggle" name="pc_CheckBoxUnit">
          <property name="minimumSize">
           <size>
            <width>66</width>
@@ -106,7 +106,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeChxTristateTransparentToggle" name="pc_CheckBoxValue">
+        <widget class="stw::opensyde_gui_elements::C_OgeChxTristateTransparentToggle" name="pc_CheckBoxValue">
          <property name="minimumSize">
           <size>
            <width>66</width>
@@ -145,14 +145,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxTristateTransparentToggle</class>
+   <class>stw::opensyde_gui_elements::C_OgeChxTristateTransparentToggle</class>
    <extends>QCheckBox</extends>
-   <header>C_OgeChxTristateTransparentToggle.h</header>
+   <header>C_OgeChxTristateTransparentToggle.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

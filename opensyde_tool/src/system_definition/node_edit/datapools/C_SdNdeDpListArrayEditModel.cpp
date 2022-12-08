@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
 #include <QMimeData>
-#include "C_SdNdeDpListArrayEditModel.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_PuiSdHandler.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_SdNdeUnoUtil.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "C_SdNdeDpListArrayEditModel.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_SdNdeUnoUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -73,10 +72,10 @@ C_SdNdeDpListArrayEditModel::C_SdNdeDpListArrayEditModel(QObject * const opc_Par
                                   Else use data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListArrayEditModel::SetElement(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                             const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
+void C_SdNdeDpListArrayEditModel::SetElement(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                             const uint32_t & oru32_ListIndex, const uint32_t & oru32_ElementIndex,
                                              const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                             const uint32 & oru32_DataSetIndex)
+                                             const uint32_t & oru32_DataSetIndex)
 {
    beginResetModel();
    this->mu32_NodeIndex = oru32_NodeIndex;
@@ -104,10 +103,10 @@ void C_SdNdeDpListArrayEditModel::SetElement(const uint32 & oru32_NodeIndex, con
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListArrayEditModel::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                         const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
+bool C_SdNdeDpListArrayEditModel::Equals(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                         const uint32_t & oru32_ListIndex, const uint32_t & oru32_ElementIndex,
                                          const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                         const uint32 & oru32_DataSetIndex) const
+                                         const uint32_t & oru32_DataSetIndex) const
 {
    bool q_Retval;
 
@@ -127,26 +126,26 @@ bool C_SdNdeDpListArrayEditModel::Equals(const uint32 & oru32_NodeIndex, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in] osn_Section    Section
+   \param[in] os32_Section    Section
    \param[in] oe_Orientation Orientation
-   \param[in] osn_Role       Role
+   \param[in] os32_Role       Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeDpListArrayEditModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                                 const sintn osn_Role) const
+QVariant C_SdNdeDpListArrayEditModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                                 const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractTableModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractTableModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Vertical)
    {
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
          c_Retval = C_GtGetText::h_GetText("Value");
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
@@ -157,11 +156,11 @@ QVariant C_SdNdeDpListArrayEditModel::headerData(const sintn osn_Section, const 
    }
    else
    {
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
       {
-         c_Retval = QString::number(osn_Section);
+         c_Retval = QString::number(os32_Section);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
@@ -182,16 +181,16 @@ QVariant C_SdNdeDpListArrayEditModel::headerData(const sintn osn_Section, const 
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeDpListArrayEditModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeDpListArrayEditModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 1;
+      s32_Retval = 1;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,73 +202,74 @@ sintn C_SdNdeDpListArrayEditModel::rowCount(const QModelIndex & orc_Parent) cons
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeDpListArrayEditModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_SdNdeDpListArrayEditModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      const C_OSCNodeDataPoolListElement * const pc_Element =
-         C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex, this->mu32_ElementIndex);
       if (pc_Element != NULL)
       {
          //For table parent should always be invalid
-         sn_Retval = pc_Element->GetArraySize();
+         s32_Retval = pc_Element->GetArraySize();
       }
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in] orc_Index Index
-   \param[in] osn_Role  Data role
+   \param[in] os32_Role  Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          if (orc_Index.column() >= 0)
          {
-            const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex,
+            const C_OscNodeDataPoolListElement * const pc_OscElement =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
                                                                           this->mu32_DataPoolIndex,
                                                                           this->mu32_ListIndex,
                                                                           this->mu32_ElementIndex);
-            if (pc_OSCElement != NULL)
+            if (pc_OscElement != NULL)
             {
                switch (this->me_ArrayEditType)
                {
                case C_SdNdeDpUtil::eARRAY_EDIT_MIN:
                   c_Retval =
-                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCElement->c_MinValue,
-                                                                           pc_OSCElement->f64_Factor,
-                                                                           pc_OSCElement->f64_Offset,
-                                                                           static_cast<uint32>(orc_Index.column()));
+                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OscElement->c_MinValue,
+                                                                           pc_OscElement->f64_Factor,
+                                                                           pc_OscElement->f64_Offset,
+                                                                           static_cast<uint32_t>(orc_Index.column()));
                   break;
                case C_SdNdeDpUtil::eARRAY_EDIT_MAX:
                   c_Retval =
-                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OSCElement->c_MaxValue,
-                                                                           pc_OSCElement->f64_Factor,
-                                                                           pc_OSCElement->f64_Offset,
-                                                                           static_cast<uint32>(orc_Index.column()));
+                     C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_OscElement->c_MaxValue,
+                                                                           pc_OscElement->f64_Factor,
+                                                                           pc_OscElement->f64_Offset,
+                                                                           static_cast<uint32_t>(orc_Index.column()));
                   break;
                case C_SdNdeDpUtil::eARRAY_EDIT_DATA_SET:
-                  if (this->mu32_DataSetIndex < pc_OSCElement->c_DataSetValues.size())
+                  if (this->mu32_DataSetIndex < pc_OscElement->c_DataSetValues.size())
                   {
                      c_Retval =
                         C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(
-                           pc_OSCElement->c_DataSetValues[this->mu32_DataSetIndex], pc_OSCElement->f64_Factor,
-                           pc_OSCElement->f64_Offset, static_cast<uint32>(orc_Index.column()));
+                           pc_OscElement->c_DataSetValues[this->mu32_DataSetIndex], pc_OscElement->f64_Factor,
+                           pc_OscElement->f64_Offset, static_cast<uint32_t>(orc_Index.column()));
                   }
                   break;
                default:
@@ -278,11 +278,11 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignHCenter | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          //Default
          c_Retval = mc_STYLE_GUIDE_COLOR_6;
@@ -293,15 +293,15 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
             if (orc_Index.column() >= 0)
             {
                bool q_ValueBelowMin = false;
-               const C_OSCNodeDataPoolList * const pc_OSCElement =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(this->mu32_NodeIndex,
+               const C_OscNodeDataPoolList * const pc_OscElement =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(this->mu32_NodeIndex,
                                                                       this->mu32_DataPoolIndex,
                                                                       this->mu32_ListIndex);
-               if (pc_OSCElement != NULL)
+               if (pc_OscElement != NULL)
                {
-                  const stw_types::uint32 u32_ArrayIndex = static_cast<stw_types::uint32>(orc_Index.column());
+                  const uint32_t u32_ArrayIndex = static_cast<uint32_t>(orc_Index.column());
                   bool q_ValueOverMax = false;
-                  pc_OSCElement->CheckErrorDataSetValue(this->mu32_ElementIndex,
+                  pc_OscElement->CheckErrorDataSetValue(this->mu32_ElementIndex,
                                                         this->mu32_DataSetIndex, &q_ValueBelowMin,
                                                         &q_ValueOverMax, &u32_ArrayIndex);
                   if (q_ValueOverMax == true)
@@ -321,16 +321,16 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
             if (orc_Index.column() >= 0)
             {
                bool q_MinMaxError = false;
-               const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-                  C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex,
+               const C_OscNodeDataPoolListElement * const pc_OscElement =
+                  C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
                                                                              this->mu32_DataPoolIndex,
                                                                              this->mu32_ListIndex,
                                                                              this->mu32_ElementIndex);
-               if (pc_OSCElement != NULL)
+               if (pc_OscElement != NULL)
                {
-                  const stw_types::uint32 u32_ArrayIndex = static_cast<stw_types::uint32>(orc_Index.column());
+                  const uint32_t u32_ArrayIndex = static_cast<uint32_t>(orc_Index.column());
 
-                  q_MinMaxError = pc_OSCElement->c_MinValue.CompareArrayGreater(pc_OSCElement->c_MaxValue,
+                  q_MinMaxError = pc_OscElement->c_MinValue.CompareArrayGreater(pc_OscElement->c_MaxValue,
                                                                                 u32_ArrayIndex);
                }
                if (q_MinMaxError == true)
@@ -357,7 +357,7 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
 
    \param[in] orc_Index Index
    \param[in] orc_Value New data
-   \param[in] osn_Role  Data role
+   \param[in] os32_Role  Data role
 
    \return
    true  success
@@ -365,23 +365,23 @@ QVariant C_SdNdeDpListArrayEditModel::data(const QModelIndex & orc_Index, const 
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SdNdeDpListArrayEditModel::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
-                                          const sintn osn_Role)
+                                          const int32_t os32_Role)
 {
    bool q_Retval = false;
 
-   if (data(orc_Index, osn_Role) != orc_Value)
+   if (data(orc_Index, os32_Role) != orc_Value)
    {
-      if (osn_Role == static_cast<sintn>(Qt::EditRole))
+      if (os32_Role == static_cast<int32_t>(Qt::EditRole))
       {
          if (orc_Index.column() >= 0)
          {
-            const uint32 u32_Index = static_cast<uint32>(orc_Index.column());
+            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.column());
             Q_EMIT this->SigDataChange(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                        this->mu32_ListIndex, this->mu32_ElementIndex, this->me_ArrayEditType,
                                        this->mu32_DataSetIndex,
                                        u32_Index, orc_Value);
 
-            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<stw_types::sintn>() << osn_Role);
+            Q_EMIT this->dataChanged(orc_Index, orc_Index, QVector<int32_t>() << os32_Role);
             Q_EMIT this->SigErrorChangePossible(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                                 this->mu32_ElementIndex, this->me_ArrayEditType,
                                                 this->mu32_DataSetIndex);
@@ -423,7 +423,7 @@ Qt::ItemFlags C_SdNdeDpListArrayEditModel::flags(const QModelIndex & orc_Index) 
    \param[in] oru32_Column   Changed column
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListArrayEditModel::HandleDataChange(const uint32 & oru32_Column)
+void C_SdNdeDpListArrayEditModel::HandleDataChange(const uint32_t & oru32_Column)
 {
    Q_EMIT this->dataChanged(this->index(0, oru32_Column), this->index(0, oru32_Column));
 }
@@ -435,17 +435,17 @@ void C_SdNdeDpListArrayEditModel::HandleDataChange(const uint32 & oru32_Column)
    Type of current data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolContent::E_Type C_SdNdeDpListArrayEditModel::GetType(void) const
+C_OscNodeDataPoolContent::E_Type C_SdNdeDpListArrayEditModel::GetType(void) const
 {
-   C_OSCNodeDataPoolContent::E_Type e_Retval = C_OSCNodeDataPoolContent::eUINT8;
-   const C_OSCNodeDataPoolListElement * const pc_OSCElement =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex,
+   C_OscNodeDataPoolContent::E_Type e_Retval = C_OscNodeDataPoolContent::eUINT8;
+   const C_OscNodeDataPoolListElement * const pc_OscElement =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
                                                                  this->mu32_DataPoolIndex,
                                                                  this->mu32_ListIndex,
                                                                  this->mu32_ElementIndex);
-   if (pc_OSCElement != NULL)
+   if (pc_OscElement != NULL)
    {
-      e_Retval = pc_OSCElement->GetType();
+      e_Retval = pc_OscElement->GetType();
    }
    return e_Retval;
 }
@@ -458,9 +458,9 @@ C_OSCNodeDataPoolContent::E_Type C_SdNdeDpListArrayEditModel::GetType(void) cons
    Else NULL
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCNodeDataPoolListElement * C_SdNdeDpListArrayEditModel::GetOSCElement(void) const
+const C_OscNodeDataPoolListElement * C_SdNdeDpListArrayEditModel::GetOscElement(void) const
 {
-   return C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(this->mu32_NodeIndex,
+   return C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mu32_NodeIndex,
                                                                      this->mu32_DataPoolIndex,
                                                                      this->mu32_ListIndex,
                                                                      this->mu32_ElementIndex);

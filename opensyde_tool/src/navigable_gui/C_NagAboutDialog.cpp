@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_NagAboutDialog.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_NagAboutDialog.hpp"
 #include "ui_C_NagAboutDialog.h"
-#include "C_HeHandler.h"
-#include "C_Uti.h"
+#include "C_HeHandler.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,9 +49,9 @@ using namespace stw_opensyde_gui_elements;
                                           When adding more than one component, separate the strings by semicolon
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagAboutDialog::C_NagAboutDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                   const QString oc_ProductName, const QString oc_LogoUrl,
-                                   const stw_types::uint32 ou32_Margin, const QString oc_OptionalComponents) :
+C_NagAboutDialog::C_NagAboutDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                   const QString oc_ProductName, const QString oc_LogoUrl, const uint32_t ou32_Margin,
+                                   const QString oc_OptionalComponents) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_NagAboutDialog),
    mrc_ParentDialog(orc_Parent),
@@ -113,11 +112,11 @@ void C_NagAboutDialog::InitStaticNames(void) const
    if (this->mc_OptionalComponents != "")
    {
       QStringList c_Components = this->mc_OptionalComponents.split(";");
-      sintn sn_Counter;
+      int32_t s32_Counter;
 
-      for (sn_Counter = 0; sn_Counter < c_Components.size(); ++sn_Counter)
+      for (s32_Counter = 0; s32_Counter < c_Components.size(); ++s32_Counter)
       {
-         c_Text += static_cast<QString>("    - %1\n").arg(c_Components[sn_Counter]);
+         c_Text += static_cast<QString>("    - %1\n").arg(c_Components[s32_Counter]);
       }
    }
 
@@ -134,7 +133,7 @@ void C_NagAboutDialog::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagAboutDialog::InitDynamicNames(void) const
 {
-   const QString c_BinaryHash = stw_opensyde_gui_logic::C_Uti::h_GetHashValueAsQString();
+   const QString c_BinaryHash = stw::opensyde_gui_logic::C_Uti::h_GetHashValueAsQtString();
 
    mpc_Ui->pc_LabelValOpenSYDEVersion->setText(C_Uti::h_GetApplicationVersion());
    mpc_Ui->pc_LabelValOpenSYDEHash->setText("MD5-Checksum: " + c_BinaryHash);
@@ -182,8 +181,8 @@ void C_NagAboutDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

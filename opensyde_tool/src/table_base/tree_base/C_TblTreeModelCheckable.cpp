@@ -8,21 +8,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
 
-#include "C_GtGetText.h"
-//#include "C_SdCodeGenerationModel.h"
-#include "C_TblTreeModelCheckable.h"
-#include "C_PuiSdHandler.h"
+#include "C_GtGetText.hpp"
+//#include "C_SdCodeGenerationModel.hpp"
+#include "C_TblTreeModelCheckable.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -80,7 +79,7 @@ C_TblTreeModelCheckable::~C_TblTreeModelCheckable(void)
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_TblTreeModelCheckable::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_TblTreeModelCheckable::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 1;
@@ -90,17 +89,17 @@ sintn C_TblTreeModelCheckable::columnCount(const QModelIndex & orc_Parent) const
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_TblTreeModelCheckable::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_TblTreeModelCheckable::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Return;
 
-   if ((osn_Role == static_cast<sintn>(Qt::CheckStateRole)) &&
+   if ((os32_Role == static_cast<int32_t>(Qt::CheckStateRole)) &&
        (orc_Index.isValid() == true))
    {
       //lint -e{9079}  Result of Qt interface restrictions, set by index function
@@ -109,12 +108,12 @@ QVariant C_TblTreeModelCheckable::data(const QModelIndex & orc_Index, const sint
 
       if ((pc_TreeItem != NULL) && (pc_TreeItem->q_CheckBoxVisible))
       {
-         c_Return = static_cast<sintn>(pc_TreeItem->e_CheckState);
+         c_Return = static_cast<int32_t>(pc_TreeItem->e_CheckState);
       }
    }
    else
    {
-      c_Return = C_TblTreModel::data(orc_Index, osn_Role);
+      c_Return = C_TblTreModel::data(orc_Index, os32_Role);
    }
 
    return c_Return;
@@ -125,18 +124,19 @@ QVariant C_TblTreeModelCheckable::data(const QModelIndex & orc_Index, const sint
 
    \param[in]  orc_Index   Index
    \param[in]  orc_Value   New data
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    true  success
    false failure
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_TblTreeModelCheckable::setData(const QModelIndex & orc_Index, const QVariant & orc_Value, const sintn osn_Role)
+bool C_TblTreeModelCheckable::setData(const QModelIndex & orc_Index, const QVariant & orc_Value,
+                                      const int32_t os32_Role)
 {
    bool q_Return = false;
 
-   if (osn_Role == static_cast<sintn>(Qt::CheckStateRole))
+   if (os32_Role == static_cast<int32_t>(Qt::CheckStateRole))
    {
       if (orc_Index.isValid() == true)
       {
@@ -158,14 +158,14 @@ bool C_TblTreeModelCheckable::setData(const QModelIndex & orc_Index, const QVari
             // or has a parent
             this->m_CheckParent(pc_TreeItem, orc_Index, c_StartIndex);
 
-            Q_EMIT (this->dataChanged(c_StartIndex, c_EndIndex, QVector<stw_types::sintn>() << osn_Role));
+            Q_EMIT (this->dataChanged(c_StartIndex, c_EndIndex, QVector<int32_t>() << os32_Role));
             q_Return = true;
          }
       }
    }
    else
    {
-      q_Return = C_TblTreModel::setData(orc_Index, orc_Value, osn_Role);
+      q_Return = C_TblTreModel::setData(orc_Index, orc_Value, os32_Role);
    }
 
    return q_Return;
@@ -214,8 +214,8 @@ void C_TblTreeModelCheckable::m_CheckChildren(C_TblTreeModelCheckableItem * cons
 {
    if (opc_TreeItem->c_Children.size() > 0)
    {
-      uint32 u32_ChildCounter;
-      const uint32 u32_IndexLastChild = static_cast<uint32>(opc_TreeItem->c_Children.size() - 1UL);
+      uint32_t u32_ChildCounter;
+      const uint32_t u32_IndexLastChild = static_cast<uint32_t>(opc_TreeItem->c_Children.size() - 1UL);
 
       orc_EndIndex = this->index(u32_IndexLastChild, 0, orc_ItemIndex);
 
@@ -260,7 +260,7 @@ void C_TblTreeModelCheckable::m_CheckParent(const C_TblTreeModelCheckableItem * 
       {
          bool q_AllAreChecked = true;
          bool q_AtLeastOneIsChecked = false;
-         uint32 u32_ChildCounter;
+         uint32_t u32_ChildCounter;
          const QModelIndex c_ParentIndex = this->parent(orc_ItemIndex);
          orc_StartIndex = c_ParentIndex;
 

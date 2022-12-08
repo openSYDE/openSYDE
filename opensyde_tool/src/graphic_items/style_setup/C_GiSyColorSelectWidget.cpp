@@ -12,28 +12,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QString>
 #include <QRegExpValidator>
 
-#include "C_GiSyColorSelectWidget.h"
+#include "C_GiSyColorSelectWidget.hpp"
 #include "ui_C_GiSyColorSelectWidget.h"
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_GiSyScreenColorPickingEventFilter.h"
-#include "C_GiSyColorPicker.h"
-#include "C_GiSyColorBrightnessPicker.h"
-#include "C_UtiStyleSheets.h"
-#include "C_UsHandler.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiSyScreenColorPickingEventFilter.hpp"
+#include "C_GiSyColorPicker.hpp"
+#include "C_GiSyColorBrightnessPicker.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_ROUND_BACKGROUND_IMG = ":/images/graphic_items/TransparentRoundBackground.png";
@@ -58,15 +57,15 @@ const QString mc_PATH_ROUND_SMALL_BACKGROUND_IMG = ":/images/graphic_items/Trans
    \param[in]      oc_Color      Color from previous widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSyColorSelectWidget::C_GiSyColorSelectWidget(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                 QColor const oc_Color) :
+C_GiSyColorSelectWidget::C_GiSyColorSelectWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                 const QColor oc_Color) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_GiSyColorSelectWidget),
    mrc_ParentDialog(orc_Parent),
    mc_PreviousColor(oc_Color),
    mq_ColorPickingActive(false),
    mpc_ScreenColorPickingEventFilter(NULL),
-   msn_NextRecentButton(C_UsHandler::h_GetInstance()->GetNextRecentColorButtonNumber())
+   ms32_NextRecentButton(C_UsHandler::h_GetInstance()->GetNextRecentColorButtonNumber())
 {
    const QVector<QColor> c_RecentColors = C_UsHandler::h_GetInstance()->GetRecentColors();
 
@@ -191,8 +190,8 @@ void C_GiSyColorSelectWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    // Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -269,9 +268,9 @@ void C_GiSyColorSelectWidget::m_InitStaticNames(void) const
    this->mrc_ParentDialog.SetSubTitle(C_GtGetText::h_GetText("Selection"));
    this->mpc_Ui->pc_LabelHeadingPreviewStandardColors->setText(C_GtGetText::h_GetText("Standard Colors"));
    this->mpc_Ui->pc_LabelHeadingPreviewRecentColors->setText(C_GtGetText::h_GetText("Recent Colors"));
-   this->mpc_Ui->pc_PushButtonHTML->setText(C_GtGetText::h_GetText("HTML"));
+   this->mpc_Ui->pc_PushButtonHtml->setText(C_GtGetText::h_GetText("HTML"));
    this->mpc_Ui->pc_LabelPipeSymbol->setText(C_GtGetText::h_GetText("|"));
-   this->mpc_Ui->pc_PushButtonRGBA->setText(C_GtGetText::h_GetText("RGBA"));
+   this->mpc_Ui->pc_PushButtonRgba->setText(C_GtGetText::h_GetText("RGBA"));
    this->mpc_Ui->pc_LabelNote->setText(C_GtGetText::h_GetText(""));
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
@@ -390,9 +389,9 @@ void C_GiSyColorSelectWidget::m_InitElements(void) const
    this->m_SetRecentColorToRecentButton(this->mpc_Ui->pc_PushButtonRecentColorNr5, this->mc_RecentColorNr5);
    this->m_SetRecentColorToRecentButton(this->mpc_Ui->pc_PushButtonRecentColorNr6, this->mc_RecentColorNr6);
 
-   this->mpc_Ui->pc_PushButtonHTML->setCursor(Qt::PointingHandCursor);
+   this->mpc_Ui->pc_PushButtonHtml->setCursor(Qt::PointingHandCursor);
    this->mpc_Ui->pc_LabelPipeSymbol->SetForegroundColor(6);
-   this->mpc_Ui->pc_PushButtonRGBA->setCursor(Qt::PointingHandCursor);
+   this->mpc_Ui->pc_PushButtonRgba->setCursor(Qt::PointingHandCursor);
 
    this->mpc_Ui->pc_PushButtonIcon->setFocusPolicy(Qt::NoFocus);
    this->mpc_Ui->pc_PushButtonIcon->setIcon(QIcon(":/images/graphic_items/Icon_pipette.svg"));
@@ -416,7 +415,7 @@ void C_GiSyColorSelectWidget::m_InitElements(void) const
    this->mpc_Ui->pc_LabelNote->SetForegroundColor(6);
 
    this->m_RepaintColorShowerButton();
-   this->m_HMTLClicked();
+   this->m_HtmlClicked();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -425,7 +424,7 @@ void C_GiSyColorSelectWidget::m_InitElements(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorSelectWidget::m_InitStandardColorButtons(void)
 {
-   QVector<stw_opensyde_gui_elements::C_OgePubColor *>::iterator pc_ItButton;
+   QVector<stw::opensyde_gui_elements::C_OgePubColor *>::iterator pc_ItButton;
 
    this->mc_StandardColorButtons.push_back(this->mpc_Ui->pc_PushButtonLightBlue);
    this->mc_StandardColorButtons.push_back(this->mpc_Ui->pc_PushButtonGreen);
@@ -528,13 +527,13 @@ void C_GiSyColorSelectWidget::m_InitConnects(void) const
    connect(this->mpc_Ui->pc_PushButtonRecentColorNr6, &QPushButton::clicked,
            this, &C_GiSyColorSelectWidget::m_RecentColorNr6Clicked);
 
-   connect(this->mpc_Ui->pc_PushButtonHTML, &QPushButton::clicked, this, &C_GiSyColorSelectWidget::m_HMTLClicked);
-   connect(this->mpc_Ui->pc_PushButtonRGBA, &QPushButton::clicked, this, &C_GiSyColorSelectWidget::m_RGBAClicked);
+   connect(this->mpc_Ui->pc_PushButtonHtml, &QPushButton::clicked, this, &C_GiSyColorSelectWidget::m_HtmlClicked);
+   connect(this->mpc_Ui->pc_PushButtonRgba, &QPushButton::clicked, this, &C_GiSyColorSelectWidget::m_RgbaClicked);
    // The screen color picker button
    connect(this->mpc_Ui->pc_PushButtonIcon, &QPushButton::clicked, this, &C_GiSyColorSelectWidget::m_PickScreenColor);
 
    connect(this->mpc_ColorPicker, &C_GiSyColorPicker::SigNewColor,
-           mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SetColorWithHS);
+           mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SetColorWithHs);
    connect(this->mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SigNewHsv,
            this, &C_GiSyColorSelectWidget::m_NewHsv);
    connect(this->mpc_ColorBrightnessPicker, &C_GiSyColorBrightnessPicker::SigNewHsv,
@@ -558,46 +557,46 @@ void C_GiSyColorSelectWidget::m_InitConnects(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorSelectWidget::m_RepaintColorShowerButton(void) const
 {
-   const sintn sn_Red = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().red();
-   const sintn sn_Green = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().green();
-   const sintn sn_Blue = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().blue();
+   const int32_t s32_Red = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().red();
+   const int32_t s32_Green = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().green();
+   const int32_t s32_Blue = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().blue();
 
-   sintn sn_RedDarker = sn_Red - ((sn_Red * 20) / 100);
-   sintn sn_GreenDarker = sn_Green - ((sn_Green * 20) / 100);
-   sintn sn_BlueDarker = sn_Blue - ((sn_Blue * 20) / 100);
+   int32_t s32_RedDarker = s32_Red - ((s32_Red * 20) / 100);
+   int32_t s32_GreenDarker = s32_Green - ((s32_Green * 20) / 100);
+   int32_t s32_BlueDarker = s32_Blue - ((s32_Blue * 20) / 100);
 
-   sn_RedDarker = (sn_RedDarker > 255) ? 255 : sn_RedDarker;
-   sn_GreenDarker = (sn_RedDarker > 255) ? 255 : sn_GreenDarker;
-   sn_BlueDarker = (sn_RedDarker > 255) ? 255 : sn_BlueDarker;
+   s32_RedDarker = (s32_RedDarker > 255) ? 255 : s32_RedDarker;
+   s32_GreenDarker = (s32_RedDarker > 255) ? 255 : s32_GreenDarker;
+   s32_BlueDarker = (s32_RedDarker > 255) ? 255 : s32_BlueDarker;
 
    this->mpc_Ui->pc_PushButtonColorShower->setStyleSheet("\
-                            stw_opensyde_gui--C_GiSyColorShower {\
+                            stw--opensyde_gui--C_GiSyColorShower {\
                                 background-color: " +
                                                          this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().name() + ";\
                                 border-top-color: rgb(" + QString::number(
-                                                            sn_RedDarker) + ", \
+                                                            s32_RedDarker) + ", \
                                                       " + QString::number(
-                                                            sn_GreenDarker) + ", \
+                                                            s32_GreenDarker) + ", \
                                                       " + QString::number(
-                                                            sn_BlueDarker) + ");\
+                                                            s32_BlueDarker) + ");\
                                 border-right-color: rgb(" + QString::number(
-                                                            sn_RedDarker) + ", \
+                                                            s32_RedDarker) + ", \
                                                         " + QString::number(
-                                                            sn_GreenDarker) + ", \
+                                                            s32_GreenDarker) + ", \
                                                         " + QString::number(
-                                                            sn_BlueDarker) + ");\
+                                                            s32_BlueDarker) + ");\
                                 border-bottom-color: rgb(" + QString::number(
-                                                            sn_RedDarker) + ", \
+                                                            s32_RedDarker) + ", \
                                                          " + QString::number(
-                                                            sn_GreenDarker) + ", \
+                                                            s32_GreenDarker) + ", \
                                                          " + QString::number(
-                                                            sn_BlueDarker) + ");\
+                                                            s32_BlueDarker) + ");\
                                 border-left-color: rgb(" + QString::number(
-                                                            sn_RedDarker) + ", \
+                                                            s32_RedDarker) + ", \
                                                        " + QString::number(
-                                                            sn_GreenDarker) + ", \
+                                                            s32_GreenDarker) + ", \
                                                        " + QString::number(
-                                                            sn_BlueDarker) + ");\
+                                                            s32_BlueDarker) + ");\
                             }\
                             ");
    QString c_Style = this->mpc_Ui->pc_PushButtonColorShower->styleSheet();
@@ -632,7 +631,7 @@ void C_GiSyColorSelectWidget::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorSelectWidget::m_StandardColorClicked(const C_OgePubColor * const opc_Button)
 {
-   QVector<stw_opensyde_gui_elements::C_OgePubColor *>::iterator pc_ItButton;
+   QVector<stw::opensyde_gui_elements::C_OgePubColor *>::iterator pc_ItButton;
    for (pc_ItButton = this->mc_StandardColorButtons.begin();
         pc_ItButton != this->mc_StandardColorButtons.end();
         ++pc_ItButton)
@@ -843,44 +842,44 @@ void C_GiSyColorSelectWidget::m_RecentColorNr6Clicked()
 /*! \brief   Slot of html button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_HMTLClicked(void) const
+void C_GiSyColorSelectWidget::m_HtmlClicked(void) const
 {
-   this->mpc_Ui->pc_PushButtonRGBA->setChecked(false);
-   this->mpc_Ui->pc_PushButtonHTML->setChecked(true);
+   this->mpc_Ui->pc_PushButtonRgba->setChecked(false);
+   this->mpc_Ui->pc_PushButtonHtml->setChecked(true);
 
-   this->m_PushButtonHTML();
+   this->m_PushButtonHtml();
    this->mpc_Ui->pc_LineEditColor->setText(this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().name().toUpper());
-   QFont c_FontHTML;
-   c_FontHTML.setBold(true);
-   this->mpc_Ui->pc_PushButtonHTML->setFont(c_FontHTML);
-   QFont c_FontRGBA;
-   c_FontRGBA.setBold(false);
-   this->mpc_Ui->pc_PushButtonRGBA->setFont(c_FontRGBA);
+   QFont c_FontHtml;
+   c_FontHtml.setBold(true);
+   this->mpc_Ui->pc_PushButtonHtml->setFont(c_FontHtml);
+   QFont c_FontRgba;
+   c_FontRgba.setBold(false);
+   this->mpc_Ui->pc_PushButtonRgba->setFont(c_FontRgba);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Slot of rgba button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_RGBAClicked(void) const
+void C_GiSyColorSelectWidget::m_RgbaClicked(void) const
 {
-   this->mpc_Ui->pc_PushButtonHTML->setChecked(false);
-   this->mpc_Ui->pc_PushButtonRGBA->setChecked(true);
+   this->mpc_Ui->pc_PushButtonHtml->setChecked(false);
+   this->mpc_Ui->pc_PushButtonRgba->setChecked(true);
 
-   this->m_PushButtonRGBA();
-   QFont c_FontRGBA;
-   c_FontRGBA.setBold(true);
-   this->mpc_Ui->pc_PushButtonRGBA->setFont(c_FontRGBA);
-   QFont c_FontHTML;
-   c_FontHTML.setBold(false);
-   this->mpc_Ui->pc_PushButtonHTML->setFont(c_FontHTML);
+   this->m_PushButtonRgba();
+   QFont c_FontRgba;
+   c_FontRgba.setBold(true);
+   this->mpc_Ui->pc_PushButtonRgba->setFont(c_FontRgba);
+   QFont c_FontHtml;
+   c_FontHtml.setBold(false);
+   this->mpc_Ui->pc_PushButtonHtml->setFont(c_FontHtml);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Initalize the html button
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_PushButtonHTML(void) const
+void C_GiSyColorSelectWidget::m_PushButtonHtml(void) const
 {
    this->mpc_Ui->pc_LineEditColor->setText(this->mpc_Ui->pc_PushButtonColorShower->CurrentColor().name().toUpper());
    this->mpc_Ui->pc_LineEditColor->setValidator(new QRegExpValidator(QRegExp("#([A-Fa-f0-9]{1,6})"),
@@ -893,7 +892,7 @@ void C_GiSyColorSelectWidget::m_PushButtonHTML(void) const
 /*! \brief   Initalize the rgba button
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_PushButtonRGBA(void) const
+void C_GiSyColorSelectWidget::m_PushButtonRgba(void) const
 {
    const QColor c_HtmlColor = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor();
 
@@ -927,11 +926,11 @@ void C_GiSyColorSelectWidget::m_UpdateLineEditColor(void) const
 {
    const QColor c_CurrentColor = this->mpc_Ui->pc_PushButtonColorShower->CurrentColor();
 
-   if (this->mpc_Ui->pc_PushButtonHTML->font().bold() == true)
+   if (this->mpc_Ui->pc_PushButtonHtml->font().bold() == true)
    {
       this->mpc_Ui->pc_LineEditColor->setText(c_CurrentColor.name().toUpper());
    }
-   else if (this->mpc_Ui->pc_PushButtonRGBA->font().bold() == true)
+   else if (this->mpc_Ui->pc_PushButtonRgba->font().bold() == true)
    {
       this->mpc_Ui->pc_LineEditColor->setText(QString::number(c_CurrentColor.red()) + "/" +
                                               QString::number(c_CurrentColor.green()) + "/" +
@@ -952,7 +951,7 @@ void C_GiSyColorSelectWidget::m_NewColor(void)
 {
    QColor c_NewColorTypeIn;
 
-   if (this->mpc_Ui->pc_PushButtonHTML->font().bold() == true)
+   if (this->mpc_Ui->pc_PushButtonHtml->font().bold() == true)
    {
       if (this->mpc_Ui->pc_LineEditColor->text().isEmpty())
       {
@@ -964,7 +963,7 @@ void C_GiSyColorSelectWidget::m_NewColor(void)
       }
       c_NewColorTypeIn = static_cast<QColor>(this->mpc_Ui->pc_LineEditColor->text());
    }
-   else if (this->mpc_Ui->pc_PushButtonRGBA->font().bold() == true)
+   else if (this->mpc_Ui->pc_PushButtonRgba->font().bold() == true)
    {
       const QStringList c_StringColorList = this->mpc_Ui->pc_LineEditColor->text().split("/");
       c_NewColorTypeIn = QColor(c_StringColorList.at(0).toInt(), c_StringColorList.at(1).toInt(),
@@ -985,7 +984,7 @@ void C_GiSyColorSelectWidget::m_NewColor(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSyColorSelectWidget::m_AutomaticallyFillOutLineEditColor(void)
 {
-   if ((this->mpc_Ui->pc_PushButtonHTML->font().bold() == true) &&
+   if ((this->mpc_Ui->pc_PushButtonHtml->font().bold() == true) &&
        (this->mpc_Ui->pc_LineEditColor->text().length() < 7))
    {
       const QStringList c_StringColorList = this->mpc_Ui->pc_LineEditColor->text().split("");
@@ -1043,61 +1042,61 @@ void C_GiSyColorSelectWidget::m_AutomaticallyFillOutLineEditColor(void)
 void C_GiSyColorSelectWidget::m_SetRecentColorToRecentButton(C_OgePubColor * const opc_Button,
                                                              const QColor oc_Color) const
 {
-   const sintn sn_Red = oc_Color.red();
-   const sintn sn_Green = oc_Color.green();
-   const sintn sn_Blue = oc_Color.blue();
+   const int32_t s32_Red = oc_Color.red();
+   const int32_t s32_Green = oc_Color.green();
+   const int32_t s32_Blue = oc_Color.blue();
 
-   sintn sn_RedDark = sn_Red - ((sn_Red * 40) / 100);
-   sintn sn_GreenDark = sn_Green - ((sn_Green * 40) / 100);
-   sintn sn_BlueDark = sn_Blue - ((sn_Blue * 40) / 100);
+   int32_t s32_RedDark = s32_Red - ((s32_Red * 40) / 100);
+   int32_t s32_GreenDark = s32_Green - ((s32_Green * 40) / 100);
+   int32_t s32_BlueDark = s32_Blue - ((s32_Blue * 40) / 100);
 
-   sintn sn_RedDarker = sn_Red - ((sn_Red * 20) / 100);
-   sintn sn_GreenDarker = sn_Green - ((sn_Green * 20) / 100);
-   sintn sn_BlueDarker = sn_Blue - ((sn_Blue * 20) / 100);
+   int32_t s32_RedDarker = s32_Red - ((s32_Red * 20) / 100);
+   int32_t s32_GreenDarker = s32_Green - ((s32_Green * 20) / 100);
+   int32_t s32_BlueDarker = s32_Blue - ((s32_Blue * 20) / 100);
 
-   sintn sn_RedLightDark = sn_Red - ((sn_Red * 15) / 100);
-   sintn sn_GreenLightDark = sn_Green - ((sn_Green * 15) / 100);
-   sintn sn_BlueLightDark = sn_Blue - ((sn_Blue * 15) / 100);
+   int32_t s32_RedLightDark = s32_Red - ((s32_Red * 15) / 100);
+   int32_t s32_GreenLightDark = s32_Green - ((s32_Green * 15) / 100);
+   int32_t s32_BlueLightDark = s32_Blue - ((s32_Blue * 15) / 100);
 
-   sn_RedDark = (sn_RedDark > 255) ? 255 : sn_RedDark;
-   sn_GreenDark = (sn_GreenDark > 255) ? 255 : sn_GreenDark;
-   sn_BlueDark = (sn_BlueDark > 255) ? 255 : sn_BlueDark;
-   sn_RedDarker = (sn_RedDarker > 255) ? 255 : sn_RedDarker;
-   sn_GreenDarker = (sn_RedDarker > 255) ? 255 : sn_GreenDarker;
-   sn_BlueDarker = (sn_RedDarker > 255) ? 255 : sn_BlueDarker;
-   sn_RedLightDark = (sn_RedDarker > 255) ? 255 : sn_RedLightDark;
-   sn_GreenLightDark = (sn_RedDarker > 255) ? 255 : sn_GreenLightDark;
-   sn_BlueLightDark = (sn_RedDarker > 255) ? 255 : sn_BlueLightDark;
+   s32_RedDark = (s32_RedDark > 255) ? 255 : s32_RedDark;
+   s32_GreenDark = (s32_GreenDark > 255) ? 255 : s32_GreenDark;
+   s32_BlueDark = (s32_BlueDark > 255) ? 255 : s32_BlueDark;
+   s32_RedDarker = (s32_RedDarker > 255) ? 255 : s32_RedDarker;
+   s32_GreenDarker = (s32_RedDarker > 255) ? 255 : s32_GreenDarker;
+   s32_BlueDarker = (s32_RedDarker > 255) ? 255 : s32_BlueDarker;
+   s32_RedLightDark = (s32_RedDarker > 255) ? 255 : s32_RedLightDark;
+   s32_GreenLightDark = (s32_RedDarker > 255) ? 255 : s32_GreenLightDark;
+   s32_BlueLightDark = (s32_RedDarker > 255) ? 255 : s32_BlueLightDark;
 
    opc_Button->setStyleSheet(
-      "stw_opensyde_gui_elements--C_OgePubColor {"
+      "stw--opensyde_gui_elements--C_OgePubColor {"
       "background-color: " + oc_Color.name() + ";"
       "border-top-color: rgb(" +
-      QString::number(sn_RedDark) + ", " +
-      QString::number(sn_GreenDark) + ", " +
-      QString::number(sn_BlueDark) + ");"
+      QString::number(s32_RedDark) + ", " +
+      QString::number(s32_GreenDark) + ", " +
+      QString::number(s32_BlueDark) + ");"
       "border-right-color: rgb(" +
-      QString::number(sn_RedDarker) + ", " +
-      QString::number(sn_GreenDarker) + ", " +
-      QString::number(sn_BlueDarker) + ");"
+      QString::number(s32_RedDarker) + ", " +
+      QString::number(s32_GreenDarker) + ", " +
+      QString::number(s32_BlueDarker) + ");"
       "border-bottom-color: rgb(" +
-      QString::number(sn_RedLightDark) + ", " +
-      QString::number(sn_GreenLightDark) + ", " +
-      QString::number(sn_BlueLightDark) + ");"
+      QString::number(s32_RedLightDark) + ", " +
+      QString::number(s32_GreenLightDark) + ", " +
+      QString::number(s32_BlueLightDark) + ");"
       "border-left-color: rgb(" +
-      QString::number(sn_RedDarker) + ", " +
-      QString::number(sn_GreenDarker) + ", " +
-      QString::number(sn_BlueDarker) + ");"
+      QString::number(s32_RedDarker) + ", " +
+      QString::number(s32_GreenDarker) + ", " +
+      QString::number(s32_BlueDarker) + ");"
       "}");
    QString c_Style = opc_Button->styleSheet();
    C_UtiStyleSheets::h_SetStyleSheetBackgroundColor(c_Style, oc_Color);
    opc_Button->setStyleSheet(c_Style);
 
    // choose which button gets the current color
-   this->msn_NextRecentButton = this->msn_NextRecentButton + 1;
-   if (this->msn_NextRecentButton == 7)
+   this->ms32_NextRecentButton = this->ms32_NextRecentButton + 1;
+   if (this->ms32_NextRecentButton == 7)
    {
-      this->msn_NextRecentButton = 1;
+      this->ms32_NextRecentButton = 1;
    }
    //lint -e{1746} Necessary because needs default parameter and is not recognized as const
 }
@@ -1121,7 +1120,7 @@ void C_GiSyColorSelectWidget::m_AddRecentColors(void)
    }
    else
    {
-      switch (this->msn_NextRecentButton)
+      switch (this->ms32_NextRecentButton)
       {
       case 1:
          this->m_SetRecentColorToRecentButton(this->mpc_Ui->pc_PushButtonRecentColorNr1,
@@ -1165,22 +1164,22 @@ void C_GiSyColorSelectWidget::m_AddRecentColors(void)
    c_RecentColorsVector.push_back(this->mc_RecentColorNr5);
    c_RecentColorsVector.push_back(this->mc_RecentColorNr6);
    C_UsHandler::h_GetInstance()->SetRecentColors(c_RecentColorsVector);
-   C_UsHandler::h_GetInstance()->SetNextRecentColorButtonNumber(this->msn_NextRecentButton);
+   C_UsHandler::h_GetInstance()->SetNextRecentColorButtonNumber(this->ms32_NextRecentButton);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets all widgets to display h, s, v
 
-   \param[in]  osn_Hue     Hue
-   \param[in]  osn_Sat     Saturation
-   \param[in]  osn_Value   Value
+   \param[in]  os32_Hue     Hue
+   \param[in]  os32_Sat     Saturation
+   \param[in]  os32_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_NewHsv(const sintn osn_Hue, const sintn osn_Sat, const sintn osn_Value)
+void C_GiSyColorSelectWidget::m_NewHsv(const int32_t os32_Hue, const int32_t os32_Sat, const int32_t os32_Value)
 {
-   this->mpc_Ui->pc_PushButtonColorShower->SetHsv(osn_Hue, osn_Sat, osn_Value);
-   this->mpc_ColorPicker->SetColor(osn_Hue, osn_Sat);
-   this->mpc_ColorBrightnessPicker->SetColorWithHSV(osn_Hue, osn_Sat, osn_Value);
+   this->mpc_Ui->pc_PushButtonColorShower->SetHsv(os32_Hue, os32_Sat, os32_Value);
+   this->mpc_ColorPicker->SetColor(os32_Hue, os32_Sat);
+   this->mpc_ColorBrightnessPicker->SetColorWithHsv(os32_Hue, os32_Sat, os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1227,17 +1226,17 @@ void C_GiSyColorSelectWidget::m_UpdatePositionWhileScreenColorPicking(void)
 #ifndef QT_NO_CURSOR
    static QPoint hc_LastGlobalPosition;
    const QPoint c_NewGlobalPosition = QCursor::pos();
-   if (hc_LastGlobalPosition == c_NewGlobalPosition)
+   if (hc_LastGlobalPosition != c_NewGlobalPosition)
    {
-      return;
-   }
-   hc_LastGlobalPosition = c_NewGlobalPosition;
+      hc_LastGlobalPosition = c_NewGlobalPosition;
 
-   if (!this->rect().contains(this->mapFromGlobal(c_NewGlobalPosition))) // Inside the dialog mouse tracking works,
-                                                                         // handleColorPickingMouseMove will be called
-   {
-      this->m_UpdateColorPicking(c_NewGlobalPosition);
-      mc_DummyTransparentWindow.setPosition(c_NewGlobalPosition);
+      if (!this->rect().contains(this->mapFromGlobal(c_NewGlobalPosition))) // Inside the dialog mouse tracking works,
+                                                                            // handleColorPickingMouseMove will be
+                                                                            // called
+      {
+         this->m_UpdateColorPicking(c_NewGlobalPosition);
+         mc_DummyTransparentWindow.setPosition(c_NewGlobalPosition);
+      }
    }
 #endif // ! QT_NO_CURSOR
 }
@@ -1259,18 +1258,18 @@ void C_GiSyColorSelectWidget::m_UpdateColorPicking(const QPoint & orc_GlobalPosi
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets all widgets to display rgb
 
-   \param[in]  oun_Rgb  RGB color of type QRgb that is equivalent to an unsigned int
+   \param[in]  ou32_Rgb  RGB color of type QRgb that is equivalent to an unsigned int
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const uintn oun_Rgb)
+void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const uint32_t ou32_Rgb)
 {
-   const QColor c_RgbColor = this->mpc_Ui->pc_PushButtonColorShower->SetRgb(oun_Rgb);
+   const QColor c_RgbColor = this->mpc_Ui->pc_PushButtonColorShower->SetRgb(ou32_Rgb);
 
-   if (this->mpc_Ui->pc_PushButtonHTML->font().bold() == true)
+   if (this->mpc_Ui->pc_PushButtonHtml->font().bold() == true)
    {
       this->mpc_Ui->pc_LineEditColor->setText(c_RgbColor.name().toUpper());
    }
-   else if (this->mpc_Ui->pc_PushButtonRGBA->font().bold() == true)
+   else if (this->mpc_Ui->pc_PushButtonRgba->font().bold() == true)
    {
       this->mpc_Ui->pc_LineEditColor->setText(QString::number(c_RgbColor.red()) + "/" +
                                               QString::number(c_RgbColor.green()) + "/" +
@@ -1281,7 +1280,7 @@ void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const uintn oun_Rgb)
    {
       // nothing to do
    }
-   this->m_NewColorTypedIn(oun_Rgb);
+   this->m_NewColorTypedIn(ou32_Rgb);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1295,11 +1294,11 @@ void C_GiSyColorSelectWidget::m_SetCurrentRgbColor(const uintn oun_Rgb)
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyColorSelectWidget::m_GrabScreenColor(const QPoint & orc_Position) const
 {
-   const QDesktopWidget * const p_Desktop = QApplication::desktop();
-   const QPixmap c_Pixmap = QGuiApplication::screens().at(p_Desktop->screenNumber())->grabWindow(p_Desktop->winId(),
-                                                                                                 orc_Position.x(),
-                                                                                                 orc_Position.y(),
-                                                                                                 1, 1);
+   const QDesktopWidget * const pc_Desktop = QApplication::desktop();
+   const QPixmap c_Pixmap = QGuiApplication::screens().at(pc_Desktop->screenNumber())->grabWindow(pc_Desktop->winId(),
+                                                                                                  orc_Position.x(),
+                                                                                                  orc_Position.y(),
+                                                                                                  1, 1);
 
    return c_Pixmap.toImage().pixel(0, 0);
 }
@@ -1307,23 +1306,23 @@ QColor C_GiSyColorSelectWidget::m_GrabScreenColor(const QPoint & orc_Position) c
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sets all widgets except cs to display rgb
 
-   \param[in]  oun_Rgb  RGB color of type QRgb that is equivalent to an unsigned int
+   \param[in]  ou32_Rgb  RGB color of type QRgb that is equivalent to an unsigned int
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorSelectWidget::m_NewColorTypedIn(const uintn oun_Rgb)
+void C_GiSyColorSelectWidget::m_NewColorTypedIn(const uint32_t ou32_Rgb)
 {
-   sintn sn_Hue;
-   sintn sn_Sat;
-   sintn sn_Value;
+   int32_t s32_Hue;
+   int32_t s32_Sat;
+   int32_t s32_Value;
 
    // Convert rgb to hsv and set it to the color
    QColor c_Color;
 
-   c_Color.setRgb(oun_Rgb);
-   c_Color.getHsv(&sn_Hue, &sn_Sat, &sn_Value);
+   c_Color.setRgb(ou32_Rgb);
+   c_Color.getHsv(&s32_Hue, &s32_Sat, &s32_Value);
 
-   this->mpc_ColorPicker->SetColor(sn_Hue, sn_Sat);
-   this->mpc_ColorBrightnessPicker->SetColorWithHSV(sn_Hue, sn_Sat, sn_Value);
+   this->mpc_ColorPicker->SetColor(s32_Hue, s32_Sat);
+   this->mpc_ColorBrightnessPicker->SetColorWithHsv(s32_Hue, s32_Sat, s32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

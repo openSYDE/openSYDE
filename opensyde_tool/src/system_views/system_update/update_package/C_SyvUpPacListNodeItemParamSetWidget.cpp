@@ -8,29 +8,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
-#include "C_OgePopUpDialog.h"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OgePopUpDialog.hpp"
 
-#include "C_OgeWiCustomMessage.h"
-#include "C_SyvUpPacListNodeItemParamSetWidget.h"
-#include "C_SyvUpPacParamSetFileInfoPopUp.h"
-#include "C_SyvUpPacParamSetFileAddPopUp.h"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SyvUpPacListNodeItemParamSetWidget.hpp"
+#include "C_SyvUpPacParamSetFileInfoPopUp.hpp"
+#include "C_SyvUpPacParamSetFileAddPopUp.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,8 +56,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacListNodeItemParamSetWidget::C_SyvUpPacListNodeItemParamSetWidget(const uint32 ou32_ViewIndex,
-                                                                           const uint32 ou32_NodeIndex,
+C_SyvUpPacListNodeItemParamSetWidget::C_SyvUpPacListNodeItemParamSetWidget(const uint32_t ou32_ViewIndex,
+                                                                           const uint32_t ou32_NodeIndex,
                                                                            const QString & orc_DeviceName,
                                                                            const bool oq_FileBased,
                                                                            const bool oq_StwFlashloader,
@@ -75,7 +74,7 @@ C_SyvUpPacListNodeItemParamSetWidget::C_SyvUpPacListNodeItemParamSetWidget(const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListNodeItemParamSetWidget::SetParamInfo(
-   const stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamInfo)
+   const stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamInfo)
 {
    this->mc_ParamsetInfo = orc_ParamInfo;
    this->SetAppFile(this->mc_ParamsetInfo.GetPath(), (orc_ParamInfo.GetPath() == this->GetDefaultFilePath()));
@@ -88,7 +87,7 @@ void C_SyvUpPacListNodeItemParamSetWidget::SetParamInfo(
    Paramterset information
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo C_SyvUpPacListNodeItemParamSetWidget::GetParamInfo(void) const
+stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo C_SyvUpPacListNodeItemParamSetWidget::GetParamInfo(void) const
 {
    return mc_ParamsetInfo;
 }
@@ -100,7 +99,7 @@ stw_opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo C_SyvUpPacListNodeItemParamSe
    Type of return values, e.g. STW error codes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacListNodeItemParamSetWidget::GetType(void) const
+uint32_t C_SyvUpPacListNodeItemParamSetWidget::GetType(void) const
 {
    return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET;
 }
@@ -115,7 +114,7 @@ void C_SyvUpPacListNodeItemParamSetWidget::ViewFileInfo(void)
 {
    if (this->GetAppFilePath().compare("") != 0)
    {
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpPacParamSetFileInfoPopUp * const pc_InfoDialog =
          new C_SyvUpPacParamSetFileInfoPopUp(*c_New,
                                              this->GetAppAbsoluteFilePath(),
@@ -126,7 +125,7 @@ void C_SyvUpPacListNodeItemParamSetWidget::ViewFileInfo(void)
       //Resize
       c_New->SetSize(QSize(1000, 761));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          //No confirmation
       }
@@ -176,13 +175,13 @@ void C_SyvUpPacListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_File
        (orq_FileExists == true))
    {
       //Special handling required
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpPacParamSetFileAddPopUp * const pc_InfoDialog =
          new C_SyvUpPacParamSetFileAddPopUp(*c_New, this->GetAppAbsoluteFilePath(), this->GetAppFilePath(),
                                             this->mu32_NodeIndex);
 
       //Read file info
-      const sint32 s32_ReadResult = pc_InfoDialog->ReadFile();
+      const int32_t s32_ReadResult = pc_InfoDialog->ReadFile();
       if (s32_ReadResult == C_NO_ERR)
       {
          const C_PuiSvNodeUpdateParamInfo & rc_ParamSetInfo = pc_InfoDialog->GetParamInfo();
@@ -192,7 +191,7 @@ void C_SyvUpPacListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_File
             //Resize
             c_New->SetSize(QSize(1000, 761));
 
-            if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+            if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
             {
                //User accepted changed file
                this->SetParamInfo(rc_ParamSetInfo);

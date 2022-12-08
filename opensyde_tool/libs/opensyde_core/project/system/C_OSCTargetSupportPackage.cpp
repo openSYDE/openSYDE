@@ -8,13 +8,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCTargetSupportPackage.h"
+#include "C_OscTargetSupportPackage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -34,13 +34,13 @@ using namespace stw_opensyde_core;
    Initialize all class elements with default values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCTSPApplication::C_OSCTSPApplication(void) :
+C_OscTspApplication::C_OscTspApplication(void) :
    q_IsProgrammable(true),
    u8_ProcessId(0),
    c_Name(""),
    c_Comment(""),
    c_IdeCall(""),
-   q_IsStandardSydeCoderC(true),
+   q_IsStandardSydeCoderCe(true),
    c_CodeGeneratorPath(""),
    c_ProjectFolder(""),
    c_GeneratePath(""),
@@ -56,7 +56,7 @@ C_OSCTSPApplication::C_OSCTSPApplication(void) :
    Initialize all class elements with default values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
+C_OscTargetSupportPackage::C_OscTargetSupportPackage(void) :
    c_DeviceName(""),
    c_Comment(""),
    u8_ApplicationIndex(0U),
@@ -77,7 +77,7 @@ C_OSCTargetSupportPackage::C_OSCTargetSupportPackage(void) :
    Sets all strings to "" and other values to default.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCTargetSupportPackage::Clear(void)
+void C_OscTargetSupportPackage::Clear(void)
 {
    c_DeviceName = "";
    c_Comment = "";

@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_PuiBsTemporaryDataID.h"
+#include "stwtypes.hpp"
+#include "C_PuiBsTemporaryDataId.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +37,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in]  oru32_Index    Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsTemporaryDataID::C_PuiBsTemporaryDataID(const sint32 & ors32_Type, const stw_types::uint32 & oru32_Index) :
+C_PuiBsTemporaryDataId::C_PuiBsTemporaryDataId(const int32_t & ors32_Type, const uint32_t & oru32_Index) :
    s32_Type(ors32_Type),
    u32_Index(oru32_Index)
 {
@@ -53,7 +52,7 @@ C_PuiBsTemporaryDataID::C_PuiBsTemporaryDataID(const sint32 & ors32_Type, const 
    Comparison result
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiBsTemporaryDataID::operator <(const C_PuiBsTemporaryDataID & orc_Other) const
+bool C_PuiBsTemporaryDataId::operator <(const C_PuiBsTemporaryDataId & orc_Other) const
 {
    bool q_Retval;
 

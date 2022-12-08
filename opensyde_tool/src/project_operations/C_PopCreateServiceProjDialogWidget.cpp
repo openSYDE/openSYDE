@@ -12,41 +12,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PopCreateServiceProjDialogWidget.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PopCreateServiceProjDialogWidget.hpp"
 #include "ui_C_PopCreateServiceProjDialogWidget.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiProject.h"
-#include "C_OgeWiCustomMessage.h"
-#include "TGLFile.h"
-#include "C_OSCUtils.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "TglFile.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiUtil.hpp"
 
-#include "CSCLString.h"
-#include "CSCLIniFile.h"
-#include "C_UsFiler.h"
-#include "C_UsHandler.h"
+#include "C_SclString.hpp"
+#include "C_SclIniFile.hpp"
+#include "C_UsFiler.hpp"
+#include "C_UsHandler.hpp"
 
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
-#include "C_PuiUtil.h"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiUtil.hpp"
 
-#include "C_OgeTreeViewCheckable.h"
+#include "C_OgeTreeViewCheckable.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -69,7 +68,7 @@ using namespace stw_tgl;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PopCreateServiceProjDialogWidget::C_PopCreateServiceProjDialogWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_PopCreateServiceProjDialogWidget),
    mrc_ParentDialog(orc_Parent)
@@ -172,7 +171,7 @@ void C_PopCreateServiceProjDialogWidget::InitStaticNames(void) const
  *  \param[in]    orc_ViewIndices   View indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopCreateServiceProjDialogWidget::PrepareDialog(const std::vector<stw_types::uint32> & orc_ViewIndices)
+void C_PopCreateServiceProjDialogWidget::PrepareDialog(const std::vector<uint32_t> & orc_ViewIndices)
 {
    this->mpc_Ui->pc_TreeView->Init(&this->mc_Model, orc_ViewIndices);
 }
@@ -184,8 +183,8 @@ void C_PopCreateServiceProjDialogWidget::PrepareDialog(const std::vector<stw_typ
    \param[out]      orc_ChildIndicesPerView   Vector of vectors of childs per view
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopCreateServiceProjDialogWidget::GetCheckedItems(std::vector<uint32> & orc_ViewIndices,
-                                                         std::vector<std::vector<uint32> > & orc_ChildIndicesPerView)
+void C_PopCreateServiceProjDialogWidget::GetCheckedItems(std::vector<uint32_t> & orc_ViewIndices,
+                                                         std::vector<std::vector<uint32_t> > & orc_ChildIndicesPerView)
 const
 {
    this->mpc_Ui->pc_TreeView->GetCheckedItems(&this->mc_Model, orc_ViewIndices, orc_ChildIndicesPerView);
@@ -240,9 +239,9 @@ void C_PopCreateServiceProjDialogWidget::SetSpPath(const QString & orc_SpPath) c
    \retval   C_COM      Bus sorting failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopCreateServiceProjDialogWidget::SaveCurrentProjectForServiceMode(void)
+int32_t C_PopCreateServiceProjDialogWidget::SaveCurrentProjectForServiceMode(void)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    std::vector<std::array<bool, 3> > c_ViewConfigs = this->m_CollectViewConfig();
    const QString c_Path = C_PuiUtil::h_GetAbsolutePathFromProject(this->GetSpPath());
@@ -271,8 +270,8 @@ void C_PopCreateServiceProjDialogWidget::keyPressEvent(QKeyEvent * const opc_Key
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -299,9 +298,9 @@ void C_PopCreateServiceProjDialogWidget::keyPressEvent(QKeyEvent * const opc_Key
    \retval   C_RDWR   Invalid path (e.g. contains invalid characters)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopCreateServiceProjDialogWidget::m_CheckPath(void)
+int32_t C_PopCreateServiceProjDialogWidget::m_CheckPath(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    const QFileInfo c_FileInfo(this->GetSpPath());
 
    if (this->GetSpPath() == "")
@@ -312,7 +311,7 @@ sint32 C_PopCreateServiceProjDialogWidget::m_CheckPath(void)
    {
       s32_Return = C_RANGE;
    }
-   else if (C_OSCUtils::h_CheckValidFilePath(this->GetSpPath().toStdString().c_str()) == false)
+   else if (C_OscUtils::h_CheckValidFilePath(this->GetSpPath().toStdString().c_str()) == false)
    {
       s32_Return = C_RD_WR;
    }
@@ -330,7 +329,7 @@ sint32 C_PopCreateServiceProjDialogWidget::m_CheckPath(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopCreateServiceProjDialogWidget::m_OkClicked(void)
 {
-   const sint32 s32_Result = this->m_CheckPath();
+   const int32_t s32_Result = this->m_CheckPath();
    bool q_Continue = true;
 
    if (s32_Result != C_NO_ERR)
@@ -355,7 +354,7 @@ void C_PopCreateServiceProjDialogWidget::m_OkClicked(void)
       default:
          break;
       }
-      c_ErrorPath.SetOKButtonText(C_GtGetText::h_GetText("OK"));
+      c_ErrorPath.SetOkButtonText(C_GtGetText::h_GetText("OK"));
       c_ErrorPath.SetCustomMinHeight(180, 180);
       c_ErrorPath.exec();
 
@@ -371,7 +370,7 @@ void C_PopCreateServiceProjDialogWidget::m_OkClicked(void)
          c_Message.SetHeading(C_GtGetText::h_GetText("Create service project"));
          c_Message.SetDescription(C_GtGetText::h_GetText(
                                      "No password specified. The project won't be encrypted. Do you want to continue?"));
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
          c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
          c_Message.SetCustomMinHeight(180, 180);
          if (c_Message.Execute() != C_OgeWiCustomMessage::eOK)
@@ -417,7 +416,7 @@ void C_PopCreateServiceProjDialogWidget::m_SpPathClicked()
 
    c_Dialog.setDefaultSuffix("syde_sp");
 
-   if (c_Dialog.exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Dialog.exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       QString c_FilePath;
       c_FilePath = c_Dialog.selectedFiles().at(0); // no multi select
@@ -465,9 +464,9 @@ void C_PopCreateServiceProjDialogWidget::m_HidePassword(void)
 /*! \brief  Enables/disables create button based on selection
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopCreateServiceProjDialogWidget::m_UpdateSelection(const stw_types::sintn osn_SelectionCount) const
+void C_PopCreateServiceProjDialogWidget::m_UpdateSelection(const int32_t os32_SelectionCount) const
 {
-   if (osn_SelectionCount > 0)
+   if (os32_SelectionCount > 0)
    {
       this->mpc_Ui->pc_PushButtonOk->setDisabled(false);
    }
@@ -487,16 +486,16 @@ std::vector<std::array<bool, 3> > C_PopCreateServiceProjDialogWidget::m_CollectV
 {
    std::vector<std::array<bool, 3> > c_ViewConfig;
 
-   std::vector<uint32> c_ViewIndices;
-   std::vector<std::vector<uint32> > c_ChildIndicesPerView;
+   std::vector<uint32_t> c_ViewIndices;
+   std::vector<std::vector<uint32_t> > c_ChildIndicesPerView;
 
    this->GetCheckedItems(c_ViewIndices, c_ChildIndicesPerView);
 
-   for (uint32 u32_ItView = 0; u32_ItView < c_ChildIndicesPerView.size(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < c_ChildIndicesPerView.size(); ++u32_ItView)
    {
       std::array<bool, 3> c_Temp;
       bool q_Temp;
-      for (uint32 u32_ItChild = 0; u32_ItChild < c_ChildIndicesPerView[u32_ItView].size(); ++u32_ItChild)
+      for (uint32_t u32_ItChild = 0; u32_ItChild < c_ChildIndicesPerView[u32_ItView].size(); ++u32_ItChild)
       {
          if (c_ChildIndicesPerView[u32_ItView][u32_ItChild] == 1)
          {
@@ -524,11 +523,11 @@ void C_PopCreateServiceProjDialogWidget::m_SavePermissionsToUserSettings(std::ve
                                                                                                 3> > & orc_ViewConfigs)
 {
    // get views
-   const uint32 u32_ViewCnt = C_PuiSvHandler::h_GetInstance()->GetViewCount();
+   const uint32_t u32_ViewCnt = C_PuiSvHandler::h_GetInstance()->GetViewCount();
 
    if (orc_ViewConfigs.size() == u32_ViewCnt)
    {
-      for (uint32 u32_ItView = 0; u32_ItView < u32_ViewCnt; ++u32_ItView)
+      for (uint32_t u32_ItView = 0; u32_ItView < u32_ViewCnt; ++u32_ItView)
       {
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(u32_ItView);
          if (pc_View != NULL)

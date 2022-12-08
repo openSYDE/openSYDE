@@ -11,42 +11,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QProcess>
 
-#include "TGLUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSvHandler.h"
-#include "C_NagNaviBarWidget.h"
-#include "C_GtGetText.h"
+#include "TglUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_NagNaviBarWidget.hpp"
+#include "C_GtGetText.hpp"
 #include "ui_C_NagNaviBarWidget.h"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
-#include "C_PuiSdUtil.h"
-#include "C_Uti.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_Uti.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-static const sintn msn_MAXIMIZED_WIDTH = 290;
-static const sintn msn_MINIMIZED_WIDTH = 36; //36 = min size of minimize/maximize icon
+static const int32_t ms32_MAXIMIZED_WIDTH = 290;
+static const int32_t ms32_MINIMIZED_WIDTH = 36; //36 = min size of minimize/maximize icon
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -101,8 +100,8 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_TreeViewBuses->SetTypeNode(false);
 
    // configure animation
-   this->mc_TimerAnimation.setInterval(msn_TIMER_INTERVAL);
-   this->msn_StepSize = (msn_MAXIMIZED_WIDTH - msn_MINIMIZED_WIDTH) / msn_ANIMATION_STEPS;
+   this->mc_TimerAnimation.setInterval(ms32_TIMER_INTERVAL);
+   this->ms32_StepSize = (ms32_MAXIMIZED_WIDTH - ms32_MINIMIZED_WIDTH) / ms32_ANIMATION_STEPS;
 
    //Remove focus from topology button (otherwise escape does not get forwarded for whatever reason!)
    this->mpc_Ui->pc_PushButtonTopology->setFocusPolicy(Qt::NoFocus);
@@ -140,8 +139,8 @@ C_NagNaviBarWidget::C_NagNaviBarWidget(QWidget * const opc_Parent) :
 
    // view action
    connect(this->mpc_Ui->pc_PushButtonAddSysView, &QPushButton::clicked, this, &C_NagNaviBarWidget::m_AddViewClicked);
-   connect(this->mpc_Ui->pc_WidgetTabSc, &C_OgeWiNavigationTab::released, this, &C_NagNaviBarWidget::m_TabScCLicked);
-   connect(this->mpc_Ui->pc_WidgetTabSd, &C_OgeWiNavigationTab::released, this, &C_NagNaviBarWidget::m_TabSdCLicked);
+   connect(this->mpc_Ui->pc_WidgetTabSc, &C_OgeWiNavigationTab::released, this, &C_NagNaviBarWidget::m_TabScClicked);
+   connect(this->mpc_Ui->pc_WidgetTabSd, &C_OgeWiNavigationTab::released, this, &C_NagNaviBarWidget::m_TabSdClicked);
 
    // Tree for topology and its nodes and busses
    connect(this->mpc_Ui->pc_PushButtonTopology, &C_OgePubNavigation::clicked, this,
@@ -219,7 +218,7 @@ void C_NagNaviBarWidget::UpdateNames(void) const
    \param[in]  ou32_ViewIndex    Index to specify which view changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::UpdateViewIcons(const uint32 ou32_ViewIndex) const
+void C_NagNaviBarWidget::UpdateViewIcons(const uint32_t ou32_ViewIndex) const
 {
    m_UpdateViewIcons(true, ou32_ViewIndex);
 }
@@ -260,7 +259,7 @@ void C_NagNaviBarWidget::UpdateAllScreenIcons(const bool oq_CheckAll) const
    \param[in]  ou32_Index     Optional Index number (for example for node or bus)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMode, const uint32 ou32_Index)
+void C_NagNaviBarWidget::SetMode(const int32_t os32_Mode, const int32_t os32_SubMode, const uint32_t ou32_Index)
 {
    //remember mode
    if (os32_Mode != ms32_MODE_NONE)
@@ -309,10 +308,10 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
          C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonTopology, "Active", true);
          break;
       case ms32_SUBMODE_SYSDEF_NODEEDIT:
-         this->mpc_Ui->pc_TreeViewNodes->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
+         this->mpc_Ui->pc_TreeViewNodes->SetSelectedIndexAndScroll(static_cast<int32_t>(this->mu32_ActiveIndex));
          break;
       case ms32_SUBMODE_SYSDEF_BUSEDIT:
-         this->mpc_Ui->pc_TreeViewBuses->SetSelectedIndexAndScroll(static_cast<sint32>(this->mu32_ActiveIndex));
+         this->mpc_Ui->pc_TreeViewBuses->SetSelectedIndexAndScroll(static_cast<int32_t>(this->mu32_ActiveIndex));
          break;
       default:
          break;
@@ -348,8 +347,8 @@ void C_NagNaviBarWidget::SetMode(const sint32 os32_Mode, const sint32 os32_SubMo
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175}  //intentionally no functionality in deactivated implementation
-void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const bool oq_All, const sint32 os32_Mode,
-                                                const sint32 os32_SubMode, const uint32 ou32_Index) const
+void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const bool oq_All, const int32_t os32_Mode,
+                                                const int32_t os32_SubMode, const uint32_t ou32_Index) const
 {
    //Currently deactivated
    Q_UNUSED(oq_Changed)
@@ -365,7 +364,7 @@ void C_NagNaviBarWidget::MarkModeForDataChanged(const bool oq_Changed, const boo
    \param[in]  os32_Mode   Use-case to revert to
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::ResetUseCaseAfterChangeFailure(const sint32 os32_Mode) const
+void C_NagNaviBarWidget::ResetUseCaseAfterChangeFailure(const int32_t os32_Mode) const
 {
    //Update active mode
    if (os32_Mode == ms32_MODE_SYSDEF)
@@ -414,7 +413,7 @@ void C_NagNaviBarWidget::LoadUserSettings(void)
    }
    else
    {
-      const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetNaviBarNodeSectionSize();
+      const int32_t s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetNaviBarNodeSectionSize();
 
       this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
       this->mq_NodeSectionSizeLoaded = true;
@@ -435,7 +434,7 @@ void C_NagNaviBarWidget::SaveUserSettings(void)
       }
       else if (this->mq_NodeSectionSizeLoaded == true)
       {
-         const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+         const QList<int32_t> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
          // Save only in case of a valid value
          // If the system view was opened and the system definition not, it can happen that no valid values will be
@@ -508,7 +507,7 @@ void C_NagNaviBarWidget::resizeEvent(QResizeEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }
@@ -562,13 +561,13 @@ void C_NagNaviBarWidget::m_StartViewClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_NodesChanged(void) const
 {
-   uint32 u32_ItNodes;
-   uint32 u32_ChildNodeCounter = 0;
-   uint32 u32_ParentNodeCounter = 0;
+   uint32_t u32_ItNodes;
+   uint32_t u32_ChildNodeCounter = 0;
+   uint32_t u32_ParentNodeCounter = 0;
 
    std::vector<QString> c_Nodes;
    std::vector<std::vector<QString> > c_SubNodes;
-   std::vector<stw_types::sint32> c_NodeListWithSquads;
+   std::vector<int32_t> c_NodeListWithSquads;
    const std::vector<QString> c_EmptySubNodeDummy; // dummy necessary for correspondence of nodes and sub-nodes
 
    // get node indices
@@ -584,28 +583,30 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
          {
             // standard node
             c_SubNodes.push_back(c_EmptySubNodeDummy);
-            c_Nodes.push_back(C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItNodes)->c_Properties.c_Name.c_str());
+            c_Nodes.emplace_back(C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
+                                    u32_ItNodes)->c_Properties.c_Name.c_str());
          }
          else
          {
             // node squad
-            const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(c_NodeListWithSquads[u32_ItNodes]);
+            const stw::opensyde_core::C_OscNodeSquad * const pc_NodeSquad =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(c_NodeListWithSquads[u32_ItNodes]);
             if (pc_NodeSquad != NULL)
             {
                std::vector<QString> c_SubNodeNames;
 
-               for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < pc_NodeSquad->c_SubNodeIndexes.size(); u32_ItSubNodes++)
+               for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < pc_NodeSquad->c_SubNodeIndexes.size();
+                    u32_ItSubNodes++)
                {
                   c_SubNodeNames.push_back(
                      C_PuiSdUtil::h_GetSubNodeDeviceName(pc_NodeSquad->c_SubNodeIndexes[u32_ItSubNodes]));
                }
 
                c_SubNodes.push_back(c_SubNodeNames);
-               c_Nodes.push_back(pc_NodeSquad->c_BaseName.c_str());
+               c_Nodes.emplace_back(pc_NodeSquad->c_BaseName.c_str());
 
                // skip sub nodes in complete list (-1 because one up-count is done anyway in loop)
-               u32_ChildNodeCounter += static_cast<uint32>(pc_NodeSquad->c_SubNodeIndexes.size()) - 1;
+               u32_ChildNodeCounter += static_cast<uint32_t>(pc_NodeSquad->c_SubNodeIndexes.size()) - 1;
             }
          }
 
@@ -634,7 +635,7 @@ void C_NagNaviBarWidget::m_NodesChanged(void) const
    \param[in]  ou32_Index  Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_NodeChanged(const uint32 ou32_NodeIndex) const
+void C_NagNaviBarWidget::m_NodeChanged(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_TreeViewNodes->UpdateItem(ou32_NodeIndex, C_PuiSdUtil::h_GetNodeBaseNameOrName(ou32_NodeIndex));
 
@@ -648,19 +649,19 @@ void C_NagNaviBarWidget::m_NodeChanged(const uint32 ou32_NodeIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_BussesChanged(void) const
 {
-   uint32 u32_Index;
+   uint32_t u32_Index;
 
    std::vector<QString> c_Buses;
 
    //Update bus count
    this->mpc_Ui->pc_LabelBuses->setText(static_cast<QString>(C_GtGetText::h_GetText("Buses (%1)")).
-                                        arg(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize()));
+                                        arg(C_PuiSdHandler::h_GetInstance()->GetOscBusesSize()));
 
-   c_Buses.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
+   c_Buses.reserve(C_PuiSdHandler::h_GetInstance()->GetOscBusesSize());
    //add new nodes
-   for (u32_Index = 0U; u32_Index < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_Index)
+   for (u32_Index = 0U; u32_Index < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_Index)
    {
-      c_Buses.push_back(C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_Index)->c_Name.c_str());
+      c_Buses.emplace_back(C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_Index)->c_Name.c_str());
    }
    //Update view
    this->mpc_Ui->pc_TreeViewBuses->SetContent(c_Buses);
@@ -674,9 +675,9 @@ void C_NagNaviBarWidget::m_BussesChanged(void) const
    \param[in]  ou32_BusIndex  Bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_BusChanged(const uint32 ou32_BusIndex) const
+void C_NagNaviBarWidget::m_BusChanged(const uint32_t ou32_BusIndex) const
 {
-   const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_BusIndex);
+   const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(ou32_BusIndex);
 
    tgl_assert(pc_Bus != NULL);
    if (pc_Bus != NULL)
@@ -694,7 +695,7 @@ void C_NagNaviBarWidget::m_BusChanged(const uint32 ou32_BusIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagNaviBarWidget::m_AddViewClicked(void)
 {
-   const uint16 u16_TimerId = osc_write_log_performance_start();
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
 
    Q_EMIT this->SigAddViewClicked();
    m_SysViewSizeChanged();
@@ -738,7 +739,7 @@ void C_NagNaviBarWidget::m_OpenCanMonitor(void)
    \param[in]  orc_Name          Name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_SysViewRenameClicked(const stw_types::uint32 ou32_ViewIndex, const QString & orc_Name)
+void C_NagNaviBarWidget::m_SysViewRenameClicked(const uint32_t ou32_ViewIndex, const QString & orc_Name)
 {
    Q_EMIT this->SigRenameView(ou32_ViewIndex, orc_Name, false);
 }
@@ -749,7 +750,7 @@ void C_NagNaviBarWidget::m_SysViewRenameClicked(const stw_types::uint32 ou32_Vie
    \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_SysViewDeleteClicked(const stw_types::uint32 ou32_ViewIndex)
+void C_NagNaviBarWidget::m_SysViewDeleteClicked(const uint32_t ou32_ViewIndex)
 {
    Q_EMIT this->SigDeleteView(ou32_ViewIndex, this->ms32_ActiveSubMode, this->mu32_ActiveIndex);
 }
@@ -760,7 +761,7 @@ void C_NagNaviBarWidget::m_SysViewDeleteClicked(const stw_types::uint32 ou32_Vie
    \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_SysViewDuplicateClicked(const stw_types::uint32 ou32_ViewIndex)
+void C_NagNaviBarWidget::m_SysViewDuplicateClicked(const uint32_t ou32_ViewIndex)
 {
    Q_EMIT this->SigDuplicateView(ou32_ViewIndex);
 }
@@ -773,16 +774,16 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
 {
    if (this->mpc_Ui->pc_ListViewViews->isVisible() == true)
    {
-      const sint32 s32_OTHER_ITEM_SIZES = 444;
-      const sint32 s32_MIN_SIZE = 52;
+      const int32_t s32_OTHER_ITEM_SIZES = 444;
+      const int32_t s32_MIN_SIZE = 52;
       //Check if there is any available space to work with
       if (this->height() > (s32_OTHER_ITEM_SIZES + s32_MIN_SIZE))
       {
-         const sint32 s32_AvailableSpace = static_cast<sint32>(this->height()) - s32_OTHER_ITEM_SIZES;
+         const int32_t s32_AvailableSpace = static_cast<int32_t>(this->height()) - s32_OTHER_ITEM_SIZES;
          //Get desired size taking into account that the minimum is still there
-         const sint32 s32_DesiredSize =
+         const int32_t s32_DesiredSize =
             std::max(this->mpc_Ui->pc_ListViewViews->GetMaximumRequiredHeight(), s32_MIN_SIZE);
-         sint32 s32_FinalSize;
+         int32_t s32_FinalSize;
          //Check if the desired size is in the available space (so in this case the add button can be moved)
          if (s32_DesiredSize < s32_AvailableSpace)
          {
@@ -815,7 +816,7 @@ void C_NagNaviBarWidget::m_SysViewSizeChanged(void) const
 /*! \brief   Handle SC tab clicked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_TabScCLicked(void)
+void C_NagNaviBarWidget::m_TabScClicked(void)
 {
    //Update active mode (user feedback before triggering a "long" action,
    // and avoid setting the buttons after they were reverted by an aborted action)
@@ -829,7 +830,7 @@ void C_NagNaviBarWidget::m_TabScCLicked(void)
 /*! \brief   Handle SD tab clicked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_TabSdCLicked(void)
+void C_NagNaviBarWidget::m_TabSdClicked(void)
 {
    //Update active mode (user feedback before triggering a "long" action,
    // and avoid setting the buttons after they were reverted by an aborted action)
@@ -846,8 +847,8 @@ void C_NagNaviBarWidget::m_TabSdCLicked(void)
 void C_NagNaviBarWidget::m_UpdateNodeErrors(void)  const
 {
    std::vector<bool> c_ErrorsNode;
-   c_ErrorsNode.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize());
-   for (uint32 u32_ItNode = 0UL; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOSCNodesSize(); ++u32_ItNode)
+   c_ErrorsNode.reserve(C_PuiSdHandler::h_GetInstance()->GetOscNodesSize());
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_ItNode)
    {
       c_ErrorsNode.push_back(C_PuiSdHandler::h_GetInstance()->CheckNodeConflict(u32_ItNode));
    }
@@ -861,8 +862,8 @@ void C_NagNaviBarWidget::m_UpdateNodeErrors(void)  const
 void C_NagNaviBarWidget::m_UpdateBusErrors(void) const
 {
    std::vector<bool> c_ErrorsBus;
-   c_ErrorsBus.reserve(C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize());
-   for (uint32 u32_ItBus = 0UL; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOSCBusesSize(); ++u32_ItBus)
+   c_ErrorsBus.reserve(C_PuiSdHandler::h_GetInstance()->GetOscBusesSize());
+   for (uint32_t u32_ItBus = 0UL; u32_ItBus < C_PuiSdHandler::h_GetInstance()->GetOscBusesSize(); ++u32_ItBus)
    {
       c_ErrorsBus.push_back(C_PuiSdHandler::h_GetInstance()->CheckBusConflict(u32_ItBus));
    }
@@ -872,15 +873,15 @@ void C_NagNaviBarWidget::m_UpdateBusErrors(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle bus click
 
-   \param[in]  osn_Index   Selected index
+   \param[in]  os32_Index   Selected index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_OnClickBus(const sintn osn_Index)
+void C_NagNaviBarWidget::m_OnClickBus(const int32_t os32_Index)
 {
-   if (osn_Index >= 0)
+   if (os32_Index >= 0)
    {
-      const uint32 u32_Index = static_cast<uint32>(osn_Index);
-      const stw_opensyde_core::C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(u32_Index);
+      const uint32_t u32_Index = static_cast<uint32_t>(os32_Index);
+      const stw::opensyde_core::C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_Index);
       if (pc_Bus != NULL)
       {
          Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_BUSEDIT, u32_Index, pc_Bus->c_Name.c_str());
@@ -891,15 +892,15 @@ void C_NagNaviBarWidget::m_OnClickBus(const sintn osn_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle node click
 
-   \param[in]  osn_Index   Selected index
+   \param[in]  os32_Index   Selected index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_OnClickNode(const sintn osn_Index)
+void C_NagNaviBarWidget::m_OnClickNode(const int32_t os32_Index)
 {
-   if (osn_Index >= 0)
+   if (os32_Index >= 0)
    {
-      const uint32 u32_Index = static_cast<uint32>(osn_Index);
-      const stw_opensyde_core::C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_Index);
+      const uint32_t u32_Index = static_cast<uint32_t>(os32_Index);
+      const stw::opensyde_core::C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_Index);
       if (pc_Node != NULL)
       {
          Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, ms32_SUBMODE_SYSDEF_NODEEDIT, u32_Index,
@@ -917,8 +918,8 @@ void C_NagNaviBarWidget::m_OnClickNode(const sintn osn_Index)
    \param[in]  orc_SubSubItemName   Selected sub sub mode name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 os32_SubMode, const QString & orc_Name,
-                                      const QString & orc_SubSubItemName)
+void C_NagNaviBarWidget::m_SelectView(const uint32_t ou32_ViewIndex, const int32_t os32_SubMode,
+                                      const QString & orc_Name, const QString & orc_SubSubItemName)
 {
    //After change of mode we will restore user settings so we have to store the current configuration
    this->SaveUserSettings();
@@ -932,7 +933,7 @@ void C_NagNaviBarWidget::m_SelectView(const uint32 ou32_ViewIndex, const sint32 
    \param[in]  ou32_ViewIndex          Index to specify which view changed (only used if oq_CheckOnlyThisView set)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, const uint32 ou32_ViewIndex) const
+void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, const uint32_t ou32_ViewIndex) const
 {
    if (this->ms32_ActiveMode == ms32_MODE_SYSVIEW)
    {
@@ -973,30 +974,30 @@ void C_NagNaviBarWidget::m_UpdateViewIcons(const bool oq_CheckOnlyThisView, cons
 void C_NagNaviBarWidget::m_AnimationTimerEvent()
 {
    QSize c_Size;
-   sintn sn_NewWidth;
+   int32_t s32_NewWidth;
 
    if (this->mq_Maximized == false)
    {
       // minimize the widget
       c_Size = this->minimumSize();
 
-      if (c_Size.width() == msn_MAXIMIZED_WIDTH)
+      if (c_Size.width() == ms32_MAXIMIZED_WIDTH)
       {
          // first call
          this->HandleElements();
       }
 
-      if (c_Size.width() > msn_MINIMIZED_WIDTH)
+      if (c_Size.width() > ms32_MINIMIZED_WIDTH)
       {
          //make slide step
-         sn_NewWidth = c_Size.width() - this->msn_StepSize;
-         if (sn_NewWidth > msn_MINIMIZED_WIDTH)
+         s32_NewWidth = c_Size.width() - this->ms32_StepSize;
+         if (s32_NewWidth > ms32_MINIMIZED_WIDTH)
          {
-            this->setMinimumSize(sn_NewWidth, 0);
+            this->setMinimumSize(s32_NewWidth, 0);
          }
          else
          {
-            this->setMinimumSize(msn_MINIMIZED_WIDTH, 0);
+            this->setMinimumSize(ms32_MINIMIZED_WIDTH, 0);
          }
       }
       else
@@ -1010,17 +1011,17 @@ void C_NagNaviBarWidget::m_AnimationTimerEvent()
       // maximize the widget
       c_Size = this->minimumSize();
 
-      if (c_Size.width() < msn_MAXIMIZED_WIDTH)
+      if (c_Size.width() < ms32_MAXIMIZED_WIDTH)
       {
          //make slide step
-         sn_NewWidth = c_Size.width() + this->msn_StepSize;
-         if (sn_NewWidth < msn_MAXIMIZED_WIDTH)
+         s32_NewWidth = c_Size.width() + this->ms32_StepSize;
+         if (s32_NewWidth < ms32_MAXIMIZED_WIDTH)
          {
-            this->setMinimumSize(sn_NewWidth, 0);
+            this->setMinimumSize(s32_NewWidth, 0);
          }
          else
          {
-            this->setMinimumSize(msn_MAXIMIZED_WIDTH, 0);
+            this->setMinimumSize(ms32_MAXIMIZED_WIDTH, 0);
          }
       }
       else
@@ -1039,7 +1040,7 @@ void C_NagNaviBarWidget::m_AnimationTimerEvent()
 void C_NagNaviBarWidget::m_PbTopologyClick(void)
 {
    const QString c_Name = C_GtGetText::h_GetText("NETWORK TOPOLOGY");
-   const sint32 s32_SUB_MODE = ms32_SUBMODE_SYSDEF_TOPOLOGY;
+   const int32_t s32_SUB_MODE = ms32_SUBMODE_SYSDEF_TOPOLOGY;
 
    Q_EMIT this->SigChangeMode(ms32_MODE_SYSDEF, s32_SUB_MODE, 0, c_Name);
 }

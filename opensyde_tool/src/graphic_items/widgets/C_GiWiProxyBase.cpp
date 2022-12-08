@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 
-#include "C_GiWiProxyBase.h"
+#include "C_GiWiProxyBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,7 +37,7 @@ using namespace stw_opensyde_gui;
    \param[in,out] opc_Parent        Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiWiProxyBase::C_GiWiProxyBase(const stw_types::float64 of64_InitWidth, const stw_types::float64 of64_InitHeight,
+C_GiWiProxyBase::C_GiWiProxyBase(const float64_t of64_InitWidth, const float64_t of64_InitHeight,
                                  QGraphicsItem * const opc_Parent) :
    QGraphicsProxyWidget(opc_Parent),
    C_GiBiSizeableItem(of64_InitWidth, of64_InitHeight),

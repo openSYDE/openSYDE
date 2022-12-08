@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpListsWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpListsWidget.hpp"
 #include "ui_C_SdNdeDpListsWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -163,7 +162,7 @@ void C_SdNdeDpListsWidget::Clear(void) const
    \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::SetDataPool(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex)
+void C_SdNdeDpListsWidget::SetDataPool(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex)
 {
    this->m_UpdateDpLabel(ou32_NodeIndex, ou32_DataPoolIndex);
 
@@ -193,7 +192,7 @@ void C_SdNdeDpListsWidget::SetDataPool(const uint32 ou32_NodeIndex, const uint32
    \param[in]  os32_DataElementIndex   Optional data element index (if not used set to -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::OpenDetail(const sint32 os32_ListIndex, const sint32 os32_DataElementIndex) const
+void C_SdNdeDpListsWidget::OpenDetail(const int32_t os32_ListIndex, const int32_t os32_DataElementIndex) const
 {
    this->mpc_Ui->pc_TreeWidget->OpenDetail(os32_ListIndex, os32_DataElementIndex);
 }
@@ -239,15 +238,15 @@ void C_SdNdeDpListsWidget::m_InitButtonIcons() const
    \param[in]  ou32_DataPoolIndex   Data pool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::m_UpdateDpLabel(const uint32 ou32_NodeIndex, const uint32 ou32_DataPoolIndex) const
+void C_SdNdeDpListsWidget::m_UpdateDpLabel(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex) const
 {
-   const C_OSCNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(ou32_NodeIndex,
+   const C_OscNodeDataPool * const pc_Dp = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(ou32_NodeIndex,
                                                                                            ou32_DataPoolIndex);
 
    if (pc_Dp != NULL)
    {
-      const sint32 s32_TypeSpecificNum = C_PuiSdHandler::h_GetInstance()->GetDataPoolTypeIndex(ou32_NodeIndex,
-                                                                                               ou32_DataPoolIndex);
+      const int32_t s32_TypeSpecificNum = C_PuiSdHandler::h_GetInstance()->GetDataPoolTypeIndex(ou32_NodeIndex,
+                                                                                                ou32_DataPoolIndex);
       const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("%1 Datapool: #%2 %3")).
                              arg(C_PuiSdUtil::h_ConvertDataPoolTypeToString(pc_Dp->e_Type)).
                              arg(s32_TypeSpecificNum + 1).
@@ -263,10 +262,10 @@ void C_SdNdeDpListsWidget::m_UpdateDpLabel(const uint32 ou32_NodeIndex, const ui
    \param[in]  orq_List       Flag if items belong to list
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListsWidget::m_HandleSelection(const uint32 & oru32_Count, const bool & orq_List)
+void C_SdNdeDpListsWidget::m_HandleSelection(const uint32_t & oru32_Count, const bool & orq_List)
 {
    QString c_Text;
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mu32_NodeIndex,
       this->mu32_DataPoolIndex);
    bool q_List;

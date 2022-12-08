@@ -8,21 +8,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_SyvDaPePieChart.h"
+#include "C_SyvDaPePieChart.hpp"
 #include "ui_C_SyvDaPePieChart.h"
 
-#include "C_GtGetText.h"
-#include "C_GiSvDaPieChartBase.h"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaPieChartBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -152,12 +151,12 @@ void C_SyvDaPePieChart::m_UpdatePreview(void)
 {
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    C_GiSvDaPieChartBase * const pc_Item = new C_GiSvDaPieChartBase(0UL, 0UL, -1L, 0ULL, NULL);
-   const QSizeF c_ItemSize(static_cast<float64>(c_ViewSize.height()),
-                           static_cast<float64>(c_ViewSize.height()));
+   const QSizeF c_ItemSize(static_cast<float64_t>(c_ViewSize.height()),
+                           static_cast<float64_t>(c_ViewSize.height()));
    //20.0 to center the chart
    const QPointF c_ItemPos(
-      ((static_cast<float64>(c_ViewSize.width()) - static_cast<float64>(c_ItemSize.width())) / 2.0) + 20.0,
-      (static_cast<float64>(c_ViewSize.height()) - static_cast<float64>(c_ItemSize.height())) / 2.0);
+      ((static_cast<float64_t>(c_ViewSize.width()) - static_cast<float64_t>(c_ItemSize.width())) / 2.0) + 20.0,
+      (static_cast<float64_t>(c_ViewSize.height()) - static_cast<float64_t>(c_ItemSize.height())) / 2.0);
 
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateTypePe(this->GetShowUnit(), this->GetShowValue());

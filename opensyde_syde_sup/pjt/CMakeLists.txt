@@ -8,7 +8,7 @@ include(lint_config.cmake)
 
 if (NOT WIN32)
    #dynamic link
-   set(OPENSSL_USE_STATIC_LIBS 0) 
+   set(OPENSSL_USE_STATIC_LIBS TRUE) 
    find_package(OpenSSL REQUIRED)
 endif()
 
@@ -23,7 +23,7 @@ if (WIN32)
    set(SYDESUP_COMMON_INCLUDE_DIRECTORIES
       ${SYDESUP_COMMON_INCLUDE_DIRECTORIES}
       #/libs/openssl/include needen only on windows
-	  ${PROJECT_ROOT}/libs/openssl/include
+     ${PROJECT_ROOT}/libs/openssl/openssl/include
       )
 endif()
 
@@ -38,39 +38,39 @@ set(SYDESUP_LINUX_INCLUDE_DIRECTORIES
 
 # --- PROJECT SOURCE FILE PATHS ----------------------------------------------------------------------------------------
 set(SYDESUP_COMMON_SOURCES
-   ${PROJECT_ROOT}/src/C_SYDEsup.cpp
-   ${PROJECT_ROOT}/src/C_SUPSuSequences.cpp
+   ${PROJECT_ROOT}/src/C_SydeSup.cpp
+   ${PROJECT_ROOT}/src/C_SupSuSequences.cpp
 )
 
 set(SYDESUP_WINDOWS_SOURCES
-   ${PROJECT_ROOT}/src/C_SYDEsupWindows.cpp
+   ${PROJECT_ROOT}/src/C_SydeSupWindows.cpp
    ${PROJECT_ROOT}/src/resources.rc
    )
 
 set(SYDESUP_LINUX_SOURCES
-   ${PROJECT_ROOT}/src/C_SYDEsupLinux.cpp
+   ${PROJECT_ROOT}/src/C_SydeSupLinux.cpp
    ${PROJECT_ROOT}/src/resources.rc
    )
 
 set(SYDESUP_LINUX_LIB_SOURCES
-   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TGLFile.cpp
-   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TGLTasks.cpp
-   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TGLTime.cpp
-   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TGLUtils.cpp
-   ${PROJECT_ROOT}/libs/opensyde_core/ip_dispatcher/target_linux_sock/C_OSCIpDispatcherLinuxSock.cpp
-   ${PROJECT_ROOT}/libs/opensyde_core/can_dispatcher/target_linux_socket_can/CCAN.cpp
+   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TglFile.cpp
+   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TglTasks.cpp
+   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TglTime.cpp
+   ${PROJECT_ROOT}/libs/opensyde_core/kefex_diaglib/tgl_linux/TglUtils.cpp
+   ${PROJECT_ROOT}/libs/opensyde_core/ip_dispatcher/target_linux_sock/C_OscIpDispatcherLinuxSock.cpp
+   ${PROJECT_ROOT}/libs/opensyde_core/can_dispatcher/target_linux_socket_can/C_Can.cpp
    )
 
 # for Linux shared library only:
 set(SYDESUP_API_HEADERS
-   ${PROJECT_ROOT}/libs/opensyde_core/scl/CSCLString.h
-   ${PROJECT_ROOT}/libs/opensyde_core/scl/SCLDynamicArray.h
-   ${PROJECT_ROOT}/src/C_SYDEsup.h
-   ${PROJECT_ROOT}/src/C_SYDEsupLinux.h
+   ${PROJECT_ROOT}/libs/opensyde_core/scl/C_SclString.hpp
+   ${PROJECT_ROOT}/libs/opensyde_core/scl/C_SclDynamicArray.hpp
+   ${PROJECT_ROOT}/src/C_SydeSup.hpp
+   ${PROJECT_ROOT}/src/C_SydeSupLinux.hpp
 )
 
 set(SYDESUP_API_HEADERS_STWTYPES
-   ${PROJECT_ROOT}/libs/opensyde_core/stwtypes/stwtypes.h
+   ${PROJECT_ROOT}/libs/opensyde_core/stwtypes/stwtypes.hpp
 )
 
 # --- COMPILER FLAGS AND LIBRARIES -------------------------------------------------------------------------------------
@@ -139,7 +139,7 @@ endif()
 # --- BUILD EXECUTABLE -------------------------------------------------------------------------------------------------
 if(WIN32)
    link_directories(
-       ../libs/openssl
+       ../libs/openssl/openssl
    )
    add_executable(SYDEsup ${SYDESUP_COMMON_SOURCES} ${SYDESUP_WINDOWS_SOURCES} ${PROJECT_ROOT}/src/WindowsMain.cpp)
    target_link_libraries(SYDEsup ${SYDESUP_LINK_LIBRARIES_WINDOWS})
@@ -157,8 +157,8 @@ endif()
 target_include_directories(SYDEsup PRIVATE ${SYDESUP_COMMON_INCLUDE_DIRECTORIES})
 
 # precompiled headers for core and application
-target_precompile_headers(SYDEsup PRIVATE ${PROJECT_ROOT}/src/precomp_headers.h)
-target_precompile_headers(SYDEsup PRIVATE ${PROJECT_ROOT}/src/precomp_headers.h)
+target_precompile_headers(SYDEsup PRIVATE ${PROJECT_ROOT}/src/precomp_headers.hpp)
+target_precompile_headers(SYDEsup PRIVATE ${PROJECT_ROOT}/src/precomp_headers.hpp)
 
 # create PC-lint configuration files
 if(COMMAND add_pc_lint)

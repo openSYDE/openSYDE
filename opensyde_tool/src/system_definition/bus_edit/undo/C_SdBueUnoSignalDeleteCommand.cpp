@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdBueUnoSignalDeleteCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdBueUnoSignalDeleteCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,12 +43,12 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalDeleteCommand::C_SdBueUnoSignalDeleteCommand(
-   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_MessageId, const std::vector<uint32> & orc_SignalIndex,
-   C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+   const std::vector<C_OscCanMessageIdentificationIndices> & orc_MessageId,
+   const std::vector<uint32_t> & orc_SignalIndex, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, QUndoCommand * const opc_Parent) :
-   C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, orc_SignalIndex, std::vector<stw_types::uint16>(),
-                                        std::vector<stw_opensyde_core::C_OSCCanSignal::E_MultiplexerType>(),
-                                        std::vector<stw_types::uint16>(),
+   C_SdBueUnoSignalAddDeleteBaseCommand(orc_MessageId, orc_SignalIndex, std::vector<uint16_t>(),
+                                        std::vector<stw::opensyde_core::C_OscCanSignal::E_MultiplexerType>(),
+                                        std::vector<uint16_t>(),
                                         opc_MessageSyncManager,
                                         opc_MessageTreeWidget,
                                         "Delete Signal",

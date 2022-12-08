@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCSubDeviceDefinition.h"
+#include "C_OscSubDeviceDefinition.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSubDeviceDefinition::C_OSCSubDeviceDefinition()
+C_OscSubDeviceDefinition::C_OscSubDeviceDefinition()
 {
    this->Clear();
 }
@@ -42,7 +42,7 @@ C_OSCSubDeviceDefinition::C_OSCSubDeviceDefinition()
 /*! \brief  Clear
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSubDeviceDefinition::Clear()
+void C_OscSubDeviceDefinition::Clear()
 {
    c_SubDeviceName = "";
    c_ConnectedInterfaces.clear();
@@ -69,14 +69,14 @@ void C_OSCSubDeviceDefinition::Clear()
 
 //----------------------------------------------------------------------------------------------------------------------
 
-bool C_OSCSubDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe_Type) const
+bool C_OscSubDeviceDefinition::IsUpdateAvailable(const C_OscSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
 
    //flashloader support?
    switch (oe_Type)
    {
-   case C_OSCSystemBus::eCAN:
+   case C_OscSystemBus::eCAN:
       if (this->q_FlashloaderOpenSydeCan || this->q_FlashloaderStwCan)
       {
          q_Retval = true;
@@ -86,7 +86,7 @@ bool C_OSCSubDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe
          q_Retval = false;
       }
       break;
-   case C_OSCSystemBus::eETHERNET:
+   case C_OscSystemBus::eETHERNET:
       if (this->q_FlashloaderOpenSydeEthernet)
       {
          q_Retval = true;
@@ -104,13 +104,13 @@ bool C_OSCSubDeviceDefinition::IsUpdateAvailable(const C_OSCSystemBus::E_Type oe
 
 //----------------------------------------------------------------------------------------------------------------------
 
-bool C_OSCSubDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type oe_Type) const
+bool C_OscSubDeviceDefinition::IsRoutingAvailable(const C_OscSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
 
    switch (oe_Type)
    {
-   case C_OSCSystemBus::eCAN:
+   case C_OscSystemBus::eCAN:
       if (this->q_DiagnosticProtocolOpenSydeCan)
       {
          q_Retval = true;
@@ -120,7 +120,7 @@ bool C_OSCSubDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type o
          q_Retval = false;
       }
       break;
-   case C_OSCSystemBus::eETHERNET:
+   case C_OscSystemBus::eETHERNET:
       if (this->q_DiagnosticProtocolOpenSydeEthernet)
       {
          q_Retval = true;
@@ -137,13 +137,13 @@ bool C_OSCSubDeviceDefinition::IsRoutingAvailable(const C_OSCSystemBus::E_Type o
 }
 //----------------------------------------------------------------------------------------------------------------------
 
-bool C_OSCSubDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type oe_Type) const
+bool C_OscSubDeviceDefinition::IsDiagnosisAvailable(const C_OscSystemBus::E_Type oe_Type) const
 {
    bool q_Retval = false;
 
    switch (oe_Type)
    {
-   case C_OSCSystemBus::eCAN:
+   case C_OscSystemBus::eCAN:
       if (this->q_DiagnosticProtocolKefex || this->q_DiagnosticProtocolOpenSydeCan)
       {
          q_Retval = true;
@@ -153,7 +153,7 @@ bool C_OSCSubDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type
          q_Retval = false;
       }
       break;
-   case C_OSCSystemBus::eETHERNET:
+   case C_OscSystemBus::eETHERNET:
       if (this->q_DiagnosticProtocolOpenSydeEthernet)
       {
          q_Retval = true;
@@ -179,15 +179,15 @@ bool C_OSCSubDeviceDefinition::IsDiagnosisAvailable(const C_OSCSystemBus::E_Type
    State if interface is connected
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCSubDeviceDefinition::IsConnected(const C_OSCSystemBus::E_Type oe_Type,
-                                           const stw_types::uint8 ou8_InterfaceNumber) const
+bool C_OscSubDeviceDefinition::IsConnected(const C_OscSystemBus::E_Type oe_Type,
+                                           const uint8_t ou8_InterfaceNumber) const
 {
    bool q_Retval = false;
 
-   const stw_scl::C_SCLString c_Interface = C_OSCSubDeviceDefinition::h_GetInterfaceNameLower(oe_Type,
-                                                                                              ou8_InterfaceNumber);
+   const stw::scl::C_SclString c_Interface = C_OscSubDeviceDefinition::h_GetInterfaceNameLower(oe_Type,
+                                                                                               ou8_InterfaceNumber);
    {
-      const std::map<stw_scl::C_SCLString, bool>::const_iterator c_It = this->c_ConnectedInterfaces.find(c_Interface);
+      const std::map<stw::scl::C_SclString, bool>::const_iterator c_It = this->c_ConnectedInterfaces.find(c_Interface);
       if (c_It != this->c_ConnectedInterfaces.end())
       {
          q_Retval = c_It->second;
@@ -207,13 +207,12 @@ bool C_OSCSubDeviceDefinition::IsConnected(const C_OSCSystemBus::E_Type oe_Type,
    Interface name (lowercase)
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCSubDeviceDefinition::h_GetInterfaceNameLower(const C_OSCSystemBus::E_Type oe_Type,
-                                                                       const stw_types::uint8 ou8_InterfaceNumber)
+stw::scl::C_SclString C_OscSubDeviceDefinition::h_GetInterfaceNameLower(const C_OscSystemBus::E_Type oe_Type,
+                                                                        const uint8_t ou8_InterfaceNumber)
 {
-   stw_scl::C_SCLString c_Interface =
-      stw_scl::C_SCLString::IntToStr(static_cast<stw_types::uintn>(ou8_InterfaceNumber) + 1U);
+   stw::scl::C_SclString c_Interface = stw::scl::C_SclString::IntToStr(static_cast<uint32_t>(ou8_InterfaceNumber) + 1U);
 
-   if (oe_Type == C_OSCSystemBus::eCAN)
+   if (oe_Type == C_OscSystemBus::eCAN)
    {
       c_Interface = "can" + c_Interface;
    }

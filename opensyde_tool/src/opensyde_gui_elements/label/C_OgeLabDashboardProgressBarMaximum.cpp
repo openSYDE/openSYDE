@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeWiUtil.h"
-#include "C_OgeLabDashboardProgressBarMaximum.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_OgeLabDashboardProgressBarMaximum.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,13 +50,13 @@ C_OgeLabDashboardProgressBarMaximum::C_OgeLabDashboardProgressBarMaximum(QWidget
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeLabDashboardProgressBarMaximum::AdjustFontToSize(void)
 {
-   const sintn sn_NewPointSize = C_OgeWiUtil::h_UpdateFontSize(this, this->text(), 1.0F, true);
+   const int32_t s32_NewPointSize = C_OgeWiUtil::h_UpdateFontSize(this, this->text(), 1.0F, true);
 
-   if (sn_NewPointSize > 0)
+   if (s32_NewPointSize > 0)
    {
       this->setStyleSheet(static_cast<QString>("QLabel{\n"
                                                "font-size:%1pt;\n"
                                                "margin-bottom:-%2px;\n"
-                                               "}").arg(sn_NewPointSize).arg((sn_NewPointSize * 30) / 100));
+                                               "}").arg(s32_NewPointSize).arg((s32_NewPointSize * 30) / 100));
    }
 }

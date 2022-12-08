@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabProgressLogItem" name="pc_LabelDescription">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabProgressLogItem" name="pc_LabelDescription">
      <property name="text">
       <string>TextLabel</string>
      </property>
@@ -50,7 +50,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabProgressLogItem" name="pc_LabelStatus">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabProgressLogItem" name="pc_LabelStatus">
      <property name="text">
       <string>TextLabel</string>
      </property>
@@ -60,9 +60,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabProgressLogItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabProgressLogItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabProgressLogItem.h</header>
+   <header>C_OgeLabProgressLogItem.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

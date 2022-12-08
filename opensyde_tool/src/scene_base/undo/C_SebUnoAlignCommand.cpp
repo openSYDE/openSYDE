@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SebUnoAlignCommand.h"
-#include "C_GiUnique.h"
-#include "C_SebUnoMoveCommand.h"
-#include "C_SebScene.h"
-#include "C_SebUtil.h"
+#include "C_SebUnoAlignCommand.hpp"
+#include "C_GiUnique.hpp"
+#include "C_SebUnoMoveCommand.hpp"
+#include "C_SebScene.hpp"
+#include "C_SebUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
 using namespace std;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,19 +39,18 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene             Pointer to currently active scene
-   \param[in]     orc_IDs               Affected unique IDs
-   \param[in]     oru64_GuidelineItemID ID of guideline item
+   \param[in]     orc_Ids               Affected unique IDs
+   \param[in]     oru64_GuidelineItemId ID of guideline item
    \param[in]     ore_Alignment         Alignment type
    \param[in,out] opc_Parent            Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SebUnoAlignCommand::C_SebUnoAlignCommand(QGraphicsScene * const opc_Scene,
-                                           const std::vector<stw_types::uint64> & orc_IDs,
-                                           const uint64 & oru64_GuidelineItemID, const E_Alignment & ore_Alignment,
+C_SebUnoAlignCommand::C_SebUnoAlignCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
+                                           const uint64_t & oru64_GuidelineItemId, const E_Alignment & ore_Alignment,
                                            QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Align drawing elements", opc_Parent)
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, "Align drawing elements", opc_Parent)
 {
-   m_Align(oru64_GuidelineItemID, ore_Alignment);
+   m_Align(oru64_GuidelineItemId, ore_Alignment);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -88,13 +86,13 @@ void C_SebUnoAlignCommand::undo(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Align selected items
 
-   \param[in] oru64_GuidelineItemID ID of guideline item
+   \param[in] oru64_GuidelineItemId ID of guideline item
    \param[in] ore_Alignment         Alignment type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E_Alignment & ore_Alignment)
+void C_SebUnoAlignCommand::m_Align(const uint64_t & oru64_GuidelineItemId, const E_Alignment & ore_Alignment)
 {
-   QGraphicsItem * const pc_GuidelineItem = this->m_GetSceneItem(oru64_GuidelineItemID);
+   QGraphicsItem * const pc_GuidelineItem = this->m_GetSceneItem(oru64_GuidelineItemId);
 
    //Is there a guideline object
    if (pc_GuidelineItem != NULL)
@@ -111,7 +109,7 @@ void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E
          QRectF c_CurRect;
          QPointF c_Difference;
          const QRectF c_GuidelineRect = pc_GuidelineItem->sceneBoundingRect();
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_SelectedItems.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_SelectedItems.size(); ++u32_ItItem)
          {
             pc_CurItem = C_SebUtil::h_GetHighestParent(c_SelectedItems[u32_ItItem]);
             if (((pc_CurItem != pc_GuidelineItem) && (pc_Scene != NULL)) && (pc_CurItem != NULL))
@@ -159,7 +157,7 @@ void C_SebUnoAlignCommand::m_Align(const uint64 & oru64_GuidelineItemID, const E
                   pc_UniqueItem = dynamic_cast<C_GiUnique *>(pc_CurItem);
                   if (pc_UniqueItem != NULL)
                   {
-                     const std::vector<uint64> c_Vec(1, pc_UniqueItem->GetID());
+                     const std::vector<uint64_t> c_Vec(1, pc_UniqueItem->GetId());
                      new C_SebUnoMoveCommand(this->mpc_Scene, c_Vec, c_Difference, this);
                   }
                }

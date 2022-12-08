@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "constants.h"
-#include "C_SdNdeDpListPopUp.h"
+#include "constants.hpp"
+#include "C_SdNdeDpListPopUp.hpp"
 #include "ui_C_SdNdeDpListPopUp.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_GiSyColorSelectWidget.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -53,8 +52,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDpListPopUp::C_SdNdeDpListPopUp(C_OgePopUpDialog & orc_Parent, const uint32 & oru32_NodeIndex,
-                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_ListIndex,
+C_SdNdeDpListPopUp::C_SdNdeDpListPopUp(C_OgePopUpDialog & orc_Parent, const uint32_t & oru32_NodeIndex,
+                                       const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_ListIndex,
                                        C_SdNdeDpListModelViewManager * const opc_ModelViewManager,
                                        QTreeWidget * const opc_TreeWidget,
                                        C_SdNdeUnoDataPoolManager * const opc_UndoManager, QWidget * const opc_Parent) :
@@ -82,7 +81,7 @@ C_SdNdeDpListPopUp::C_SdNdeDpListPopUp(C_OgePopUpDialog & orc_Parent, const uint
    //undo
    if (this->mpc_UndoManager != NULL)
    {
-      this->ms32_UndoStartCount = static_cast<sint32>(this->mpc_UndoManager->index());
+      this->ms32_UndoStartCount = static_cast<int32_t>(this->mpc_UndoManager->index());
    }
 
    //-- Init header widget --
@@ -158,7 +157,7 @@ C_SdNdeDpListPopUp::~C_SdNdeDpListPopUp(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListPopUp::InitText(void) const
 {
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mu32_NodeIndex,
       this->mu32_DataPoolIndex);
 
@@ -236,7 +235,7 @@ void C_SdNdeDpListPopUp::paintEvent(QPaintEvent * const opc_Event)
    QPainter c_Painter(this);
 
    //draw background
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this, &c_Painter);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this, &c_Painter);
 
    QWidget::paintEvent(opc_Event);
 }
@@ -274,7 +273,7 @@ void C_SdNdeDpListPopUp::keyPressEvent(QKeyEvent * const opc_Event)
       case Qt::Key_Z:
          if (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true)
          {
-            if (this->ms32_UndoStartCount < static_cast<sint32>(this->mpc_UndoManager->index()))
+            if (this->ms32_UndoStartCount < static_cast<int32_t>(this->mpc_UndoManager->index()))
             {
                this->mpc_UndoManager->DoUndo();
             }
@@ -367,10 +366,10 @@ void C_SdNdeDpListPopUp::m_Close(void)
    \param[in] oru32_Count     Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListPopUp::m_HandleSelection(const uint32 & oru32_ListIndex, const uint32 & oru32_Count) const
+void C_SdNdeDpListPopUp::m_HandleSelection(const uint32_t & oru32_ListIndex, const uint32_t & oru32_Count) const
 {
    QString c_Text;
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
       this->mu32_NodeIndex,
       this->mu32_DataPoolIndex);
 
@@ -432,14 +431,14 @@ void C_SdNdeDpListPopUp::m_HandleButtonChange(const bool & orq_AddActive, const 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListPopUp::m_OpenColorPicker(void)
 {
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
    // open color picker dialog
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       pc_ColorWidget->ChooseSelectedColor();
    }

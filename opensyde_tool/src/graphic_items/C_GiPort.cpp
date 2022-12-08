@@ -8,19 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QLinearGradient>
-#include "C_GiPort.h"
-#include "constants.h"
-#include "C_OSCUtils.h"
+#include "C_GiPort.hpp"
+#include "constants.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_types;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -254,12 +253,12 @@ void C_GiPort::AbortTemporaryUnregister(void)
    \param[in]   of64_Difference     Stretch distance
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiPort::StretchPort(const float64 of64_Difference)
+void C_GiPort::StretchPort(const float64_t of64_Difference)
 {
    if ((this->mc_Points.size() == 4) &&
-       (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Difference, 0.0) == false))
+       (C_OscUtils::h_IsFloat64NearlyEqual(of64_Difference, 0.0) == false))
    {
-      const float64 f64_DiffHalf = of64_Difference / 2.0;
+      const float64_t f64_DiffHalf = of64_Difference / 2.0;
 
       this->mc_Points[1].setX(this->mc_Points[1].x() + f64_DiffHalf);
       this->mc_Points[2].setX(this->mc_Points[2].x() + f64_DiffHalf);

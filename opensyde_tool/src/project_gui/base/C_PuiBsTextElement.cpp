@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_PuiBsTextElement.h"
+#include "constants.hpp"
+#include "C_PuiBsTextElement.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,13 +39,13 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsTextElement::C_PuiBsTextElement(void) :
    C_PuiBsBox(),
-   c_UIFontStyle(QFont("Segoe UI", 18)),
-   c_UIFontColorBright(mc_STYLE_GUIDE_COLOR_34),
-   c_UIFontColorDark(mc_STYLE_GUIDE_COLOR_0),
-   c_UIText("Text Element")
+   c_UiFontStyle(QFont("Segoe UI", 18)),
+   c_UiFontColorBright(mc_STYLE_GUIDE_COLOR_34),
+   c_UiFontColorDark(mc_STYLE_GUIDE_COLOR_0),
+   c_UiText("Text Element")
 {
-   c_UIFontStyle.setPixelSize(18);
-   c_UIFontStyle.setItalic(true);
+   c_UiFontStyle.setPixelSize(18);
+   c_UiFontStyle.setItalic(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -67,32 +66,32 @@ C_PuiBsTextElement::~C_PuiBsTextElement(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsTextElement::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiBsTextElement::CalcHash(uint32_t & oru32_HashValue) const
 {
-   sintn sn_Value;
-   const QString c_Font = this->c_UIFontStyle.toString();
+   int32_t s32_Value;
+   const QString c_Font = this->c_UiFontStyle.toString();
 
-   stw_scl::C_SCLChecksums::CalcCRC32(c_Font.toStdString().c_str(), c_Font.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(c_Font.toStdString().c_str(), c_Font.length(), oru32_HashValue);
 
-   sn_Value = this->c_UIFontColorBright.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIFontColorBright.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIFontColorBright.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIFontColorBright.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorBright.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorBright.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorBright.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorBright.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   sn_Value = this->c_UIFontColorDark.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIFontColorDark.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIFontColorDark.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIFontColorDark.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorDark.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorDark.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorDark.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiFontColorDark.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_UIText.toStdString().c_str(), this->c_UIText.length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_UiText.toStdString().c_str(), this->c_UiText.length(), oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);
 }

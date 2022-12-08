@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QTextCursor>
 
-#include "stwtypes.h"
-#include "C_GiSvDaTextElement.h"
-#include "C_PuiSvHandler.h"
+#include "stwtypes.hpp"
+#include "C_GiSvDaTextElement.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,15 +42,15 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru32_ViewIndex      Index of system view
    \param[in]     oru32_DashboardIndex Index of dashboard in system view
    \param[in]     ors32_DataIndex      Index of connected data item
-   \param[in]     oru64_ID             Unique ID
+   \param[in]     oru64_Id             Unique ID
    \param[in]     oq_Editable          Flag for editing the content of the text element
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaTextElement::C_GiSvDaTextElement(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                         const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaTextElement::C_GiSvDaTextElement(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                         const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                          const bool oq_Editable, QGraphicsItem * const opc_Parent) :
-   C_GiBiTextElement(oru64_ID, oq_Editable, opc_Parent),
+   C_GiBiTextElement(oru64_Id, oq_Editable, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eTEXT_ELEMENT)
 {
 }
@@ -64,14 +63,14 @@ C_GiSvDaTextElement::C_GiSvDaTextElement(const uint32 & oru32_ViewIndex, const u
    \param[in]     oru32_ViewIndex      Index of system view
    \param[in]     oru32_DashboardIndex Index of dashboard in system view
    \param[in]     ors32_DataIndex      Index of connected data item
-   \param[in]     oru64_ID             Unique ID
+   \param[in]     oru64_Id             Unique ID
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaTextElement::C_GiSvDaTextElement(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                         const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaTextElement::C_GiSvDaTextElement(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                         const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                          QGraphicsItem * const opc_Parent) :
-   C_GiBiTextElement(oru64_ID, opc_Parent),
+   C_GiBiTextElement(oru64_Id, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eTEXT_ELEMENT)
 {
 }
@@ -92,7 +91,7 @@ void C_GiSvDaTextElement::LoadData(void)
          if (pc_Dashboard != NULL)
          {
             const C_PuiBsTextElement * const pc_Item = pc_Dashboard->GetTextElement(
-               static_cast<uint32>(this->ms32_Index));
+               static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                this->m_LoadTextElementData(pc_Item, pc_View->GetDarkModeActive());
@@ -118,7 +117,7 @@ void C_GiSvDaTextElement::UpdateData(void)
          if (pc_Dashboard != NULL)
          {
             const C_PuiBsTextElement * const pc_Item = pc_Dashboard->GetTextElement(
-               static_cast<uint32>(this->ms32_Index));
+               static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                C_PuiBsTextElement c_Item = *pc_Item;
@@ -126,7 +125,8 @@ void C_GiSvDaTextElement::UpdateData(void)
                this->m_UpdateTextElementData(&c_Item, pc_View->GetDarkModeActive());
 
                C_PuiSvHandler::h_GetInstance()->SetDashboardTextElement(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index), c_Item);
+                                                                        static_cast<uint32_t>(this->ms32_Index),
+                                                                        c_Item);
             }
          }
       }
@@ -142,19 +142,19 @@ void C_GiSvDaTextElement::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       C_PuiSvHandler::h_GetInstance()->DeleteDashboardTextElement(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                  static_cast<uint32>(this->ms32_Index));
+                                                                  static_cast<uint32_t>(this->ms32_Index));
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaTextElement::SetZValueCustom(const float64 of64_ZValue)
+void C_GiSvDaTextElement::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiTextElement::SetZValueCustom(of64_ZValue);
+   C_GiBiTextElement::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }

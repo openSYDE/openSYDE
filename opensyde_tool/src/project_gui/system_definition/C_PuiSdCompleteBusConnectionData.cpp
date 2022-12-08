@@ -10,13 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdCompleteBusConnectionData.h"
+#include "C_PuiSdCompleteBusConnectionData.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +34,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSdCompleteBusConnectionData::C_PuiSdCompleteBusConnectionData() :
-   u64_NodeID(0),
-   u64_BusID(0)
+   u64_NodeId(0),
+   u64_BusId(0)
 {
 }

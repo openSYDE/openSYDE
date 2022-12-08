@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QWinTaskbarButton>
 
-#include "stwerrors.h"
-#include "C_SyvUpInformationWidget.h"
+#include "stwerrors.hpp"
+#include "C_SyvUpInformationWidget.hpp"
 #include "ui_C_SyvUpInformationWidget.h"
-#include "C_PuiSvData.h"
-#include "C_PuiSvHandler.h"
-#include "C_UsHandler.h"
-#include "C_GtGetText.h"
-#include "C_OsyHexFile.h"
-#include "C_OgeWiUtil.h"
-#include "C_OSCParamSetHandler.h"
+#include "C_PuiSvData.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_UsHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OsyHexFile.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OscParamSetHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -61,7 +60,7 @@ C_SyvUpInformationWidget::C_SyvUpInformationWidget(QWidget * const opc_Parent) :
    mu32_ItPemFile(0U),
    mu32_ViewIndex(0U),
    mu64_NodeStartTimeMs(0ULL),
-   mu64_LastKnownDataRateS(0ULL),
+   mu64_LastKnownDataRateSeconds(0ULL),
    mu64_CurrentFlashedBytes(0ULL),
    mu64_FlashedBytesHistoryPrev(0ULL),
    mu64_FlashedBytesHistoryPrevPrev(0ULL),
@@ -115,7 +114,7 @@ C_SyvUpInformationWidget::~C_SyvUpInformationWidget()
    \param[in]  ou32_ViewIndex    View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetViewIndex(const stw_types::uint32 ou32_ViewIndex)
+void C_SyvUpInformationWidget::SetViewIndex(const uint32_t ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->mpc_Ui->pc_WidgetUpdatePackage->SetViewIndex(ou32_ViewIndex);
@@ -145,7 +144,7 @@ void C_SyvUpInformationWidget::SetUpdateStarted(void) const
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetUpdateNodeStarted(const uint32 ou32_NodeIndex)
+void C_SyvUpInformationWidget::SetUpdateNodeStarted(const uint32_t ou32_NodeIndex)
 {
    Q_UNUSED(ou32_NodeIndex)
    this->mu64_NodeStartTimeMs = this->mc_ElapsedTimer.elapsed();
@@ -157,9 +156,9 @@ void C_SyvUpInformationWidget::SetUpdateNodeStarted(const uint32 ou32_NodeIndex)
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetUpdateNodeSuccess(const uint32 ou32_NodeIndex)
+void C_SyvUpInformationWidget::SetUpdateNodeSuccess(const uint32_t ou32_NodeIndex)
 {
-   const uint64 u64_NodeEndTimeMs = this->mc_ElapsedTimer.elapsed();
+   const uint64_t u64_NodeEndTimeMs = this->mc_ElapsedTimer.elapsed();
 
    this->mc_FileSizeInformation.SetElapsedTimeForNode(ou32_NodeIndex, u64_NodeEndTimeMs - this->mu64_NodeStartTimeMs);
 }
@@ -172,8 +171,8 @@ void C_SyvUpInformationWidget::SetUpdateNodeSuccess(const uint32 ou32_NodeIndex)
    \param[in]  oq_IsPemFile      Flag if "application" was a PEM file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const stw_types::uint32 ou32_NodeIndex,
-                                                           const bool oq_IsParam, const bool oq_IsPemFile) const
+void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const uint32_t ou32_NodeIndex, const bool oq_IsParam,
+                                                           const bool oq_IsPemFile) const
 {
    Q_UNUSED(oq_IsParam)
    Q_UNUSED(oq_IsPemFile)
@@ -188,8 +187,8 @@ void C_SyvUpInformationWidget::SetUpdateApplicationStarted(const stw_types::uint
    \param[in]  oq_IsPemFile      Flag if "application" was a PEM file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetUpdateApplicationFinished(const stw_types::uint32 ou32_NodeIndex,
-                                                            const bool oq_IsParam, const bool oq_IsPemFile)
+void C_SyvUpInformationWidget::SetUpdateApplicationFinished(const uint32_t ou32_NodeIndex, const bool oq_IsParam,
+                                                            const bool oq_IsPemFile)
 {
    this->mpc_Ui->pc_WidgetUpdatePackage->SetUpdateApplicationFinished(ou32_NodeIndex);
 
@@ -214,7 +213,7 @@ void C_SyvUpInformationWidget::SetUpdateApplicationFinished(const stw_types::uin
    \param[in]  ou32_NodeIndex    Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetUpdateApplicationError(const stw_types::uint32 ou32_NodeIndex) const
+void C_SyvUpInformationWidget::SetUpdateApplicationError(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_WidgetUpdatePackage->SetUpdateApplicationError(ou32_NodeIndex);
 }
@@ -225,7 +224,7 @@ void C_SyvUpInformationWidget::SetUpdateApplicationError(const stw_types::uint32
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::DiscardApplicationStatus(const stw_types::uint32 ou32_NodeIndex) const
+void C_SyvUpInformationWidget::DiscardApplicationStatus(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_WidgetUpdatePackage->DiscardApplicationStatus(ou32_NodeIndex);
 }
@@ -255,8 +254,8 @@ void C_SyvUpInformationWidget::SetDisconnected(void) const
    \param[in]  orc_DeviceInformation   Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::UpdateDeviceInformation(const std::vector<stw_types::uint32> & orc_NodeIndexes,
-                                                       const std::vector<stw_opensyde_gui_logic::C_SyvUpDeviceInfo> & orc_DeviceInformation)
+void C_SyvUpInformationWidget::UpdateDeviceInformation(const std::vector<uint32_t> & orc_NodeIndexes,
+                                                       const std::vector<stw::opensyde_gui_logic::C_SyvUpDeviceInfo> & orc_DeviceInformation)
 const
 {
    this->mpc_Ui->pc_WidgetUpdatePackage->UpdateDeviceInformation(orc_NodeIndexes, orc_DeviceInformation);
@@ -269,8 +268,7 @@ const
    \param[in]  ou8_Progress      Entire progress of node of update process
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::SetNodeProgress(const stw_types::uint32 ou32_NodeIndex,
-                                               const stw_types::uint8 ou8_Progress) const
+void C_SyvUpInformationWidget::SetNodeProgress(const uint32_t ou32_NodeIndex, const uint8_t ou8_Progress) const
 {
    this->mpc_Ui->pc_WidgetUpdatePackage->SetNodeProgress(ou32_NodeIndex, ou8_Progress);
 }
@@ -286,10 +284,10 @@ void C_SyvUpInformationWidget::SetNodeProgress(const stw_types::uint32 ou32_Node
    STW error code, see called function for detailed description
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_SyvUpInformationWidget::GetUpdatePackage(
-   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-   std::vector<stw_types::uint32> & orc_NodesOrder,
-   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications) const
+int32_t C_SyvUpInformationWidget::GetUpdatePackage(
+   std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+   std::vector<uint32_t> & orc_NodesOrder,
+   std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> * const opc_AllApplications) const
 {
    return this->mpc_Ui->pc_WidgetUpdatePackage->GetUpdatePackage(orc_ApplicationsToWrite, orc_NodesOrder,
                                                                  opc_AllApplications);
@@ -348,8 +346,8 @@ void C_SyvUpInformationWidget::SetHeading(const QString & orc_Icon, const QStrin
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpInformationWidget::InitUpdatePackage(
-   const std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_Flashpackage,
-   const std::vector<stw_types::uint32> & orc_Order, const std::vector<bool> & orc_IsFileBased,
+   const std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_Flashpackage,
+   const std::vector<uint32_t> & orc_Order, const std::vector<bool> & orc_IsFileBased,
    const bool oq_IncludesCurrentNodeStatus)
 {
    this->mu32_ItFile = 0UL;
@@ -358,33 +356,33 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
    this->mc_FileSizeInformation.Reset();
    this->mc_FileSizeInformation.ReserveSpace(orc_Order.size());
    //Search for matching value in order
-   for (uint32 u32_ItOrder = 0; u32_ItOrder < orc_Order.size(); ++u32_ItOrder)
+   for (uint32_t u32_ItOrder = 0; u32_ItOrder < orc_Order.size(); ++u32_ItOrder)
    {
-      const uint32 u32_NodeIndex = orc_Order[u32_ItOrder];
+      const uint32_t u32_NodeIndex = orc_Order[u32_ItOrder];
       if (u32_NodeIndex < orc_Flashpackage.size())
       {
          //Check if there are any files
-         const C_OSCSuSequences::C_DoFlash & rc_Device = orc_Flashpackage[u32_NodeIndex];
+         const C_OscSuSequences::C_DoFlash & rc_Device = orc_Flashpackage[u32_NodeIndex];
          if (rc_Device.c_FilesToFlash.size() > 0)
          {
             //Convert and add hex files
-            std::vector<uint64> c_Files;
-            std::vector<uint64> c_ParamFiles;
+            std::vector<uint64_t> c_Files;
+            std::vector<uint64_t> c_ParamFiles;
             c_Files.reserve(rc_Device.c_FilesToFlash.size());
-            for (uint32 u32_ItFile = 0; u32_ItFile < rc_Device.c_FilesToFlash.size(); ++u32_ItFile)
+            for (uint32_t u32_ItFile = 0; u32_ItFile < rc_Device.c_FilesToFlash.size(); ++u32_ItFile)
             {
-               const stw_scl::C_SCLString & rc_File = rc_Device.c_FilesToFlash[u32_ItFile];
+               const stw::scl::C_SclString & rc_File = rc_Device.c_FilesToFlash[u32_ItFile];
                bool q_UseFileSize = true;
                //Check which case it is
                if ((u32_NodeIndex < orc_IsFileBased.size()) && (orc_IsFileBased[u32_NodeIndex] == false))
                {
                   //Do the address based byte count stuff
                   C_OsyHexFile c_HexFile;
-                  const uint32 u32_Result = c_HexFile.LoadFromFile(rc_File.c_str());
-                  if (u32_Result == stw_hex_file::NO_ERR)
+                  const uint32_t u32_Result = c_HexFile.LoadFromFile(rc_File.c_str());
+                  if (u32_Result == stw::hex_file::NO_ERR)
                   {
                      q_UseFileSize = false;
-                     c_Files.push_back(static_cast<uint64>(c_HexFile.ByteCount()));
+                     c_Files.push_back(static_cast<uint64_t>(c_HexFile.ByteCount()));
                   }
                }
                //Check if fall back to file based approach is necessary
@@ -403,26 +401,26 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
             }
             //New vector for the parameter set files to the other flashed ones
             c_ParamFiles.reserve(rc_Device.c_FilesToWriteToNvm.size());
-            for (uint32 u32_ItFile = 0; u32_ItFile < rc_Device.c_FilesToWriteToNvm.size(); ++u32_ItFile)
+            for (uint32_t u32_ItFile = 0; u32_ItFile < rc_Device.c_FilesToWriteToNvm.size(); ++u32_ItFile)
             {
-               const stw_scl::C_SCLString & rc_File = rc_Device.c_FilesToWriteToNvm[u32_ItFile];
-               C_OSCParamSetHandler c_FileHandler;
+               const stw::scl::C_SclString & rc_File = rc_Device.c_FilesToWriteToNvm[u32_ItFile];
+               C_OscParamSetHandler c_FileHandler;
                if (c_FileHandler.ReadFile(rc_File, false, true, NULL) == C_NO_ERR)
                {
-                  const C_OSCParamSetInterpretedData & rc_InterpretedData = c_FileHandler.GetInterpretedData();
+                  const C_OscParamSetInterpretedData & rc_InterpretedData = c_FileHandler.GetInterpretedData();
                   if (rc_InterpretedData.c_InterpretedNodes.size() >= 1UL)
                   {
-                     const C_OSCParamSetInterpretedNode & rc_Node = rc_InterpretedData.c_InterpretedNodes[0UL];
-                     uint64 u64_Size = 0ULL;
-                     for (uint32 u32_ItDp = 0UL; u32_ItDp < rc_Node.c_DataPools.size(); ++u32_ItDp)
+                     const C_OscParamSetInterpretedNode & rc_Node = rc_InterpretedData.c_InterpretedNodes[0UL];
+                     uint64_t u64_Size = 0ULL;
+                     for (uint32_t u32_ItDp = 0UL; u32_ItDp < rc_Node.c_DataPools.size(); ++u32_ItDp)
                      {
-                        const C_OSCParamSetInterpretedDataPool & rc_Dp = rc_Node.c_DataPools[u32_ItDp];
-                        for (uint32 u32_ItLi = 0UL; u32_ItLi < rc_Dp.c_Lists.size(); ++u32_ItLi)
+                        const C_OscParamSetInterpretedDataPool & rc_Dp = rc_Node.c_DataPools[u32_ItDp];
+                        for (uint32_t u32_ItLi = 0UL; u32_ItLi < rc_Dp.c_Lists.size(); ++u32_ItLi)
                         {
-                           const C_OSCParamSetInterpretedList & rc_Li = rc_Dp.c_Lists[u32_ItLi];
-                           for (uint32 u32_ItEl = 0UL; u32_ItEl < rc_Li.c_Elements.size(); ++u32_ItEl)
+                           const C_OscParamSetInterpretedList & rc_Li = rc_Dp.c_Lists[u32_ItLi];
+                           for (uint32_t u32_ItEl = 0UL; u32_ItEl < rc_Li.c_Elements.size(); ++u32_ItEl)
                            {
-                              const C_OSCParamSetInterpretedElement & rc_El = rc_Li.c_Elements[u32_ItEl];
+                              const C_OscParamSetInterpretedElement & rc_El = rc_Li.c_Elements[u32_ItEl];
                               u64_Size += rc_El.c_NvmValue.GetSizeByte();
                            }
                            //Write 2 byte CRC twice (invalidate+validate)
@@ -457,35 +455,35 @@ void C_SyvUpInformationWidget::InitUpdatePackage(
    \param[in]  oq_Finished       Finished
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progress100, const bool oq_Finished)
+void C_SyvUpInformationWidget::UpdateProgress(const uint16_t ou16_Progress100, const bool oq_Finished)
 {
    // TODO BAY: Handle PEM files
    if (oq_Finished == false)
    {
-      uint16 u16_ActualProgress = 0;
-      uint32 u32_Counter = 0;
-      uint64 u64_FlashedBytes = 0;
+      uint16_t u16_ActualProgress = 0;
+      uint32_t u32_Counter = 0;
+      uint64_t u64_FlashedBytes = 0;
       bool q_Stop = false;
 
       //Add file info
-      for (uint32 u32_ItDevice = 0;
+      for (uint32_t u32_ItDevice = 0;
            (u32_ItDevice < this->mc_FileSizeInformation.GetNumOtherFiles()) && (q_Stop == false); ++u32_ItDevice)
       {
-         const uint32 u32_NumFiles = this->mc_FileSizeInformation.GetNumOtherFilesForDevice(u32_ItDevice);
-         for (uint32 u32_ItFile = 0; (u32_ItFile < u32_NumFiles) && (q_Stop == false); ++u32_ItFile)
+         const uint32_t u32_NumFiles = this->mc_FileSizeInformation.GetNumOtherFilesForDevice(u32_ItDevice);
+         for (uint32_t u32_ItFile = 0; (u32_ItFile < u32_NumFiles) && (q_Stop == false); ++u32_ItFile)
          {
-            const uint64 u64_CurFileSize = this->mc_FileSizeInformation.GetOtherFileSizeForDevice(u32_ItDevice,
-                                                                                                  u32_ItFile);
+            const uint64_t u64_CurFileSize = this->mc_FileSizeInformation.GetOtherFileSizeForDevice(u32_ItDevice,
+                                                                                                    u32_ItFile);
             if (u32_Counter == this->mu32_ItFile)
             {
-               const uint64 u64_OverallFilesSize = this->mc_FileSizeInformation.GetOverallFilesSize();
+               const uint64_t u64_OverallFilesSize = this->mc_FileSizeInformation.GetOverallFilesSize();
                //Match
                //Adapt to progress
-               u64_FlashedBytes += (u64_CurFileSize * static_cast<uint64>(ou16_Progress100)) / 100ULL;
+               u64_FlashedBytes += (u64_CurFileSize * static_cast<uint64_t>(ou16_Progress100)) / 100ULL;
                //Calculate overall progress
                if (u64_OverallFilesSize != 0U)
                {
-                  u16_ActualProgress = static_cast<uint16>((u64_FlashedBytes * 100ULL) / u64_OverallFilesSize);
+                  u16_ActualProgress = static_cast<uint16_t>((u64_FlashedBytes * 100ULL) / u64_OverallFilesSize);
                }
                else
                {
@@ -505,25 +503,25 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
       //Add param info
       //New counter
       u32_Counter = 0UL;
-      for (uint32 u32_ItDevice = 0;
+      for (uint32_t u32_ItDevice = 0;
            (u32_ItDevice < this->mc_FileSizeInformation.GetNumParamFiles()) && (q_Stop == false);
            ++u32_ItDevice)
       {
-         const uint32 u32_NumFiles = this->mc_FileSizeInformation.GetNumParamFilesForDevice(u32_ItDevice);
-         for (uint32 u32_ItFile = 0; (u32_ItFile < u32_NumFiles) && (q_Stop == false); ++u32_ItFile)
+         const uint32_t u32_NumFiles = this->mc_FileSizeInformation.GetNumParamFilesForDevice(u32_ItDevice);
+         for (uint32_t u32_ItFile = 0; (u32_ItFile < u32_NumFiles) && (q_Stop == false); ++u32_ItFile)
          {
-            const uint64 u64_CurFileSize = this->mc_FileSizeInformation.GetParamFileSizeForDevice(u32_ItDevice,
-                                                                                                  u32_ItFile);
+            const uint64_t u64_CurFileSize = this->mc_FileSizeInformation.GetParamFileSizeForDevice(u32_ItDevice,
+                                                                                                    u32_ItFile);
             if (u32_Counter == this->mu32_ItParamFile)
             {
-               const uint64 u64_OverallFilesSize = this->mc_FileSizeInformation.GetOverallFilesSize();
+               const uint64_t u64_OverallFilesSize = this->mc_FileSizeInformation.GetOverallFilesSize();
                //Match
                //Adapt to progress
-               u64_FlashedBytes += (u64_CurFileSize * static_cast<uint64>(ou16_Progress100)) / 100ULL;
+               u64_FlashedBytes += (u64_CurFileSize * static_cast<uint64_t>(ou16_Progress100)) / 100ULL;
                //Calculate overall progress
                if (u64_OverallFilesSize != 0U)
                {
-                  u16_ActualProgress = static_cast<uint16>((u64_FlashedBytes * 100ULL) / u64_OverallFilesSize);
+                  u16_ActualProgress = static_cast<uint16_t>((u64_FlashedBytes * 100ULL) / u64_OverallFilesSize);
                }
                else
                {
@@ -549,7 +547,7 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
       m_UpdateDataTransfer(u64_FlashedBytes, true);
 
       //Handle bytes per second info (only update if change)
-      if ((static_cast<uint64>(this->mc_ElapsedTimer.elapsed()) != this->mu64_FlashedBytesTimestampPrev) &&
+      if ((static_cast<uint64_t>(this->mc_ElapsedTimer.elapsed()) != this->mu64_FlashedBytesTimestampPrev) &&
           (this->mu64_FlashedBytesHistoryPrev != this->mu64_CurrentFlashedBytes))
       {
          this->mu64_FlashedBytesHistoryPrevPrev = this->mu64_FlashedBytesHistoryPrev;
@@ -560,7 +558,7 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
    }
    else
    {
-      uint64 u64_AverageDataRate;
+      uint64_t u64_AverageDataRate;
       m_UpdateWinProgress(false, ou16_Progress100);
       m_UpdateProgressVisualization(ou16_Progress100, oq_Finished);
 
@@ -570,7 +568,7 @@ void C_SyvUpInformationWidget::UpdateProgress(const stw_types::uint16 ou16_Progr
       if (this->mc_ElapsedTimer.elapsed() > 0)
       {
          u64_AverageDataRate = (this->mu64_CurrentFlashedBytes * 1000ULL) /
-                               static_cast<uint64>(this->mc_ElapsedTimer.elapsed());
+                               static_cast<uint64_t>(this->mc_ElapsedTimer.elapsed());
       }
       else
       {
@@ -631,13 +629,13 @@ void C_SyvUpInformationWidget::showEvent(QShowEvent * const opc_Event)
 void C_SyvUpInformationWidget::m_UpdateTime(void) const
 {
    //Current time
-   const uint64 u64_ElapsedMs = this->mc_ElapsedTimer.elapsed();
-   const uint64 u64_ElapsedS = (u64_ElapsedMs / 1000ULL) % 60ULL;
-   const uint64 u64_ElapsedMin = (u64_ElapsedMs / 60000ULL) % 60ULL;
-   const uint64 u64_ElapsedH = u64_ElapsedMs / 3600000ULL;
+   const uint64_t u64_ElapsedMs = this->mc_ElapsedTimer.elapsed();
+   const uint64_t u64_ElapsedSeconds = (u64_ElapsedMs / 1000ULL) % 60ULL;
+   const uint64_t u64_ElapsedMin = (u64_ElapsedMs / 60000ULL) % 60ULL;
+   const uint64_t u64_ElapsedHours = u64_ElapsedMs / 3600000ULL;
 
-   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedH, 2, 10, QChar('0')).
-                          arg(u64_ElapsedMin, 2, 10, QChar('0')).arg(u64_ElapsedS, 2, 10, QChar('0'));
+   const QString c_Time = static_cast<QString>("%1:%2:%3").arg(u64_ElapsedHours, 2, 10, QChar('0')).
+                          arg(u64_ElapsedMin, 2, 10, QChar('0')).arg(u64_ElapsedSeconds, 2, 10, QChar('0'));
 
    this->mpc_Ui->pc_WidgetUpdateSummary->SetElapsedTime(c_Time);
    this->mpc_Ui->pc_WidgetUpdateSummarySmall->SetElapsedTime(c_Time);
@@ -652,15 +650,15 @@ void C_SyvUpInformationWidget::m_UpdateTime(void) const
    \param[in]  oq_ShowDataRate            Flag to request show of data rate
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64 & oru64_OverallFlashedBytes,
+void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64_t & oru64_OverallFlashedBytes,
                                                     const bool oq_ShowDataRate)
 {
    QString c_Value;
    QString c_Progress;
    QString c_Complete;
    QString c_Unit;
-   const float64 f64_OverallFlashedBytes = static_cast<float64>(oru64_OverallFlashedBytes);
-   const float64 f64_OverallFilesSize = static_cast<float64>(this->mc_FileSizeInformation.GetOverallFilesSize());
+   const float64_t f64_OverallFlashedBytes = static_cast<float64_t>(oru64_OverallFlashedBytes);
+   const float64_t f64_OverallFilesSize = static_cast<float64_t>(this->mc_FileSizeInformation.GetOverallFilesSize());
 
    this->mu64_CurrentFlashedBytes = oru64_OverallFlashedBytes;
    this->mq_ShowDataRateBytesPerSecond = oq_ShowDataRate;
@@ -684,7 +682,7 @@ void C_SyvUpInformationWidget::m_UpdateDataTransfer(const uint64 & oru64_Overall
       //kB
       c_Unit = "kB";
       c_Progress = QString::number(f64_OverallFlashedBytes / 1024.0, 'f', 1);
-      c_Complete = QString::number(f64_OverallFilesSize / static_cast<float32>(1024ULL), 'f', 1);
+      c_Complete = QString::number(f64_OverallFilesSize / static_cast<float32_t>(1024ULL), 'f', 1);
    }
    else
    {
@@ -749,11 +747,11 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
       if (this->mc_FileSizeInformation.GetOverallFilesSize() > 0ULL)
       {
          bool q_Worked;
-         const uint64 u64_WaitingTimeS = this->mc_FileSizeInformation.GetEstimatedTimeS(&q_Worked);
+         const uint64_t u64_WaitingTimeSeconds = this->mc_FileSizeInformation.GetEstimatedTimeS(&q_Worked);
          //After all estimations were attempted check if any succeeded
          if (q_Worked == true)
          {
-            const uint64 u64_WaitingTimeMin = u64_WaitingTimeS / 60ULL;
+            const uint64_t u64_WaitingTimeMin = u64_WaitingTimeSeconds / 60ULL;
 
             if (u64_WaitingTimeMin == 0ULL)
             {
@@ -764,9 +762,9 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
             {
                //One min for rounding errors has to be added before
                //-> we should round ceil (include the last seconds) but we are rounding floor (integer)
-               const uint64 u64_WaitingTimeH = (u64_WaitingTimeMin + 1ULL) / 60ULL;
+               const uint64_t u64_WaitingTimeHours = (u64_WaitingTimeMin + 1ULL) / 60ULL;
                //lint -e{774,831,948} False positive
-               if (u64_WaitingTimeH == 0ULL)
+               if (u64_WaitingTimeHours == 0ULL)
                {
                   this->mc_EstimatedTime =
                      static_cast<QString>(C_GtGetText::h_GetText("Estimated waiting time %1 min.")).arg(
@@ -776,7 +774,7 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
                {
                   this->mc_EstimatedTime =
                      static_cast<QString>(C_GtGetText::h_GetText("Estimated waiting time %1 h %2 min.")).arg(
-                        u64_WaitingTimeH).arg((u64_WaitingTimeMin + 1ULL) % 60ULL);
+                        u64_WaitingTimeHours).arg((u64_WaitingTimeMin + 1ULL) % 60ULL);
                }
             }
          }
@@ -806,13 +804,13 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
    {
       QString c_DataTransferRate;
       QString c_Unit;
-      const uint64 u64_Timespan = this->mu64_FlashedBytesTimestampPrev - this->mu64_FlashedBytesTimestampPrevPrev;
-      const float64 f64_Timespan = static_cast<float64>(u64_Timespan);
-      const uint64 u64_NumberOfFlashedBytesInTimeSpan = this->mu64_FlashedBytesHistoryPrev -
-                                                        this->mu64_FlashedBytesHistoryPrevPrev;
-      const float64 f64_NumberOfFlashedBytesInTimeSpan = static_cast<float64>(u64_NumberOfFlashedBytesInTimeSpan);
-      const float64 f64_NumberOfFlashedBytesThisSecond = f64_NumberOfFlashedBytesInTimeSpan / (f64_Timespan * 0.001);
-      const uint64 u64_NumberOfFlashedBytesThisSecond = static_cast<uint64>(f64_NumberOfFlashedBytesThisSecond);
+      const uint64_t u64_Timespan = this->mu64_FlashedBytesTimestampPrev - this->mu64_FlashedBytesTimestampPrevPrev;
+      const float64_t f64_Timespan = static_cast<float64_t>(u64_Timespan);
+      const uint64_t u64_NumberOfFlashedBytesInTimeSpan = this->mu64_FlashedBytesHistoryPrev -
+                                                          this->mu64_FlashedBytesHistoryPrevPrev;
+      const float64_t f64_NumberOfFlashedBytesInTimeSpan = static_cast<float64_t>(u64_NumberOfFlashedBytesInTimeSpan);
+      const float64_t f64_NumberOfFlashedBytesThisSecond = f64_NumberOfFlashedBytesInTimeSpan / (f64_Timespan * 0.001);
+      const uint64_t u64_NumberOfFlashedBytesThisSecond = static_cast<uint64_t>(f64_NumberOfFlashedBytesThisSecond);
 
       //Remember last value
 
@@ -855,7 +853,7 @@ void C_SyvUpInformationWidget::m_UpdateDataRate()
    \param[in]  os32_Value  Progress value (0-100)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::m_UpdateWinProgress(const bool oq_Visible, const sint32 os32_Value)
+void C_SyvUpInformationWidget::m_UpdateWinProgress(const bool oq_Visible, const int32_t os32_Value)
 {
    this->mpc_Progress->setVisible(oq_Visible);
    this->mpc_Progress->setMinimum(0);
@@ -870,7 +868,7 @@ void C_SyvUpInformationWidget::m_UpdateWinProgress(const bool oq_Visible, const 
    \param[in]  oq_Finished       Flag if already finished
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpInformationWidget::m_UpdateProgressVisualization(const uint16 ou16_Progress100,
+void C_SyvUpInformationWidget::m_UpdateProgressVisualization(const uint16_t ou16_Progress100,
                                                              const bool oq_Finished) const
 {
    this->mpc_Ui->pc_WidgetUpdateSummary->SetProgress(ou16_Progress100, oq_Finished);
@@ -913,7 +911,7 @@ void C_SyvUpInformationWidget::m_LoadUserSettings()
       const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
 
       //splitter
-      sint32 s32_LastSegmentWidth  = c_UserView.GetUpdateSplitterX();
+      int32_t s32_LastSegmentWidth  = c_UserView.GetUpdateSplitterHorizontal();
 
       //Revert to default if necessary
       if (s32_LastSegmentWidth <= 0)
@@ -947,10 +945,10 @@ void C_SyvUpInformationWidget::m_SaveUserSettings() const
    if (pc_View != NULL)
    {
       // splitter
-      const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterVert->sizes();
+      const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterVert->sizes();
       if (c_Sizes.count() > 1)
       {
-         C_UsHandler::h_GetInstance()->SetProjSvUpdateSplitterX(pc_View->GetName(), c_Sizes.at(1));
+         C_UsHandler::h_GetInstance()->SetProjSvUpdateSplitterHorizontal(pc_View->GetName(), c_Sizes.at(1));
       }
 
       // summary widget style type

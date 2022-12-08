@@ -11,19 +11,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
 #include <QHeaderView>
 #include <QHoverEvent>
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_TblViewToolTipBase.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_TblViewToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -107,20 +106,20 @@ void C_TblViewToolTipBase::keyPressEvent(QKeyEvent * const opc_Event)
       // toggle checkbox in checkbox case
       if (this->model()->flags(this->currentIndex()).testFlag(Qt::ItemIsUserCheckable) == true)
       {
-         if (this->model()->data(this->currentIndex(), static_cast<sintn>(Qt::CheckStateRole)) ==
-             static_cast<sintn>(Qt::Checked))
+         if (this->model()->data(this->currentIndex(), static_cast<int32_t>(Qt::CheckStateRole)) ==
+             static_cast<int32_t>(Qt::Checked))
          {
             q_CallOrig = false;
-            this->model()->setData(this->currentIndex(), static_cast<sintn>(Qt::Unchecked),
-                                   static_cast<sintn>(Qt::CheckStateRole));
+            this->model()->setData(this->currentIndex(), static_cast<int32_t>(Qt::Unchecked),
+                                   static_cast<int32_t>(Qt::CheckStateRole));
             opc_Event->accept();
          }
-         else if (this->model()->data(this->currentIndex(), static_cast<sintn>(Qt::CheckStateRole)) ==
-                  static_cast<sintn>(Qt::Unchecked))
+         else if (this->model()->data(this->currentIndex(), static_cast<int32_t>(Qt::CheckStateRole)) ==
+                  static_cast<int32_t>(Qt::Unchecked))
          {
             q_CallOrig = false;
-            this->model()->setData(this->currentIndex(), static_cast<sintn>(Qt::Checked),
-                                   static_cast<sintn>(Qt::CheckStateRole));
+            this->model()->setData(this->currentIndex(), static_cast<int32_t>(Qt::Checked),
+                                   static_cast<int32_t>(Qt::CheckStateRole));
             opc_Event->accept();
          }
          else
@@ -177,15 +176,15 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                 (this->verticalHeader()->geometry().contains(
                     this->verticalHeader()->mapFromGlobal(c_GlobalPos)) == true))
             {
-               const sint32 s32_LogicalIndex =
+               const int32_t s32_LogicalIndex =
                   this->verticalHeader()->logicalIndexAt(this->verticalHeader()->mapFromGlobal(c_GlobalPos));
-               const sint32 s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
+               const int32_t s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
                if (s32_VisualIndex >= 0)
                {
                   const QString c_Heading = this->model()->headerData(s32_VisualIndex, Qt::Vertical,
-                                                                      msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
                   const QString c_Content = this->model()->headerData(s32_VisualIndex, Qt::Vertical,
-                                                                      msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
 
                   if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                   {
@@ -206,15 +205,15 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                      (this->horizontalHeader()->geometry().contains(
                          this->horizontalHeader()->mapFromGlobal(c_GlobalPos)) == true))
             {
-               const sint32 s32_LogicalIndex =
+               const int32_t s32_LogicalIndex =
                   this->horizontalHeader()->logicalIndexAt(this->horizontalHeader()->mapFromGlobal(c_GlobalPos));
-               const sint32 s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
+               const int32_t s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
                if (s32_VisualIndex >= 0)
                {
                   const QString c_Heading = this->model()->headerData(s32_VisualIndex, Qt::Horizontal,
-                                                                      msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
                   const QString c_Content = this->model()->headerData(s32_VisualIndex, Qt::Horizontal,
-                                                                      msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                                                                      ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
 
                   if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                   {
@@ -236,14 +235,14 @@ bool C_TblViewToolTipBase::event(QEvent * const opc_Event)
                const QModelIndex c_Index = this->indexAt(this->viewport()->mapFromGlobal(c_GlobalPos));
                if (c_Index.isValid() == true)
                {
-                  const sint32 s32_ToolTipRow = c_Index.row();
-                  const sint32 s32_ToolTipCol = c_Index.column();
+                  const int32_t s32_ToolTipRow = c_Index.row();
+                  const int32_t s32_ToolTipCol = c_Index.column();
                   if ((s32_ToolTipRow >= 0) && (s32_ToolTipCol >= 0))
                   {
-                     const QString c_Heading = c_Index.data(msn_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
-                     const QString c_Content = c_Index.data(msn_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
+                     const QString c_Heading = c_Index.data(ms32_USER_ROLE_TOOL_TIP_HEADING).value<QString>();
+                     const QString c_Content = c_Index.data(ms32_USER_ROLE_TOOL_TIP_CONTENT).value<QString>();
                      const C_NagToolTip::E_Type e_Type =
-                        static_cast<C_NagToolTip::E_Type>(c_Index.data(msn_USER_ROLE_TOOL_TIP_TYPE).toInt());
+                        static_cast<C_NagToolTip::E_Type>(c_Index.data(ms32_USER_ROLE_TOOL_TIP_TYPE).toInt());
                      if ((c_Heading.compare("") != 0) || (c_Content.compare("") != 0))
                      {
                         this->ms32_HoveredRow = s32_ToolTipRow;
@@ -319,11 +318,11 @@ void C_TblViewToolTipBase::m_HideToolTip(void)
    Column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_TblViewToolTipBase::m_GetColumnWidths(void) const
+std::vector<int32_t> C_TblViewToolTipBase::m_GetColumnWidths(void) const
 {
-   std::vector<sint32> c_ColumnWidths;
+   std::vector<int32_t> c_ColumnWidths;
    c_ColumnWidths.reserve(this->model()->columnCount());
-   for (sint32 s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
+   for (int32_t s32_ItColumn = 0; s32_ItColumn < this->model()->columnCount(); ++s32_ItColumn)
    {
       c_ColumnWidths.push_back(this->columnWidth(s32_ItColumn));
    }
@@ -339,18 +338,18 @@ std::vector<sint32> C_TblViewToolTipBase::m_GetColumnWidths(void) const
    \retval   false  Were not set
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_TblViewToolTipBase::m_SetColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+bool C_TblViewToolTipBase::m_SetColumnWidths(const std::vector<int32_t> & orc_ColumnWidths)
 {
    bool q_Retval = false;
 
    //Only apply user settings if number of expected columns, otherwise this could lead to unexpected behavior
    if ((orc_ColumnWidths.size() > 0UL) &&
-       (static_cast<uint32>(this->model()->columnCount()) == orc_ColumnWidths.size()))
+       (static_cast<uint32_t>(this->model()->columnCount()) == orc_ColumnWidths.size()))
    {
       q_Retval = true;
-      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
       {
-         this->setColumnWidth(static_cast<sint32>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+         this->setColumnWidth(static_cast<int32_t>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
       }
    }
    return q_Retval;
@@ -383,9 +382,9 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
    }
    if ((this->verticalHeader()->isVisible() == true) && (this->ms32_HoveredVertHeader >= 0))
    {
-      const sint32 s32_LogicalIndex =
+      const int32_t s32_LogicalIndex =
          this->verticalHeader()->logicalIndexAt(this->verticalHeader()->mapFromGlobal(orc_GlobalPos));
-      const sint32 s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
+      const int32_t s32_VisualIndex = this->verticalHeader()->visualIndex(s32_LogicalIndex);
       if (s32_VisualIndex != this->ms32_HoveredVertHeader)
       {
          //Hide Tooltip
@@ -403,9 +402,9 @@ void C_TblViewToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos
    }
    if ((this->horizontalHeader()->isVisible() == true) && (this->ms32_HoveredHorzHeader >= 0))
    {
-      const sint32 s32_LogicalIndex =
+      const int32_t s32_LogicalIndex =
          this->horizontalHeader()->logicalIndexAt(this->horizontalHeader()->mapFromGlobal(orc_GlobalPos));
-      const sint32 s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
+      const int32_t s32_VisualIndex = this->horizontalHeader()->visualIndex(s32_LogicalIndex);
       if (s32_VisualIndex != this->ms32_HoveredHorzHeader)
       {
          //Hide Tooltip

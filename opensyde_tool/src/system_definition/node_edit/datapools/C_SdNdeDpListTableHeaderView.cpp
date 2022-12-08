@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSpinBox>
 #include <QStyleOptionHeader>
 #include <QPainter>
-#include "C_SdNdeDpListTableHeaderView.h"
-#include "C_OgeWiUtil.h"
+#include "C_SdNdeDpListTableHeaderView.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -104,21 +103,21 @@ QStyleOptionViewItem C_SdNdeDpListTableHeaderView::viewOptions(void) const
 
    Here: Draw icon manually
 
-   \param[in,out] opc_Painter      Painter
-   \param[in]     orc_Rect         Rectangle
-   \param[in]     osn_LogicalIndex Logical index
+   \param[in,out] opc_Painter       Painter
+   \param[in]     orc_Rect          Rectangle
+   \param[in]     os32_LogicalIndex Logical index
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableHeaderView::paintSection(QPainter * const opc_Painter, const QRect & orc_Rect,
-                                                const sintn osn_LogicalIndex) const
+                                                const int32_t os32_LogicalIndex) const
 {
-   QHeaderView::paintSection(opc_Painter, orc_Rect, osn_LogicalIndex);
+   QHeaderView::paintSection(opc_Painter, orc_Rect, os32_LogicalIndex);
    //You can draw anything here, it is not shown as long as you do call the original function
    if (this->model() != NULL)
    {
       //Check if icon set
       const QVariant c_Variant =
-         this->model()->headerData(osn_LogicalIndex, this->orientation(), static_cast<sintn>(Qt::DecorationRole));
+         this->model()->headerData(os32_LogicalIndex, this->orientation(), static_cast<int32_t>(Qt::DecorationRole));
       const QPixmap c_Icon = qvariant_cast<QPixmap>(c_Variant);
       if (c_Icon.isNull() == false)
       {

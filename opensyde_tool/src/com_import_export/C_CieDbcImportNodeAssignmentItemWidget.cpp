@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CieDbcImportNodeAssignmentItemWidget.h"
+#include "C_CieDbcImportNodeAssignmentItemWidget.hpp"
 #include "ui_C_CieDbcImportNodeAssignmentItemWidget.h"
 
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,14 +40,16 @@ using namespace stw_opensyde_gui_elements;
 
    Set up GUI with all elements.
 
-   \param[in]        orc_DbcNode       Node data structure read from DBC file
-   \param[in]        orc_OsyNodeNames  Names of nodes resp. node and interface connected to specific bus
-   \param[in,out]    opc_Parent        Optional pointer to parent
+   \param[in]        orc_DbcNode          Node data structure read from DBC file
+   \param[in]        orc_OsyNodeNames     Names of nodes resp. node and interface connected to specific bus
+   \param[in]        orc_NodeIndexes      Indices of nodes connected to specific bus
+   \param[in]        orc_InterfaceIndexes Indices of interfaces connected to specific bus
+   \param[in,out]    opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieDbcImportNodeAssignmentItemWidget::C_CieDbcImportNodeAssignmentItemWidget(
-   const C_CieConverter::C_CIENode & orc_DbcNode, const std::vector<QString> & orc_OsyNodeNames,
-   const std::vector<uint32> & orc_NodeIndexes, const std::vector<uint32> & orc_InterfaceIndexes,
+   const C_CieConverter::C_CieNode & orc_DbcNode, const std::vector<QString> & orc_OsyNodeNames,
+   const std::vector<uint32_t> & orc_NodeIndexes, const std::vector<uint32_t> & orc_InterfaceIndexes,
    QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_CieDbcImportNodeAssignmentItemWidget),
@@ -74,7 +75,7 @@ C_CieDbcImportNodeAssignmentItemWidget::C_CieDbcImportNodeAssignmentItemWidget(
    }
 
    //lint -e{929} Cast required to avoid ambiguous signal of Qt interface
-   connect(this->mpc_Ui->pc_CbxOsyNodes, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_CbxOsyNodes, static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_CieDbcImportNodeAssignmentItemWidget::m_OnComboboxIndexChanged);
 }
 
@@ -99,7 +100,7 @@ C_CieDbcImportNodeAssignmentItemWidget::~C_CieDbcImportNodeAssignmentItemWidget(
 C_CieDbcOsyNodeAssignment C_CieDbcImportNodeAssignmentItemWidget::GetNodeAssignment(void) const
 {
    C_CieDbcOsyNodeAssignment c_Return;
-   const sint32 s32_CurrentIndex = this->mpc_Ui->pc_CbxOsyNodes->currentIndex();
+   const int32_t s32_CurrentIndex = this->mpc_Ui->pc_CbxOsyNodes->currentIndex();
 
    c_Return.s32_AssignedOsyNodeIndex = -1;
    c_Return.s32_AssignedOsyInterfaceIndex = -1;
@@ -110,12 +111,12 @@ C_CieDbcOsyNodeAssignment C_CieDbcImportNodeAssignmentItemWidget::GetNodeAssignm
       tgl_assert(this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size());
 
       // subtract one of current index because of ignore item in combobox
-      const uint32 u32_DataIndex = static_cast<uint32>(s32_CurrentIndex - 1);
+      const uint32_t u32_DataIndex = static_cast<uint32_t>(s32_CurrentIndex - 1);
 
       if (u32_DataIndex < this->mc_NodeIndexes.size())
       {
-         c_Return.s32_AssignedOsyNodeIndex = static_cast<sint32>(this->mc_NodeIndexes[u32_DataIndex]);
-         c_Return.s32_AssignedOsyInterfaceIndex = static_cast<sint32>(this->mc_InterfaceIndexes[u32_DataIndex]);
+         c_Return.s32_AssignedOsyNodeIndex = static_cast<int32_t>(this->mc_NodeIndexes[u32_DataIndex]);
+         c_Return.s32_AssignedOsyInterfaceIndex = static_cast<int32_t>(this->mc_InterfaceIndexes[u32_DataIndex]);
       }
    }
 
@@ -142,7 +143,8 @@ bool C_CieDbcImportNodeAssignmentItemWidget::IsAssigned(void) const
    \param[in]       oq_Enable     flag of enable or disable
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentItemWidget::UpdateComboboxEntries(const uint32 ou32_Index, const bool oq_Enable) const
+void C_CieDbcImportNodeAssignmentItemWidget::UpdateComboboxEntries(const uint32_t ou32_Index,
+                                                                   const bool oq_Enable) const
 {
    this->mpc_Ui->pc_CbxOsyNodes->SetItemState(ou32_Index, oq_Enable);
 }
@@ -155,7 +157,7 @@ void C_CieDbcImportNodeAssignmentItemWidget::UpdateComboboxEntries(const uint32 
    \param[in]       os32_Index   New combo box index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieDbcImportNodeAssignmentItemWidget::m_OnComboboxIndexChanged(const sint32 os32_Index)
+void C_CieDbcImportNodeAssignmentItemWidget::m_OnComboboxIndexChanged(const int32_t os32_Index)
 {
    tgl_assert(os32_Index >= 0);
 

@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QVBoxLayout>
 #include <QStylePainter>
 #include <QApplication>
 #include <QDesktopWidget>
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "C_GtGetText.h"
-#include "C_OgeCbxMultiSelect.h"
-#include "C_OgeCbxTableBase.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeCbxMultiSelect.hpp"
+#include "C_OgeCbxTableBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -122,7 +121,7 @@ QBitArray C_OgeCbxMultiSelect::GetValuesAsBitArray(void) const
    QBitArray c_Retval;
 
    c_Retval.resize(this->mpc_ListWidget->count());
-   for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); ++s32_Counter)
+   for (int32_t s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); ++s32_Counter)
    {
       // get one item from list widget
       const QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(s32_Counter);
@@ -196,28 +195,28 @@ void C_OgeCbxMultiSelect::mousePressEvent(QMouseEvent * const opc_Event)
 void C_OgeCbxMultiSelect::showPopup()
 {
    QRect c_Rect;
-   const sintn sn_ListHeight = (this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 2;
+   const int32_t s32_ListHeight = (this->mpc_ListWidget->count() * this->mpc_ListWidget->sizeHintForRow(0)) + 2;
    const QRect c_ScreenRect = QApplication::desktop()->screenGeometry(this);
    const QPoint c_Above = this->mapToGlobal(QPoint(0, 0));
    const QPoint c_Below = this->mapToGlobal(QPoint(0, this->geometry().height()));
-   const sint32 s32_BelowHeight = std::min(abs(c_ScreenRect.bottom() - c_Below.y()), sn_ListHeight);
-   const sint32 s32_AboveHeight = std::min(abs(c_Above.y() - c_ScreenRect.y()), sn_ListHeight);
+   const int32_t s32_BelowHeight = std::min(abs(c_ScreenRect.bottom() - c_Below.y()), s32_ListHeight);
+   const int32_t s32_AboveHeight = std::min(abs(c_Above.y() - c_ScreenRect.y()), s32_ListHeight);
 
    // give the list widget a small minimum (important if only 2 or less entries exist)
    this->mpc_ListWidget->setMinimumHeight(1);
 
    // if we use below or above
-   if ((s32_BelowHeight == sn_ListHeight) || (s32_BelowHeight > s32_AboveHeight))
+   if ((s32_BelowHeight == s32_ListHeight) || (s32_BelowHeight > s32_AboveHeight))
    {
       c_Rect.setTopLeft(c_Below);
       c_Rect.setWidth(this->geometry().width());
-      c_Rect.setHeight(sn_ListHeight);
+      c_Rect.setHeight(s32_ListHeight);
    }
    else
    {
       c_Rect.setTopLeft(c_Above - QPoint(0, s32_AboveHeight));
       c_Rect.setWidth(this->geometry().width());
-      c_Rect.setHeight(sn_ListHeight);
+      c_Rect.setHeight(s32_ListHeight);
    }
 
    // set popup geometry
@@ -284,7 +283,7 @@ void C_OgeCbxMultiSelect::SetItem(const QString & orc_DisplayName)
       this->mc_DisplayText = "";
    }
    // search for the item
-   for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
+   for (int32_t s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
    {
       // get one item from list widget
       QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(s32_Counter);
@@ -320,9 +319,9 @@ void C_OgeCbxMultiSelect::Init(const QStringList & orc_Strings, const QBitArray 
    this->RemoveAllItems();
    if (orc_Strings.size() == orc_Values.size())
    {
-      for (sintn sn_It = 0; sn_It < orc_Strings.size(); ++sn_It)
+      for (int32_t s32_It = 0; s32_It < orc_Strings.size(); ++s32_It)
       {
-         this->AddItem(orc_Strings.at(sn_It), orc_Values.at(sn_It));
+         this->AddItem(orc_Strings.at(s32_It), orc_Values.at(s32_It));
       }
       this->m_UpdateDisplayName();
    }
@@ -356,7 +355,7 @@ void C_OgeCbxMultiSelect::m_UpdateDisplayName(void)
    QString c_ToolTip;
 
    // search for items are checked
-   for (stw_types::sint32 s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
+   for (int32_t s32_Counter = 0; s32_Counter < this->mpc_ListWidget->count(); s32_Counter++)
    {
       // get one item from list widget
       QListWidgetItem * const pc_Item = this->mpc_ListWidget->item(s32_Counter);

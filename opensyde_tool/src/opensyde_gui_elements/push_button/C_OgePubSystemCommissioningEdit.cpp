@@ -13,16 +13,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "constants.h"
-#include "C_OgePubSystemCommissioningEdit.h"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "C_OgePubSystemCommissioningEdit.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,11 +48,11 @@ C_OgePubSystemCommissioningEdit::C_OgePubSystemCommissioningEdit(QWidget * const
    C_OgePubSvgIconWithTextBase(opc_Parent)
 {
    this->SetMargins(10, 20);
-   this->msn_LeftBorderEnabledWidth = 1;
-   this->msn_RightBorderDisabledWidth = 1;
-   this->msn_LeftBorderDisabledWidth = 1;
-   this->msn_TopBorderDisabledWidth = 1;
-   this->msn_BottomBorderDisabledWidth = 1;
+   this->ms32_LeftBorderEnabledWidth = 1;
+   this->ms32_RightBorderDisabledWidth = 1;
+   this->ms32_LeftBorderDisabledWidth = 1;
+   this->ms32_TopBorderDisabledWidth = 1;
+   this->ms32_BottomBorderDisabledWidth = 1;
    this->mc_BorderColorEnabledLeft = mc_STYLE_GUIDE_COLOR_0;
    this->mc_BorderColorDisabledLeft = mc_STYLE_GUIDE_COLOR_10;
    this->mc_BorderColorDisabledBottom = mc_STYLE_GUIDE_COLOR_10;

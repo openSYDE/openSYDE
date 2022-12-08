@@ -8,21 +8,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QVBoxLayout>
 
-#include "TGLUtils.h"
-#include "C_SdBueNodeSelectorCheckBoxListWidget.h"
+#include "TglUtils.hpp"
+#include "C_SdBueNodeSelectorCheckBoxListWidget.hpp"
 
 #include "ui_C_SdBueNodeSelectorCheckBoxListWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -82,18 +81,18 @@ C_SdBueNodeSelectorCheckBoxListWidget::~C_SdBueNodeSelectorCheckBoxListWidget()
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> & orc_Names,
-                                                     const std::vector<uint32> & orc_Indexes,
-                                                     const std::vector<uint32> & orc_SubIndexes)
+                                                     const std::vector<uint32_t> & orc_Indexes,
+                                                     const std::vector<uint32_t> & orc_SubIndexes)
 {
-   uint32 u32_Counter;
-   sintn sn_Counter;
+   uint32_t u32_Counter;
+   int32_t s32_Counter;
    QSpacerItem * const pc_Spacer = new QSpacerItem(0, 3, QSizePolicy::Minimum, QSizePolicy::Expanding);
-   const sintn sn_ItemCount = this->mpc_Ui->pc_CbxVerticalLayout->count();
+   const int32_t s32_ItemCount = this->mpc_Ui->pc_CbxVerticalLayout->count();
 
    // clear all previous nodes
-   for (sn_Counter = (sn_ItemCount - 1); sn_Counter >= 0; --sn_Counter)
+   for (s32_Counter = (s32_ItemCount - 1); s32_Counter >= 0; --s32_Counter)
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_Counter);
 
       C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
          dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
@@ -134,21 +133,21 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
    \param[in]     orc_SubIndexes     Subindexes of Nodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32> & orc_Indexes,
-                                                       const std::vector<uint32> & orc_SubIndexes) const
+void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32_t> & orc_Indexes,
+                                                       const std::vector<uint32_t> & orc_SubIndexes) const
 {
    if (orc_Indexes.size() == orc_SubIndexes.size())
    {
-      sintn sn_Counter;
-      uint32 u32_Index;
-      uint32 u32_SubIndex;
-      uint32 u32_CounterIndex;
-      const sintn sn_ItemCount = this->mpc_Ui->pc_CbxVerticalLayout->count();
+      int32_t s32_Counter;
+      uint32_t u32_Index;
+      uint32_t u32_SubIndex;
+      uint32_t u32_CounterIndex;
+      const int32_t s32_ItemCount = this->mpc_Ui->pc_CbxVerticalLayout->count();
 
       // check all checkboxes which have these indexes and uncheck all other checkboxes
-      for (sn_Counter = (sn_ItemCount - 1); sn_Counter >= 0; --sn_Counter)
+      for (s32_Counter = (s32_ItemCount - 1); s32_Counter >= 0; --s32_Counter)
       {
-         QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
+         QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_Counter);
 
          C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
             dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
@@ -183,7 +182,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckNodes(const std::vector<uint32>
    \param[in]     oq_Checked        Flag for checked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32 ou32_Index, const uint32 ou32_SubIndex,
+void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32_t ou32_Index, const uint32_t ou32_SubIndex,
                                                               const bool oq_Checked) const
 {
    C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem = this->m_GetItemWidget(ou32_Index, ou32_SubIndex);
@@ -204,8 +203,8 @@ void C_SdBueNodeSelectorCheckBoxListWidget::CheckSpecificNode(const uint32 ou32_
    \param[in]     oq_Manager        Flag if node is a CANopen Manager
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsManager(const uint32 ou32_Index,
-                                                                     const uint32 ou32_SubIndex,
+void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsManager(const uint32_t ou32_Index,
+                                                                     const uint32_t ou32_SubIndex,
                                                                      const bool oq_Manager) const
 {
    C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem = this->m_GetItemWidget(ou32_Index, ou32_SubIndex);
@@ -228,10 +227,10 @@ void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsManager(const uint3
                                           assigned to (if oq_Device == true)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsDevice(const uint32 ou32_Index, const uint32 ou32_SubIndex,
-                                                                    const bool oq_Device,
-                                                                    const stw_opensyde_core::C_OSCCanInterfaceId * const opc_DeviceId, const uint32 ou32_ManagerNodeIndex,
-                                                                    const uint32 ou32_ManagerIntfIndex)
+void C_SdBueNodeSelectorCheckBoxListWidget::SetSpecificNodeAsDevice(const uint32_t ou32_Index,
+                                                                    const uint32_t ou32_SubIndex, const bool oq_Device,
+                                                                    const stw::opensyde_core::C_OscCanInterfaceId * const opc_DeviceId, const uint32_t ou32_ManagerNodeIndex,
+                                                                    const uint32_t ou32_ManagerIntfIndex)
 const
 {
    C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem = this->m_GetItemWidget(ou32_Index, ou32_SubIndex);
@@ -248,10 +247,10 @@ const
    \param[in]     oe_Protocol     Protocol id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::SetProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
+void C_SdBueNodeSelectorCheckBoxListWidget::SetProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol)
 const
 {
-   for (sint32 s32_ItItem = 0; s32_ItItem < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++s32_ItItem)
+   for (int32_t s32_ItItem = 0; s32_ItItem < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++s32_ItItem)
    {
       QLayoutItem * const pc_Layout = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_ItItem);
       if (pc_Layout != NULL)
@@ -272,7 +271,7 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
 {
-   for (sint32 s32_ItItem = 0; s32_ItItem < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++s32_ItItem)
+   for (int32_t s32_ItItem = 0; s32_ItItem < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++s32_ItItem)
    {
       QLayoutItem * const pc_Layout = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_ItItem);
       if (pc_Layout != NULL)
@@ -293,8 +292,8 @@ void C_SdBueNodeSelectorCheckBoxListWidget::Refresh(void) const
    \param[in]     orc_Name       Name of Node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, const uint32 ou32_Index,
-                                                      const uint32 ou32_SubIndex)
+void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, const uint32_t ou32_Index,
+                                                      const uint32_t ou32_SubIndex)
 {
    C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
       new C_SdBueNodeSelectorCheckBoxItemWidget(ou32_Index,
@@ -311,10 +310,11 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_AddNode(const QString & orc_Name, 
 } //lint !e429  //no memory leak because of the parent of pc_SelectorItem by addWidget and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged(const sintn osn_Min, const sintn osn_Max) const
+void C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged(const int32_t os32_Min,
+                                                                    const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->mpc_Ui->pc_ScrollArea->verticalScrollBar()->hide();
    }
@@ -334,25 +334,25 @@ void C_SdBueNodeSelectorCheckBoxListWidget::m_ScrollBarRangeChanged(const sintn 
    \retval   NULL            No item with matching parameters found
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueNodeSelectorCheckBoxItemWidget * C_SdBueNodeSelectorCheckBoxListWidget::m_GetItemWidget(const uint32 ou32_Index,
-                                                                                               const uint32 ou32_SubIndex)
+C_SdBueNodeSelectorCheckBoxItemWidget * C_SdBueNodeSelectorCheckBoxListWidget::m_GetItemWidget(
+   const uint32_t ou32_Index, const uint32_t ou32_SubIndex)
 const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
    C_SdBueNodeSelectorCheckBoxItemWidget * pc_Return = NULL;
 
    // check all checkboxes which have these indexes and uncheck all other checkboxes
-   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_CbxVerticalLayout->count(); ++s32_Counter)
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(sn_Counter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_Counter);
 
       C_SdBueNodeSelectorCheckBoxItemWidget * const pc_SelectorItem =
          dynamic_cast<C_SdBueNodeSelectorCheckBoxItemWidget *>(pc_Item->widget());
 
       if (pc_SelectorItem != NULL)
       {
-         uint32 u32_Index;
-         uint32 u32_SubIndex;
+         uint32_t u32_Index;
+         uint32_t u32_SubIndex;
 
          pc_SelectorItem->GetIndexes(u32_Index, u32_SubIndex);
 

@@ -8,19 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaDashboardToolbox.h"
+#include "C_SyvDaDashboardToolbox.hpp"
 #include "ui_C_SyvDaDashboardToolbox.h"
-#include "C_GtGetText.h"
-#include "C_SebToolboxUtil.h"
-#include "C_OgeWiUtil.h"
+#include "C_GtGetText.hpp"
+#include "C_SebToolboxUtil.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -96,7 +95,7 @@ void C_SyvDaDashboardToolbox::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardToolbox::ApplyDarkMode(const bool oq_Active)
 {
-   for (uint32 u32_ItList = 0; u32_ItList < static_cast<uint32>(this->mc_ListWidgets.size()); ++u32_ItList)
+   for (uint32_t u32_ItList = 0; u32_ItList < static_cast<uint32_t>(this->mc_ListWidgets.size()); ++u32_ItList)
    {
       C_SdTopologyListWidget * const pc_ListWidget = this->mc_ListWidgets[u32_ItList];
       if (pc_ListWidget != NULL)
@@ -182,8 +181,8 @@ void C_SyvDaDashboardToolbox::m_FillToolboxStatic(void)
    m_AddWidgetItems();
 
    // configure Headings
-   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
-   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hsn_LABEL_SIZE);
+   this->mpc_Ui->pc_LabelFreeElements->setMaximumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
+   this->mpc_Ui->pc_LabelFreeElements->setMinimumHeight(C_SebToolboxUtil::hs32_LABEL_SIZE);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

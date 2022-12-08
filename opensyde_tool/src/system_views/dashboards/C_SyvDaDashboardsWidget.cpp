@@ -8,42 +8,41 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvDaDashboardsWidget.h"
+#include "C_SyvDaDashboardsWidget.hpp"
 #include "ui_C_SyvDaDashboardsWidget.h"
 
-#include "C_Uti.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "TGLUtils.h"
-#include "TGLTime.h"
-#include "C_SyvUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgePopUpDialog.h"
-#include "C_UsHandler.h"
-#include "C_SyvDaDashboardToolbox.h"
-#include "C_SyvDaPeUpdateModeConfiguration.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_Uti.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "TglTime.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_UsHandler.hpp"
+#include "C_SyvDaDashboardToolbox.hpp"
+#include "C_SyvDaPeUpdateModeConfiguration.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDaDashboardsWidget::mhc_DARK_MODE_ENABLED_ICON_PATH = "://images/system_views/Darkmode_Disable.svg";
 const QString C_SyvDaDashboardsWidget::mhc_DARK_MODE_DISABLED_ICON_PATH = "://images/system_views/Darkmode_Enable.svg";
-const sintn C_SyvDaDashboardsWidget::mhsn_WIDGET_BORDER = 11;
-const sintn C_SyvDaDashboardsWidget::mhsn_TOOLBOX_INIT_POS_Y = 150;
-stw_types::uint32 C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
+const int32_t C_SyvDaDashboardsWidget::mhs32_WIDGET_BORDER = 11;
+const int32_t C_SyvDaDashboardsWidget::mhs32_TOOLBOX_INIT_POS_Y = 150;
+uint32_t C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -65,7 +64,7 @@ stw_types::uint32 C_SyvDaDashboardsWidget::mhu32_DisconnectTime = 0UL;
    \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QWidget * const opc_ToolboxParent,
+C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32_t ou32_ViewIndex, QWidget * const opc_ToolboxParent,
                                                  QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDaDashboardsWidget),
@@ -79,7 +78,7 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    mq_DarkModeActive(false),
    mq_ConnectActive(false),
    me_ConnectState(eCS_DISCONNECTED),
-   msn_InitToolboxCounter(0)
+   ms32_InitToolboxCounter(0)
 {
    const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
 
@@ -105,16 +104,16 @@ C_SyvDaDashboardsWidget::C_SyvDaDashboardsWidget(const uint32 ou32_ViewIndex, QW
    this->mpc_Ui->pc_PbCancel->setVisible(false);
 
    // Configure timer
-   this->mc_Timer.setInterval(msn_TIMER_GUI_REFRESH);
+   this->mc_Timer.setInterval(ms32_TIMER_GUI_REFRESH);
    connect(&this->mc_Timer, &QTimer::timeout, this, &C_SyvDaDashboardsWidget::m_UpdateShowValues);
 
    // Handle the service mode
    this->mpc_Ui->pc_PbConfirm->setEnabled(!q_ServiceModeActive);
 
    // Connect buttons
-   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
+   connect(this->mpc_Ui->pc_PbConfirm, &stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaDashboardsWidget::m_ConfirmClicked);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
+   connect(this->mpc_Ui->pc_PbCancel, &stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaDashboardsWidget::m_CancelClicked);
 
    connect(this->mpc_Ui->pc_TabWidget, &C_SyvDaDashboardSelectorTabWidget::SigConfirmClicked,
@@ -233,7 +232,7 @@ void C_SyvDaDashboardsWidget::OpenSettings(void)
    //Resize
    c_New->SetSize(QSize(1400, 809));
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       //Signal widget update
       this->mpc_Ui->pc_TabWidget->UpdateTransmissionConfiguration();
@@ -392,7 +391,7 @@ void C_SyvDaDashboardsWidget::SetConnectActive(const bool oq_Value)
       Q_EMIT (this->SigBlockDragAndDrop(false));
 
       // Save the time of disconnect
-      C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TGL_GetTickCount();
+      C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TglGetTickCount();
    }
 
    QApplication::restoreOverrideCursor();
@@ -425,22 +424,22 @@ void C_SyvDaDashboardsWidget::CheckError(void) const
 
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
-   sintn sn_ColorID;
+   int32_t s32_ColorId;
    const bool q_ViewSetupError = C_SyvUtil::h_GetViewStatusLabelInfo(
       this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_DASHBOARD, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip,
       e_ToolTipType,
-      c_IconPath, sn_ColorID);
+      c_IconPath, s32_ColorId);
 
    if (q_ViewSetupError == true)
    {
       this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
       this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
                                                              c_ErrorTextTooltip, e_ToolTipType);
-      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(s32_ColorId);
       this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
       this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
                                                               c_ErrorTextTooltip, e_ToolTipType);
-      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(s32_ColorId);
       this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
    }
@@ -541,32 +540,32 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
       }
 
       // would the toolbox be outside of the widget in x direction
-      if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhsn_WIDGET_BORDER) > pc_Widget->width())
+      if ((this->mpc_Toolbox->x() + this->mpc_Toolbox->width() + mhs32_WIDGET_BORDER) > pc_Widget->width())
       {
          // is the toolbox to big?
-         if ((this->mpc_Toolbox->width() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->width())
+         if ((this->mpc_Toolbox->width() + (2 * mhs32_WIDGET_BORDER)) > pc_Widget->width())
          {
-            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WIDGET_BORDER));
+            c_Size.setWidth(pc_Widget->width() - (2 * mhs32_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhsn_WIDGET_BORDER);
+            c_Point.setX((pc_Widget->width() - this->mpc_Toolbox->width()) - mhs32_WIDGET_BORDER);
          }
       }
 
       // would the toolbox be outside of the widget in y direction
-      if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhsn_WIDGET_BORDER) > pc_Widget->height())
+      if ((this->mpc_Toolbox->y() + this->mpc_Toolbox->height() + mhs32_WIDGET_BORDER) > pc_Widget->height())
       {
          // is the toolbox to big?
-         if ((this->mpc_Toolbox->height() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->height())
+         if ((this->mpc_Toolbox->height() + (2 * mhs32_WIDGET_BORDER)) > pc_Widget->height())
          {
-            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WIDGET_BORDER));
+            c_Size.setHeight(pc_Widget->height() - (2 * mhs32_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhsn_WIDGET_BORDER);
+            c_Point.setY((pc_Widget->height() - this->mpc_Toolbox->height()) - mhs32_WIDGET_BORDER);
          }
       }
 
@@ -574,7 +573,7 @@ void C_SyvDaDashboardsWidget::resizeEvent(QResizeEvent * const opc_Event)
       // The operator '-' have to follow by the same operator, otherwise the geometry is wrong
       //lint -save -e834
       c_PointFixMiniToolbox.setX((pc_Widget->width() - this->mpc_FixMinimizedToolbox->width()) -
-                                 170 - mhsn_WIDGET_BORDER);
+                                 170 - mhs32_WIDGET_BORDER);
       //lint -restore
 
       this->mpc_Toolbox->setGeometry(QRect(c_Point, c_Size));
@@ -663,15 +662,15 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
          if (this->mpc_ToolboxParent == NULL)
          {
             // default value in this error case
-            this->mpc_Toolbox->move(mhsn_WIDGET_BORDER, mhsn_TOOLBOX_INIT_POS_Y);
+            this->mpc_Toolbox->move(mhs32_WIDGET_BORDER, mhs32_TOOLBOX_INIT_POS_Y);
          }
          else
          {
             // default value
             this->mpc_Toolbox->setGeometry(QRect(QPoint((((this->mpc_ToolboxParent->width() -
                                                            this->mpc_Toolbox->width()) -
-                                                          mhsn_WIDGET_BORDER) - static_cast<sintn> (150)),
-                                                        mhsn_TOOLBOX_INIT_POS_Y + static_cast<sintn> (50)),
+                                                          mhs32_WIDGET_BORDER) - static_cast<int32_t> (150)),
+                                                        mhs32_TOOLBOX_INIT_POS_Y + static_cast<int32_t> (50)),
                                                  QSize(449, 429)));
 
             this->mpc_Toolbox->SetMaximizedHeight(429);
@@ -708,7 +707,7 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
    connect(this->mpc_FixMinimizedToolbox, &C_OgeWiFixPosition::SigWiFixPosMaxBtnClicked,
            this, &C_SyvDaDashboardsWidget::m_WiFixPosMaxBtnClicked);
 
-   this->msn_InitToolboxCounter = this->msn_InitToolboxCounter + 1;
+   this->ms32_InitToolboxCounter = this->ms32_InitToolboxCounter + 1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -717,7 +716,7 @@ void C_SyvDaDashboardsWidget::m_InitToolBox(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardsWidget::m_CleanUpToolBox(void) const
 {
-   if ((this->mpc_Toolbox != NULL) && (this->msn_InitToolboxCounter > 0))
+   if ((this->mpc_Toolbox != NULL) && (this->ms32_InitToolboxCounter > 0))
    {
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       if (pc_View != NULL)
@@ -757,11 +756,11 @@ void C_SyvDaDashboardsWidget::m_UpdateShowValues(void) const
    C_RANGE       Routing configuration failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
+int32_t C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
    bool q_NameInvalid;
-   bool q_PCNotConnected;
+   bool q_PcNotConnected;
    bool q_RoutingInvalid;
    bool q_SysDefInvalid;
    bool q_NoNodesActive;
@@ -806,11 +805,11 @@ sint32 C_SyvDaDashboardsWidget::m_InitOsyDriver(QString & orc_Message)
       break;
    case C_BUSY:
       if (C_PuiSvHandler::h_GetInstance()->CheckViewError(this->mu32_ViewIndex, &q_NameInvalid,
-                                                          &q_PCNotConnected, &q_RoutingInvalid,
+                                                          &q_PcNotConnected, &q_RoutingInvalid,
                                                           NULL, NULL,
                                                           &q_SysDefInvalid, &q_NoNodesActive, NULL, NULL) == C_NO_ERR)
       {
-         if ((q_NameInvalid == false) && (q_PCNotConnected == false) && (q_RoutingInvalid == false) &&
+         if ((q_NameInvalid == false) && (q_PcNotConnected == false) && (q_RoutingInvalid == false) &&
              (q_SysDefInvalid == false) && (q_NoNodesActive == false))
          {
             orc_Message =
@@ -872,37 +871,38 @@ void C_SyvDaDashboardsWidget::m_CloseOsyDriver(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::m_DataPoolWrite(const uint32 ou32_NodeIndex, const uint8 ou8_DataPoolIndex,
-                                              const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
+void C_SyvDaDashboardsWidget::m_DataPoolWrite(const uint32_t ou32_NodeIndex, const uint8_t ou8_DataPoolIndex,
+                                              const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
 {
    if (this->mpc_ComDriver != NULL)
    {
-      const sint32 s32_Return = this->mpc_ComDriver->PollDataPoolWrite(ou32_NodeIndex, ou8_DataPoolIndex,
-                                                                       ou16_ListIndex, ou16_ElementIndex);
+      const int32_t s32_Return = this->mpc_ComDriver->PollDataPoolWrite(ou32_NodeIndex, ou8_DataPoolIndex,
+                                                                        ou16_ListIndex, ou16_ElementIndex);
       //Error handling
       if (s32_Return == C_BUSY)
       {
-         const C_OSCNodeDataPoolListElementId c_Id(ou32_NodeIndex, static_cast<uint32>(ou8_DataPoolIndex),
-                                                   static_cast<uint32>(ou16_ListIndex),
-                                                   static_cast<uint32>(ou16_ElementIndex));
+         const C_OscNodeDataPoolListElementId c_Id(ou32_NodeIndex, static_cast<uint32_t>(ou8_DataPoolIndex),
+                                                   static_cast<uint32_t>(ou16_ListIndex),
+                                                   static_cast<uint32_t>(ou16_ElementIndex));
          this->mc_MissedWriteOperations.insert(c_Id);
       }
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OSCNodeDataPoolListElementId & orc_Index)
+void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OscNodeDataPoolListElementId & orc_Index)
 {
    if (this->mpc_ComDriver != NULL)
    {
-      const sint32 s32_Return =
-         this->mpc_ComDriver->PollDataPoolRead(orc_Index.u32_NodeIndex, static_cast<uint8>(orc_Index.u32_DataPoolIndex),
-                                               static_cast<uint16>(orc_Index.u32_ListIndex),
-                                               static_cast<uint16>(orc_Index.u32_ElementIndex));
+      const int32_t s32_Return =
+         this->mpc_ComDriver->PollDataPoolRead(orc_Index.u32_NodeIndex,
+                                               static_cast<uint8_t>(orc_Index.u32_DataPoolIndex),
+                                               static_cast<uint16_t>(orc_Index.u32_ListIndex),
+                                               static_cast<uint16_t>(orc_Index.u32_ElementIndex));
       //Error handling
       if (s32_Return == C_BUSY)
       {
-         const C_OSCNodeDataPoolListElementId c_Id(orc_Index);
+         const C_OscNodeDataPoolListElementId c_Id(orc_Index);
          this->mc_MissedReadOperations.insert(c_Id);
       }
    }
@@ -914,13 +914,14 @@ void C_SyvDaDashboardsWidget::m_DataPoolRead(const C_OSCNodeDataPoolListElementI
    \param[in]  orc_Index   List index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::m_NvmReadList(const C_OSCNodeDataPoolListId & orc_Index)
+void C_SyvDaDashboardsWidget::m_NvmReadList(const C_OscNodeDataPoolListId & orc_Index)
 {
    if (this->mpc_ComDriver != NULL)
    {
-      const sint32 s32_Return =
-         this->mpc_ComDriver->PollNvmReadList(orc_Index.u32_NodeIndex, static_cast<uint8>(orc_Index.u32_DataPoolIndex),
-                                              static_cast<uint16>(orc_Index.u32_ListIndex));
+      const int32_t s32_Return =
+         this->mpc_ComDriver->PollNvmReadList(orc_Index.u32_NodeIndex,
+                                              static_cast<uint8_t>(orc_Index.u32_DataPoolIndex),
+                                              static_cast<uint16_t>(orc_Index.u32_ListIndex));
       //Error handling
       if (s32_Return == C_BUSY)
       {
@@ -933,20 +934,20 @@ void C_SyvDaDashboardsWidget::m_NvmReadList(const C_OSCNodeDataPoolListId & orc_
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC)
+void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc)
 {
-   this->mpc_Ui->pc_TabWidget->HandleManualOperationFinished(os32_Result, ou8_NRC);
+   this->mpc_Ui->pc_TabWidget->HandleManualOperationFinished(os32_Result, ou8_Nrc);
    if (this->mpc_ComDriver != NULL)
    {
       if (this->mc_MissedReadNvmOperations.size() > 0)
       {
-         const C_OSCNodeDataPoolListId c_Id = *this->mc_MissedReadNvmOperations.begin();
-         const sint32 s32_Return =
-            this->mpc_ComDriver->PollNvmReadList(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
-                                                 static_cast<uint16>(c_Id.u32_ListIndex));
+         const C_OscNodeDataPoolListId c_Id = *this->mc_MissedReadNvmOperations.begin();
+         const int32_t s32_Return =
+            this->mpc_ComDriver->PollNvmReadList(c_Id.u32_NodeIndex, static_cast<uint8_t>(c_Id.u32_DataPoolIndex),
+                                                 static_cast<uint16_t>(c_Id.u32_ListIndex));
          //Error handling
          if (s32_Return != C_BUSY)
          {
@@ -957,11 +958,11 @@ void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const sint32 os32_
       {
          if (this->mc_MissedReadOperations.size() > 0)
          {
-            const C_OSCNodeDataPoolListElementId c_Id = *this->mc_MissedReadOperations.begin();
-            const sint32 s32_Return =
-               this->mpc_ComDriver->PollDataPoolRead(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
-                                                     static_cast<uint16>(c_Id.u32_ListIndex),
-                                                     static_cast<uint16>(c_Id.u32_ElementIndex));
+            const C_OscNodeDataPoolListElementId c_Id = *this->mc_MissedReadOperations.begin();
+            const int32_t s32_Return =
+               this->mpc_ComDriver->PollDataPoolRead(c_Id.u32_NodeIndex, static_cast<uint8_t>(c_Id.u32_DataPoolIndex),
+                                                     static_cast<uint16_t>(c_Id.u32_ListIndex),
+                                                     static_cast<uint16_t>(c_Id.u32_ElementIndex));
             //Error handling
             if (s32_Return != C_BUSY)
             {
@@ -972,11 +973,12 @@ void C_SyvDaDashboardsWidget::m_HandleManualOperationFinished(const sint32 os32_
          {
             if (this->mc_MissedWriteOperations.size() > 0)
             {
-               const C_OSCNodeDataPoolListElementId c_Id = *this->mc_MissedWriteOperations.begin();
-               const sint32 s32_Return =
-                  this->mpc_ComDriver->PollDataPoolWrite(c_Id.u32_NodeIndex, static_cast<uint8>(c_Id.u32_DataPoolIndex),
-                                                         static_cast<uint16>(c_Id.u32_ListIndex),
-                                                         static_cast<uint16>(c_Id.u32_ElementIndex));
+               const C_OscNodeDataPoolListElementId c_Id = *this->mc_MissedWriteOperations.begin();
+               const int32_t s32_Return =
+                  this->mpc_ComDriver->PollDataPoolWrite(c_Id.u32_NodeIndex,
+                                                         static_cast<uint8_t>(c_Id.u32_DataPoolIndex),
+                                                         static_cast<uint16_t>(c_Id.u32_ListIndex),
+                                                         static_cast<uint16_t>(c_Id.u32_ElementIndex));
                //Error handling
                if (s32_Return != C_BUSY)
                {
@@ -996,7 +998,7 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
 {
    if (this->mpc_ConnectionThread->GetStep() == C_SyvComDriverDiagConnect::eCDCS_WAITING_FINISHED)
    {
-      sint32 s32_Retval;
+      int32_t s32_Retval;
       QString c_Message;
 
       mpc_ComDriver = new C_SyvComDriverDiag(this->mu32_ViewIndex);
@@ -1021,7 +1023,7 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
    else if ((this->mpc_ConnectionThread->GetStep() == C_SyvComDriverDiagConnect::eCDCS_SET_DIAGNOSTIC_MODE_FINISHED) &&
             (this->mpc_ComDriver != NULL))
    {
-      sint32 s32_Retval;
+      int32_t s32_Retval;
       QString c_Message;
       QString c_MessageDetails;
       //Get result of set diagnostic mode
@@ -1050,7 +1052,7 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
              C_SyvComDriverDiagConnect::eCDCS_SET_UP_CYCLIC_TRANSMISSIONS_FINISHED) &&
             (this->mpc_ComDriver != NULL))
    {
-      sint32 s32_Retval;
+      int32_t s32_Retval;
       QString c_Message;
       QString c_MessageDetails;
       //Get result of set up cyclic transmissions
@@ -1094,7 +1096,7 @@ void C_SyvDaDashboardsWidget::m_ConnectStepFinished(void)
    \param[in]  orc_MessageDetails   Error message details (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result, const QString & orc_Message,
+void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const int32_t os32_Result, const QString & orc_Message,
                                                        const QString & orc_MessageDetails)
 {
    if (os32_Result == C_NO_ERR)
@@ -1117,7 +1119,7 @@ void C_SyvDaDashboardsWidget::m_HandleConnectionResult(const sint32 os32_Result,
 
       this->m_CloseOsyDriver();
       // Save the time of 'disconnect'
-      C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TGL_GetTickCount();
+      C_SyvDaDashboardsWidget::mhu32_DisconnectTime = TglGetTickCount();
 
       //Reactivate edit & config
       if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)

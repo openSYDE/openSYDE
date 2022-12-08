@@ -8,24 +8,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdUtil.h"
-#include "C_NagToolTip.h"
-#include "C_TblTreItem.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdUtil.hpp"
+#include "C_NagToolTip.hpp"
+#include "C_TblTreItem.hpp"
 
-#include "C_NagTopTreeModel.h"
+#include "C_NagTopTreeModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -74,7 +73,7 @@ C_NagTopTreeModel::~C_NagTopTreeModel()
    Number of columns, namely 1
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_NagTopTreeModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_NagTopTreeModel::columnCount(const QModelIndex & orc_Parent) const
 {
    Q_UNUSED(orc_Parent)
    return 1;
@@ -86,22 +85,22 @@ sintn C_NagTopTreeModel::columnCount(const QModelIndex & orc_Parent) const
    Here: handle tool tip error type
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_NagTopTreeModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_NagTopTreeModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
-   QVariant c_Retval = C_TblTreModel::data(orc_Index, osn_Role);
+   QVariant c_Retval = C_TblTreModel::data(orc_Index, os32_Role);
 
    if ((orc_Index.isValid() == true) && (orc_Index.column() == 0))
    {
-      if (osn_Role == msn_USER_ROLE_TOOL_TIP_TYPE)
+      if (os32_Role == ms32_USER_ROLE_TOOL_TIP_TYPE)
       {
          // if there is a tooltip, it is of type error (no non-error tooltips)
-         c_Retval = static_cast<sintn>(C_NagToolTip::eERROR);
+         c_Retval = static_cast<int32_t>(C_NagToolTip::eERROR);
       }
    }
 
@@ -129,7 +128,7 @@ void C_NagTopTreeModel::SetTypeNode(const bool oq_IsNode)
 void C_NagTopTreeModel::SetContent(const std::vector<QString> & orc_Content,
                                    const std::vector<std::vector<QString> > & orc_SubContent)
 {
-   uint32 u32_FlatIndex = 0;
+   uint32_t u32_FlatIndex = 0;
 
    if (orc_SubContent.empty() == false)
    {
@@ -147,7 +146,7 @@ void C_NagTopTreeModel::SetContent(const std::vector<QString> & orc_Content,
    }
 
    // collect items
-   for (uint32 u32_ContIt = 0; u32_ContIt < orc_Content.size(); u32_ContIt++)
+   for (uint32_t u32_ContIt = 0; u32_ContIt < orc_Content.size(); u32_ContIt++)
    {
       C_TblTreItem * const pc_Parent = new C_TblTreItem();
       pc_Parent->c_Name = orc_Content[u32_ContIt];
@@ -157,7 +156,7 @@ void C_NagTopTreeModel::SetContent(const std::vector<QString> & orc_Content,
       // collect subitems
       const std::vector<QString> & rc_CurSubContent =
          orc_SubContent.empty() ? std::vector<QString>() : orc_SubContent[u32_ContIt];
-      for (uint32 u32_SubIt = 0; u32_SubIt < rc_CurSubContent.size(); u32_SubIt++)
+      for (uint32_t u32_SubIt = 0; u32_SubIt < rc_CurSubContent.size(); u32_SubIt++)
       {
          // create child
          C_TblTreItem * const pc_Child = new C_TblTreItem();
@@ -248,7 +247,7 @@ void C_NagTopTreeModel::SetError(const std::vector<bool> & orc_Error)
 
    // reload tree
    Q_EMIT (this->dataChanged(this->index(0, 0), this->index(this->rowCount() - 1, 0), // flat tree so column is always 0
-                             QVector<stw_types::sintn>() << static_cast<stw_types::sintn>(Qt::DecorationRole)));
+                             QVector<int32_t>() << static_cast<int32_t>(Qt::DecorationRole)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -260,7 +259,7 @@ void C_NagTopTreeModel::SetError(const std::vector<bool> & orc_Error)
    \param[in]  orc_Content    Content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagTopTreeModel::UpdateItem(const uint32 ou32_Index, const QString & orc_Content)
+void C_NagTopTreeModel::UpdateItem(const uint32_t ou32_Index, const QString & orc_Content)
 {
    if (this->mpc_InvisibleRootItem != NULL)
    {
@@ -355,9 +354,9 @@ void C_NagTopTreeModel::Clear(void)
    flat row index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_NagTopTreeModel::h_GetFlatIndexFromModelIndex(const QModelIndex & orc_ModelIndex)
+uint32_t C_NagTopTreeModel::h_GetFlatIndexFromModelIndex(const QModelIndex & orc_ModelIndex)
 {
-   uint32 u32_Return = 0;
+   uint32_t u32_Return = 0;
 
    //lint -e{9079}  Result of Qt interface restrictions, set by index function
    const C_TblTreItem * const pc_TreeItem = static_cast<const C_TblTreItem *>(orc_ModelIndex.internalPointer());
@@ -381,12 +380,12 @@ uint32 C_NagTopTreeModel::h_GetFlatIndexFromModelIndex(const QModelIndex & orc_M
    Model index
 */
 //----------------------------------------------------------------------------------------------------------------------
-QModelIndex C_NagTopTreeModel::GetModelIndexFromFlatIndex(const uint32 ou32_FlatIndex)
+QModelIndex C_NagTopTreeModel::GetModelIndexFromFlatIndex(const uint32_t ou32_FlatIndex)
 {
    QModelIndex c_ModelIndex;
    bool q_Found = false;
 
-   for (uint32 u32_ItParents = 0;
+   for (uint32_t u32_ItParents = 0;
         (u32_ItParents < this->mpc_InvisibleRootItem->c_Children.size()) && (q_Found == false); u32_ItParents++)
    {
       C_TblTreItem * const pc_ParentItem =
@@ -404,7 +403,7 @@ QModelIndex C_NagTopTreeModel::GetModelIndexFromFlatIndex(const uint32 ou32_Flat
          }
          else
          {
-            for (uint32 u32_ItChildren = 0; u32_ItChildren < pc_ParentItem->c_Children.size(); u32_ItChildren++)
+            for (uint32_t u32_ItChildren = 0; u32_ItChildren < pc_ParentItem->c_Children.size(); u32_ItChildren++)
             {
                C_TblTreItem * const pc_ChildItem =
                   dynamic_cast<C_TblTreItem *>(pc_ParentItem->c_Children[u32_ItChildren]);

@@ -8,17 +8,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMouseEvent>
 #include <QCursor>
 
-#include "stwtypes.h"
-#include "C_SyvDaDashboardSelectorTabBar.h"
+#include "stwtypes.hpp"
+#include "C_SyvDaDashboardSelectorTabBar.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -77,30 +76,30 @@ void C_SyvDaDashboardSelectorTabBar::SetScreenshot(const QPixmap & orc_Screensho
       c_ImgCompleteCursor.fill(QColor(255, 255, 255, 0));
       QImage c_ImgCompleteCursorMask(orc_Screenshot.width() + 20, orc_Screenshot.height() + 20, QImage::Format_Mono);
       c_ImgCompleteCursorMask.fill(Qt::color0);
-      sintn sn_CounterX;
-      sintn sn_CounterY;
+      int32_t s32_CounterX;
+      int32_t s32_CounterY;
       QPixmap c_PixCompleteCursor(orc_Screenshot.width() + 20, orc_Screenshot.height() + 20);
       QPainter c_Painter(&c_PixCompleteCursor);
 
-      for(sn_CounterX = 0; sn_CounterX < (orc_Screenshot.width() + 20); ++sn_CounterX)
+      for(s32_CounterX = 0; s32_CounterX < (orc_Screenshot.width() + 20); ++s32_CounterX)
       {
-        for(sn_CounterY = 0; sn_CounterY < 20; ++sn_CounterY)
+        for(s32_CounterY = 0; s32_CounterY < 20; ++s32_CounterY)
         {
             // Wie gesagt, transparent ist der Cursor dann, wenn Maske
             // und Bild 0 ist. Bei mir ist es eben genau andersrum
-            c_ImgCompleteCursorMask.setPixel(sn_CounterX,sn_CounterY, Qt::color1);
-            c_ImgCompleteCursor.setPixel(sn_CounterX, sn_CounterY, Qt::color1);
+            c_ImgCompleteCursorMask.setPixel(s32_CounterX,s32_CounterY, Qt::color1);
+            c_ImgCompleteCursor.setPixel(s32_CounterX, s32_CounterY, Qt::color1);
         }
       }
 
-      for(sn_CounterX = 0; sn_CounterX < 20; ++sn_CounterX)
+      for(s32_CounterX = 0; s32_CounterX < 20; ++s32_CounterX)
       {
-        for(sn_CounterY = 20; sn_CounterY < (orc_Screenshot.height() + 20); ++sn_CounterY)
+        for(s32_CounterY = 20; s32_CounterY < (orc_Screenshot.height() + 20); ++s32_CounterY)
         {
             // Wie gesagt, transparent ist der Cursor dann, wenn Maske
             // und Bild 0 ist. Bei mir ist es eben genau andersrum
-            c_ImgCompleteCursorMask.setPixel(sn_CounterX,sn_CounterY, Qt::color1);
-            c_ImgCompleteCursor.setPixel(sn_CounterX, sn_CounterY, Qt::color1);
+            c_ImgCompleteCursorMask.setPixel(s32_CounterX,s32_CounterY, Qt::color1);
+            c_ImgCompleteCursor.setPixel(s32_CounterX, s32_CounterY, Qt::color1);
         }
       }
 
@@ -122,14 +121,14 @@ void C_SyvDaDashboardSelectorTabBar::SetScreenshot(const QPixmap & orc_Screensho
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaDashboardSelectorTabBar::mousePressEvent(QMouseEvent * const opc_Event)
 {
-   const sintn sn_Index = this->tabAt(opc_Event->pos());
+   const int32_t s32_Index = this->tabAt(opc_Event->pos());
 
    QTabBar::mousePressEvent(opc_Event);
 
    this->mq_TearOff = false;
 
-   if (((opc_Event->buttons() == static_cast<sintn>(Qt::LeftButton)) &&
-        (sn_Index >= 0)) && (this->isTabEnabled(sn_Index) == true))
+   if (((opc_Event->buttons() == static_cast<int32_t>(Qt::LeftButton)) &&
+        (s32_Index >= 0)) && (this->isTabEnabled(s32_Index) == true))
    {
       this->mq_MouseClicked = true;
       this->mc_LastMouseClickPosition = opc_Event->pos();

@@ -8,28 +8,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDbViewWidget.h"
-#include "C_SdNdeDbProperties.h"
-#include "C_OgeWiCustomMessage.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDbViewWidget.hpp"
+#include "C_SdNdeDbProperties.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 #include "ui_C_SdNdeDbViewWidget.h"
-#include "C_PopSaveAsDialogWidget.h"
-#include "C_SdNdeProgrammingOptions.h"
-#include "C_OSCHalcDefFiler.h"
+#include "C_PopSaveAsDialogWidget.hpp"
+#include "C_SdNdeProgrammingOptions.hpp"
+#include "C_OscHalcDefFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -71,7 +70,7 @@ C_SdNdeDbViewWidget::C_SdNdeDbViewWidget(QWidget * const opc_Parent) :
            &C_SdNdeDbViewWidget::SigErrorChange);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigAppDisplay, this,
            &C_SdNdeDbViewWidget::m_OnAppDisplay);
-   connect(this->mpc_Ui->pc_PushButtonAdd, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonAdd, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked, this,
            &C_SdNdeDbViewWidget::AddApp);
    connect(this->mpc_Ui->pc_ListWidget, &C_SdNdeDbListWidget::SigOwnedDataPoolsChanged, this,
            &C_SdNdeDbViewWidget::SigOwnedDataPoolsChanged);
@@ -120,9 +119,9 @@ void C_SdNdeDbViewWidget::InitStaticNames(void) const
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
+void C_SdNdeDbViewWidget::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    this->mu32_NodeIndex = ou32_NodeIndex;
    tgl_assert(pc_Node != NULL);
@@ -131,7 +130,7 @@ void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
       this->mpc_Ui->pc_ListWidget->SetIndex(ou32_NodeIndex);
 
       this->mpc_Ui->pc_ListWidget->clear();
-      for (uint32 u32_ItApp = 0; u32_ItApp < pc_Node->c_Applications.size(); ++u32_ItApp)
+      for (uint32_t u32_ItApp = 0; u32_ItApp < pc_Node->c_Applications.size(); ++u32_ItApp)
       {
          this->mpc_Ui->pc_ListWidget->AddApplication(ou32_NodeIndex, u32_ItApp);
       }
@@ -149,10 +148,10 @@ void C_SdNdeDbViewWidget::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
    \param[in]  ou32_ApplicationIndex   Index of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::ShowApplication(const uint32 ou32_ApplicationIndex) const
+void C_SdNdeDbViewWidget::ShowApplication(const uint32_t ou32_ApplicationIndex) const
 {
    this->mpc_Ui->pc_ListWidget->scrollToItem(
-      this->mpc_Ui->pc_ListWidget->item(static_cast<sintn>(ou32_ApplicationIndex)));
+      this->mpc_Ui->pc_ListWidget->item(static_cast<int32_t>(ou32_ApplicationIndex)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -175,7 +174,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
                                      "problems with file or directory paths."));
       c_MessageBox.SetDetails(C_GtGetText::h_GetText(
                                  "Paths that are handled as relative to *.syde file can not be resolved correctly!"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
       c_MessageBox.SetCustomMinHeight(230, 270);
       c_MessageBox.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
       if (c_MessageBox.Execute() != C_OgeWiCustomMessage::eOK)
@@ -186,7 +185,7 @@ void C_SdNdeDbViewWidget::AddApp(void)
 
    if (q_Continue)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
@@ -224,11 +223,11 @@ void C_SdNdeDbViewWidget::UpdateApplications(void) const
 /*! \brief   Add new project action
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::AddFromTSP(void)
+void C_SdNdeDbViewWidget::AddFromTsp(void)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_SdNdeDbAddNewProject * const pc_Dialog = new C_SdNdeDbAddNewProject(this->mu32_NodeIndex, *c_New);
-   C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
+   C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
 
    //Help
    //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
@@ -237,24 +236,24 @@ void C_SdNdeDbViewWidget::AddFromTSP(void)
    c_New->SetSize(QSize(800, 745));
 
    //init
-   pc_Dialog->SetTSPPath(C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTSPPath());
+   pc_Dialog->SetTspPath(C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTspPath());
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
-      QString const c_HalcFileName = pc_Dialog->GetHalcDefinitionFileName();
+      const QString c_HalcFileName = pc_Dialog->GetHalcDefinitionFileName();
       C_OgeWiCustomMessage c_Message(this);
       c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
       QString c_Description = "";
       if (c_HalcFileName == "")
       {
          c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).")).
-                         arg(pc_Dialog->GetTSPApplicationCount());
+                         arg(pc_Dialog->GetTspApplicationCount());
       }
       else
       {
          c_Description = static_cast<QString>(C_GtGetText::h_GetText("Successfully created %1 Data Block(s).\n"
                                                                      "Hardware Configurator: Hardware Definition File (%2) selected."))
-                         .arg(pc_Dialog->GetTSPApplicationCount()).arg(c_HalcFileName);
+                         .arg(pc_Dialog->GetTspApplicationCount()).arg(c_HalcFileName);
       }
       QString c_Details = "";
       c_Message.SetCustomMinHeight(180, 180);
@@ -266,10 +265,10 @@ void C_SdNdeDbViewWidget::AddFromTSP(void)
          m_DeleteAllDatablocks(mu32_NodeIndex, pc_Node->c_Applications);
       }
 
-      for (uint32 u32_It = 0; u32_It < pc_Dialog->GetTSPApplicationCount(); ++u32_It)
+      for (uint32_t u32_It = 0; u32_It < pc_Dialog->GetTspApplicationCount(); ++u32_It)
       {
-         C_OSCNodeApplication c_Tmp;
-         c_Tmp.e_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+         C_OscNodeApplication c_Tmp;
+         c_Tmp.e_Type = C_OscNodeApplication::ePROGRAMMABLE_APPLICATION;
          c_Tmp.q_Active = true;
          pc_Dialog->AddSelectedProject(u32_It, c_Tmp, c_Details);
          m_AddApplication(c_Tmp);
@@ -292,7 +291,7 @@ void C_SdNdeDbViewWidget::AddFromTSP(void)
 
    if (c_New != NULL)
    {
-      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownTSPPath(pc_Dialog->GetTSPPath());
+      C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownTspPath(pc_Dialog->GetTspPath());
       c_New->HideOverlay();
       c_New->deleteLater();
    }
@@ -317,22 +316,22 @@ void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_D
 
    tgl_assert(C_PuiSdHandler::h_GetInstance()->IsHalcClear(this->mu32_NodeIndex, q_IsClear) == C_NO_ERR);
 
-   uint32 u32_NotHALCDpCount = 0UL;
+   uint32_t u32_NotHalcDpCount = 0UL;
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
       if (pc_Node != NULL)
       {
-         for (uint32 u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
+         for (uint32_t u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
          {
-            const C_OSCNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
-            if (rc_Dp.e_Type != C_OSCNodeDataPool::eHALC)
+            const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
+            if (rc_Dp.e_Type != C_OscNodeDataPool::eHALC)
             {
-               ++u32_NotHALCDpCount;
+               ++u32_NotHalcDpCount;
             }
          }
       }
    }
-   if (u32_NotHALCDpCount > (C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE - 2UL))
+   if (u32_NotHalcDpCount > (C_OscNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE - 2UL))
    {
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::eERROR);
 
@@ -341,15 +340,15 @@ void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_D
                                                           "Cannot select hardware description,\n"
                                                           "because HAL Datapools may not be created,\n"
                                                           "as the max Datapool count (%1) would be exceeded.")).arg(
-                                     C_OSCNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
+                                     C_OscNode::hu32_MAX_NUMBER_OF_DATA_POOLS_PER_NODE));
       c_MessageBox.SetCustomMinHeight(200, 270);
       c_MessageBox.Execute();
    }
    else
    {
-      C_OSCHalcConfig c_HalcConfig;
+      C_OscHalcConfig c_HalcConfig;
 
-      const sint32 s32_LoadResult = C_OSCHalcDefFiler::h_LoadFile(c_HalcConfig, c_HalcPath.toStdString().c_str());
+      const int32_t s32_LoadResult = C_OscHalcDefFiler::h_LoadFile(c_HalcConfig, c_HalcPath.toStdString().c_str());
 
       if (s32_LoadResult == C_NO_ERR)
       {
@@ -357,17 +356,17 @@ void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_D
          if (q_IsClear == false)
          {
             // Clear configuration
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHALCConfig(this->mu32_NodeIndex) == C_NO_ERR);
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->ClearHalcConfig(this->mu32_NodeIndex) == C_NO_ERR);
 
             // Remove HAL Datapools
-            tgl_assert(C_PuiSdHandler::h_GetInstance()->HALCRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
+            tgl_assert(C_PuiSdHandler::h_GetInstance()->HalcRemoveDatapools(this->mu32_NodeIndex) == C_NO_ERR);
          }
 
          // set the HALC definition
-         tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHALCConfig(this->mu32_NodeIndex, c_HalcConfig) == C_NO_ERR);
+         tgl_assert(C_PuiSdHandler::h_GetInstance()->SetHalcConfig(this->mu32_NodeIndex, c_HalcConfig) == C_NO_ERR);
 
          // run HALC magician and update GUI
-         Q_EMIT (this->SigHalcLoadedFromTSP());
+         Q_EMIT (this->SigHalcLoadedFromTsp());
       }
    }
 }
@@ -378,7 +377,7 @@ void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_D
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_HandleNoDatablocksLabel(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if ((pc_Node != NULL) && (pc_Node->IsAnyUpdateAvailable() == true))
    {
@@ -411,7 +410,7 @@ void C_SdNdeDbViewWidget::m_HandleNoDatablocksLabel(void) const
 void C_SdNdeDbViewWidget::m_HandleAddButtonAvailability(void) const
 {
    bool q_Enabled = true;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
@@ -440,10 +439,10 @@ void C_SdNdeDbViewWidget::m_HandleAddButtonAvailability(void) const
    Application position (in node)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDbViewWidget::m_AddApplication(const C_OSCNodeApplication::E_Type oe_Type) const
+uint32_t C_SdNdeDbViewWidget::m_AddApplication(const C_OscNodeApplication::E_Type oe_Type) const
 {
-   C_OSCNodeApplication c_Appl;
-   uint32 u32_Retval;
+   C_OscNodeApplication c_Appl;
+   uint32_t u32_Retval;
 
    // add datablock
    c_Appl.c_Name = "DataBlock";
@@ -464,10 +463,10 @@ uint32 C_SdNdeDbViewWidget::m_AddApplication(const C_OSCNodeApplication::E_Type 
    Application position (in node)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDbViewWidget::m_AddApplication(C_OSCNodeApplication & orc_Application) const
+uint32_t C_SdNdeDbViewWidget::m_AddApplication(C_OscNodeApplication & orc_Application) const
 {
-   uint32 u32_Retval = 0UL;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   uint32_t u32_Retval = 0UL;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
@@ -503,7 +502,7 @@ void C_SdNdeDbViewWidget::m_OnAppDisplay() const
    \param[in]  ou32_ApplicationIndex   Application index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 ou32_ApplicationIndex)
+void C_SdNdeDbViewWidget::m_OnDelete(const uint32_t ou32_NodeIndex, const uint32_t ou32_ApplicationIndex)
 {
    tgl_assert(this->mu32_NodeIndex == ou32_NodeIndex);
    tgl_assert(C_PuiSdHandler::h_GetInstance()->RemoveApplication(ou32_NodeIndex, ou32_ApplicationIndex) == C_NO_ERR);
@@ -519,8 +518,8 @@ void C_SdNdeDbViewWidget::m_OnDelete(const uint32 ou32_NodeIndex, const uint32 o
    \param[in]  orc_Applications  Array of the node's applications
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::m_DeleteAllDatablocks(const uint32 ou32_NodeIndex,
-                                                const std::vector<C_OSCNodeApplication> & orc_Applications)
+void C_SdNdeDbViewWidget::m_DeleteAllDatablocks(const uint32_t ou32_NodeIndex,
+                                                const std::vector<C_OscNodeApplication> & orc_Applications)
 {
    tgl_assert(this->mu32_NodeIndex == ou32_NodeIndex);
    while (orc_Applications.size() > 0)
@@ -537,7 +536,7 @@ void C_SdNdeDbViewWidget::m_DeleteAllDatablocks(const uint32 ou32_NodeIndex,
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_UpdateCount(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
@@ -553,14 +552,14 @@ void C_SdNdeDbViewWidget::m_UpdateCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
 {
-   const std::vector<const C_OSCNodeApplication *> c_ProgrammableApplications =
+   const std::vector<const C_OscNodeApplication *> c_ProgrammableApplications =
       C_PuiSdHandler::h_GetInstance()->GetProgrammableApplications(this->mu32_NodeIndex);
 
    if (c_ProgrammableApplications.size() > 0)
    {
       //Set parent for better hierarchy handling via window manager
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
-      QPointer<const C_SdNdeProgrammingOptions> const c_Dialog = new C_SdNdeProgrammingOptions(*c_New,
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
+      const QPointer<const C_SdNdeProgrammingOptions> c_Dialog = new C_SdNdeProgrammingOptions(*c_New,
                                                                                                this->mu32_NodeIndex);
 
       //Help
@@ -569,7 +568,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       //Resize
       c_New->SetSize(QSize(810, 350));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          if (c_Dialog.isNull() == false)
          {
@@ -601,17 +600,17 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_AddManualApplication(void)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_SdNdeDbProperties * const pc_Dialog = new C_SdNdeDbProperties(this->mu32_NodeIndex, -1, *c_New);
 
    //Resize
    c_New->SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());
 
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
-      C_OSCNodeApplication c_Tmp;
+      C_OscNodeApplication c_Tmp;
 
-      uint32 u32_Index;
+      uint32_t u32_Index;
       pc_Dialog->ApplyNewData(c_Tmp);
       u32_Index = m_AddApplication(c_Tmp);
       pc_Dialog->HandleDataPools(u32_Index);
@@ -632,7 +631,7 @@ void C_SdNdeDbViewWidget::m_AddManualApplication(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbViewWidget::m_HandleCodeGenerationSettingsButtonAvailability(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)

@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeUnoDataPoolListAddCommand.h"
+#include "stwtypes.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeUnoDataPoolListAddCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,39 +42,39 @@ using namespace stw_opensyde_core;
    \param[in,out] opc_Parent                  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32 & oru32_NodeIndex,
-                                                                   const uint32 & oru32_DataPoolIndex,
-                                                                   stw_opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
-                                                                   const std::vector<uint32> & orc_Indices,
+C_SdNdeUnoDataPoolListAddCommand::C_SdNdeUnoDataPoolListAddCommand(const uint32_t & oru32_NodeIndex,
+                                                                   const uint32_t & oru32_DataPoolIndex,
+                                                                   stw::opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
+                                                                   const std::vector<uint32_t> & orc_Indices,
                                                                    QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDataPoolListAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex,
                                               opc_DataPoolListsTreeWidget, orc_Indices,
                                               "Add List", opc_Parent)
 {
-   std::vector<C_OSCNodeDataPoolList> c_OSCContent;
-   std::vector<C_PuiSdNodeDataPoolList> c_UIContent;
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(oru32_NodeIndex,
+   std::vector<C_OscNodeDataPoolList> c_OscContent;
+   std::vector<C_PuiSdNodeDataPoolList> c_UiContent;
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(oru32_NodeIndex,
                                                                                                  oru32_DataPoolIndex);
-   c_OSCContent.resize(orc_Indices.size());
-   c_UIContent.resize(orc_Indices.size());
+   c_OscContent.resize(orc_Indices.size());
+   c_UiContent.resize(orc_Indices.size());
    //Init
    if (pc_DataPool != NULL)
    {
-      for (uint32 u32_ItList = 0; u32_ItList < c_OSCContent.size(); ++u32_ItList)
+      for (uint32_t u32_ItList = 0; u32_ItList < c_OscContent.size(); ++u32_ItList)
       {
-         C_OSCNodeDataPoolList & rc_List = c_OSCContent[u32_ItList];
-         for (uint32 u32_ItElement = 0; u32_ItElement < rc_List.c_Elements.size(); ++u32_ItElement)
+         C_OscNodeDataPoolList & rc_List = c_OscContent[u32_ItList];
+         for (uint32_t u32_ItElement = 0; u32_ItElement < rc_List.c_Elements.size(); ++u32_ItElement)
          {
             C_PuiSdHandler::h_InitDataElement(pc_DataPool->e_Type, pc_DataPool->q_IsSafety,
                                               rc_List.c_Elements[u32_ItElement]);
          }
-         if ((pc_DataPool->e_Type == C_OSCNodeDataPool::eNVM) && (pc_DataPool->q_IsSafety == true))
+         if ((pc_DataPool->e_Type == C_OscNodeDataPool::eNVM) && (pc_DataPool->q_IsSafety == true))
          {
-            rc_List.q_NvMCRCActive = true;
+            rc_List.q_NvmCrcActive = true;
          }
       }
    }
-   this->m_SetInitialData(c_OSCContent, c_UIContent);
+   this->m_SetInitialData(c_OscContent, c_UiContent);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

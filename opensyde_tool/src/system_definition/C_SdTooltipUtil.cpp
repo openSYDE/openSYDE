@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_SdTooltipUtil.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdTooltipUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,7 +45,7 @@ using namespace stw_opensyde_gui_logic;
    Content as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_OSCCanMessage & orc_Message)
+QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw::opensyde_core::C_OscCanMessage & orc_Message)
 {
    QString c_ToolTipContent;
    QString c_Tmp;
@@ -81,28 +80,40 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
          orc_Message.u16_Dlc);
    switch (orc_Message.e_TxMethod)
    {
-   case C_OSCCanMessage::eTX_METHOD_ON_EVENT:
+   case C_OscCanMessage::eTX_METHOD_ON_EVENT:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: On Event\n"));
       break;
-   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_0:
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") +
+                              C_GtGetText::h_GetText(
+                                 "Tx-Method: Type 0 - synchronous transmission after next SYNC and change\n"));
+      break;
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_1_TO_240:
+      c_ToolTipContent +=
+         static_cast<QString>(static_cast<QString>("   ") +
+                              C_GtGetText::h_GetText(
+                                 "Tx-Method: Type 1 to 240 - synchronous transmission after 1st to 240th SYNC\n"));
+      break;
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_254:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") +
                               C_GtGetText::h_GetText("Tx-Method: Type 254 - asynchronous manufacturer specific\n"));
       break;
-   case C_OSCCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
+   case C_OscCanMessage::eTX_METHOD_CAN_OPEN_TYPE_255:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") +
                               C_GtGetText::h_GetText("Tx-Method: Type 255 - asynchronous device specific\n"));
       break;
-   case C_OSCCanMessage::eTX_METHOD_CYCLIC:
+   case C_OscCanMessage::eTX_METHOD_CYCLIC:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: Cyclic\n"));
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Cycle Time: %1\n")).arg(
             orc_Message.u32_CycleTimeMs);
       break;
-   case C_OSCCanMessage::eTX_METHOD_ON_CHANGE:
+   case C_OscCanMessage::eTX_METHOD_ON_CHANGE:
       c_ToolTipContent +=
          static_cast<QString>(static_cast<QString>("   ") + C_GtGetText::h_GetText("Tx-Method: On Change\n"));
       c_ToolTipContent +=
@@ -135,18 +146,18 @@ QString C_SdTooltipUtil::h_GetToolTipContentMessage(const stw_opensyde_core::C_O
       content as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Signal,
-                                                   const C_OSCCanMessage & orc_Message,
-                                                   const C_OSCNodeDataPoolListElement & orc_DpListElement,
-                                                   const C_OSCCanProtocol::E_Type oe_ProtocolType,
+QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OscCanSignal & orc_Signal,
+                                                   const C_OscCanMessage & orc_Message,
+                                                   const C_OscNodeDataPoolListElement & orc_DpListElement,
+                                                   const C_OscCanProtocol::E_Type oe_ProtocolType,
                                                    const QString & orc_AutoMinMaxInformation,
                                                    const QString & orc_AdditionalInformation)
 {
    QString c_ToolTipContent = "";
-   float64 f64_Value = 0.0;
+   float64_t f64_Value = 0.0;
 
    // Object Dictionary (only CANopen Protocol)
-   if (oe_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   if (oe_ProtocolType == C_OscCanProtocol::eCAN_OPEN)
    {
       c_ToolTipContent.append(C_GtGetText::h_GetText("Object Dictionary: "));
       c_ToolTipContent.append(QString::number(orc_Signal.u16_CanOpenManagerObjectDictionaryIndex, 16) +
@@ -219,7 +230,7 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
 
    // Value type information
    c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Byte Order: "));
-   if (orc_Signal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+   if (orc_Signal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
    {
       c_ToolTipContent.append(C_GtGetText::h_GetText("Intel"));
    }
@@ -245,12 +256,12 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Start Bit: "));
    c_ToolTipContent.append(QString::number(orc_Signal.u16_ComBitStart));
 
-   if (orc_Signal.e_MultiplexerType != C_OSCCanSignal::eMUX_DEFAULT)
+   if (orc_Signal.e_MultiplexerType != C_OscCanSignal::eMUX_DEFAULT)
    {
       c_ToolTipContent.append("\n");
       c_ToolTipContent.append(static_cast<QString>("   ") + C_GtGetText::h_GetText("Multiplexer Type: "));
 
-      if (orc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+      if (orc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
       {
          c_ToolTipContent.append(C_GtGetText::h_GetText("Multiplexed Signal"));
          c_ToolTipContent.append("\n");
@@ -276,28 +287,28 @@ QString C_SdTooltipUtil::h_GetToolTipContentSignal(const C_OSCCanSignal & orc_Si
    Simplified name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdTooltipUtil::h_ConvertTypeToNameSimplified(const C_OSCNodeDataPoolContent::E_Type & ore_Type)
+QString C_SdTooltipUtil::h_ConvertTypeToNameSimplified(const C_OscNodeDataPoolContent::E_Type & ore_Type)
 {
    QString c_Retval;
 
    switch (ore_Type)
    {
-   case C_OSCNodeDataPoolContent::eUINT8:
-   case C_OSCNodeDataPoolContent::eUINT16:
-   case C_OSCNodeDataPoolContent::eUINT32:
-   case C_OSCNodeDataPoolContent::eUINT64:
+   case C_OscNodeDataPoolContent::eUINT8:
+   case C_OscNodeDataPoolContent::eUINT16:
+   case C_OscNodeDataPoolContent::eUINT32:
+   case C_OscNodeDataPoolContent::eUINT64:
       c_Retval = C_GtGetText::h_GetText("unsigned");
       break;
-   case C_OSCNodeDataPoolContent::eSINT8:
-   case C_OSCNodeDataPoolContent::eSINT16:
-   case C_OSCNodeDataPoolContent::eSINT32:
-   case C_OSCNodeDataPoolContent::eSINT64:
+   case C_OscNodeDataPoolContent::eSINT8:
+   case C_OscNodeDataPoolContent::eSINT16:
+   case C_OscNodeDataPoolContent::eSINT32:
+   case C_OscNodeDataPoolContent::eSINT64:
       c_Retval = C_GtGetText::h_GetText("signed");
       break;
-   case C_OSCNodeDataPoolContent::eFLOAT32:
+   case C_OscNodeDataPoolContent::eFLOAT32:
       c_Retval = C_GtGetText::h_GetText("IEEE float (32)");
       break;
-   case C_OSCNodeDataPoolContent::eFLOAT64:
+   case C_OscNodeDataPoolContent::eFLOAT64:
       c_Retval = C_GtGetText::h_GetText("IEEE float (64)");
       break;
    default:

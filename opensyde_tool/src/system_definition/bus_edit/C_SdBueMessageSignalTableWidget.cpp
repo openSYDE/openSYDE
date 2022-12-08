@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
-#include "C_SdBueMessageSignalTableWidget.h"
+#include "precomp_headers.hpp"
+#include "C_SdBueMessageSignalTableWidget.hpp"
 #include "ui_C_SdBueMessageSignalTableWidget.h"
-#include "C_GtGetText.h"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,9 +56,9 @@ C_SdBueMessageSignalTableWidget::C_SdBueMessageSignalTableWidget(QWidget * const
    this->mpc_Ui->pc_LabelNoMessages->setVisible(false);
    this->mpc_Ui->pc_LabelNoSignals->setVisible(false);
 
-   connect(this->mpc_Ui->pc_RadioButtonMessages, &stw_opensyde_gui_elements::C_OgeRabCheckBox::toggled, this,
+   connect(this->mpc_Ui->pc_RadioButtonMessages, &stw::opensyde_gui_elements::C_OgeRabCheckBox::toggled, this,
            &C_SdBueMessageSignalTableWidget::m_OnMessagesToggle);
-   connect(this->mpc_Ui->pc_RadioButtonSignals, &stw_opensyde_gui_elements::C_OgeRabCheckBox::toggled, this,
+   connect(this->mpc_Ui->pc_RadioButtonSignals, &stw::opensyde_gui_elements::C_OgeRabCheckBox::toggled, this,
            &C_SdBueMessageSignalTableWidget::m_OnSignalsToggle);
    //Selection
    connect(this->mpc_Ui->pc_TableViewMessages, &C_SdBueMessageTableView::SigMessageSelected, this,
@@ -85,7 +85,7 @@ C_SdBueMessageSignalTableWidget::~C_SdBueMessageSignalTableWidget(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::SetMessageSyncManager(
-   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
+   stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
 {
    this->mpc_Ui->pc_TableViewMessages->SetMessageSyncManager(opc_Value);
    this->mpc_Ui->pc_TableViewSignals->SetMessageSyncManager(opc_Value);
@@ -123,8 +123,8 @@ void C_SdBueMessageSignalTableWidget::InitStaticNames(void) const
    \param[in]  orc_SignalValues     Signal values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalTableWidget::LoadUserSettings(const std::vector<stw_types::sint32> & orc_MessageValues,
-                                                       const std::vector<stw_types::sint32> & orc_SignalValues) const
+void C_SdBueMessageSignalTableWidget::LoadUserSettings(const std::vector<int32_t> & orc_MessageValues,
+                                                       const std::vector<int32_t> & orc_SignalValues) const
 {
    this->mpc_Ui->pc_TableViewSignals->LoadUserSettings(orc_SignalValues);
    this->mpc_Ui->pc_TableViewMessages->LoadUserSettings(orc_MessageValues);
@@ -137,8 +137,8 @@ void C_SdBueMessageSignalTableWidget::LoadUserSettings(const std::vector<stw_typ
    \param[in,out]  orc_SignalValues    Signal values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalTableWidget::SaveUserSettings(std::vector<stw_types::sint32> & orc_MessageValues,
-                                                       std::vector<stw_types::sint32> & orc_SignalValues) const
+void C_SdBueMessageSignalTableWidget::SaveUserSettings(std::vector<int32_t> & orc_MessageValues,
+                                                       std::vector<int32_t> & orc_SignalValues) const
 {
    this->mpc_Ui->pc_TableViewSignals->SaveUserSettings(orc_SignalValues);
    this->mpc_Ui->pc_TableViewMessages->SaveUserSettings(orc_MessageValues);
@@ -175,7 +175,7 @@ void C_SdBueMessageSignalTableWidget::m_OnSignalsToggle(const bool & orq_Checked
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnMessageSelected(
-   const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId)
+   const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigMessageSelected(orc_MessageId);
 }
@@ -188,8 +188,7 @@ void C_SdBueMessageSignalTableWidget::m_OnMessageSelected(
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalTableWidget::m_OnSignalSelected(
-   const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & orc_MessageId,
-   const stw_types::uint32 & oru32_SignalIndex)
+   const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId, const uint32_t & oru32_SignalIndex)
 {
    Q_EMIT this->SigSignalSelected(orc_MessageId, oru32_SignalIndex);
 }

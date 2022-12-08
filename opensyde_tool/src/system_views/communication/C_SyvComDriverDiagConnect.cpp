@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "TGLTime.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_SyvComDriverDiagConnect.h"
-#include "C_OSCLoggingHandler.h"
+#include "C_Uti.hpp"
+#include "TglTime.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SyvComDriverDiagConnect.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -75,7 +74,7 @@ C_SyvComDriverDiagConnect::E_ConnectState C_SyvComDriverDiagConnect::GetStep(voi
    \param[in] ou32_DisconnectTime Last known disconnect time
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComDriverDiagConnect::SetWaitingStepParameters(const uint32 ou32_DisconnectTime)
+void C_SyvComDriverDiagConnect::SetWaitingStepParameters(const uint32_t ou32_DisconnectTime)
 {
    this->mu32_DisconnectTime = ou32_DisconnectTime;
    //Update status
@@ -116,7 +115,7 @@ void C_SyvComDriverDiagConnect::SetSetUpCyclicTransmissionsParameters(C_SyvComDr
    \param[out] orc_MessageDetails Error message details (if any)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvComDriverDiagConnect::GetLastOperationResult(sint32 & ors32_Result, QString & orc_Message,
+void C_SyvComDriverDiagConnect::GetLastOperationResult(int32_t & ors32_Result, QString & orc_Message,
                                                        QString & orc_MessageDetails) const
 {
    ors32_Result = this->ms32_OperationResult;
@@ -166,11 +165,11 @@ void C_SyvComDriverDiagConnect::m_RunWaitingStep(void)
    this->mc_ErrorMessageDetails = "";
    this->ms32_OperationResult = C_NO_ERR;
    // Is a new connect already possible
-   if ((this->mu32_DisconnectTime + 5100U) > TGL_GetTickCount())
+   if ((this->mu32_DisconnectTime + 5100U) > TglGetTickCount())
    {
-      QThread::usleep((this->mu32_DisconnectTime + 5100U) - TGL_GetTickCount());
+      QThread::usleep((this->mu32_DisconnectTime + 5100U) - TglGetTickCount());
    }
-   while ((this->mu32_DisconnectTime + 5100U) > TGL_GetTickCount())
+   while ((this->mu32_DisconnectTime + 5100U) > TglGetTickCount())
    {
       // Wait till it is possible
    }
@@ -251,13 +250,13 @@ void C_SyvComDriverDiagConnect::m_RunSetDiagnosticMode(void)
          this->mc_ErrorMessage =
             static_cast<QString>(C_GtGetText::h_GetText(
                                     "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
-         C_OSCLoggingHandler::h_Flush();
+         C_OscLoggingHandler::h_Flush();
          this->mc_ErrorMessageDetails = C_GtGetText::h_GetText("Possible reasons:<br/>"
                                                                "- Associated private key (*.pem) not found in /certificates folder (most common)<br/>"
                                                                "- Failure during authenfication process<br/>"
                                                                "For more information see ") +
                                         C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
-                                                         C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
+                                                         C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
                                         C_GtGetText::h_GetText(".");
          break;
       default:
@@ -285,10 +284,10 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
    if (this->mpc_ComDriverDiag != NULL)
    {
       QString c_ErrorDetails;
-      std::vector<C_OSCNodeDataPoolListElementId> c_FailedIdRegisters;
+      std::vector<C_OscNodeDataPoolListElementId> c_FailedIdRegisters;
       std::vector<QString> c_FailedIdErrorDetails;
-      std::map<stw_types::uint32, stw_types::uint32> c_FailedNodesElementNumber;
-      std::map<stw_types::uint32, stw_types::uint32> c_NodesElementNumber;
+      std::map<uint32_t, uint32_t> c_FailedNodesElementNumber;
+      std::map<uint32_t, uint32_t> c_NodesElementNumber;
 
       // Start the asyn communication
       this->ms32_OperationResult = this->mpc_ComDriverDiag->SetUpCyclicTransmissions(c_ErrorDetails,
@@ -302,8 +301,8 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
       case C_NO_ERR:
          if (c_FailedIdRegisters.size() > 0)
          {
-            uintn un_Counter;
-            uintn un_CurrentNode = 0xFFFFFFFFU;
+            uint32_t u32_Counter;
+            uint32_t u32_CurrentNode = 0xFFFFFFFFU;
 
             // Show all error information
             this->mc_ErrorMessage =
@@ -312,16 +311,16 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
                arg(
                   c_FailedIdRegisters.size());
 
-            for (un_Counter = 0; un_Counter < c_FailedIdRegisters.size(); ++un_Counter)
+            for (u32_Counter = 0; u32_Counter < c_FailedIdRegisters.size(); ++u32_Counter)
             {
-               const C_OSCNodeDataPoolListElementId & rc_Id = c_FailedIdRegisters[un_Counter];
-               C_OSCNodeDataPool::E_Type e_Type;
+               const C_OscNodeDataPoolListElementId & rc_Id = c_FailedIdRegisters[u32_Counter];
+               C_OscNodeDataPool::E_Type e_Type;
                C_PuiSdHandler::h_GetInstance()->GetDataPoolType(rc_Id.u32_NodeIndex, rc_Id.u32_DataPoolIndex,
                                                                 e_Type);
 
-               if (un_CurrentNode != rc_Id.u32_NodeIndex)
+               if (u32_CurrentNode != rc_Id.u32_NodeIndex)
                {
-                  const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                  const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                      rc_Id.u32_NodeIndex);
 
                   if (this->mc_ErrorMessageDetails != "")
@@ -331,8 +330,8 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
 
                   if (pc_Node != NULL)
                   {
-                     const std::map<stw_types::uint32,
-                                    stw_types::uint32>::const_iterator c_ItFailedNodesElementNumber =
+                     const std::map<uint32_t,
+                                    uint32_t>::const_iterator c_ItFailedNodesElementNumber =
                         c_FailedNodesElementNumber.find(rc_Id.u32_NodeIndex);
 
                      // This information as title for all errors of this node
@@ -354,11 +353,11 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
                   }
                   this->mc_ErrorMessageDetails += "Error details:\n";
 
-                  un_CurrentNode = rc_Id.u32_NodeIndex;
+                  u32_CurrentNode = rc_Id.u32_NodeIndex;
                }
 
                this->mc_ErrorMessageDetails += "The initiating of the transmission of the element ";
-               if (e_Type != C_OSCNodeDataPool::eCOM)
+               if (e_Type != C_OscNodeDataPool::eCOM)
                {
                   this->mc_ErrorMessageDetails += C_PuiSdUtil::h_GetNamespace(rc_Id);
                }
@@ -367,7 +366,7 @@ void C_SyvComDriverDiagConnect::m_RunSetUpCyclicTransmissions(void)
                   this->mc_ErrorMessageDetails += C_PuiSdUtil::h_GetSignalNamespace(rc_Id);
                }
 
-               this->mc_ErrorMessageDetails += " failed: " + c_FailedIdErrorDetails[un_Counter] + "\n";
+               this->mc_ErrorMessageDetails += " failed: " + c_FailedIdErrorDetails[u32_Counter] + "\n";
             }
 
             this->ms32_OperationResult = C_RD_WR;

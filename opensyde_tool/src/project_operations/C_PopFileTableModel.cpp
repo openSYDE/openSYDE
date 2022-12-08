@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cmath>
 #include <QFileInfo>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_PopFileTableModel.h"
-#include "C_GtGetText.h"
-#include "C_SdUtil.h"
-#include "C_PuiProject.h"
-#include "C_Uti.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_PopFileTableModel.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiProject.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,7 +64,7 @@ C_PopFileTableModel::C_PopFileTableModel(QObject * const opc_Parent) :
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PopFileTableModel::UpdateData(const std::vector<QString> & orc_RecentFilePaths,
-                                     const std::vector<C_OSCProject> & orc_RecentProjects)
+                                     const std::vector<C_OscProject> & orc_RecentProjects)
 {
    tgl_assert(orc_RecentFilePaths.size() == orc_RecentProjects.size());
    if (orc_RecentFilePaths.size() == orc_RecentProjects.size())
@@ -86,14 +85,15 @@ void C_PopFileTableModel::UpdateData(const std::vector<QString> & orc_RecentFile
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_PopFileTableModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_PopFileTableModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   stw_types::sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
+
    if (!orc_Parent.isValid())
    {
-      sn_Retval = this->mc_RecentFilePaths.size();
+      s32_Retval = this->mc_RecentFilePaths.size();
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -105,44 +105,44 @@ sintn C_PopFileTableModel::rowCount(const QModelIndex & orc_Parent) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_PopFileTableModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_PopFileTableModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      sn_Retval = 3;
+      s32_Retval = 3;
    }
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
    if (orc_Index.isValid() == true)
    {
       const C_PopFileTableModel::E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
-      if ((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == static_cast<sintn>(Qt::EditRole)))
+      if ((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == static_cast<int32_t>(Qt::EditRole)))
       {
          if (orc_Index.row() >= 0)
          {
-            const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
             if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
             {
                const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
-               const C_OSCProject & rc_RecentProjects = this->mc_RecentProjects[u32_Index];
+               const C_OscProject & rc_RecentProjects = this->mc_RecentProjects[u32_Index];
                QFileInfo c_ProjectFileInfo;
                QFont c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
                c_Font.setPixelSize(c_Font.pointSize());
@@ -167,7 +167,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::FontRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::FontRole))
       {
          QFont c_Font;
          //Stylesheets do not allow access of specific columns so we need to set fonts manually
@@ -188,11 +188,11 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
          c_Font.setPixelSize(c_Font.pointSize());
          c_Retval = c_Font;
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          c_Retval = static_cast<QVariant>(Qt::AlignLeft | Qt::AlignVCenter);
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          switch (e_Col)
          {
@@ -208,11 +208,11 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          if (orc_Index.row() >= 0)
          {
-            const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
             if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
             {
                const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
@@ -223,15 +223,15 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          if (orc_Index.row() >= 0)
          {
-            const uint32 u32_Index = static_cast<uint32>(orc_Index.row());
+            const uint32_t u32_Index = static_cast<uint32_t>(orc_Index.row());
             if ((u32_Index < this->mc_RecentFilePaths.size()) && (u32_Index < this->mc_RecentProjects.size()))
             {
                const QString & rc_RecentFilePaths = this->mc_RecentFilePaths[u32_Index];
-               const C_OSCProject & rc_RecentProject = this->mc_RecentProjects[u32_Index];
+               const C_OscProject & rc_RecentProject = this->mc_RecentProjects[u32_Index];
                QFileInfo c_ProjectFileInfo;
                c_ProjectFileInfo.setFile(rc_RecentFilePaths);
                QString c_TooltipContent;
@@ -245,8 +245,8 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                }
                else
                {
-                  c_CreationTime = C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str();
-                  c_ModificationTime = C_OSCProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str();
+                  c_CreationTime = C_OscProject::h_GetTimeFormatted(rc_RecentProject.c_CreationTime).c_str();
+                  c_ModificationTime = C_OscProject::h_GetTimeFormatted(rc_RecentProject.c_ModificationTime).c_str();
                }
                c_TooltipContent =
                   static_cast<QString>(C_GtGetText::h_GetText("Version: %1 \nAuthor: %2 \nCreated: %3 \n"
@@ -256,15 +256,15 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
                   arg(c_CreationTime).
                   arg(c_ModificationTime).
                   arg(rc_RecentProject.c_Editor.c_str()).
-                  arg(C_Uti::h_ConvertVersionToSTWStyle(rc_RecentProject.c_OpenSYDEVersion.c_str()));
+                  arg(C_Uti::h_ConvertVersionToStwStyle(rc_RecentProject.c_OpenSydeVersion.c_str()));
                if (c_ProjectFileInfo.exists() == true)
                {
-                  const uint64 u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
-                  const float64 f64_SizeFloat = std::ceil(static_cast<float64>(u64_SizeByte) / 1024.0);
+                  const uint64_t u64_SizeByte = C_PuiProject::h_GetProjectSize(rc_RecentFilePaths);
+                  const float64_t f64_SizeFloat = std::ceil(static_cast<float64_t>(u64_SizeByte) / 1024.0);
 
                   c_TooltipContent.append(
                      static_cast<QString>(C_GtGetText::h_GetText("\nSize: %L1 kB")).arg(static_cast
-                                                                                        <uint64>(
+                                                                                        <uint64_t>(
                                                                                            f64_SizeFloat)));
                }
                c_TooltipContent.append("\n\n" + rc_RecentFilePaths);
@@ -289,7 +289,7 @@ QVariant C_PopFileTableModel::data(const QModelIndex & orc_Index, const sintn os
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PopFileTableModel::E_Columns C_PopFileTableModel::h_ColumnToEnum(const sint32 & ors32_Column)
+C_PopFileTableModel::E_Columns C_PopFileTableModel::h_ColumnToEnum(const int32_t & ors32_Column)
 {
    C_PopFileTableModel::E_Columns e_Retval = eNAME;
    switch (ors32_Column)
@@ -321,9 +321,9 @@ C_PopFileTableModel::E_Columns C_PopFileTableModel::h_ColumnToEnum(const sint32 
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns & ore_Value)
+int32_t C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns & ore_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (ore_Value)
    {
@@ -355,13 +355,13 @@ sint32 C_PopFileTableModel::h_EnumToColumn(const C_PopFileTableModel::E_Columns 
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PopFileTableModel::ConvertRowToFile(const sint32 & ors32_Row, QString & orc_FilePath) const
+int32_t C_PopFileTableModel::ConvertRowToFile(const int32_t & ors32_Row, QString & orc_FilePath) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (ors32_Row >= 0)
    {
-      const uint32 u32_Row = static_cast<uint32>(ors32_Row);
+      const uint32_t u32_Row = static_cast<uint32_t>(ors32_Row);
       if (u32_Row < this->mc_RecentFilePaths.size())
       {
          orc_FilePath = this->mc_RecentFilePaths[u32_Row];

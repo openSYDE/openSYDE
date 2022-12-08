@@ -10,21 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCSystemBusFiler.h"
-#include "CSCLString.h"
-#include "TGLUtils.h"
-#include "C_OSCSystemFilerUtil.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscSystemBusFiler.hpp"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_scl;
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
+
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,23 +46,23 @@ using namespace stw_errors;
    post-condition: the passed XML parser has the active node set to the same "bus"
 
    \param[out]    orc_Bus        Bus data
-   \param[in,out] orc_XMLParser  XML parser
+   \param[in,out] orc_XmlParser  XML parser
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete (content of orc_Bus is undefined)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscSystemBusFiler::h_LoadBus(C_OscSystemBus & orc_Bus, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Name
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_Bus.c_Name = orc_XMLParser.GetNodeContent();
+      orc_Bus.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
    }
    else
    {
@@ -72,23 +72,23 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
    //Comment
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+      if (orc_XmlParser.SelectNodeChild("comment") == "comment")
       {
-         orc_Bus.c_Comment = orc_XMLParser.GetNodeContent();
+         orc_Bus.c_Comment = orc_XmlParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
       }
       //Type
-      if (orc_XMLParser.SelectNodeChild("type") == "type")
+      if (orc_XmlParser.SelectNodeChild("type") == "type")
       {
-         s32_Retval = C_OSCSystemFilerUtil::h_BusTypeStringToEnum(orc_XMLParser.GetNodeContent(), orc_Bus.e_Type);
+         s32_Retval = C_OscSystemFilerUtil::h_BusTypeStringToEnum(orc_XmlParser.GetNodeContent(), orc_Bus.e_Type);
          if (s32_Retval != C_NO_ERR)
          {
             osc_write_log_error("Loading bus definition", "Could not find \"bus\".\"type\" node.");
             s32_Retval = C_CONFIG;
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
       }
       else
       {
@@ -99,11 +99,11 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
    //Bitrate
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("bitrate") == "bitrate")
+      if (orc_XmlParser.SelectNodeChild("bitrate") == "bitrate")
       {
          try
          {
-            orc_Bus.u64_BitRate = orc_XMLParser.GetAttributeSint64("number");
+            orc_Bus.u64_BitRate = orc_XmlParser.GetAttributeSint64("number");
          }
          catch (...)
          {
@@ -112,7 +112,7 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
             s32_Retval = C_CONFIG;
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
       }
       else
       {
@@ -123,20 +123,20 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
    //Bus id
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("bus-id") == "bus-id")
+      if (orc_XmlParser.SelectNodeChild("bus-id") == "bus-id")
       {
          try
          {
-            orc_Bus.u8_BusID = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("number"));
+            orc_Bus.u8_BusId = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("number"));
          }
          catch (...)
          {
             osc_write_log_error("Loading bus definition", "Invalid value for \"bus-id\".\"number\".");
-            orc_Bus.u8_BusID = 0;
+            orc_Bus.u8_BusId = 0;
             s32_Retval = C_CONFIG;
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
       }
       else
       {
@@ -147,11 +147,11 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
    //Rx delta time
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("rx-delta-time") == "rx-delta-time")
+      if (orc_XmlParser.SelectNodeChild("rx-delta-time") == "rx-delta-time")
       {
          try
          {
-            orc_Bus.u16_RxTimeoutOffsetMs = static_cast<uint16>(orc_XMLParser.GetAttributeUint32("number"));
+            orc_Bus.u16_RxTimeoutOffsetMs = static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("number"));
          }
          catch (...)
          {
@@ -160,7 +160,7 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
             s32_Retval = C_CONFIG;
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
       }
       else
       {
@@ -179,39 +179,39 @@ sint32 C_OSCSystemBusFiler::h_LoadBus(C_OSCSystemBus & orc_Bus, C_OSCXMLParserBa
    post-condition: the passed XML parser has the active node set to the same "bus"
 
    \param[in]     orc_Bus        Bus data to store
-   \param[in,out] orc_XMLParser  XML with bus active
+   \param[in,out] orc_XmlParser  XML with bus active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemBusFiler::h_SaveBus(const C_OSCSystemBus & orc_Bus, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscSystemBusFiler::h_SaveBus(const C_OscSystemBus & orc_Bus, C_OscXmlParserBase & orc_XmlParser)
 {
-   const C_SCLString c_BitRate(orc_Bus.u64_BitRate);
-   const C_SCLString c_RxTimeout(orc_Bus.u16_RxTimeoutOffsetMs);
+   const C_SclString c_BitRate(orc_Bus.u64_BitRate);
+   const C_SclString c_RxTimeout(orc_Bus.u16_RxTimeoutOffsetMs);
 
    //Name
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("name") == "name");
-   orc_XMLParser.SetNodeContent(orc_Bus.c_Name);
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("name") == "name");
+   orc_XmlParser.SetNodeContent(orc_Bus.c_Name);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
    //Comment
-   orc_XMLParser.CreateNodeChild("comment", orc_Bus.c_Comment);
+   orc_XmlParser.CreateNodeChild("comment", orc_Bus.c_Comment);
    //Type
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("type") == "type");
-   orc_XMLParser.SetNodeContent(C_OSCSystemFilerUtil::h_BusTypeEnumToString(orc_Bus.e_Type));
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("type") == "type");
+   orc_XmlParser.SetNodeContent(C_OscSystemFilerUtil::h_BusTypeEnumToString(orc_Bus.e_Type));
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
    //Bitrate
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("bitrate") == "bitrate");
-   orc_XMLParser.SetAttributeString("number", c_BitRate);
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("bitrate") == "bitrate");
+   orc_XmlParser.SetAttributeString("number", c_BitRate);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
    //Bus id
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("bus-id") == "bus-id");
-   orc_XMLParser.SetAttributeUint32("number", orc_Bus.u8_BusID);
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("bus-id") == "bus-id");
+   orc_XmlParser.SetAttributeUint32("number", orc_Bus.u8_BusId);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
    //Bitrate
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("rx-delta-time") == "rx-delta-time");
-   orc_XMLParser.SetAttributeString("number", c_RxTimeout);
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("rx-delta-time") == "rx-delta-time");
+   orc_XmlParser.SetAttributeString("number", c_RxTimeout);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "bus");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "bus");
 }

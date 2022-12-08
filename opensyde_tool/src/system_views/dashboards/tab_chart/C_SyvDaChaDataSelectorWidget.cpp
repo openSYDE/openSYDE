@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 #include <QScrollBar>
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SyvDaChaDataSelectorWidget.h"
+#include "C_SyvDaChaDataSelectorWidget.hpp"
 #include "ui_C_SyvDaChaDataSelectorWidget.h"
 
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -78,7 +77,7 @@ C_SyvDaChaDataSelectorWidget::~C_SyvDaChaDataSelectorWidget(void)
    \param[in]  ou32_ViewIndex    Index of system view
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::SetView(const uint32 ou32_ViewIndex)
+void C_SyvDaChaDataSelectorWidget::SetView(const uint32_t ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
 }
@@ -101,12 +100,12 @@ void C_SyvDaChaDataSelectorWidget::SetView(const uint32 ou32_ViewIndex)
    \param[in]  orc_ToolTipErrorText                Text of tool tip in case of a warning
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::AddDataSerie(const stw_types::uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataSelectorWidget::AddDataSerie(const uint32_t ou32_DataPoolElementConfigIndex,
                                                 const C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
                                                 const QString & orc_DisplayName, const bool oq_Active,
                                                 const QColor & orc_Color, const QString & orc_Unit,
                                                 const bool oq_Warning, const bool oq_Invalid,
-                                                const stw_opensyde_core::C_OSCNodeDataPool::E_Type oe_InvalidPlaceholderDataPoolType, const QString & orc_ToolTipErrorTextHeading,
+                                                const stw::opensyde_core::C_OscNodeDataPool::E_Type oe_InvalidPlaceholderDataPoolType, const QString & orc_ToolTipErrorTextHeading,
                                                 const QString & orc_ToolTipErrorText)
 {
    C_SyvDaChaDataItemWidget * const pc_DataSerieItem = new C_SyvDaChaDataItemWidget(this->mu32_ViewIndex);
@@ -155,10 +154,10 @@ void C_SyvDaChaDataSelectorWidget::AddDataSerie(const stw_types::uint32 ou32_Dat
    false    nothing removed
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaChaDataSelectorWidget::RemoveDataSerie(const uint32 ou32_DataPoolElementConfigIndex)
+bool C_SyvDaChaDataSelectorWidget::RemoveDataSerie(const uint32_t ou32_DataPoolElementConfigIndex)
 {
    bool q_Return = false;
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Remove the item widget
    if (ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataItemWidgets.size())
@@ -196,7 +195,7 @@ bool C_SyvDaChaDataSelectorWidget::RemoveDataSerie(const uint32 ou32_DataPoolEle
    \param[in]  orc_Color                        New color
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::UpdateDataSerieColor(const uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataSelectorWidget::UpdateDataSerieColor(const uint32_t ou32_DataPoolElementConfigIndex,
                                                         const QColor & orc_Color) const
 {
    if (ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataItemWidgets.size())
@@ -211,7 +210,7 @@ void C_SyvDaChaDataSelectorWidget::UpdateDataSerieColor(const uint32 ou32_DataPo
    \param[in]  orc_Value                        New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::UpdateDataSerieValue(const uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataSelectorWidget::UpdateDataSerieValue(const uint32_t ou32_DataPoolElementConfigIndex,
                                                         const QString & orc_Value) const
 {
    if (ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataItemWidgets.size())
@@ -233,7 +232,7 @@ void C_SyvDaChaDataSelectorWidget::UpdateDataSerieValue(const uint32 ou32_DataPo
 void C_SyvDaChaDataSelectorWidget::SetMeasurementState(
    const C_SyvDaChaDataItemWidget::E_MeasurementValueState oe_MeasurementValueState)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->mc_DataPoolElementsDataItemWidgets.size(); ++u32_Counter)
    {
@@ -250,7 +249,7 @@ void C_SyvDaChaDataSelectorWidget::SetMeasurementState(
    \param[in]  orc_Value                        New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::UpdateDataSerieMeasurementValue(const uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataSelectorWidget::UpdateDataSerieMeasurementValue(const uint32_t ou32_DataPoolElementConfigIndex,
                                                                    const C_SyvDaChaDataItemWidget::E_MeasurementValueState oe_MeasurementValueVariant,
                                                                    const QString & orc_Value)
 {
@@ -270,7 +269,7 @@ void C_SyvDaChaDataSelectorWidget::UpdateDataSerieMeasurementValue(const uint32 
    \param[in]  oq_ErrorActive          Flag if error is active or should be cleared
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::UpdateError(const uint32 ou32_DataElementIndex, const QString & orc_ErrorText,
+void C_SyvDaChaDataSelectorWidget::UpdateError(const uint32_t ou32_DataElementIndex, const QString & orc_ErrorText,
                                                const bool oq_IsTransmissionError, const bool oq_ErrorActive) const
 {
    if (ou32_DataElementIndex < this->mc_DataPoolElementsDataItemWidgets.size())
@@ -287,7 +286,7 @@ void C_SyvDaChaDataSelectorWidget::UpdateError(const uint32 ou32_DataElementInde
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaDataSelectorWidget::ResetError(void) const
 {
-   uint32 u32_Index;
+   uint32_t u32_Index;
 
    for (u32_Index = 0U; u32_Index < this->mc_DataPoolElementsDataItemWidgets.size(); ++u32_Index)
    {
@@ -299,14 +298,14 @@ void C_SyvDaChaDataSelectorWidget::ResetError(void) const
 /*! \brief   Update of the color transparency value configured by the actual timeout state
 
    \param[in]  ou32_DataElementIndex   Index of shown datapool element in widget
-   \param[in]  osn_Value               Value for transparency (0..255)
+   \param[in]  os32_Value              Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_SyvDaChaDataSelectorWidget::UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value)
 {
    if (ou32_DataElementIndex < this->mc_DataPoolElementsDataItemWidgets.size())
    {
-      this->mc_DataPoolElementsDataItemWidgets[ou32_DataElementIndex]->UpdateTransparency(osn_Value);
+      this->mc_DataPoolElementsDataItemWidgets[ou32_DataElementIndex]->UpdateTransparency(os32_Value);
    }
 }
 
@@ -319,7 +318,7 @@ void C_SyvDaChaDataSelectorWidget::UpdateTransparency(const uint32 ou32_DataElem
    Element name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaChaDataSelectorWidget::GetDataElementName(const uint32 ou32_DataPoolElementConfigIndex) const
+QString C_SyvDaChaDataSelectorWidget::GetDataElementName(const uint32_t ou32_DataPoolElementConfigIndex) const
 {
    QString c_Return = "";
 
@@ -340,7 +339,7 @@ QString C_SyvDaChaDataSelectorWidget::GetDataElementName(const uint32 ou32_DataP
    Element unit
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvDaChaDataSelectorWidget::GetDataElementUnit(const uint32 ou32_DataPoolElementConfigIndex) const
+QString C_SyvDaChaDataSelectorWidget::GetDataElementUnit(const uint32_t ou32_DataPoolElementConfigIndex) const
 {
    QString c_Return = "";
 
@@ -361,7 +360,7 @@ QString C_SyvDaChaDataSelectorWidget::GetDataElementUnit(const uint32 ou32_DataP
    \retval   false   Element is disabled
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaChaDataSelectorWidget::GetDataElementToggledState(const uint32 ou32_DataPoolElementConfigIndex) const
+bool C_SyvDaChaDataSelectorWidget::GetDataElementToggledState(const uint32_t ou32_DataPoolElementConfigIndex) const
 {
    bool q_Return = false;
 
@@ -384,7 +383,7 @@ bool C_SyvDaChaDataSelectorWidget::GetDataElementToggledState(const uint32 ou32_
    \param[in]  orc_Unit                         Element unit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::SetDataElementUnit(const uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataSelectorWidget::SetDataElementUnit(const uint32_t ou32_DataPoolElementConfigIndex,
                                                       const QString & orc_DisplayName, const QString & orc_Unit)
 {
    if (ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataItemWidgets.size())
@@ -404,7 +403,7 @@ void C_SyvDaChaDataSelectorWidget::SetDataElementUnit(const uint32 ou32_DataPool
    false    data element does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaChaDataSelectorWidget::GetCurrentDataSerie(uint32 & oru32_DataPoolElementConfigIndex) const
+bool C_SyvDaChaDataSelectorWidget::GetCurrentDataSerie(uint32_t & oru32_DataPoolElementConfigIndex) const
 {
    bool q_Return = false;
 
@@ -427,18 +426,18 @@ bool C_SyvDaChaDataSelectorWidget::GetCurrentDataSerie(uint32 & oru32_DataPoolEl
    false    No data element is on the position
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaChaDataSelectorWidget::IsADataSerieOnPosition(const QPoint & orc_Pos) const
+bool C_SyvDaChaDataSelectorWidget::IsAnyDataSerieOnPosition(const QPoint & orc_Pos) const
 {
    bool q_Return = false;
    const QPoint c_PosAdapted = this->mapFromParent(orc_Pos);
 
    if (this->mc_DataPoolElementsDataItemWidgets.size() > 0)
    {
-      uintn un_Counter;
+      uint32_t u32_Counter;
 
-      for (un_Counter = 0; un_Counter < this->mc_DataPoolElementsDataItemWidgets.size(); ++un_Counter)
+      for (u32_Counter = 0; u32_Counter < this->mc_DataPoolElementsDataItemWidgets.size(); ++u32_Counter)
       {
-         if (this->mc_DataPoolElementsDataItemWidgets[un_Counter]->geometry().contains(c_PosAdapted) == true)
+         if (this->mc_DataPoolElementsDataItemWidgets[u32_Counter]->geometry().contains(c_PosAdapted) == true)
          {
             q_Return = true;
             break;
@@ -455,7 +454,7 @@ bool C_SyvDaChaDataSelectorWidget::IsADataSerieOnPosition(const QPoint & orc_Pos
    \param[in]  ou32_DataPoolElementConfigIndex  Current data serie id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::SelectDataSerie(const uint32 ou32_DataPoolElementConfigIndex)
+void C_SyvDaChaDataSelectorWidget::SelectDataSerie(const uint32_t ou32_DataPoolElementConfigIndex)
 {
    this->m_DataItemSelected(ou32_DataPoolElementConfigIndex, false);
 }
@@ -477,7 +476,7 @@ bool C_SyvDaChaDataSelectorWidget::event(QEvent * const opc_Event)
 {
    if (opc_Event->type() == QEvent::Leave)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < this->mc_DataPoolElementsDataItemWidgets.size(); ++u32_Counter)
       {
@@ -489,18 +488,18 @@ bool C_SyvDaChaDataSelectorWidget::event(QEvent * const opc_Event)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::m_DataItemSelectedSlot(const stw_types::uint32 ou32_DataPoolElementConfigIndex)
+void C_SyvDaChaDataSelectorWidget::m_DataItemSelectedSlot(const uint32_t ou32_DataPoolElementConfigIndex)
 {
    this->m_DataItemSelected(ou32_DataPoolElementConfigIndex, true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaDataSelectorWidget::m_DataItemSelected(const uint32 ou32_DataPoolElementConfigIndex,
+void C_SyvDaChaDataSelectorWidget::m_DataItemSelected(const uint32_t ou32_DataPoolElementConfigIndex,
                                                       const bool oq_SendSignal)
 {
    if (ou32_DataPoolElementConfigIndex < this->mc_DataPoolElementsDataItemWidgets.size())
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       // Select the item
       this->mc_DataPoolElementsDataItemWidgets[ou32_DataPoolElementConfigIndex]->SetDataElementSelected(true);

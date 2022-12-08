@@ -10,29 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QMimeData>
 #include <QDrag>
-#include "C_SdNdeDpListArrayEditView.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_Uti.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeSingleHeaderView.h"
-#include "C_GtGetText.h"
+#include "C_SdNdeDpListArrayEditView.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_Uti.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_errors;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -146,10 +145,10 @@ C_SdNdeDpListArrayEditView::~C_SdNdeDpListArrayEditView(void)
                                   Else use data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListArrayEditView::SetElement(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                            const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
+void C_SdNdeDpListArrayEditView::SetElement(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                            const uint32_t & oru32_ListIndex, const uint32_t & oru32_ElementIndex,
                                             const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                            const uint32 & oru32_DataSetIndex)
+                                            const uint32_t & oru32_DataSetIndex)
 {
    if (this->mpc_ModelViewManager != NULL)
    {
@@ -182,10 +181,10 @@ void C_SdNdeDpListArrayEditView::SetElement(const uint32 & oru32_NodeIndex, cons
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListArrayEditView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                        const uint32 & oru32_ListIndex, const uint32 & oru32_ElementIndex,
+bool C_SdNdeDpListArrayEditView::Equals(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                        const uint32_t & oru32_ListIndex, const uint32_t & oru32_ElementIndex,
                                         const C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,
-                                        const uint32 & oru32_DataSetIndex) const
+                                        const uint32_t & oru32_DataSetIndex) const
 {
    bool q_Retval;
 
@@ -233,7 +232,7 @@ void C_SdNdeDpListArrayEditView::OnErrorChangePossible(void)
    \param[in] orc_NewData      New data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListArrayEditView::OnDataChange(const uint32 & oru32_ArrayIndex, const QVariant & orc_NewData)
+void C_SdNdeDpListArrayEditView::OnDataChange(const uint32_t & oru32_ArrayIndex, const QVariant & orc_NewData)
 {
    this->mc_UndoManager.DoDataChangeElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                              this->mu32_ListIndex, this->mu32_ElementIndex, this->me_ArrayEditType,
@@ -260,9 +259,9 @@ void C_SdNdeDpListArrayEditView::SetModelViewManager(C_SdNdeDpListModelViewManag
    Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SdNdeDpListArrayEditView::m_GetSelectedIndices(void) const
+std::vector<uint32_t> C_SdNdeDpListArrayEditView::m_GetSelectedIndices(void) const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    QModelIndexList c_SelectedItems = this->selectedIndexes();
 
    c_Retval.reserve(c_SelectedItems.size());

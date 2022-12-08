@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_PuiSdUtil.h"
-#include "C_SdTopologyScene.h"
-#include "C_SdManUnoTopologyAddSnapshotCommand.h"
+#include "stwtypes.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_SdTopologyScene.hpp"
+#include "C_SdManUnoTopologyAddSnapshotCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,23 +39,23 @@ using namespace stw_opensyde_core;
 
    \param[in,out]  opc_Scene                 Pointer to currently active scene
    \param[in]      orc_InitialSnapshotData   Initial snapshot data
-   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      orc_Ids                   Affected unique IDs
    \param[in]      orc_NewPos                New position
-   \param[in]      of64_HighestUsedZValue    Highest used Z value
+   \param[in]      of64_HighestUsedZetValue    Highest used Z value
    \param[in,out]  opc_Parent                Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddSnapshotCommand::C_SdManUnoTopologyAddSnapshotCommand(QGraphicsScene * const opc_Scene,
                                                                            const C_SdTopologyDataSnapshot & orc_InitialSnapshotData,
-                                                                           const std::vector<uint64> & orc_IDs, const QPointF & orc_NewPos, const float64 of64_HighestUsedZValue,
+                                                                           const std::vector<uint64_t> & orc_Ids, const QPointF & orc_NewPos, const float64_t of64_HighestUsedZetValue,
                                                                            QUndoCommand * const opc_Parent) :
-   C_SdManUnoTopologyAddBaseCommand(opc_Scene, orc_IDs, "Paste drawing element(s)",
+   C_SdManUnoTopologyAddBaseCommand(opc_Scene, orc_Ids, "Paste drawing element(s)",
                                     opc_Parent, orc_InitialSnapshotData)
 {
    //Handle pos
    this->m_SetDataPositionOffset(orc_NewPos);
    //Handle Z
-   this->m_SetDataZOffset(of64_HighestUsedZValue);
+   this->m_SetDataZetOffset(of64_HighestUsedZetValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,82 +76,82 @@ void C_SdManUnoTopologyAddSnapshotCommand::m_AddNew(void)
 
    if (pc_Scene != NULL)
    {
-      QMap<C_PuiBsTemporaryDataID, uint64> c_IDMap;
-      uint32 u32_ItID = 0;
+      QMap<C_PuiBsTemporaryDataId, uint64_t> c_IdMap;
       const C_SdTopologyDataSnapshot c_InitialData = this->GetDataBackup();
-      const std::vector<stw_types::uint64> c_AllIDs = this->m_GetIDs();
-      const uint32 u32_ItemCount = c_InitialData.Count();
-      if (u32_ItemCount <= c_AllIDs.size())
+      const std::vector<uint64_t> c_AllIds = this->m_GetIds();
+      const uint32_t u32_ItemCount = c_InitialData.Count();
+      if (u32_ItemCount <= c_AllIds.size())
       {
+         uint32_t u32_ItId = 0;
          //Map IDs
-         uint32 u32_Counter = 0UL;
+         uint32_t u32_Counter = 0UL;
 
          //Nodes
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_UINodes.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_UiNodes.size(); ++u32_ItItem)
          {
             const bool q_IsFirst = C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(u32_ItItem,
-                                                                                   c_InitialData.c_OSCNodeGroups);
+                                                                                   c_InitialData.c_OscNodeGroups);
             if (q_IsFirst)
             {
-               c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eNODE),
-                                                     u32_Counter), c_AllIDs[u32_ItID]);
-               ++u32_ItID;
+               c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eNODE),
+                                                     u32_Counter), c_AllIds[u32_ItId]);
+               ++u32_ItId;
                ++u32_Counter;
             }
          }
          //Buses
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_OSCBuses.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_OscBuses.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eBUS),
-                                                  u32_ItItem), c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eBUS),
+                                                  u32_ItItem), c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
          //Boundaries
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_Boundaries.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_Boundaries.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eBOUNDARY),
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eBOUNDARY),
                                                   u32_ItItem),
-                           c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+                           c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
          //Images
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_Images.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_Images.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eIMAGE),
-                                                  u32_ItItem), c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eIMAGE),
+                                                  u32_ItItem), c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
          //Line arrows
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_LineArrows.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_LineArrows.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eLINE_ARROW),
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eLINE_ARROW),
                                                   u32_ItItem),
-                           c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+                           c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
          //Text elements
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_TextElements.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_TextElements.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eTEXT_ELEMENT),
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eTEXT_ELEMENT),
                                                   u32_ItItem),
-                           c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+                           c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
          //Bus connector
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_BusConnections.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_BusConnections.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eBUS_CONNECTOR),
-                                                  u32_ItItem), c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eBUS_CONNECTOR),
+                                                  u32_ItItem), c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
          //Bus text elements
-         for (uint32 u32_ItItem = 0; u32_ItItem < c_InitialData.c_BusTextElements.size(); ++u32_ItItem)
+         for (uint32_t u32_ItItem = 0; u32_ItItem < c_InitialData.c_BusTextElements.size(); ++u32_ItItem)
          {
-            c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(C_PuiSdDataElement::eTEXT_ELEMENT_BUS),
-                                                  u32_ItItem), c_AllIDs[u32_ItID]);
-            ++u32_ItID;
+            c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(C_PuiSdDataElement::eTEXT_ELEMENT_BUS),
+                                                  u32_ItItem), c_AllIds[u32_ItId]);
+            ++u32_ItId;
          }
-         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &c_IDMap);
+         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &c_IdMap);
       }
    }
 }

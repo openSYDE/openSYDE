@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QHeaderView>
 #include <QMimeData>
@@ -18,31 +18,30 @@
 #include <QScrollBar>
 #include <QPointer>
 
-#include "C_SdNdeDpListTableView.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_SdClipBoardHelper.h"
-#include "C_Uti.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_SdNdeSingleHeaderView.h"
-#include "C_OgePopUpDialog.h"
-#include "C_SdNdeDpListArrayEditWidget.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_SdUtil.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_UsHandler.h"
+#include "C_SdNdeDpListTableView.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_SdClipBoardHelper.hpp"
+#include "C_Uti.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SdNdeDpListArrayEditWidget.hpp"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_SdUtil.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_errors;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -176,8 +175,8 @@ C_SdNdeDpListTableView::~C_SdNdeDpListTableView(void)
    \param[in]  oru32_ListIndex      Node data pool list index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::SetList(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                     const uint32 & oru32_ListIndex)
+void C_SdNdeDpListTableView::SetList(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                     const uint32_t & oru32_ListIndex)
 {
    if (this->mpc_ModelViewManager != NULL)
    {
@@ -202,8 +201,8 @@ void C_SdNdeDpListTableView::SetList(const uint32 & oru32_NodeIndex, const uint3
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListTableView::Equals(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                    const uint32 & oru32_ListIndex) const
+bool C_SdNdeDpListTableView::Equals(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                    const uint32_t & oru32_ListIndex) const
 {
    bool q_Retval;
 
@@ -225,30 +224,30 @@ bool C_SdNdeDpListTableView::Equals(const uint32 & oru32_NodeIndex, const uint32
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::Copy(void) const
 {
-   std::vector<C_OSCNodeDataPoolListElement> c_OSCContentVec;
-   std::vector<C_PuiSdNodeDataPoolListElement> c_UIContentVec;
-   C_OSCNodeDataPoolListElement c_OSCContent;
-   C_PuiSdNodeDataPoolListElement c_UIContent;
+   std::vector<C_OscNodeDataPoolListElement> c_OscContentVec;
+   std::vector<C_PuiSdNodeDataPoolListElement> c_UiContentVec;
+   C_OscNodeDataPoolListElement c_OscContent;
+   C_PuiSdNodeDataPoolListElement c_UiContent;
 
-   std::vector<uint32> c_SelectedIndices = m_GetSelectedIndices();
-   c_OSCContentVec.reserve(c_SelectedIndices.size());
-   c_UIContentVec.reserve(c_SelectedIndices.size());
+   std::vector<uint32_t> c_SelectedIndices = m_GetSelectedIndices();
+   c_OscContentVec.reserve(c_SelectedIndices.size());
+   c_UiContentVec.reserve(c_SelectedIndices.size());
 
    //Sort to have "correct" copy order
    C_SdUtil::h_SortIndicesAscending(c_SelectedIndices);
-   for (uint32 u32_ItIndex = 0; u32_ItIndex < c_SelectedIndices.size(); ++u32_ItIndex)
+   for (uint32_t u32_ItIndex = 0; u32_ItIndex < c_SelectedIndices.size(); ++u32_ItIndex)
    {
       if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                                   this->mu32_ListIndex,
                                                                   c_SelectedIndices[u32_ItIndex],
-                                                                  c_OSCContent,
-                                                                  c_UIContent) == C_NO_ERR)
+                                                                  c_OscContent,
+                                                                  c_UiContent) == C_NO_ERR)
       {
-         c_OSCContentVec.push_back(c_OSCContent);
-         c_UIContentVec.push_back(c_UIContent);
+         c_OscContentVec.push_back(c_OscContent);
+         c_UiContentVec.push_back(c_UiContent);
       }
    }
-   C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(c_OSCContentVec, c_UIContentVec);
+   C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(c_OscContentVec, c_UiContentVec);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -267,7 +266,7 @@ void C_SdNdeDpListTableView::Cut(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::Paste(void)
 {
-   const uint32 u32_LastIndex = m_GetOneAfterHighestSelected();
+   const uint32_t u32_LastIndex = m_GetOneAfterHighestSelected();
 
    this->mc_UndoManager.DoPaste(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                 this->mpc_ModelViewManager,
@@ -280,7 +279,7 @@ void C_SdNdeDpListTableView::Paste(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::Delete(void)
 {
-   const std::vector<uint32> c_Indices = m_GetSelectedIndices();
+   const std::vector<uint32_t> c_Indices = m_GetSelectedIndices();
 
    this->mc_UndoManager.DoDeleteElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                          this->mpc_ModelViewManager,
@@ -306,7 +305,7 @@ void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
 {
    if (mq_AllowAdd == true)
    {
-      std::vector<uint32> c_Indices;
+      std::vector<uint32_t> c_Indices;
       c_Indices.push_back(m_GetOneAfterHighestSelected());
 
       this->mc_UndoManager.DoAddElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
@@ -320,7 +319,7 @@ void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
    {
       QString c_Text;
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eERROR);
-      const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex);
       if (pc_DataPool != NULL)
       {
@@ -331,7 +330,7 @@ void C_SdNdeDpListTableView::Insert(const bool & orq_SetFocus)
          c_Text = C_GtGetText::h_GetText("Data elements");
       }
       c_MessageBox.SetDescription(static_cast<QString>(C_GtGetText::h_GetText("Only %1 %2 allowed per list.")).arg(
-                                     C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST).arg(c_Text));
+                                     C_OscNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST).arg(c_Text));
       c_MessageBox.SetCustomMinHeight(180, 180);
       c_MessageBox.Execute();
    }
@@ -347,13 +346,13 @@ void C_SdNdeDpListTableView::DoMoveUp(void)
    {
       bool q_AllowMove = true;
 
-      std::vector<uint32> c_TargetIndices;
-      std::vector<uint32> c_SourceIndices = m_GetSelectedIndices();
+      std::vector<uint32_t> c_TargetIndices;
+      std::vector<uint32_t> c_SourceIndices = m_GetSelectedIndices();
       c_TargetIndices.resize(c_SourceIndices.size());
 
       //Sort to have "correct" move order
       C_SdUtil::h_SortIndicesAscending(c_SourceIndices);
-      for (uint32 u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
+      for (uint32_t u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
       {
          //Check if not first
          if (c_SourceIndices[u32_ItItem] > 0)
@@ -389,14 +388,14 @@ void C_SdNdeDpListTableView::DoMoveDown(void)
          {
             bool q_AllowMove = true;
 
-            std::vector<uint32> c_TargetIndices;
-            std::vector<uint32> c_SourceIndices = m_GetSelectedIndices();
-            const uint32 u32_LastIndex = static_cast<uint32>(pc_Model->rowCount() - 1);
+            std::vector<uint32_t> c_TargetIndices;
+            std::vector<uint32_t> c_SourceIndices = m_GetSelectedIndices();
+            const uint32_t u32_LastIndex = static_cast<uint32_t>(pc_Model->rowCount() - 1);
             c_TargetIndices.resize(c_SourceIndices.size());
 
             //Sort to have "correct" move order
             C_SdUtil::h_SortIndicesAscending(c_SourceIndices);
-            for (uint32 u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
+            for (uint32_t u32_ItItem = 0; u32_ItItem < c_TargetIndices.size(); ++u32_ItItem)
             {
                //Check if not last
                if (c_SourceIndices[u32_ItItem] < u32_LastIndex)
@@ -424,7 +423,7 @@ void C_SdNdeDpListTableView::DoMoveDown(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::EditInitial(void)
 {
-   const std::vector<uint32> c_Selection = this->m_GetSelectedIndices();
+   const std::vector<uint32_t> c_Selection = this->m_GetSelectedIndices();
 
    if (c_Selection.size() == 1)
    {
@@ -483,10 +482,10 @@ void C_SdNdeDpListTableView::OnSizeChangePossible(void)
    \param[in]  ors32_DataSetIndex               Optional data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::OnDataChangeElements(const uint32 & oru32_DataPoolListElementIndex,
+void C_SdNdeDpListTableView::OnDataChangeElements(const uint32_t & oru32_DataPoolListElementIndex,
                                                   const QVariant & orc_NewData,
                                                   const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType,
-                                                  const uint32 & oru32_ArrayIndex, const sint32 & ors32_DataSetIndex)
+                                                  const uint32_t & oru32_ArrayIndex, const int32_t & ors32_DataSetIndex)
 {
    this->mc_UndoManager.DoDataChangeElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                              this->mpc_ModelViewManager, oru32_DataPoolListElementIndex, orc_NewData,
@@ -601,30 +600,30 @@ void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
                   if ((pc_MimeData->hasFormat(pc_Model->mimeTypes().at(1)) == true) &&
                       (pc_MimeData->hasFormat(pc_Model->mimeTypes().at(2)) == true))
                   {
-                     std::vector<C_OSCNodeDataPoolListElement> c_OSCContent;
-                     std::vector<C_PuiSdNodeDataPoolListElement> c_UIContent;
+                     std::vector<C_OscNodeDataPoolListElement> c_OscContent;
+                     std::vector<C_PuiSdNodeDataPoolListElement> c_UiContent;
                      const QString c_Content = pc_MimeData->data(pc_Model->mimeTypes().at(1));
                      //Insert indices
-                     if (C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(c_OSCContent, c_UIContent,
+                     if (C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromString(c_OscContent, c_UiContent,
                                                                                      c_Content) == C_NO_ERR)
                      {
-                        std::vector<uint32> c_SourceIndices;
-                        uint32 u32_TargetRow;
+                        std::vector<uint32_t> c_SourceIndices;
+                        uint32_t u32_TargetRow;
                         const QString c_IndicesString = pc_MimeData->data(pc_Model->mimeTypes().at(2));
-                        std::vector<uint32> c_NewIndices;
+                        std::vector<uint32_t> c_NewIndices;
                         const QModelIndex c_Index = this->indexAt(opc_Event->pos());
                         //Target row
                         if (c_Index.isValid())
                         {
-                           u32_TargetRow = static_cast<uint32>(c_Index.row()) + 1UL;
+                           u32_TargetRow = static_cast<uint32_t>(c_Index.row()) + 1UL;
                         }
                         else
                         {
                            u32_TargetRow = pc_Model->rowCount();
                         }
                         //Calculate target indices
-                        c_NewIndices.resize(c_OSCContent.size());
-                        for (uint32 u32_ItNewIndex = 0; u32_ItNewIndex < c_NewIndices.size(); ++u32_ItNewIndex)
+                        c_NewIndices.resize(c_OscContent.size());
+                        for (uint32_t u32_ItNewIndex = 0; u32_ItNewIndex < c_NewIndices.size(); ++u32_ItNewIndex)
                         {
                            c_NewIndices[u32_ItNewIndex] = u32_TargetRow + u32_ItNewIndex;
                         }
@@ -648,7 +647,7 @@ void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
                                                                          this->mu32_ListIndex,
                                                                          this->mpc_ModelViewManager,
                                                                          c_NewIndices,
-                                                                         c_OSCContent, c_UIContent);
+                                                                         c_OscContent, c_UiContent);
                               //Delete indices in source
                               pc_SourceTable->m_DeleteIndices(c_SourceIndices);
                            }
@@ -676,7 +675,7 @@ void C_SdNdeDpListTableView::dropEvent(QDropEvent * const opc_Event)
 void C_SdNdeDpListTableView::selectionChanged(const QItemSelection & orc_Selected,
                                               const QItemSelection & orc_Deselected)
 {
-   std::vector<uint32> c_SelectedIndices;
+   std::vector<uint32_t> c_SelectedIndices;
    C_TblViewScroll::selectionChanged(orc_Selected, orc_Deselected);
 
    c_SelectedIndices = C_SdNdeDpUtil::h_ConvertVector(this->selectedIndexes());
@@ -696,7 +695,7 @@ void C_SdNdeDpListTableView::selectionChanged(const QItemSelection & orc_Selecte
 void C_SdNdeDpListTableView::startDrag(const Qt::DropActions oc_SupportedActions)
 {
    const QModelIndexList c_SelectedItems = this->selectedIndexes();
-   const std::vector<uint32> c_ReallySelectedItems = this->m_GetSelectedIndices();
+   const std::vector<uint32_t> c_ReallySelectedItems = this->m_GetSelectedIndices();
 
    if (c_ReallySelectedItems.size() > 0)
    {
@@ -725,7 +724,7 @@ void C_SdNdeDpListTableView::SetModelViewManager(C_SdNdeDpListModelViewManager *
    \param[in]  os32_DataElementIndex   Data element index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::SelectDataElement(const sint32 os32_DataElementIndex)
+void C_SdNdeDpListTableView::SelectDataElement(const int32_t os32_DataElementIndex)
 {
    this->clearSelection();
    this->selectRow(os32_DataElementIndex);
@@ -739,7 +738,7 @@ void C_SdNdeDpListTableView::SelectDataElement(const sint32 os32_DataElementInde
    \param[in]  ou32_LastRow   Last row to select
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::SelectRange(const uint32 ou32_FirstRow, const uint32 ou32_LastRow) const
+void C_SdNdeDpListTableView::SelectRange(const uint32_t ou32_FirstRow, const uint32_t ou32_LastRow) const
 {
    const QModelIndex c_TopLeft = this->model()->index(ou32_FirstRow, 0);
    const QModelIndex c_BottomRight = this->model()->index(ou32_LastRow, this->model()->columnCount() - 1);
@@ -767,7 +766,7 @@ bool C_SdNdeDpListTableView::IsSelected(void) const
    \param[in]  os32_DataSetColumn   Index of new data set
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::UpdateSelectionForNewDataSetColumn(const sint32 os32_DataSetColumn)
+void C_SdNdeDpListTableView::UpdateSelectionForNewDataSetColumn(const int32_t os32_DataSetColumn)
 {
    const QModelIndexList c_SelectedIndices = this->selectedIndexes();
 
@@ -777,10 +776,10 @@ void C_SdNdeDpListTableView::UpdateSelectionForNewDataSetColumn(const sint32 os3
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
       if (pc_Model != NULL)
       {
-         const sint32 s32_DataSetOffset = pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eDATA_SET);
-         std::vector<uint32> c_Rows;
+         const int32_t s32_DataSetOffset = pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eDATA_SET);
+         std::vector<uint32_t> c_Rows;
          //Get all rows
-         for (uint32 u32_ItIndex = 0; static_cast<sintn>(u32_ItIndex) < c_SelectedIndices.size(); ++u32_ItIndex)
+         for (uint32_t u32_ItIndex = 0; static_cast<int32_t>(u32_ItIndex) < c_SelectedIndices.size(); ++u32_ItIndex)
          {
             const QModelIndex & rc_CurIndex = c_SelectedIndices[u32_ItIndex];
             c_Rows.push_back(rc_CurIndex.row());
@@ -788,11 +787,11 @@ void C_SdNdeDpListTableView::UpdateSelectionForNewDataSetColumn(const sint32 os3
          //Make rows unique
          C_Uti::h_Uniqueify(c_Rows);
          //Select all rows (again)
-         for (uint32 u32_ItRow = 0; u32_ItRow < c_Rows.size(); ++u32_ItRow)
+         for (uint32_t u32_ItRow = 0; u32_ItRow < c_Rows.size(); ++u32_ItRow)
          {
             //this->selectRow(c_Rows[u32_ItRow]);
             this->selectionModel()->select(pc_Model->index(c_Rows[u32_ItRow],
-                                                           static_cast<sintn>(s32_DataSetOffset + os32_DataSetColumn)),
+                                                           static_cast<int32_t>(s32_DataSetOffset + os32_DataSetColumn)),
                                            QItemSelectionModel::Select);
          }
       }
@@ -824,15 +823,15 @@ void C_SdNdeDpListTableView::SetSelectedVariableNames(const std::vector<QString>
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
       if (pc_Model != NULL)
       {
-         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
          if (pc_List != NULL)
          {
-            for (uint32 u32_ItElement = 0; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
+            for (uint32_t u32_ItElement = 0; u32_ItElement < pc_List->c_Elements.size(); ++u32_ItElement)
             {
-               const C_OSCNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_ItElement];
-               for (uint32 u32_ItVarName = 0; u32_ItVarName < orc_VariableNames.size(); ++u32_ItVarName)
+               const C_OscNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_ItElement];
+               for (uint32_t u32_ItVarName = 0; u32_ItVarName < orc_VariableNames.size(); ++u32_ItVarName)
                {
                   const QString & rc_VariableName = orc_VariableNames[u32_ItVarName];
                   if (rc_VariableName.compare(rc_Element.c_Name.c_str()) == 0)
@@ -860,18 +859,18 @@ void C_SdNdeDpListTableView::SetSelectedVariableNames(const std::vector<QString>
 std::vector<QString> C_SdNdeDpListTableView::GetSelectedVariableNames(void) const
 {
    std::vector<QString> c_Retval;
-   const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+   const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
       this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
    if (pc_List != NULL)
    {
-      const std::vector<uint32> c_Indices = this->m_GetSelectedIndices();
+      const std::vector<uint32_t> c_Indices = this->m_GetSelectedIndices();
       c_Retval.reserve(c_Indices.size());
-      for (uint32 u32_ItVar = 0; u32_ItVar < c_Indices.size(); ++u32_ItVar)
+      for (uint32_t u32_ItVar = 0; u32_ItVar < c_Indices.size(); ++u32_ItVar)
       {
-         const uint32 u32_VarIndex = c_Indices[u32_ItVar];
+         const uint32_t u32_VarIndex = c_Indices[u32_ItVar];
          if (u32_VarIndex < pc_List->c_Elements.size())
          {
-            const C_OSCNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_VarIndex];
+            const C_OscNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_VarIndex];
             c_Retval.push_back(rc_Element.c_Name.c_str());
          }
       }
@@ -885,9 +884,9 @@ std::vector<QString> C_SdNdeDpListTableView::GetSelectedVariableNames(void) cons
    \param[in]  orc_Indices    Indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::m_DeleteIndices(const std::vector<uint32> & orc_Indices)
+void C_SdNdeDpListTableView::m_DeleteIndices(const std::vector<uint32_t> & orc_Indices)
 {
-   std::vector<uint32> c_Indices = orc_Indices;
+   std::vector<uint32_t> c_Indices = orc_Indices;
    C_Uti::h_Uniqueify(c_Indices);
    this->mc_UndoManager.DoDeleteElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                          this->mpc_ModelViewManager,
@@ -897,16 +896,16 @@ void C_SdNdeDpListTableView::m_DeleteIndices(const std::vector<uint32> & orc_Ind
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Move item in tree
 
-   \param[in]  oru32_SourceIndices  Source index
-   \param[in]  oru32_TargetIndices  Target index
+   \param[in]  orc_SourceIndices  Source index
+   \param[in]  orc_TargetIndices  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::m_Move(const std::vector<uint32> & oru32_SourceIndices,
-                                    const std::vector<uint32> & oru32_TargetIndices)
+void C_SdNdeDpListTableView::m_Move(const std::vector<uint32_t> & orc_SourceIndices,
+                                    const std::vector<uint32_t> & orc_TargetIndices)
 {
    this->mc_UndoManager.DoMoveElements(this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex,
                                        this->mpc_ModelViewManager,
-                                       oru32_SourceIndices, oru32_TargetIndices, false);
+                                       orc_SourceIndices, orc_TargetIndices, false);
 }
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get selected indices
@@ -915,9 +914,9 @@ void C_SdNdeDpListTableView::m_Move(const std::vector<uint32> & oru32_SourceIndi
    Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_SdNdeDpListTableView::m_GetSelectedIndices(void) const
+std::vector<uint32_t> C_SdNdeDpListTableView::m_GetSelectedIndices(void) const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    QModelIndexList c_SelectedItems = this->selectedIndexes();
 
    c_Retval.reserve(c_SelectedItems.size());
@@ -940,8 +939,8 @@ void C_SdNdeDpListTableView::m_SetupContextMenu(void)
    this->mpc_ContextMenu = new C_OgeContextMenu(this);
 
    this->mpc_ActionAdd = this->mpc_ContextMenu->addAction("", this, &C_SdNdeDpListTableView::InsertAction,
-                                                          static_cast<sintn>(Qt::CTRL) +
-                                                          static_cast<sintn>(Qt::Key_Plus));
+                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                          static_cast<int32_t>(Qt::Key_Plus));
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -949,34 +948,35 @@ void C_SdNdeDpListTableView::m_SetupContextMenu(void)
 
    this->mpc_ActionCut = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                              "Cut"), this, &C_SdNdeDpListTableView::Cut,
-                                                          static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_X));
+                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                          static_cast<int32_t>(Qt::Key_X));
    this->mpc_ActionCopy = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                               "Copy"), this, &C_SdNdeDpListTableView::Copy,
-                                                           static_cast<sintn>(Qt::CTRL) +
-                                                           static_cast<sintn>(Qt::Key_C));
+                                                           static_cast<int32_t>(Qt::CTRL) +
+                                                           static_cast<int32_t>(Qt::Key_C));
    this->mpc_ActionPaste = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                "Paste"), this, &C_SdNdeDpListTableView::Paste,
-                                                            static_cast<sintn>(Qt::CTRL) +
-                                                            static_cast<sintn>(Qt::Key_V));
+                                                            static_cast<int32_t>(Qt::CTRL) +
+                                                            static_cast<int32_t>(Qt::Key_V));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionMoveUp = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                 "Move Up"), this,
                                                              &C_SdNdeDpListTableView::DoMoveUp,
-                                                             static_cast<sintn>(Qt::CTRL) +
-                                                             static_cast<sintn>(Qt::Key_Up));
+                                                             static_cast<int32_t>(Qt::CTRL) +
+                                                             static_cast<int32_t>(Qt::Key_Up));
    this->mpc_ActionMoveDown = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                   "Move Down"), this,
                                                                &C_SdNdeDpListTableView::DoMoveDown,
-                                                               static_cast<sintn>(Qt::CTRL) +
-                                                               static_cast<sintn>(Qt::Key_Down));
+                                                               static_cast<int32_t>(Qt::CTRL) +
+                                                               static_cast<int32_t>(Qt::Key_Down));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionDelete = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                 "Delete"), this, &C_SdNdeDpListTableView::Delete,
-                                                             static_cast<sintn>(Qt::Key_Delete));
+                                                             static_cast<int32_t>(Qt::Key_Delete));
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(this, &C_SdNdeDpListTableView::customContextMenuRequested, this,
@@ -1006,16 +1006,16 @@ void C_SdNdeDpListTableView::m_HandleColumnChange(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
       if (pc_Model != NULL)
       {
-         C_OSCNodeDataPool::E_Type e_DataPoolType;
+         C_OscNodeDataPool::E_Type e_DataPoolType;
          //Show all columns
-         for (uint32 u32_Col = 0; u32_Col < static_cast<uint32>(pc_Model->columnCount()); ++u32_Col)
+         for (uint32_t u32_Col = 0; u32_Col < static_cast<uint32_t>(pc_Model->columnCount()); ++u32_Col)
          {
             this->showColumn(u32_Col);
          }
          //Handle data pool type
          C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
                                                           e_DataPoolType);
-         if (e_DataPoolType == C_OSCNodeDataPool::E_Type::eNVM)
+         if (e_DataPoolType == C_OscNodeDataPool::E_Type::eNVM)
          {
             this->hideColumn(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eEVENT_CALL));
          }
@@ -1036,7 +1036,7 @@ void C_SdNdeDpListTableView::m_HandleColumnChange(void)
    \param[in]  orc_SelectedIndices  Selected indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableView::m_CheckActions(const std::vector<uint32> & orc_SelectedIndices)
+void C_SdNdeDpListTableView::m_CheckActions(const std::vector<uint32_t> & orc_SelectedIndices)
 {
    if (orc_SelectedIndices.size() > 0)
    {
@@ -1045,7 +1045,7 @@ void C_SdNdeDpListTableView::m_CheckActions(const std::vector<uint32> & orc_Sele
       bool q_AllowMoveDown;
 
       //Add
-      if (static_cast<uint32>(this->model()->rowCount()) < C_OSCNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST)
+      if (static_cast<uint32_t>(this->model()->rowCount()) < C_OscNode::hu32_MAX_NUMBER_OF_ELEMENTS_PER_LIST)
       {
          q_AllowAdd = true;
       }
@@ -1062,14 +1062,14 @@ void C_SdNdeDpListTableView::m_CheckActions(const std::vector<uint32> & orc_Sele
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
          if (pc_Model != NULL)
          {
-            for (uint32 u32_ItSelectedIndex = 0; u32_ItSelectedIndex < orc_SelectedIndices.size();
+            for (uint32_t u32_ItSelectedIndex = 0; u32_ItSelectedIndex < orc_SelectedIndices.size();
                  ++u32_ItSelectedIndex)
             {
                if (orc_SelectedIndices[u32_ItSelectedIndex] == 0)
                {
                   q_AllowMoveUp = false;
                }
-               if (orc_SelectedIndices[u32_ItSelectedIndex] == static_cast<uint32>(pc_Model->rowCount() - 1))
+               if (orc_SelectedIndices[u32_ItSelectedIndex] == static_cast<uint32_t>(pc_Model->rowCount() - 1))
                {
                   q_AllowMoveDown = false;
                }
@@ -1186,7 +1186,7 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
             this->mu32_ListIndex);
          if (pc_Model != NULL)
          {
-            sint32 s32_DataSetIndex = -1;
+            int32_t s32_DataSetIndex = -1;
             C_SdNdeDpUtil::E_ArrayEditType e_ArrayEditType;
             const C_SdNdeDpListTableModel::E_Columns e_Column = pc_Model->ColumnToEnum(
                orc_Index.column(), &s32_DataSetIndex);
@@ -1204,17 +1204,17 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
             }
             if (orc_Index.row() >= 0)
             {
-               const uint32 u32_ElementIndex = static_cast<uint32>(orc_Index.row());
-               const uint32 u32_DataSetIndex = static_cast<uint32>(s32_DataSetIndex);
-               C_OSCNodeDataPoolListElement c_OSCElement;
-               C_PuiSdNodeDataPoolListElement c_UIElement;
+               const uint32_t u32_ElementIndex = static_cast<uint32_t>(orc_Index.row());
+               const uint32_t u32_DataSetIndex = static_cast<uint32_t>(s32_DataSetIndex);
+               C_OscNodeDataPoolListElement c_OscElement;
+               C_PuiSdNodeDataPoolListElement c_UiElement;
                const QPointer<C_OgePopUpDialog> c_Dialog = new C_OgePopUpDialog(this, this);
 
                if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex,
                                                                            this->mu32_DataPoolIndex,
                                                                            this->mu32_ListIndex, u32_ElementIndex,
-                                                                           c_OSCElement,
-                                                                           c_UIElement) == C_NO_ERR)
+                                                                           c_OscElement,
+                                                                           c_UiElement) == C_NO_ERR)
                {
                   C_SdNdeDpListArrayEditWidget * const pc_ArrayEditWidget =
                      new C_SdNdeDpListArrayEditWidget(
@@ -1225,7 +1225,7 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
                   pc_ArrayEditWidget->SetModelViewManager(this->mpc_ModelViewManager);
                   //Resize
                   c_Dialog->SetSize(QSize(871, 318));
-                  if (c_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
+                  if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
                   {
                      //Register undo
                      QUndoCommand * const pc_UndoCommand = pc_ArrayEditWidget->TakeUndoCommand();
@@ -1244,7 +1244,7 @@ void C_SdNdeDpListTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
                         C_PuiSdHandler::h_GetInstance()->SetDataPoolListElement(this->mu32_NodeIndex,
                                                                                 this->mu32_DataPoolIndex,
                                                                                 this->mu32_ListIndex, u32_ElementIndex,
-                                                                                c_OSCElement, c_UIElement);
+                                                                                c_OscElement, c_UiElement);
                      }
                   }
                } //lint !e429  //no memory leak because of the parent of pc_ArrayEditWidget and the Qt memory management
@@ -1268,7 +1268,7 @@ void C_SdNdeDpListTableView::m_CheckContextMenuText(void)
    if (this->mpc_ActionAdd != NULL)
    {
       QString c_Text;
-      const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          this->mu32_NodeIndex,
          this->mu32_DataPoolIndex);
 
@@ -1303,17 +1303,17 @@ void C_SdNdeDpListTableView::m_OnColumnResize(void)
          this->mu32_ListIndex);
       if (pc_Model != NULL)
       {
-         const sint32 s32_ColAuto =
+         const int32_t s32_ColAuto =
             this->columnWidth(pc_Model->EnumToColumn(C_SdNdeDpListTableModel::eAUTO_MIN_MAX));
-         const sint32 s32_ColEvent = this->columnWidth(pc_Model->EnumToColumn(
-                                                          C_SdNdeDpListTableModel::eEVENT_CALL));
+         const int32_t s32_ColEvent = this->columnWidth(pc_Model->EnumToColumn(
+                                                           C_SdNdeDpListTableModel::eEVENT_CALL));
          if (this->ms32_LastIndicatorSize < std::max(s32_ColAuto, s32_ColEvent))
          {
             QString c_Style;
             this->ms32_LastIndicatorSize = std::max(s32_ColAuto, s32_ColEvent);
 
             //Stylesheet to make complete checkbox area interact-able
-            c_Style = static_cast<QString>("stw_opensyde_gui--C_SdNdeDpListTableView::indicator {"
+            c_Style = static_cast<QString>("stw--opensyde_gui--C_SdNdeDpListTableView::indicator {"
                                            "width: %1px;"
                                            "height: 30px;"
                                            "}").arg(this->ms32_LastIndicatorSize);
@@ -1330,16 +1330,16 @@ void C_SdNdeDpListTableView::m_OnColumnResize(void)
    Index of element after highest selected element
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDpListTableView::m_GetOneAfterHighestSelected(void)
+uint32_t C_SdNdeDpListTableView::m_GetOneAfterHighestSelected(void)
 {
-   uint32 u32_Retval = 0;
-   const std::vector<uint32> c_SelectedItems = this->m_GetSelectedIndices();
+   uint32_t u32_Retval = 0;
+   const std::vector<uint32_t> c_SelectedItems = this->m_GetSelectedIndices();
 
    if (c_SelectedItems.size() > 0)
    {
-      for (uint32 u32_ItSelected = 0; u32_ItSelected < c_SelectedItems.size(); ++u32_ItSelected)
+      for (uint32_t u32_ItSelected = 0; u32_ItSelected < c_SelectedItems.size(); ++u32_ItSelected)
       {
-         const uint32 u32_Cur = c_SelectedItems[u32_ItSelected];
+         const uint32_t u32_Cur = c_SelectedItems[u32_ItSelected];
          u32_Retval = std::max(u32_Retval, u32_Cur);
       }
       ++u32_Retval;
@@ -1353,10 +1353,10 @@ uint32 C_SdNdeDpListTableView::m_GetOneAfterHighestSelected(void)
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
          if (pc_Model != NULL)
          {
-            const sint32 s32_RowCount = pc_Model->rowCount();
+            const int32_t s32_RowCount = pc_Model->rowCount();
             if (s32_RowCount >= 0)
             {
-               u32_Retval = static_cast<uint32>(s32_RowCount);
+               u32_Retval = static_cast<uint32_t>(s32_RowCount);
             }
          }
       }
@@ -1372,15 +1372,15 @@ void C_SdNdeDpListTableView::m_HandleColumnStateSave(void) const
 {
    if (this->model() != NULL)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-      const C_OSCNodeDataPool * const pc_NodeDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+      const C_OscNodeDataPool * const pc_NodeDataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex);
-      const C_OSCNodeDataPoolList * const pc_NodeDataPoolList = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+      const C_OscNodeDataPoolList * const pc_NodeDataPoolList = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
       if (((pc_Node != NULL) && (pc_NodeDataPool != NULL)) && (pc_NodeDataPoolList != NULL))
       {
-         const std::vector<sint32> c_ColumnWidths = this->m_GetColumnWidths();
+         const std::vector<int32_t> c_ColumnWidths = this->m_GetColumnWidths();
          C_UsHandler::h_GetInstance()->SetProjSdNodeDatapoolListColumnSizes(
             pc_Node->c_Properties.c_Name.c_str(), pc_NodeDataPool->c_Name.c_str(),
             pc_NodeDataPoolList->c_Name.c_str(), c_ColumnWidths);
@@ -1401,10 +1401,10 @@ void C_SdNdeDpListTableView::m_HandleColumnStateRestore(void)
       if (pc_Model != NULL)
       {
          bool q_UserSettingsApplied = false;
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
-         const C_OSCNodeDataPool * const pc_NodeDataPool = C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
+         const C_OscNodeDataPool * const pc_NodeDataPool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex);
-         const C_OSCNodeDataPoolList * const pc_NodeDataPoolList = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+         const C_OscNodeDataPoolList * const pc_NodeDataPoolList = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
             this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_ListIndex);
 
          if (((pc_Node != NULL) && (pc_NodeDataPool != NULL)) && (pc_NodeDataPoolList != NULL))
@@ -1413,7 +1413,7 @@ void C_SdNdeDpListTableView::m_HandleColumnStateRestore(void)
                C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
             const C_UsNodeDatapool c_UserDataPool = c_UserNode.GetDatapool(pc_NodeDataPool->c_Name.c_str());
             const C_UsNodeDatapoolList c_UserList = c_UserDataPool.GetOtherList(pc_NodeDataPoolList->c_Name.c_str());
-            const std::vector<sint32> & rc_ColumnWidths = c_UserList.GetColumnWidths();
+            const std::vector<int32_t> & rc_ColumnWidths = c_UserList.GetColumnWidths();
             q_UserSettingsApplied = this->m_SetColumnWidths(rc_ColumnWidths);
          }
          if (q_UserSettingsApplied == false)

@@ -39,14 +39,14 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeChxTiny" name="pc_CheckBoxDataSerieActive">
+    <widget class="stw::opensyde_gui_elements::C_OgeChxTiny" name="pc_CheckBoxDataSerieActive">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabColorOnly" name="pc_LabelColor">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabColorOnly" name="pc_LabelColor">
      <property name="minimumSize">
       <size>
        <width>18</width>
@@ -84,14 +84,14 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelDataSerieName">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelDataSerieName">
      <property name="text">
       <string>Signal A</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelValue">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardChart" name="pc_LabelValue">
      <property name="text">
       <string>10</string>
      </property>
@@ -101,19 +101,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDashboardChart</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDashboardChart</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDashboardChart.h</header>
+   <header>C_OgeLabDashboardChart.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabColorOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabColorOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabColorOnly.h</header>
+   <header>C_OgeLabColorOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxTiny</class>
+   <class>stw::opensyde_gui_elements::C_OgeChxTiny</class>
    <extends>QCheckBox</extends>
-   <header>C_OgeChxTiny.h</header>
+   <header>C_OgeChxTiny.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

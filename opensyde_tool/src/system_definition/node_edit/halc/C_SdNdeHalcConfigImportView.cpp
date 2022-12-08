@@ -8,16 +8,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 
-#include "C_SdNdeHalcConfigImportView.h"
+#include "C_SdNdeHalcConfigImportView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -71,10 +70,10 @@ C_SdNdeHalcConfigImportView::~C_SdNdeHalcConfigImportView(void)
    \retval   C_CHECKSUM Configuration is not compatible
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcConfigImportView::Init(const C_OSCHalcConfig & orc_Config,
-                                         const C_OSCHalcConfigStandalone & orc_ImportConfig)
+int32_t C_SdNdeHalcConfigImportView::Init(const C_OscHalcConfig & orc_Config,
+                                          const C_OscHalcConfigStandalone & orc_ImportConfig)
 {
-   const sint32 s32_Return = this->mc_Model.Init(orc_Config, orc_ImportConfig);
+   const int32_t s32_Return = this->mc_Model.Init(orc_Config, orc_ImportConfig);
 
    this->expandAll();
 
@@ -87,7 +86,7 @@ sint32 C_SdNdeHalcConfigImportView::Init(const C_OSCHalcConfig & orc_Config,
    \param[out]    orc_AdaptedConfig   Adapted HALC configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcConfigImportView::GetAdaptedConfiguration(C_OSCHalcConfig & orc_AdaptedConfig)
+void C_SdNdeHalcConfigImportView::GetAdaptedConfiguration(C_OscHalcConfig & orc_AdaptedConfig)
 {
    return this->mc_Model.GetAdaptedConfiguration(orc_AdaptedConfig);
 }
@@ -102,8 +101,8 @@ void C_SdNdeHalcConfigImportView::GetAdaptedConfiguration(C_OSCHalcConfig & orc_
    \retval  false    There exist linked channels where one is selected and the other one not
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeHalcConfigImportView::IsSelectionOfLinkedChannelsValid(std::vector<uint32> & orc_DomainIndices,
-                                                                   std::vector<std::vector<uint32> > & orc_MissingChannelIndices)
+bool C_SdNdeHalcConfigImportView::IsSelectionOfLinkedChannelsValid(std::vector<uint32_t> & orc_DomainIndices,
+                                                                   std::vector<std::vector<uint32_t> > & orc_MissingChannelIndices)
 {
    return this->mc_Model.IsSelectionOfLinkedChannelsValid(orc_DomainIndices, orc_MissingChannelIndices);
 }
@@ -115,8 +114,8 @@ bool C_SdNdeHalcConfigImportView::IsSelectionOfLinkedChannelsValid(std::vector<u
    \param[in]  orc_ChannelIndices   Channel indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcConfigImportView::CheckChannels(const std::vector<uint32> & orc_DomainIndices,
-                                                const std::vector<std::vector<uint32> > & orc_ChannelIndices)
+void C_SdNdeHalcConfigImportView::CheckChannels(const std::vector<uint32_t> & orc_DomainIndices,
+                                                const std::vector<std::vector<uint32_t> > & orc_ChannelIndices)
 {
    return this->mc_Model.CheckChannels(orc_DomainIndices, orc_ChannelIndices);
 }

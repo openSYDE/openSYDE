@@ -8,74 +8,73 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QTextDocument>
 #include <QFile>
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "C_UtiStyleSheets.h"
+#include "C_UtiStyleSheets.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
 const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_AREA_ELEMENTS(
 {
-   "stw_opensyde_gui--C_SdSearchTreeWidget",
-   "stw_opensyde_gui_elements--C_OgeTedTable",
-   "stw_opensyde_gui--C_SyvDaItPaListTreeWidget",
-   "stw_opensyde_gui--C_SdNdeDbListWidget",
-   "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget",
-   "stw_opensyde_gui_elements--C_OgeTableWidgetComIF",
-   "stw_opensyde_gui--C_SdNdeDpListsTreeWidget",
-   "stw_opensyde_gui--C_SyvDaItPaArView",
-   "stw_opensyde_gui--C_SyvDaItPaTableView",
-   "stw_opensyde_gui--C_SdBueSignalTableView",
-   "stw_opensyde_gui--C_SdBueMessageTableView",
-   "stw_opensyde_gui--C_SdNdeHalcOvTableView",
-   "stw_opensyde_gui--C_SdNdeCoOverviewTableView",
-   "stw_opensyde_gui--C_SdNdeCoPdoTableView",
-   "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView",
-   "stw_opensyde_gui--C_SdNdeDpListTableView",
-   "stw_opensyde_gui--C_SdNdeHalcConfigImportView",
-   "stw_opensyde_gui_elements--C_OgeTreeViewCheckable",
-   "stw_opensyde_gui--C_TblTreDataElementView",
-   "stw_opensyde_gui--C_SyvDaItTaView",
-   "stw_opensyde_gui--C_SyvDaItPaTreeView",
-   "stw_opensyde_gui--C_SdNdeDpListDataSetView",
-   "stw_opensyde_gui--C_SdNdeDpListArrayEditView",
-   "stw_opensyde_gui--C_SdNdeSfoResetMessageTableView",
-   "stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget",
-   "stw_opensyde_gui--C_SdNdeCoConfigTreeView",
-   "stw_opensyde_gui--C_SdNdeHalcChannelTreeView",
-   "stw_opensyde_gui--C_SdNdeHalcConfigTreeView",
-   "stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTedPropertiesComment",
-   "stw_opensyde_gui_elements--C_OgeTebMessageDetails",
-   "stw_opensyde_gui_elements--C_OgeTebReport",
-   "stw_opensyde_gui--C_SebGraphicsView",
-   "stw_opensyde_gui--C_SyvUpPacListWidget",
-   "stw_opensyde_gui--C_SyvUpPacSectionNodeWidget",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget",
-   "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView",
-   "stw_opensyde_gui_elements--C_OgeSmoothScrollArea",
-   "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QAbstractScrollArea",
-   "stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView",
-   "stw_opensyde_gui_elements--C_OgeDarkScrollArea",
-   "stw_opensyde_gui_elements--C_OgeTransparentScrollArea",
-   "stw_opensyde_gui--C_SyvDcExistingNodeList",
-   "stw_opensyde_gui--C_SyvDcConnectedNodeList",
-   "stw_opensyde_gui--C_SdBueMlvGraphicsView",
-   "stw_opensyde_gui_elements--C_OgeDarkScrollArea",
-   "stw_opensyde_gui_logic--C_PopFileTableView",
-   "stw_opensyde_gui_elements--C_OgeSaNaviBar",
-   "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget"
+   "stw--opensyde_gui--C_SdSearchTreeWidget",
+   "stw--opensyde_gui_elements--C_OgeTedTable",
+   "stw--opensyde_gui--C_SyvDaItPaListTreeWidget",
+   "stw--opensyde_gui--C_SdNdeDbListWidget",
+   "stw--opensyde_gui--C_SyvDaPeUpdateModeTreeWidget",
+   "stw--opensyde_gui_elements--C_OgeTableWidgetComIf",
+   "stw--opensyde_gui--C_SdNdeDpListsTreeWidget",
+   "stw--opensyde_gui--C_SyvDaItPaArView",
+   "stw--opensyde_gui--C_SyvDaItPaTableView",
+   "stw--opensyde_gui--C_SdBueSignalTableView",
+   "stw--opensyde_gui--C_SdBueMessageTableView",
+   "stw--opensyde_gui--C_SdNdeHalcOvTableView",
+   "stw--opensyde_gui--C_SdNdeCoOverviewTableView",
+   "stw--opensyde_gui--C_SdNdeCoPdoTableView",
+   "stw--opensyde_gui--C_SyvDaPeUpdateModeTableView",
+   "stw--opensyde_gui--C_SdNdeDpListTableView",
+   "stw--opensyde_gui--C_SdNdeHalcConfigImportView",
+   "stw--opensyde_gui_elements--C_OgeTreeViewCheckable",
+   "stw--opensyde_gui--C_TblTreDataElementView",
+   "stw--opensyde_gui--C_SyvDaItTaView",
+   "stw--opensyde_gui--C_SyvDaItPaTreeView",
+   "stw--opensyde_gui--C_SdNdeDpListDataSetView",
+   "stw--opensyde_gui--C_SdNdeDpListArrayEditView",
+   "stw--opensyde_gui--C_SdNdeSfoResetMessageTableView",
+   "stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget",
+   "stw--opensyde_gui--C_SdNdeCoConfigTreeView",
+   "stw--opensyde_gui--C_SdNdeHalcChannelTreeView",
+   "stw--opensyde_gui--C_SdNdeHalcConfigTreeView",
+   "stw--opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTedPropertiesComment",
+   "stw--opensyde_gui_elements--C_OgeTebMessageDetails",
+   "stw--opensyde_gui_elements--C_OgeTebReport",
+   "stw--opensyde_gui--C_SebGraphicsView",
+   "stw--opensyde_gui--C_SyvUpPacListWidget",
+   "stw--opensyde_gui--C_SyvUpPacSectionNodeWidget",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget",
+   "stw--opensyde_gui_elements--C_OgeCbxText QAbstractItemView",
+   "stw--opensyde_gui_elements--C_OgeSmoothScrollArea",
+   "stw--opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QAbstractScrollArea",
+   "stw--opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView",
+   "stw--opensyde_gui_elements--C_OgeDarkScrollArea",
+   "stw--opensyde_gui_elements--C_OgeTransparentScrollArea",
+   "stw--opensyde_gui--C_SyvDcExistingNodeList",
+   "stw--opensyde_gui--C_SyvDcConnectedNodeList",
+   "stw--opensyde_gui--C_SdBueMlvGraphicsView",
+   "stw--opensyde_gui_elements--C_OgeDarkScrollArea",
+   "stw--opensyde_gui_logic--C_PopFileTableView",
+   "stw--opensyde_gui_elements--C_OgeSaNaviBar",
+   "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_AREA_PROPERTIES(
@@ -86,98 +85,99 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
 const std::vector<C_UtiStyleSheets::C_ElementColorConfig> C_UtiStyleSheets::mhc_ELEMENT_COLORS_WITH_TRANSPARENCY(
 {
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_32),
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_32),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_DARK\"]", mc_STYLE_GUIDE_COLOR_32),
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_DARK\"]", mc_STYLE_GUIDE_COLOR_32),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_2_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_3),
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_2_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_3),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_2_DARK\"]", mc_STYLE_GUIDE_COLOR_0),
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"OPENSYDE_2_DARK\"]", mc_STYLE_GUIDE_COLOR_0),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"FLAT_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_1),
-   C_UtiStyleSheets::C_ElementColorConfig("stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"FLAT_DARK\"]",
-                                          mc_STYLE_GUIDE_COLOR_0),
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"FLAT_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_1),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"SKEUOMORPH_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_34),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"SKEUOMORPH_DARK\"]", mc_STYLE_GUIDE_COLOR_0),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"][Active=\"true\"]",
-      mc_STYLE_GUIDE_COLOR_4),
-   C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"][Active=\"true\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"FLAT_DARK\"]",
       mc_STYLE_GUIDE_COLOR_0),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"][Active=\"true\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"SKEUOMORPH_BRIGHT\"]", mc_STYLE_GUIDE_COLOR_34),
+   C_UtiStyleSheets::C_ElementColorConfig(
+      "stw--opensyde_gui_elements--C_OgeLabDashboardLabelValue[Style=\"SKEUOMORPH_DARK\"]", mc_STYLE_GUIDE_COLOR_0),
+   C_UtiStyleSheets::C_ElementColorConfig(
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"][Active=\"true\"]",
+      mc_STYLE_GUIDE_COLOR_4),
+   C_UtiStyleSheets::C_ElementColorConfig(
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"][Active=\"true\"]",
+      mc_STYLE_GUIDE_COLOR_0),
+   C_UtiStyleSheets::C_ElementColorConfig(
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"][Active=\"true\"]",
       mc_STYLE_GUIDE_COLOR_34),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"][Active=\"true\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"][Active=\"true\"]",
       mc_STYLE_GUIDE_COLOR_10),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"][Active=\"false\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"true\"][Active=\"false\"]",
       mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"][Active=\"false\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"true\"][Active=\"false\"]",
       mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"][Active=\"false\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_BRIGHT\"][Selected=\"false\"][Active=\"false\"]",
       mc_STYLE_GUIDE_COLOR_8),
    C_UtiStyleSheets::C_ElementColorConfig(
-      "stw_opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"][Active=\"false\"]",
+      "stw--opensyde_gui_elements--C_OgeLabDashboardChart#pc_LabelValue[Style=\"OPENSYDE_DARK\"][Selected=\"false\"][Active=\"false\"]",
       mc_STYLE_GUIDE_COLOR_8)
 }
    );
 
 const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
 {
-   "stw_opensyde_gui--C_SyvDaItPaArView QScrollBar",
-   "stw_opensyde_gui--C_SyvDaItPaTableView QScrollBar",
-   "stw_opensyde_gui--C_SdSearchTreeWidget QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTedTable QScrollBar",
-   "stw_opensyde_gui--C_SdBueSignalTableView QScrollBar",
-   "stw_opensyde_gui--C_SdBueMessageTableView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeHalcOvTableView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeCoOverviewTableView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeCoPdoTableView QScrollBar",
-   "stw_opensyde_gui--C_SyvDaItPaListTreeWidget QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDbListWidget QScrollBar[C_SdNdeDbWidget=\"true\"]",
-   "stw_opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDpListTableView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTreeViewCheckable QScrollBar",
-   "stw_opensyde_gui--C_TblTreDataElementView QScrollBar",
-   "stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTableWidgetComIF QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDpListsTreeWidget QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDpListDataSetView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDpListArrayEditView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeSfoResetMessageTableView QScrollBar",
-   "stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar",
-   "stw_opensyde_gui--C_SdNdeCoConfigTreeView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar",
-   "stw_opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView QScrollBar",
-   "stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"false\"]",
-   "stw_opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"false\"]",
-   "stw_opensyde_gui_elements--C_OgeTedPropertiesComment QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTebReport QScrollBar",
-   "stw_opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"false\"]",
-   "stw_opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar",
-   "stw_opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_BRIGHT\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_BRIGHT\"]",
-   "stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeSmoothScrollArea[DarkMode=\"false\"] QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar[DarkMode=\"false\"]",
-   "stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
-   "stw_opensyde_gui--C_SyvDcExistingNodeList QScrollBar",
-   "stw_opensyde_gui--C_SyvDcConnectedNodeList QScrollBar",
-   "stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar"
+   "stw--opensyde_gui--C_SyvDaItPaArView QScrollBar",
+   "stw--opensyde_gui--C_SyvDaItPaTableView QScrollBar",
+   "stw--opensyde_gui--C_SdSearchTreeWidget QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTedTable QScrollBar",
+   "stw--opensyde_gui--C_SdBueSignalTableView QScrollBar",
+   "stw--opensyde_gui--C_SdBueMessageTableView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeHalcOvTableView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeCoOverviewTableView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeCoPdoTableView QScrollBar",
+   "stw--opensyde_gui--C_SyvDaItPaListTreeWidget QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDbListWidget QScrollBar[C_SdNdeDbWidget=\"true\"]",
+   "stw--opensyde_gui--C_SyvDaPeUpdateModeTableView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDpListTableView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeHalcConfigImportView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTreeViewCheckable QScrollBar",
+   "stw--opensyde_gui--C_TblTreDataElementView QScrollBar",
+   "stw--opensyde_gui--C_SyvDaPeUpdateModeTreeWidget QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTableWidgetComIf QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDpListsTreeWidget QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDpListDataSetView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDpListArrayEditView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeSfoResetMessageTableView QScrollBar",
+   "stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget QScrollBar",
+   "stw--opensyde_gui--C_SdNdeCoConfigTreeView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeHalcChannelTreeView QScrollBar",
+   "stw--opensyde_gui--C_SdNdeHalcConfigTreeView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView QScrollBar",
+   "stw--opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"false\"]",
+   "stw--opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"false\"]",
+   "stw--opensyde_gui_elements--C_OgeTedPropertiesComment QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTebReport QScrollBar",
+   "stw--opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"false\"]",
+   "stw--opensyde_gui--C_SdBueNodeSelectorCheckBoxListWidget QScrollBar",
+   "stw--opensyde_gui--C_SyvUpPacSectionNodeWidget QScrollBar",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_BRIGHT\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_BRIGHT\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_BRIGHT\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_BRIGHT\"]",
+   "stw--opensyde_gui_elements--C_OgeCbxText QAbstractItemView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeSmoothScrollArea[DarkMode=\"false\"] QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar[DarkMode=\"false\"]",
+   "stw--opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
+   "stw--opensyde_gui--C_SyvDcExistingNodeList QScrollBar",
+   "stw--opensyde_gui--C_SyvDcConnectedNodeList QScrollBar",
+   "stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget QScrollBar"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT(
@@ -200,15 +200,15 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
    );
 const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_DARK(
 {
-   "stw_opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"true\"]",
-   "stw_opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"true\"]",
-   "stw_opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"true\"]",
-   "stw_opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar[DarkMode=\"true\"]",
-   "stw_opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar[DarkMode=\"true\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_DARK\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_DARK\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_DARK\"]",
-   "stw_opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_DARK\"]"
+   "stw--opensyde_gui--C_SyvDaItPaTreeView QScrollBar[DarkMode=\"true\"]",
+   "stw--opensyde_gui--C_SyvDaItTaView QScrollBar[DarkMode=\"true\"]",
+   "stw--opensyde_gui--C_SebGraphicsView QScrollBar[DarkMode=\"true\"]",
+   "stw--opensyde_gui_elements--C_OgeSmoothScrollArea QScrollBar[DarkMode=\"true\"]",
+   "stw--opensyde_gui_elements--C_OgeDarkScrollArea QScrollBar[DarkMode=\"true\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_DARK\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"FLAT_DARK\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"SKEUOMORPH_DARK\"]",
+   "stw--opensyde_gui--C_SyvDaChaDataSelectorWidget QScrollBar[Style=\"OPENSYDE_2_DARK\"]"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_DARK(
@@ -231,8 +231,8 @@ const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets
    );
 const std::vector<QString> C_UtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_MAIN_NAVI(
 {
-   "stw_opensyde_gui_logic--C_PopFileTableView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeSaNaviBar QScrollBar"
+   "stw--opensyde_gui_logic--C_PopFileTableView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeSaNaviBar QScrollBar"
 }
    );
 const std::vector<C_UtiStyleSheets::C_PropertyValueColorConfig> C_UtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_MAIN_NAVI(
@@ -323,10 +323,10 @@ QString C_UtiStyleSheets::h_GetStylesheet(void)
 QColor C_UtiStyleSheets::h_GetStyleSheetColor(const QString & orc_Style)
 {
    const QString c_Category = "background-color: ";
-   const sintn sn_Pos = orc_Style.indexOf(c_Category);
+   const int32_t s32_Pos = orc_Style.indexOf(c_Category);
    QColor c_Color;
 
-   c_Color.setNamedColor(orc_Style.mid(sn_Pos + c_Category.length(), 9));
+   c_Color.setNamedColor(orc_Style.mid(s32_Pos + c_Category.length(), 9));
 
    return c_Color;
 }
@@ -389,7 +389,7 @@ void C_UtiStyleSheets::mh_AppendDynamicStylesheet(QString & orc_Stylesheet)
 //----------------------------------------------------------------------------------------------------------------------
 void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
    const QString c_TransparencyPropertyStart = "[Transparency=\"";
    const QString c_TransparencyPropertyEnd = "\"] {\n";
    const QString c_End = "\n}\n";
@@ -398,20 +398,20 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
    {
       // Prepare color for start
       QColor c_Color = mhc_ELEMENT_COLORS_WITH_TRANSPARENCY[u32_Counter].c_Color;
-      sintn sn_AlphaValue = msn_TRANSPARENCY_START;
+      int32_t s32_AlphaValue = ms32_TRANSPARENCY_START;
 
       do
       {
          QString c_Line;
          QString c_ColorString;
 
-         c_Color.setAlpha(sn_AlphaValue);
+         c_Color.setAlpha(s32_AlphaValue);
 
          // Build the stylesheet string
          c_Line = mhc_ELEMENT_COLORS_WITH_TRANSPARENCY[u32_Counter].c_ElementName;
          c_Line += c_TransparencyPropertyStart;
          // Add the property value -> transparency value
-         c_Line += QString::number(sn_AlphaValue);
+         c_Line += QString::number(s32_AlphaValue);
          c_Line += c_TransparencyPropertyEnd;
          // Add the color itself
          mh_SetStyleSheetColor("color", c_ColorString, c_Color);
@@ -422,9 +422,9 @@ void C_UtiStyleSheets::mh_AppendTransparentColorSteps(QString & orc_Stylesheet)
          orc_Stylesheet += c_Line;
 
          // Prepare next transparent step
-         ++sn_AlphaValue;
+         ++s32_AlphaValue;
       }
-      while (sn_AlphaValue <= msn_TRANSPARENCY_END);
+      while (s32_AlphaValue <= ms32_TRANSPARENCY_END);
    }
 }
 
@@ -460,17 +460,17 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
    {
       orc_Stylesheet += "\n";
       //Each property
-      for (uint32 u32_ItProperty = 0; u32_ItProperty < orc_ScrollBarProperties.size(); ++u32_ItProperty)
+      for (uint32_t u32_ItProperty = 0; u32_ItProperty < orc_ScrollBarProperties.size(); ++u32_ItProperty)
       {
          QString c_Value;
          const C_UtiStyleSheets::C_PropertyValueColorConfig & rc_Property = orc_ScrollBarProperties[u32_ItProperty];
          //Add elements
-         for (uint32 u32_ItElement = 0; u32_ItElement < orc_ScrollBarElements.size(); ++u32_ItElement)
+         for (uint32_t u32_ItElement = 0; u32_ItElement < orc_ScrollBarElements.size(); ++u32_ItElement)
          {
             QString c_Entry;
             const QString & rc_Element = orc_ScrollBarElements[u32_ItElement];
             c_Entry = static_cast<QString>("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
-            if (u32_ItElement < (static_cast<uint32>(orc_ScrollBarElements.size()) - 1UL))
+            if (u32_ItElement < (static_cast<uint32_t>(orc_ScrollBarElements.size()) - 1UL))
             {
                c_Entry += ",";
             }
@@ -494,18 +494,18 @@ void C_UtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString> &
 void C_UtiStyleSheets::mh_SetStyleSheetColor(const QString & orc_ColorType, QString & orc_Style,
                                              const QColor & orc_Color)
 {
-   const sintn sn_Pos = orc_Style.indexOf(orc_ColorType + ":");
-   sintn sn_PosSemicolon;
+   const int32_t s32_Pos = orc_Style.indexOf(orc_ColorType + ":");
+   int32_t s32_PosSemicolon;
    QString c_StyleColor;
 
    c_StyleColor = orc_ColorType + ": " + orc_Color.name(QColor::HexArgb);
 
-   if (sn_Pos >= 0)
+   if (s32_Pos >= 0)
    {
       // search the semicolon of this part of the stylesheet
-      sn_PosSemicolon = orc_Style.indexOf(";", sn_Pos);
-      orc_Style.remove(sn_Pos, sn_PosSemicolon - sn_Pos);
-      orc_Style.insert(sn_Pos, c_StyleColor);
+      s32_PosSemicolon = orc_Style.indexOf(";", s32_Pos);
+      orc_Style.remove(s32_Pos, s32_PosSemicolon - s32_Pos);
+      orc_Style.insert(s32_Pos, c_StyleColor);
    }
    else
    {

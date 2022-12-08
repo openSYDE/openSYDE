@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEventLoop>
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiError.h"
-#include "C_Uti.h"
-#include "C_OgePopUpDialog.h"
-#include "C_PopErrorHandling.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OSCSystemDefinitionFiler.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiError.hpp"
+#include "C_Uti.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_PopErrorHandling.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OscSystemDefinitionFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,8 +53,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in] ou16_SystemDefinitionVersion System definition version
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QString & orc_Path,
-                                          QWidget * const opc_Parent, const uint16 ou16_SystemDefinitionVersion)
+void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QString & orc_Path,
+                                          QWidget * const opc_Parent, const uint16_t ou16_SystemDefinitionVersion)
 {
    if (ors32_Err == C_WARN)
    {
@@ -102,19 +101,19 @@ void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QStrin
       }
 
       //Update log file
-      C_OSCLoggingHandler::h_Flush();
+      C_OscLoggingHandler::h_Flush();
 
       // Show error message
       c_Details += C_GtGetText::h_GetText("<br/>For more information see ");
       c_Details += C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLE_GUIDE_COLOR_LINK,
-                                    C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+                                    C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
       c_Details += ".";
       c_Message.SetDetails(c_Details);
       c_Message.Execute();
    }
    else
    {
-      if ((ou16_SystemDefinitionVersion < C_OSCSystemDefinitionFiler::hu16_FILE_VERSION_LATEST) &&
+      if ((ou16_SystemDefinitionVersion < C_OscSystemDefinitionFiler::hu16_FILE_VERSION_LATEST) &&
           (orc_Path.isEmpty() == false))
       {
          //Handle version update
@@ -136,7 +135,7 @@ void C_PopErrorHandling::h_ProjectLoadErr(const sint32 & ors32_Err, const QStrin
 */
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_PopErrorHandling::h_ProjectSaveErr(const sint32 & ors32_Err, QWidget * const opc_Parent)
+void C_PopErrorHandling::h_ProjectSaveErr(const int32_t & ors32_Err, QWidget * const opc_Parent)
 {
    if (ors32_Err != C_NO_ERR)
    {
@@ -172,7 +171,7 @@ void C_PopErrorHandling::h_ProjectSaveErr(const sint32 & ors32_Err, QWidget * co
    \param[in]   opc_Parent    parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopErrorHandling::h_ServiceProjectSaveErr(const sint32 & ors32_Err, QWidget * const opc_Parent)
+void C_PopErrorHandling::h_ServiceProjectSaveErr(const int32_t & ors32_Err, QWidget * const opc_Parent)
 {
    if (ors32_Err != C_NO_ERR)
    {
@@ -216,7 +215,7 @@ void C_PopErrorHandling::h_ServiceProjectSaveErr(const sint32 & ors32_Err, QWidg
    \param[in]   ors32_Err   Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PopErrorHandling::h_GetTextInitializeErr(const sint32 & ors32_Err)
+void C_PopErrorHandling::h_GetTextInitializeErr(const int32_t & ors32_Err)
 {
    if (ors32_Err != C_NO_ERR)
    {
@@ -229,17 +228,17 @@ void C_PopErrorHandling::h_GetTextInitializeErr(const sint32 & ors32_Err)
       switch (ors32_Err)
       {
       case C_CONFIG:
-         pc_Widget->SetErrorDescription(C_GtGetText::h_GetText("C_OSCGetText - h_Initialize:\n"
+         pc_Widget->SetErrorDescription(C_GtGetText::h_GetText("C_OscGetText - h_Initialize:\n"
                                                                "orc_BasePath does not point to a valid directory"));
          c_Dialog.exec();
          break;
       case C_NOACT:
-         pc_Widget->SetErrorDescription(C_GtGetText::h_GetText("C_OSCGetText - h_Initialize:\n"
+         pc_Widget->SetErrorDescription(C_GtGetText::h_GetText("C_OscGetText - h_Initialize:\n"
                                                                "internal error in gettext library"));
          c_Dialog.exec();
          break;
       default:
-         pc_Widget->SetErrorDescription(C_GtGetText::h_GetText("C_OSCGetText - h_Initialize: unknown error"));
+         pc_Widget->SetErrorDescription(C_GtGetText::h_GetText("C_OscGetText - h_Initialize: unknown error"));
          c_Dialog.exec();
          break;
       }

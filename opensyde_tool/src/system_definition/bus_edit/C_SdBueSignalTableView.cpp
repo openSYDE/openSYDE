@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QHeaderView>
 #include <QMouseEvent>
 #include <QScrollBar>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SdBueSignalTableView.h"
-#include "C_SdBueMessageSignalTableDelegate.h"
-#include "C_SdNdeSingleHeaderView.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SdBueSignalTableView.hpp"
+#include "C_SdBueMessageSignalTableDelegate.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,7 +56,7 @@ C_SdBueSignalTableView::C_SdBueSignalTableView(QWidget * const opc_Parent) :
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
+   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::EditRole));
    this->C_SdBueSignalTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -122,7 +121,7 @@ C_SdBueSignalTableView::~C_SdBueSignalTableView(void)
    \param[in]  orc_Values  Values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalTableView::LoadUserSettings(const std::vector<sint32> & orc_Values)
+void C_SdBueSignalTableView::LoadUserSettings(const std::vector<int32_t> & orc_Values)
 {
    if (this->m_SetColumnWidths(orc_Values) == false)
    {
@@ -136,7 +135,7 @@ void C_SdBueSignalTableView::LoadUserSettings(const std::vector<sint32> & orc_Va
    \param[in,out]  orc_Values    Values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueSignalTableView::SaveUserSettings(std::vector<sint32> & orc_Values) const
+void C_SdBueSignalTableView::SaveUserSettings(std::vector<int32_t> & orc_Values) const
 {
    orc_Values = this->m_GetColumnWidths();
 }
@@ -148,7 +147,7 @@ void C_SdBueSignalTableView::SaveUserSettings(std::vector<sint32> & orc_Values) 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableView::SetMessageSyncManager(
-   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
+   stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_SyncManager = opc_Value;
    this->mc_Model.SetMessageSyncManager(opc_Value);
@@ -172,7 +171,7 @@ void C_SdBueSignalTableView::UpdateData(void)
    Count of items in table
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdBueSignalTableView::GetCountRows(void) const
+int32_t C_SdBueSignalTableView::GetCountRows(void) const
 {
    return this->mc_Model.rowCount();
 }
@@ -187,7 +186,7 @@ sintn C_SdBueSignalTableView::GetCountRows(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_HoveredRow = -1;
+   int32_t s32_HoveredRow = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
    QTableView::mouseMoveEvent(opc_Event);
@@ -237,8 +236,8 @@ void C_SdBueSignalTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event
       const QModelIndex c_ClickedIndex = this->mc_SortProxyModel.mapToSource(c_ClickedIndexProxy);
       if (c_ClickedIndex.isValid() == true)
       {
-         C_OSCCanMessageIdentificationIndices c_MessageId;
-         uint32 u32_SignalIndex;
+         C_OscCanMessageIdentificationIndices c_MessageId;
+         uint32_t u32_SignalIndex;
          if (this->mc_Model.ConvertRowToSignal(c_ClickedIndex.row(), c_MessageId, u32_SignalIndex) == C_NO_ERR)
          {
             Q_EMIT this->SigSignalSelected(c_MessageId, u32_SignalIndex);
@@ -280,7 +279,7 @@ void C_SdBueSignalTableView::m_HandleColumnVisibility()
 {
    if (this->mpc_SyncManager != NULL)
    {
-      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OSCCanProtocol::eCAN_OPEN)
+      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
       {
          this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX),
                                false);

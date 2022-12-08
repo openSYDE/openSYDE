@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScreen>
 #include <QGuiApplication>
 #include <QDesktopWidget>
 #include <QAbstractTextDocumentLayout>
 #include <QGraphicsDropShadowEffect>
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_NagToolTip.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_NagToolTip.hpp"
 #include "ui_C_NagToolTip.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -170,34 +169,35 @@ void C_NagToolTip::DoMove(const QPoint & orc_GlobalPos)
    {
       const QRect c_RectMonitor = pc_Screen->availableGeometry();
 
-      stw_types::sintn sn_NewY = orc_GlobalPos.y();
-      stw_types::sintn sn_NewX = orc_GlobalPos.x();
-      const sintn sn_DISTANCE_TO_BORDER = 20; //space between tooltip and boarder
+      int32_t s32_NewVertical = orc_GlobalPos.y();
+      int32_t s32_NewHorizontal = orc_GlobalPos.x();
+      const int32_t s32_DISTANCE_TO_BORDER = 20; //space between tooltip and boarder
 
       this->updateGeometry();
 
       // x coordinate out of monitor
-      if ((sn_NewX + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width()) >
+      if ((s32_NewHorizontal + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width()) >
           (c_RectMonitor.x() + c_RectMonitor.width()))
       {
          // max of left border of monitor and right border of monitor minus tool-tip-width
-         sn_NewX = std::max(c_RectMonitor.x() + sn_DISTANCE_TO_BORDER,
-                            (c_RectMonitor.x() + c_RectMonitor.width()) -
-                            (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() + sn_DISTANCE_TO_BORDER));
+         s32_NewHorizontal = std::max(c_RectMonitor.x() + s32_DISTANCE_TO_BORDER,
+                                      (c_RectMonitor.x() + c_RectMonitor.width()) -
+                                      (this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().width() +
+                                       s32_DISTANCE_TO_BORDER));
       }
 
       // y coordinate out of monitor
-      if ((sn_NewY + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) >
+      if ((s32_NewVertical + this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) >
           (c_RectMonitor.y() + c_RectMonitor.height()))
       {
          //display tooltip above global pos (otheriwse the global pos is inside the tooltip
          // which usally means the mouse is inside the tooltip which then will trigger the tooltip to instantly hide
          // Also include the distance to the border so the mouse does not even touch the tooltip
-         sn_NewY = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) -
-                   sn_DISTANCE_TO_BORDER;
+         s32_NewVertical = (orc_GlobalPos.y() - this->mpc_Ui->mpc_GroupBoxInklShadow->sizeHint().height()) -
+                           s32_DISTANCE_TO_BORDER;
       }
 
-      this->move(QPoint(sn_NewX, sn_NewY));
+      this->move(QPoint(s32_NewHorizontal, s32_NewVertical));
    }
 }
 
@@ -275,7 +275,7 @@ void C_NagToolTip::showEvent(QShowEvent * const opc_Event)
    //Register new one
    if (q_Found == false)
    {
-      C_NagToolTip::mhc_ExistingToolTips.push_back(this);
+      C_NagToolTip::mhc_ExistingToolTips.emplace_back(this);
    }
    //Show new one
    QWidget::showEvent(opc_Event);

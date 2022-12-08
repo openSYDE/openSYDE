@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_SebUtil.h"
-#include "C_PuiBsElements.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_SebUtil.hpp"
+#include "C_PuiBsElements.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ C_PuiBsElements::C_PuiBsElements(void)
    Instance with new values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsElements & C_PuiBsElements::operator =(const C_PuiBsElements & orc_Snapshot)
+C_PuiBsElements & C_PuiBsElements::operator =(const C_PuiBsElements & orc_Snapshot) &
 {
    if (&orc_Snapshot != this)
    {
@@ -108,24 +107,24 @@ void C_PuiBsElements::ReplaceSnapshotElements(C_PuiBsElements & orc_Snapshot) co
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsElements::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiBsElements::CalcHash(uint32_t & oru32_HashValue) const
 {
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_Boundaries.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_Boundaries.size(); ++u32_Counter)
    {
       this->c_Boundaries[u32_Counter].CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_Images.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_Images.size(); ++u32_Counter)
    {
       this->c_Images[u32_Counter].CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_LineArrows.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_LineArrows.size(); ++u32_Counter)
    {
       this->c_LineArrows[u32_Counter].CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_TextElements.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_TextElements.size(); ++u32_Counter)
    {
       this->c_TextElements[u32_Counter].CalcHash(oru32_HashValue);
    }
@@ -138,9 +137,9 @@ void C_PuiBsElements::CalcHash(uint32 & oru32_HashValue) const
    Total number of items
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint32 C_PuiBsElements::Count(void) const
+uint32_t C_PuiBsElements::Count(void) const
 {
-   uint32 u32_Retval = 0;
+   uint32_t u32_Retval = 0;
 
    u32_Retval += this->c_Boundaries.size();
    u32_Retval += this->c_Images.size();
@@ -158,25 +157,25 @@ stw_types::uint32 C_PuiBsElements::Count(void) const
 void C_PuiBsElements::SetDataPositionOffset(const QPointF & orc_NewPos)
 {
    //Boundaries
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Boundaries.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_Boundaries.size(); ++u32_ItItem)
    {
       C_PuiBsBoundary & rc_Data = this->c_Boundaries[u32_ItItem];
-      rc_Data.c_UIPosition += orc_NewPos;
+      rc_Data.c_UiPosition += orc_NewPos;
    }
    //Images
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Images.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_Images.size(); ++u32_ItItem)
    {
       C_PuiBsImage & rc_Data = this->c_Images[u32_ItItem];
-      rc_Data.c_UIPosition += orc_NewPos;
+      rc_Data.c_UiPosition += orc_NewPos;
    }
    //Text elements
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_TextElements.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_TextElements.size(); ++u32_ItItem)
    {
       C_PuiBsTextElement & rc_Data = this->c_TextElements[u32_ItItem];
-      rc_Data.c_UIPosition += orc_NewPos;
+      rc_Data.c_UiPosition += orc_NewPos;
    }
    //Lines
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_LineArrows.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_LineArrows.size(); ++u32_ItItem)
    {
       C_PuiBsLineArrow & rc_Data = this->c_LineArrows[u32_ItItem];
       C_SebUtil::h_AddLineOffset(rc_Data, orc_NewPos);
@@ -186,34 +185,34 @@ void C_PuiBsElements::SetDataPositionOffset(const QPointF & orc_NewPos)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply Z value offset
 
-   \param[in]  of64_HighestUsedZValue  Highest used Z value
+   \param[in]  of64_HighestUsedZetValue  Highest used Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsElements::SetDataZOffset(const float64 of64_HighestUsedZValue)
+void C_PuiBsElements::SetDataZetOffset(const float64_t of64_HighestUsedZetValue)
 {
    //Boundaries
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Boundaries.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_Boundaries.size(); ++u32_ItItem)
    {
       C_PuiBsBoundary & rc_Data = this->c_Boundaries[u32_ItItem];
-      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+      rc_Data.f64_ZetOrder += of64_HighestUsedZetValue;
    }
    //Images
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_Images.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_Images.size(); ++u32_ItItem)
    {
       C_PuiBsImage & rc_Data = this->c_Images[u32_ItItem];
-      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+      rc_Data.f64_ZetOrder += of64_HighestUsedZetValue;
    }
    //Text elements
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_TextElements.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_TextElements.size(); ++u32_ItItem)
    {
       C_PuiBsTextElement & rc_Data = this->c_TextElements[u32_ItItem];
-      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+      rc_Data.f64_ZetOrder += of64_HighestUsedZetValue;
    }
    //Lines
-   for (uint32 u32_ItItem = 0UL; u32_ItItem < this->c_LineArrows.size(); ++u32_ItItem)
+   for (uint32_t u32_ItItem = 0UL; u32_ItItem < this->c_LineArrows.size(); ++u32_ItItem)
    {
       C_PuiBsLineArrow & rc_Data = this->c_LineArrows[u32_ItItem];
-      rc_Data.f64_ZOrder += of64_HighestUsedZValue;
+      rc_Data.f64_ZetOrder += of64_HighestUsedZetValue;
    }
 }
 
@@ -239,9 +238,9 @@ void C_PuiBsElements::AddBoundary(const C_PuiBsBoundary & orc_Data)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::InsertBoundary(const uint32 & oru32_Index, const C_PuiBsBoundary & orc_Data)
+int32_t C_PuiBsElements::InsertBoundary(const uint32_t & oru32_Index, const C_PuiBsBoundary & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index <= this->c_Boundaries.size())
    {
@@ -276,9 +275,9 @@ void C_PuiBsElements::AddImage(const C_PuiBsImage & orc_Data)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::InsertImage(const uint32 & oru32_Index, const C_PuiBsImage & orc_Data)
+int32_t C_PuiBsElements::InsertImage(const uint32_t & oru32_Index, const C_PuiBsImage & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index <= this->c_Images.size())
    {
@@ -313,9 +312,9 @@ void C_PuiBsElements::AddLineArrow(const C_PuiBsLineArrow & orc_Data)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::InsertLineArrow(const uint32 & oru32_Index, const C_PuiBsLineArrow & orc_Data)
+int32_t C_PuiBsElements::InsertLineArrow(const uint32_t & oru32_Index, const C_PuiBsLineArrow & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index <= this->c_LineArrows.size())
    {
@@ -350,9 +349,9 @@ void C_PuiBsElements::AddTextElement(const C_PuiBsTextElement & orc_Data)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::InsertTextElement(const uint32 & oru32_Index, const C_PuiBsTextElement & orc_Data)
+int32_t C_PuiBsElements::InsertTextElement(const uint32_t & oru32_Index, const C_PuiBsTextElement & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index <= this->c_TextElements.size())
    {
@@ -375,9 +374,9 @@ sint32 C_PuiBsElements::InsertTextElement(const uint32 & oru32_Index, const C_Pu
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::DeleteBoundary(const uint32 & oru32_Index)
+int32_t C_PuiBsElements::DeleteBoundary(const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_Boundaries.size())
    {
@@ -400,9 +399,9 @@ sint32 C_PuiBsElements::DeleteBoundary(const uint32 & oru32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::DeleteImage(const uint32 & oru32_Index)
+int32_t C_PuiBsElements::DeleteImage(const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_Images.size())
    {
@@ -425,9 +424,9 @@ sint32 C_PuiBsElements::DeleteImage(const uint32 & oru32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::DeleteLineArrow(const uint32 & oru32_Index)
+int32_t C_PuiBsElements::DeleteLineArrow(const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_LineArrows.size())
    {
@@ -450,9 +449,9 @@ sint32 C_PuiBsElements::DeleteLineArrow(const uint32 & oru32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::DeleteTextElement(const uint32 & oru32_Index)
+int32_t C_PuiBsElements::DeleteTextElement(const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_TextElements.size())
    {
@@ -475,7 +474,7 @@ sint32 C_PuiBsElements::DeleteTextElement(const uint32 & oru32_Index)
    Else Valid boundary
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiBsBoundary * C_PuiBsElements::GetBoundary(const uint32 & oru32_Index) const
+const C_PuiBsBoundary * C_PuiBsElements::GetBoundary(const uint32_t & oru32_Index) const
 {
    const C_PuiBsBoundary * pc_Retval = NULL;
 
@@ -497,9 +496,9 @@ const C_PuiBsBoundary * C_PuiBsElements::GetBoundary(const uint32 & oru32_Index)
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::SetBoundary(const uint32 & oru32_Index, const C_PuiBsBoundary & orc_Data)
+int32_t C_PuiBsElements::SetBoundary(const uint32_t & oru32_Index, const C_PuiBsBoundary & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_Boundaries.size())
    {
@@ -522,7 +521,7 @@ sint32 C_PuiBsElements::SetBoundary(const uint32 & oru32_Index, const C_PuiBsBou
    Else Valid image
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiBsImage * C_PuiBsElements::GetImage(const uint32 & oru32_Index) const
+const C_PuiBsImage * C_PuiBsElements::GetImage(const uint32_t & oru32_Index) const
 {
    const C_PuiBsImage * pc_Retval = NULL;
 
@@ -544,9 +543,9 @@ const C_PuiBsImage * C_PuiBsElements::GetImage(const uint32 & oru32_Index) const
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::SetImage(const uint32 & oru32_Index, const C_PuiBsImage & orc_Data)
+int32_t C_PuiBsElements::SetImage(const uint32_t & oru32_Index, const C_PuiBsImage & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_Images.size())
    {
@@ -569,7 +568,7 @@ sint32 C_PuiBsElements::SetImage(const uint32 & oru32_Index, const C_PuiBsImage 
    Else Valid line arrow
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiBsLineArrow * C_PuiBsElements::GetLineArrow(const uint32 & oru32_Index) const
+const C_PuiBsLineArrow * C_PuiBsElements::GetLineArrow(const uint32_t & oru32_Index) const
 {
    const C_PuiBsLineArrow * pc_Retval = NULL;
 
@@ -591,9 +590,9 @@ const C_PuiBsLineArrow * C_PuiBsElements::GetLineArrow(const uint32 & oru32_Inde
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::SetLineArrow(const uint32 & oru32_Index, const C_PuiBsLineArrow & orc_Data)
+int32_t C_PuiBsElements::SetLineArrow(const uint32_t & oru32_Index, const C_PuiBsLineArrow & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_LineArrows.size())
    {
@@ -616,7 +615,7 @@ sint32 C_PuiBsElements::SetLineArrow(const uint32 & oru32_Index, const C_PuiBsLi
    Else Valid text element
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiBsTextElement * C_PuiBsElements::GetTextElement(const uint32 & oru32_Index) const
+const C_PuiBsTextElement * C_PuiBsElements::GetTextElement(const uint32_t & oru32_Index) const
 {
    const C_PuiBsTextElement * pc_Retval = NULL;
 
@@ -638,9 +637,9 @@ const C_PuiBsTextElement * C_PuiBsElements::GetTextElement(const uint32 & oru32_
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiBsElements::SetTextElement(const uint32 & oru32_Index, const C_PuiBsTextElement & orc_Data)
+int32_t C_PuiBsElements::SetTextElement(const uint32_t & oru32_Index, const C_PuiBsTextElement & orc_Data)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_TextElements.size())
    {

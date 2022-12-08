@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxNavigationTab" name="pc_GroupBoxStyle">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxNavigationTab" name="pc_GroupBoxStyle">
      <property name="title">
       <string>StyleBox</string>
      </property>
@@ -56,7 +56,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeGbxNavigationSectionSelected" name="pc_GroupBoxActive">
+         <widget class="stw::opensyde_gui_elements::C_OgeGbxNavigationSectionSelected" name="pc_GroupBoxActive">
           <property name="title">
            <string/>
           </property>
@@ -77,7 +77,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetTopButton" native="true">
+            <widget class="stw::opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetTopButton" native="true">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -107,7 +107,7 @@
                <number>9</number>
               </property>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelExpand">
+               <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelExpand">
                 <property name="minimumSize">
                  <size>
                   <width>16</width>
@@ -142,7 +142,7 @@
                </spacer>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelError">
+               <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelError">
                 <property name="minimumSize">
                  <size>
                   <width>16</width>
@@ -177,17 +177,17 @@
                </spacer>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelHeading">
+               <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelHeading">
                 <property name="text">
                  <string>Label</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeLeNavigation" name="pc_LineEditHeading"/>
+               <widget class="stw::opensyde_gui_elements::C_OgeLeNavigation" name="pc_LineEditHeading"/>
               </item>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxHoverButtons">
+               <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxHoverButtons">
                 <property name="title">
                  <string/>
                 </property>
@@ -208,7 +208,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonEdit">
+                  <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonEdit">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
@@ -227,7 +227,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonCopy">
+                  <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonCopy">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
@@ -246,7 +246,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonDelete">
+                  <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PushButtonDelete">
                    <property name="minimumSize">
                     <size>
                      <width>16</width>
@@ -271,7 +271,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetSetup" native="true">
+            <widget class="stw::opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetSetup" native="true">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -287,7 +287,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetUpdate" native="true">
+            <widget class="stw::opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetUpdate" native="true">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -303,7 +303,7 @@
             </widget>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetDashboard" native="true">
+            <widget class="stw::opensyde_gui_elements::C_OgePubNavigationHover" name="pc_WidgetDashboard" native="true">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -343,47 +343,47 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxNavigationTab</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxNavigationTab</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxNavigationTab.h</header>
+   <header>C_OgeGbxNavigationTab.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.h</header>
+   <header>C_OgePubSvgIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubNavigationHover</class>
+   <class>stw::opensyde_gui_elements::C_OgePubNavigationHover</class>
    <extends>QWidget</extends>
-   <header>C_OgePubNavigationHover.h</header>
+   <header>C_OgePubNavigationHover.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeNavigation</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeNavigation</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeNavigation.h</header>
+   <header>C_OgeLeNavigation.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxNavigationSectionSelected</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxNavigationSectionSelected</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxNavigationSectionSelected.h</header>
+   <header>C_OgeGbxNavigationSectionSelected.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

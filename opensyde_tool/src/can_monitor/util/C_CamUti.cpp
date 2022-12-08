@@ -10,25 +10,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDir>
 
-#include "cam_constants.h"
-#include "C_CamUti.h"
-#include "C_CamProHandler.h"
-#include "C_Uti.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_GtGetText.h"
-#include "C_OSCUtils.h"
-#include "C_OgeWiUtil.h"
+#include "cam_constants.hpp"
+#include "C_CamUti.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_Uti.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -92,7 +91,7 @@ QString C_CamUti::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const 
    QString c_PathAbsolute;
 
    // Check first if path is a valid path with no unwanted characters
-   if (C_OSCUtils::h_CheckValidFilePath(orc_Path.toStdString().c_str()) == false)
+   if (C_OscUtils::h_CheckValidFilePath(orc_Path.toStdString().c_str()) == false)
    {
       C_OgeWiUtil::h_ShowPathInvalidError(opc_Parent, orc_Path);
       c_Return = "";
@@ -105,8 +104,8 @@ QString C_CamUti::h_AskUserToSaveRelativePath(QWidget * const opc_Parent, const 
       c_Message.SetDescription(C_GtGetText::h_GetText("Do you want to save the selected path relative or absolute?"));
       c_Message.SetDetails(static_cast<QString>(C_GtGetText::h_GetText("Relative path: %1 \nAbsolute path: %2")).
                            arg(c_PathRelative).arg(c_PathAbsolute));
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Relative"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Absolute"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Relative"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Absolute"));
 
       if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
       {

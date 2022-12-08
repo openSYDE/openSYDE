@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SebUnoMoveCommand.h"
+#include "C_SebUnoMoveCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace std;
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,14 +34,14 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene              Pointer to currently active scene
-   \param[in]     orc_IDs                Affected unique IDs
+   \param[in]     orc_Ids                Affected unique IDs
    \param[in]     orc_PositionDifference Position difference for this move action
    \param[in,out] opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SebUnoMoveCommand::C_SebUnoMoveCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64> & orc_IDs,
+C_SebUnoMoveCommand::C_SebUnoMoveCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
                                          const QPointF & orc_PositionDifference, QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Move drawing element(s)", opc_Parent),
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, "Move drawing element(s)", opc_Parent),
    mc_PositionDifference(orc_PositionDifference)
 {
 }
@@ -64,9 +63,9 @@ C_SebUnoMoveCommand::~C_SebUnoMoveCommand(void)
 void C_SebUnoMoveCommand::undo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-   for (uint32 u32_ItID = 0; u32_ItID < c_Items.size(); ++u32_ItID)
+   for (uint32_t u32_ItId = 0; u32_ItId < c_Items.size(); ++u32_ItId)
    {
-      m_UndoSingle(c_Items[u32_ItID]);
+      m_UndoSingle(c_Items[u32_ItId]);
    }
    QUndoCommand::undo();
 }
@@ -78,9 +77,9 @@ void C_SebUnoMoveCommand::undo(void)
 void C_SebUnoMoveCommand::redo(void)
 {
    vector<QGraphicsItem *> c_Items = this->m_GetSceneItems();
-   for (uint32 u32_ItID = 0; u32_ItID < c_Items.size(); ++u32_ItID)
+   for (uint32_t u32_ItId = 0; u32_ItId < c_Items.size(); ++u32_ItId)
    {
-      m_RedoSingle(c_Items[u32_ItID]);
+      m_RedoSingle(c_Items[u32_ItId]);
    }
    QUndoCommand::redo();
 }

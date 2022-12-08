@@ -8,33 +8,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QGraphicsView>
 
-#include "C_Uti.h"
-#include "gitypes.h"
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdUtil.h"
-#include "C_OgePopUpDialog.h"
-#include "C_GiSvNodeSyvUpdate.h"
-#include "C_OSCLoggingHandler.h"
-#include "TGLUtils.h"
-#include "C_PuiUtil.h"
+#include "C_Uti.hpp"
+#include "gitypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_GiSvNodeSyvUpdate.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_PuiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,17 +54,17 @@ using namespace stw_opensyde_gui_elements;
 
    \param[in]      ou32_ViewIndex   Index of system view
    \param[in]      ors32_NodeIndex  Index of data element in system view
-   \param[in]      oru64_ID         Unique ID
+   \param[in]      oru64_Id         Unique ID
    \param[in]      orf64_Width      Width of node
    \param[in]      orf64_Height     Height of node
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
-                                         const uint64 & oru64_ID, const float64 & orf64_Width,
-                                         const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
+C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32_t ou32_ViewIndex, const int32_t & ors32_NodeIndex,
+                                         const uint64_t & oru64_Id, const float64_t & orf64_Width,
+                                         const float64_t & orf64_Height, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiSvNodeSyvBase(ou32_ViewIndex, ors32_NodeIndex, oru64_ID, orf64_Width, orf64_Height, opc_Parent),
+   C_GiSvNodeSyvBase(ou32_ViewIndex, ors32_NodeIndex, oru64_Id, orf64_Width, orf64_Height, opc_Parent),
    mpc_IconTopLeft(NULL),
    mpc_IconBottom(NULL),
    mpc_InfoDialog(NULL)
@@ -73,7 +72,7 @@ C_GiSvNodeSyvUpdate::C_GiSvNodeSyvUpdate(const uint32 ou32_ViewIndex, const sint
    tgl_assert(this->ms32_Index >= 0);
    if (this->ms32_Index >= 0)
    {
-      this->mc_NodeData.Init(ou32_ViewIndex, static_cast<uint32>(ors32_NodeIndex));
+      this->mc_NodeData.Init(ou32_ViewIndex, static_cast<uint32_t>(ors32_NodeIndex));
    }
 
    m_InitIcons();
@@ -174,12 +173,13 @@ void C_GiSvNodeSyvUpdate::SetUpdating(const bool oq_Active)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
-                                                  const uint32 ou32_FailedApplicationIndex, const uint32 ou32_NodeIndex)
+                                                  const uint32_t ou32_FailedApplicationIndex,
+                                                  const uint32_t ou32_NodeIndex)
 {
    if (this->ms32_Index >= 0)
    {
       this->mc_NodeData.SetNodeUpdateInProgress(oq_Active, oq_Aborted, ou32_FailedApplicationIndex, ou32_NodeIndex,
-                                                static_cast<uint32>(this->ms32_Index));
+                                                static_cast<uint32_t>(this->ms32_Index));
    }
    this->m_RefreshDialog();
    this->UpdateIcons();
@@ -191,7 +191,7 @@ void C_GiSvNodeSyvUpdate::SetNodeUpdateInProgress(const bool oq_Active, const bo
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeSyvUpdate::SetNodeError(const uint32 ou32_NodeIndex)
+void C_GiSvNodeSyvUpdate::SetNodeError(const uint32_t ou32_NodeIndex)
 {
    this->mc_NodeData.SetErrorState(ou32_NodeIndex);
 
@@ -206,7 +206,7 @@ void C_GiSvNodeSyvUpdate::SetNodeError(const uint32 ou32_NodeIndex)
    \param[in]       orc_NodePreconditionErrors     Node precondition error states
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeSyvUpdate::SetNodeConnectStates(const std::vector<C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+void C_GiSvNodeSyvUpdate::SetNodeConnectStates(const std::vector<C_OscSuSequencesNodeConnectStates> & orc_NodeStates,
                                                const C_GiSvNodeData::C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors)
 {
    this->mc_NodeData.SetNodeConnectStates(orc_NodeStates, orc_NodePreconditionErrors);
@@ -219,7 +219,7 @@ void C_GiSvNodeSyvUpdate::SetNodeConnectStates(const std::vector<C_OSCSuSequence
    \param[in]       orc_NodeStates     Node connect states
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeSyvUpdate::SetNodeUpdateStates(const std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates)
+void C_GiSvNodeSyvUpdate::SetNodeUpdateStates(const std::vector<C_OscSuSequencesNodeUpdateStates> & orc_NodeStates)
 {
    this->mc_NodeData.SetNodeUpdateStates(orc_NodeStates);
    this->m_RefreshDialog();
@@ -237,16 +237,16 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
        (this->HasNodeAnAvailableFlashloader() == true))
    {
       QGraphicsView * const pc_View = this->scene()->views().at(0);
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View->parentWidget(), pc_View->parentWidget());
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View->parentWidget(), pc_View->parentWidget());
       this->mpc_InfoDialog =
-         new C_SyvUpNodePropertiesDialog(*c_New,  static_cast<uint32>(this->ms32_Index),
+         new C_SyvUpNodePropertiesDialog(*c_New,  static_cast<uint32_t>(this->ms32_Index),
                                          this->mc_NodeData);
 
       this->m_RefreshDialog();
       //Resize
       c_New->SetSize(QSize(1000, 820));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          //No confirmation
       }
@@ -255,14 +255,14 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
       //Check if valid infos
       if (this->mc_NodeData.IsThereAnyHexFileInformation())
       {
-         const std::vector<uint32> c_NodeIndices =
+         const std::vector<uint32_t> c_NodeIndices =
             C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
-               static_cast<uint32>(this->ms32_Index));
+               static_cast<uint32_t>(this->ms32_Index));
          this->mpc_InfoDialog->CopyDiscardedStatus(this->mc_NodeData);
-         for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
+         for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
          {
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItNode]);
+            const C_OscNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndices[u32_ItNode]);
             if ((pc_Node != NULL) && (pc_Node->u32_SubDeviceIndex < this->mc_NodeData.GetSubNodeCount()))
             {
                if (this->mc_NodeData.IsThereAnyHexFileInformationForDevice(pc_Node->u32_SubDeviceIndex) &&
@@ -277,8 +277,8 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
       //Get new info
       this->mpc_InfoDialog->CopyInitialStatus(this->mc_NodeData);
       this->mpc_InfoDialog->CopyUpdateStatus(this->mc_NodeData);
-      this->mpc_InfoDialog->CopySTWDeviceInfo(this->mc_NodeData);
-      this->mpc_InfoDialog->CopyOSYDeviceInfo(this->mc_NodeData);
+      this->mpc_InfoDialog->CopyStwDeviceInfo(this->mc_NodeData);
+      this->mpc_InfoDialog->CopyOpenSydeDeviceInfo(this->mc_NodeData);
 
       //Trigger icon update if necessary
       UpdateIcons();
@@ -300,7 +300,7 @@ void C_GiSvNodeSyvUpdate::ShowInfo(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc_DeviceApplicationInfos,
-                                                     const uint32 ou32_NodeIndex)
+                                                     const uint32_t ou32_NodeIndex)
 {
    this->mc_NodeData.UpdateInitialPackageStatus(orc_DeviceApplicationInfos, ou32_NodeIndex);
    this->UpdateIcons();
@@ -337,26 +337,26 @@ bool C_GiSvNodeSyvUpdate::HasNoResponseAndIsActive(void) const
    All active STW device indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_GiSvNodeSyvUpdate::GetAllActiveSTWDeviceIndices() const
+std::vector<uint32_t> C_GiSvNodeSyvUpdate::GetAllActiveStwDeviceIndices() const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    if (this->ms32_Index >= 0)
    {
-      std::vector<uint8> c_NodeActiveFlags;
-      const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+      std::vector<uint8_t> c_NodeActiveFlags;
+      const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
          this->mu32_ViewIndex,
          c_NodeActiveFlags);
 
       if (s32_Retval == C_NO_ERR)
       {
-         const std::vector<uint32> c_NodeIndices =
+         const std::vector<uint32_t> c_NodeIndices =
             C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
-               static_cast<uint32>(this->ms32_Index));
-         for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
+               static_cast<uint32_t>(this->ms32_Index));
+         for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
          {
             if (c_NodeActiveFlags[c_NodeIndices[u32_ItNode]] == 1U)
             {
-               if (this->mc_NodeData.GetSTWDeviceInfoByNodeIndex(c_NodeIndices[u32_ItNode]))
+               if (this->mc_NodeData.GetStwDeviceInfoByNodeIndex(c_NodeIndices[u32_ItNode]))
                {
                   c_Retval.push_back(c_NodeIndices[u32_ItNode]);
                }
@@ -383,7 +383,7 @@ bool C_GiSvNodeSyvUpdate::IsActiveInView(void) const
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       if (pc_View != NULL)
       {
-         q_Retval = pc_View->GetNodeStatusDisplayedAsActive(static_cast<uint32>(this->ms32_Index));
+         q_Retval = pc_View->GetNodeStatusDisplayedAsActive(static_cast<uint32_t>(this->ms32_Index));
       }
       else
       {
@@ -480,7 +480,7 @@ void C_GiSvNodeSyvUpdate::UpdateIcons(void)
          this->mpc_IconTopLeft->SetSvg("");
 
          this->mpc_IconBottom->SetBackgroundColor(mc_STYLE_GUIDE_COLOR_24);
-         this->mpc_IconBottom->SetTextColor(Qt::white, static_cast<sint32>(Qt::AlignCenter));
+         this->mpc_IconBottom->SetTextColor(Qt::white, static_cast<int32_t>(Qt::AlignCenter));
          this->mpc_IconBottom->setVisible(true);
          q_TopLeftVisible = false;
       }
@@ -519,7 +519,7 @@ void C_GiSvNodeSyvUpdate::GenerateHint(void)
    else
    {
       this->SetDefaultToolTipType(C_NagToolTip::eDEFAULT);
-      this->SetDefaultToolTipHeading(C_PuiSdUtil::h_GetNodeBaseNameOrName(static_cast<uint32>(this->GetIndex())));
+      this->SetDefaultToolTipHeading(C_PuiSdUtil::h_GetNodeBaseNameOrName(static_cast<uint32_t>(this->GetIndex())));
 
       if (this->mq_ViewConnected == true)
       {
@@ -638,43 +638,44 @@ void C_GiSvNodeSyvUpdate::UpdateTransform(const QTransform & orc_Transform)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvUpdate::m_InitIcons(void)
 {
-   const uint32 u32_ScaleCategory = m_GetScaleCategory();
-   const sint32 s32_IconSize = this->m_GetIconSize();
+   const uint32_t u32_ScaleCategory = m_GetScaleCategory();
+   const int32_t s32_IconSize = this->m_GetIconSize();
    const QRectF c_Rect = this->m_GetBoundary()->boundingRect();
-   const sint32 s32_BORDER_SIZE = 9;
-   const sint32 s32_BORDER_SIZE_ICON_BOTTOM = 15;
-   const sint32 s32_IconOffset = std::max(1L, s32_IconSize / 4L);
-   sint32 s32_PosX;
-   sint32 s32_PosY;
+   const int32_t s32_BORDER_SIZE = 9;
+   const int32_t s32_BORDER_SIZE_ICON_BOTTOM = 15;
+   const int32_t s32_IconOffset = std::max(1L, s32_IconSize / 4L);
+   int32_t s32_PosHorizontal;
+   int32_t s32_PosVertical;
    //Helper Variable to avoid pc lint warnings
-   float64 f64_HelpVar;
+   float64_t f64_HelpVar;
 
    //Create + placement
 
    //handling of this->mpc_IconTopLeft
-   s32_PosX = (static_cast<sint32>(c_Rect.width()) - s32_IconSize) - s32_BORDER_SIZE;
-   s32_PosY = s32_BORDER_SIZE;
-   this->mpc_IconTopLeft = new C_GiInfo(QRect(s32_PosX, s32_PosY, s32_IconSize, s32_IconSize));
+   s32_PosHorizontal = (static_cast<int32_t>(c_Rect.width()) - s32_IconSize) - s32_BORDER_SIZE;
+   s32_PosVertical = s32_BORDER_SIZE;
+   this->mpc_IconTopLeft = new C_GiInfo(QRect(s32_PosHorizontal, s32_PosVertical, s32_IconSize, s32_IconSize));
 
    //handling of this->mpc_IconBottom
-   s32_PosX = s32_BORDER_SIZE_ICON_BOTTOM;
+   s32_PosHorizontal = s32_BORDER_SIZE_ICON_BOTTOM;
 
    //Note:
    //   0.77: vertical position factor
    //   0.75: icon size factor
 
-   f64_HelpVar = static_cast<float64>(c_Rect.height() * 0.77);
-   s32_PosY = static_cast<sint32>(f64_HelpVar) - s32_IconSize;
+   f64_HelpVar = static_cast<float64_t>(c_Rect.height() * 0.77);
+   s32_PosVertical = static_cast<int32_t>(f64_HelpVar) - s32_IconSize;
 
-   f64_HelpVar = static_cast<float64>(s32_IconSize) * 0.75;
+   f64_HelpVar = static_cast<float64_t>(s32_IconSize) * 0.75;
    this->mpc_IconBottom =
-      new C_GiInfo(QRect(static_cast<sintn>(s32_PosX), static_cast<sintn>(s32_PosY),
-                         static_cast<sintn>(static_cast<sint32>(c_Rect.width()) - (2L * s32_BORDER_SIZE_ICON_BOTTOM)),
-                         static_cast<sintn>(static_cast<sint32>(f64_HelpVar) + s32_IconOffset)));
+      new C_GiInfo(QRect(static_cast<int32_t>(s32_PosHorizontal), static_cast<int32_t>(s32_PosVertical),
+                         static_cast<int32_t>(static_cast<int32_t>(c_Rect.width()) -
+                                              (2L * s32_BORDER_SIZE_ICON_BOTTOM)),
+                         static_cast<int32_t>(static_cast<int32_t>(f64_HelpVar) + s32_IconOffset)));
 
    //Colors
    this->mpc_IconBottom->SetBackgroundColor(Qt::transparent);
-   this->mpc_IconBottom->SetTextColor(mc_STYLE_GUIDE_COLOR_8, static_cast<sint32>(Qt::AlignLeft));
+   this->mpc_IconBottom->SetTextColor(mc_STYLE_GUIDE_COLOR_8, static_cast<int32_t>(Qt::AlignLeft));
    this->mpc_IconBottom->SetText("Unexpected");
 
    //Font
@@ -713,8 +714,8 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
 
    //Icons
    this->mpc_IconTopLeft->SetIconSize(s32_IconSize);
-   f64_HelpVar = static_cast<float64>(s32_IconSize) * 0.75;
-   this->mpc_IconBottom->SetIconSize(static_cast<sint32>(f64_HelpVar));
+   f64_HelpVar = static_cast<float64_t>(s32_IconSize) * 0.75;
+   this->mpc_IconBottom->SetIconSize(static_cast<int32_t>(f64_HelpVar));
 
    //Defaults
    this->mpc_IconTopLeft->setZValue(mf64_ZORDER_INIT_NODE + 1.0);

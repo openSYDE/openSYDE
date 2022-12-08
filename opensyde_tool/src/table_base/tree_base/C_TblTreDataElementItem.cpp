@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
 
-#include "C_TblTreDataElementItem.h"
+#include "C_TblTreDataElementItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_TblTreDataElementItem::mhc_ADDITIONAL_64BIT_INFO = " (Not supported, 64 bit value)";
@@ -53,8 +52,8 @@ const QString C_TblTreDataElementItem::mhc_ADDITIONAL_ARRAY_STRING_INFO = " (Not
 //----------------------------------------------------------------------------------------------------------------------
 C_TblTreDataElementItem::C_TblTreDataElementItem(const bool oq_IsArrayItem, const bool oq_IsArray,
                                                  const QString & orc_OriginalName,
-                                                 const C_OSCNodeDataPoolContent::E_Type oe_Type,
-                                                 const C_OSCNodeDataPoolListElement::E_Access oe_Access,
+                                                 const C_OscNodeDataPoolContent::E_Type oe_Type,
+                                                 const C_OscNodeDataPoolListElement::E_Access oe_Access,
                                                  const bool oq_IsString,
                                                  const C_PuiSvDbNodeDataPoolListElementId & orc_Id) :
    C_TblTreItem(),
@@ -88,12 +87,12 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
    if (((this->mq_IsArrayItem) && (oq_ShowArrayIndexElements == true)) ||
        ((this->mq_IsArrayItem == false) && ((this->mq_IsArray == false) || (oq_ShowArrayElements == true))))
    {
-      if ((((this->me_Type != C_OSCNodeDataPoolContent::eFLOAT64) &&
-            (this->me_Type != C_OSCNodeDataPoolContent::eUINT64)) &&
-           (this->me_Type != C_OSCNodeDataPoolContent::eSINT64)) ||
+      if ((((this->me_Type != C_OscNodeDataPoolContent::eFLOAT64) &&
+            (this->me_Type != C_OscNodeDataPoolContent::eUINT64)) &&
+           (this->me_Type != C_OscNodeDataPoolContent::eSINT64)) ||
           (oq_Show64BitValues == true))
       {
-         if ((this->me_Access == C_OSCNodeDataPoolListElement::eACCESS_RW) ||
+         if ((this->me_Access == C_OscNodeDataPoolListElement::eACCESS_RW) ||
              (oq_ShowOnlyWriteElements == false))
          {
             //Valid
@@ -160,10 +159,10 @@ void C_TblTreDataElementItem::ConfigureDynamicName(const bool oq_ShowOnlyWriteEl
    {
       // Check for already used elements is active
       // Check if element is already used
-      uintn un_Counter;
-      for (un_Counter = 0; un_Counter < opc_AlreasyUsedElements->size(); ++un_Counter)
+      uint32_t u32_Counter;
+      for (u32_Counter = 0; u32_Counter < opc_AlreasyUsedElements->size(); ++u32_Counter)
       {
-         const C_PuiSvDbNodeDataPoolListElementId & rc_ExistingId = (*opc_AlreasyUsedElements)[un_Counter];
+         const C_PuiSvDbNodeDataPoolListElementId & rc_ExistingId = (*opc_AlreasyUsedElements)[u32_Counter];
 
          if (rc_ExistingId == this->mc_Id)
          {

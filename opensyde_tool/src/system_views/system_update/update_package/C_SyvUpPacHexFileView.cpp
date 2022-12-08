@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDateTime>
 #include <QFileInfo>
 #include <QCryptographicHash>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_PuiProject.h"
-#include "C_SyvUpPacHexFileView.h"
-#include "C_PuiUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiProject.hpp"
+#include "C_SyvUpPacHexFileView.hpp"
+#include "C_PuiUtil.hpp"
 #include "ui_C_SyvUpPacHexFileView.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpPacHexFileView::mhc_START_TD = "<td style=\"padding: 0 9px 0 0;\">";
@@ -55,7 +54,7 @@ const QString C_SyvUpPacHexFileView::mhc_CONTINUE_TD = "<td style=\"padding: 0 9
    \param[in]     orc_File   The file to look at
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacHexFileView::C_SyvUpPacHexFileView(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+C_SyvUpPacHexFileView::C_SyvUpPacHexFileView(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                              const QString & orc_File) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpPacHexFileView),
@@ -113,8 +112,8 @@ void C_SyvUpPacHexFileView::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -141,10 +140,10 @@ void C_SyvUpPacHexFileView::m_LoadInfo(void) const
 {
    QString c_Text = "<html><body>";
    C_OsyHexFile c_HexFile;
-   uint32 u32_Result;
+   uint32_t u32_Result;
 
    u32_Result = c_HexFile.LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str());
-   if (u32_Result == stw_hex_file::NO_ERR)
+   if (u32_Result == stw::hex_file::NO_ERR)
    {
       mh_AddFileSection(this->mc_AbsoluteFilePath, c_Text);
       mh_AddDataInformation(c_HexFile, c_Text);
@@ -245,8 +244,8 @@ QString C_SyvUpPacHexFileView::mh_GetMD5Hex(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
 {
-   const uint32 u32_Bytes = orc_HexFile.ByteCount();
-   uint32 u32_CRC;
+   const uint32_t u32_Bytes = orc_HexFile.ByteCount();
+   uint32_t u32_CRC;
 
    orc_HexFile.CalcFileChecksum(u32_CRC);
 
@@ -280,7 +279,7 @@ void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QS
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
 {
-   SCLDynamicArray<stw_diag_lib::C_XFLECUInformation> c_InfoBlocks;
+   C_SclDynamicArray<stw::diag_lib::C_XFLECUInformation> c_InfoBlocks;
    orc_HexFile.GetECUInformationBlocks(c_InfoBlocks, 0UL, false, false, false);
    orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("File Information Blocks")) + "</h3>";
    orc_Content += "<table>";
@@ -293,9 +292,9 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexF
    orc_Content += "</td>";
    orc_Content += "</tr>";
    orc_Content += "</table>";
-   for (sint32 s32_ItAppl = 0UL; s32_ItAppl < c_InfoBlocks.GetLength(); ++s32_ItAppl)
+   for (int32_t s32_ItAppl = 0UL; s32_ItAppl < c_InfoBlocks.GetLength(); ++s32_ItAppl)
    {
-      const stw_diag_lib::C_XFLECUInformation & rc_CurInfo = c_InfoBlocks[s32_ItAppl];
+      const stw::diag_lib::C_XFLECUInformation & rc_CurInfo = c_InfoBlocks[s32_ItAppl];
       orc_Content += "<h3>" +
                      static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1L, 2, 10,
                                                                                   QChar('0')) + "</h3>";

@@ -16,29 +16,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "CSCLString.h"
-#include "TGLUtils.h"
-#include "TGLTime.h"
-#include "C_Uti.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SyvUpSequences.h"
-#include "C_SyvComDriverUtil.h"
-#include "DLLocalize.h"
+#include "C_SclString.hpp"
+#include "TglUtils.hpp"
+#include "TglTime.hpp"
+#include "C_Uti.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SyvUpSequences.hpp"
+#include "C_SyvComDriverUtil.hpp"
+#include "DLLocalize.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,7 +56,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpSequences::C_SyvUpSequences(void) :
-   C_OSCSuSequences(),
+   C_OscSuSequences(),
    mpc_CanDllDispatcher(NULL),
    mpc_EthernetDispatcher(NULL),
    mq_AbortFlag(false),
@@ -65,7 +64,7 @@ C_SyvUpSequences::C_SyvUpSequences(void) :
    me_Sequence(eNOT_ACTIVE),
    ms32_Result(C_NOACT)
 {
-   mpc_Lock = new stw_tgl::C_TGLCriticalSection();
+   mpc_Lock = new stw::tgl::C_TglCriticalSection();
    mpc_Thread = new C_SyvComDriverThread(&C_SyvUpSequences::mh_ThreadFunc, this);
 }
 
@@ -126,16 +125,16 @@ C_SyvUpSequences::~C_SyvUpSequences(void)
    C_RANGE       Routing configuration failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
+int32_t C_SyvUpSequences::InitUpSequences(const uint32_t ou32_ViewIndex)
 {
-   sint32 s32_Return;
-   uint32 u32_ActiveBusIndex;
+   int32_t s32_Return;
+   uint32_t u32_ActiveBusIndex;
 
-   std::vector<uint8> c_ActiveNodes;
+   std::vector<uint8_t> c_ActiveNodes;
 
    this->mu32_ViewIndex = ou32_ViewIndex;
 
-   s32_Return = C_SyvComDriverUtil::h_GetOSCComDriverParamFromView(ou32_ViewIndex, u32_ActiveBusIndex,
+   s32_Return = C_SyvComDriverUtil::h_GetOscComDriverParamFromView(ou32_ViewIndex, u32_ActiveBusIndex,
                                                                    c_ActiveNodes,
                                                                    &this->mpc_CanDllDispatcher,
                                                                    &this->mpc_EthernetDispatcher, true, false, NULL);
@@ -145,7 +144,7 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
       // pem folder is optional -> no error handling
       mc_PemDatabase.ParseFolder(C_Uti::h_GetPemDbPath().toStdString());
 
-      s32_Return = C_OSCComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinition(),
+      s32_Return = C_OscComSequencesBase::Init(C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinition(),
                                                u32_ActiveBusIndex, c_ActiveNodes, this->mpc_CanDllDispatcher,
                                                this->mpc_EthernetDispatcher, &this->mc_PemDatabase);
    }
@@ -166,9 +165,9 @@ sint32 C_SyvUpSequences::InitUpSequences(const uint32 ou32_ViewIndex)
    C_COM       CAN initialization failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::ReinitDispatcher(void)
+int32_t C_SyvUpSequences::ReinitDispatcher(void)
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->IsInitialized() == true)
    {
@@ -176,17 +175,17 @@ sint32 C_SyvUpSequences::ReinitDispatcher(void)
 
       if (pc_View != NULL)
       {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
             pc_View->GetPcData().GetBusIndex());
 
          if (pc_Bus != NULL)
          {
-            if (pc_Bus->e_Type == C_OSCSystemBus::eCAN)
+            if (pc_Bus->e_Type == C_OscSystemBus::eCAN)
             {
                if (this->mpc_CanDllDispatcher != NULL)
                {
                   s32_Return = this->mpc_CanDllDispatcher->CAN_Init(
-                     static_cast<sint32>(pc_Bus->u64_BitRate / 1000ULL));
+                     static_cast<int32_t>(pc_Bus->u64_BitRate / 1000ULL));
 
                   if (s32_Return != C_NO_ERR)
                   {
@@ -247,19 +246,19 @@ void C_SyvUpSequences::CloseDispatcher(void)
    C_TIMEOUT   could not create target directory
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::SyvUpCreateTemporaryFolder(const C_SCLString & orc_TargetPath,
-                                                    std::vector<C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-                                                    QString & orc_ErrorPath) const
+int32_t C_SyvUpSequences::SyvUpCreateTemporaryFolder(const C_SclString & orc_TargetPath,
+                                                     std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+                                                     QString & orc_ErrorPath) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if ((this->IsInitialized() == true) &&
        (pc_View != NULL))
    {
-      C_SCLString c_ErrorPath;
-      s32_Return = C_OSCSuSequences::h_CreateTemporaryFolder(
-         C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().c_Nodes,
+      C_SclString c_ErrorPath;
+      s32_Return = C_OscSuSequences::h_CreateTemporaryFolder(
+         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().c_Nodes,
          this->mc_ActiveNodes,
          orc_TargetPath,
          orc_ApplicationsToWrite, &c_ErrorPath);
@@ -282,9 +281,11 @@ sint32 C_SyvUpSequences::SyvUpCreateTemporaryFolder(const C_SCLString & orc_Targ
    C_BUSY         previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::GetResults(sint32 & ors32_Result) const
+int32_t C_SyvUpSequences::GetResults(int32_t & ors32_Result) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
+
+   ors32_Result = C_UNKNOWN_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -311,9 +312,9 @@ sint32 C_SyvUpSequences::GetResults(sint32 & ors32_Result) const
    C_BUSY         previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::GetLastUpdatePosition(uint32 & oru32_NodeIndex, uint32 & oru32_FileIndex) const
+int32_t C_SyvUpSequences::GetLastUpdatePosition(uint32_t & oru32_NodeIndex, uint32_t & oru32_FileIndex) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -338,8 +339,8 @@ sint32 C_SyvUpSequences::GetLastUpdatePosition(uint32 & oru32_NodeIndex, uint32 
    \param[out]    orc_OsyDeviceInformation   All device information associated to the node index in the same order
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpSequences::GetOsyDeviceInformation(std::vector<uint32> & orc_OsyNodeIndexes,
-                                               std::vector<C_OSCSuSequences::C_OsyDeviceInformation> & orc_OsyDeviceInformation)
+void C_SyvUpSequences::GetOsyDeviceInformation(std::vector<uint32_t> & orc_OsyNodeIndexes,
+                                               std::vector<C_OscSuSequences::C_OsyDeviceInformation> & orc_OsyDeviceInformation)
 {
    this->mpc_Lock->Acquire();
 
@@ -364,8 +365,8 @@ void C_SyvUpSequences::GetOsyDeviceInformation(std::vector<uint32> & orc_OsyNode
    \param[out]    orc_XflDeviceInformation   All device information associated to the node index in the same order
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpSequences::GetXflDeviceInformation(std::vector<uint32> & orc_XflNodeIndexes,
-                                               std::vector<C_OSCSuSequences::C_XflDeviceInformation> & orc_XflDeviceInformation)
+void C_SyvUpSequences::GetXflDeviceInformation(std::vector<uint32_t> & orc_XflNodeIndexes,
+                                               std::vector<C_OscSuSequences::C_XflDeviceInformation> & orc_XflDeviceInformation)
 {
    this->mpc_Lock->Acquire();
 
@@ -760,9 +761,9 @@ QString C_SyvUpSequences::GetStepName(const E_ProgressStep oe_Step) const
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::StartActivateFlashloader(void)
+int32_t C_SyvUpSequences::StartActivateFlashloader(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -786,9 +787,9 @@ sint32 C_SyvUpSequences::StartActivateFlashloader(void)
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::StartReadDeviceInformation(void)
+int32_t C_SyvUpSequences::StartReadDeviceInformation(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -820,10 +821,10 @@ sint32 C_SyvUpSequences::StartReadDeviceInformation(void)
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::StartUpdateSystem(const std::vector<C_DoFlash> & orc_ApplicationsToWrite,
-                                           const std::vector<uint32> & orc_NodesOrder)
+int32_t C_SyvUpSequences::StartUpdateSystem(const std::vector<C_DoFlash> & orc_ApplicationsToWrite,
+                                            const std::vector<uint32_t> & orc_NodesOrder)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -851,9 +852,9 @@ sint32 C_SyvUpSequences::StartUpdateSystem(const std::vector<C_DoFlash> & orc_Ap
    C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::StartResetSystem(void)
+int32_t C_SyvUpSequences::StartResetSystem(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -893,9 +894,10 @@ void C_SyvUpSequences::AbortCurrentProgress(void)
    \retval   C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::GetConnectStates(std::vector<C_OSCSuSequencesNodeConnectStates> & orc_ConnectStatesNodes) const
+int32_t C_SyvUpSequences::GetConnectStates(std::vector<C_OscSuSequencesNodeConnectStates> & orc_ConnectStatesNodes)
+const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -903,7 +905,7 @@ sint32 C_SyvUpSequences::GetConnectStates(std::vector<C_OSCSuSequencesNodeConnec
    }
    else
    {
-      s32_Return = C_OSCSuSequences::GetConnectStates(orc_ConnectStatesNodes);
+      s32_Return = C_OscSuSequences::GetConnectStates(orc_ConnectStatesNodes);
    }
 
    return s32_Return;
@@ -922,9 +924,9 @@ sint32 C_SyvUpSequences::GetConnectStates(std::vector<C_OSCSuSequencesNodeConnec
    \retval   C_BUSY     previously started sequence still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpSequences::GetUpdateStates(std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes) const
+int32_t C_SyvUpSequences::GetUpdateStates(std::vector<C_OscSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->mpc_Thread->isRunning() == true)
    {
@@ -932,7 +934,7 @@ sint32 C_SyvUpSequences::GetUpdateStates(std::vector<C_OSCSuSequencesNodeUpdateS
    }
    else
    {
-      s32_Return = C_OSCSuSequences::GetUpdateStates(orc_UpdateStatesNodes);
+      s32_Return = C_OscSuSequences::GetUpdateStates(orc_UpdateStatesNodes);
    }
 
    return s32_Return;
@@ -954,24 +956,24 @@ sint32 C_SyvUpSequences::GetUpdateStates(std::vector<C_OSCSuSequencesNodeUpdateS
    - false  continue sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint32 os32_Result,
-                                        const uint8 ou8_Progress, const C_SCLString & orc_Information)
+bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const int32_t os32_Result,
+                                        const uint8_t ou8_Progress, const C_SclString & orc_Information)
 {
-   C_SCLString c_Text;
+   C_SclString c_Text;
 
    if ((oe_Step != C_SyvUpSequences::eXFL_PROGRESS) ||
        (orc_Information.Pos(TGL_LoadStr(STR_FDL_TXT_WR_FLASH_RQ)) == 0))
    {
       c_Text =  ("Step: " + this->GetStepName(oe_Step)).toStdString().c_str();
-      c_Text += " Progress: " + C_SCLString::IntToStr(ou8_Progress);
-      c_Text += " Result: " + C_SCLString::IntToStr(os32_Result);
+      c_Text += " Progress: " + C_SclString::IntToStr(ou8_Progress);
+      c_Text += " Result: " + C_SclString::IntToStr(os32_Result);
       c_Text += " Info: " + orc_Information;
 
       mh_WriteLog(oe_Step, c_Text);
    }
 
    // Enum make problems with signal slot mechanism
-   Q_EMIT this->SigReportProgress(static_cast<uint32>(oe_Step), os32_Result, ou8_Progress);
+   Q_EMIT this->SigReportProgress(static_cast<uint32_t>(oe_Step), os32_Result, ou8_Progress);
 
    return this->mq_AbortFlag;
 }
@@ -992,27 +994,27 @@ bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
    - false  continue sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint32 os32_Result,
-                                        const uint8 ou8_Progress, const C_OSCProtocolDriverOsyNode & orc_Server,
-                                        const C_SCLString & orc_Information)
+bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const int32_t os32_Result,
+                                        const uint8_t ou8_Progress, const C_OscProtocolDriverOsyNode & orc_Server,
+                                        const C_SclString & orc_Information)
 {
-   C_SCLString c_Text;
+   C_SclString c_Text;
 
    if ((oe_Step != C_SyvUpSequences::eXFL_PROGRESS) ||
        (orc_Information.Pos(TGL_LoadStr(STR_FDL_TXT_WR_FLASH_RQ)) == 0))
    {
       c_Text =  ("Step: " + this->GetStepName(oe_Step)).toStdString().c_str();
-      c_Text += " Progress: " + C_SCLString::IntToStr(ou8_Progress);
-      c_Text += " Result: " + C_SCLString::IntToStr(os32_Result);
-      c_Text += " Bus ID: " + C_SCLString::IntToStr(orc_Server.u8_BusIdentifier);
-      c_Text += " Node ID: " + C_SCLString::IntToStr(orc_Server.u8_NodeIdentifier);
+      c_Text += " Progress: " + C_SclString::IntToStr(ou8_Progress);
+      c_Text += " Result: " + C_SclString::IntToStr(os32_Result);
+      c_Text += " Bus ID: " + C_SclString::IntToStr(orc_Server.u8_BusIdentifier);
+      c_Text += " Node ID: " + C_SclString::IntToStr(orc_Server.u8_NodeIdentifier);
       c_Text += " Info: " + orc_Information;
 
       mh_WriteLog(oe_Step, c_Text);
    }
 
    // Enum make problems with signal slot mechanism
-   Q_EMIT this->SigReportProgressForServer(static_cast<uint32>(oe_Step), os32_Result, ou8_Progress,
+   Q_EMIT this->SigReportProgressForServer(static_cast<uint32_t>(oe_Step), os32_Result, ou8_Progress,
                                            orc_Server.u8_BusIdentifier,
                                            orc_Server.u8_NodeIdentifier);
 
@@ -1030,7 +1032,7 @@ bool C_SyvUpSequences::m_ReportProgress(const E_ProgressStep oe_Step, const sint
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::m_ReportOpenSydeFlashloaderInformationRead(const C_OsyDeviceInformation & orc_Info,
-                                                                  const uint32 ou32_NodeIndex)
+                                                                  const uint32_t ou32_NodeIndex)
 {
    // Save the device information
    // Using the signals only for primitive data types when using multi-threading
@@ -1053,7 +1055,7 @@ void C_SyvUpSequences::m_ReportOpenSydeFlashloaderInformationRead(const C_OsyDev
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpSequences::m_ReportStwFlashloaderInformationRead(const C_XflDeviceInformation & orc_Info,
-                                                             const uint32 ou32_NodeIndex)
+                                                             const uint32_t ou32_NodeIndex)
 {
    // Save the device information
    // Using the signals only for primitive data types when using multi-threading
@@ -1110,7 +1112,7 @@ void C_SyvUpSequences::m_ThreadFunc(void)
       case eRESET_SYSTEM:
          this->ms32_Result = this->ResetSystem();
          //Wait until every device is restarted
-         stw_tgl::TGL_Sleep(2000);
+         stw::tgl::TglSleep(2000);
          break;
       default:
          tgl_assert(false);
@@ -1129,68 +1131,68 @@ void C_SyvUpSequences::m_ThreadFunc(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-void C_SyvUpSequences::mh_WriteLog(const C_OSCSuSequences::E_ProgressStep oe_Step,
-                                   const stw_scl::C_SCLString & orc_Text)
+void C_SyvUpSequences::mh_WriteLog(const C_OscSuSequences::E_ProgressStep oe_Step,
+                                   const stw::scl::C_SclString & orc_Text)
 {
    // Decide if error or info
    switch (oe_Step) //lint !e788  //not all cases handled explicitly here
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OscSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
+   case C_OscSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
       osc_write_log_error("Update Node", orc_Text);
       break;
    default:

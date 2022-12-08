@@ -10,23 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstring>
 #include <iostream>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLTime.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCProtocolDriverOsyTpCan.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglTime.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscProtocolDriverOsyTpCan.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_can;
-using namespace stw_scl;
-using namespace stw_tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::can;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,7 +46,7 @@ using namespace stw_tgl;
    Initialize class fields with defaults
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProtocolDriverOsyTpCan::C_ServiceState::C_ServiceState(void) :
+C_OscProtocolDriverOsyTpCan::C_ServiceState::C_ServiceState(void) :
    u16_TransmissionIndex(0U),
    u8_SequenceNumber(0U),
    e_Status(eIDLE),
@@ -63,8 +63,8 @@ C_OSCProtocolDriverOsyTpCan::C_ServiceState::C_ServiceState(void) :
    \param[in]  ou16_MaxServiceQueueSize   maximum number of entries in Tx/Rx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProtocolDriverOsyTpCan::C_OSCProtocolDriverOsyTpCan(const uint16 ou16_MaxServiceQueueSize) :
-   C_OSCProtocolDriverOsyTpBase(ou16_MaxServiceQueueSize),
+C_OscProtocolDriverOsyTpCan::C_OscProtocolDriverOsyTpCan(const uint16_t ou16_MaxServiceQueueSize) :
+   C_OscProtocolDriverOsyTpBase(ou16_MaxServiceQueueSize),
    mpc_CanDispatcher(NULL),
    mu16_DispatcherClientHandle(0U)
 {
@@ -76,7 +76,7 @@ C_OSCProtocolDriverOsyTpCan::C_OSCProtocolDriverOsyTpCan(const uint16 ou16_MaxSe
    clean up ...
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProtocolDriverOsyTpCan::~C_OSCProtocolDriverOsyTpCan(void)
+C_OscProtocolDriverOsyTpCan::~C_OscProtocolDriverOsyTpCan(void)
 {
    //remove us from dispatcher queue:
    if (mpc_CanDispatcher != NULL)
@@ -106,11 +106,11 @@ C_OSCProtocolDriverOsyTpCan::~C_OSCProtocolDriverOsyTpCan(void)
    C_OVERFLOW   could not add incoming service to Rx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingSingleFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingSingleFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   C_OSCProtocolDriverOsyService c_Service;
-   sint32 s32_Return = C_NO_ERR;
-   const uint8 u8_Size = orc_CanMessage.au8_Data[0] & 0x0FU;
+   C_OscProtocolDriverOsyService c_Service;
+   int32_t s32_Return = C_NO_ERR;
+   const uint8_t u8_Size = orc_CanMessage.au8_Data[0] & 0x0FU;
 
    c_Service.c_Data.resize(u8_Size);
    if (orc_CanMessage.u8_DLC >= (c_Service.c_Data.size() + 1))
@@ -152,23 +152,28 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingSingleFrame(const T_STWCAN_M
 
    \return
    C_NO_ERR     no problems; service added to Rx queue
-   C_CONFIG     frame invalid (DLC does not match length in PCI byte)
    C_OVERFLOW   could not add incoming service to Rx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   C_OSCProtocolDriverOsyService c_Service;
-   sint32 s32_Return = C_NO_ERR;
-   const uint8 u8_Size = orc_CanMessage.u8_DLC;
+   C_OscProtocolDriverOsyService c_Service;
+   int32_t s32_Return = C_NO_ERR;
+   const uint8_t u8_Size = orc_CanMessage.u8_DLC;
 
    // message without request SID 0xFA
    if ((orc_CanMessage.au8_Data[0] & 0x0FU) == mhu8_OSY_OSF_TYPE_EVENT_DRIVEN_DP_SINGLE_FRAME)
    {
+      tgl_assert((u8_Size > 0) && (u8_Size <= 8U));
+
       c_Service.c_Data.resize(u8_Size);
       //remap to service in the format expected by upper layer ...
       c_Service.c_Data[0] = 0xFAU;
-      (void)std::memcpy(&c_Service.c_Data[1], &orc_CanMessage.au8_Data[1], static_cast<uintn>(u8_Size) - 1);
+
+      if ((u8_Size > 0) && (u8_Size <= 8U))
+      {
+         (void)std::memcpy(&c_Service.c_Data[1], &orc_CanMessage.au8_Data[1], static_cast<uint32_t>(u8_Size) - 1);
+      }
 
       //add to queue:
       s32_Return = m_AddToRxQueue(c_Service);
@@ -208,9 +213,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(const
    C_COM        could not send out flow control
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mc_RxService.e_Status != C_ServiceState::eIDLE)
    {
@@ -220,26 +225,26 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Ms
 
    if (orc_CanMessage.u8_DLC == 8U)
    {
-      T_STWCAN_Msg_TX t_TxMsg;
+      T_STWCAN_Msg_TX c_TxMsg;
       //get total size:
-      const uint8 u8_Size = orc_CanMessage.au8_Data[0] & 0x0FU;
-      const uint16 u16_ServiceSize = static_cast<uint16>(static_cast<uint16>(u8_Size) << 8U) +
-                                     orc_CanMessage.au8_Data[1];
+      const uint8_t u8_Size = orc_CanMessage.au8_Data[0] & 0x0FU;
+      const uint16_t u16_ServiceSize = static_cast<uint16_t>(static_cast<uint16_t>(u8_Size) << 8U) +
+                                       orc_CanMessage.au8_Data[1];
       mc_RxService.c_ServiceData.c_Data.resize(u16_ServiceSize);
       (void)std::memcpy(&mc_RxService.c_ServiceData.c_Data[0], &orc_CanMessage.au8_Data[2], 6U);
       mc_RxService.u16_TransmissionIndex = 6U;
       mc_RxService.u8_SequenceNumber = 1U;
 
       //send flow control:
-      t_TxMsg.u32_ID = m_GetTxIdentifier();
-      t_TxMsg.u8_XTD = 1U;
-      t_TxMsg.u8_RTR = 0U;
-      t_TxMsg.u8_DLC = 3U;
-      t_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_FC;
-      t_TxMsg.au8_Data[1] = 0U; //no block limits (BS)
-      t_TxMsg.au8_Data[2] = 0U; //no separation time (STmin)
+      c_TxMsg.u32_ID = m_GetTxIdentifier();
+      c_TxMsg.u8_XTD = 1U;
+      c_TxMsg.u8_RTR = 0U;
+      c_TxMsg.u8_DLC = 3U;
+      c_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_FC;
+      c_TxMsg.au8_Data[1] = 0U; //no block limits (BS)
+      c_TxMsg.au8_Data[2] = 0U; //no separation time (STmin)
 
-      s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg); //lint !e613  //caller is responsible for valid dispatcher
+      s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_TxMsg); //lint !e613  //caller is responsible for valid dispatcher
       if (s32_Return != C_NO_ERR)
       {
          m_LogWarningWithHeader("Could not send flow control CAN message.", TGL_UTIL_FUNC_ID);
@@ -274,32 +279,33 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFirstFrame(const T_STWCAN_Ms
                 Tx state machine still at eMORE_CONSECUTIVE_FRAMES_TO_SEND
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_SendNextConsecutiveFrames(void)
+int32_t C_OscProtocolDriverOsyTpCan::m_SendNextConsecutiveFrames(void)
 {
-   uint8 u8_NumBytesToSend;
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    //continue where we left:
    for (; mc_TxService.u16_TransmissionIndex < mc_TxService.c_ServiceData.c_Data.size();
         mc_TxService.u16_TransmissionIndex += 7)
    {
-      T_STWCAN_Msg_TX t_TxMsg;
-      u8_NumBytesToSend = static_cast<uint8>
-                          (((mc_TxService.c_ServiceData.c_Data.size() - mc_TxService.u16_TransmissionIndex) > 7U) ? 7U :
-                           (mc_TxService.c_ServiceData.c_Data.size() - mc_TxService.u16_TransmissionIndex));
-      t_TxMsg.u32_ID = m_GetTxIdentifier();
-      t_TxMsg.u8_XTD = 1U;
-      t_TxMsg.u8_RTR = 0U;
-      t_TxMsg.u8_DLC = 1U + u8_NumBytesToSend;
-      t_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_CF + mc_TxService.u8_SequenceNumber;
+      T_STWCAN_Msg_TX c_TxMsg;
+      const uint8_t u8_NumBytesToSend = static_cast<uint8_t>
+                                        (((mc_TxService.c_ServiceData.c_Data.size() -
+                                           mc_TxService.u16_TransmissionIndex) > 7U) ? 7U :
+                                         (mc_TxService.c_ServiceData.c_Data.size() -
+                                          mc_TxService.u16_TransmissionIndex));
+      c_TxMsg.u32_ID = m_GetTxIdentifier();
+      c_TxMsg.u8_XTD = 1U;
+      c_TxMsg.u8_RTR = 0U;
+      c_TxMsg.u8_DLC = 1U + u8_NumBytesToSend;
+      c_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_CF + mc_TxService.u8_SequenceNumber;
       //lint -e{670} //std::vector reference returned by [] is guaranteed to have linear data in memory
-      (void)std::memcpy(&t_TxMsg.au8_Data[1],
+      (void)std::memcpy(&c_TxMsg.au8_Data[1],
                         &mc_TxService.c_ServiceData.c_Data[mc_TxService.u16_TransmissionIndex],
                         u8_NumBytesToSend);
 
       //send message:
       //lint -e{613}  //caller is responsible for valid dispatcher
-      s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg);
+      s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_TxMsg);
       if (s32_Return != C_NO_ERR)
       {
          //most likely Tx buffer is full; but we cannot be 100% sure, so write a log entry
@@ -344,9 +350,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SendNextConsecutiveFrames(void)
    C_COM        could not send out following consecutive frames
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_Msg_RX & orc_CanMessage)
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    //are we in a segmented Tx transfer ?
    if (mc_TxService.e_Status == C_ServiceState::eWAITING_FOR_FLOW_CONTROL)
@@ -362,13 +368,14 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_M
             // in openSYDE (100 kbit/s) and an alien busload of 50%
             //So we'll have around 2 ms/message
             //But we'll add a lower limit of 100ms to compensate for client side timing constraints
-            mc_TxService.u32_SendCfTimeout = static_cast<uint32>((mc_TxService.c_ServiceData.c_Data.size() / 7U) * 2U);
+            mc_TxService.u32_SendCfTimeout =
+               static_cast<uint32_t>((mc_TxService.c_ServiceData.c_Data.size() / 7U) * 2U);
             if (mc_TxService.u32_SendCfTimeout < 100U)
             {
                mc_TxService.u32_SendCfTimeout = 100U;
             }
             //offset with current system time:
-            mc_TxService.u32_SendCfTimeout += TGL_GetTickCount();
+            mc_TxService.u32_SendCfTimeout += TglGetTickCount();
             mc_TxService.e_Status = C_ServiceState::eMORE_CONSECUTIVE_FRAMES_TO_SEND;
 
             s32_Return = m_SendNextConsecutiveFrames();
@@ -419,16 +426,16 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingFlowControl(const T_STWCAN_M
    C_OVERFLOW   could not add full service to Rx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mc_RxService.e_Status == C_ServiceState::eWAITING_FOR_CONSECUTIVE_FRAME)
    {
       if (mc_RxService.u8_SequenceNumber == (orc_CanMessage.au8_Data[0] & 0x0FU))
       {
          //correct sequence; copy data.
-         const uint8 u8_NumBytes = (orc_CanMessage.u8_DLC - 1);
+         const uint8_t u8_NumBytes = (orc_CanMessage.u8_DLC - 1);
          if (u8_NumBytes >= (mc_RxService.c_ServiceData.c_Data.size() - mc_RxService.u16_TransmissionIndex))
          {
             //enough data received to fill our buffer:
@@ -467,7 +474,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
       }
       else
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          //incorrect sequence: abort
          mc_RxService.e_Status = C_ServiceState::eIDLE;
          c_Tmp.PrintFormatted("Consecutive frame with incorrect sequence number received. Expected: %i, Received: %i",
@@ -507,9 +514,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingConsecutiveFrame(const T_STW
    C_OVERFLOW   Rx Queue overflow. Incoming consecutive frame dumped
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const T_STWCAN_Msg_RX & orc_CanMessage)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (mc_RxService.e_Status != C_ServiceState::eIDLE)
    {
@@ -523,7 +530,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
       if (orc_CanMessage.u8_DLC == 8U)
       {
          //get total size:
-         const uint16 u16_ServiceSize = orc_CanMessage.au8_Data[1];
+         const uint16_t u16_ServiceSize = orc_CanMessage.au8_Data[1];
          mc_RxService.c_ServiceData.c_Data.resize(u16_ServiceSize);
          (void)memcpy(&mc_RxService.c_ServiceData.c_Data[0], &orc_CanMessage.au8_Data[2], 6U);
          mc_RxService.u16_TransmissionIndex = 6U;
@@ -542,7 +549,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
       if (mc_RxService.u8_SequenceNumber == (orc_CanMessage.au8_Data[0] & 0x0FU))
       {
          //correct sequence; copy data.
-         const uint8 u8_NumBytes = (orc_CanMessage.u8_DLC - 1);
+         const uint8_t u8_NumBytes = (orc_CanMessage.u8_DLC - 1);
          if (u8_NumBytes >= (mc_RxService.c_ServiceData.c_Data.size() - mc_RxService.u16_TransmissionIndex))
          {
             //enough data received to fill our buffer:
@@ -607,9 +614,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificMultiFrame(const 
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(const uint8 ou8_Session) const
+int32_t C_OscProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(const uint8_t ou8_Session) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (mpc_CanDispatcher == NULL)
    {
@@ -618,13 +625,13 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(cons
    else
    {
       //set up request
-      C_OSCProtocolDriverOsyService c_Service;
+      C_OscProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
       c_Service.c_Data.resize(2);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_DIAGNOSTIC_SESSION_CONTROL;
       // We do not want any answer for this broadcast. Use the suppressPosRspMsgIndicationBit
       c_Service.c_Data[1] = ou8_Session | 0x80U;
-      m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+      mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
       s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
       if (s32_Return != C_NO_ERR)
@@ -649,17 +656,17 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_BroadcastSendDiagnosticSessionControl(cons
    \param[out] orc_CanMessage    resulting CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriverOsyService & orc_Service,
-                                                       const uint32 ou32_Identifier,
-                                                       T_STWCAN_Msg_TX & orc_CanMessage) const
+void C_OscProtocolDriverOsyTpCan::mh_ComposeSingleFrame(const C_OscProtocolDriverOsyService & orc_Service,
+                                                        const uint32_t ou32_Identifier,
+                                                        T_STWCAN_Msg_TX & orc_CanMessage)
 {
    orc_CanMessage.u32_ID = ou32_Identifier;
    orc_CanMessage.u8_XTD = 1U;
    orc_CanMessage.u8_RTR = 0U;
-   orc_CanMessage.u8_DLC = static_cast<uint8>(orc_Service.c_Data.size() + 1U);
+   orc_CanMessage.u8_DLC = static_cast<uint8_t>(orc_Service.c_Data.size() + 1U);
 
    //set PCI:
-   orc_CanMessage.au8_Data[0] = static_cast<uint8>(mhu8_ISO15765_N_PCI_SF + (orc_Service.c_Data.size()));
+   orc_CanMessage.au8_Data[0] = static_cast<uint8_t>(mhu8_ISO15765_N_PCI_SF + (orc_Service.c_Data.size()));
    if (orc_Service.c_Data.size() > 0)
    {
       (void)std::memcpy(&orc_CanMessage.au8_Data[1], &orc_Service.c_Data[0], orc_Service.c_Data.size());
@@ -683,22 +690,23 @@ void C_OSCProtocolDriverOsyTpCan::m_ComposeSingleFrame(const C_OSCProtocolDriver
    C_OVERFLOW  multiple positive responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberResponse(const uint8 ou8_RoutineIdMsb,
-                                                                                     const uint8 ou8_RoutineIdLsb,
-                                                                                     uint8 * const opu8_NrCode) const
+int32_t C_OscProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberResponse(const uint8_t ou8_RoutineIdMsb,
+                                                                                      const uint8_t ou8_RoutineIdLsb,
+                                                                                      uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
    //check for responses
-   const uint32 u32_StartTime = TGL_GetTickCount();
+   const uint32_t u32_StartTime = TglGetTickCount();
    T_STWCAN_Msg_RX c_Response;
-   sint32 s32_ReturnLocal;
    bool q_PositiveResponseReceived = false;
    bool q_MultiplePositiveResponsesReceived = false;
    bool q_NegativeResponseReceived = false;
 
    // No further abort condition. Wait always the entire timeout time to get all positive and negative responses
-   while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
+   while ((TglGetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
    {
+      int32_t s32_ReturnLocal;
+
       //trigger dispatcher
       //ignore return value: we cannot be sure some other client did not check before us
       (void)mpc_CanDispatcher->DispatchIncoming();
@@ -795,10 +803,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_HandleBroadcastSetNodeIdBySerialNumberResp
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
+int32_t C_OscProtocolDriverOsyTpCan::Cycle(void)
 {
-   sint32 s32_ReturnFunc = C_NO_ERR;
-   sint32 s32_Return;
+   int32_t s32_ReturnFunc = C_NO_ERR;
 
    if (mpc_CanDispatcher == NULL)
    {
@@ -806,6 +813,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
    }
    else
    {
+      int32_t s32_Return;
       if (mc_TxService.e_Status == C_ServiceState::eIDLE)
       {
          //do we have more to send ?
@@ -818,10 +826,10 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                if (mc_TxService.c_ServiceData.c_Data.size() <= 7)
                {
                   //simple single frame:
-                  T_STWCAN_Msg_TX t_Msg;
-                  m_ComposeSingleFrame(mc_TxService.c_ServiceData, m_GetTxIdentifier(), t_Msg);
+                  T_STWCAN_Msg_TX c_Msg;
+                  mh_ComposeSingleFrame(mc_TxService.c_ServiceData, m_GetTxIdentifier(), c_Msg);
 
-                  s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_Msg);
+                  s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
                   if (s32_Return != C_NO_ERR)
                   {
                      m_LogWarningWithHeader("Could not send single frame CAN message.", TGL_UTIL_FUNC_ID);
@@ -832,23 +840,23 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                else if (mc_TxService.c_ServiceData.q_CanTransferWithoutFlowControl == true)
                {
                   // openSYDE specific multi frame without flow control
-                  T_STWCAN_Msg_TX t_TxMsg;
-                  const uintn un_CountBytes = mc_TxService.c_ServiceData.c_Data.size();
+                  T_STWCAN_Msg_TX c_TxMsg;
+                  const uint32_t u32_CountBytes = static_cast<uint32_t>(mc_TxService.c_ServiceData.c_Data.size());
 
-                  t_TxMsg.u32_ID = m_GetTxIdentifier();
-                  t_TxMsg.u8_XTD = 1U;
-                  t_TxMsg.u8_RTR = 0U;
-                  t_TxMsg.u8_DLC = 8U;
+                  c_TxMsg.u32_ID = m_GetTxIdentifier();
+                  c_TxMsg.u8_XTD = 1U;
+                  c_TxMsg.u8_RTR = 0U;
+                  c_TxMsg.u8_DLC = 8U;
 
                   // First frame
                   mc_TxService.u8_SequenceNumber = 0U;
                   // The number of bytes in the first frame. Start with this byte in the following frames
                   mc_TxService.u16_TransmissionIndex = 6U;
 
-                  t_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_OMF;
-                  t_TxMsg.au8_Data[1] = static_cast<uint8>(un_CountBytes & 0xFFU);
-                  (void)std::memcpy(&t_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
-                  s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg);
+                  c_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_OMF;
+                  c_TxMsg.au8_Data[1] = static_cast<uint8_t>(u32_CountBytes & 0xFFU);
+                  (void)std::memcpy(&c_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
+                  s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_TxMsg);
 
                   if (s32_Return != C_NO_ERR)
                   {
@@ -859,8 +867,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                      // Following frames
                      do
                      {
-                        uint32 u32_BytesForNextMessage =
-                           static_cast<uint32>(un_CountBytes - mc_TxService.u16_TransmissionIndex);
+                        uint32_t u32_BytesForNextMessage =
+                           static_cast<uint32_t>(u32_CountBytes - mc_TxService.u16_TransmissionIndex);
 
                         // Maximum are 7 bytes payload for each message
                         if (u32_BytesForNextMessage > 7U)
@@ -871,15 +879,15 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                         mc_TxService.u8_SequenceNumber++;
                         mc_TxService.u8_SequenceNumber %= 16U;
 
-                        t_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_OMF + mc_TxService.u8_SequenceNumber;
+                        c_TxMsg.au8_Data[0] = mhu8_ISO15765_N_PCI_OMF + mc_TxService.u8_SequenceNumber;
                         //std::vector reference returned by [] is guaranteed to have linear data in memory:
                         //lint -e{670}
-                        (void)std::memcpy(&t_TxMsg.au8_Data[1],
+                        (void)std::memcpy(&c_TxMsg.au8_Data[1],
                                           &mc_TxService.c_ServiceData.c_Data[mc_TxService.u16_TransmissionIndex],
                                           u32_BytesForNextMessage);
 
-                        t_TxMsg.u8_DLC = static_cast<uint8>(u32_BytesForNextMessage + 1U);
-                        s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg);
+                        c_TxMsg.u8_DLC = static_cast<uint8_t>(u32_BytesForNextMessage + 1U);
+                        s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_TxMsg);
                         if (s32_Return != C_NO_ERR)
                         {
                            //We do not handle Tx buffer issues with the OMF-CFs (like we do with regular CFs)
@@ -890,27 +898,28 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                            break;
                         }
 
-                        mc_TxService.u16_TransmissionIndex += static_cast<uint16>(u32_BytesForNextMessage);
+                        mc_TxService.u16_TransmissionIndex += static_cast<uint16_t>(u32_BytesForNextMessage);
                      }
-                     while (mc_TxService.u16_TransmissionIndex < un_CountBytes);
+                     while (mc_TxService.u16_TransmissionIndex < u32_CountBytes);
                   }
                }
                else
                {
                   //multi-frame; compose first frame:
-                  T_STWCAN_Msg_TX t_TxMsg;
-                  t_TxMsg.u32_ID = m_GetTxIdentifier();
-                  t_TxMsg.u8_XTD = 1U;
-                  t_TxMsg.u8_RTR = 0U;
-                  t_TxMsg.u8_DLC = 8U;
+                  T_STWCAN_Msg_TX c_TxMsg;
+                  c_TxMsg.u32_ID = m_GetTxIdentifier();
+                  c_TxMsg.u8_XTD = 1U;
+                  c_TxMsg.u8_RTR = 0U;
+                  c_TxMsg.u8_DLC = 8U;
 
-                  t_TxMsg.au8_Data[0] = static_cast<uint8>(mhu8_ISO15765_N_PCI_FF +
-                                                           ((mc_TxService.c_ServiceData.c_Data.size() >> 8U) & 0x0FU));
-                  t_TxMsg.au8_Data[1] = static_cast<uint8>(mc_TxService.c_ServiceData.c_Data.size() & 0xFFU);
-                  (void)std::memcpy(&t_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
+                  c_TxMsg.au8_Data[0] = static_cast<uint8_t>(mhu8_ISO15765_N_PCI_FF +
+                                                             ((mc_TxService.c_ServiceData.c_Data.size() >> 8U) &
+                                                              0x0FU));
+                  c_TxMsg.au8_Data[1] = static_cast<uint8_t>(mc_TxService.c_ServiceData.c_Data.size() & 0xFFU);
+                  (void)std::memcpy(&c_TxMsg.au8_Data[2], &mc_TxService.c_ServiceData.c_Data[0], 6U);
                   mc_TxService.u16_TransmissionIndex = 6U;
                   mc_TxService.u8_SequenceNumber = 1U;
-                  s32_Return = mpc_CanDispatcher->CAN_Send_Msg(t_TxMsg);
+                  s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_TxMsg);
                   if (s32_Return != C_NO_ERR)
                   {
                      m_LogWarningWithHeader("Could not send first frame CAN message.", TGL_UTIL_FUNC_ID);
@@ -918,7 +927,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
                   else
                   {
                      mc_TxService.e_Status = C_ServiceState::eWAITING_FOR_FLOW_CONTROL;
-                     mc_TxService.u32_StartTimeMs = TGL_GetTickCount();
+                     mc_TxService.u32_StartTimeMs = TglGetTickCount();
                   }
 
                   break; //not yet finished with this transfer
@@ -929,7 +938,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
       else if (mc_TxService.e_Status == C_ServiceState::eWAITING_FOR_FLOW_CONTROL)
       {
          //check for Tx timeout:
-         if ((TGL_GetTickCount() - mhu16_NBS_TIMEOUTS_MS) > mc_TxService.u32_StartTimeMs)
+         if ((TglGetTickCount() - mhu16_NBS_TIMEOUTS_MS) > mc_TxService.u32_StartTimeMs)
          {
             //transfer timed out ...
             m_LogWarningWithHeader("N_Bs timeout reached before receiving flow control. Aborting ongoing Tx transfer.",
@@ -945,7 +954,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
          //still not finished ?
          if (mc_TxService.e_Status == C_ServiceState::eMORE_CONSECUTIVE_FRAMES_TO_SEND)
          {
-            if (TGL_GetTickCount() > mc_TxService.u32_SendCfTimeout)
+            if (TglGetTickCount() > mc_TxService.u32_SendCfTimeout)
             {
                //transfer timed out ...
                m_LogWarningWithHeader("Could not send all CFs within timeout. Aborting ongoing Tx transfer.",
@@ -960,7 +969,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
       }
 
       //now check Rx messages:
-      T_STWCAN_Msg_RX t_Msg;
+      T_STWCAN_Msg_RX c_Msg;
       //check for incoming messages
       //ignore return value: we cannot be sure some other client did not check before us
       (void)mpc_CanDispatcher->DispatchIncoming();
@@ -969,31 +978,31 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
       s32_Return = C_NO_ERR;
       while (s32_Return == C_NO_ERR)
       {
-         s32_Return = mpc_CanDispatcher->ReadFromQueue(mu16_DispatcherClientHandle, t_Msg);
-         if ((s32_Return == C_NO_ERR) && (t_Msg.u8_DLC > 0U))
+         s32_Return = mpc_CanDispatcher->ReadFromQueue(mu16_DispatcherClientHandle, c_Msg);
+         if ((s32_Return == C_NO_ERR) && (c_Msg.u8_DLC > 0U))
          {
             //return values of frame handler functions are ignored
             //- problem details are reported there in the log
             //- we need to continue parsing incoming data even after a hiccup
-            switch (t_Msg.au8_Data[0] & 0xF0U)
+            switch (c_Msg.au8_Data[0] & 0xF0U)
             {
             case mhu8_ISO15765_N_PCI_SF:
-               (void)m_HandleIncomingSingleFrame(t_Msg);
+               (void)m_HandleIncomingSingleFrame(c_Msg);
                break;
             case mhu8_ISO15765_N_PCI_FF:
-               (void)m_HandleIncomingFirstFrame(t_Msg);
+               (void)m_HandleIncomingFirstFrame(c_Msg);
                break;
             case mhu8_ISO15765_N_PCI_CF:
-               (void)m_HandleIncomingConsecutiveFrame(t_Msg);
+               (void)m_HandleIncomingConsecutiveFrame(c_Msg);
                break;
             case mhu8_ISO15765_N_PCI_FC: // flow control
-               (void)m_HandleIncomingFlowControl(t_Msg);
+               (void)m_HandleIncomingFlowControl(c_Msg);
                break;
             case mhu8_ISO15765_N_PCI_OSF: // openSYDE specific
-               (void)m_HandleIncomingOsySpecificSingleFrame(t_Msg);
+               (void)m_HandleIncomingOsySpecificSingleFrame(c_Msg);
                break;
             case mhu8_ISO15765_N_PCI_OMF:
-               (void)m_HandleIncomingOsySpecificMultiFrame(t_Msg);
+               (void)m_HandleIncomingOsySpecificMultiFrame(c_Msg);
                break;
             default:
                m_LogWarningWithHeader("Unexpected frame type received. Ignoring.", TGL_UTIL_FUNC_ID);
@@ -1022,12 +1031,12 @@ sint32 C_OSCProtocolDriverOsyTpCan::Cycle(void)
    C_NOACT    could not reconfigure Rx filters
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiers(const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier,
-                                                       const C_OSCProtocolDriverOsyNode & orc_ServerIdentifier)
+int32_t C_OscProtocolDriverOsyTpCan::SetNodeIdentifiers(const C_OscProtocolDriverOsyNode & orc_ClientIdentifier,
+                                                        const C_OscProtocolDriverOsyNode & orc_ServerIdentifier)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   s32_Return = C_OSCProtocolDriverOsyTpBase::SetNodeIdentifiers(orc_ClientIdentifier, orc_ServerIdentifier);
+   s32_Return = C_OscProtocolDriverOsyTpBase::SetNodeIdentifiers(orc_ClientIdentifier, orc_ServerIdentifier);
    if ((s32_Return == C_NO_ERR) && (mpc_CanDispatcher != NULL))
    {
       //Clear Rx queue; we are no longer interested in that old stuff:
@@ -1064,16 +1073,16 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiers(const C_OSCProtocolDriver
    C_NOACT    could not reconfigure Rx filters
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiersForBroadcasts(
-   const C_OSCProtocolDriverOsyNode & orc_ClientIdentifier)
+int32_t C_OscProtocolDriverOsyTpCan::SetNodeIdentifiersForBroadcasts(
+   const C_OscProtocolDriverOsyNode & orc_ClientIdentifier)
 {
-   sint32 s32_Return;
-   C_OSCProtocolDriverOsyNode c_ServerId;
+   int32_t s32_Return;
+   C_OscProtocolDriverOsyNode c_ServerId;
 
    c_ServerId.u8_BusIdentifier = orc_ClientIdentifier.u8_BusIdentifier;
-   c_ServerId.u8_NodeIdentifier = C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS;
+   c_ServerId.u8_NodeIdentifier = C_OscProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS;
 
-   s32_Return = C_OSCProtocolDriverOsyTpBase::SetNodeIdentifiers(orc_ClientIdentifier, c_ServerId);
+   s32_Return = C_OscProtocolDriverOsyTpBase::SetNodeIdentifiers(orc_ClientIdentifier, c_ServerId);
    if ((s32_Return == C_NO_ERR) && (mpc_CanDispatcher != NULL))
    {
       //Clear Rx queue; we are no longer interested in that old stuff:
@@ -1103,25 +1112,25 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetNodeIdentifiersForBroadcasts(
    CAN message ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
+uint32_t C_OscProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
 {
-   uint32 u32_Identifier;
+   uint32_t u32_Identifier;
 
    //is routing required ?
    if (mc_ServerId.u8_BusIdentifier == mc_ClientId.u8_BusIdentifier)
    {
       //same bus; no routing -> we use normal fixed addressing
-      u32_Identifier = static_cast<uint32>(0x18DA0000U) +
-                       (static_cast<uint32>(mc_ServerId.u8_NodeIdentifier) << 8U) +
+      u32_Identifier = static_cast<uint32_t>(0x18DA0000U) +
+                       (static_cast<uint32_t>(mc_ServerId.u8_NodeIdentifier) << 8U) +
                        mc_ClientId.u8_NodeIdentifier;
    }
    else
    {
       //different bus; routing -> we use 15765-3 section 8.3 IDs
-      u32_Identifier = static_cast<uint32>(0x1BC00000U) +
-                       (static_cast<uint32>(mc_ClientId.u8_BusIdentifier) << 18U) +
-                       (static_cast<uint32>(mc_ClientId.u8_NodeIdentifier) << 11U) +
-                       (static_cast<uint32>(mc_ServerId.u8_BusIdentifier) << 7U) +
+      u32_Identifier = static_cast<uint32_t>(0x1BC00000U) +
+                       (static_cast<uint32_t>(mc_ClientId.u8_BusIdentifier) << 18U) +
+                       (static_cast<uint32_t>(mc_ClientId.u8_NodeIdentifier) << 11U) +
+                       (static_cast<uint32_t>(mc_ServerId.u8_BusIdentifier) << 7U) +
                        mc_ServerId.u8_NodeIdentifier;
    }
    return u32_Identifier;
@@ -1138,11 +1147,11 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxIdentifier(void) const
    CAN message ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
+uint32_t C_OscProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
 {
-   return static_cast<uint32>(0x18DB0000U +
-                              ((static_cast<uint32>(C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS)) << 8U) +
-                              mc_ClientId.u8_NodeIdentifier);
+   return static_cast<uint32_t>(0x18DB0000U +
+                                ((static_cast<uint32_t>(C_OscProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS)) << 8U) +
+                                mc_ClientId.u8_NodeIdentifier);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1165,9 +1174,9 @@ uint32 C_OSCProtocolDriverOsyTpCan::m_GetTxBroadcastIdentifier(void) const
    C_RANGE    invalid dispatcher handle
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
+int32_t C_OscProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
 {
-   C_CAN_RXFilter c_Filter;
+   C_CanRxFilter c_Filter;
 
    c_Filter.q_RTR = false; //pfuideifi !
    c_Filter.q_RTRMustMatch = true;
@@ -1180,18 +1189,18 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
       if (mc_ServerId.u8_BusIdentifier == mc_ClientId.u8_BusIdentifier)
       {
          //same bus; no routing -> we use normal fixed addressing (physical)
-         c_Filter.u32_Code = static_cast<uint32>(0x18DA0000U) +
-                             (static_cast<uint32>(mc_ClientId.u8_NodeIdentifier) << 8U) +
+         c_Filter.u32_Code = static_cast<uint32_t>(0x18DA0000U) +
+                             (static_cast<uint32_t>(mc_ClientId.u8_NodeIdentifier) << 8U) +
                              mc_ServerId.u8_NodeIdentifier;
          c_Filter.u32_Mask = 0x1FFFFFFFU; //must be exactly for us and from specific sender
       }
       else
       {
          //different bus; routing -> we use 15765-3 section 8.3 IDs
-         c_Filter.u32_Code = static_cast<uint32>(0x1BC00000U) +
-                             (static_cast<uint32>(mc_ServerId.u8_BusIdentifier) << 18U) +
-                             (static_cast<uint32>(mc_ServerId.u8_NodeIdentifier) << 11U) +
-                             (static_cast<uint32>(mc_ClientId.u8_BusIdentifier) << 7U) +
+         c_Filter.u32_Code = static_cast<uint32_t>(0x1BC00000U) +
+                             (static_cast<uint32_t>(mc_ServerId.u8_BusIdentifier) << 18U) +
+                             (static_cast<uint32_t>(mc_ServerId.u8_NodeIdentifier) << 11U) +
+                             (static_cast<uint32_t>(mc_ClientId.u8_BusIdentifier) << 7U) +
                              mc_ClientId.u8_NodeIdentifier;
          c_Filter.u32_Mask = 0x1FFFFFFFU; //must be exactly for us and from specific sender
       }
@@ -1199,8 +1208,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
    else
    {
       //normal fixed addressing physical (responses will not be addresses as broadcasts)
-      c_Filter.u32_Code = static_cast<uint32>(0x18DA0000U) +
-                          (static_cast<uint32>(mc_ClientId.u8_NodeIdentifier) << 8U);
+      c_Filter.u32_Code = static_cast<uint32_t>(0x18DA0000U) +
+                          (static_cast<uint32_t>(mc_ClientId.u8_NodeIdentifier) << 8U);
       c_Filter.u32_Mask = 0x1FFFFF80U; //must be exactly for us; but sender may be anyone
    }
    //lint -e{613}  //caller is responsible for valid dispatcher
@@ -1221,9 +1230,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::m_SetRxFilter(const bool oq_ForBroadcast)
    C_NOACT    could not configure Rx filter
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_Dispatcher)
+int32_t C_OscProtocolDriverOsyTpCan::SetDispatcher(C_CanDispatcher * const opc_Dispatcher)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    //was there a dispatcher installed previously ?
    if (mpc_CanDispatcher != NULL)
@@ -1246,7 +1255,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
       {
          //set reception filters:
          s32_Return = m_SetRxFilter(
-            (mc_ServerId.u8_NodeIdentifier == C_OSCProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS) ? true : false);
+            (mc_ServerId.u8_NodeIdentifier == C_OscProtocolDriverOsyNode::mhu8_NODE_ID_BROADCASTS) ? true : false);
          if (s32_Return != C_NO_ERR)
          {
             s32_Return = C_NOACT;
@@ -1277,11 +1286,11 @@ sint32 C_OSCProtocolDriverOsyTpCan::SetDispatcher(C_CAN_Dispatcher * const opc_D
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
    std::vector<C_BroadcastReadEcuSerialNumberResults> & orc_Responses,
    std::vector<C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    orc_Responses.clear();
    orc_ExtendedResponses.clear();
@@ -1292,14 +1301,14 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
    else
    {
       //set up request
-      C_OSCProtocolDriverOsyService c_Service;
+      C_OscProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
       T_STWCAN_Msg_RX c_Response;
-      sint32 s32_ReturnLocal;
+      int32_t s32_ReturnLocal;
 
       c_Service.c_Data.resize(1);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_READ_SERIAL_NUMBER;
-      m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+      mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
       s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
       if (s32_Return != C_NO_ERR)
@@ -1310,9 +1319,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
       else
       {
          //check for responses
-         const uint32 u32_StartTimeStd = TGL_GetTickCount();
+         const uint32_t u32_StartTimeStd = TglGetTickCount();
 
-         while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTimeStd)
+         while ((TglGetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTimeStd)
          {
             //trigger dispatcher
             //ignore return value: we cannot be sure some other client did not check before us
@@ -1328,14 +1337,14 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                {
                   //looks legit; extract payload ...
                   C_BroadcastReadEcuSerialNumberResults c_Result;
-                  uint8 au8_SerialNumber[6];
+                  uint8_t au8_SerialNumber[6];
                   (void)std::memcpy(&au8_SerialNumber[0], &c_Response.au8_Data[2], 6U);
                   c_Result.c_SerialNumber.SetPosSerialNumber(au8_SerialNumber);
 
                   //extract node-id from sender
                   //must be local addressing ...
                   c_Result.c_SenderId.u8_BusIdentifier = mc_ClientId.u8_BusIdentifier; //same as ours ...
-                  c_Result.c_SenderId.u8_NodeIdentifier = static_cast<uint8>(c_Response.u32_ID & 0x7FU);
+                  c_Result.c_SenderId.u8_NodeIdentifier = static_cast<uint8_t>(c_Response.u32_ID & 0x7FU);
                   orc_Responses.push_back(c_Result);
                }
                else if ((c_Response.u8_DLC == 4U) && (c_Response.au8_Data[0] == (mhu8_ISO15765_N_PCI_SF + 3U)) &&
@@ -1357,13 +1366,13 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
       if (s32_Return == C_NO_ERR)
       {
          bool q_Continue = false;
-         std::map<uint32, C_BroadcastReadEcuSerialNumberExtendedResults> c_UniqueIdToResult;
+         std::map<uint32_t, C_BroadcastReadEcuSerialNumberExtendedResults> c_UniqueIdToResult;
 
          // Send the extended variant
          c_Service.c_Data.resize(3);
          c_Service.c_Data[1] = 0U; // Block number. Start with the first block
          c_Service.c_Data[2] = 0U; // Reserved byte
-         m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+         mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
          do
          {
@@ -1378,9 +1387,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
             else
             {
                //check for responses
-               const uint32 u32_StartTimeExt = TGL_GetTickCount();
+               const uint32_t u32_StartTimeExt = TglGetTickCount();
 
-               while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTimeExt)
+               while ((TglGetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTimeExt)
                {
                   //trigger dispatcher
                   //ignore return value: we cannot be sure some other client did not check before us
@@ -1396,14 +1405,14 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                      {
                         //looks legit; extract payload ...
                         // The block information
-                        const uint8 u8_ReceivedBlockNumber = c_Response.au8_Data[2] & 0x0FU;
-                        const uint8 u8_ReceivedSubNodeId = c_Response.au8_Data[2] >> 4U;
+                        const uint8_t u8_ReceivedBlockNumber = c_Response.au8_Data[2] & 0x0FU;
+                        const uint8_t u8_ReceivedSubNodeId = c_Response.au8_Data[2] >> 4U;
 
                         if (u8_ReceivedBlockNumber == c_Service.c_Data[1])
                         {
-                           const uint32 u32_UniqueId = (static_cast<uint32>(c_Response.au8_Data[3]) << 16U) +
-                                                       (static_cast<uint32>(c_Response.au8_Data[4]) << 8U) +
-                                                       static_cast<uint32>(c_Response.au8_Data[5]);
+                           const uint32_t u32_UniqueId = (static_cast<uint32_t>(c_Response.au8_Data[3]) << 16U) +
+                                                         (static_cast<uint32_t>(c_Response.au8_Data[4]) << 8U) +
+                                                         static_cast<uint32_t>(c_Response.au8_Data[5]);
 
                            // The serial number payload in the last two bytes will contain following information
                            // separated in the different block
@@ -1421,7 +1430,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                               //extract node-id from sender
                               //must be local addressing ...
                               c_ResultExt.c_SenderId.u8_BusIdentifier = mc_ClientId.u8_BusIdentifier; //same as ours ...
-                              c_ResultExt.c_SenderId.u8_NodeIdentifier = static_cast<uint8>(c_Response.u32_ID & 0x7FU);
+                              c_ResultExt.c_SenderId.u8_NodeIdentifier =
+                                 static_cast<uint8_t>(c_Response.u32_ID & 0x7FU);
                               c_ResultExt.u8_SubNodeId = u8_ReceivedSubNodeId;
                               c_ResultExt.c_SerialNumber.u8_SerialNumberByteLength = 0U; // Will be filled in the
                                                                                          // next
@@ -1455,7 +1465,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                            }
                            else
                            {
-                              std::map<uint32, C_BroadcastReadEcuSerialNumberExtendedResults>::iterator c_ItResult;
+                              std::map<uint32_t, C_BroadcastReadEcuSerialNumberExtendedResults>::iterator c_ItResult;
                               // Search the matching extended result to complete the result
                               c_ItResult = c_UniqueIdToResult.find(u32_UniqueId);
 
@@ -1479,7 +1489,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                                           {
                                              // FSN format
                                              rc_CurrentResult.c_SerialNumber.c_SerialNumberExt =
-                                                static_cast<charn>(c_Response.au8_Data[7]);
+                                                static_cast<char_t>(c_Response.au8_Data[7]);
                                           }
                                           else
                                           {
@@ -1500,8 +1510,8 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                                        // Building the serial number
                                        // The first block has no part of the serial number and the
                                        // second block had only the first sign.
-                                       const uint8 u8_SnrBlock = u8_ReceivedBlockNumber - 2U;
-                                       uint32 u32_NextSnrSignIndex = (static_cast<uint32>(u8_SnrBlock) * 2U) + 1U;
+                                       const uint8_t u8_SnrBlock = u8_ReceivedBlockNumber - 2U;
+                                       uint32_t u32_NextSnrSignIndex = (static_cast<uint32_t>(u8_SnrBlock) * 2U) + 1U;
 
                                        if (u32_NextSnrSignIndex <
                                            rc_CurrentResult.c_SerialNumber.u8_SerialNumberByteLength)
@@ -1510,7 +1520,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                                           {
                                              // FSN format
                                              rc_CurrentResult.c_SerialNumber.c_SerialNumberExt +=
-                                                static_cast<charn>(c_Response.au8_Data[6]);
+                                                static_cast<char_t>(c_Response.au8_Data[6]);
                                           }
                                           else if (u32_NextSnrSignIndex < 6)
                                           {
@@ -1535,7 +1545,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                                           if (rc_CurrentResult.c_SerialNumber.q_FsnSerialNumber == true)
                                           {
                                              rc_CurrentResult.c_SerialNumber.c_SerialNumberExt +=
-                                                static_cast<charn>(c_Response.au8_Data[7]);
+                                                static_cast<char_t>(c_Response.au8_Data[7]);
                                           }
                                           else if (u32_NextSnrSignIndex < 6U)
                                           {
@@ -1613,7 +1623,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
                {
                   // Next bock number for next request
                   c_Service.c_Data[1] = c_Service.c_Data[1] + 1U;
-                  m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+                  mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
                }
             }
          }
@@ -1622,7 +1632,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
          // Add the extended results to the output
          if (s32_Return == C_NO_ERR)
          {
-            std::map<uint32, C_BroadcastReadEcuSerialNumberExtendedResults>::iterator c_ItResult;
+            std::map<uint32_t, C_BroadcastReadEcuSerialNumberExtendedResults>::iterator c_ItResult;
 
             for (c_ItResult = c_UniqueIdToResult.begin(); c_ItResult != c_UniqueIdToResult.end(); ++c_ItResult)
             {
@@ -1673,10 +1683,10 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastReadSerialNumber(
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    std::vector<C_BroadcastRequestProgrammingResults> & orc_Results) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    orc_Results.clear();
    if (mpc_CanDispatcher == NULL)
@@ -1686,14 +1696,14 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    else
    {
       //set up request
-      C_OSCProtocolDriverOsyService c_Service;
+      C_OscProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
       c_Service.c_Data.resize(4);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_ROUTINE_CONTROL;
       c_Service.c_Data[1] = mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE;
-      c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_REQUEST_PROGRAMMING >> 8U);
-      c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_REQUEST_PROGRAMMING & 0xFFU);
-      m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+      c_Service.c_Data[2] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_REQUEST_PROGRAMMING >> 8U);
+      c_Service.c_Data[3] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_REQUEST_PROGRAMMING & 0xFFU);
+      mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
       s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
       if (s32_Return != C_NO_ERR)
@@ -1704,12 +1714,13 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
       else
       {
          //check for responses
-         const uint32 u32_StartTime = TGL_GetTickCount();
+         const uint32_t u32_StartTime = TglGetTickCount();
          T_STWCAN_Msg_RX c_Response;
-         sint32 s32_ReturnLocal;
 
-         while ((TGL_GetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
+         while ((TglGetTickCount() - mu32_BroadcastTimeoutMs) < u32_StartTime)
          {
+            int32_t s32_ReturnLocal;
+
             //trigger dispatcher
             //ignore return value: we cannot be sure some other client did not check before us
             (void)mpc_CanDispatcher->DispatchIncoming();
@@ -1746,7 +1757,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
                   //extract node-id from sender
                   //must be local addressing ...
                   c_Result.c_SenderId.u8_BusIdentifier = mc_ClientId.u8_BusIdentifier; //same as ours ...
-                  c_Result.c_SenderId.u8_NodeIdentifier = static_cast<uint8>(c_Response.u32_ID & 0x7FU);
+                  c_Result.c_SenderId.u8_NodeIdentifier = static_cast<uint8_t>(c_Response.u32_ID & 0x7FU);
                   orc_Results.push_back(c_Result);
                }
             }
@@ -1790,18 +1801,18 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastRequestProgramming(
    C_OVERFLOW  multiple positive responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                                                     const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-                                                                     uint8 * const opu8_NrCode) const
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(
+   const C_OscProtocolSerialNumber & orc_SerialNumber, const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+   uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (mpc_CanDispatcher == NULL)
    {
       s32_Return = C_CONFIG;
    }
-   else if ((orc_NewNodeId.u8_BusIdentifier > C_OSCProtocolDriverOsyNode::mhu8_MAX_BUS) ||
-            (orc_NewNodeId.u8_NodeIdentifier >= C_OSCProtocolDriverOsyNode::mhu8_MAX_NODE) ||
+   else if ((orc_NewNodeId.u8_BusIdentifier > C_OscProtocolDriverOsyNode::mhu8_MAX_BUS) ||
+            (orc_NewNodeId.u8_NodeIdentifier >= C_OscProtocolDriverOsyNode::mhu8_MAX_NODE) ||
             (orc_SerialNumber.q_IsValid == false) ||
             (orc_SerialNumber.q_ExtFormatUsed == true))
    {
@@ -1810,17 +1821,17 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const C_OSC
    else
    {
       //set up request
-      C_OSCProtocolDriverOsyService c_Service;
+      C_OscProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
       c_Service.c_Data.resize(7);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_ROUTINE_CONTROL;
       c_Service.c_Data[1] = mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE;
-      c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1 >> 8U);
-      c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1 & 0xFFU);
+      c_Service.c_Data[2] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1 >> 8U);
+      c_Service.c_Data[3] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART1 & 0xFFU);
       c_Service.c_Data[4] = orc_SerialNumber.au8_SerialNumber[0];
       c_Service.c_Data[5] = orc_SerialNumber.au8_SerialNumber[1];
       c_Service.c_Data[6] = orc_SerialNumber.au8_SerialNumber[2];
-      m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+      mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
       s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
       if (s32_Return != C_NO_ERR)
@@ -1830,12 +1841,12 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const C_OSC
       }
       else
       {
-         c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2 >> 8U);
-         c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2 & 0xFFU);
+         c_Service.c_Data[2] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2 >> 8U);
+         c_Service.c_Data[3] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART2 & 0xFFU);
          c_Service.c_Data[4] = orc_SerialNumber.au8_SerialNumber[3];
          c_Service.c_Data[5] = orc_SerialNumber.au8_SerialNumber[4];
          c_Service.c_Data[6] = orc_SerialNumber.au8_SerialNumber[5];
-         m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+         mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
          s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
          if (s32_Return != C_NO_ERR)
@@ -1848,11 +1859,11 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const C_OSC
             c_Service.c_Data.resize(6);
             c_Service.c_Data[0] = mhu8_OSY_BC_SI_ROUTINE_CONTROL;
             c_Service.c_Data[1] = mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE;
-            c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3 >> 8U);
-            c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3 & 0xFFU);
+            c_Service.c_Data[2] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3 >> 8U);
+            c_Service.c_Data[3] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_PART3 & 0xFFU);
             c_Service.c_Data[4] = orc_NewNodeId.u8_BusIdentifier;
             c_Service.c_Data[5] = orc_NewNodeId.u8_NodeIdentifier;
-            m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+            mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
             s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
             if (s32_Return != C_NO_ERR)
@@ -1908,18 +1919,18 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumber(const C_OSC
    C_OVERFLOW  multiple positive responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
-   const C_OSCProtocolSerialNumber & orc_SerialNumber, const uint8 ou8_SubNodeId,
-   const C_OSCProtocolDriverOsyNode & orc_NewNodeId, uint8 * const opu8_NrCode) const
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
+   const C_OscProtocolSerialNumber & orc_SerialNumber, const uint8_t ou8_SubNodeId,
+   const C_OscProtocolDriverOsyNode & orc_NewNodeId, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (mpc_CanDispatcher == NULL)
    {
       s32_Return = C_CONFIG;
    }
-   else if ((orc_NewNodeId.u8_BusIdentifier > C_OSCProtocolDriverOsyNode::mhu8_MAX_BUS) ||
-            (orc_NewNodeId.u8_NodeIdentifier >= C_OSCProtocolDriverOsyNode::mhu8_MAX_NODE) ||
+   else if ((orc_NewNodeId.u8_BusIdentifier > C_OscProtocolDriverOsyNode::mhu8_MAX_BUS) ||
+            (orc_NewNodeId.u8_NodeIdentifier >= C_OscProtocolDriverOsyNode::mhu8_MAX_NODE) ||
             (orc_SerialNumber.q_IsValid == false) ||
             (orc_SerialNumber.q_ExtFormatUsed == false))
    {
@@ -1939,20 +1950,20 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
       // -- SerialNumber (1 .. 29 bytes)
 
       //set up request
-      C_OSCProtocolDriverOsyService c_Service;
+      C_OscProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
-      uint16 u16_PartCounter = 0U;
-      uint8 u8_SerialNumberBytesSent = 0U;
-      const std::vector<uint8> c_RawSerialNumber = orc_SerialNumber.GetSerialNumberAsRawData();
+      uint16_t u16_PartCounter = 0U;
+      uint8_t u8_SerialNumberBytesSent = 0U;
+      const std::vector<uint8_t> c_RawSerialNumber = orc_SerialNumber.GetSerialNumberAsRawData();
       c_Service.c_Data.resize(7);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_ROUTINE_CONTROL;
       c_Service.c_Data[1] = mhu8_OSY_BC_RC_SUB_FUNCTION_START_ROUTINE;
-      c_Service.c_Data[2] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START >> 8U);
+      c_Service.c_Data[2] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START >> 8U);
 
       do
       {
-         c_Service.c_Data[3] = static_cast<uint8>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START & 0xFFU) +
-                               static_cast<uint8>(u16_PartCounter);
+         c_Service.c_Data[3] = static_cast<uint8_t>(mhu16_OSY_BC_RC_SID_SET_NODEID_BY_SERIALNUMBER_EXT_START & 0xFFU) +
+                               static_cast<uint8_t>(u16_PartCounter);
 
          if (u16_PartCounter == 0U)
          {
@@ -1969,21 +1980,21 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
          else
          {
             // Now the serial number will be part of the parts
-            const uint8 u8_BytesLeft = orc_SerialNumber.u8_SerialNumberByteLength - u8_SerialNumberBytesSent;
-            const uint8 u8_BytesToCopy = (u8_BytesLeft >= 3U) ? 3U : (u8_BytesLeft % 3U);
+            const uint8_t u8_BytesLeft = orc_SerialNumber.u8_SerialNumberByteLength - u8_SerialNumberBytesSent;
+            const uint8_t u8_BytesToCopy = (u8_BytesLeft >= 3U) ? 3U : (u8_BytesLeft % 3U);
 
             if (u8_BytesToCopy < 3U)
             {
                // Set the not needed bytes to 0
-               memset(&c_Service.c_Data[static_cast<uintn>(u8_BytesToCopy) + 4U], 0U,
-                      3U - static_cast<uintn>(u8_BytesToCopy));
+               memset(&c_Service.c_Data[static_cast<uint32_t>(u8_BytesToCopy) + 4U], 0U,
+                      3U - static_cast<uint32_t>(u8_BytesToCopy));
             }
 
             memcpy(&c_Service.c_Data[4], &c_RawSerialNumber[u8_SerialNumberBytesSent], u8_BytesToCopy);
             u8_SerialNumberBytesSent += u8_BytesToCopy;
          }
 
-         m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+         mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
          s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
          if (s32_Return != C_NO_ERR)
@@ -2034,9 +2045,9 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8 ou8_ResetType) const
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8_t ou8_ResetType) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (mpc_CanDispatcher == NULL)
    {
@@ -2045,12 +2056,12 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8 ou8_ResetType)
    else
    {
       //set up request
-      C_OSCProtocolDriverOsyService c_Service;
+      C_OscProtocolDriverOsyService c_Service;
       T_STWCAN_Msg_TX c_Msg;
       c_Service.c_Data.resize(2);
       c_Service.c_Data[0] = mhu8_OSY_BC_SI_ECU_RESET;
       c_Service.c_Data[1] = ou8_ResetType;
-      m_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
+      mh_ComposeSingleFrame(c_Service, m_GetTxBroadcastIdentifier(), c_Msg);
 
       s32_Return = mpc_CanDispatcher->CAN_Send_Msg(c_Msg);
       if (s32_Return != C_NO_ERR)
@@ -2076,7 +2087,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastEcuReset(const uint8 ou8_ResetType)
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterPreProgrammingSession(void) const
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastSendEnterPreProgrammingSession(void) const
 {
    return this->m_BroadcastSendDiagnosticSessionControl(0x60U);
 }
@@ -2095,7 +2106,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterPreProgrammingSession(void
    C_CONFIG   no dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterDefaultSession(void) const
+int32_t C_OscProtocolDriverOsyTpCan::BroadcastSendEnterDefaultSession(void) const
 {
    return this->m_BroadcastSendDiagnosticSessionControl(0x01U);
 }
@@ -2104,7 +2115,7 @@ sint32 C_OSCProtocolDriverOsyTpCan::BroadcastSendEnterDefaultSession(void) const
 /*! \brief   Dump all messages of receive queue of CAN dispatcher
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProtocolDriverOsyTpCan::ClearDispatcherQueue(void)
+void C_OscProtocolDriverOsyTpCan::ClearDispatcherQueue(void)
 {
    if (this->mpc_CanDispatcher != NULL)
    {
@@ -2122,12 +2133,12 @@ void C_OSCProtocolDriverOsyTpCan::ClearDispatcherQueue(void)
    \param[in]     opcn_Function       function name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProtocolDriverOsyTpCan::m_LogWarningWithHeader(const stw_scl::C_SCLString & orc_Information,
-                                                         const charn * const opcn_Function) const
+void C_OscProtocolDriverOsyTpCan::m_LogWarningWithHeader(const stw::scl::C_SclString & orc_Information,
+                                                         const char_t * const opcn_Function) const
 {
-   C_OSCLoggingHandler::h_WriteLogError("openSYDE CAN-TP", "openSYDE CAN-TP node " + C_SCLString::IntToStr(
+   C_OscLoggingHandler::h_WriteLogError("openSYDE CAN-TP", "openSYDE CAN-TP node " + C_SclString::IntToStr(
                                            mc_ServerId.u8_BusIdentifier) + "." +
-                                        C_SCLString::IntToStr(
+                                        C_SclString::IntToStr(
                                            mc_ServerId.u8_NodeIdentifier) + ": " + orc_Information, __FILE__,
                                         opcn_Function);
 }

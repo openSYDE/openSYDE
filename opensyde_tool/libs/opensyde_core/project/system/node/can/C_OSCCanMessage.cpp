@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <map>
 
-#include "C_OSCCanMessage.h"
-#include "CSCLChecksums.h"
+#include "C_OscCanMessage.hpp"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +38,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanMessage::C_OSCCanMessage(void) :
+C_OscCanMessage::C_OscCanMessage(void) :
    c_Name("NewMessage"),
    c_Comment(""),
    u32_CanId(0x7FF),
@@ -48,10 +48,11 @@ C_OSCCanMessage::C_OSCCanMessage(void) :
    u32_CycleTimeMs(100),
    u16_DelayTimeMs(10),
    u32_TimeoutMs(310),
-   q_CanOpenManagerCobIdIncludesNodeID(true),
+   q_CanOpenManagerCobIdIncludesNodeId(true),
    u32_CanOpenManagerCobIdOffset(0),
    q_CanOpenManagerMessageActive(true),
-   u16_CanOpenManagerPdoIndex(0)
+   u16_CanOpenManagerPdoIndex(0),
+   u8_CanOpenTxMethodAdditionalInfo(0)
 {
 }
 
@@ -65,7 +66,7 @@ C_OSCCanMessage::C_OSCCanMessage(void) :
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessage::operator !=(const C_OSCCanMessage & orc_Cmp) const
+bool C_OscCanMessage::operator !=(const C_OscCanMessage & orc_Cmp) const
 {
    bool q_Return = false;
 
@@ -78,6 +79,12 @@ bool C_OSCCanMessage::operator !=(const C_OSCCanMessage & orc_Cmp) const
        (this->u32_CycleTimeMs != orc_Cmp.u32_CycleTimeMs) ||
        (this->u16_DelayTimeMs != orc_Cmp.u16_DelayTimeMs) ||
        (this->u32_TimeoutMs   != orc_Cmp.u32_TimeoutMs) ||
+       (this->c_CanOpenManagerOwnerNodeIndex   != orc_Cmp.c_CanOpenManagerOwnerNodeIndex) ||
+       (this->q_CanOpenManagerCobIdIncludesNodeId   != orc_Cmp.q_CanOpenManagerCobIdIncludesNodeId) ||
+       (this->u32_CanOpenManagerCobIdOffset   != orc_Cmp.u32_CanOpenManagerCobIdOffset) ||
+       (this->q_CanOpenManagerMessageActive   != orc_Cmp.q_CanOpenManagerMessageActive) ||
+       (this->u16_CanOpenManagerPdoIndex   != orc_Cmp.u16_CanOpenManagerPdoIndex) ||
+       (this->u8_CanOpenTxMethodAdditionalInfo   != orc_Cmp.u8_CanOpenTxMethodAdditionalInfo) ||
        (this->c_Signals       != orc_Cmp.c_Signals))
    {
       q_Return = true;
@@ -96,21 +103,21 @@ bool C_OSCCanMessage::operator !=(const C_OSCCanMessage & orc_Cmp) const
                                        to allow compatibility with existing hash values from R20 release
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compatible) const
+void C_OscCanMessage::CalcHash(uint32_t & oru32_HashValue, const bool oq_R20Compatible) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_CanId, sizeof(this->u32_CanId), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_IsExtended, sizeof(this->q_IsExtended), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_Dlc, sizeof(this->u16_Dlc), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_TxMethod, sizeof(this->e_TxMethod), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_CycleTimeMs, sizeof(this->u32_CycleTimeMs), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_DelayTimeMs, sizeof(this->u16_DelayTimeMs),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_TimeoutMs, sizeof(this->u32_TimeoutMs),
-                                      oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_CanId, sizeof(this->u32_CanId), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_IsExtended, sizeof(this->q_IsExtended), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_Dlc, sizeof(this->u16_Dlc), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_TxMethod, sizeof(this->e_TxMethod), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_CycleTimeMs, sizeof(this->u32_CycleTimeMs), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u16_DelayTimeMs, sizeof(this->u16_DelayTimeMs),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_TimeoutMs, sizeof(this->u32_TimeoutMs),
+                                       oru32_HashValue);
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->c_Signals.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->c_Signals.size(); ++u32_Counter)
    {
       this->c_Signals[u32_Counter].CalcHash(oru32_HashValue, oq_R20Compatible);
    }
@@ -118,18 +125,21 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compat
    {
       this->c_CanOpenManagerOwnerNodeIndex.CalcHash(oru32_HashValue);
 
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->q_CanOpenManagerCobIdIncludesNodeID,
-                                         sizeof(this->q_CanOpenManagerCobIdIncludesNodeID),
-                                         oru32_HashValue);
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_CanOpenManagerCobIdOffset,
-                                         sizeof(this->u32_CanOpenManagerCobIdOffset),
-                                         oru32_HashValue);
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->q_CanOpenManagerMessageActive,
-                                         sizeof(this->q_CanOpenManagerMessageActive),
-                                         oru32_HashValue);
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->u16_CanOpenManagerPdoIndex,
-                                         sizeof(this->u16_CanOpenManagerPdoIndex),
-                                         oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->q_CanOpenManagerCobIdIncludesNodeId,
+                                          sizeof(this->q_CanOpenManagerCobIdIncludesNodeId),
+                                          oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->u32_CanOpenManagerCobIdOffset,
+                                          sizeof(this->u32_CanOpenManagerCobIdOffset),
+                                          oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->q_CanOpenManagerMessageActive,
+                                          sizeof(this->q_CanOpenManagerMessageActive),
+                                          oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->u16_CanOpenManagerPdoIndex,
+                                          sizeof(this->u16_CanOpenManagerPdoIndex),
+                                          oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->u8_CanOpenTxMethodAdditionalInfo,
+                                          sizeof(this->u8_CanOpenTxMethodAdditionalInfo),
+                                          oru32_HashValue);
    }
 }
 
@@ -139,8 +149,8 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compat
    \param[in]  opc_List                               Node data pool list containing signal data
                                                       (Optional as it is only required by some checks)
    \param[in]  oru32_SignalIndex                      Signal index
-   \param[in]  ou32_CANMessageValidSignalsDLCOffset   CAN message DLC offset for valid signal range check
-   \param[in]  oq_CANMessageSignalGapsValid           Flag if gaps between signals are valid or handled as errors
+   \param[in]  ou32_CanMessageValidSignalsDlcOffset   CAN message DLC offset for valid signal range check
+   \param[in]  oq_CanMessageSignalGapsValid           Flag if gaps between signals are valid or handled as errors
    \param[in]  oq_ByteAlignmentRequired               Flag if byte alignment is required and if the signal does not
                                                       fit into byte alignment it will be handled as error
 
@@ -149,9 +159,9 @@ void C_OSCCanMessage::CalcHash(uint32 & oru32_HashValue, const bool oq_R20Compat
    False No error
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_List, const uint32 & oru32_SignalIndex,
-                                       const uint32 ou32_CANMessageValidSignalsDLCOffset,
-                                       const bool oq_CANMessageSignalGapsValid,
+bool C_OscCanMessage::CheckErrorSignal(const C_OscNodeDataPoolList * const opc_List, const uint32_t & oru32_SignalIndex,
+                                       const uint32_t ou32_CanMessageValidSignalsDlcOffset,
+                                       const bool oq_CanMessageSignalGapsValid,
                                        const bool oq_ByteAlignmentRequired) const
 {
    bool q_Retval = false;
@@ -167,10 +177,10 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
       bool q_NoMultiplexerButMultiplexed;
       bool q_MultiplexedValueOutOfRange;
       //Get Hash for all relevant data
-      const std::vector<uint32> c_Hashes = this->m_GetSignalHashes(opc_List, oru32_SignalIndex);
-      static std::map<std::vector<uint32>, bool> hc_PreviousResults;
+      const std::vector<uint32_t> c_Hashes = this->m_GetSignalHashes(opc_List, oru32_SignalIndex);
+      static std::map<std::vector<uint32_t>, bool> hc_PreviousResults;
       //Check if check was already performed in the past
-      const std::map<std::vector<uint32>, bool>::const_iterator c_It = hc_PreviousResults.find(c_Hashes);
+      const std::map<std::vector<uint32_t>, bool>::const_iterator c_It = hc_PreviousResults.find(c_Hashes);
 
       if (c_It == hc_PreviousResults.end())
       {
@@ -183,8 +193,8 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
                                         &q_ByteAlignmentLengthConflict, &q_ByteAlignmentStartbitConflict,
                                         &q_NameConflict, &q_NameInvalid, &q_MinOverMax, &q_ValueBelowMin,
                                         &q_ValueOverMax, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
-                                        ou32_CANMessageValidSignalsDLCOffset,
-                                        oq_CANMessageSignalGapsValid,
+                                        ou32_CanMessageValidSignalsDlcOffset,
+                                        oq_CanMessageSignalGapsValid,
                                         oq_ByteAlignmentRequired);
          if ((q_MultiplexedValueOutOfRange == false) &&
              (q_NoMultiplexerButMultiplexed == false) &&
@@ -227,8 +237,8 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
                                         &q_NameConflict,
                                         NULL, NULL,
                                         NULL, NULL, &q_NoMultiplexerButMultiplexed, &q_MultiplexedValueOutOfRange,
-                                        ou32_CANMessageValidSignalsDLCOffset,
-                                        oq_CANMessageSignalGapsValid,
+                                        ou32_CanMessageValidSignalsDlcOffset,
+                                        oq_CanMessageSignalGapsValid,
                                         oq_ByteAlignmentRequired);
          if ((q_NameConflict == true) ||
              (q_LayoutConflict == true) ||
@@ -260,7 +270,7 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    \param[out]  opq_LayoutConflict                    Layout conflict
    \param[out]  opq_BorderConflict                    Border not usable as variable
    \param[out]  opq_GapConflict                       Gap between signals found and
-                                                      oq_CANMessageSignalGapsValid is false
+                                                      oq_CanMessageSignalGapsValid is false
    \param[out]  opq_ByteAlignmentLengthConflict       Length of signal is not compatible to byte alignment and
                                                       oq_ByteAlignmentRequired is true
    \param[out]  opq_ByteAlignmentStartbitConflict     Start bit of signal is not compatible to byte alignment and
@@ -272,14 +282,14 @@ bool C_OSCCanMessage::CheckErrorSignal(const C_OSCNodeDataPoolList * const opc_L
    \param[out]  opq_ValueOverMax                      Init value over maximum
    \param[out]  opq_NoMultiplexerButMultiplexed       Multiplexed signal(s) but no multiplexer
    \param[out]  opq_MultiplexedValueOutOfRange        Multiplexed signal multiplexer value out of range of multiplexer
-   \param[in]   ou32_CANMessageValidSignalsDLCOffset  CAN message DLC offset for valid signal range check
-   \param[in]   oq_CANMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
+   \param[in]   ou32_CanMessageValidSignalsDlcOffset  CAN message DLC offset for valid signal range check
+   \param[in]   oq_CanMessageSignalGapsValid          Flag if gaps between signals are valid or handled as errors
    \param[in]   oq_ByteAlignmentRequired              Flag if byte alignment is required and if the signal does not
                                                       fit into byte alignment it will be handled as error
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * const opc_List,
-                                               const uint32 & oru32_SignalIndex, bool * const opq_LayoutConflict,
+void C_OscCanMessage::CheckErrorSignalDetailed(const C_OscNodeDataPoolList * const opc_List,
+                                               const uint32_t & oru32_SignalIndex, bool * const opq_LayoutConflict,
                                                bool * const opq_BorderConflict, bool * const opq_GapConflict,
                                                bool * const opq_ByteAlignmentLengthConflict,
                                                bool * const opq_ByteAlignmentStartbitConflict,
@@ -288,8 +298,8 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
                                                bool * const opq_ValueOverMax,
                                                bool * const opq_NoMultiplexerButMultiplexed,
                                                bool * const opq_MultiplexedValueOutOfRange,
-                                               const uint32 ou32_CANMessageValidSignalsDLCOffset,
-                                               const bool oq_CANMessageSignalGapsValid,
+                                               const uint32_t ou32_CanMessageValidSignalsDlcOffset,
+                                               const bool oq_CanMessageSignalGapsValid,
                                                const bool oq_ByteAlignmentRequired) const
 {
    if (opq_LayoutConflict != NULL)
@@ -345,30 +355,30 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
    {
       if (oru32_SignalIndex < this->c_Signals.size())
       {
-         const C_OSCCanSignal & rc_CheckedSignal = this->c_Signals[oru32_SignalIndex];
+         const C_OscCanSignal & rc_CheckedSignal = this->c_Signals[oru32_SignalIndex];
          if (opq_LayoutConflict != NULL)
          {
-            std::set<uint16> c_CheckedSetPositions;
+            std::set<uint16_t> c_CheckedSetPositions;
             rc_CheckedSignal.GetDataBytesBitPositionsOfSignal(c_CheckedSetPositions);
-            for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+            for (uint32_t u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
             {
-               const C_OSCCanSignal & rc_CurrentSignal = c_Signals[u32_ItSignal];
+               const C_OscCanSignal & rc_CurrentSignal = c_Signals[u32_ItSignal];
                //Skip current signal
                if (u32_ItSignal != oru32_SignalIndex)
                {
                   //Check relevant conflict
                   //Basically: Not relevant if both are multiplexed and have different multiplexer values
-                  if ((((rc_CheckedSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
-                        (rc_CurrentSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)) &&
+                  if ((((rc_CheckedSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                        (rc_CurrentSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)) &&
                        (rc_CheckedSignal.u16_MultiplexValue != rc_CurrentSignal.u16_MultiplexValue)) == false)
                   {
-                     std::set<uint16> c_CurrentSetPositions;
+                     std::set<uint16_t> c_CurrentSetPositions;
                      rc_CurrentSignal.GetDataBytesBitPositionsOfSignal(c_CurrentSetPositions);
-                     for (std::set<uint16>::const_iterator c_ItCurrentPosition = c_CurrentSetPositions.begin();
+                     for (std::set<uint16_t>::const_iterator c_ItCurrentPosition = c_CurrentSetPositions.begin();
                           c_ItCurrentPosition != c_CurrentSetPositions.end();
                           ++c_ItCurrentPosition)
                      {
-                        for (std::set<uint16>::const_iterator c_ItCheckedPosition = c_CheckedSetPositions.begin();
+                        for (std::set<uint16_t>::const_iterator c_ItCheckedPosition = c_CheckedSetPositions.begin();
                              c_ItCheckedPosition != c_CheckedSetPositions.end();
                              ++c_ItCheckedPosition)
                         {
@@ -390,16 +400,16 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
          }
          if (opq_BorderConflict != NULL)
          {
-            if (static_cast<uint16>(ou32_CANMessageValidSignalsDLCOffset) <= this->u16_Dlc)
+            if (static_cast<uint16_t>(ou32_CanMessageValidSignalsDlcOffset) <= this->u16_Dlc)
             {
-               std::set<uint16> c_SetPositions;
+               std::set<uint16_t> c_SetPositions;
                //Check over end (after dlc)
                rc_CheckedSignal.GetDataBytesBitPositionsOfSignal(c_SetPositions);
-               for (std::set<uint16>::const_iterator c_ItPosition = c_SetPositions.begin();
+               for (std::set<uint16_t>::const_iterator c_ItPosition = c_SetPositions.begin();
                     c_ItPosition != c_SetPositions.end(); ++c_ItPosition)
                {
-                  const uint16 u16_MaxPosition = static_cast<uint16>
-                                                 (((this->u16_Dlc - ou32_CANMessageValidSignalsDLCOffset) * 8U) - 1U);
+                  const uint16_t u16_MaxPosition = static_cast<uint16_t>
+                                                   (((this->u16_Dlc - ou32_CanMessageValidSignalsDlcOffset) * 8U) - 1U);
                   if ((*c_ItPosition) > u16_MaxPosition)
                   {
                      *opq_BorderConflict = true;
@@ -413,13 +423,13 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             }
          }
          if ((opq_GapConflict != NULL)  &&
-             (oq_CANMessageSignalGapsValid == false))
+             (oq_CanMessageSignalGapsValid == false))
          {
             bool q_NoCheckNecessary = false;
-            uint16 u16_RelevantBitPos;
+            uint16_t u16_RelevantBitPos;
 
             *opq_GapConflict = true;
-            if (rc_CheckedSignal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+            if (rc_CheckedSignal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
             {
                if (rc_CheckedSignal.u16_ComBitStart > 0U)
                {
@@ -435,14 +445,14 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             }
             else
             {
-               const uint16 u16_ComBitStartModulo = rc_CheckedSignal.u16_ComBitStart % 8U;
+               const uint16_t u16_ComBitStartModulo = rc_CheckedSignal.u16_ComBitStart % 8U;
                if ((u16_ComBitStartModulo + 1U) <= rc_CheckedSignal.u16_ComBitLength)
                {
                   // Needs all lower bits of the byte, so the first bit before the message is in the byte before
                   if (rc_CheckedSignal.u16_ComBitStart >= 8U)
                   {
                      u16_RelevantBitPos =
-                        static_cast<uint16>(rc_CheckedSignal.u16_ComBitStart - u16_ComBitStartModulo) -
+                        static_cast<uint16_t>(rc_CheckedSignal.u16_ComBitStart - u16_ComBitStartModulo) -
                         1U;
                   }
                   else
@@ -463,9 +473,9 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             {
                // The signal shall not have a gap before its start bit
                // Comparing with the other signals
-               for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+               for (uint32_t u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
                {
-                  const C_OSCCanSignal & rc_CurrentSignal = c_Signals[u32_ItSignal];
+                  const C_OscCanSignal & rc_CurrentSignal = c_Signals[u32_ItSignal];
                   //Skip current signal
                   if (u32_ItSignal != oru32_SignalIndex)
                   {
@@ -501,7 +511,7 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             }
             if (opq_ByteAlignmentStartbitConflict != NULL)
             {
-               if (rc_CheckedSignal.e_ComByteOrder == C_OSCCanSignal::eBYTE_ORDER_INTEL)
+               if (rc_CheckedSignal.e_ComByteOrder == C_OscCanSignal::eBYTE_ORDER_INTEL)
                {
                   // Intel byte order needs the first bit of the byte as start bit
                   *opq_ByteAlignmentStartbitConflict = ((rc_CheckedSignal.u16_ComBitStart % 8U) != 0);
@@ -528,17 +538,17 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
             {
                if (rc_CheckedSignal.u32_ComDataElementIndex < opc_List->c_Elements.size())
                {
-                  const C_OSCNodeDataPoolListElement & rc_CurrentElement =
+                  const C_OscNodeDataPoolListElement & rc_CurrentElement =
                      opc_List->c_Elements[rc_CheckedSignal.u32_ComDataElementIndex];
-                  for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+                  for (uint32_t u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
                   {
-                     const C_OSCCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
+                     const C_OscCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
                      //Skip current signal
                      if (u32_ItSignal != oru32_SignalIndex)
                      {
                         if (rc_SignalData.u32_ComDataElementIndex < opc_List->c_Elements.size())
                         {
-                           const C_OSCNodeDataPoolListElement & rc_ListElement =
+                           const C_OscNodeDataPoolListElement & rc_ListElement =
                               opc_List->c_Elements[rc_SignalData.u32_ComDataElementIndex];
                            if (rc_CurrentElement.c_Name.LowerCase() == rc_ListElement.c_Name.LowerCase())
                            {
@@ -554,10 +564,10 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
          if (opq_NoMultiplexerButMultiplexed != NULL)
          {
             //Check contains multiplexer
-            if (C_OSCCanMessage::h_ContainsMultiplexer(this->c_Signals) == false)
+            if (C_OscCanMessage::h_ContainsMultiplexer(this->c_Signals) == false)
             {
                //Check is multiplexed
-               if (rc_CheckedSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+               if (rc_CheckedSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
                {
                   *opq_NoMultiplexerButMultiplexed = true;
                }
@@ -566,22 +576,22 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
          if (opq_MultiplexedValueOutOfRange != NULL)
          {
             //Only relevant for multiplexed signals
-            if (rc_CheckedSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            if (rc_CheckedSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
                //Find multiplexer
-               for (uint32 u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
+               for (uint32_t u32_ItSignal = 0; u32_ItSignal < this->c_Signals.size(); ++u32_ItSignal)
                {
                   //Skip current signal
                   if (u32_ItSignal != oru32_SignalIndex)
                   {
-                     const C_OSCCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
-                     if (rc_SignalData.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+                     const C_OscCanSignal & rc_SignalData = c_Signals[u32_ItSignal];
+                     if (rc_SignalData.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
                      {
                         //Check range
-                        const uint64 u64_MaxValue =
+                        const uint64_t u64_MaxValue =
                            (rc_SignalData.u16_ComBitLength >= 64U) ?
-                           std::numeric_limits<uint64>::max() :
-                           ((static_cast<uint64>(1ULL) << rc_SignalData.u16_ComBitLength) - 1ULL);
+                           std::numeric_limits<uint64_t>::max() :
+                           ((static_cast<uint64_t>(1ULL) << rc_SignalData.u16_ComBitLength) - 1ULL);
                         if (rc_CheckedSignal.u16_MultiplexValue > u64_MaxValue)
                         {
                            *opq_MultiplexedValueOutOfRange = true;
@@ -607,9 +617,9 @@ void C_OSCCanMessage::CheckErrorSignalDetailed(const C_OSCNodeDataPoolList * con
    \retval   False   Transmission type is not a cyclic type
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessage::IsTransmissionTypeACyclicType() const
+bool C_OscCanMessage::IsTransmissionTypeOfCyclicType() const
 {
-   return C_OSCCanMessage::h_IsTransmissionTypeACyclicType(this->e_TxMethod);
+   return C_OscCanMessage::h_IsTransmissionTypeOfCyclicType(this->e_TxMethod);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -624,7 +634,7 @@ bool C_OSCCanMessage::IsTransmissionTypeACyclicType() const
    \retval   False   Transmission type is not a cyclic type
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessage::h_IsTransmissionTypeACyclicType(const C_OSCCanMessage::E_TxMethodType oe_Type)
+bool C_OscCanMessage::h_IsTransmissionTypeOfCyclicType(const C_OscCanMessage::E_TxMethodType oe_Type)
 {
    return ((oe_Type == eTX_METHOD_CYCLIC) || ((oe_Type == eTX_METHOD_CAN_OPEN_TYPE_254)) ||
            (oe_Type == eTX_METHOD_CAN_OPEN_TYPE_255));
@@ -642,9 +652,9 @@ bool C_OSCCanMessage::h_IsTransmissionTypeACyclicType(const C_OSCCanMessage::E_T
    \retval   false   CAN message is not multiplexed
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessage::IsMultiplexed(uint32 * const opu32_MultiplexerIndex) const
+bool C_OscCanMessage::IsMultiplexed(uint32_t * const opu32_MultiplexerIndex) const
 {
-   return C_OSCCanMessage::h_ContainsMultiplexer(this->c_Signals, opu32_MultiplexerIndex);
+   return C_OscCanMessage::h_ContainsMultiplexer(this->c_Signals, opu32_MultiplexerIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -657,16 +667,16 @@ bool C_OSCCanMessage::IsMultiplexed(uint32 * const opu32_MultiplexerIndex) const
    \retval   false   No multiplexer signal found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessage::h_ContainsMultiplexer(const std::vector<C_OSCCanSignal> & orc_Signals,
-                                            uint32 * const opu32_MultiplexerIndex)
+bool C_OscCanMessage::h_ContainsMultiplexer(const std::vector<C_OscCanSignal> & orc_Signals,
+                                            uint32_t * const opu32_MultiplexerIndex)
 {
    bool q_Return = false;
-   uint32 u32_SignalCounter;
+   uint32_t u32_SignalCounter;
 
    for (u32_SignalCounter = 0U; u32_SignalCounter < orc_Signals.size(); ++u32_SignalCounter)
    {
-      const C_OSCCanSignal & rc_Signal = orc_Signals[u32_SignalCounter];
-      if (rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      const C_OscCanSignal & rc_Signal = orc_Signals[u32_SignalCounter];
+      if (rc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          if (opu32_MultiplexerIndex != NULL)
          {
@@ -686,14 +696,14 @@ bool C_OSCCanMessage::h_ContainsMultiplexer(const std::vector<C_OSCCanSignal> & 
    \param[out]  orc_Values    All multiplexer values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
+void C_OscCanMessage::GetMultiplexerValues(std::set<uint16_t> & orc_Values) const
 {
    orc_Values.clear();
-   uint32 u32_SignalCounter;
+   uint32_t u32_SignalCounter;
 
    for (u32_SignalCounter = 0U; u32_SignalCounter < this->c_Signals.size(); ++u32_SignalCounter)
    {
-      if (this->c_Signals[u32_SignalCounter].e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+      if (this->c_Signals[u32_SignalCounter].e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
       {
          orc_Values.insert(this->c_Signals[u32_SignalCounter].u16_MultiplexValue);
       }
@@ -710,21 +720,21 @@ void C_OSCCanMessage::GetMultiplexerValues(std::set<uint16> & orc_Values) const
    Hashes for signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_OSCCanMessage::m_GetSignalHashes(const C_OSCNodeDataPoolList * const opc_List,
-                                                       const uint32 & oru32_SignalIndex) const
+std::vector<uint32_t> C_OscCanMessage::m_GetSignalHashes(const C_OscNodeDataPoolList * const opc_List,
+                                                         const uint32_t & oru32_SignalIndex) const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    if (opc_List != NULL)
    {
-      uint32 u32_HashSig = 0xFFFFFFFFUL;
-      uint32 u32_HashSigCo = 0xFFFFFFFFUL;
       if (oru32_SignalIndex < this->c_Signals.size())
       {
-         const C_OSCCanSignal & rc_Signal = this->c_Signals[oru32_SignalIndex];
+         const C_OscCanSignal & rc_Signal = this->c_Signals[oru32_SignalIndex];
+         uint32_t u32_HashSig = 0xFFFFFFFFUL;
          rc_Signal.CalcHash(u32_HashSig);
          if (rc_Signal.u32_ComDataElementIndex < opc_List->c_Elements.size())
          {
-            const C_OSCNodeDataPoolListElement & rc_Element = opc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
+            const C_OscNodeDataPoolListElement & rc_Element = opc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
+            uint32_t u32_HashSigCo = 0xFFFFFFFFUL;
             rc_Element.CalcHash(u32_HashSigCo);
             c_Retval.push_back(u32_HashSig);
             c_Retval.push_back(u32_HashSigCo);

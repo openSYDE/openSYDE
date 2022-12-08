@@ -1,87 +1,87 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_NagTopTreeView,
-stw_opensyde_gui--C_NagTopTreeView::item,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget,
-stw_opensyde_gui--C_SdNdeDpListsTreeWidget,
-stw_opensyde_gui--C_SyvDaItPaListTreeWidget,
-stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
-stw_opensyde_gui--C_TblTreDataElementView,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView,
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView,
-stw_opensyde_gui--C_SdBueCoAddSignalsView
+stw--opensyde_gui--C_NagTopTreeView,
+stw--opensyde_gui--C_NagTopTreeView::item,
+stw--opensyde_gui--C_SyvDaPeUpdateModeTreeWidget,
+stw--opensyde_gui--C_SdNdeDpListsTreeWidget,
+stw--opensyde_gui--C_SyvDaItPaListTreeWidget,
+stw--opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch,
+stw--opensyde_gui--C_TblTreDataElementView,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView,
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView,
+stw--opensyde_gui--C_SdBueCoAddSignalsView
 {
 border-style: none;
 outline: none;
 }
 
-stw_opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch::item
+stw--opensyde_gui_elements--C_OgeTreeWidgetToolBarSearch::item
 {
 margin-right: 10px;
 }
 
-stw_opensyde_gui--C_NagTopTreeView::item
+stw--opensyde_gui--C_NagTopTreeView::item
 {
 height: 30px;
 padding-left: 4px; /*padding on right hand side of expand/collapse arrow */
 }
 
-stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:!has-children,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:!has-children,
-stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:!has-children,
-stw_opensyde_gui--C_TblTreDataElementView::item,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::item,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::item,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::item
+stw--opensyde_gui--C_SyvDaItPaListTreeWidget::item:!has-children,
+stw--opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:!has-children,
+stw--opensyde_gui--C_SdNdeDpListsTreeWidget::item:!has-children,
+stw--opensyde_gui--C_TblTreDataElementView::item,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::item,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::item,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::item,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::item
 {
 border-style: none;
 }
 
-stw_opensyde_gui--C_TblTreDataElementView::item,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::item,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::item,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::item,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::item,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::item
+stw--opensyde_gui--C_TblTreDataElementView::item,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::item,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::item,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::item,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::item
 {
 margin-top: 3px;
 margin-bottom: 3px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::item
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::item
 {
 padding-top: 3px;
 padding-bottom: 3px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView::item
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView::item
 {
 height: 26px;
 padding-right: 4px;
 }
 
-stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
-stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:has-children
+stw--opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
+stw--opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
+stw--opensyde_gui--C_SdNdeDpListsTreeWidget::item:has-children
 {
 margin-bottom: 1px;
 }
 
-stw_opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
-stw_opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
-stw_opensyde_gui--C_SdNdeDpListsTreeWidget::item:has-children
+stw--opensyde_gui--C_SyvDaItPaListTreeWidget::item:has-children,
+stw--opensyde_gui--C_SyvDaPeUpdateModeTreeWidget::item:has-children,
+stw--opensyde_gui--C_SdNdeDpListsTreeWidget::item:has-children
 {
 border-style: solid;
 border-width: 1px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView
 {
 border-style: solid;
 border-width: 1px;
@@ -89,16 +89,16 @@ border-top-width: 0px;
 padding: 9px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView,
-stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView,
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView
 {
 border-style: solid;
 border-width: 0px;
 border-bottom-width: 1px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
-stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section
 {
 height: 25px;
 border-style: solid;
@@ -109,20 +109,20 @@ margin-bottom: 1px;
 padding-left: 4px;
 }
 
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section:first,
-stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section:first
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section:first,
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section:first
 {
 border-left-width: 0px;
 }
 
 /* --------------------------------------------------------------------- */
 /* closed and not selected */
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:closed:has-children:has-siblings,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:closed:has-children:has-siblings
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:closed:has-children:has-siblings
 {
 border-image: none;
 image:url(:/images/IconArrowSmallOpen.png);
@@ -130,37 +130,37 @@ image:url(:/images/IconArrowSmallOpen.png);
 
 /* --------------------------------------------------------------------- */
 /* closed and selected */
-stw_opensyde_gui--C_SyvDaItPaTreeView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SyvDaItPaTreeView::branch:closed:has-children:has-siblings,
-stw_opensyde_gui--C_TblTreDataElementView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_TblTreDataElementView::branch:closed:has-children:has-siblings,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::branch:closed:has-children:has-siblings,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:closed:has-children:has-siblings,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::branch:closed:has-children:has-siblings,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed:selected,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings:selected,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:closed:selected,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:closed:has-children:has-siblings:selected,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:closed:selected,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:closed:has-children:has-siblings:selected
+stw--opensyde_gui--C_SyvDaItPaTreeView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SyvDaItPaTreeView::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_TblTreDataElementView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_TblTreDataElementView::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::branch:closed:has-children:has-siblings,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::branch:closed:has-children:has-siblings,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:closed:selected,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:closed:has-children:has-siblings:selected,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:closed:selected,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:closed:has-children:has-siblings:selected,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:closed:selected,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:closed:has-children:has-siblings:selected
 {
 border-image: none;
 image:url(:/images/IconArrowSmallOpenBlue.png);
 }
 
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView::branch:closed:has-children:has-siblings
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView::branch:closed:has-children:has-siblings
 {
 border-image: none;
 image:url(://images/IconOpenListClicked.svg);
 padding: 5px;
 }
 
-stw_opensyde_gui--C_NagTopTreeView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_NagTopTreeView::branch:closed:has-children:has-siblings
+stw--opensyde_gui--C_NagTopTreeView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_NagTopTreeView::branch:closed:has-children:has-siblings
 {
 border-image: none;
 image:url(://images/main_page_and_navi_bar/Icon_open_list.svg);
@@ -169,37 +169,37 @@ padding: 2px;
 
 /* --------------------------------------------------------------------- */
 /* open and not selected */
-stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:!has-siblings,
-stw_opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:has-siblings,
-stw_opensyde_gui--C_TblTreDataElementView::branch:open:has-children:!has-siblings,
-stw_opensyde_gui--C_TblTreDataElementView::branch:open:has-children:has-siblings,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::branch:open:has-children:!has-siblings,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::branch:open:has-children:has-siblings,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:open:has-children:!has-siblings,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch:open:has-children:has-siblings,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::branch:open:has-children:!has-siblings,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::branch:open:has-children:has-siblings,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open:selected,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings:selected,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:open:selected,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:open:has-children:has-siblings:selected,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:open:selected,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:open:has-children:has-siblings:selected
+stw--opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:!has-siblings,
+stw--opensyde_gui--C_SyvDaItPaTreeView::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_TblTreDataElementView::branch:open:has-children:!has-siblings,
+stw--opensyde_gui--C_TblTreDataElementView::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::branch:open:has-children:!has-siblings,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::branch:open:has-children:!has-siblings,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::branch:open:has-children:has-siblings,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::branch:open:has-children:!has-siblings,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open:selected,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings:selected,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:open:selected,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:open:has-children:has-siblings:selected,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:open:selected,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:open:has-children:has-siblings:selected
 {
 border-image: none;
 image:url(:/images/IconArrowSmallClose.png);
 }
 
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView::branch:has-children:!has-siblings:open,
-stw_opensyde_gui--C_SdNdeHalcConfigTreeView::branch:open:has-children:has-siblings
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView::branch:has-children:!has-siblings:open,
+stw--opensyde_gui--C_SdNdeHalcConfigTreeView::branch:open:has-children:has-siblings
 {
 border-image: none;
 image:url(://images/IconArrowBottomClicked.svg);
 padding: 5px;
 }
 
-stw_opensyde_gui--C_NagTopTreeView::branch:open:has-children:!has-siblings,
-stw_opensyde_gui--C_NagTopTreeView::branch:open:has-children:has-siblings
+stw--opensyde_gui--C_NagTopTreeView::branch:open:has-children:!has-siblings,
+stw--opensyde_gui--C_NagTopTreeView::branch:open:has-children:has-siblings
 {
 border-image: none;
 image:url(://images/main_page_and_navi_bar/Icon_close_list.svg);
@@ -208,42 +208,42 @@ padding: 2px;
 
 /* --------------------------------------------------------------------- */
 /* open and selected */
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open,
-stw_opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:open,
-stw_opensyde_gui--C_SdNdeCoConfigTreeView::branch:open:has-children:has-siblings,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:open,
-stw_opensyde_gui--C_SdNdeHalcChannelTreeView::branch:open:has-children:has-siblings
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:has-children:!has-siblings:open,
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:has-children:!has-siblings:open,
+stw--opensyde_gui--C_SdNdeCoConfigTreeView::branch:open:has-children:has-siblings,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:has-children:!has-siblings:open,
+stw--opensyde_gui--C_SdNdeHalcChannelTreeView::branch:open:has-children:has-siblings
 {
 border-image: none;
 image:url(:/images/IconArrowSmallCloseGray.png);
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_TblTreDataElementView::branch,
-stw_opensyde_gui--C_SdBueCoAddSignalsView::branch,
-stw_opensyde_gui--C_SdNdeHalcConfigImportView::branch,
-stw_opensyde_gui_elements--C_OgeTreeViewCheckable::branch
+stw--opensyde_gui--C_TblTreDataElementView::branch,
+stw--opensyde_gui--C_SdBueCoAddSignalsView::branch,
+stw--opensyde_gui--C_SdNdeHalcConfigImportView::branch,
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::branch
 {
 margin-top: 3px;
 margin-bottom: 3px;
 }
 
 /* Indent 2*24px */
-stw_opensyde_gui--C_SyvDaItPaListTreeWidget
+stw--opensyde_gui--C_SyvDaItPaListTreeWidget
 {
 padding-left: 48px;
 }
 
 /* --------------------------------------------------------------------- */
 /* Sort indicator */
-stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::down-arrow {
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::down-arrow {
 width: 20px;
 height: 20px;
 image: url(://images/system_definition/NodeEdit/lists/IconSortDown.svg) 0 0 0 0 stretch stretch;
 }
 
-stw_opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::up-arrow {
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::up-arrow {
 width: 20px;
 height: 20px;
 image: url(://images/system_definition/NodeEdit/lists/IconSortUp.svg) 0 0 0 0 stretch stretch;

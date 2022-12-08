@@ -8,22 +8,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 #include <QSizePolicy>
 
-#include "C_SyvUpPacWidget.h"
+#include "C_SyvUpPacWidget.hpp"
 #include "ui_C_SyvUpPacWidget.h"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OgeWiCustomMessage.h"
-#include "C_GtGetText.h"
-#include "constants.h"
-#include "C_PuiSvHandler.h"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_GtGetText.hpp"
+#include "constants.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -76,20 +75,20 @@ C_SyvUpPacWidget::C_SyvUpPacWidget(QWidget * const opc_Parent) :
    // Handle service mode
    this->mpc_Ui->pc_PushButtonCreatePackage->setEnabled(!q_ServiceModeActive);
 
-   connect(this->mpc_Ui->pc_PushButtonScrollLeft, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
+   connect(this->mpc_Ui->pc_PushButtonScrollLeft, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SyvUpPacWidget::m_ButtonLeftClicked);
-   connect(this->mpc_Ui->pc_PushButtonScrollRight, &stw_opensyde_gui_elements::C_OgePubIconOnly::clicked,
+   connect(this->mpc_Ui->pc_PushButtonScrollRight, &stw::opensyde_gui_elements::C_OgePubIconOnly::clicked,
            this, &C_SyvUpPacWidget::m_ButtonRightClicked);
    connect(this->mpc_Ui->pc_ListWidget, &C_SyvUpPacListWidget::SigListChanged,
            this, &C_SyvUpPacWidget::m_UpdateWidget);
 
-   connect(this->mpc_Ui->pc_PushButtonClearAll, &stw_opensyde_gui_elements::C_OgePubIconText::clicked,
+   connect(this->mpc_Ui->pc_PushButtonClearAll, &stw::opensyde_gui_elements::C_OgePubIconText::clicked,
            this, &C_SyvUpPacWidget::m_ButtonClearAll);
-   connect(this->mpc_Ui->pc_PushButtonExport, &stw_opensyde_gui_elements::C_OgePubIconText::clicked,
+   connect(this->mpc_Ui->pc_PushButtonExport, &stw::opensyde_gui_elements::C_OgePubIconText::clicked,
            this, &C_SyvUpPacWidget::m_ButtonExport);
-   connect(this->mpc_Ui->pc_PushButtonImport, &stw_opensyde_gui_elements::C_OgePubIconText::clicked,
+   connect(this->mpc_Ui->pc_PushButtonImport, &stw::opensyde_gui_elements::C_OgePubIconText::clicked,
            this, &C_SyvUpPacWidget::m_ButtonImport);
-   connect(this->mpc_Ui->pc_PushButtonCreatePackage, &stw_opensyde_gui_elements::C_OgePubIconText::clicked,
+   connect(this->mpc_Ui->pc_PushButtonCreatePackage, &stw::opensyde_gui_elements::C_OgePubIconText::clicked,
            this, &C_SyvUpPacWidget::m_ButtonCreatePackage);
 
    connect(this->mpc_Ui->pc_ListWidget, &C_SyvUpPacListWidget::SigStartCheck,
@@ -159,7 +158,7 @@ void C_SyvUpPacWidget::InitText(void) const
    \param[in]     ou32_ViewIndex         View index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::SetViewIndex(const uint32 ou32_ViewIndex)
+void C_SyvUpPacWidget::SetViewIndex(const uint32_t ou32_ViewIndex)
 {
    this->mpc_Ui->pc_ListWidget->SetViewIndex(ou32_ViewIndex);
 
@@ -205,7 +204,7 @@ void C_SyvUpPacWidget::SetUpdateStarted(void) const
    \param[in]     ou32_NodeIndex         Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::SetUpdateApplicationStarted(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacWidget::SetUpdateApplicationStarted(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_ListWidget->SetUpdateApplicationStarted(ou32_NodeIndex);
 }
@@ -216,7 +215,7 @@ void C_SyvUpPacWidget::SetUpdateApplicationStarted(const uint32 ou32_NodeIndex) 
    \param[in]     ou32_NodeIndex         Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::SetUpdateApplicationFinished(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacWidget::SetUpdateApplicationFinished(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_ListWidget->SetUpdateApplicationFinished(ou32_NodeIndex);
 }
@@ -227,7 +226,7 @@ void C_SyvUpPacWidget::SetUpdateApplicationFinished(const uint32 ou32_NodeIndex)
    \param[in]     ou32_NodeIndex         Index of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::SetUpdateApplicationError(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacWidget::SetUpdateApplicationError(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_ListWidget->SetUpdateApplicationError(ou32_NodeIndex);
 }
@@ -238,7 +237,7 @@ void C_SyvUpPacWidget::SetUpdateApplicationError(const uint32 ou32_NodeIndex) co
    \param[in] ou32_NodeIndex Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::DiscardApplicationStatus(const uint32 ou32_NodeIndex) const
+void C_SyvUpPacWidget::DiscardApplicationStatus(const uint32_t ou32_NodeIndex) const
 {
    this->mpc_Ui->pc_ListWidget->DiscardApplicationStatus(ou32_NodeIndex);
 }
@@ -278,7 +277,7 @@ void C_SyvUpPacWidget::SetDisconnected(void)
    \param[in] orc_DeviceInformation Device info
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::UpdateDeviceInformation(const std::vector<uint32> & orc_NodeIndexes,
+void C_SyvUpPacWidget::UpdateDeviceInformation(const std::vector<uint32_t> & orc_NodeIndexes,
                                                const std::vector<C_SyvUpDeviceInfo> & orc_DeviceInformation)
 const
 {
@@ -292,7 +291,7 @@ const
    \param[in]     ou8_Progress           Entire progress of node of update process
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacWidget::SetNodeProgress(const uint32 ou32_NodeIndex, const uint8 ou8_Progress) const
+void C_SyvUpPacWidget::SetNodeProgress(const uint32_t ou32_NodeIndex, const uint8_t ou8_Progress) const
 {
    this->mpc_Ui->pc_ListWidget->SetNodeProgress(ou32_NodeIndex, ou8_Progress);
 }
@@ -311,10 +310,10 @@ void C_SyvUpPacWidget::SetNodeProgress(const uint32 ou32_NodeIndex, const uint8 
    C_RD_WR     At least one file does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacWidget::GetUpdatePackage(
-   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
-   std::vector<uint32> & orc_NodesOrder,
-   std::vector<stw_opensyde_core::C_OSCSuSequences::C_DoFlash> * const opc_AllApplications) const
+int32_t C_SyvUpPacWidget::GetUpdatePackage(
+   std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
+   std::vector<uint32_t> & orc_NodesOrder,
+   std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> * const opc_AllApplications) const
 {
    return this->mpc_Ui->pc_ListWidget->GetUpdatePackage(orc_ApplicationsToWrite, orc_NodesOrder,
                                                         opc_AllApplications);
@@ -340,8 +339,8 @@ void C_SyvUpPacWidget::m_ButtonClearAll(void) const
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Update Package clear"));
    c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                   "Do you really want to clear the configuration of Update Package?"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Clear"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Clear"));
+   c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
    c_MessageBox.SetCustomMinHeight(180, 180);
    e_ReturnMessageBox = c_MessageBox.Execute();
 
@@ -374,8 +373,8 @@ void C_SyvUpPacWidget::m_ButtonCreatePackage(void) const
    c_Message.SetHeading(C_GtGetText::h_GetText("Save Service Update Package"));
    c_Message.SetDescription(C_GtGetText::h_GetText(
                                "Do you want to save your Service Update Package as .syde_sup archive file or un-zipped to a directory?"));
-   c_Message.SetOKButtonText(C_GtGetText::h_GetText("Archive"));
-   c_Message.SetNOButtonText(C_GtGetText::h_GetText("Directory"));
+   c_Message.SetOkButtonText(C_GtGetText::h_GetText("Archive"));
+   c_Message.SetNoButtonText(C_GtGetText::h_GetText("Directory"));
    c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
    c_Message.SetDetails(
       "Saving to a directory means, that all files which are part of the Service Update Package are not zipped into a .syde_sup file.");
@@ -456,14 +455,14 @@ void C_SyvUpPacWidget::m_UpdateWidget(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacWidget::m_FileCheckTimer(void)
 {
-   uint32 u32_CountFiles = 0U;
+   uint32_t u32_CountFiles = 0U;
    const bool q_ServiceModeActive = C_PuiSvHandler::h_GetInstance()->GetServiceModeActive();
 
    QStringList c_FlashwareWarningsApps;
    QStringList c_MissingDataBlocks;
    QStringList c_MissingParamFiles;
    QStringList c_MissingFiles;
-   sint32 s32_Return =
+   int32_t s32_Return =
       this->mpc_Ui->pc_ListWidget->CheckAllPaths(u32_CountFiles, &c_FlashwareWarningsApps, &c_MissingDataBlocks,
                                                  &c_MissingParamFiles, &c_MissingFiles);
 
@@ -553,8 +552,8 @@ void C_SyvUpPacWidget::m_SetUpdatePackageStatusNotLocked(const QStringList & orc
       if ((orc_MissingDataBlocks.length() > 0) || (orc_MissingParamFiles.length() > 0) ||
           (orc_MissingFiles.length() > 0))
       {
-         const sint32 s32_TotalMissingFiles =
-            static_cast<sint32>(orc_MissingDataBlocks.length()) + orc_MissingParamFiles.length() +
+         const int32_t s32_TotalMissingFiles =
+            static_cast<int32_t>(orc_MissingDataBlocks.length()) + orc_MissingParamFiles.length() +
             orc_MissingFiles.length();
          c_TooltipHeading = C_GtGetText::h_GetText("Update Package Invalid");
          if (orc_MissingDataBlocks.length() > 0)

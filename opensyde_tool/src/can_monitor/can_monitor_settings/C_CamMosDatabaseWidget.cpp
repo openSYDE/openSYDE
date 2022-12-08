@@ -11,33 +11,32 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QTimer>
 
-#include "C_CamMosDatabaseWidget.h"
+#include "C_CamMosDatabaseWidget.hpp"
 #include "ui_C_CamMosDatabaseWidget.h"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "TGLUtils.h"
-#include "C_CamProHandler.h"
-#include "stwerrors.h"
-#include "C_OgePopUpDialog.h"
-#include "C_CamMosDatabaseBusSelectionPopup.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_UsHandler.h"
-#include "C_CamUti.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "TglUtils.hpp"
+#include "C_CamProHandler.hpp"
+#include "stwerrors.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_CamMosDatabaseBusSelectionPopup.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_UsHandler.hpp"
+#include "C_CamUti.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -107,7 +106,7 @@ void C_CamMosDatabaseWidget::LoadUserSettings(void) const
    \param[in]  os32_Result    Result of DBC file load
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const sint32 os32_Result)
+void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const int32_t os32_Result)
 {
    // check if first database in queue is of type dbc
    if (this->mc_DatabasesToLoad.isEmpty() == false)
@@ -131,8 +130,8 @@ void C_CamMosDatabaseWidget::OnLoadFinishedDbc(const sint32 os32_Result)
    \param[in]  orc_Busses     Buses found in system definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
-                                                     const std::vector<C_OSCSystemBus> & orc_Busses)
+void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const int32_t os32_Result,
+                                                     const std::vector<C_OscSystemBus> & orc_Busses)
 {
    // update database (first database in queue)
    if (this->mc_DatabasesToLoad.isEmpty() == false)
@@ -161,7 +160,7 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
             c_New->SetSize(QSize(700, 400));
 
             // Execute
-            if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+            if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
             {
                // remember selected bus and update data handling later on success (signal)
                this->mc_DatabasesToLoad[0]->SetBusIndex(pc_Dialog->GetSelectedBus());
@@ -193,7 +192,8 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const sint32 os32_Result,
    \param[in]  os32_Result                result of bus selection
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition, const sint32 os32_Result)
+void C_CamMosDatabaseWidget::OnSigOsySysDefBusResult(const QString & orc_PathSystemDefinition,
+                                                     const int32_t os32_Result)
 {
    C_CamMosDatabaseItemWidget * pc_Item = NULL;
 
@@ -297,7 +297,7 @@ void C_CamMosDatabaseWidget::OnSigSavedAsNew(void) const
    const std::vector<C_CamProDatabaseData> c_Databases = C_CamProHandler::h_GetInstance()->GetDatabases();
 
    // load new database paths
-   uint32 u32_It = 0;
+   uint32_t u32_It = 0;
 
    for (std::vector<C_CamMosDatabaseItemWidget *>::const_iterator c_It = mc_Entries.begin(); c_It != mc_Entries.end();
         ++c_It)
@@ -356,7 +356,7 @@ void C_CamMosDatabaseWidget::Clear(void)
    // clear loading queue (first to avoid ghost signals)
    mc_DatabasesToLoad.clear();
 
-   for (uint32 u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   for (uint32_t u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
    {
       // remove database from interpreting
       Q_EMIT (this->SigRemoveDatabase(
@@ -427,7 +427,7 @@ void C_CamMosDatabaseWidget::m_LoadConfig(void)
    // initialize Database widgets
    std::vector<C_CamProDatabaseData> c_Databases = C_CamProHandler::h_GetInstance()->GetDatabases();
 
-   for (uint32 u32_ItDatabase = 0UL; u32_ItDatabase < c_Databases.size(); ++u32_ItDatabase)
+   for (uint32_t u32_ItDatabase = 0UL; u32_ItDatabase < c_Databases.size(); ++u32_ItDatabase)
    {
       this->m_AddDatabaseWidget(c_Databases[u32_ItDatabase]);
    }
@@ -553,8 +553,8 @@ void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const
       c_Message.SetHeading(C_GtGetText::h_GetText("Database Delete"));
       c_Message.SetDescription(c_Description);
       c_Message.SetDetails(c_Details);
-      c_Message.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-      c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+      c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+      c_Message.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
 
       if (c_Message.Execute() != C_OgeWiCustomMessage::eOK)
       {
@@ -564,7 +564,7 @@ void C_CamMosDatabaseWidget::m_RemoveDatabase(C_CamMosDatabaseItemWidget * const
 
    if ((q_Continue == true) && (opc_ItemWidget != NULL))
    {
-      sint32 s32_IndexToRemove = 0;
+      int32_t s32_IndexToRemove = 0;
 
       // remove widget from list
       for (std::vector<C_CamMosDatabaseItemWidget *>::iterator c_It = mc_Entries.begin(); c_It != mc_Entries.end();
@@ -620,7 +620,7 @@ bool C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget
                                                 const bool & orq_Enable)
 {
    bool q_State = orq_Enable;
-   const sint32 s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
+   const int32_t s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
    bool q_Continue = true;
 
    if ((orq_Enable == false) && (opc_ItemWidget != NULL))
@@ -639,8 +639,8 @@ bool C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget
          c_Message.SetHeading(C_GtGetText::h_GetText("Database Disable"));
          c_Message.SetDescription(c_Description);
          c_Message.SetDetails(c_Details);
-         c_Message.SetOKButtonText(C_GtGetText::h_GetText("Disable"));
-         c_Message.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+         c_Message.SetOkButtonText(C_GtGetText::h_GetText("Disable"));
+         c_Message.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
 
          if (c_Message.Execute() != C_OgeWiCustomMessage::eOK)
          {
@@ -683,12 +683,12 @@ bool C_CamMosDatabaseWidget::m_ActivateDatabase(const C_CamMosDatabaseItemWidget
 void C_CamMosDatabaseWidget::m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * const opc_ItemWidget,
                                                   const C_CamProDatabaseData & orc_Database, const bool oq_IsUpdate)
 {
-   const sint32 s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
+   const int32_t s32_Index = this->m_GetIndexFromWidget(opc_ItemWidget);
    const std::vector<C_CamProDatabaseData>  & rc_Databases =  C_CamProHandler::h_GetInstance()->GetDatabases();
 
    // index is -1 if item widget is NULL which can not happen
-   tgl_assert((s32_Index >= 0) && (s32_Index < static_cast<sint32>(rc_Databases.size())));
-   if ((s32_Index >= 0) && (s32_Index < static_cast<sint32>(rc_Databases.size())))
+   tgl_assert((s32_Index >= 0) && (s32_Index < static_cast<int32_t>(rc_Databases.size())));
+   if ((s32_Index >= 0) && (s32_Index < static_cast<int32_t>(rc_Databases.size())))
    {
       // remove deprecated database
       Q_EMIT (this->SigRemoveDatabase(C_CamUti::h_GetAbsPathFromProj(rc_Databases[s32_Index].c_Name),
@@ -714,7 +714,7 @@ void C_CamMosDatabaseWidget::m_UpdateDatabasePath(C_CamMosDatabaseItemWidget * c
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabaseItemWidget * const opc_ItemWidget,
-                                                          const sint32 os32_BusIndex)
+                                                          const int32_t os32_BusIndex)
 {
    Q_EMIT (this->SigSetDatabaseOsySysDefBus(C_CamUti::h_GetAbsPathFromProj(opc_ItemWidget->GetDatabaseData().c_Name),
                                             opc_ItemWidget->GetDatabaseData().c_Name,
@@ -731,9 +731,9 @@ void C_CamMosDatabaseWidget::m_UpdateDatabaseOsySysDefBus(const C_CamMosDatabase
    index of database in data handling
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMosDatabaseWidget::m_GetIndexFromWidget(const C_CamMosDatabaseItemWidget * const opc_ItemWidget)
+int32_t C_CamMosDatabaseWidget::m_GetIndexFromWidget(const C_CamMosDatabaseItemWidget * const opc_ItemWidget)
 {
-   sint32 s32_Return = 0;
+   int32_t s32_Return = 0;
 
    if (opc_ItemWidget != NULL)
    {
@@ -836,7 +836,7 @@ void C_CamMosDatabaseWidget::m_CheckAndLoadDatabase(void)
    \param[in]  os32_ErrorCode    error code of loading
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMosDatabaseWidget::m_LoadFinishedGeneric(const sint32 os32_ErrorCode)
+void C_CamMosDatabaseWidget::m_LoadFinishedGeneric(const int32_t os32_ErrorCode)
 {
    // there is at least one entry in databases loading queue because we requested load for exactly this database
    if (this->mc_DatabasesToLoad.isEmpty() == false)
@@ -882,7 +882,7 @@ void C_CamMosDatabaseWidget::m_LoadFinishedGeneric(const sint32 os32_ErrorCode)
 void C_CamMosDatabaseWidget::m_OnFileCheckTimeout()
 {
    // check all files
-   for (uint32 u32_Pos = 0; u32_Pos < this->mc_Entries.size(); u32_Pos++)
+   for (uint32_t u32_Pos = 0; u32_Pos < this->mc_Entries.size(); u32_Pos++)
    {
       if (this->mc_Entries[u32_Pos] != NULL)
       {

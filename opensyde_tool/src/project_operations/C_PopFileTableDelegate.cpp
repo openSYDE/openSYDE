@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_PopFileTableDelegate.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_PopFileTableDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -91,7 +90,7 @@ void C_PopFileTableDelegate::paint(QPainter * const opc_Painter, const QStyleOpt
    false No change
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PopFileTableDelegate::SetHoveredRow(const stw_types::sint32 & ors32_Value)
+bool C_PopFileTableDelegate::SetHoveredRow(const int32_t & ors32_Value)
 {
    bool q_Retval;
 
@@ -117,7 +116,7 @@ bool C_PopFileTableDelegate::SetHoveredRow(const stw_types::sint32 & ors32_Value
    false No change
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PopFileTableDelegate::SetClickedRow(const stw_types::sint32 & ors32_Value)
+bool C_PopFileTableDelegate::SetClickedRow(const int32_t & ors32_Value)
 {
    bool q_Retval;
 

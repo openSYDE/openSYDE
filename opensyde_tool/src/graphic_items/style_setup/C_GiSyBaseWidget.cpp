@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QVBoxLayout>
 
-#include "TGLUtils.h"
-#include "C_GiSyBaseWidget.h"
-#include "C_OgeWiUtil.h"
+#include "TglUtils.hpp"
+#include "C_GiSyBaseWidget.hpp"
+#include "C_OgeWiUtil.hpp"
 #include "ui_C_GiSyBaseWidget.h"
 
-#include "C_GtGetText.h"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -69,8 +68,8 @@ C_GiSyBaseWidget::C_GiSyBaseWidget(C_OgePopUpDialog & orc_Parent, const QString 
 
    // configure background drawing
    this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                 static_cast<float64>(c_Size.width()),
-                                 static_cast<float64>(c_Size.height()));
+                                 static_cast<float64_t>(c_Size.width()),
+                                 static_cast<float64_t>(c_Size.height()));
    this->mpc_Ui->pc_GraphicsView->setScene(this->mpc_Scene);
    this->mpc_Ui->pc_GraphicsView->setEnabled(false);
    this->mpc_Ui->pc_GraphicsView->SetSubtleSurroundGradient(true);
@@ -124,14 +123,14 @@ void C_GiSyBaseWidget::SetWidget(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
    {
-      stw_types::sintn sn_Index;
+      int32_t s32_Index;
       QVBoxLayout * const pc_Layout = new QVBoxLayout(this->mpc_Ui->pc_SettingsShowWidget);
 
       opc_Widget->setParent(this);
       this->mpc_Ui->pc_SettingsShowWidget->setLayout(pc_Layout);
       pc_Layout->addWidget(opc_Widget);
-      sn_Index = pc_Layout->indexOf(opc_Widget);
-      pc_Layout->setStretch(sn_Index, 1);
+      s32_Index = pc_Layout->indexOf(opc_Widget);
+      pc_Layout->setStretch(s32_Index, 1);
       pc_Layout->setMargin(0);
    } //lint !e429  //no memory leak because of the parent of pc_Layout and the Qt memory management
 }
@@ -172,8 +171,8 @@ void C_GiSyBaseWidget::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

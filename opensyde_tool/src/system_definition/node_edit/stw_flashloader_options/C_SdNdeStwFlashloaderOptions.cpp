@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeStwFlashloaderOptions.h"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeStwFlashloaderOptions.hpp"
 #include "ui_C_SdNdeStwFlashloaderOptions.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -42,8 +41,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     ou32_Index Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeStwFlashloaderOptions::C_SdNdeStwFlashloaderOptions(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                           const uint32 ou32_Index) :
+C_SdNdeStwFlashloaderOptions::C_SdNdeStwFlashloaderOptions(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                           const uint32_t ou32_Index) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeStwFlashloaderOptions),
    mrc_ParentDialog(orc_Parent),
@@ -103,14 +102,14 @@ void C_SdNdeStwFlashloaderOptions::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeStwFlashloaderOptions::m_LoadData(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Index);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Index);
 
    this->mpc_Ui->pc_TableView->SetNode(this->mu32_Index);
    if (pc_Node != NULL)
    {
       this->mpc_Ui->pc_CheckBoxUseResetMessage->setChecked(
-         pc_Node->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive);
-      this->mpc_Ui->pc_TableView->setEnabled(pc_Node->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive);
+         pc_Node->c_Properties.c_StwFlashloaderSettings.q_ResetMessageActive);
+      this->mpc_Ui->pc_TableView->setEnabled(pc_Node->c_Properties.c_StwFlashloaderSettings.q_ResetMessageActive);
    }
 }
 
@@ -138,11 +137,11 @@ void C_SdNdeStwFlashloaderOptions::m_CancelClicked(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeStwFlashloaderOptions::m_OnUseResetMessageChanged(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_Index);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_Index);
 
    if (pc_Node != NULL)
    {
-      C_OSCNodeStwFlashloaderSettings c_Settings = pc_Node->c_Properties.c_STWFlashloaderSettings;
+      C_OscNodeStwFlashloaderSettings c_Settings = pc_Node->c_Properties.c_StwFlashloaderSettings;
 
       c_Settings.q_ResetMessageActive = this->mpc_Ui->pc_CheckBoxUseResetMessage->isChecked();
       this->mpc_Ui->pc_TableView->setEnabled(c_Settings.q_ResetMessageActive);

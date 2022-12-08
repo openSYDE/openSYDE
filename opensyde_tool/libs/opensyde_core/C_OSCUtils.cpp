@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cctype>
 #include <iterator>
@@ -18,25 +18,25 @@
 #include <limits>
 #include <fstream>
 #include <algorithm>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "TGLFile.h"
-#include "CSCLResourceStrings.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "TglFile.hpp"
+#include "C_SclResourceStrings.hpp"
 #define STR_TABLE_INCLUDE //we really want the symbols from the DLStrings.h header
-#include "DLStrings.h"
-#include "C_OSCLoggingHandler.h"
+#include "DLStrings.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_OSCUtils::mhf64_EPSILON = 1e-5;
-stw_scl::C_SCLResourceStrings C_OSCUtils::mhc_ResourceStrings;
+const float64_t C_OscUtils::mhf64_EPSILON = 1e-5;
+stw::scl::C_SCLResourceStrings C_OscUtils::mhc_ResourceStrings;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -52,13 +52,13 @@ stw_scl::C_SCLResourceStrings C_OSCUtils::mhc_ResourceStrings;
 /*! \brief  CheckValidCName
 
    Function adapted from KEFEX to openSYDE (KFXCheckValidCName)
-   Check if tName follows C naming conventions:
+   Check if orc_Name follows C language naming conventions:
    -> must not be empty
    -> only alphanumeric characters + "_"
    -> should not be longer than "ou16_MaxLength" characters
 
    \param[in]  orc_Name                         symbol name to check
-   \param[in]  oq_AutomaticCStringAdaptation    if automatic c string adaptation true or false
+   \param[in]  oq_AutomaticCeStringAdaptation   if automatic c string adaptation true or false
    \param[in]  ou16_MaxLength                   permitted maximum identifier length
 
    \return
@@ -66,11 +66,10 @@ stw_scl::C_SCLResourceStrings C_OSCUtils::mhc_ResourceStrings;
    false -> violation of rules
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const bool oq_AutomaticCStringAdaptation,
-                                   const stw_types::uint16 ou16_MaxLength)
+bool C_OscUtils::h_CheckValidCeName(const stw::scl::C_SclString & orc_Name, const bool oq_AutomaticCeStringAdaptation,
+                                    const uint16_t ou16_MaxLength)
 {
-   uint32 u32_Index;
-   charn cn_Char;
+   char_t cn_Char;
    bool q_IsValid = true;
 
    if (orc_Name.Length() == 0)
@@ -79,8 +78,9 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    }
    else
    {
+      uint32_t u32_Index;
       // -> only alphanumeric characters + "_"
-      if (oq_AutomaticCStringAdaptation == false)
+      if (oq_AutomaticCeStringAdaptation == false)
       {
          // no automatic c string adaptation
          for (u32_Index = 0; u32_Index < orc_Name.Length(); u32_Index++)
@@ -116,7 +116,7 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
       if (q_IsValid == true)
       {
          // -> should not be longer than ou16_MaxLength characters
-         if (orc_Name.Length() > static_cast<uint32>(ou16_MaxLength))
+         if (orc_Name.Length() > static_cast<uint32_t>(ou16_MaxLength))
          {
             q_IsValid = false;
          }
@@ -137,10 +137,10 @@ bool C_OSCUtils::h_CheckValidCName(const stw_scl::C_SCLString & orc_Name, const 
    false Not equal
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const float64 & orf64_Float2)
+bool C_OscUtils::h_IsFloat64NearlyEqual(const float64_t & orf64_Float1, const float64_t & orf64_Float2)
 {
    //From Marshall Cline's C++ FAQ Lite document
-   return std::abs(orf64_Float1 - orf64_Float2) <= (C_OSCUtils::mhf64_EPSILON * std::abs(orf64_Float1));
+   return std::abs(orf64_Float1 - orf64_Float2) <= (C_OscUtils::mhf64_EPSILON * std::abs(orf64_Float1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -154,11 +154,11 @@ bool C_OSCUtils::h_IsFloat64NearlyEqual(const float64 & orf64_Float1, const floa
    false Not equal
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const float32 & orf32_Float2)
+bool C_OscUtils::h_IsFloat32NearlyEqual(const float32_t & orf32_Float1, const float32_t & orf32_Float2)
 {
    //From Marshall Cline's C++ FAQ Lite document
    return std::abs(orf32_Float1 - orf32_Float2) <=
-          (static_cast<float32>(C_OSCUtils::mhf64_EPSILON) * std::abs(orf32_Float1));
+          (static_cast<float32_t>(C_OscUtils::mhf64_EPSILON) * std::abs(orf32_Float1));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -174,27 +174,27 @@ bool C_OSCUtils::h_IsFloat32NearlyEqual(const float32 & orf32_Float1, const floa
    C_NOACT   could not create folder
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
+int32_t C_OscUtils::h_CreateFolderRecursively(const C_SclString & orc_Folder)
 {
    //lint -e{8080} //using type expected by the library for compatibility
-   size_t un_CharIndex = 0U;
-   sint32 s32_Return = C_NO_ERR;
+   size_t x_CharIndex = 0U;
+   int32_t s32_Return = C_NO_ERR;
 
    const std::string c_Path = orc_Folder.c_str();
 
    do
    {
       std::string c_PartialPath;
-      un_CharIndex = c_Path.find_first_of("\\/", un_CharIndex + 1);
+      x_CharIndex = c_Path.find_first_of("\\/", x_CharIndex + 1);
 
-      c_PartialPath = c_Path.substr(0, un_CharIndex);
-      s32_Return = TGL_CreateDirectory(c_PartialPath.c_str());
+      c_PartialPath = c_Path.substr(0, x_CharIndex);
+      s32_Return = TglCreateDirectory(c_PartialPath.c_str());
       if (s32_Return != 0)
       {
          s32_Return = C_NOACT;
       }
    }
-   while ((un_CharIndex != std::string::npos) && (s32_Return == C_NO_ERR));
+   while ((x_CharIndex != std::string::npos) && (s32_Return == C_NO_ERR));
    return s32_Return;
 }
 
@@ -250,9 +250,9 @@ sint32 C_OSCUtils::h_CreateFolderRecursively(const C_SCLString & orc_Folder)
    Niceified string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_String)
+C_SclString C_OscUtils::h_NiceifyStringForFileName(const C_SclString & orc_String)
 {
-   C_SCLString c_Result;
+   C_SclString c_Result;
    bool q_Blank = true;
 
    //check fringe cases; "." and ".." have special meaning in most file systems and are no valid directory names
@@ -266,9 +266,9 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
    }
    else
    {
-      for (uint32 u32_Index = 0U; u32_Index < orc_String.Length(); u32_Index++)
+      for (uint32_t u32_Index = 0U; u32_Index < orc_String.Length(); u32_Index++)
       {
-         const charn cn_Character = orc_String.c_str()[u32_Index];
+         const char_t cn_Character = orc_String.c_str()[u32_Index];
          if ((std::isalnum(cn_Character) == 0) &&
              (cn_Character != '_') && (cn_Character != '-') && (cn_Character != '(') && (cn_Character != ')') &&
              (cn_Character != '{') && (cn_Character != '}') && (cn_Character != '$') && (cn_Character != '.') &&
@@ -277,7 +277,7 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
              (cn_Character != '=') && (cn_Character != '@') && (cn_Character != '[') && (cn_Character != ']') &&
              (cn_Character != '^') && (cn_Character != '\'') && (cn_Character != '~'))
          {
-            c_Result += C_SCLString::IntToStr(cn_Character);
+            c_Result += C_SclString::IntToStr(cn_Character);
          }
          else
          {
@@ -317,14 +317,14 @@ C_SCLString C_OSCUtils::h_NiceifyStringForFileName(const C_SCLString & orc_Strin
    Niceified string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_String)
+C_SclString C_OscUtils::h_NiceifyStringForCeComment(const C_SclString & orc_String)
 {
-   C_SCLString c_Result = orc_String;
+   C_SclString c_Result = orc_String;
 
-   for (uint32 u32_Index = 1U; u32_Index <= orc_String.Length(); u32_Index++)
+   for (uint32_t u32_Index = 1U; u32_Index <= orc_String.Length(); u32_Index++)
    {
-      const charn cn_Character = c_Result[u32_Index];
-      const uint32 u32_NextIndex = u32_Index + 1U;
+      const char_t cn_Character = c_Result[u32_Index];
+      const uint32_t u32_NextIndex = u32_Index + 1U;
 
       if ((std::isprint(cn_Character) == 0) || (cn_Character == '@') || (cn_Character == '`'))
       {
@@ -363,10 +363,10 @@ C_SCLString C_OSCUtils::h_NiceifyStringForCComment(const C_SCLString & orc_Strin
    \retval   false   The string is not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_CheckValidFileName(const C_SCLString & orc_String)
+bool C_OscUtils::h_CheckValidFileName(const C_SclString & orc_String)
 {
    bool q_Return = true;
-   const C_SCLString c_Temp = h_NiceifyStringForFileName(orc_String);
+   const C_SclString c_Temp = h_NiceifyStringForFileName(orc_String);
 
    if (c_Temp != orc_String)
    {
@@ -394,7 +394,7 @@ bool C_OSCUtils::h_CheckValidFileName(const C_SCLString & orc_String)
    \retval   false   The string invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
+bool C_OscUtils::h_CheckValidFilePath(const C_SclString & orc_String)
 {
    bool q_Return = true;
 
@@ -405,12 +405,12 @@ bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
    else
    {
       bool q_AtLeastOneOtherChar = false;
-      SCLDynamicArray<C_SCLString> c_SplitStrings;
+      C_SclDynamicArray<C_SclString> c_SplitStrings;
       orc_String.Tokenize("\\/", c_SplitStrings);
 
-      for (sint32 s32_Index = 0U; (s32_Index < c_SplitStrings.GetLength()) && (q_Return == true); s32_Index++)
+      for (int32_t s32_Index = 0U; (s32_Index < c_SplitStrings.GetLength()) && (q_Return == true); s32_Index++)
       {
-         const C_SCLString & rc_Substring = c_SplitStrings[s32_Index];
+         const C_SclString & rc_Substring = c_SplitStrings[s32_Index];
 
          // empty sub-strings are okay here, because they result from two consecutive (back-)slashes or from
          // trailing/leading(back-)slash
@@ -454,11 +454,11 @@ bool C_OSCUtils::h_CheckValidFilePath(const C_SCLString & orc_String)
    False Scaling inactive
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64_Offset)
+bool C_OscUtils::h_IsScalingActive(const float64_t of64_Factor, const float64_t of64_Offset)
 {
-   bool q_Return = (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Factor, 1.0) == false);
+   bool q_Return = (C_OscUtils::h_IsFloat64NearlyEqual(of64_Factor, 1.0) == false);
 
-   q_Return = (q_Return || (C_OSCUtils::h_IsFloat64NearlyEqual(of64_Offset, 0.0) == false));
+   q_Return = (q_Return || (C_OscUtils::h_IsFloat64NearlyEqual(of64_Offset, 0.0) == false));
 
    return q_Return;
 }
@@ -477,10 +477,10 @@ bool C_OSCUtils::h_IsScalingActive(const float64 of64_Factor, const float64 of64
    Scaled value
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset,
-                                     const bool oq_AllowRangeAdaptation)
+float64_t C_OscUtils::h_GetValueScaled(const float64_t of64_Value, const float64_t of64_Factor,
+                                       const float64_t of64_Offset, const bool oq_AllowRangeAdaptation)
 {
-   float64 f64_Result;
+   float64_t f64_Result;
 
    f64_Result = of64_Value * of64_Factor;
    f64_Result += of64_Offset;
@@ -506,9 +506,10 @@ float64 C_OSCUtils::h_GetValueScaled(const float64 of64_Value, const float64 of6
    Origin value
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 of64_Factor, const float64 of64_Offset)
+float64_t C_OscUtils::h_GetValueUnscaled(const float64_t of64_Value, const float64_t of64_Factor,
+                                         const float64_t of64_Offset)
 {
-   float64 f64_Result;
+   float64_t f64_Result;
 
    f64_Result = of64_Value - of64_Offset;
    f64_Result /= of64_Factor;
@@ -531,13 +532,13 @@ float64 C_OSCUtils::h_GetValueUnscaled(const float64 of64_Value, const float64 o
    serial number string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_PosSerialNumberToString(const uint8 * const opu8_SerialNumber)
+C_SclString C_OscUtils::h_PosSerialNumberToString(const uint8_t * const opu8_SerialNumber)
 {
-   C_SCLString c_Result;
+   C_SclString c_Result;
 
    if (opu8_SerialNumber != NULL)
    {
-      if (opu8_SerialNumber[0] < static_cast<uint8>(0x20))
+      if (opu8_SerialNumber[0] < static_cast<uint8_t>(0x20))
       {
          //format up to and including 2019. E.g: 05.123456.1001
          c_Result.PrintFormatted("%02X.%02X%02X%02X.%02X%02X",
@@ -571,10 +572,10 @@ C_SCLString C_OSCUtils::h_PosSerialNumberToString(const uint8 * const opu8_Seria
    \retval   empty string  if length of orc_RawSerialNumber does not match the expectations
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const uint8 ou8_ManufacturerFormat,
-                                                  const stw_scl::C_SCLString & orc_RawSerialNumber)
+C_SclString C_OscUtils::h_FsnSerialNumberToString(const uint8_t ou8_ManufacturerFormat,
+                                                  const stw::scl::C_SclString & orc_RawSerialNumber)
 {
-   C_SCLString c_Result;
+   C_SclString c_Result;
 
    if ((orc_RawSerialNumber.Length() > 0) &&
        (orc_RawSerialNumber.Length() <= 29))
@@ -587,8 +588,8 @@ C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const uint8 ou8_ManufacturerFo
             // STW POS format
             //lint -e{9176} //no problems as long as charn has the same size as uint8; if not we'd be in deep !"=?&
             // anyway
-            c_Result = C_OSCUtils::h_PosSerialNumberToString(
-               reinterpret_cast<const uint8 *>(orc_RawSerialNumber.c_str()));
+            c_Result = C_OscUtils::h_PosSerialNumberToString(
+               reinterpret_cast<const uint8_t *>(orc_RawSerialNumber.c_str()));
          }
       }
       else
@@ -608,7 +609,7 @@ C_SCLString C_OSCUtils::h_FsnSerialNumberToString(const uint8 ou8_ManufacturerFo
    \param[out]  orc_OutputString    File content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & orc_OutputString)
+void C_OscUtils::h_FileToString(const C_SclString & orc_FilePath, C_SclString & orc_OutputString)
 {
    std::string c_Input;
    {
@@ -619,11 +620,11 @@ void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & 
       if (c_File.is_open())
       {
          c_File.seekg(0LL, std::ios::end);
-         c_Input.reserve(static_cast<stw_types::uint32>(c_File.tellg()));
+         c_Input.reserve(static_cast<uint32_t>(c_File.tellg()));
          c_File.seekg(0LL, std::ios::beg);
 
-         c_Input.assign(static_cast<std::istreambuf_iterator<stw_types::charn> >(c_File),
-                        std::istreambuf_iterator<stw_types::charn>());
+         c_Input.assign(static_cast<std::istreambuf_iterator<char_t> >(c_File),
+                        std::istreambuf_iterator<char_t>());
          c_File.close();
       }
    }
@@ -637,10 +638,10 @@ void C_OSCUtils::h_FileToString(const C_SCLString & orc_FilePath, C_SCLString & 
    \param[out]  orf64_Value   Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCUtils::h_RangeCheckFloat(float64 & orf64_Value)
+void C_OscUtils::h_RangeCheckFloat(float64_t & orf64_Value)
 {
-   orf64_Value = std::min(orf64_Value, std::numeric_limits<float64>::max());
-   orf64_Value = std::max(orf64_Value, -std::numeric_limits<float64>::max());
+   orf64_Value = std::min(orf64_Value, std::numeric_limits<float64_t>::max());
+   orf64_Value = std::max(orf64_Value, -std::numeric_limits<float64_t>::max());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -659,7 +660,7 @@ void C_OSCUtils::h_RangeCheckFloat(float64 & orf64_Value)
    string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCUtils::h_LoadString(const uint16 ou16_StringIndex)
+C_SclString C_OscUtils::h_LoadString(const uint16_t ou16_StringIndex)
 {
    static bool hq_Initialized = false;
 
@@ -691,11 +692,11 @@ C_SCLString C_OSCUtils::h_LoadString(const uint16 ou16_StringIndex)
    C_RD_WR     read/write error (see log file for details)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCUtils::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLString & orc_TargetFile,
-                              C_SCLString * const opc_ErrorPath, C_SCLString * const opc_ErrorMessage)
+int32_t C_OscUtils::h_CopyFile(const C_SclString & orc_SourceFile, const C_SclString & orc_TargetFile,
+                               C_SclString * const opc_ErrorPath, C_SclString * const opc_ErrorMessage)
 {
-   sint32 s32_Return = C_NO_ERR;
-   C_SCLString c_ErrorMessage = "";
+   int32_t s32_Return = C_NO_ERR;
+   C_SclString c_ErrorMessage = "";
 
    std::fstream c_Input(orc_SourceFile.c_str(), std::fstream::in | std::fstream::binary);
    if (c_Input.fail() == true)
@@ -712,8 +713,8 @@ sint32 C_OSCUtils::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLStr
    {
       c_Input << &std::noskipws;
 
-      const std::istream_iterator<uint8> c_Begin(c_Input);
-      const std::istream_iterator<uint8> c_END;
+      const std::istream_iterator<uint8_t> c_Begin(c_Input);
+      const std::istream_iterator<uint8_t> c_END;
 
       std::fstream c_Output(orc_TargetFile.c_str(), std::fstream::out | std::fstream::trunc | std::fstream::binary);
       if (c_Output.fail() == true)
@@ -728,7 +729,7 @@ sint32 C_OSCUtils::h_CopyFile(const C_SCLString & orc_SourceFile, const C_SCLStr
       }
       else
       {
-         const std::ostream_iterator<uint8> c_Begin2(c_Output);
+         const std::ostream_iterator<uint8_t> c_Begin2(c_Output);
          try
          {
             std::copy(c_Begin, c_END, c_Begin2);

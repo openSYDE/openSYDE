@@ -3,27 +3,27 @@
    \file
    \brief       Basic sequences to communicate with flashloader protocols. (implementation)
 
-   Initialization for C_OSCComDriverFlash
+   Initialization for C_OscComDriverFlash
 
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OSCComSequencesBase.h"
+#include "C_OscComSequencesBase.hpp"
 
-#include "TGLUtils.h"
-#include "C_OSCRoutingRoute.h"
+#include "TglUtils.hpp"
+#include "C_OscRoutingRoute.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,8 +44,8 @@ using namespace stw_opensyde_core;
    \param[in]  oq_UpdateRoutingMode Flag for update specific routing or generic routing
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode) :
-   mpc_ComDriver(new C_OSCComDriverFlash(oq_RoutingActive, oq_UpdateRoutingMode, &mh_MyXflReportProgress, this)),
+C_OscComSequencesBase::C_OscComSequencesBase(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode) :
+   mpc_ComDriver(new C_OscComDriverFlash(oq_RoutingActive, oq_UpdateRoutingMode, &mh_MyXflReportProgress, this)),
    mpc_SystemDefinition(NULL),
    mu32_ActiveBusIndex(0U),
    mq_OpenSydeDevicesActive(false),
@@ -60,7 +60,7 @@ C_OSCComSequencesBase::C_OSCComSequencesBase(const bool oq_RoutingActive, const 
    Tear down class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
+C_OscComSequencesBase::~C_OscComSequencesBase(void)
 {
    delete this->mpc_ComDriver;
    mpc_SystemDefinition = NULL;
@@ -105,13 +105,13 @@ C_OSCComSequencesBase::~C_OSCComSequencesBase(void)
    C_RANGE       Routing configuration failed (can all nodes marked as active be reached from the defined bus ?)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComSequencesBase::Init(C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
-                                   const std::vector<uint8> & orc_ActiveNodes,
-                                   stw_can::C_CAN_Dispatcher * const opc_CanDispatcher,
-                                   C_OSCIpDispatcher * const opc_IpDispatcher,
-                                   C_OSCSecurityPemDatabase * const opc_SecurityPemDb)
+int32_t C_OscComSequencesBase::Init(C_OscSystemDefinition & orc_SystemDefinition, const uint32_t ou32_ActiveBusIndex,
+                                    const std::vector<uint8_t> & orc_ActiveNodes,
+                                    stw::can::C_CanDispatcher * const opc_CanDispatcher,
+                                    C_OscIpDispatcher * const opc_IpDispatcher,
+                                    C_OscSecurityPemDatabase * const opc_SecurityPemDb)
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if ((orc_SystemDefinition.c_Nodes.size() == orc_ActiveNodes.size()) &&
        (ou32_ActiveBusIndex < orc_SystemDefinition.c_Buses.size()))
@@ -151,7 +151,7 @@ sint32 C_OSCComSequencesBase::Init(C_OSCSystemDefinition & orc_SystemDefinition,
    Is initialized flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::IsInitialized(void) const
+bool C_OscComSequencesBase::IsInitialized(void) const
 {
    return this->mpc_ComDriver->IsInitialized();
 }
@@ -167,8 +167,8 @@ bool C_OSCComSequencesBase::IsInitialized(void) const
    false    Node index not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                         uint32 & oru32_NodeIndex) const
+bool C_OscComSequencesBase::GetNodeIndex(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                         uint32_t & oru32_NodeIndex) const
 {
    return this->mpc_ComDriver->GetNodeIndex(orc_ServerId, oru32_NodeIndex);
 }
@@ -183,7 +183,7 @@ bool C_OSCComSequencesBase::GetNodeIndex(const C_OSCProtocolDriverOsyNode & orc_
    false    No device found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
+bool C_OscComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
 {
    return this->mq_OpenSydeDevicesActive;
 }
@@ -198,7 +198,7 @@ bool C_OSCComSequencesBase::IsAtLeastOneOpenSydeNodeActive(void) const
    false    No device found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
+bool C_OscComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
 {
    return this->mq_StwFlashloaderDevicesActive;
 }
@@ -213,7 +213,7 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActive(void) const
    false    No device found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void) const
+bool C_OscComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void) const
 {
    return this->mq_StwFlashloaderDevicesActiveOnLocalBus;
 }
@@ -228,7 +228,7 @@ bool C_OSCComSequencesBase::IsAtLeastOneStwFlashloaderNodeActiveOnLocalBus(void)
    \retval   false    Ethernet to Ethernet Routing must not be supported by router node
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::IsEthToEthRoutingNecessary(const uint32 ou32_RouterNodeIndex) const
+bool C_OscComSequencesBase::IsEthToEthRoutingNecessary(const uint32_t ou32_RouterNodeIndex) const
 {
    return this->mpc_ComDriver->IsEthToEthRoutingNecessary(ou32_RouterNodeIndex);
 }
@@ -244,8 +244,8 @@ bool C_OSCComSequencesBase::IsEthToEthRoutingNecessary(const uint32 ou32_RouterN
    Time in ms all nodes needs at least to get from application to the Flashloader
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
-   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type) const
+uint32_t C_OscComSequencesBase::GetMinimumFlashloaderResetWaitTime(
+   const C_OscComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type) const
 {
    return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime(oe_Type);
 }
@@ -264,9 +264,9 @@ uint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
    \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
-   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type,
-   const C_OSCProtocolDriverOsyNode & orc_ServerId, stw_types::uint32 & oru32_TimeValue) const
+int32_t C_OscComSequencesBase::GetMinimumFlashloaderResetWaitTime(
+   const C_OscComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type,
+   const C_OscProtocolDriverOsyNode & orc_ServerId, uint32_t & oru32_TimeValue) const
 {
    return this->mpc_ComDriver->GetMinimumFlashloaderResetWaitTime(oe_Type, orc_ServerId, oru32_TimeValue);
 }
@@ -281,7 +281,7 @@ sint32 C_OSCComSequencesBase::GetMinimumFlashloaderResetWaitTime(
    false    Node is not reachable on the current route
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::m_IsNodeReachable(const uint32 ou32_NodeIndex) const
+bool C_OscComSequencesBase::m_IsNodeReachable(const uint32_t ou32_NodeIndex) const
 {
    bool q_Return;
 
@@ -293,8 +293,8 @@ bool C_OSCComSequencesBase::m_IsNodeReachable(const uint32 ou32_NodeIndex) const
    else
    {
       // Check the nodes on the route
-      C_OSCRoutingRoute c_Route(ou32_NodeIndex);
-      uint32 u32_PointCounter;
+      C_OscRoutingRoute c_Route(ou32_NodeIndex);
+      uint32_t u32_PointCounter;
       q_Return = true;
 
       this->mpc_ComDriver->GetRouteOfNode(ou32_NodeIndex, c_Route);
@@ -328,11 +328,11 @@ bool C_OSCComSequencesBase::m_IsNodeReachable(const uint32 ou32_NodeIndex) const
    else        abort operation (not honored at each position)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, const uint8 ou8_Progress,
-                                                     const C_SCLString & orc_Text)
+int32_t C_OscComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, const uint8_t ou8_Progress,
+                                                      const C_SclString & orc_Text)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   return reinterpret_cast<C_OSCComSequencesBase *>(opv_Instance)->m_MyXflReportProgress(ou8_Progress, orc_Text);
+   return reinterpret_cast<C_OscComSequencesBase *>(opv_Instance)->m_MyXflReportProgress(ou8_Progress, orc_Text);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -349,7 +349,7 @@ sint32 C_OSCComSequencesBase::mh_MyXflReportProgress(void * const opv_Instance, 
    else        abort operation (not honored at each position)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComSequencesBase::m_MyXflReportProgress(const uint8 ou8_Progress, const C_SCLString & orc_Text)
+int32_t C_OscComSequencesBase::m_MyXflReportProgress(const uint8_t ou8_Progress, const C_SclString & orc_Text)
 {
    //invoke virtual function:
    return this->m_XflReportProgress(ou8_Progress, orc_Text);
@@ -363,19 +363,19 @@ sint32 C_OSCComSequencesBase::m_MyXflReportProgress(const uint8 ou8_Progress, co
    false    No device found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
+bool C_OscComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
 {
    bool q_Return = false;
 
    if (this->mpc_SystemDefinition != NULL)
    {
-      for (uint32 u32_Counter = 0U; u32_Counter < this->mc_ActiveNodes.size(); ++u32_Counter)
+      for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_ActiveNodes.size(); ++u32_Counter)
       {
          if ((u32_Counter < this->mpc_SystemDefinition->c_Nodes.size()) && (this->mc_ActiveNodes[u32_Counter] == 1U))
          {
-            const C_OSCNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[u32_Counter];
+            const C_OscNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[u32_Counter];
 
-            if (rc_Node.c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_OPEN_SYDE)
+            if (rc_Node.c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_OPEN_SYDE)
             {
                q_Return = true;
                break;
@@ -395,19 +395,19 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneOpenSydeNodeActive(void) const
    false    No device found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
+bool C_OscComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
 {
    bool q_Return = false;
 
    if (this->mpc_SystemDefinition != NULL)
    {
-      for (uint32 u32_Counter = 0U; u32_Counter < this->mc_ActiveNodes.size(); ++u32_Counter)
+      for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_ActiveNodes.size(); ++u32_Counter)
       {
          if ((u32_Counter < this->mpc_SystemDefinition->c_Nodes.size()) && (this->mc_ActiveNodes[u32_Counter] == 1U))
          {
-            const C_OSCNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[u32_Counter];
+            const C_OscNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[u32_Counter];
 
-            if (rc_Node.c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+            if (rc_Node.c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW)
             {
                q_Return = true;
                break;
@@ -429,28 +429,28 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeActive(void) const
    false    No device found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
-   C_OSCProtocolDriverOsyNode & orc_StwFlashloaderDeviceOnLocalBus) const
+bool C_OscComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
+   C_OscProtocolDriverOsyNode & orc_StwFlashloaderDeviceOnLocalBus) const
 {
    bool q_Return = false;
 
    if (this->mpc_SystemDefinition != NULL)
    {
-      for (uint32 u32_Counter = 0U; u32_Counter < this->mc_ActiveNodes.size(); ++u32_Counter)
+      for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_ActiveNodes.size(); ++u32_Counter)
       {
          if ((u32_Counter < this->mpc_SystemDefinition->c_Nodes.size()) && (this->mc_ActiveNodes[u32_Counter] == 1U))
          {
-            const C_OSCNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[u32_Counter];
+            const C_OscNode & rc_Node = this->mpc_SystemDefinition->c_Nodes[u32_Counter];
 
-            if (rc_Node.c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+            if (rc_Node.c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW)
             {
-               uint32 u32_IntfCounter;
+               uint32_t u32_IntfCounter;
 
                // Check all interfaces of node if connected to the bus which is connected to the client
                for (u32_IntfCounter = 0U; u32_IntfCounter < rc_Node.c_Properties.c_ComInterfaces.size();
                     ++u32_IntfCounter)
                {
-                  const C_OSCNodeComInterfaceSettings & rc_ComIntf =
+                  const C_OscNodeComInterfaceSettings & rc_ComIntf =
                      rc_Node.c_Properties.c_ComInterfaces[u32_IntfCounter];
 
                   if ((rc_ComIntf.u32_BusIndex == this->mu32_ActiveBusIndex) &&
@@ -460,9 +460,9 @@ bool C_OSCComSequencesBase::m_IsAtLeastOneStwFlashloaderNodeOnLocalBusActive(
 
                      // Save the node identifier for a local STW flashloader device to get easy access
                      // to the protocol for the local bus and not server specific services
-                     orc_StwFlashloaderDeviceOnLocalBus.u8_NodeIdentifier = rc_ComIntf.u8_NodeID;
+                     orc_StwFlashloaderDeviceOnLocalBus.u8_NodeIdentifier = rc_ComIntf.u8_NodeId;
                      orc_StwFlashloaderDeviceOnLocalBus.u8_BusIdentifier =
-                        this->mpc_SystemDefinition->c_Buses[this->mu32_ActiveBusIndex].u8_BusID;
+                        this->mpc_SystemDefinition->c_Buses[this->mu32_ActiveBusIndex].u8_BusId;
 
                      q_Return = true;
                      break;

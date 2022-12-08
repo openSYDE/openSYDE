@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_PuiBsLineArrow.h"
+#include "constants.hpp"
+#include "C_PuiBsLineArrow.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,14 +40,14 @@ using namespace stw_scl;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsLineArrow::C_PuiBsLineArrow() :
    C_PuiBsLineBase(),
-   c_UIColorDark(mc_STYLE_GUIDE_COLOR_36),
+   c_UiColorDark(mc_STYLE_GUIDE_COLOR_36),
    e_StartArrowHeadType(eNONE),
    e_EndArrowHeadType(eNONE),
    e_LineType(eSOLID)
 {
-   c_UIColor = mc_STYLE_GUIDE_COLOR_7;
-   s32_UIWidthPixels = 2;
-   f64_ZOrder = 0.0;
+   c_UiColor = mc_STYLE_GUIDE_COLOR_7;
+   s32_UiWidthPixels = 2;
+   f64_ZetOrder = 0.0;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -59,22 +58,22 @@ C_PuiBsLineArrow::C_PuiBsLineArrow() :
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiBsLineArrow::CalcHash(uint32_t & oru32_HashValue) const
 {
-   sintn sn_Value;
+   int32_t s32_Value;
 
-   C_SCLChecksums::CalcCRC32(&this->e_StartArrowHeadType, sizeof(this->e_StartArrowHeadType), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(&this->e_EndArrowHeadType, sizeof(this->e_EndArrowHeadType), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(&this->e_LineType, sizeof(this->e_LineType), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->e_StartArrowHeadType, sizeof(this->e_StartArrowHeadType), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->e_EndArrowHeadType, sizeof(this->e_EndArrowHeadType), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->e_LineType, sizeof(this->e_LineType), oru32_HashValue);
 
-   sn_Value = this->c_UIColorDark.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIColorDark.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIColorDark.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIColorDark.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorDark.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorDark.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorDark.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiColorDark.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
    C_PuiBsLineBase::CalcHash(oru32_HashValue);
 }
@@ -88,9 +87,9 @@ void C_PuiBsLineArrow::CalcHash(uint32 & oru32_HashValue) const
    Arrow head type as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_PuiBsLineArrow::h_ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type)
+stw::scl::C_SclString C_PuiBsLineArrow::h_ArrowHeadTypeToString(const E_ArrowHeadType & ore_Type)
 {
-   stw_scl::C_SCLString c_Retval;
+   stw::scl::C_SclString c_Retval;
    switch (ore_Type)
    {
    case eNORMAL:
@@ -125,9 +124,9 @@ stw_scl::C_SCLString C_PuiBsLineArrow::h_ArrowHeadTypeToString(const E_ArrowHead
    Line type as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_PuiBsLineArrow::h_LineTypeToString(const E_LineType & ore_Type)
+stw::scl::C_SclString C_PuiBsLineArrow::h_LineTypeToString(const E_LineType & ore_Type)
 {
-   stw_scl::C_SCLString c_Retval;
+   stw::scl::C_SclString c_Retval;
    switch (ore_Type)
    {
    case eDASH:
@@ -159,7 +158,7 @@ stw_scl::C_SCLString C_PuiBsLineArrow::h_LineTypeToString(const E_LineType & ore
    Arrow type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::h_ArrowHeadTypeFromString(const stw_scl::C_SCLString & orc_Str)
+C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::h_ArrowHeadTypeFromString(const stw::scl::C_SclString & orc_Str)
 {
    C_PuiBsLineArrow::E_ArrowHeadType e_Retval;
    if (orc_Str == "normal")
@@ -198,7 +197,7 @@ C_PuiBsLineArrow::E_ArrowHeadType C_PuiBsLineArrow::h_ArrowHeadTypeFromString(co
    Line type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiBsLineArrow::E_LineType C_PuiBsLineArrow::h_LineTypeFromString(const stw_scl::C_SCLString & orc_Str)
+C_PuiBsLineArrow::E_LineType C_PuiBsLineArrow::h_LineTypeFromString(const stw::scl::C_SclString & orc_Str)
 {
    C_PuiBsLineArrow::E_LineType e_Retval;
    if (orc_Str == "dash")

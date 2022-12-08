@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_OSCHalcDef.h"
+#include "stwtypes.hpp"
+#include "C_OscHalcDef.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,8 +33,8 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDef::C_OSCHalcDef(void) :
-   C_OSCHalcDefBase()
+C_OscHalcDef::C_OscHalcDef(void) :
+   C_OscHalcDefBase()
 {
 }
 
@@ -45,9 +45,9 @@ C_OSCHalcDef::C_OSCHalcDef(void) :
    Current domain count
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCHalcDef::GetDomainSize(void) const
+uint32_t C_OscHalcDef::GetDomainSize(void) const
 {
-   return this->mc_Domains.size();
+   return static_cast<uint32_t>(this->mc_Domains.size());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -60,9 +60,9 @@ uint32 C_OSCHalcDef::GetDomainSize(void) const
    Else Valid domain
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCHalcDefDomain * C_OSCHalcDef::GetDomainDefDataConst(const uint32 ou32_Index) const
+const C_OscHalcDefDomain * C_OscHalcDef::GetDomainDefDataConst(const uint32_t ou32_Index) const
 {
-   const C_OSCHalcDefDomain * pc_Retval = NULL;
+   const C_OscHalcDefDomain * pc_Retval = NULL;
 
    if (ou32_Index < this->mc_Domains.size())
    {
@@ -77,7 +77,7 @@ const C_OSCHalcDefDomain * C_OSCHalcDef::GetDomainDefDataConst(const uint32 ou32
    \param[in]  orc_Domain  Domain
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDef::AddDomain(const C_OSCHalcDefDomain & orc_Domain)
+void C_OscHalcDef::AddDomain(const C_OscHalcDefDomain & orc_Domain)
 {
    this->mc_Domains.push_back(orc_Domain);
 }
@@ -89,6 +89,6 @@ void C_OSCHalcDef::AddDomain(const C_OSCHalcDefDomain & orc_Domain)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{9175} intentionally no functionality in this implementation
-void C_OSCHalcDef::HandleFileLoadPostProcessing(void)
+void C_OscHalcDef::HandleFileLoadPostProcessing(void)
 {
 }

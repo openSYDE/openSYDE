@@ -21,18 +21,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SyvComPollingThreadDiag.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SyvComPollingThreadDiag.hpp"
 
-#include "TGLUtils.h"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,8 +56,8 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
-                                               C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                               const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
+                                               C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                               const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
 {
    me_Service = oe_Service;
    mpc_Dealer = &orc_Dealer;
@@ -77,8 +76,8 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
-                                               C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                               const uint16 ou16_ListIndex)
+                                               C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                               const uint16_t ou16_ListIndex)
 {
    me_Service = oe_Service;
    mpc_Dealer = &orc_Dealer;
@@ -96,7 +95,7 @@ void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvComPollingThreadDiag::m_SetRunParams(const C_SyvComPollingThreadDiag::E_Service oe_Service,
                                                C_SyvComDataDealer & orc_Dealer,
-                                               const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
+                                               const std::vector<stw::opensyde_core::C_OscNodeDataPoolListId> & orc_ListIds)
 {
    me_Service = oe_Service;
    mpc_Dealer = &orc_Dealer;
@@ -128,37 +127,37 @@ void C_SyvComPollingThreadDiag::run(void)
    switch (me_Service)
    {
    case eDPREAD:
-      ms32_Result = mpc_Dealer->DataPoolRead(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_NRC);
+      ms32_Result = mpc_Dealer->DataPoolRead(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_Nrc);
       break;
    case eDPWRITE:
-      ms32_Result = mpc_Dealer->DataPoolWrite(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_NRC);
+      ms32_Result = mpc_Dealer->DataPoolWrite(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_Nrc);
       break;
    case eNVMREAD:
-      ms32_Result = mpc_Dealer->NvmRead(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmRead(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_Nrc);
       break;
    case eNVMWRITE:
-      ms32_Result = mpc_Dealer->NvmWrite(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmWrite(mu8_DataPoolIndex, mu16_ListIndex, mu16_ElementIndex, &mu8_Nrc);
       break;
    case eNVMREADLIST:
-      ms32_Result = mpc_Dealer->NvmReadList(mu8_DataPoolIndex, mu16_ListIndex, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmReadList(mu8_DataPoolIndex, mu16_ListIndex, &mu8_Nrc);
       break;
    case eNVMSAFEWRITECHANGEDVALUES:
       // Special case: Output parameter
       this->mc_ChangedElements.clear();
-      ms32_Result = mpc_Dealer->NvmSafeWriteChangedValues(this->mc_ChangedElements, &this->mc_ListIds, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmSafeWriteChangedValues(this->mc_ChangedElements, &this->mc_ListIds, &mu8_Nrc);
       break;
    case eNVMSAFEREAD:
-      ms32_Result = mpc_Dealer->NvmSafeReadValues(this->mpc_ParamNodeValues, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmSafeReadValues(this->mpc_ParamNodeValues, &mu8_Nrc);
       break;
    case eNVMSAFEWRITECRCS:
-      ms32_Result = mpc_Dealer->NvmSafeWriteCrcs(&mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmSafeWriteCrcs(&mu8_Nrc);
       break;
    case eNVMNOTIFYOFCHANGES:
-      ms32_Result = mpc_Dealer->NvmNotifyOfChanges(mu8_DataPoolIndex, static_cast<uint8>(mu16_ListIndex),
-                                                   mq_ApplicationAcknowledge, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmNotifyOfChanges(mu8_DataPoolIndex, static_cast<uint8_t>(mu16_ListIndex),
+                                                   mq_ApplicationAcknowledge, &mu8_Nrc);
       break;
    case eNVMSAFEREADPARAMETERVALUES:
-      ms32_Result = mpc_Dealer->NvmSafeReadParameterValues(this->mc_ListIds, &mu8_NRC);
+      ms32_Result = mpc_Dealer->NvmSafeReadParameterValues(this->mc_ListIds, &mu8_Nrc);
       break;
    default:
       tgl_assert(false);
@@ -182,7 +181,7 @@ C_SyvComPollingThreadDiag::C_SyvComPollingThreadDiag(void) :
    mpc_ParamNodeValues(NULL),
    mq_ApplicationAcknowledge(false),
    ms32_Result(C_UNKNOWN_ERR),
-   mu8_NRC(0),
+   mu8_Nrc(0),
    mq_AcceptNextRequest(true)
 {
 }
@@ -212,10 +211,10 @@ C_SyvComPollingThreadDiag::~C_SyvComPollingThreadDiag(void)
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                                    const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
+int32_t C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                                     const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -243,10 +242,10 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolRead(C_SyvComDataDealer & orc_Dea
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                                     const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
+int32_t C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                                      const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -274,10 +273,10 @@ sint32 C_SyvComPollingThreadDiag::StartDataPoolWrite(C_SyvComDataDealer & orc_De
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                               const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
+int32_t C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                                const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -305,10 +304,10 @@ sint32 C_SyvComPollingThreadDiag::StartNvmRead(C_SyvComDataDealer & orc_Dealer, 
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                                const uint16 ou16_ListIndex, const uint16 ou16_ElementIndex)
+int32_t C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                                 const uint16_t ou16_ListIndex, const uint16_t ou16_ElementIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -335,10 +334,10 @@ sint32 C_SyvComPollingThreadDiag::StartNvmWrite(C_SyvComDataDealer & orc_Dealer,
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Dealer, const uint8 ou8_DataPoolIndex,
-                                                   const uint16 ou16_ListIndex)
+int32_t C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Dealer, const uint8_t ou8_DataPoolIndex,
+                                                    const uint16_t ou16_ListIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -364,10 +363,10 @@ sint32 C_SyvComPollingThreadDiag::StartNvmReadList(C_SyvComDataDealer & orc_Deal
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDealer & orc_Dealer,
-                                                                 const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
+int32_t C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDealer & orc_Dealer,
+                                                                  const std::vector<stw::opensyde_core::C_OscNodeDataPoolListId> & orc_ListIds)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -394,10 +393,10 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteChangedValues(C_SyvComDataDea
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolListElementId> & orc_ChangedElements) const
+int32_t C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
+   std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> & orc_ChangedElements) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->isRunning() == true)
    {
@@ -422,9 +421,9 @@ sint32 C_SyvComPollingThreadDiag::GetNvmSafeWriteChangedValuesOutput(
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & orc_Dealer)
+int32_t C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & orc_Dealer)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -451,10 +450,11 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadValues(C_SyvComDataDealer & or
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::GetNvmSafeReadValuesOutput(const stw_opensyde_core::C_OSCNode * & orpc_ParamNodeValues)
+int32_t C_SyvComPollingThreadDiag::GetNvmSafeReadValuesOutput(
+   const stw::opensyde_core::C_OscNode * & orpc_ParamNodeValues)
 const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->isRunning() == true)
    {
@@ -480,9 +480,9 @@ const
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc_Dealer)
+int32_t C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc_Dealer)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -509,10 +509,11 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeWriteCrcs(C_SyvComDataDealer & orc
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & orc_Dealer,
-                                                          const uint8 ou8_DataPoolIndex, const uint16 ou16_ListIndex)
+int32_t C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & orc_Dealer,
+                                                           const uint8_t ou8_DataPoolIndex,
+                                                           const uint16_t ou16_ListIndex)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -540,9 +541,9 @@ sint32 C_SyvComPollingThreadDiag::StartNvmNotifyOfChanges(C_SyvComDataDealer & o
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::GetNvmNotifyOfChangesOutput(bool & orq_ApplicationAcknowledge) const
+int32_t C_SyvComPollingThreadDiag::GetNvmNotifyOfChangesOutput(bool & orq_ApplicationAcknowledge) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->isRunning() == true)
    {
@@ -569,10 +570,10 @@ sint32 C_SyvComPollingThreadDiag::GetNvmNotifyOfChangesOutput(bool & orq_Applica
    C_BUSY     previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDealer & orc_Dealer,
-                                                                  const std::vector<stw_opensyde_core::C_OSCNodeDataPoolListId> & orc_ListIds)
+int32_t C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDealer & orc_Dealer,
+                                                                   const std::vector<stw::opensyde_core::C_OscNodeDataPoolListId> & orc_ListIds)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((this->isRunning() == true) || (this->mq_AcceptNextRequest == false))
    {
@@ -601,9 +602,9 @@ sint32 C_SyvComPollingThreadDiag::StartNvmSafeReadParameterValues(C_SyvComDataDe
    C_UNKNOWN_ERR  no concrete state was set yet
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
+int32_t C_SyvComPollingThreadDiag::GetResults(int32_t & ors32_Result) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->isRunning() == true)
    {
@@ -622,7 +623,7 @@ sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
 
    Can be used to extract the results of one service execution after it has finished.
 
-   \param[out]  oru8_NRC   negative response code of executed service function
+   \param[out]  oru8_Nrc   negative response code of executed service function
                            for possible values see the DataDealer's function documentation
 
    \return
@@ -630,9 +631,9 @@ sint32 C_SyvComPollingThreadDiag::GetResults(sint32 & ors32_Result) const
    C_BUSY         previously started polled communication still going on
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvComPollingThreadDiag::GetNegativeResponseCode(uint8 & oru8_NRC) const
+int32_t C_SyvComPollingThreadDiag::GetNegativeResponseCode(uint8_t & oru8_Nrc) const
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (this->isRunning() == true)
    {
@@ -640,7 +641,7 @@ sint32 C_SyvComPollingThreadDiag::GetNegativeResponseCode(uint8 & oru8_NRC) cons
    }
    else
    {
-      oru8_NRC = mu8_NRC;
+      oru8_Nrc = mu8_Nrc;
    }
 
    return s32_Return;

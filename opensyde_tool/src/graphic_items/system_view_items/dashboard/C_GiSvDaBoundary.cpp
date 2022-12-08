@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GiSvDaBoundary.h"
-#include "C_PuiSvHandler.h"
+#include "stwtypes.hpp"
+#include "C_GiSvDaBoundary.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,16 +40,17 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     oru32_ViewIndex      Index of system view
    \param[in]     oru32_DashboardIndex Index of dashboard in system view
    \param[in]     ors32_DataIndex      Index of connected data item
-   \param[in]     oru64_ID             Unique ID
+   \param[in]     oru64_Id             Unique ID
    \param[in]     of64_Width           Width of node
    \param[in]     of64_Height          Height of node
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaBoundary::C_GiSvDaBoundary(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                   const sint32 & ors32_DataIndex, const uint64 & oru64_ID, const float64 of64_Width,
-                                   const float64 of64_Height, QGraphicsItem * const opc_Parent) :
-   C_GiBiBoundary(oru64_ID, of64_Width, of64_Height, opc_Parent),
+C_GiSvDaBoundary::C_GiSvDaBoundary(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                   const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
+                                   const float64_t of64_Width, const float64_t of64_Height,
+                                   QGraphicsItem * const opc_Parent) :
+   C_GiBiBoundary(oru64_Id, of64_Width, of64_Height, opc_Parent),
    C_PuiSvDbDataElement(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eBOUNDARY)
 {
 }
@@ -70,7 +70,7 @@ void C_GiSvDaBoundary::LoadData(void)
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiBsBoundary * const pc_Item = pc_Dashboard->GetBoundary(static_cast<uint32>(this->ms32_Index));
+            const C_PuiBsBoundary * const pc_Item = pc_Dashboard->GetBoundary(static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                m_LoadFromData(*pc_Item, pc_View->GetDarkModeActive());
@@ -95,13 +95,13 @@ void C_GiSvDaBoundary::UpdateData(void)
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mu32_DashboardIndex);
          if (pc_Dashboard != NULL)
          {
-            const C_PuiBsBoundary * const pc_Item = pc_Dashboard->GetBoundary(static_cast<uint32>(this->ms32_Index));
+            const C_PuiBsBoundary * const pc_Item = pc_Dashboard->GetBoundary(static_cast<uint32_t>(this->ms32_Index));
             if (pc_Item != NULL)
             {
                C_PuiBsBoundary c_Item = *pc_Item;
                m_UpdateData(c_Item, pc_View->GetDarkModeActive());
                C_PuiSvHandler::h_GetInstance()->SetDashboardBoundary(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                     static_cast<uint32>(this->ms32_Index), c_Item);
+                                                                     static_cast<uint32_t>(this->ms32_Index), c_Item);
             }
          }
       }
@@ -117,19 +117,19 @@ void C_GiSvDaBoundary::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       C_PuiSvHandler::h_GetInstance()->DeleteDashboardBoundary(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                               static_cast<uint32>(this->ms32_Index));
+                                                               static_cast<uint32_t>(this->ms32_Index));
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaBoundary::SetZValueCustom(const float64 of64_ZValue)
+void C_GiSvDaBoundary::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiBoundary::SetZValueCustom(of64_ZValue);
+   C_GiBiBoundary::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }

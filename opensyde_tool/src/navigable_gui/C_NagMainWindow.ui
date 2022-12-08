@@ -41,7 +41,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="stw_opensyde_gui::C_NagServiceModeInfo" name="pc_WidgetServiceModeInfo" native="true">
+     <widget class="stw::opensyde_gui::C_NagServiceModeInfo" name="pc_WidgetServiceModeInfo" native="true">
       <property name="minimumSize">
        <size>
         <width>0</width>
@@ -57,7 +57,7 @@
      </widget>
     </item>
     <item>
-     <widget class="stw_opensyde_gui_elements::C_OgeSaMain" name="scrollArea">
+     <widget class="stw::opensyde_gui_elements::C_OgeSaMain" name="scrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -84,11 +84,11 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeSpiVerticalNavi" name="pc_Splitter">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpiVerticalNavi" name="pc_Splitter">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
-          <widget class="stw_opensyde_gui::C_NagNaviBarWidget" name="pc_NaviBar" native="true"/>
+          <widget class="stw::opensyde_gui::C_NagNaviBarWidget" name="pc_NaviBar" native="true"/>
           <widget class="QWidget" name="layoutWidget">
            <layout class="QVBoxLayout" name="pc_VerticalLayout">
             <property name="spacing">
@@ -107,7 +107,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui::C_NagToolBarWidget" name="pc_TopToolBar" native="true"/>
+             <widget class="stw::opensyde_gui::C_NagToolBarWidget" name="pc_TopToolBar" native="true"/>
             </item>
             <item>
              <widget class="QWidget" name="pc_workAreaWidget" native="true">
@@ -172,33 +172,33 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui::C_NagToolBarWidget</class>
+   <class>stw::opensyde_gui::C_NagToolBarWidget</class>
    <extends>QWidget</extends>
-   <header>C_NagToolBarWidget.h</header>
+   <header>C_NagToolBarWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_NagNaviBarWidget</class>
+   <class>stw::opensyde_gui::C_NagNaviBarWidget</class>
    <extends>QWidget</extends>
-   <header>C_NagNaviBarWidget.h</header>
+   <header>C_NagNaviBarWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSaMain</class>
+   <class>stw::opensyde_gui_elements::C_OgeSaMain</class>
    <extends>QScrollArea</extends>
-   <header>C_OgeSaMain.h</header>
+   <header>C_OgeSaMain.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiVerticalNavi</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpiVerticalNavi</class>
    <extends>QSplitter</extends>
-   <header>C_OgeSpiVerticalNavi.h</header>
+   <header>C_OgeSpiVerticalNavi.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_NagServiceModeInfo</class>
+   <class>stw::opensyde_gui::C_NagServiceModeInfo</class>
    <extends>QWidget</extends>
-   <header>C_NagServiceModeInfo.h</header>
+   <header>C_NagServiceModeInfo.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

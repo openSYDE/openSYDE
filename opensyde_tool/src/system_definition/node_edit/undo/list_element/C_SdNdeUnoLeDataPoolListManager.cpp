@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoLeDataPoolListManager.h"
-#include "C_SdNdeUnoLeDataPoolListElementMoveCommand.h"
-#include "C_SdNdeUnoLeDataPoolListElementDeleteCommand.h"
-#include "C_SdNdeUnoLeDataPoolListElementPasteCommand.h"
-#include "C_SdNdeUnoLeDataPoolListElementAddCommand.h"
-#include "C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.h"
-#include "C_SdNdeUnoLeDataPoolListElementDataChangeCommand.h"
-#include "C_SdNdeDpListTableView.h"
-#include "C_SdNdeDpListTableModel.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoLeDataPoolListManager.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementMoveCommand.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementDeleteCommand.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementPasteCommand.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementAddCommand.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementAddSpecificCommand.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementDataChangeCommand.hpp"
+#include "C_SdNdeDpListTableView.hpp"
+#include "C_SdNdeDpListTableModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -62,9 +61,10 @@ C_SdNdeUnoLeDataPoolListManager::C_SdNdeUnoLeDataPoolListManager(void) :
    \param[in]     orq_AdaptIndices                 Flag, if target rows should be adapted to source row deletion
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                                     const uint32 & oru32_DataPoolListIndex,
-                                                     C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_StartIndex, const std::vector<uint32> & orc_TargetIndex,
+void C_SdNdeUnoLeDataPoolListManager::DoMoveElements(const uint32_t & oru32_NodeIndex,
+                                                     const uint32_t & oru32_DataPoolIndex,
+                                                     const uint32_t & oru32_DataPoolListIndex,
+                                                     C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32_t> & orc_StartIndex, const std::vector<uint32_t> & orc_TargetIndex,
                                                      const bool & orq_AdaptIndices)
 {
    if (((orc_StartIndex.size() > 0) && (orc_TargetIndex.size() > 0)) &&
@@ -92,11 +92,11 @@ void C_SdNdeUnoLeDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeIn
    \param[in]     orc_Indices                      Node data pool list indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListManager::DoDeleteElements(const uint32 & oru32_NodeIndex,
-                                                       const uint32 & oru32_DataPoolIndex,
-                                                       const uint32 & oru32_DataPoolListIndex,
+void C_SdNdeUnoLeDataPoolListManager::DoDeleteElements(const uint32_t & oru32_NodeIndex,
+                                                       const uint32_t & oru32_DataPoolIndex,
+                                                       const uint32_t & oru32_DataPoolListIndex,
                                                        C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                       const std::vector<uint32> & orc_Indices)
+                                                       const std::vector<uint32_t> & orc_Indices)
 {
    if (orc_Indices.size() > 0)
    {
@@ -116,9 +116,9 @@ void C_SdNdeUnoLeDataPoolListManager::DoDeleteElements(const uint32 & oru32_Node
             oru32_DataPoolListIndex);
          if (pc_Model != NULL)
          {
-            if (static_cast<uint32>(pc_Model->rowCount()) == orc_Indices.size())
+            if (static_cast<uint32_t>(pc_Model->rowCount()) == orc_Indices.size())
             {
-               std::vector<uint32> c_Index;
+               std::vector<uint32_t> c_Index;
                c_Index.push_back(0);
                new C_SdNdeUnoLeDataPoolListElementAddCommand(oru32_NodeIndex, oru32_DataPoolIndex,
                                                              oru32_DataPoolListIndex,
@@ -141,10 +141,10 @@ void C_SdNdeUnoLeDataPoolListManager::DoDeleteElements(const uint32 & oru32_Node
    \param[in]     oru32_InsertListIndex            Node data pool list index to insert new elements at
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                              const uint32 & oru32_DataPoolListIndex,
+void C_SdNdeUnoLeDataPoolListManager::DoPaste(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                              const uint32_t & oru32_DataPoolListIndex,
                                               C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                              const uint32 & oru32_InsertListIndex)
+                                              const uint32_t & oru32_InsertListIndex)
 {
    C_SdNdeUnoLeDataPoolListElementPasteCommand * const pc_PasteCommand =
       new C_SdNdeUnoLeDataPoolListElementPasteCommand(oru32_NodeIndex,
@@ -173,10 +173,11 @@ void C_SdNdeUnoLeDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, co
    \param[in]     orc_Indices                      Node data pool list indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListManager::DoAddElements(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                                    const uint32 & oru32_DataPoolListIndex,
+void C_SdNdeUnoLeDataPoolListManager::DoAddElements(const uint32_t & oru32_NodeIndex,
+                                                    const uint32_t & oru32_DataPoolIndex,
+                                                    const uint32_t & oru32_DataPoolListIndex,
                                                     C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                    const std::vector<uint32> & orc_Indices)
+                                                    const std::vector<uint32_t> & orc_Indices)
 {
    if (orc_Indices.size() > 0)
    {
@@ -198,15 +199,15 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddElements(const uint32 & oru32_NodeInd
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     orc_Indices                      Node data pool list indices
-   \param[in]     orc_OSCData                      OSC node data pool list data
-   \param[in]     orc_UIData                       UI node data pool list data
+   \param[in]     orc_OscData                      OSC node data pool list data
+   \param[in]     orc_UiData                       UI node data pool list data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32 & oru32_NodeIndex,
-                                                            const uint32 & oru32_DataPoolIndex,
-                                                            const uint32 & oru32_DataPoolListIndex,
-                                                            C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_Indices, const std::vector<C_OSCNodeDataPoolListElement> & orc_OSCData,
-                                                            const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UIData)
+void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32_t & oru32_NodeIndex,
+                                                            const uint32_t & oru32_DataPoolIndex,
+                                                            const uint32_t & oru32_DataPoolListIndex,
+                                                            C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32_t> & orc_Indices, const std::vector<C_OscNodeDataPoolListElement> & orc_OscData,
+                                                            const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiData)
 {
    if (orc_Indices.size() > 0)
    {
@@ -215,7 +216,7 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32 & oru32
             oru32_NodeIndex,
             oru32_DataPoolIndex, oru32_DataPoolListIndex,
             opc_DataPoolListModelViewManager,
-            orc_Indices, orc_OSCData, orc_UIData);
+            orc_Indices, orc_OscData, orc_UiData);
 
       DoPush(pc_AddCommand);
    }
@@ -235,11 +236,11 @@ void C_SdNdeUnoLeDataPoolListManager::DoAddSpecificElements(const uint32 & oru32
    \param[in]     ors32_DataSetIndex               Optional data set index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoLeDataPoolListManager::DoDataChangeElements(const uint32 & oru32_NodeIndex,
-                                                           const uint32 & oru32_DataPoolIndex,
-                                                           const uint32 & oru32_DataPoolListIndex,
-                                                           C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32 & oru32_DataPoolListElementIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32 & oru32_ArrayIndex,
-                                                           const sint32 & ors32_DataSetIndex)
+void C_SdNdeUnoLeDataPoolListManager::DoDataChangeElements(const uint32_t & oru32_NodeIndex,
+                                                           const uint32_t & oru32_DataPoolIndex,
+                                                           const uint32_t & oru32_DataPoolListIndex,
+                                                           C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32_t & oru32_DataPoolListElementIndex, const QVariant & orc_NewData, const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType, const uint32_t & oru32_ArrayIndex,
+                                                           const int32_t & ors32_DataSetIndex)
 {
    C_SdNdeUnoLeDataPoolListElementDataChangeCommand * const pc_ChangeCommand =
       new C_SdNdeUnoLeDataPoolListElementDataChangeCommand(

@@ -138,7 +138,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame">
+      <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -191,7 +191,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingWidgetTitle" name="pc_LabelMode">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingWidgetTitle" name="pc_LabelMode">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -210,7 +210,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSubSubMode">
+        <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSubSubMode">
          <property name="title">
           <string>MidSection</string>
          </property>
@@ -255,7 +255,7 @@
              <number>2</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelSpace_2">
+             <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelSpace_2">
               <property name="minimumSize">
                <size>
                 <width>24</width>
@@ -292,7 +292,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingWidgetSubTitle" name="pc_LabelMidSection">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingWidgetSubTitle" name="pc_LabelMidSection">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -340,7 +340,7 @@
           <number>2</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelSpace">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelSpace">
            <property name="minimumSize">
             <size>
              <width>24</width>
@@ -377,7 +377,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingWidgetSubSubTitle" name="pc_LabelSubmode">
+        <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingWidgetSubSubTitle" name="pc_LabelSubmode">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -421,36 +421,36 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingWidgetSubTitle</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingWidgetSubTitle</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingWidgetSubTitle.h</header>
+   <header>C_OgeLabHeadingWidgetSubTitle.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingWidgetTitle</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingWidgetTitle</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingWidgetTitle.h</header>
+   <header>C_OgeLabHeadingWidgetTitle.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingWidgetSubSubTitle</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingWidgetSubSubTitle</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingWidgetSubSubTitle.h</header>
+   <header>C_OgeLabHeadingWidgetSubSubTitle.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

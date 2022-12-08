@@ -8,19 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QLinearGradient>
 
-#include "gitypes.h"
-#include "constants.h"
-#include "C_GiNodeBoundary.h"
-#include "C_Uti.h"
+#include "gitypes.hpp"
+#include "constants.hpp"
+#include "C_GiNodeBoundary.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -45,9 +44,8 @@ using namespace stw_opensyde_gui;
    \param[in,out] opc_Parent   Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const stw_types::float64 of64_Width,
-                                   const stw_types::float64 of64_Height, const uint32 ou32_SubNodesCount,
-                                   QGraphicsItem * const opc_Parent) :
+C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const float64_t of64_Width, const float64_t of64_Height,
+                                   const uint32_t ou32_SubNodesCount, QGraphicsItem * const opc_Parent) :
    QGraphicsItem(opc_Parent),
    C_GiBiSizeableItem(of64_Width, of64_Height),
    mc_Text(orc_Text),
@@ -106,10 +104,10 @@ void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGra
    QPen c_Pen;
 
    QRect c_Rect = this->boundingRect().toAlignedRect();
-   sintn sn_Width;
-   const float64 f64_HalfRectHeight = static_cast<float64>(c_Rect.height()) / 1.2;
+   int32_t s32_Width;
+   const float64_t f64_HalfRectHeight = static_cast<float64_t>(c_Rect.height()) / 1.2;
    //Text should not be painted center aligned
-   c_Rect.setHeight(static_cast<sintn>(f64_HalfRectHeight));
+   c_Rect.setHeight(static_cast<int32_t>(f64_HalfRectHeight));
 
    m_DrawBackground(opc_Painter);
 
@@ -119,14 +117,14 @@ void C_GiNodeBoundary::paint(QPainter * const opc_Painter, const QStyleOptionGra
    }
    else
    {
-      c_Pen.setColor(stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_4, 54));
+      c_Pen.setColor(stw::opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_4, 54));
    }
    opc_Painter->setPen(c_Pen);
    opc_Painter->setFont(this->mc_Font);
-   sn_Width = c_Rect.width() - 20;
-   opc_Painter->drawText(c_Rect, static_cast<sintn>(Qt::AlignCenter),
-                         stw_opensyde_gui_logic::C_Uti::h_AdaptStringToSize(this->mc_Text, opc_Painter->fontMetrics(),
-                                                                            static_cast<float64>(sn_Width)));
+   s32_Width = c_Rect.width() - 20;
+   opc_Painter->drawText(c_Rect, static_cast<int32_t>(Qt::AlignCenter),
+                         stw::opensyde_gui_logic::C_Uti::h_AdaptStringToSize(this->mc_Text, opc_Painter->fontMetrics(),
+                                                                             static_cast<float64_t>(s32_Width)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -219,27 +217,27 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
             opc_Painter->drawRoundedRect(c_SurroundingRect, 12.0, 12.0);
 
             // Draw shadow as bigger rect than base -> smaller when surrounding rect is drawn
-            c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
-                                 static_cast<float64>(c_Rect.top()) + 2.0,
-                                 static_cast<float64>(c_Rect.width()) - 4.0,
-                                 static_cast<float64>(c_Rect.height()) - 4.0);
+            c_ShadowRect.setRect(static_cast<float64_t>(c_Rect.left()) + 2.0,
+                                 static_cast<float64_t>(c_Rect.top()) + 2.0,
+                                 static_cast<float64_t>(c_Rect.width()) - 4.0,
+                                 static_cast<float64_t>(c_Rect.height()) - 4.0);
          }
          else
          {
             // Draw shadow as bigger rect than base -> bigger when no surrounding rect
-            c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
-                                 static_cast<float64>(c_Rect.top()) + 2.0,
-                                 static_cast<float64>(c_Rect.width()) - 4.0,
-                                 static_cast<float64>(c_Rect.height()) - 3.0);
+            c_ShadowRect.setRect(static_cast<float64_t>(c_Rect.left()) + 2.0,
+                                 static_cast<float64_t>(c_Rect.top()) + 2.0,
+                                 static_cast<float64_t>(c_Rect.width()) - 4.0,
+                                 static_cast<float64_t>(c_Rect.height()) - 3.0);
          }
       }
       else
       {
          // Draw shadow as bigger rect than base -> bigger when no surrounding rect
-         c_ShadowRect.setRect(static_cast<float64>(c_Rect.left()) + 2.0,
-                              static_cast<float64>(c_Rect.top()) + 2.0,
-                              static_cast<float64>(c_Rect.width()) - 4.0,
-                              static_cast<float64>(c_Rect.height()) - 3.0);
+         c_ShadowRect.setRect(static_cast<float64_t>(c_Rect.left()) + 2.0,
+                              static_cast<float64_t>(c_Rect.top()) + 2.0,
+                              static_cast<float64_t>(c_Rect.width()) - 4.0,
+                              static_cast<float64_t>(c_Rect.height()) - 3.0);
       }
       opc_Painter->setPen(Qt::NoPen);
       opc_Painter->setBrush(static_cast<QBrush>(QColor(206, 206, 217)));
@@ -252,18 +250,19 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
       c_Gradient.setColorAt(0.86, QColor(237, 237, 237));
       c_Gradient.setColorAt(1.0, QColor(237, 237, 237));
 
-      c_InsideRect.setRect(static_cast<float64>(c_Rect.left()) + 3.5,
-                           static_cast<float64>(c_Rect.top()) + 2.5,
-                           static_cast<float64>(c_Rect.width()) - 7.0,
-                           static_cast<float64>(c_Rect.height()) - 6.0);
+      c_InsideRect.setRect(static_cast<float64_t>(c_Rect.left()) + 3.5,
+                           static_cast<float64_t>(c_Rect.top()) + 2.5,
+                           static_cast<float64_t>(c_Rect.width()) - 7.0,
+                           static_cast<float64_t>(c_Rect.height()) - 6.0);
 
-      c_Gradient.setStart(static_cast<float64>(c_Rect.left()) - ((7.5 * static_cast<float64>(c_Rect.width())) / 210.0),
-                          static_cast<float64>(c_Rect.top()) +
-                          ((27.5 * static_cast<float64>(c_Rect.height())) / 137.5));
-      c_Gradient.setFinalStop(static_cast<float64>(c_Rect.right()) +
-                              ((6.25 * static_cast<float64>(c_Rect.width())) / 210.0),
-                              static_cast<float64>(c_Rect.bottom()) -
-                              ((27.5 * static_cast<float64>(c_Rect.height())) / 137.5));
+      c_Gradient.setStart(static_cast<float64_t>(c_Rect.left()) -
+                          ((7.5 * static_cast<float64_t>(c_Rect.width())) / 210.0),
+                          static_cast<float64_t>(c_Rect.top()) +
+                          ((27.5 * static_cast<float64_t>(c_Rect.height())) / 137.5));
+      c_Gradient.setFinalStop(static_cast<float64_t>(c_Rect.right()) +
+                              ((6.25 * static_cast<float64_t>(c_Rect.width())) / 210.0),
+                              static_cast<float64_t>(c_Rect.bottom()) -
+                              ((27.5 * static_cast<float64_t>(c_Rect.height())) / 137.5));
 
       opc_Painter->setBrush(c_Gradient);
       QPen c_Pen;
@@ -282,26 +281,27 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
       //draw "multi node indicator"
       if (this->mu32_SubNodesCount > 0)
       {
-         const float64 f64_LEFT_MARGIN = 15.0;
-         const float64 f64_RIGHT_MARGIN = 20.0;
-         const float64 f64_TopMargin = static_cast<float64>(c_InsideRect.top() + (c_InsideRect.height() * 0.85));
-         const float64 f64_ButtomMargin = static_cast<float64>(c_InsideRect.height() - (c_InsideRect.height() * 0.94));
-         const float64 f64_FREE_SPACE_BETWEEN = 5.0;
-         const float64 f64_SpaceEachNode =
-            static_cast<float64>(((c_InsideRect.width() - (f64_RIGHT_MARGIN - c_InsideRect.left())) -
-                                  (static_cast<float64>(this->mu32_SubNodesCount) * f64_FREE_SPACE_BETWEEN)) /
-                                 static_cast<float64>(this->mu32_SubNodesCount));
+         const float64_t f64_LEFT_MARGIN = 15.0;
+         const float64_t f64_RIGHT_MARGIN = 20.0;
+         const float64_t f64_TopMargin = static_cast<float64_t>(c_InsideRect.top() + (c_InsideRect.height() * 0.85));
+         const float64_t f64_ButtomMargin =
+            static_cast<float64_t>(c_InsideRect.height() - (c_InsideRect.height() * 0.94));
+         const float64_t f64_FREE_SPACE_BETWEEN = 5.0;
+         const float64_t f64_SpaceEachNode =
+            static_cast<float64_t>(((c_InsideRect.width() - (f64_RIGHT_MARGIN - c_InsideRect.left())) -
+                                    (static_cast<float64_t>(this->mu32_SubNodesCount) * f64_FREE_SPACE_BETWEEN)) /
+                                   static_cast<float64_t>(this->mu32_SubNodesCount));
 
          opc_Painter->setPen(Qt::NoPen);
          opc_Painter->setBrush(static_cast<QBrush>(QColor(178, 178, 189)));
 
-         for (uint8 u8_Counter = 0; u8_Counter < this->mu32_SubNodesCount; ++u8_Counter)
+         for (uint8_t u8_Counter = 0; u8_Counter < this->mu32_SubNodesCount; ++u8_Counter)
          {
-            const float64 f64_ExLeft =
-               static_cast<float64>(f64_LEFT_MARGIN + (static_cast<float64>(u8_Counter) * f64_FREE_SPACE_BETWEEN) +
-                                    (static_cast<float64>(u8_Counter) * f64_SpaceEachNode));
+            const float64_t f64_ExLeft =
+               static_cast<float64_t>(f64_LEFT_MARGIN + (static_cast<float64_t>(u8_Counter) * f64_FREE_SPACE_BETWEEN) +
+                                      (static_cast<float64_t>(u8_Counter) * f64_SpaceEachNode));
 
-            const float64 f64_ExRight = f64_SpaceEachNode;
+            const float64_t f64_ExRight = f64_SpaceEachNode;
 
             c_MultiNodeIndicatorRect.setRect(f64_ExLeft,
                                              f64_TopMargin, //const
@@ -309,8 +309,8 @@ void C_GiNodeBoundary::m_DrawBackground(QPainter * const opc_Painter) const
                                              f64_ButtomMargin); //const
 
             opc_Painter->drawRoundedRect(c_MultiNodeIndicatorRect,
-                                         static_cast<float64>(c_InsideRect.height() * 0.03),
-                                         static_cast<float64>(c_InsideRect.height() * 0.03));
+                                         static_cast<float64_t>(c_InsideRect.height() * 0.03),
+                                         static_cast<float64_t>(c_InsideRect.height() * 0.03));
          }
       }
 

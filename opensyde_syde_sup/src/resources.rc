@@ -1,22 +1,33 @@
+//-----------------------------------------------------------------------------
+/*!
+   \file
+   \brief       Short description
+
+   Detailed description (optional). The module shall be described detailed if it is not described completely
+   by short description. (todo: remove this line for header files)
+
+   \copyright   Copyright 2022 Sensor-Technik Wiedemann GmbH. All rights reserved.
+*/
+//-----------------------------------------------------------------------------
 #include <windows.h>
-#include "version_config.h"
+#include "version_config.hpp"
 
 VS_VERSION_INFO VERSIONINFO
 // use version as defined in version_config.h:
-FILEVERSION     PROJECT_VERSION_MAJOR,PROJECT_VERSION_MINOR,PROJECT_VERSION_RELEASE,PROJECT_VERSION_BUILD
+FILEVERSION PROJECT_VERSION_MAJOR, PROJECT_VERSION_MINOR, PROJECT_VERSION_RELEASE, PROJECT_VERSION_BUILD
 
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904E4"
-        BEGIN
+            BLOCK "StringFileInfo"
+BEGIN
+            BLOCK "040904E4"
+BEGIN
             VALUE "CompanyName",        "Sensor-Technik Wiedemann GmbH\0"
-            VALUE "FileDescription",    "openSYDE SYDEsup\n"
-        END
-    END
-
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1252
-    END
+VALUE "FileDescription",    "openSYDE SYDEsup\n"
 END
+END
+
+            BLOCK "VarFileInfo"
+BEGIN
+            VALUE "Translation", 0x409, 1252
+END
+            END

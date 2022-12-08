@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoUtil.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,13 +37,13 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] orc_Target Target indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoUtil::h_AdaptTargetToDeletedSource(const std::vector<uint32> & orc_Source,
-                                                  std::vector<uint32> & orc_Target)
+void C_SdNdeUnoUtil::h_AdaptTargetToDeletedSource(const std::vector<uint32_t> & orc_Source,
+                                                  std::vector<uint32_t> & orc_Target)
 {
-   for (uint32 u32_ItTarget = 0; u32_ItTarget < orc_Target.size(); ++u32_ItTarget)
+   for (uint32_t u32_ItTarget = 0; u32_ItTarget < orc_Target.size(); ++u32_ItTarget)
    {
-      uint32 u32_Adaption = 0;
-      for (uint32 u32_ItSource = 0; u32_ItSource < orc_Source.size(); ++u32_ItSource)
+      uint32_t u32_Adaption = 0;
+      for (uint32_t u32_ItSource = 0; u32_ItSource < orc_Source.size(); ++u32_ItSource)
       {
          if (orc_Source[u32_ItSource] <= orc_Target[u32_ItTarget])
          {

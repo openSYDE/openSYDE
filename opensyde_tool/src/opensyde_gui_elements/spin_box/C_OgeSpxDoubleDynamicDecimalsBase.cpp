@@ -11,20 +11,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QLineEdit>
 #include <QKeyEvent>
-#include "stwtypes.h"
-#include "C_Uti.h"
-#include "constants.h"
-#include "C_OgeSpxDoubleDynamicDecimalsBase.h"
+#include "stwtypes.hpp"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "C_OgeSpxDoubleDynamicDecimalsBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,7 +48,7 @@ using namespace stw_opensyde_gui_logic;
 C_OgeSpxDoubleDynamicDecimalsBase::C_OgeSpxDoubleDynamicDecimalsBase(QWidget * const opc_Parent) :
    QDoubleSpinBox(opc_Parent)
 {
-   this->setDecimals(msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
+   this->setDecimals(ms32_DOUBLE_SPIN_BOX_DECIMAL_COUNT);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +63,7 @@ C_OgeSpxDoubleDynamicDecimalsBase::C_OgeSpxDoubleDynamicDecimalsBase(QWidget * c
    Spinbox text
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxDoubleDynamicDecimalsBase::textFromValue(const float64 of64_Value) const
+QString C_OgeSpxDoubleDynamicDecimalsBase::textFromValue(const float64_t of64_Value) const
 {
    QString c_StringFromValue;
    QChar c_DecimalSeparator;
@@ -72,7 +71,7 @@ QString C_OgeSpxDoubleDynamicDecimalsBase::textFromValue(const float64 of64_Valu
    c_StringFromValue = C_Uti::h_GetStringFromDouble(of64_Value);
 
    // do not show more decimals than the number of QDoubleSpinbox::decimals()
-   // which is per default msn_DOUBLE_SPIN_BOX_DECIMAL_COUNT but could be customized
+   // which is per default ms32_DOUBLE_SPIN_BOX_DECIMAL_COUNT but could be customized
    if (c_StringFromValue.split(".").at(1).length() > this->decimals())
    {
       c_StringFromValue = QDoubleSpinBox::textFromValue(of64_Value);

@@ -8,16 +8,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QRectF>
 
-#include "stwtypes.h"
-#include "C_GiBiSizeableItem.h"
+#include "stwtypes.hpp"
+#include "C_GiBiSizeableItem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,7 +47,7 @@ C_GiBiSizeableItem::C_GiBiSizeableItem() :
    \param[in] of64_Height Height
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiSizeableItem::C_GiBiSizeableItem(const float64 of64_Width, const float64 of64_Height) :
+C_GiBiSizeableItem::C_GiBiSizeableItem(const float64_t of64_Width, const float64_t of64_Height) :
    f64_Width(of64_Width),
    f64_Height(of64_Height)
 {

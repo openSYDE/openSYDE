@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvNodeSyvBase.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvNodeSyvBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,16 +40,16 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]      ou32_ViewIndex   Index of system view
    \param[in]      ors32_NodeIndex  Index of data element in system view
-   \param[in]      oru64_ID         Unique ID
+   \param[in]      oru64_Id         Unique ID
    \param[in]      orf64_Width      Width of node
    \param[in]      orf64_Height     Height of node
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvNodeSyvBase::C_GiSvNodeSyvBase(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
-                                     const uint64 & oru64_ID, const float64 & orf64_Width, const float64 & orf64_Height,
-                                     QGraphicsItem * const opc_Parent) :
-   C_GiNode(ors32_NodeIndex, oru64_ID, orf64_Width, orf64_Height, opc_Parent),
+C_GiSvNodeSyvBase::C_GiSvNodeSyvBase(const uint32_t ou32_ViewIndex, const int32_t & ors32_NodeIndex,
+                                     const uint64_t & oru64_Id, const float64_t & orf64_Width,
+                                     const float64_t & orf64_Height, QGraphicsItem * const opc_Parent) :
+   C_GiNode(ors32_NodeIndex, oru64_Id, orf64_Width, orf64_Height, opc_Parent),
    mu32_ViewIndex(ou32_ViewIndex),
    mq_ViewConnected(false)
 {
@@ -87,7 +86,7 @@ void C_GiSvNodeSyvBase::LoadData(void)
 
       if (pc_SvData != NULL)
       {
-         this->SetViewConnected(pc_SvData->GetNodeStatusDisplayedAsActive(static_cast<uint32>(this->ms32_Index)));
+         this->SetViewConnected(pc_SvData->GetNodeStatusDisplayedAsActive(static_cast<uint32_t>(this->ms32_Index)));
       }
    }
 }
@@ -102,7 +101,7 @@ void C_GiSvNodeSyvBase::LoadData(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_GiSvNodeSyvBase::m_UpdateError(void)
 {
-   const bool q_Retval = C_PuiSvHandler::h_GetInstance()->GetErrorNode(static_cast<uint32>(this->ms32_Index));
+   const bool q_Retval = C_PuiSvHandler::h_GetInstance()->GetErrorNode(static_cast<uint32_t>(this->ms32_Index));
 
    if (q_Retval == true)
    {

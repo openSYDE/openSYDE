@@ -8,14 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCComMessageLoggerData.h"
+#include "C_OscComMessageLoggerData.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerDataSignal::C_OSCComMessageLoggerDataSignal(void) :
+C_OscComMessageLoggerDataSignal::C_OscComMessageLoggerDataSignal(void) :
    c_Name(""),
    c_Value(""),
    c_Unit(""),
@@ -56,7 +56,7 @@ C_OSCComMessageLoggerDataSignal::C_OSCComMessageLoggerDataSignal(void) :
    false orc_Cmp equal or bigger than current
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComMessageLoggerDataSignal::operator <(const C_OSCComMessageLoggerDataSignal & orc_Cmp) const
+bool C_OscComMessageLoggerDataSignal::operator <(const C_OscComMessageLoggerDataSignal & orc_Cmp) const
 {
    bool q_Return = false;
 
@@ -72,7 +72,7 @@ bool C_OSCComMessageLoggerDataSignal::operator <(const C_OSCComMessageLoggerData
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerData::C_OSCComMessageLoggerData(void) :
+C_OscComMessageLoggerData::C_OscComMessageLoggerData(void) :
    u64_TimeStampRelative(0U),
    u64_TimeStampAbsoluteStart(0U),
    u64_TimeStampAbsoluteTimeOfDay(0U),
@@ -89,7 +89,7 @@ C_OSCComMessageLoggerData::C_OSCComMessageLoggerData(void) :
    c_ProtocolTextDec(""),
    c_ProtocolTextHex(""),
    c_Counter(""),
-   c_CanMsg(stw_can::T_STWCAN_Msg_RX()),
+   c_CanMsg(stw::can::T_STWCAN_Msg_RX()),
    q_IsTx(false)
 {
 }
@@ -98,7 +98,7 @@ C_OSCComMessageLoggerData::C_OSCComMessageLoggerData(void) :
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComMessageLoggerData::~C_OSCComMessageLoggerData(void)
+C_OscComMessageLoggerData::~C_OscComMessageLoggerData(void)
 {
 }
 
@@ -106,7 +106,7 @@ C_OSCComMessageLoggerData::~C_OSCComMessageLoggerData(void)
 /*! \brief   Sort the signals
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComMessageLoggerData::SortSignals(void)
+void C_OscComMessageLoggerData::SortSignals(void)
 {
    std::sort(this->c_Signals.begin(), this->c_Signals.end());
 }
@@ -124,24 +124,24 @@ void C_OSCComMessageLoggerData::SortSignals(void)
    Formatted timestamp
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComMessageLoggerData::h_GetTimestampAsString(const uint64 ou64_TimeStamp)
+C_SclString C_OscComMessageLoggerData::h_GetTimestampAsString(const uint64_t ou64_TimeStamp)
 {
-   C_SCLString c_TimeStamp;
-   const uint16 u16_MicroSec = static_cast<uint16>(ou64_TimeStamp % 1000U);
-   uint64 u64_TimeStampTemp = ou64_TimeStamp / 1000U; // To ms
-   const uint16 u16_MilliSec = static_cast<uint16>(u64_TimeStampTemp % 1000U);
-   uint8 u8_Sec;
-   uint8 u8_Min;
-   uint32 u32_Hours;
+   C_SclString c_TimeStamp;
+   const uint16_t u16_MicroSec = static_cast<uint16_t>(ou64_TimeStamp % 1000U);
+   uint64_t u64_TimeStampTemp = ou64_TimeStamp / 1000U; // To ms
+   const uint16_t u16_MilliSec = static_cast<uint16_t>(u64_TimeStampTemp % 1000U);
+   uint8_t u8_Sec;
+   uint8_t u8_Min;
+   uint32_t u32_Hours;
 
    u64_TimeStampTemp /= 1000U; // To sec
-   u8_Sec = static_cast<uint8>(u64_TimeStampTemp % 60U);
+   u8_Sec = static_cast<uint8_t>(u64_TimeStampTemp % 60U);
 
    u64_TimeStampTemp /= 60U; // To min
-   u8_Min = static_cast<uint8>(u64_TimeStampTemp % 60U);
+   u8_Min = static_cast<uint8_t>(u64_TimeStampTemp % 60U);
 
    u64_TimeStampTemp /= 60U; // To hours
-   u32_Hours = static_cast<uint32>(u64_TimeStampTemp);
+   u32_Hours = static_cast<uint32_t>(u64_TimeStampTemp);
 
    c_TimeStamp.PrintFormatted("%02d:%02d:%02d.%03d.%03d",
                               u32_Hours, u8_Min, u8_Sec, u16_MilliSec, u16_MicroSec);

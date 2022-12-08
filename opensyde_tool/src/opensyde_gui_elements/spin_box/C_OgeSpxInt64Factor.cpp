@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_OgeSpxInt64Factor.h"
+#include "stwtypes.hpp"
+#include "C_OgeSpxInt64Factor.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -72,17 +71,17 @@ void C_OgeSpxInt64Factor::InterpretValue(void)
 
    Here: Skip 0
 
-   \param[in]  osn_Steps   Steps
+   \param[in]  os32_Steps   Steps
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
+void C_OgeSpxInt64Factor::stepBy(const int32_t os32_Steps)
 {
-   C_OgeSpxInt64::stepBy(osn_Steps);
+   C_OgeSpxInt64::stepBy(os32_Steps);
    if (this->GetIsUnsigned() == true)
    {
       if (this->GetValue().toULongLong() == 0ULL)
       {
-         if (osn_Steps != 0)
+         if (os32_Steps != 0)
          {
             this->SetValue(1ULL, true);
          }
@@ -96,11 +95,11 @@ void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
    {
       if (this->GetValue().toLongLong() == 0LL)
       {
-         if (osn_Steps > 0)
+         if (os32_Steps > 0)
          {
             this->SetValue(1LL, true);
          }
-         else if (osn_Steps < 0)
+         else if (os32_Steps < 0)
          {
             this->SetValue(-1LL, true);
          }
@@ -118,15 +117,15 @@ void C_OgeSpxInt64Factor::stepBy(const sintn osn_Steps)
    Here: Skip 0
 
    \param[in]  orc_Text    Text
-   \param[in]  orsn_Pos    Position
+   \param[in]  ors32_Pos    Position
 
    \return
    Validation state (invalid, intermediate, valid)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QValidator::State C_OgeSpxInt64Factor::validate(QString & orc_Text, sintn & orsn_Pos) const
+QValidator::State C_OgeSpxInt64Factor::validate(QString & orc_Text, int32_t & ors32_Pos) const
 {
-   QValidator::State e_Retval = C_OgeSpxInt64::validate(orc_Text, orsn_Pos);
+   QValidator::State e_Retval = C_OgeSpxInt64::validate(orc_Text, ors32_Pos);
    if (this->GetIsUnsigned() == true)
    {
       if (this->GetValue().toULongLong() == 0ULL)

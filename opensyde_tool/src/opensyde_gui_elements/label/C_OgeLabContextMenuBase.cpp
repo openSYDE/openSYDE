@@ -12,19 +12,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QApplication>
 #include <QClipboard>
 
-#include "C_OgeLabContextMenuBase.h"
-#include "stwtypes.h"
-#include "C_GtGetText.h"
+#include "C_OgeLabContextMenuBase.hpp"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -78,14 +77,14 @@ void C_OgeLabContextMenuBase::m_SetupContextMenu(void)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy"),
                                     this,
                                     &C_OgeLabContextMenuBase::m_Copy,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_C));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select All"),
                                     this,
                                     &C_OgeLabContextMenuBase::m_SelectAll,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCParamSetDataPoolInfo.h"
+#include "C_OscParamSetDataPoolInfo.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,10 +33,10 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetDataPoolInfo::C_OSCParamSetDataPoolInfo(void) :
+C_OscParamSetDataPoolInfo::C_OscParamSetDataPoolInfo(void) :
    u32_DataPoolCrc(0),
-   u32_NvMStartAddress(0),
-   u32_NvMSize(0)
+   u32_NvmStartAddress(0),
+   u32_NvmSize(0)
 {
    au8_Version[0] = 0;
    au8_Version[1] = 0;

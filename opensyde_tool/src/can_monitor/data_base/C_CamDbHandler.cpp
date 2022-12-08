@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_CamDbHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_CamDbHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 C_CamDbHandler C_CamDbHandler::mhc_Instance;
@@ -41,8 +40,8 @@ C_CamDbHandler C_CamDbHandler::mhc_Instance;
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::RemoveAllFiles(void)
 {
-   this->mc_DBCFiles.clear();
-   this->mc_OSYFiles.clear();
+   this->mc_DbcFiles.clear();
+   this->mc_OsyFiles.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -53,7 +52,7 @@ void C_CamDbHandler::RemoveAllFiles(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::RemoveDbcFile(const QString & orc_File)
 {
-   this->mc_DBCFiles.remove(orc_File);
+   this->mc_DbcFiles.remove(orc_File);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -64,7 +63,7 @@ void C_CamDbHandler::RemoveDbcFile(const QString & orc_File)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::RemoveOsyFile(const QString & orc_File)
 {
-   this->mc_OSYFiles.remove(orc_File);
+   this->mc_OsyFiles.remove(orc_File);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -74,12 +73,12 @@ void C_CamDbHandler::RemoveOsyFile(const QString & orc_File)
    \param[in]  orc_Data    Data extracted from this file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamDbHandler::AddDbcFile(const QString & orc_File, const C_CieConverter::C_CIECommDefinition & orc_Data)
+void C_CamDbHandler::AddDbcFile(const QString & orc_File, const C_CieConverter::C_CieCommDefinition & orc_Data)
 {
    C_CamDbDbc c_New;
 
    c_New.SetData(orc_Data);
-   this->mc_DBCFiles.insert(orc_File, c_New);
+   this->mc_DbcFiles.insert(orc_File, c_New);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -90,12 +89,12 @@ void C_CamDbHandler::AddDbcFile(const QString & orc_File, const C_CieConverter::
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::AddOsyFile(const QString & orc_File,
-                                const stw_opensyde_core::C_OSCComMessageLoggerOsySysDefConfig & orc_Data)
+                                const stw::opensyde_core::C_OscComMessageLoggerOsySysDefConfig & orc_Data)
 {
    C_CamDbOsy c_New;
 
    c_New.SetData(orc_Data);
-   this->mc_OSYFiles.insert(orc_File, c_New);
+   this->mc_OsyFiles.insert(orc_File, c_New);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,7 +109,7 @@ void C_CamDbHandler::AddOsyFile(const QString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 bool C_CamDbHandler::GetContainsDbc(const QString & orc_File) const
 {
-   return this->mc_DBCFiles.contains(orc_File);
+   return this->mc_DbcFiles.contains(orc_File);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -125,7 +124,7 @@ bool C_CamDbHandler::GetContainsDbc(const QString & orc_File) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_CamDbHandler::GetContainsOsy(const QString & orc_File) const
 {
-   return this->mc_OSYFiles.contains(orc_File);
+   return this->mc_OsyFiles.contains(orc_File);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -134,11 +133,11 @@ bool C_CamDbHandler::GetContainsOsy(const QString & orc_File) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamDbHandler::FindAllMessages(void)
 {
-   for (QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OSYFiles.begin(); c_It != this->mc_OSYFiles.end(); ++c_It)
+   for (QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OsyFiles.begin(); c_It != this->mc_OsyFiles.end(); ++c_It)
    {
       c_It->FindAllMessages();
    }
-   for (QMap<QString, C_CamDbDbc>::iterator c_It = this->mc_DBCFiles.begin(); c_It != this->mc_DBCFiles.end(); ++c_It)
+   for (QMap<QString, C_CamDbDbc>::iterator c_It = this->mc_DbcFiles.begin(); c_It != this->mc_DbcFiles.end(); ++c_It)
    {
       c_It->FindAllMessages();
    }
@@ -159,13 +158,13 @@ void C_CamDbHandler::FindAllMessages(void)
    C_NOACT  No matching message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, const bool oq_IsExtended, QString & orc_File,
-                                       QString & orc_Message) const
+int32_t C_CamDbHandler::FindMessageById(const uint32_t ou32_Id, const bool oq_IsExtended, QString & orc_File,
+                                        QString & orc_Message) const
 {
-   sint32 s32_Retval = C_NOACT;
+   int32_t s32_Retval = C_NOACT;
 
-   for (QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.begin();
-        (c_It != this->mc_OSYFiles.end()) && (s32_Retval == C_NOACT); ++c_It)
+   for (QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OsyFiles.begin();
+        (c_It != this->mc_OsyFiles.end()) && (s32_Retval == C_NOACT); ++c_It)
    {
       s32_Retval = c_It->FindMessageById(ou32_Id, oq_IsExtended, orc_Message);
       if (s32_Retval == C_NO_ERR)
@@ -174,8 +173,8 @@ sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, const bool oq_IsExt
          orc_File = c_It.key();
       }
    }
-   for (QMap<QString, C_CamDbDbc>::const_iterator c_It = this->mc_DBCFiles.begin();
-        (c_It != this->mc_DBCFiles.end()) && (s32_Retval == C_NOACT); ++c_It)
+   for (QMap<QString, C_CamDbDbc>::const_iterator c_It = this->mc_DbcFiles.begin();
+        (c_It != this->mc_DbcFiles.end()) && (s32_Retval == C_NOACT); ++c_It)
    {
       s32_Retval = c_It->FindMessageById(ou32_Id, oq_IsExtended, orc_Message);
       if (s32_Retval == C_NO_ERR)
@@ -199,12 +198,12 @@ sint32 C_CamDbHandler::FindMessageById(const uint32 ou32_Id, const bool oq_IsExt
    C_NOACT  Message not found in file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::FindOsyMessage(const QString & orc_File, const QString & orc_Message)
+int32_t C_CamDbHandler::FindOsyMessage(const QString & orc_File, const QString & orc_Message)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OSYFiles.find(orc_File);
+   int32_t s32_Retval = C_NO_ERR;
+   const QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OsyFiles.find(orc_File);
 
-   if (c_It != this->mc_OSYFiles.end())
+   if (c_It != this->mc_OsyFiles.end())
    {
       s32_Retval = c_It->FindMessage(orc_Message);
    }
@@ -227,12 +226,12 @@ sint32 C_CamDbHandler::FindOsyMessage(const QString & orc_File, const QString & 
    C_NOACT  Message not found in file
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & orc_Message)
+int32_t C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & orc_Message)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   const QMap<QString, C_CamDbDbc>::iterator c_It = this->mc_DBCFiles.find(orc_File);
+   int32_t s32_Retval = C_NO_ERR;
+   const QMap<QString, C_CamDbDbc>::iterator c_It = this->mc_DbcFiles.find(orc_File);
 
-   if (c_It != this->mc_DBCFiles.end())
+   if (c_It != this->mc_DbcFiles.end())
    {
       s32_Retval = c_It->FindMessage(orc_Message);
    }
@@ -259,18 +258,19 @@ sint32 C_CamDbHandler::FindDbcMessage(const QString & orc_File, const QString & 
    Else Valid OSC CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_core::C_OSCCanMessage * C_CamDbHandler::GetOSCMessage(const QString & orc_File,
-                                                                         const QString & orc_Message,
-                                                                         const bool oq_UseHash, const uint32 ou32_Hash,
-                                                                         C_OSCCanProtocol::E_Type * const ope_ProtocolType)
+const stw::opensyde_core::C_OscCanMessage * C_CamDbHandler::GetOscMessage(const QString & orc_File,
+                                                                          const QString & orc_Message,
+                                                                          const bool oq_UseHash,
+                                                                          const uint32_t ou32_Hash,
+                                                                          C_OscCanProtocol::E_Type * const ope_ProtocolType)
 const
 {
-   const stw_opensyde_core::C_OSCCanMessage * pc_Retval = NULL;
-   const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.find(orc_File);
+   const stw::opensyde_core::C_OscCanMessage * pc_Retval = NULL;
+   const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OsyFiles.find(orc_File);
 
-   if (c_It != this->mc_OSYFiles.end())
+   if (c_It != this->mc_OsyFiles.end())
    {
-      pc_Retval = c_It->GetOSCMessage(orc_Message, oq_UseHash, ou32_Hash, ope_ProtocolType);
+      pc_Retval = c_It->GetOscMessage(orc_Message, oq_UseHash, ou32_Hash, ope_ProtocolType);
    }
    return pc_Retval;
 }
@@ -290,17 +290,17 @@ const
    Else Valid OSC list
 */
 //----------------------------------------------------------------------------------------------------------------------
-const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbHandler::GetOSCList(const QString & orc_File,
-                                                                            const QString & orc_Message,
-                                                                            const bool oq_UseHash,
-                                                                            const uint32 ou32_Hash) const
+const stw::opensyde_core::C_OscNodeDataPoolList * C_CamDbHandler::GetOscList(const QString & orc_File,
+                                                                             const QString & orc_Message,
+                                                                             const bool oq_UseHash,
+                                                                             const uint32_t ou32_Hash) const
 {
-   const stw_opensyde_core::C_OSCNodeDataPoolList * pc_Retval = NULL;
-   const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OSYFiles.find(orc_File);
+   const stw::opensyde_core::C_OscNodeDataPoolList * pc_Retval = NULL;
+   const QMap<QString, C_CamDbOsy>::const_iterator c_It = this->mc_OsyFiles.find(orc_File);
 
-   if (c_It != this->mc_OSYFiles.end())
+   if (c_It != this->mc_OsyFiles.end())
    {
-      pc_Retval = c_It->GetOSCList(orc_Message, oq_UseHash, ou32_Hash);
+      pc_Retval = c_It->GetOscList(orc_Message, oq_UseHash, ou32_Hash);
    }
    return pc_Retval;
 }
@@ -320,17 +320,17 @@ const stw_opensyde_core::C_OSCNodeDataPoolList * C_CamDbHandler::GetOSCList(cons
    Else Valid DBC message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_CieConverter::C_CIECanMessage * C_CamDbHandler::GetDbcMessage(const QString & orc_File,
+const C_CieConverter::C_CieCanMessage * C_CamDbHandler::GetDbcMessage(const QString & orc_File,
                                                                       const QString & orc_Message,
                                                                       const bool oq_UseHash,
-                                                                      const uint32 ou32_Hash) const
+                                                                      const uint32_t ou32_Hash) const
 {
-   const C_CieConverter::C_CIECanMessage * pc_Retval = NULL;
-   const QMap<QString, C_CamDbDbc>::const_iterator c_It = this->mc_DBCFiles.find(orc_File);
+   const C_CieConverter::C_CieCanMessage * pc_Retval = NULL;
+   const QMap<QString, C_CamDbDbc>::const_iterator c_It = this->mc_DbcFiles.find(orc_File);
 
-   if (c_It != this->mc_DBCFiles.end())
+   if (c_It != this->mc_DbcFiles.end())
    {
-      pc_Retval = c_It->GetDBCMessage(orc_Message, oq_UseHash, ou32_Hash);
+      pc_Retval = c_It->GetDbcMessage(orc_Message, oq_UseHash, ou32_Hash);
    }
    return pc_Retval;
 }
@@ -342,9 +342,9 @@ const C_CieConverter::C_CIECanMessage * C_CamDbHandler::GetDbcMessage(const QStr
    All DBC files
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<QString, C_CamDbDbc> & C_CamDbHandler::GetDBCFiles(void) const
+const QMap<QString, C_CamDbDbc> & C_CamDbHandler::GetDbcFiles(void) const
 {
-   return this->mc_DBCFiles;
+   return this->mc_DbcFiles;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -354,9 +354,9 @@ const QMap<QString, C_CamDbDbc> & C_CamDbHandler::GetDBCFiles(void) const
    All OSY files
 */
 //----------------------------------------------------------------------------------------------------------------------
-const QMap<QString, C_CamDbOsy> & C_CamDbHandler::GetOSYFiles(void) const
+const QMap<QString, C_CamDbOsy> & C_CamDbHandler::GetOsyFiles(void) const
 {
-   return this->mc_OSYFiles;
+   return this->mc_OsyFiles;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -370,12 +370,12 @@ const QMap<QString, C_CamDbOsy> & C_CamDbHandler::GetOSYFiles(void) const
    C_RANGE  File not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::SetDBCActive(const QString & orc_File, const bool oq_Active)
+int32_t C_CamDbHandler::SetDbcActive(const QString & orc_File, const bool oq_Active)
 {
-   sint32 s32_Retval = C_RANGE;
-   const QMap<QString, C_CamDbDbc>::iterator c_It = this->mc_DBCFiles.find(orc_File);
+   int32_t s32_Retval = C_RANGE;
+   const QMap<QString, C_CamDbDbc>::iterator c_It = this->mc_DbcFiles.find(orc_File);
 
-   if (c_It != this->mc_DBCFiles.end())
+   if (c_It != this->mc_DbcFiles.end())
    {
       c_It->SetActive(oq_Active);
       s32_Retval = C_NO_ERR;
@@ -394,12 +394,12 @@ sint32 C_CamDbHandler::SetDBCActive(const QString & orc_File, const bool oq_Acti
    C_RANGE  File not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::SetOsyActive(const QString & orc_File, const bool oq_Active)
+int32_t C_CamDbHandler::SetOsyActive(const QString & orc_File, const bool oq_Active)
 {
-   sint32 s32_Retval = C_RANGE;
-   const QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OSYFiles.find(orc_File);
+   int32_t s32_Retval = C_RANGE;
+   const QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OsyFiles.find(orc_File);
 
-   if (c_It != this->mc_OSYFiles.end())
+   if (c_It != this->mc_OsyFiles.end())
    {
       c_It->SetActive(oq_Active);
       s32_Retval = C_NO_ERR;
@@ -420,12 +420,12 @@ sint32 C_CamDbHandler::SetOsyActive(const QString & orc_File, const bool oq_Acti
    All OSY files
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamDbHandler::ReplaceOsyBusIndex(const QString & orc_File, const uint32 ou32_BusIndex, bool & orq_Change)
+int32_t C_CamDbHandler::ReplaceOsyBusIndex(const QString & orc_File, const uint32_t ou32_BusIndex, bool & orq_Change)
 {
-   sint32 s32_Retval = C_NOACT;
-   const QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OSYFiles.find(orc_File);
+   int32_t s32_Retval = C_NOACT;
+   const QMap<QString, C_CamDbOsy>::iterator c_It = this->mc_OsyFiles.find(orc_File);
 
-   if (c_It != this->mc_OSYFiles.end())
+   if (c_It != this->mc_OsyFiles.end())
    {
       orq_Change = c_It->ReplaceOsyBusIndex(ou32_BusIndex);
       s32_Retval = C_NO_ERR;
@@ -445,18 +445,18 @@ sint32 C_CamDbHandler::ReplaceOsyBusIndex(const QString & orc_File, const uint32
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_CamDbHandler::CheckHashForMessage(const QString & orc_File, const QString & orc_Message,
-                                         const uint32 ou32_Hash) const
+                                         const uint32_t ou32_Hash) const
 {
    bool q_Retval = false;
-   const QMap<QString, C_CamDbOsy>::const_iterator c_ItOsy = this->mc_OSYFiles.find(orc_File);
-   const QMap<QString, C_CamDbDbc>::const_iterator c_ItDbc = this->mc_DBCFiles.find(orc_File);
+   const QMap<QString, C_CamDbOsy>::const_iterator c_ItOsy = this->mc_OsyFiles.find(orc_File);
+   const QMap<QString, C_CamDbDbc>::const_iterator c_ItDbc = this->mc_DbcFiles.find(orc_File);
 
-   if (c_ItOsy != this->mc_OSYFiles.end())
+   if (c_ItOsy != this->mc_OsyFiles.end())
    {
       q_Retval = c_ItOsy->CheckHashForMessage(orc_Message, ou32_Hash);
    }
 
-   if (c_ItDbc != this->mc_DBCFiles.end())
+   if (c_ItDbc != this->mc_DbcFiles.end())
    {
       q_Retval = c_ItDbc->CheckHashForMessage(orc_Message, ou32_Hash);
    }

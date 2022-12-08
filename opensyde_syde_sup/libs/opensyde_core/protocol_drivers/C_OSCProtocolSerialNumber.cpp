@@ -12,20 +12,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstring>
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCUtils.h"
-#include "C_OSCProtocolSerialNumber.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscProtocolSerialNumber.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +43,7 @@ using namespace stw_opensyde_core;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCProtocolSerialNumber::C_OSCProtocolSerialNumber(void) :
+C_OscProtocolSerialNumber::C_OscProtocolSerialNumber(void) :
    q_IsValid(false),
    q_ExtFormatUsed(false),
    q_FsnSerialNumber(false),
@@ -63,7 +63,7 @@ C_OSCProtocolSerialNumber::C_OSCProtocolSerialNumber(void) :
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCProtocolSerialNumber::operator ==(const C_OSCProtocolSerialNumber & orc_Cmp) const
+bool C_OscProtocolSerialNumber::operator ==(const C_OscProtocolSerialNumber & orc_Cmp) const
 {
    bool q_Return = false;
 
@@ -96,21 +96,22 @@ bool C_OSCProtocolSerialNumber::operator ==(const C_OSCProtocolSerialNumber & or
    Else false
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCProtocolSerialNumber::operator <(const C_OSCProtocolSerialNumber & orc_Cmp) const
+bool C_OscProtocolSerialNumber::operator <(const C_OscProtocolSerialNumber & orc_Cmp) const
 {
    bool q_Return = false;
 
    if ((this->q_IsValid == true) &&
        (this->q_IsValid == orc_Cmp.q_IsValid))
    {
-      const sintn sn_Return =
-         std::memcmp(&this->au8_SerialNumber[0], &orc_Cmp.au8_SerialNumber[0], sizeof(this->au8_SerialNumber));
+      const int x_Return = //lint !e970 !e8080  //using type to match library interface
+                           std::memcmp(&this->au8_SerialNumber[0], &orc_Cmp.au8_SerialNumber[0],
+                                       sizeof(this->au8_SerialNumber));
 
-      if (sn_Return < 0)
+      if (x_Return < 0)
       {
          q_Return = true;
       }
-      else if (sn_Return == 0)
+      else if (x_Return == 0)
       {
          if (this->u8_SerialNumberManufacturerFormat < orc_Cmp.u8_SerialNumberManufacturerFormat)
          {
@@ -151,7 +152,7 @@ bool C_OSCProtocolSerialNumber::operator <(const C_OSCProtocolSerialNumber & orc
    \param[in]    orau8_SerialNumber   POS serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCProtocolSerialNumber::SetPosSerialNumber(const stw_types::uint8 (&orau8_SerialNumber)[6])
+void C_OscProtocolSerialNumber::SetPosSerialNumber(const uint8_t (&orau8_SerialNumber)[6])
 {
    (void)std::memcpy(&this->au8_SerialNumber[0], &orau8_SerialNumber[0], 6U);
    this->q_ExtFormatUsed = false;
@@ -174,10 +175,10 @@ void C_OSCProtocolSerialNumber::SetPosSerialNumber(const stw_types::uint8 (&orau
    C_RANGE     Serial number has zero length or is to long
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const std::vector<stw_types::uint8> & orc_SerialNumber,
-                                                     const stw_types::uint8 ou8_SerialNumberManufacturerFormat)
+int32_t C_OscProtocolSerialNumber::SetExtSerialNumber(const std::vector<uint8_t> & orc_SerialNumber,
+                                                      const uint8_t ou8_SerialNumberManufacturerFormat)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if ((ou8_SerialNumberManufacturerFormat == 0U) &&
        (orc_SerialNumber.size() == 6))
@@ -190,11 +191,11 @@ sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const std::vector<stw_types
             (orc_SerialNumber.size() > 0) && (orc_SerialNumber.size() <= 29))
    {
       //extract text:
-      std::vector<charn> c_Text;
+      std::vector<char_t> c_Text;
       c_Text.resize(orc_SerialNumber.size() + 1); // plus 1 for termination
       (void)std::memcpy(&c_Text[0], &orc_SerialNumber[0], orc_SerialNumber.size());
       c_Text[c_Text.size() - 1] = '\0'; //add termination
-      this->c_SerialNumberExt = &c_Text[0];
+      this->c_SerialNumberExt = static_cast<C_SclString>(&c_Text[0]);
       this->q_FsnSerialNumber = true;
    }
    else
@@ -207,7 +208,7 @@ sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const std::vector<stw_types
       this->q_IsValid = true;
       this->q_ExtFormatUsed = true;
       this->u8_SerialNumberManufacturerFormat = ou8_SerialNumberManufacturerFormat;
-      this->u8_SerialNumberByteLength = static_cast<uint8>(orc_SerialNumber.size());
+      this->u8_SerialNumberByteLength = static_cast<uint8_t>(orc_SerialNumber.size());
    }
 
    return s32_Return;
@@ -229,10 +230,10 @@ sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const std::vector<stw_types
    C_RANGE     Serial number has zero length or is to long
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const stw_scl::C_SCLString & orc_SerialNumber,
-                                                     const stw_types::uint8 ou8_SerialNumberManufacturerFormat)
+int32_t C_OscProtocolSerialNumber::SetExtSerialNumber(const stw::scl::C_SclString & orc_SerialNumber,
+                                                      const uint8_t ou8_SerialNumberManufacturerFormat)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
    if (ou8_SerialNumberManufacturerFormat == 0U)
    {
@@ -250,7 +251,7 @@ sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const stw_scl::C_SCLString 
       if ((orc_SerialNumber.Length() > 0) && (orc_SerialNumber.Length() <= 29))
       {
          this->c_SerialNumberExt = orc_SerialNumber;
-         this->u8_SerialNumberByteLength = static_cast<uint8>(orc_SerialNumber.Length());
+         this->u8_SerialNumberByteLength = static_cast<uint8_t>(orc_SerialNumber.Length());
          this->q_FsnSerialNumber = true;
       }
       else
@@ -276,9 +277,9 @@ sint32 C_OSCProtocolSerialNumber::SetExtSerialNumber(const stw_scl::C_SCLString 
    Serial number in uint8 vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint8> C_OSCProtocolSerialNumber::GetSerialNumberAsRawData(void) const
+std::vector<uint8_t> C_OscProtocolSerialNumber::GetSerialNumberAsRawData(void) const
 {
-   std::vector<uint8> c_SerialNumber;
+   std::vector<uint8_t> c_SerialNumber;
 
    if (this->q_FsnSerialNumber == true)
    {
@@ -309,17 +310,17 @@ std::vector<uint8> C_OSCProtocolSerialNumber::GetSerialNumberAsRawData(void) con
    Formatted serial number string
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCProtocolSerialNumber::GetSerialNumberAsFormattedString(void) const
+stw::scl::C_SclString C_OscProtocolSerialNumber::GetSerialNumberAsFormattedString(void) const
 {
-   C_SCLString c_Return;
+   C_SclString c_Return;
 
    if (this->q_FsnSerialNumber == false)
    {
-      c_Return = C_OSCUtils::h_PosSerialNumberToString(&this->au8_SerialNumber[0]);
+      c_Return = C_OscUtils::h_PosSerialNumberToString(&this->au8_SerialNumber[0]);
    }
    else
    {
-      c_Return = C_OSCUtils::h_FsnSerialNumberToString(this->u8_SerialNumberManufacturerFormat,
+      c_Return = C_OscUtils::h_FsnSerialNumberToString(this->u8_SerialNumberManufacturerFormat,
                                                        this->c_SerialNumberExt);
    }
 
@@ -338,9 +339,9 @@ stw_scl::C_SCLString C_OSCProtocolSerialNumber::GetSerialNumberAsFormattedString
    Serial number as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCProtocolSerialNumber::GetSerialNumberAsPlainString(void) const
+C_SclString C_OscProtocolSerialNumber::GetSerialNumberAsPlainString(void) const
 {
-   C_SCLString c_Return;
+   C_SclString c_Return;
 
    if (this->q_FsnSerialNumber == true)
    {
@@ -348,7 +349,7 @@ C_SCLString C_OSCProtocolSerialNumber::GetSerialNumberAsPlainString(void) const
    }
    else
    {
-      c_Return = C_OSCUtils::h_PosSerialNumberToString(&this->au8_SerialNumber[0]);
+      c_Return = C_OscUtils::h_PosSerialNumberToString(&this->au8_SerialNumber[0]);
    }
 
    return c_Return;
@@ -364,22 +365,22 @@ C_SCLString C_OSCProtocolSerialNumber::GetSerialNumberAsPlainString(void) const
    \retval   false   String does not match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCProtocolSerialNumber::h_SerialNumberFromStringToArray(const C_SCLString & orc_SerialNumber,
-                                                                uint8 (&orau8_SerialNumber)[6])
+bool C_OscProtocolSerialNumber::h_SerialNumberFromStringToArray(const C_SclString & orc_SerialNumber,
+                                                                uint8_t (&orau8_SerialNumber)[6])
 {
    bool q_Return = false;
-   C_SCLString c_CompleteString;
+   C_SclString c_CompleteString;
 
    //format up to and including 2019. E.g: 05.123456.1001
    if (orc_SerialNumber.Length() == 14)
    {
-      SCLDynamicArray<C_SCLString> c_Tokens;
+      C_SclDynamicArray<C_SclString> c_Tokens;
       //Get all numbers
       orc_SerialNumber.Tokenize(".", c_Tokens);
       if (c_Tokens.GetLength() == 3)
       {
          //Combine all numbers
-         for (uint32 u32_ItCounter = 0U; u32_ItCounter < static_cast<uint32>(c_Tokens.GetLength()); ++u32_ItCounter)
+         for (uint32_t u32_ItCounter = 0U; u32_ItCounter < static_cast<uint32_t>(c_Tokens.GetLength()); ++u32_ItCounter)
          {
             c_CompleteString += c_Tokens[u32_ItCounter];
          }
@@ -394,7 +395,7 @@ bool C_OSCProtocolSerialNumber::h_SerialNumberFromStringToArray(const C_SCLStrin
    else
    {
       //invalid format, should never happen
-      C_SCLString c_Error;
+      C_SclString c_Error;
       c_Error.PrintFormatted("Invalid serial number format. String: \"%s\".", c_CompleteString.c_str());
       osc_write_log_error("Convert serial number string to array", c_Error);
    }
@@ -402,15 +403,15 @@ bool C_OSCProtocolSerialNumber::h_SerialNumberFromStringToArray(const C_SCLStrin
    //get bytes
    if (c_CompleteString.Length() == 12)
    {
-      uint32 u32_ItByte = 0U;
+      uint32_t u32_ItByte = 0U;
       q_Return = true;
       //For each 2 numbers assign one byte
-      for (uint32 u32_ItChar = 1U; u32_ItChar < c_CompleteString.Length(); u32_ItChar += 2)
+      for (uint32_t u32_ItChar = 1U; u32_ItChar < c_CompleteString.Length(); u32_ItChar += 2)
       {
-         C_SCLString c_SubString = c_CompleteString[u32_ItChar];
-         c_SubString += c_CompleteString[static_cast<sintn>(u32_ItChar) + 1];
+         C_SclString c_SubString = c_CompleteString[u32_ItChar];
+         c_SubString += c_CompleteString[u32_ItChar + 1];
          c_SubString = "0x" + c_SubString;
-         orau8_SerialNumber[u32_ItByte] = static_cast<uint8>(c_SubString.ToInt());
+         orau8_SerialNumber[u32_ItByte] = static_cast<uint8_t>(c_SubString.ToInt());
          //Next byte
          ++u32_ItByte;
       }

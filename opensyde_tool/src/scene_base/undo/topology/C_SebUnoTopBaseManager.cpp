@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SebUnoTopBaseManager.h"
-#include "C_SebUnoTopBusConnectorMoveCommand.h"
-#include "C_GiLiBusConnectorBase.h"
+#include "stwtypes.hpp"
+#include "C_SebUnoTopBaseManager.hpp"
+#include "C_SebUnoTopBusConnectorMoveCommand.hpp"
+#include "C_GiLiBusConnectorBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace std;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -61,17 +60,17 @@ C_SebUnoTopBaseManager::~C_SebUnoTopBaseManager(void)
 /*! \brief  Register resize
 
    \param[in] orc_Items                Affected items
-   \param[in] ors32_InteractionPointID Interaction point ID
+   \param[in] ors32_InteractionPointId Interaction point ID
    \param[in] orc_PositionDifference   Position difference
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBaseManager::RegisterResizeLine(const QList<QGraphicsItem *> & orc_Items,
-                                                const sint32 & ors32_InteractionPointID,
+                                                const int32_t & ors32_InteractionPointId,
                                                 const QPointF & orc_PositionDifference)
 {
    if (m_CheckBusConnectorChange(orc_Items) == false)
    {
-      C_SebUnoBaseManager::RegisterResizeLine(orc_Items, ors32_InteractionPointID, orc_PositionDifference);
+      C_SebUnoBaseManager::RegisterResizeLine(orc_Items, ors32_InteractionPointId, orc_PositionDifference);
    }
 }
 
@@ -96,15 +95,16 @@ void C_SebUnoTopBaseManager::RegisterCompleteMoveStep(const QList<QGraphicsItem 
 
    \param[in] orc_Items              Affected items
    \param[in] orc_PositionDifference Position difference
-   \param[in] ors32_SubLineID        Sub line ID
+   \param[in] ors32_SubLineId        Sub line ID
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebUnoTopBaseManager::RegisterMoveSubLine(const QList<QGraphicsItem *> & orc_Items,
-                                                 const QPointF & orc_PositionDifference, const sint32 & ors32_SubLineID)
+                                                 const QPointF & orc_PositionDifference,
+                                                 const int32_t & ors32_SubLineId)
 {
    if (m_CheckBusConnectorChange(orc_Items) == false)
    {
-      C_SebUnoBaseManager::RegisterMoveSubLine(orc_Items, orc_PositionDifference, ors32_SubLineID);
+      C_SebUnoBaseManager::RegisterMoveSubLine(orc_Items, orc_PositionDifference, ors32_SubLineId);
    }
 }
 
@@ -161,14 +161,14 @@ bool C_SebUnoTopBaseManager::m_CheckBusConnectorChange(const QList<QGraphicsItem
          dynamic_cast<const C_GiLiBusConnectorBase * const>(orc_Items[0]);
       if (pc_BusConnector != NULL)
       {
-         vector<uint64> c_IDs;
-         uint64 u64_ID;
+         vector<uint64_t> c_Ids;
+         uint64_t u64_Id;
          C_SebUnoTopBusConnectorMoveCommand * pc_MoveCommand;
 
-         mh_MapItemToID(pc_BusConnector, u64_ID);
-         c_IDs.push_back(u64_ID);
+         mh_MapItemToId(pc_BusConnector, u64_Id);
+         c_Ids.push_back(u64_Id);
          q_Retval = true;
-         pc_MoveCommand = new C_SebUnoTopBusConnectorMoveCommand(this->mpc_Scene, c_IDs,
+         pc_MoveCommand = new C_SebUnoTopBusConnectorMoveCommand(this->mpc_Scene, c_Ids,
                                                                  this->mc_BusConnectorInitialPoints,
                                                                  pc_BusConnector->GetPointsScenePos());
          pc_MoveCommand->undo();

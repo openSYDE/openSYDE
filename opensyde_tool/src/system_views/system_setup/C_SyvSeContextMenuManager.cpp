@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "gitypes.h"
-#include "C_SyvSeContextMenuManager.h"
-#include "C_GtGetText.h"
+#include "gitypes.hpp"
+#include "C_SyvSeContextMenuManager.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -92,13 +92,13 @@ void C_SyvSeContextMenuManager::HandleContextMenuEvent(QGraphicsSceneContextMenu
       // save the parent of the selected item or selected item
       this->mpc_ActiveItem = C_SebUtil::h_GetHighestParent(orc_SelectedItems[0]);
 
-      if (this->mpc_ActiveItem->type() == msn_GRAPHICS_ITEM_PC)
+      if (this->mpc_ActiveItem->type() == ms32_GRAPHICS_ITEM_PC)
       {
          // TODO: Deactivated because of problem with no selection of PC in edit mode only
          this->mpc_ActionShowCanConfiguration->setVisible(false);
          q_ShowMenu = true;
       }
-      else if (this->mpc_ActiveItem->type() == msn_GRAPHICS_ITEM_NODE)
+      else if (this->mpc_ActiveItem->type() == ms32_GRAPHICS_ITEM_NODE)
       {
          // TODO: Deactivated because of problem with no selection of nodes
          this->mpc_ActionShowNodeInformation->setVisible(false);

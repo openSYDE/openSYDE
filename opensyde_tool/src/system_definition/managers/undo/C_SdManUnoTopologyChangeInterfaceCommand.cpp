@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdUtil.h"
-#include "C_SdManUnoTopologyChangeInterfaceCommand.h"
-#include "C_GiLiBusConnector.h"
+#include "stwtypes.hpp"
+#include "C_SdUtil.hpp"
+#include "C_SdManUnoTopologyChangeInterfaceCommand.hpp"
+#include "C_GiLiBusConnector.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 using namespace std;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
@@ -40,7 +39,7 @@ using namespace std;
 /*! \brief   Default constructor
 
    \param[in,out]  opc_Scene                 Pointer to currently active scene
-   \param[in]      orc_IDs                   Affected unique IDs
+   \param[in]      orc_Ids                   Affected unique IDs
    \param[in]      oru8_PreviousInterface    Previous interface number
    \param[in]      oru8_NewInterface         New interface number to use
    \param[in]      orc_PreviousProperties    Previous properties
@@ -49,13 +48,11 @@ using namespace std;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyChangeInterfaceCommand::C_SdManUnoTopologyChangeInterfaceCommand(QGraphicsScene * const opc_Scene,
-                                                                                   const std::vector<uint64> & orc_IDs,
-                                                                                   const uint8 & oru8_PreviousInterface,
-                                                                                   const uint8 & oru8_NewInterface,
+                                                                                   const std::vector<uint64_t> & orc_Ids, const uint8_t & oru8_PreviousInterface, const uint8_t & oru8_NewInterface,
                                                                                    const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_PreviousProperties,
                                                                                    const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_NewProperties,
                                                                                    QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, "Change interface of bus connection(s)", opc_Parent),
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, "Change interface of bus connection(s)", opc_Parent),
    mu8_PreviousInterface(oru8_PreviousInterface),
    mu8_NewInterface(oru8_NewInterface),
    mc_PreviousProperties(orc_PreviousProperties),
@@ -98,7 +95,7 @@ void C_SdManUnoTopologyChangeInterfaceCommand::redo(void)
    \param[in]  orc_Properties       Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8 & oru8_NewInterface,
+void C_SdManUnoTopologyChangeInterfaceCommand::m_ChangeInterface(const uint8_t & oru8_NewInterface,
                                                                  const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 const
 {

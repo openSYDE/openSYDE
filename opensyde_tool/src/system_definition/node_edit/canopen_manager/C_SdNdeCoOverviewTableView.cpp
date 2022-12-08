@@ -10,21 +10,20 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QMouseEvent>
 
-#include "precomp_headers.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeCoOverviewTableView.h"
-#include "C_SdNdeCoOverviewTableModel.h"
-#include "C_SdNdeSingleHeaderView.h"
+#include "precomp_headers.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeCoOverviewTableView.hpp"
+#include "C_SdNdeCoOverviewTableModel.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ C_SdNdeCoOverviewTableView::C_SdNdeCoOverviewTableView(QWidget * const opc_Paren
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
+   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::EditRole));
    this->C_SdNdeCoOverviewTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -113,12 +112,12 @@ C_SdNdeCoOverviewTableView::~C_SdNdeCoOverviewTableView(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewTableView::LoadUserSettings(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mc_Model.GetNodeIndex());
 
    if (pc_Node != NULL)
    {
       const C_UsNode c_Node = C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
-      if (this->m_SetColumnWidths(c_Node.GetCANopenOverviewColumnWidth()) == false)
+      if (this->m_SetColumnWidths(c_Node.GetCanOpenOverviewColumnWidth()) == false)
       {
          m_InitColumns();
       }
@@ -131,11 +130,11 @@ void C_SdNdeCoOverviewTableView::LoadUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewTableView::SaveUserSettings(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mc_Model.GetNodeIndex());
 
    if (pc_Node != NULL)
    {
-      C_UsHandler::h_GetInstance()->SetProjSdNodeCANopenOverviewColumnWidth(
+      C_UsHandler::h_GetInstance()->SetProjSdNodeCanOpenOverviewColumnWidth(
          pc_Node->c_Properties.c_Name.c_str(), this->m_GetColumnWidths());
    }
 }
@@ -155,10 +154,10 @@ void C_SdNdeCoOverviewTableView::UpdateData()
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoOverviewTableView::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
+void C_SdNdeCoOverviewTableView::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
    this->mc_Model.SetNodeIndex(ou32_NodeIndex);
-   this->sortByColumn(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eINDEX), Qt::AscendingOrder);
+   this->sortByColumn(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eINDEX), Qt::AscendingOrder);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -168,7 +167,7 @@ void C_SdNdeCoOverviewTableView::SetNodeIndex(const stw_types::uint32 ou32_NodeI
    Number of items in table
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sintn C_SdNdeCoOverviewTableView::GetCountRows() const
+int32_t C_SdNdeCoOverviewTableView::GetCountRows() const
 {
    return this->mc_Model.rowCount();
 }
@@ -183,7 +182,7 @@ stw_types::sintn C_SdNdeCoOverviewTableView::GetCountRows() const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_HoveredRow = -1;
+   int32_t s32_HoveredRow = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
    QTableView::mouseMoveEvent(opc_Event);
@@ -233,12 +232,12 @@ void C_SdNdeCoOverviewTableView::mouseDoubleClickEvent(QMouseEvent * const opc_E
       const QModelIndex c_ClickedIndex = this->mc_SortProxyModel.mapToSource(c_ClickedIndexProxy);
       if (c_ClickedIndex.isValid() == true)
       {
-         uint8 u8_InterfaceNumber;
-         stw_opensyde_core::C_OSCCanInterfaceId c_CanInterfaceId;
-         uint32 u32_UseCaseIndex;
+         uint8_t u8_InterfaceNumber;
+         stw::opensyde_core::C_OscCanInterfaceId c_CanInterfaceId;
+         uint32_t u32_UseCaseIndex;
          C_SdNdeCoOverviewTableModel::E_NodeType e_NodeType;
 
-         const sint32 s32_Error = this->mc_Model.MapRowToNodeConfig(
+         const int32_t s32_Error = this->mc_Model.MapRowToNodeConfig(
             c_ClickedIndex.row(), e_NodeType, u8_InterfaceNumber, c_CanInterfaceId);
 
          if (s32_Error == C_NO_ERR)
@@ -269,11 +268,11 @@ void C_SdNdeCoOverviewTableView::mouseDoubleClickEvent(QMouseEvent * const opc_E
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoOverviewTableView::m_InitColumns()
 {
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eINDEX), 44);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eINTERFACE), 120);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eNODE), 140);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eROLE), 120);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eCANOPENNODEID), 120);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eTPDOS), 90);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoOverviewTableModel::eRPDOS), 90);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eINDEX), 44);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eINTERFACE), 120);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eNODE), 140);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eROLE), 120);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eCANOPENNODEID), 120);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eTPDOS), 90);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoOverviewTableModel::eRPDOS), 90);
 }

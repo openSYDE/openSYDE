@@ -10,17 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_OSCCanOpenEdsFileInfoBlock.h"
-#include "C_OSCCanOpenEdsDeviceInfoBlock.h"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscCanOpenEdsFileInfoBlock.hpp"
+#include "C_OscCanOpenEdsDeviceInfoBlock.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +38,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanOpenEdsFileInfoBlock::C_OSCCanOpenEdsFileInfoBlock() :
+C_OscCanOpenEdsFileInfoBlock::C_OscCanOpenEdsFileInfoBlock() :
    u8_FileVersion(0),
    u8_FileRevision(0)
 {
@@ -52,23 +52,23 @@ C_OSCCanOpenEdsFileInfoBlock::C_OSCCanOpenEdsFileInfoBlock() :
    \param[in,out]  oru32_HashValue  Hash value with unit [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenEdsFileInfoBlock::CalcHash(uint32 & oru32_HashValue) const
+void C_OscCanOpenEdsFileInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileName.c_str(), this->c_FileName.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_FileVersion, sizeof(this->u8_FileVersion),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_FileRevision, sizeof(this->u8_FileRevision),
-                                      oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_EDSVersion.c_str(), this->c_EDSVersion.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Description.c_str(), this->c_Description.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_CreationTime.c_str(), this->c_CreationTime.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_CreationDate.c_str(), this->c_CreationDate.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_CreatedBy.c_str(), this->c_CreatedBy.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ModificationTime.c_str(),
-                                      this->c_ModificationTime.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ModificationDate.c_str(),
-                                      this->c_ModificationDate.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_ModifiedBy.c_str(), this->c_ModifiedBy.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_FileName.c_str(), this->c_FileName.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_FileVersion, sizeof(this->u8_FileVersion),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_FileRevision, sizeof(this->u8_FileRevision),
+                                       oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_EdsVersion.c_str(), this->c_EdsVersion.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Description.c_str(), this->c_Description.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_CreationTime.c_str(), this->c_CreationTime.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_CreationDate.c_str(), this->c_CreationDate.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_CreatedBy.c_str(), this->c_CreatedBy.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_ModificationTime.c_str(),
+                                       this->c_ModificationTime.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_ModificationDate.c_str(),
+                                       this->c_ModificationDate.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_ModifiedBy.c_str(), this->c_ModifiedBy.Length(), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,11 +84,12 @@ void C_OSCCanOpenEdsFileInfoBlock::CalcHash(uint32 & oru32_HashValue) const
    \retval   C_CONFIG   At least one value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsFileInfoBlock::LoadFromIni(stw_scl::C_SCLIniFile & orc_File, stw_scl::C_SCLString & orc_LastError)
+int32_t C_OscCanOpenEdsFileInfoBlock::LoadFromIni(stw::scl::C_SclIniFile & orc_File,
+                                                  stw::scl::C_SclString & orc_LastError)
 {
    //lint -e{8062} Kept for later error reporting
-   const sint32 s32_Retval = C_NO_ERR;
-   const stw_scl::C_SCLString c_SectionName = "FileInfo";
+   const int32_t s32_Retval = C_NO_ERR;
+   const stw::scl::C_SclString c_SectionName = "FileInfo";
 
    orc_LastError = "";
 
@@ -103,7 +104,7 @@ sint32 C_OSCCanOpenEdsFileInfoBlock::LoadFromIni(stw_scl::C_SCLIniFile & orc_Fil
       this->c_CreationDate = orc_File.ReadString(c_SectionName, "CreationDate", "");
       this->c_CreatedBy = orc_File.ReadString(c_SectionName, "CreatedBy", "");
       //Optional values
-      this->c_EDSVersion = orc_File.ReadString(c_SectionName, "EDSVersion", "3.0");
+      this->c_EdsVersion = orc_File.ReadString(c_SectionName, "EDSVersion", "3.0");
       this->c_ModificationTime = orc_File.ReadString(c_SectionName, "ModificationTime", "");
       this->c_ModificationDate = orc_File.ReadString(c_SectionName, "ModificationDate", "");
       this->c_ModifiedBy = orc_File.ReadString(c_SectionName, "ModifiedBy", "");

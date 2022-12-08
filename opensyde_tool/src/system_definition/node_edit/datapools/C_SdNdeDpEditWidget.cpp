@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_SdNdeDpEditWidget.h"
+#include "C_SdNdeDpEditWidget.hpp"
 #include "ui_C_SdNdeDpEditWidget.h"
-#include "C_HeHandler.h"
-#include "C_PuiSdHandler.h"
+#include "C_HeHandler.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -113,7 +112,7 @@ C_SdNdeDpEditWidget::~C_SdNdeDpEditWidget()
    \param[in]  oru32_NodeIndex   Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpEditWidget::SetNode(const uint32 & oru32_NodeIndex)
+void C_SdNdeDpEditWidget::SetNode(const uint32_t & oru32_NodeIndex)
 {
    //Reset visibility
    this->mpc_Ui->pc_ListsWidget->setVisible(false);
@@ -129,21 +128,21 @@ void C_SdNdeDpEditWidget::SetNode(const uint32 & oru32_NodeIndex)
    \param[in]  os32_DataElementIndex   Optional data element index (if not used set to -1)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpEditWidget::OpenDetail(const sint32 os32_DataPoolIndex, const sint32 os32_ListIndex,
-                                     const sint32 os32_DataElementIndex) const
+void C_SdNdeDpEditWidget::OpenDetail(const int32_t os32_DataPoolIndex, const int32_t os32_ListIndex,
+                                     const int32_t os32_DataElementIndex) const
 {
-   C_OSCNodeDataPool::E_Type e_Type;
-   this->mpc_Ui->pc_WidgetDpView->SetActualDataPool(static_cast<uint32>(os32_DataPoolIndex));
+   C_OscNodeDataPool::E_Type e_Type;
+   this->mpc_Ui->pc_WidgetDpView->SetActualDataPool(static_cast<uint32_t>(os32_DataPoolIndex));
 
-   if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, static_cast<uint32>(os32_DataPoolIndex),
+   if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, static_cast<uint32_t>(os32_DataPoolIndex),
                                                         e_Type) == C_NO_ERR)
    {
       this->m_OpenDataPoolContent(os32_DataPoolIndex);
 
       if ((os32_ListIndex >= 0) &&
-          (e_Type != C_OSCNodeDataPool::eCOM) &&
-          (e_Type != C_OSCNodeDataPool::eHALC) &&
-          (e_Type != C_OSCNodeDataPool::eHALC_NVM))
+          (e_Type != C_OscNodeDataPool::eCOM) &&
+          (e_Type != C_OscNodeDataPool::eHALC) &&
+          (e_Type != C_OscNodeDataPool::eHALC_NVM))
       {
          this->mpc_Ui->pc_ListsWidget->OpenDetail(os32_ListIndex, os32_DataElementIndex);
       }
@@ -191,23 +190,23 @@ void C_SdNdeDpEditWidget::m_OnListsNavigate(const bool oq_Forwards) const
    \param[in]  ou32_DataPoolIndex   Index of selected datapool
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpEditWidget::m_OpenDataPoolContent(const uint32 ou32_DataPoolIndex) const
+void C_SdNdeDpEditWidget::m_OpenDataPoolContent(const uint32_t ou32_DataPoolIndex) const
 {
-   C_OSCNodeDataPool::E_Type e_Type;
+   C_OscNodeDataPool::E_Type e_Type;
    if (C_PuiSdHandler::h_GetInstance()->GetDataPoolType(this->mu32_NodeIndex, ou32_DataPoolIndex, e_Type) == C_NO_ERR)
    {
       bool q_ShowInternalWidget = true;
 
       //Decide
-      if (e_Type == C_OSCNodeDataPool::eCOM)
+      if (e_Type == C_OscNodeDataPool::eCOM)
       {
          bool q_SwitchToCanOpenTab = false;
          // Check for CANopen Datapool
-         C_OSCCanProtocol::E_Type e_ProtocolType;
+         C_OscCanProtocol::E_Type e_ProtocolType;
          if (C_PuiSdHandler::h_GetInstance()->GetCanProtocolType(this->mu32_NodeIndex, ou32_DataPoolIndex,
                                                                  e_ProtocolType) == C_NO_ERR)
          {
-            if (e_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+            if (e_ProtocolType == C_OscCanProtocol::eCAN_OPEN)
             {
                q_SwitchToCanOpenTab = true;
             }
@@ -225,8 +224,8 @@ void C_SdNdeDpEditWidget::m_OpenDataPoolContent(const uint32 ou32_DataPoolIndex)
          q_ShowInternalWidget = false;
       }
       // Comment this else if block out, to get the HAL Datapool in the list edit widget
-      else if ((e_Type == C_OSCNodeDataPool::eHALC) ||
-               (e_Type == C_OSCNodeDataPool::eHALC_NVM))
+      else if ((e_Type == C_OscNodeDataPool::eHALC) ||
+               (e_Type == C_OscNodeDataPool::eHALC_NVM))
       {
          Q_EMIT (this->SigSwitchToHalc());
          q_ShowInternalWidget = false;

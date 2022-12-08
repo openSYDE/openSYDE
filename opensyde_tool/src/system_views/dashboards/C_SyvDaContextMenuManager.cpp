@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "gitypes.h"
-#include "C_GtGetText.h"
-#include "C_GiLiLineGroup.h"
-#include "C_SyvDaContextMenuManager.h"
+#include "stwtypes.hpp"
+#include "gitypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiLiLineGroup.hpp"
+#include "C_SyvDaContextMenuManager.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ C_SyvDaContextMenuManager::C_SyvDaContextMenuManager() :
    this->mpc_ActionEditContent = this->mc_ContextMenu.addAction(C_GtGetText::h_GetText(
                                                                    "Edit Content"), this,
                                                                 &C_SyvDaContextMenuManager::m_EditContent,
-                                                                static_cast<sintn>(Qt::Key_F2));
+                                                                static_cast<int32_t>(Qt::Key_F2));
    this->mpc_ActionEditSeparator = this->mc_ContextMenu.addSeparator();
 
    //move to right place
@@ -185,35 +184,35 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
       // specific functionality
       switch (this->mpc_ActiveItem->type())
       {
-      case msn_GRAPHICS_ITEM_LINE_ARROW:
+      case ms32_GRAPHICS_ITEM_LINE_ARROW:
          this->mpc_ActionSetupStyle->setVisible(true);
          this->mpc_ActionBendLine->setVisible(true);
          q_Return = true;
          break;
-      case msn_GRAPHICS_ITEM_IMAGE:
+      case ms32_GRAPHICS_ITEM_IMAGE:
          q_Return = true;
          break;
-      case msn_GRAPHICS_ITEM_BOUNDARY:
+      case ms32_GRAPHICS_ITEM_BOUNDARY:
          this->mpc_ActionSetupStyle->setVisible(true);
          q_Return = true;
          break;
-      case msn_GRAPHICS_ITEM_TEXTELEMENT:
+      case ms32_GRAPHICS_ITEM_TEXTELEMENT:
          this->mpc_ActionSetupStyle->setVisible(true);
          this->mpc_ActionEditContent->setVisible(true);
          q_Return = true;
          break;
-      case msn_GRAPHICS_ITEM_DB_LABEL:        // Basic functions of dashboard elements are the same
-      case msn_GRAPHICS_ITEM_DB_SPIN_BOX:     // Basic functions of dashboard elements are the same
-      case msn_GRAPHICS_ITEM_DB_PROGRESS_BAR: // Basic functions of dashboard elements are the same
-      case msn_GRAPHICS_ITEM_DB_SLIDER:       // Basic functions of dashboard elements are the same
-      case msn_GRAPHICS_ITEM_DB_TOGGLE:       // Basic functions of dashboard elements are the same
-      case msn_GRAPHICS_ITEM_DB_PIE_CHART:    // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_LABEL:        // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_SPIN_BOX:     // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_PROGRESS_BAR: // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_SLIDER:       // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_TOGGLE:       // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_PIE_CHART:    // Basic functions of dashboard elements are the same
          // Specific functions will be registered by the items with the function RegisterAction if needed
          this->mpc_ActionEditProperties->setVisible(true);
          q_Return = true;
          break;
-      case msn_GRAPHICS_ITEM_DB_TABLE: // Basic functions of dashboard elements are the same
-      case msn_GRAPHICS_ITEM_DB_PARAM: // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_TABLE: // Basic functions of dashboard elements are the same
+      case ms32_GRAPHICS_ITEM_DB_PARAM: // Basic functions of dashboard elements are the same
          // Specific functions will be registered by the items with the function RegisterAction if needed
          this->mpc_ActionEditContent->setVisible(true);
          q_Return = true;
@@ -275,21 +274,21 @@ bool C_SyvDaContextMenuManager::m_ActivateSpecificActions(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check if the input item type requires a setup style in the context menu
 
-   \param[in] osn_ItemType Item type to check
+   \param[in] os32_ItemType Item type to check
 
    \retval   True    Setup style menu is required
    \retval   False   Setup style menu should stay hidden
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvDaContextMenuManager::m_ItemTypeHasSetupStyle(const stw_types::sintn osn_ItemType)
+bool C_SyvDaContextMenuManager::m_ItemTypeHasSetupStyle(const int32_t os32_ItemType)
 {
    bool q_Retval;
 
-   switch (osn_ItemType)
+   switch (os32_ItemType)
    {
-   case msn_GRAPHICS_ITEM_LINE_ARROW:
-   case msn_GRAPHICS_ITEM_BOUNDARY:
-   case msn_GRAPHICS_ITEM_TEXTELEMENT:
+   case ms32_GRAPHICS_ITEM_LINE_ARROW:
+   case ms32_GRAPHICS_ITEM_BOUNDARY:
+   case ms32_GRAPHICS_ITEM_TEXTELEMENT:
       q_Retval = true;
       break;
    default:

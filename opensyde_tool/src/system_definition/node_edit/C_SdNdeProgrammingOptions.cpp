@@ -12,21 +12,20 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <limits>
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
 
-#include "C_SdNdeProgrammingOptions.h"
+#include "C_SdNdeProgrammingOptions.hpp"
 #include "ui_C_SdNdeProgrammingOptions.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,8 +48,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]     ou32_NodeIndex Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                     const uint32 ou32_NodeIndex) :
+C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                     const uint32_t ou32_NodeIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeProgrammingOptions),
    mrc_ParentDialog(orc_Parent),
@@ -62,19 +61,19 @@ C_SdNdeProgrammingOptions::C_SdNdeProgrammingOptions(stw_opensyde_gui_elements::
 
    //Ranges
    this->mpc_Ui->pc_SpinBoxNBR->SetMinimumCustom(0);
-   this->mpc_Ui->pc_SpinBoxNBR->SetMaximumCustom(static_cast<sintn>(std::numeric_limits<uint16>::max()));
+   this->mpc_Ui->pc_SpinBoxNBR->SetMaximumCustom(static_cast<int32_t>(std::numeric_limits<uint16_t>::max()));
    this->mpc_Ui->pc_SpinBoxNBT->SetMinimumCustom(0);
-   this->mpc_Ui->pc_SpinBoxNBT->SetMaximumCustom(static_cast<sintn>(std::numeric_limits<uint16>::max()));
+   this->mpc_Ui->pc_SpinBoxNBT->SetMaximumCustom(static_cast<int32_t>(std::numeric_limits<uint16_t>::max()));
    this->mpc_Ui->pc_SpinBoxParallelTransmissions->SetMinimumCustom(0);
    this->mpc_Ui->pc_SpinBoxParallelTransmissions->SetMaximumCustom(255);
 
    //Scaling combobox
    this->mpc_Ui->pc_ComboBoxScaling->insertItem(0, "Float32",
-                                                static_cast<sintn>(C_OSCNodeCodeExportSettings::eFLOAT32));
+                                                static_cast<int32_t>(C_OscNodeCodeExportSettings::eFLOAT32));
    this->mpc_Ui->pc_ComboBoxScaling->insertItem(1, "Float64",
-                                                static_cast<sintn>(C_OSCNodeCodeExportSettings::eFLOAT64));
+                                                static_cast<int32_t>(C_OscNodeCodeExportSettings::eFLOAT64));
    this->mpc_Ui->pc_ComboBoxScaling->insertItem(2, C_GtGetText::h_GetText("Disabled"),
-                                                static_cast<sintn>(C_OSCNodeCodeExportSettings::eNONE));
+                                                static_cast<int32_t>(C_OscNodeCodeExportSettings::eNONE));
 
    //Load AFTER ranges are valid
    m_Load();
@@ -159,53 +158,53 @@ void C_SdNdeProgrammingOptions::InitStaticNames(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeProgrammingOptions::Save(void) const
 {
-   C_OSCNodeOpenSYDEServerSettings c_DPDSettings;
-   C_OSCNodeCodeExportSettings c_GeneralSettings;
+   C_OscNodeOpenSydeServerSettings c_DpdSettings;
+   C_OscNodeCodeExportSettings c_GeneralSettings;
 
    // Scaling
    c_GeneralSettings.e_ScalingSupport =
-      static_cast<C_OSCNodeCodeExportSettings::E_Scaling>(this->mpc_Ui->pc_ComboBoxScaling->currentData().toInt());
+      static_cast<C_OscNodeCodeExportSettings::E_Scaling>(this->mpc_Ui->pc_ComboBoxScaling->currentData().toInt());
    tgl_assert(C_PuiSdHandler::h_GetInstance()->SetNodeCodeExportSettings(this->mu32_NodeIndex,
                                                                          c_GeneralSettings) == C_NO_ERR);
 
    //DPD
    if (this->mpc_Ui->pc_ComboBoxDPD->currentIndex() >= 0)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
       if (pc_Node != NULL)
       {
-         sint16 s16_ApplicationIndex = -1;
-         sint16 s16_Counter = 0;
+         int16_t s16_ApplicationIndex = -1;
+         int16_t s16_Counter = 0;
          //Map combo box index to data block index
-         for (uint32 u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
+         for (uint32_t u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
          {
-            const C_OSCNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
-            if (rc_DataBlock.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+            const C_OscNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
+            if (rc_DataBlock.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
             {
-               if (static_cast<sint16>(this->mpc_Ui->pc_ComboBoxDPD->currentIndex()) == s16_Counter)
+               if (static_cast<int16_t>(this->mpc_Ui->pc_ComboBoxDPD->currentIndex()) == s16_Counter)
                {
-                  s16_ApplicationIndex = static_cast<sint16>(u32_ItDataBlock);
+                  s16_ApplicationIndex = static_cast<int16_t>(u32_ItDataBlock);
                }
                //Important iterator step for counter
                ++s16_Counter;
             }
          }
-         c_DPDSettings.s16_DPDDataBlockIndex = s16_ApplicationIndex;
+         c_DpdSettings.s16_DpdDataBlockIndex = s16_ApplicationIndex;
       }
    }
    else
    {
       //Invalid application
-      c_DPDSettings.s16_DPDDataBlockIndex = -1;
+      c_DpdSettings.s16_DpdDataBlockIndex = -1;
    }
 
    //Spin boxes
-   c_DPDSettings.u16_MaxMessageBufferTx = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxNBT->value());
-   c_DPDSettings.u16_MaxRoutingMessageBufferRx = static_cast<uint16>(this->mpc_Ui->pc_SpinBoxNBR->value());
-   c_DPDSettings.u8_MaxParallelTransmissions =
-      static_cast<uint8>(this->mpc_Ui->pc_SpinBoxParallelTransmissions->value());
-   tgl_assert(C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex,
-                                                                             c_DPDSettings) == C_NO_ERR);
+   c_DpdSettings.u16_MaxMessageBufferTx = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxNBT->value());
+   c_DpdSettings.u16_MaxRoutingMessageBufferRx = static_cast<uint16_t>(this->mpc_Ui->pc_SpinBoxNBR->value());
+   c_DpdSettings.u8_MaxParallelTransmissions =
+      static_cast<uint8_t>(this->mpc_Ui->pc_SpinBoxParallelTransmissions->value());
+   tgl_assert(C_PuiSdHandler::h_GetInstance()->SetNodeOpenSydeServerSettings(this->mu32_NodeIndex,
+                                                                             c_DpdSettings) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -221,8 +220,8 @@ void C_SdNdeProgrammingOptions::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -247,36 +246,36 @@ void C_SdNdeProgrammingOptions::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeProgrammingOptions::m_Load(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
-      sint32 s32_Counter = 0;
-      sint32 s32_DataBlockIndex = -1;
+      int32_t s32_Counter = 0;
+      int32_t s32_DataBlockIndex = -1;
 
       //Scaling
       this->mpc_Ui->pc_ComboBoxScaling->setCurrentIndex(
          this->mpc_Ui->pc_ComboBoxScaling->findData(
-            static_cast<sintn>(pc_Node->c_Properties.c_CodeExportSettings.e_ScalingSupport)));
+            static_cast<int32_t>(pc_Node->c_Properties.c_CodeExportSettings.e_ScalingSupport)));
 
       //DPD
       //Add all programmable applications and map data block index to combo box index
-      for (uint32 u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
+      for (uint32_t u32_ItDataBlock = 0; u32_ItDataBlock < pc_Node->c_Applications.size(); ++u32_ItDataBlock)
       {
-         const C_OSCNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
-         if (rc_DataBlock.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION)
+         const C_OscNodeApplication & rc_DataBlock = pc_Node->c_Applications[u32_ItDataBlock];
+         if (rc_DataBlock.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
          {
             this->mpc_Ui->pc_ComboBoxDPD->addItem(rc_DataBlock.c_Name.c_str());
-            if ((pc_Node->c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex >= 0) &&
-                (static_cast<uint32>(static_cast<sint32>(pc_Node->c_Properties.c_OpenSYDEServerSettings.
-                                                         s16_DPDDataBlockIndex)) == u32_ItDataBlock))
+            if ((pc_Node->c_Properties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex >= 0) &&
+                (static_cast<uint32_t>(static_cast<int32_t>(pc_Node->c_Properties.c_OpenSydeServerSettings.
+                                                            s16_DpdDataBlockIndex)) == u32_ItDataBlock))
             {
                s32_DataBlockIndex = s32_Counter;
             }
             else
             {
                //Use first valid index as default
-               if ((pc_Node->c_Properties.c_OpenSYDEServerSettings.s16_DPDDataBlockIndex < 0) &&
+               if ((pc_Node->c_Properties.c_OpenSydeServerSettings.s16_DpdDataBlockIndex < 0) &&
                    (s32_DataBlockIndex == -1))
                {
                   s32_DataBlockIndex = s32_Counter;
@@ -290,10 +289,10 @@ void C_SdNdeProgrammingOptions::m_Load(void) const
 
       //Spin boxes
       this->mpc_Ui->pc_SpinBoxNBR->setValue(
-         pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxRoutingMessageBufferRx);
-      this->mpc_Ui->pc_SpinBoxNBT->setValue(pc_Node->c_Properties.c_OpenSYDEServerSettings.u16_MaxMessageBufferTx);
+         pc_Node->c_Properties.c_OpenSydeServerSettings.u16_MaxRoutingMessageBufferRx);
+      this->mpc_Ui->pc_SpinBoxNBT->setValue(pc_Node->c_Properties.c_OpenSydeServerSettings.u16_MaxMessageBufferTx);
       this->mpc_Ui->pc_SpinBoxParallelTransmissions->setValue(
-         pc_Node->c_Properties.c_OpenSYDEServerSettings.u8_MaxParallelTransmissions);
+         pc_Node->c_Properties.c_OpenSydeServerSettings.u8_MaxParallelTransmissions);
    }
 }
 

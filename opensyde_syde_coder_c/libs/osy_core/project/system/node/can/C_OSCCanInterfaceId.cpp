@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "CSCLChecksums.h"
-#include "C_OSCCanInterfaceId.h"
+#include "stwtypes.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscCanInterfaceId.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +36,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanInterfaceId::C_OSCCanInterfaceId() :
+C_OscCanInterfaceId::C_OscCanInterfaceId() :
    u32_NodeIndex(0),
    u8_InterfaceNumber(0)
 {
@@ -49,7 +49,7 @@ C_OSCCanInterfaceId::C_OSCCanInterfaceId() :
    \param[in]  ou8_InterfaceNumber  Interface number
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanInterfaceId::C_OSCCanInterfaceId(const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceNumber) :
+C_OscCanInterfaceId::C_OscCanInterfaceId(const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceNumber) :
    u32_NodeIndex(ou32_NodeIndex),
    u8_InterfaceNumber(ou8_InterfaceNumber)
 {
@@ -65,7 +65,7 @@ C_OSCCanInterfaceId::C_OSCCanInterfaceId(const uint32 ou32_NodeIndex, const uint
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanInterfaceId::operator <(const C_OSCCanInterfaceId & orc_Cmp) const
+bool C_OscCanInterfaceId::operator <(const C_OscCanInterfaceId & orc_Cmp) const
 {
    bool q_Return;
 
@@ -102,12 +102,35 @@ bool C_OSCCanInterfaceId::operator <(const C_OSCCanInterfaceId & orc_Cmp) const
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanInterfaceId::operator ==(const C_OSCCanInterfaceId & orc_Cmp) const
+bool C_OscCanInterfaceId::operator ==(const C_OscCanInterfaceId & orc_Cmp) const
 {
    bool q_Return = false;
 
    if ((this->u32_NodeIndex == orc_Cmp.u32_NodeIndex) &&
        (this->u8_InterfaceNumber == orc_Cmp.u8_InterfaceNumber))
+   {
+      q_Return = true;
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Not equal operator.
+
+   \param[in]  orc_Cmp  Compared instance
+
+   \return
+   true     Current equals orc_Cmp
+   false    Else
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscCanInterfaceId::operator !=(const C_OscCanInterfaceId & orc_Cmp) const
+{
+   bool q_Return = false;
+
+   if ((this->u32_NodeIndex != orc_Cmp.u32_NodeIndex) ||
+       (this->u8_InterfaceNumber != orc_Cmp.u8_InterfaceNumber))
    {
       q_Return = true;
    }
@@ -123,8 +146,8 @@ bool C_OSCCanInterfaceId::operator ==(const C_OSCCanInterfaceId & orc_Cmp) const
    \param[in,out]  oru32_HashValue  Hash value with unit [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanInterfaceId::CalcHash(uint32 & oru32_HashValue) const
+void C_OscCanInterfaceId::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_NodeIndex, sizeof(this->u32_NodeIndex), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u8_InterfaceNumber, sizeof(this->u8_InterfaceNumber), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_NodeIndex, sizeof(this->u32_NodeIndex), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u8_InterfaceNumber, sizeof(this->u8_InterfaceNumber), oru32_HashValue);
 }

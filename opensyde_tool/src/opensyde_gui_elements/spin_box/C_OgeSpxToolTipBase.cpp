@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
 #include <QLineEdit>
-#include "C_GtGetText.h"
-#include "C_OgeSpxToolTipBase.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeSpxToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,9 +47,9 @@ C_OgeSpxToolTipBase::C_OgeSpxToolTipBase(QWidget * const opc_Parent) :
    C_OgeSpxAllBase(),
    mpc_ContextMenu(NULL),
    mq_ShowSpecialMin(false),
-   msn_SpecialMinValue(0),
+   ms32_SpecialMinValue(0),
    mq_ShowSpecialMax(false),
-   msn_SpecialMaxValue(0)
+   ms32_SpecialMaxValue(0)
 {
    //This function does indeed call virtual functions so do not call this one in the base class
    ActivateDefaultToolTip();
@@ -145,24 +144,24 @@ bool C_OgeSpxToolTipBase::m_CallBaseEvent(QEvent * const opc_Event)
          Use that method when a prefix e. g. "0x" is already set
          and you only need the hex number in string format
 
-   \param[in,out]  osn_Value  Value identification and information
+   \param[in,out]  os32_Value  Value identification and information
 
    \return
    A string of numbers and letters
    Here: Converted hex number as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxToolTipBase::textFromValue(const sintn osn_Value) const
+QString C_OgeSpxToolTipBase::textFromValue(const int32_t os32_Value) const
 {
    QString c_Retval;
 
    if (this->displayIntegerBase() == 16)
    {
-      c_Retval = QString::number(osn_Value, 16).toUpper();
+      c_Retval = QString::number(os32_Value, 16).toUpper();
    }
    else
    {
-      c_Retval = QSpinBox::textFromValue(osn_Value);
+      c_Retval = QSpinBox::textFromValue(os32_Value);
    }
    return c_Retval;
 }
@@ -170,34 +169,34 @@ QString C_OgeSpxToolTipBase::textFromValue(const sintn osn_Value) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set minimum value (simple wrapper with tool tip update)
 
-   \param[in]  osn_Value         New minimum value
-   \param[in]  oq_ShowSpecial    Show special
-   \param[in]  osn_SpecialValue  Special value
+   \param[in]  os32_Value         New minimum value
+   \param[in]  oq_ShowSpecial     Show special
+   \param[in]  os32_SpecialValue  Special value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxToolTipBase::SetMinimumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial,
-                                           const sintn osn_SpecialValue)
+void C_OgeSpxToolTipBase::SetMinimumCustom(const int32_t os32_Value, const bool oq_ShowSpecial,
+                                           const int32_t os32_SpecialValue)
 {
-   this->setMinimum(osn_Value);
+   this->setMinimum(os32_Value);
    this->mq_ShowSpecialMin = oq_ShowSpecial;
-   this->msn_SpecialMinValue = osn_SpecialValue;
+   this->ms32_SpecialMinValue = os32_SpecialValue;
    this->ActivateDefaultToolTip();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set maximum value (simple wrapper with tool tip update)
 
-   \param[in]  osn_Value         New maximum value
-   \param[in]  oq_ShowSpecial    Show special
-   \param[in]  osn_SpecialValue  Special value
+   \param[in]  os32_Value         New maximum value
+   \param[in]  oq_ShowSpecial     Show special
+   \param[in]  os32_SpecialValue  Special value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxToolTipBase::SetMaximumCustom(const stw_types::sintn osn_Value, const bool oq_ShowSpecial,
-                                           const sintn osn_SpecialValue)
+void C_OgeSpxToolTipBase::SetMaximumCustom(const int32_t os32_Value, const bool oq_ShowSpecial,
+                                           const int32_t os32_SpecialValue)
 {
-   this->setMaximum(osn_Value);
+   this->setMaximum(os32_Value);
    this->mq_ShowSpecialMax = oq_ShowSpecial;
-   this->msn_SpecialMaxValue = osn_SpecialValue;
+   this->ms32_SpecialMaxValue = os32_SpecialValue;
    this->ActivateDefaultToolTip();
 }
 
@@ -228,37 +227,37 @@ void C_OgeSpxToolTipBase::m_SetupContextMenu(void)
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Undo"),
                                        this,
                                        &C_OgeSpxToolTipBase::m_Undo,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_Z));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_Z));
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Redo"),
                                        this,
                                        &C_OgeSpxToolTipBase::m_Redo,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_Y));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_Y));
 
       this->mpc_ContextMenu->addSeparator();
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Cut"),
                                        this,
                                        &C_OgeSpxToolTipBase::m_Cut,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_X));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_X));
    }
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy"),
                                     this,
                                     &C_OgeSpxToolTipBase::m_Copy,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_C));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
 
    if (!this->isReadOnly())
    {
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Paste"),
                                        this,
                                        &C_OgeSpxToolTipBase::m_Paste,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_V));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_V));
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete"),
                                        this,
                                        &C_OgeSpxToolTipBase::m_Delete,
-                                       static_cast<sintn>(Qt::Key_Delete));
+                                       static_cast<int32_t>(Qt::Key_Delete));
    }
 
    this->mpc_ContextMenu->addSeparator();
@@ -266,7 +265,7 @@ void C_OgeSpxToolTipBase::m_SetupContextMenu(void)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select All"),
                                     this,
                                     &C_OgeSpxToolTipBase::selectAll,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -367,23 +366,23 @@ void C_OgeSpxToolTipBase::m_Delete() const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Convert num to string
 
-   \param[in]  osn_Value   Value
+   \param[in]  os32_Value   Value
 
    \return
    Converted num as string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_OgeSpxToolTipBase::m_ConvertNumToString(const sintn osn_Value) const
+QString C_OgeSpxToolTipBase::m_ConvertNumToString(const int32_t os32_Value) const
 {
    QString c_Retval;
 
    if (this->displayIntegerBase() == 16)
    {
-      c_Retval = "0x" + QString::number(osn_Value, 16).toUpper();
+      c_Retval = "0x" + QString::number(os32_Value, 16).toUpper();
    }
    else
    {
-      c_Retval = QString::number(osn_Value);
+      c_Retval = QString::number(os32_Value);
    }
    return c_Retval;
 }
@@ -401,7 +400,7 @@ QString C_OgeSpxToolTipBase::m_GetMinimumString() const
 
    if (this->mq_ShowSpecialMin)
    {
-      c_Retval = this->m_ConvertNumToString(this->msn_SpecialMinValue);
+      c_Retval = this->m_ConvertNumToString(this->ms32_SpecialMinValue);
    }
    else
    {
@@ -423,7 +422,7 @@ QString C_OgeSpxToolTipBase::m_GetMaximumString() const
 
    if (this->mq_ShowSpecialMax)
    {
-      c_Retval = this->m_ConvertNumToString(this->msn_SpecialMaxValue);
+      c_Retval = this->m_ConvertNumToString(this->ms32_SpecialMaxValue);
    }
    else
    {

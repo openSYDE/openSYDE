@@ -8,20 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QtGlobal>
 
-#include "stwtypes.h"
-#include "C_SyvDaItUtil.h"
-#include "C_SyvDaItDashboardSliderWidget.h"
+#include "stwtypes.hpp"
+#include "C_SyvDaItUtil.hpp"
+#include "C_SyvDaItDashboardSliderWidget.hpp"
 #include "ui_C_SyvDaItDashboardSliderWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,7 +55,7 @@ C_SyvDaItDashboardSliderWidget::C_SyvDaItDashboardSliderWidget(QWidget * const o
    this->mpc_Ui->pc_LabelMin->SetAllowAutomatedAdaptation(false);
    this->mpc_Ui->pc_LabelMax->SetAllowAutomatedAdaptation(false);
 
-   connect(this->mpc_Ui->pc_HorizontalSlider, &stw_opensyde_gui_elements::C_OgeSliDashboard::valueChanged, this,
+   connect(this->mpc_Ui->pc_HorizontalSlider, &stw::opensyde_gui_elements::C_OgeSliDashboard::valueChanged, this,
            &C_SyvDaItDashboardSliderWidget::SigOnChange);
 }
 
@@ -90,7 +89,7 @@ void C_SyvDaItDashboardSliderWidget::SetCurrentStyle(const C_PuiSvDbWidgetBase::
    \param[in]  oe_Type  New item type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::SetDisplayStyle(const stw_opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type)
+void C_SyvDaItDashboardSliderWidget::SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type)
 const
 {
    QFont c_Font;
@@ -116,15 +115,15 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
 {
-   const sintn sn_MARGINS = 2 * 6;
-   const sintn sn_AdaptedWidth = this->width() - sn_MARGINS;
-   const float32 f32_WidthLabels = static_cast<float32>(sn_AdaptedWidth) * (2.0F / ((25.0F * 2.0F) / 3.0F));
-   const sintn sn_WidthLabels = static_cast<sintn>(f32_WidthLabels);
+   const int32_t s32_MARGINS = 2 * 6;
+   const int32_t s32_AdaptedWidth = this->width() - s32_MARGINS;
+   const float32_t f32_WidthLabels = static_cast<float32_t>(s32_AdaptedWidth) * (2.0F / ((25.0F * 2.0F) / 3.0F));
+   const int32_t s32_WidthLabels = static_cast<int32_t>(f32_WidthLabels);
 
    //Manual resize
    this->mpc_Ui->pc_HorizontalSlider->setFixedHeight(this->height());
-   this->mpc_Ui->pc_LabelMin->setFixedSize(sn_WidthLabels, this->height());
-   this->mpc_Ui->pc_LabelMax->setFixedSize(sn_WidthLabels, this->height());
+   this->mpc_Ui->pc_LabelMin->setFixedSize(s32_WidthLabels, this->height());
+   this->mpc_Ui->pc_LabelMax->setFixedSize(s32_WidthLabels, this->height());
 
    this->mpc_Ui->pc_HorizontalSlider->HandleResize();
    this->mpc_Ui->pc_LabelMin->AdjustFontToSize();
@@ -137,35 +136,35 @@ void C_SyvDaItDashboardSliderWidget::AdjustFontToSize(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set minimum and maximum
 
-   \param[in]  osn_MinValue   New minimum
+   \param[in]  os32_MinValue  New minimum
    \param[in]  orc_MinString  New displayed minimum
-   \param[in]  osn_MaxValue   New maximum
+   \param[in]  os32_MaxValue  New maximum
    \param[in]  orc_MaxString  New displayed maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::SetMinMax(const sintn osn_MinValue, const QString & orc_MinString,
-                                               const sintn osn_MaxValue, const QString & orc_MaxString)
+void C_SyvDaItDashboardSliderWidget::SetMinMax(const int32_t os32_MinValue, const QString & orc_MinString,
+                                               const int32_t os32_MaxValue, const QString & orc_MaxString)
 {
 #if QT_VERSION > QT_VERSION_CHECK(5, 15, 2)
 #warning Check if this bug fix is still necessary in new Qt version
 #endif
-   // Bug fix for qt issue in QStyle::sliderPositionFromValue
+   // Bug fix for qt issue in QStyle::sliderPositionFromValue (https://bugreports.qt.io/browse/QTBUG-29764)
    // Can be reproduced in any call of:
    // QStyle::sliderPositionFromValue(std::numeric_limits<int>::min(), 0, 0, 100,false);
    // leads to crashes in C_OgeSliDashboard::paintEvent and
    // in C_OgeSliToolTipBase::m_MoveToolTip (Systemtest Project View "Bus0" Tab "Single" and Tab "WIN-PC2")
-   const sint64 s64_Range = static_cast<sint64>(osn_MaxValue) - static_cast<sint64>(osn_MinValue);
+   const int64_t s64_Range = static_cast<int64_t>(os32_MaxValue) - static_cast<int64_t>(os32_MinValue);
 
-   if (s64_Range == std::abs(static_cast<sint64>(std::numeric_limits<sintn>::min())))
+   if (s64_Range == std::abs(static_cast<int64_t>(std::numeric_limits<int32_t>::min())))
    {
-      this->mpc_Ui->pc_HorizontalSlider->setMinimum(osn_MinValue + 1);
+      this->mpc_Ui->pc_HorizontalSlider->setMinimum(os32_MinValue + 1);
    }
    else
    {
-      this->mpc_Ui->pc_HorizontalSlider->setMinimum(osn_MinValue);
+      this->mpc_Ui->pc_HorizontalSlider->setMinimum(os32_MinValue);
    }
    this->mc_Min = orc_MinString;
-   this->mpc_Ui->pc_HorizontalSlider->setMaximum(osn_MaxValue);
+   this->mpc_Ui->pc_HorizontalSlider->setMaximum(os32_MaxValue);
    this->mc_Max = orc_MaxString;
 
    this->m_UpdateLabels();
@@ -187,12 +186,24 @@ void C_SyvDaItDashboardSliderWidget::SetShowMinMax(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set value
 
-   \param[in]  osn_Value   New value
+   \param[in]  os32_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::SetValue(const sintn osn_Value) const
+void C_SyvDaItDashboardSliderWidget::SetValue(const int32_t os32_Value) const
 {
-   this->mpc_Ui->pc_HorizontalSlider->SetValueCustom(osn_Value);
+   this->mpc_Ui->pc_HorizontalSlider->SetValueCustom(os32_Value);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get min value
+
+   \return
+   Min value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_SyvDaItDashboardSliderWidget::GetMinValue() const
+{
+   return this->mpc_Ui->pc_HorizontalSlider->minimum();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -202,7 +213,7 @@ void C_SyvDaItDashboardSliderWidget::SetValue(const sintn osn_Value) const
    Actual value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SyvDaItDashboardSliderWidget::GetValue(void) const
+int32_t C_SyvDaItDashboardSliderWidget::GetValue(void) const
 {
    return this->mpc_Ui->pc_HorizontalSlider->value();
 }
@@ -210,22 +221,27 @@ sintn C_SyvDaItDashboardSliderWidget::GetValue(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set parameter for tooltip display format
 
-   Formula: ((Value - of64_ToolTipRangeOffset) * of64_ToolTipFactor) + of64_ToolTipOffset
+   Formula: (((Value - slider_min) * of64_ToolTipSliderRangeValueFactor) + of64_ToolTipValueOffset)
+            then apply orc_ToolTipUserScaling
 
-   \param[in]  of64_ToolTipRangeOffset    See formula
-   \param[in]  of64_ToolTipOffset         See formula
-   \param[in]  of64_ToolTipFactor         See formula
-   \param[in]  oe_RepresentationType      Representation type
+   \param[in]  of64_ToolTipSliderRangeValueFactor  See formula
+   \param[in]  of64_ToolTipValueOffset             See formula
+   \param[in]  orc_ToolTipUserScaling              See formula
+   \param[in]  oe_RepresentationType               Representation type
+   \param[in]  orc_FormatterConfig                 Formatter config
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaItDashboardSliderWidget::SetToolTipParameters(const float64 of64_ToolTipRangeOffset,
-                                                          const float64 of64_ToolTipOffset,
-                                                          const float64 of64_ToolTipFactor,
-                                                          const C_OSCNodeDataPoolContent::E_Type oe_RepresentationType)
+void C_SyvDaItDashboardSliderWidget::SetToolTipParameters(const float64_t of64_ToolTipSliderRangeValueFactor,
+                                                          const float64_t of64_ToolTipValueOffset,
+                                                          const C_PuiSvDbDataElementScaling & orc_ToolTipUserScaling,
+                                                          const C_OscNodeDataPoolContent::E_Type oe_RepresentationType,
+                                                          const C_PuiSvDbDataElementDisplayFormatterConfig & orc_FormatterConfig)
 const
 {
-   this->mpc_Ui->pc_HorizontalSlider->SetToolTipParameters(of64_ToolTipRangeOffset, of64_ToolTipOffset,
-                                                           of64_ToolTipFactor, oe_RepresentationType);
+   this->mpc_Ui->pc_HorizontalSlider->SetToolTipParameters(of64_ToolTipSliderRangeValueFactor,
+                                                           of64_ToolTipValueOffset,
+                                                           orc_ToolTipUserScaling, oe_RepresentationType,
+                                                           orc_FormatterConfig);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

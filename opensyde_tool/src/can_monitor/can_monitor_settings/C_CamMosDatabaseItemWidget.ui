@@ -30,14 +30,14 @@
     <number>3</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeChxSettings" name="pc_CheckBox">
+    <widget class="stw::opensyde_gui_elements::C_CamOgeChxSettings" name="pc_CheckBox">
      <property name="text">
       <string/>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabIcon">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabIcon">
      <property name="minimumSize">
       <size>
        <width>24</width>
@@ -56,14 +56,14 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabDatabase">
+    <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabDatabase">
      <property name="text">
       <string>TextLabel</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PbSelectBus">
+    <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PbSelectBus">
      <property name="minimumSize">
       <size>
        <width>16</width>
@@ -98,7 +98,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PbBrowse">
+    <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PbBrowse">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -139,7 +139,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PbRemove">
+    <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_PbRemove">
      <property name="minimumSize">
       <size>
        <width>16</width>
@@ -161,24 +161,24 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.h</header>
+   <header>C_OgePubSvgIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeChxSettings</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeChxSettings</class>
    <extends>QCheckBox</extends>
-   <header>C_CamOgeChxSettings.h</header>
+   <header>C_CamOgeChxSettings.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

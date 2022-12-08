@@ -11,31 +11,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QLineEdit>
 
-#include "C_CamMetControlBarWidget.h"
+#include "C_CamMetControlBarWidget.hpp"
 #include "ui_C_CamMetControlBarWidget.h"
 
-#include "C_UsHandler.h"
-#include "C_GtGetText.h"
+#include "C_UsHandler.hpp"
+#include "C_GtGetText.hpp"
 
-#include "C_OgePopUpDialog.h"
-#include "C_CamMetSettingsPopup.h"
+#include "C_OgePopUpDialog.hpp"
+#include "C_CamMetSettingsPopup.hpp"
 
-#include "C_OgeWiCustomMessage.h"
+#include "C_OgeWiCustomMessage.hpp"
 
 #include <QDebug>
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_CamMetControlBarWidget::mhsn_MAX_COUNT_COMBO_BOX = 7;
+const int32_t C_CamMetControlBarWidget::mhs32_MAX_COUNT_COMBO_BOX = 7;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -68,7 +67,7 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
    // Set maximum + 1, so the user can add a new element although the combo box is full. The last element will
    // be removed manually in the slot functions.
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_ComboBoxSearch->setMaxCount(mhsn_MAX_COUNT_COMBO_BOX + 1);
+   this->mpc_Ui->pc_ComboBoxSearch->setMaxCount(mhs32_MAX_COUNT_COMBO_BOX + 1);
    this->mpc_Ui->pc_ComboBoxSearch->setInsertPolicy(QComboBox::InsertAtTop);
 
    this->mpc_Ui->pc_PushButtonTogglePlay->setCheckable(true);
@@ -127,7 +126,8 @@ C_CamMetControlBarWidget::C_CamMetControlBarWidget(QWidget * const opc_Parent) :
            &C_CamMetControlBarWidget::m_HandleStop);
    connect(this->mpc_Ui->pc_PushButtonToggleDisplayMode, &QPushButton::toggled, this,
            &C_CamMetControlBarWidget::m_HandleToggleDisplayMode);
-   connect(this->mpc_Ui->pc_ComboBoxProtocol, static_cast<void (QComboBox::*)(sintn)>(&QComboBox::currentIndexChanged),
+   connect(this->mpc_Ui->pc_ComboBoxProtocol,
+           static_cast<void (QComboBox::*)(int32_t)>(&QComboBox::currentIndexChanged),
            this, &C_CamMetControlBarWidget::m_OnProtocolIndexChange);
 
    connect(this->mpc_Ui->pc_PushButtonClear, &QPushButton::clicked,
@@ -387,12 +387,12 @@ void C_CamMetControlBarWidget::m_HandleStop(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Handle selected protocol change
 
-   \param[in] osn_Index Selected protocol index
+   \param[in] os32_Index Selected protocol index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetControlBarWidget::m_OnProtocolIndexChange(const sintn osn_Index)
+void C_CamMetControlBarWidget::m_OnProtocolIndexChange(const int32_t os32_Index)
 {
-   Q_EMIT this->SigChangeProtocol(C_CamMetControlBarWidget::mh_GetProtocolFromIndex(osn_Index));
+   Q_EMIT this->SigChangeProtocol(C_CamMetControlBarWidget::mh_GetProtocolFromIndex(os32_Index));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -404,32 +404,32 @@ void C_CamMetControlBarWidget::m_OnProtocolIndexChange(const sintn osn_Index)
    Protocol type as enum
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_cmon_protocol::e_CMONL7Protocols C_CamMetControlBarWidget::mh_GetProtocolFromIndex(const sint32 os32_Protocol)
+stw::cmon_protocol::e_CanMonL7Protocols C_CamMetControlBarWidget::mh_GetProtocolFromIndex(const int32_t os32_Protocol)
 {
-   stw_cmon_protocol::e_CMONL7Protocols e_Retval;
+   stw::cmon_protocol::e_CanMonL7Protocols e_Retval;
 
    switch (os32_Protocol)
    {
    case 1:
-      e_Retval = stw_cmon_protocol::CMONL7ProtocolOpenSYDE;
+      e_Retval = stw::cmon_protocol::CMONL7ProtocolOpenSYDE;
       break;
    case 2:
-      e_Retval = stw_cmon_protocol::CMONL7ProtocolCANopen;
+      e_Retval = stw::cmon_protocol::CMONL7ProtocolCANopen;
       break;
    case 3:
-      e_Retval = stw_cmon_protocol::CMONL7ProtocolKEFEX;
+      e_Retval = stw::cmon_protocol::CMONL7ProtocolKEFEX;
       break;
    case 4:
-      e_Retval = stw_cmon_protocol::CMONL7ProtocolXFL;
+      e_Retval = stw::cmon_protocol::CMONL7ProtocolXFL;
       break;
    case 5:
-      e_Retval = stw_cmon_protocol::CMONL7Protocol_SHIP_IP_IVA;
+      e_Retval = stw::cmon_protocol::CMONL7Protocol_SHIP_IP_IVA;
       break;
    case 6:
-      e_Retval = stw_cmon_protocol::CMONL7ProtocolJ1939;
+      e_Retval = stw::cmon_protocol::CMONL7ProtocolJ1939;
       break;
    default:
-      e_Retval = stw_cmon_protocol::CMONL7ProtocolNone;
+      e_Retval = stw::cmon_protocol::CMONL7ProtocolNone;
       break;
    }
    return e_Retval;
@@ -479,9 +479,9 @@ void C_CamMetControlBarWidget::m_SearchComboBoxChanged(void) const
    if ((this->mpc_Ui->pc_PushButtonStop->isEnabled() == false) ||
        (this->mpc_Ui->pc_PushButtonTogglePlay->isChecked() == false))
    {
-      if (this->mpc_Ui->pc_ComboBoxSearch->count() > mhsn_MAX_COUNT_COMBO_BOX)
+      if (this->mpc_Ui->pc_ComboBoxSearch->count() > mhs32_MAX_COUNT_COMBO_BOX)
       {
-         this->mpc_Ui->pc_ComboBoxSearch->removeItem(mhsn_MAX_COUNT_COMBO_BOX);
+         this->mpc_Ui->pc_ComboBoxSearch->removeItem(mhs32_MAX_COUNT_COMBO_BOX);
       }
 
       Q_EMIT (this->SigSearchTrace(this->mpc_Ui->pc_ComboBoxSearch->currentText(), true));
@@ -494,13 +494,13 @@ void C_CamMetControlBarWidget::m_SearchComboBoxChanged(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetControlBarWidget::m_UpdateSearchComboBox(void) const
 {
-   sintn sn_Index;
+   int32_t s32_Index;
    const QString c_CurrentText = this->mpc_Ui->pc_ComboBoxSearch->currentText();
    bool q_Found = false;
 
-   for (sn_Index = 0U; sn_Index < this->mpc_Ui->pc_ComboBoxSearch->count(); ++sn_Index)
+   for (s32_Index = 0U; s32_Index < this->mpc_Ui->pc_ComboBoxSearch->count(); ++s32_Index)
    {
-      if (this->mpc_Ui->pc_ComboBoxSearch->itemText(sn_Index) == c_CurrentText)
+      if (this->mpc_Ui->pc_ComboBoxSearch->itemText(s32_Index) == c_CurrentText)
       {
          q_Found = true;
       }
@@ -511,9 +511,9 @@ void C_CamMetControlBarWidget::m_UpdateSearchComboBox(void) const
       this->mpc_Ui->pc_ComboBoxSearch->insertItem(0, c_CurrentText);
 
       // Remove the last item if there are to many entries
-      if (this->mpc_Ui->pc_ComboBoxSearch->count() > mhsn_MAX_COUNT_COMBO_BOX)
+      if (this->mpc_Ui->pc_ComboBoxSearch->count() > mhs32_MAX_COUNT_COMBO_BOX)
       {
-         this->mpc_Ui->pc_ComboBoxSearch->removeItem(mhsn_MAX_COUNT_COMBO_BOX);
+         this->mpc_Ui->pc_ComboBoxSearch->removeItem(mhs32_MAX_COUNT_COMBO_BOX);
       }
    }
 }
@@ -534,7 +534,7 @@ void C_CamMetControlBarWidget::m_OpenTraceSettings(void)
    pc_Dialog->SetValues(this->mq_DisplayTimestampAbsoluteTimeOfDay, this->mu32_TraceBufferSize);
 
    // Update settings on accept
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       this->mq_DisplayTimestampAbsoluteTimeOfDay = pc_Dialog->GetDisplayTimestampAbsoluteTimeOfDay();
       this->mu32_TraceBufferSize = pc_Dialog->GetTraceBufferSize();

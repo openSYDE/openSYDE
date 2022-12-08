@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_SyvDcConnectedNodeWidget.h"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvDcConnectedNodeWidget.hpp"
 #include "ui_C_SyvDcConnectedNodeWidget.h"
 
-#include "C_Uti.h"
-#include "C_OSCUtils.h"
+#include "C_Uti.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,8 +50,9 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const opc_Item,
-                                                       const C_SyvDcDeviceInformation & orc_Info, const std::map<uint8,
-                                                                                                                 C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
+                                                       const C_SyvDcDeviceInformation & orc_Info,
+                                                       const std::map<uint8_t,
+                                                                      C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvDcConnectedNodeWidget),
@@ -118,7 +118,7 @@ bool C_SyvDcConnectedNodeWidget::GetExtFormat(void) const
    Manufacturer format for ext format of serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_SyvDcConnectedNodeWidget::GetManufacturerFormat(void) const
+uint8_t C_SyvDcConnectedNodeWidget::GetManufacturerFormat(void) const
 {
    return this->mc_Info.c_SerialNumber.u8_SerialNumberManufacturerFormat;
 }
@@ -161,7 +161,7 @@ bool C_SyvDcConnectedNodeWidget::GetDeviceNameValid(void) const
    Sub node ids mapping to node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::map<stw_types::uint8, C_SyvDcDeviceOldComConfig> C_SyvDcConnectedNodeWidget::GetSubNodeIdsToOldNodeIds(void) const
+std::map<uint8_t, C_SyvDcDeviceOldComConfig> C_SyvDcConnectedNodeWidget::GetSubNodeIdsToOldNodeIds(void) const
 {
    return this->mc_SubNodeIdsToOldNodeIds;
 }
@@ -176,7 +176,7 @@ std::map<stw_types::uint8, C_SyvDcDeviceOldComConfig> C_SyvDcConnectedNodeWidget
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDcConnectedNodeWidget::CompareSerialNumber(
-   const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber) const
+   const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber) const
 {
    bool q_Return = false;
 
@@ -213,8 +213,8 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    QString c_Name;
    QString c_Id;
    QString c_Device;
-   const sintn sn_HEIGHT = 72;
-   const sintn sn_WIDTH = 294;
+   const int32_t s32_HEIGHT = 72;
+   const int32_t s32_WIDTH = 294;
 
    if (this->mc_Info.c_SerialNumber.q_IsValid == true)
    {
@@ -261,21 +261,21 @@ void C_SyvDcConnectedNodeWidget::m_Init(void)
    }
    this->mpc_Ui->pc_LabelDeviceType->setText(static_cast<QString>("Type: %1").arg(c_Device));
    //Resize
-   this->resize(sn_WIDTH, sn_HEIGHT);
-   this->setMinimumHeight(sn_HEIGHT);
-   this->setMaximumHeight(sn_HEIGHT);
-   this->setMinimumWidth(sn_WIDTH);
-   this->setMaximumWidth(sn_WIDTH);
+   this->resize(s32_WIDTH, s32_HEIGHT);
+   this->setMinimumHeight(s32_HEIGHT);
+   this->setMaximumHeight(s32_HEIGHT);
+   this->setMinimumWidth(s32_WIDTH);
+   this->setMaximumWidth(s32_WIDTH);
    if (this->mpc_ListWidgetItem != NULL)
    {
-      this->mpc_ListWidgetItem->setSizeHint(QSize(sn_WIDTH, sn_HEIGHT));
+      this->mpc_ListWidgetItem->setSizeHint(QSize(s32_WIDTH, s32_HEIGHT));
    }
    else
    {
       //Adapted for missing borders
-      this->setMinimumWidth(sn_WIDTH);
-      this->setMaximumWidth(sn_WIDTH);
-      this->setMinimumHeight(sn_HEIGHT);
-      this->setMaximumHeight(sn_HEIGHT);
+      this->setMinimumWidth(s32_WIDTH);
+      this->setMaximumWidth(s32_WIDTH);
+      this->setMinimumHeight(s32_HEIGHT);
+      this->setMaximumHeight(s32_HEIGHT);
    }
 }

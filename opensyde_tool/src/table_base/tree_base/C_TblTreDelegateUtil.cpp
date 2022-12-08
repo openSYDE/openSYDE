@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSvgRenderer>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_TblTreDelegateUtil.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_TblTreDelegateUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,7 +48,7 @@ bool C_TblTreDelegateUtil::h_PaintIcon(QPainter * const opc_Painter, const QStyl
                                        const QModelIndex & orc_Index)
 {
    bool q_Retval = false;
-   const QStringList c_IconPaths = orc_Index.data(msn_USER_ROLE_ICON).toStringList();
+   const QStringList c_IconPaths = orc_Index.data(ms32_USER_ROLE_ICON).toStringList();
 
    //Check for the number of expected strings
    if ((c_IconPaths.count() == 3) || (c_IconPaths.count() == 2))
@@ -57,10 +56,10 @@ bool C_TblTreDelegateUtil::h_PaintIcon(QPainter * const opc_Painter, const QStyl
       //Step 1: convert icon size to int
       bool q_Ok;
       const QString c_SizeString = c_IconPaths.at(0);
-      const sintn sn_Size = c_SizeString.toInt(&q_Ok);
+      const int32_t s32_Size = c_SizeString.toInt(&q_Ok);
       if (q_Ok)
       {
-         const QSize c_IconSize(sn_Size, sn_Size);
+         const QSize c_IconSize(s32_Size, s32_Size);
          // center icon
          const QRect c_Rect(orc_Option.rect.topLeft() + QPoint((orc_Option.rect.width() - c_IconSize.width()) / 2,
                                                                (orc_Option.rect.height() - c_IconSize.height()) / 2),

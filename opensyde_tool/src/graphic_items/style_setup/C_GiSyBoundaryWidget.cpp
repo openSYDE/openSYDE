@@ -8,25 +8,24 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GiSyBoundaryWidget.h"
+#include "C_GiSyBoundaryWidget.hpp"
 #include "ui_C_GiSyBoundaryWidget.h"
 
-#include "C_HeHandler.h"
-#include "C_GtGetText.h"
-#include "C_OgePubColorOnly.h"
-#include "C_UtiStyleSheets.h"
-#include "C_GiBiBoundary.h"
-#include "C_SdTopologyScene.h"
-#include "C_GiSyColorSelectWidget.h"
+#include "C_HeHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgePubColorOnly.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_GiBiBoundary.hpp"
+#include "C_SdTopologyScene.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString mc_PATH_BACKGROUND_IMG = ":/images/graphic_items/TransparentBtnBackground.png";
@@ -93,7 +92,7 @@ C_GiSyBoundaryWidget::C_GiSyBoundaryWidget(C_GiSyBaseWidget & orc_Parent) :
    connect(this->mpc_Ui->pc_BushButtonBackgroundColor, &C_OgePubColorOnly::clicked,
            this, &C_GiSyBoundaryWidget::m_BackgroundColorClicked);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
-   connect(this->mpc_Ui->pc_SpinBoxWidth, static_cast<void (QSpinBox::*)(sintn)>(&QSpinBox::valueChanged),
+   connect(this->mpc_Ui->pc_SpinBoxWidth, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged),
            this, &C_GiSyBoundaryWidget::m_WidthChanged);
 } //lint !e429  //no memory leak because of the parent of pc_Label-Background / Border and the Qt memory management
 
@@ -146,7 +145,7 @@ void C_GiSyBoundaryWidget::showEvent(QShowEvent * const opc_Event)
    \return  Actual line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sintn C_GiSyBoundaryWidget::GetBorderWidth(void) const
+int32_t C_GiSyBoundaryWidget::GetBorderWidth(void) const
 {
    return this->mpc_Ui->pc_SpinBoxWidth->value();
 }
@@ -154,12 +153,12 @@ stw_types::sintn C_GiSyBoundaryWidget::GetBorderWidth(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set line width
 
-   \param[in]  osn_Value   New line width
+   \param[in]  os32_Value   New line width
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyBoundaryWidget::SetBorderWidth(const stw_types::sintn osn_Value) const
+void C_GiSyBoundaryWidget::SetBorderWidth(const int32_t os32_Value) const
 {
-   this->mpc_Ui->pc_SpinBoxWidth->setValue(osn_Value);
+   this->mpc_Ui->pc_SpinBoxWidth->setValue(os32_Value);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -230,8 +229,8 @@ void C_GiSyBoundaryWidget::m_UpdatePreview(void)
    C_GiBiBoundary * const pc_Item = new C_GiBiBoundary(0ULL, 200.0, 70.0);
    const QSizeF c_ItemSize = pc_Item->GetSize();
 
-   pc_Item->setPos((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0,
-                   (static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
+   pc_Item->setPos((static_cast<float64_t>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0,
+                   (static_cast<float64_t>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0);
 
    pc_Item->SetBorderColor(this->mc_BorderColor);
    pc_Item->SetBackgroundColor(this->mc_BackgroundColor);
@@ -257,13 +256,13 @@ void C_GiSyBoundaryWidget::m_BorderColorClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Color = pc_ColorWidget->ChooseSelectedColor();
 
@@ -299,13 +298,13 @@ void C_GiSyBoundaryWidget::m_BackgroundColorClicked(void)
    // get the old color as initial color
    QColor c_Color = C_UtiStyleSheets::h_GetStyleSheetColor(c_Style);
 
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       c_Color = pc_ColorWidget->ChooseSelectedColor();
 

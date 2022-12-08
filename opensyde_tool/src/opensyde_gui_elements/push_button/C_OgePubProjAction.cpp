@@ -15,16 +15,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "C_OgePubProjAction.h"
-#include "constants.h"
+#include "C_OgePubProjAction.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,7 +49,7 @@ using namespace stw_opensyde_gui;
 C_OgePubProjAction::C_OgePubProjAction(QWidget * const opc_Parent) :
    C_OgePubToolTipBase(opc_Parent)
 {
-   this->msn_IconPaddingLeft = 26;
+   this->ms32_IconPaddingLeft = 26;
    this->setIconSize(mc_ICON_SIZE_24);
 }
 
@@ -72,7 +72,7 @@ void C_OgePubProjAction::paintEvent(QPaintEvent * const opc_Event)
       QPixmap c_PixmapEnabled;
       c_PixmapEnabled = this->mc_IconEnabled.pixmap(this->iconSize());
       //Calculate icon top left based on fixed center
-      c_Painter.drawPixmap(this->msn_IconPaddingLeft - (this->iconSize().width() / 2),
+      c_Painter.drawPixmap(this->ms32_IconPaddingLeft - (this->iconSize().width() / 2),
                            21 - (this->iconSize().height() / 2), c_PixmapEnabled);
    }
    else
@@ -81,7 +81,7 @@ void C_OgePubProjAction::paintEvent(QPaintEvent * const opc_Event)
       QPixmap c_PixmapDisabled;
       c_PixmapDisabled = this->mc_IconDisabled.pixmap(this->iconSize());
       //Calculate icon top left based on fixed center
-      c_Painter.drawPixmap(this->msn_IconPaddingLeft - (this->iconSize().width() / 2),
+      c_Painter.drawPixmap(this->ms32_IconPaddingLeft - (this->iconSize().width() / 2),
                            21 - (this->iconSize().height() / 2), c_PixmapDisabled);
    }
 }
@@ -102,10 +102,10 @@ void C_OgePubProjAction::SetCustomIcon(const QString & orc_IconPathEnabled, cons
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setting the Icon padding left value
 
-   \param[in]  osn_Value   Padding value
+   \param[in]  os32_Value   Padding value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgePubProjAction::SetIconPaddingLeft(const stw_types::sintn osn_Value)
+void C_OgePubProjAction::SetIconPaddingLeft(const int32_t os32_Value)
 {
-   this->msn_IconPaddingLeft = osn_Value;
+   this->ms32_IconPaddingLeft = os32_Value;
 }

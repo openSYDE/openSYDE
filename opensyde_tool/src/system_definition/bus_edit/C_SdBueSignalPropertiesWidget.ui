@@ -47,7 +47,7 @@
             <number>6</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelName">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelName">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -98,7 +98,7 @@
             <number>1</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_5">
+            <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_5">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -168,7 +168,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLePropertiesName" name="pc_LineEditName">
+             <widget class="stw::opensyde_gui_elements::C_OgeLePropertiesName" name="pc_LineEditName">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -226,7 +226,7 @@
                 <number>1</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelObjectDictTitle">
+                <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelObjectDictTitle">
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
@@ -244,7 +244,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="stw_opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelObjectDictValue">
+                  <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelObjectDictValue">
                    <property name="maximumSize">
                     <size>
                      <width>130</width>
@@ -286,7 +286,7 @@
             <number>6</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelComment">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelComment">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -326,7 +326,7 @@
           </layout>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeTedPropertiesComment" name="pc_TextEditComment">
+          <widget class="stw::opensyde_gui_elements::C_OgeTedPropertiesComment" name="pc_TextEditComment">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
              <horstretch>0</horstretch>
@@ -387,7 +387,7 @@ p, li { white-space: pre-wrap; }
           <number>6</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValue">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValue">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -441,7 +441,7 @@ p, li { white-space: pre-wrap; }
           <number>1</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_3">
+          <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_3">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -486,7 +486,7 @@ p, li { white-space: pre-wrap; }
           <number>6</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeChxProperties" name="pc_CheckBoxAutoMinMax">
+          <widget class="stw::opensyde_gui_elements::C_OgeChxProperties" name="pc_CheckBoxAutoMinMax">
            <property name="text">
             <string>Auto min/max</string>
            </property>
@@ -535,7 +535,7 @@ p, li { white-space: pre-wrap; }
           <number>10</number>
          </property>
          <item row="8" column="4">
-          <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxMuxValue">
+          <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxMuxValue">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -557,28 +557,28 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="8" column="3">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMuxValue">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMuxValue">
            <property name="text">
             <string>Muxvalue</string>
            </property>
           </widget>
          </item>
          <item row="0" column="0">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMin">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMin">
            <property name="text">
             <string>Min</string>
            </property>
           </widget>
          </item>
          <item row="2" column="3">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelUnit">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelUnit">
            <property name="text">
             <string>Unit</string>
            </property>
           </widget>
          </item>
          <item row="6" column="1">
-          <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxByteOrder">
+          <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxByteOrder">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -600,7 +600,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="7" column="1">
-          <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxType">
+          <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxType">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -627,7 +627,7 @@ p, li { white-space: pre-wrap; }
             <number>6</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValueType">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelValueType">
              <property name="text">
               <string>Value type</string>
              </property>
@@ -645,7 +645,7 @@ p, li { white-space: pre-wrap; }
               <number>1</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_4">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_4">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -671,7 +671,7 @@ p, li { white-space: pre-wrap; }
           </layout>
          </item>
          <item row="2" column="4">
-          <widget class="stw_opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditUnit">
+          <widget class="stw::opensyde_gui_elements::C_OgeLeProperties" name="pc_LineEditUnit">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -699,7 +699,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="stw_opensyde_gui_elements::C_OgeSpxFactorProperties" name="pc_DoubleSpinBoxFactor">
+          <widget class="stw::opensyde_gui_elements::C_OgeSpxFactorProperties" name="pc_DoubleSpinBoxFactor">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -737,7 +737,7 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item row="1" column="4">
-          <widget class="stw_opensyde_gui_elements::C_OgeSpxDoubleProperties" name="pc_DoubleSpinBoxOffset">
+          <widget class="stw::opensyde_gui_elements::C_OgeSpxDoubleProperties" name="pc_DoubleSpinBoxOffset">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -775,7 +775,7 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item row="0" column="4">
-          <widget class="stw_opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_WidgetMax" native="true">
+          <widget class="stw::opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_WidgetMax" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -797,7 +797,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="stw_opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_WidgetMin" native="true">
+          <widget class="stw::opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_WidgetMin" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -819,7 +819,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="stw_opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_WidgetInit" native="true">
+          <widget class="stw::opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties" name="pc_WidgetInit" native="true">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -841,7 +841,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="8" column="1">
-          <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxLength">
+          <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxLength">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -863,21 +863,21 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="6" column="3">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelStartBit">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelStartBit">
            <property name="text">
             <string>Start bit</string>
            </property>
           </widget>
          </item>
          <item row="7" column="3">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMuxType">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMuxType">
            <property name="text">
             <string>Muxtype</string>
            </property>
           </widget>
          </item>
          <item row="6" column="4">
-          <widget class="stw_opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxStartBit">
+          <widget class="stw::opensyde_gui_elements::C_OgeSpxNumber" name="pc_SpinBoxStartBit">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
              <horstretch>0</horstretch>
@@ -899,7 +899,7 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="7" column="4">
-          <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxMuxType">
+          <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxMuxType">
            <property name="minimumSize">
             <size>
              <width>100</width>
@@ -915,49 +915,49 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item row="7" column="0">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelType">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelType">
            <property name="text">
             <string>Type</string>
            </property>
           </widget>
          </item>
          <item row="8" column="0">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLength">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelLength">
            <property name="text">
             <string>Length</string>
            </property>
           </widget>
          </item>
          <item row="6" column="0">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelByteOrder">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelByteOrder">
            <property name="text">
             <string>Byte order</string>
            </property>
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelInitValue">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelInitValue">
            <property name="text">
             <string>Init value</string>
            </property>
           </widget>
          </item>
          <item row="0" column="3">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMax">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelMax">
            <property name="text">
             <string>Max</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelFactor">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelFactor">
            <property name="text">
             <string>Factor</string>
            </property>
           </widget>
          </item>
          <item row="1" column="3">
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelOffset">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelOffset">
            <property name="text">
             <string>Offset</string>
            </property>
@@ -969,7 +969,7 @@ p, li { white-space: pre-wrap; }
             <number>6</number>
            </property>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelLayout">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelLayout">
              <property name="text">
               <string>Layout</string>
              </property>
@@ -987,7 +987,7 @@ p, li { white-space: pre-wrap; }
               <number>1</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_6">
+              <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_6">
                <property name="minimumSize">
                 <size>
                  <width>0</width>
@@ -1051,76 +1051,76 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <class>stw::opensyde_gui_elements::C_OgeTedPropertiesComment</class>
    <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.h</header>
+   <header>C_OgeTedPropertiesComment.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLeProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.h</header>
+   <header>C_OgeLeProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLePropertiesName</class>
+   <class>stw::opensyde_gui_elements::C_OgeLePropertiesName</class>
    <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.h</header>
+   <header>C_OgeLePropertiesName.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxNumber</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxNumber</class>
    <extends>QSpinBox</extends>
-   <header>C_OgeSpxNumber.h</header>
+   <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeChxProperties</class>
    <extends>QCheckBox</extends>
-   <header>C_OgeChxProperties.h</header>
+   <header>C_OgeChxProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxDoubleProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxDoubleProperties</class>
    <extends>QDoubleSpinBox</extends>
-   <header>C_OgeSpxDoubleProperties.h</header>
+   <header>C_OgeSpxDoubleProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpxFactorProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpxFactorProperties</class>
    <extends>QDoubleSpinBox</extends>
-   <header>C_OgeSpxFactorProperties.h</header>
+   <header>C_OgeSpxFactorProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiSpinBoxGroupProperties</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiSpinBoxGroupProperties.h</header>
+   <header>C_OgeWiSpinBoxGroupProperties.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericBubble</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericBubble</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericBubble.h</header>
+   <header>C_OgeLabGenericBubble.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

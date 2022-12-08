@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "CSCLChecksums.h"
-#include "C_OSCHalcDefChannelUseCase.h"
+#include "C_SclChecksums.hpp"
+#include "C_OscHalcDefChannelUseCase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefChannelUseCase::C_OSCHalcDefChannelUseCase(void)
+C_OscHalcDefChannelUseCase::C_OscHalcDefChannelUseCase(void)
 {
 }
 
@@ -43,7 +43,7 @@ C_OSCHalcDefChannelUseCase::C_OSCHalcDefChannelUseCase(void)
 /*! \brief  Destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcDefChannelUseCase::~C_OSCHalcDefChannelUseCase()
+C_OscHalcDefChannelUseCase::~C_OscHalcDefChannelUseCase()
 {
 }
 
@@ -55,22 +55,22 @@ C_OSCHalcDefChannelUseCase::~C_OSCHalcDefChannelUseCase()
    \param[in,out]  oru32_HashValue  Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcDefChannelUseCase::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_OscHalcDefChannelUseCase::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Id.c_str(), this->c_Id.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Id.c_str(), this->c_Id.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Display.c_str(), this->c_Display.Length(), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
 
    c_Value.CalcHash(oru32_HashValue);
 
-   for (uint32 u32_It = 0UL; u32_It < this->c_Availability.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_Availability.size(); ++u32_It)
    {
       this->c_Availability[u32_It].CalcHash(oru32_HashValue);
    }
 
-   for (uint32 u32_It = 0UL; u32_It < this->c_DefaultChannels.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->c_DefaultChannels.size(); ++u32_It)
    {
-      stw_scl::C_SCLChecksums::CalcCRC32(&this->c_DefaultChannels[u32_It], sizeof(uint32),
-                                         oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->c_DefaultChannels[u32_It], sizeof(uint32_t),
+                                          oru32_HashValue);
    }
 }

@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMouseEvent>
 
-#include "constants.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeHalcOvTableView.h"
-#include "C_SdNdeSingleHeaderView.h"
+#include "constants.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeHalcOvTableView.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,7 +51,7 @@ C_SdNdeHalcOvTableView::C_SdNdeHalcOvTableView(QWidget * const opc_Parent) :
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
+   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::EditRole));
    this->C_SdNdeHalcOvTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -117,7 +116,7 @@ C_SdNdeHalcOvTableView::~C_SdNdeHalcOvTableView(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcOvTableView::LoadUserSettings(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mc_Model.GetNodeIndex());
 
    if (pc_Node != NULL)
    {
@@ -135,7 +134,7 @@ void C_SdNdeHalcOvTableView::LoadUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcOvTableView::SaveUserSettings(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mc_Model.GetNodeIndex());
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mc_Model.GetNodeIndex());
 
    if (pc_Node != NULL)
    {
@@ -159,7 +158,7 @@ void C_SdNdeHalcOvTableView::UpdateData(void)
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcOvTableView::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex)
+void C_SdNdeHalcOvTableView::SetNodeIndex(const uint32_t ou32_NodeIndex)
 {
    this->mc_Model.SetNodeIndex(ou32_NodeIndex);
    this->sortByColumn(C_SdNdeHalcOvTableModel::h_EnumToColumn(C_SdNdeHalcOvTableModel::eINDEX), Qt::AscendingOrder);
@@ -172,7 +171,7 @@ void C_SdNdeHalcOvTableView::SetNodeIndex(const stw_types::uint32 ou32_NodeIndex
    Count of items in table
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_SdNdeHalcOvTableView::GetCountRows() const
+int32_t C_SdNdeHalcOvTableView::GetCountRows() const
 {
    return this->mc_Model.rowCount();
 }
@@ -187,7 +186,7 @@ sintn C_SdNdeHalcOvTableView::GetCountRows() const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcOvTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_HoveredRow = -1;
+   int32_t s32_HoveredRow = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
    QTableView::mouseMoveEvent(opc_Event);
@@ -237,10 +236,10 @@ void C_SdNdeHalcOvTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event
       const QModelIndex c_ClickedIndex = this->mc_SortProxyModel.mapToSource(c_ClickedIndexProxy);
       if (c_ClickedIndex.isValid() == true)
       {
-         uint32 u32_DomainNum;
+         uint32_t u32_DomainNum;
          if (this->mc_Model.MapRowToDomainIndex(c_ClickedIndex.row(), u32_DomainNum) == C_NO_ERR)
          {
-            uint32 u32_ChanNum;
+            uint32_t u32_ChanNum;
             if (this->mc_Model.MapRowToChannelNum(c_ClickedIndex.row(), u32_ChanNum) == C_NO_ERR)
             {
                Q_EMIT (this->SigChannelSelected(u32_DomainNum, u32_ChanNum, true));

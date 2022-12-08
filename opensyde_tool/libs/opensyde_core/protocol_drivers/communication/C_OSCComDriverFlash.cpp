@@ -11,21 +11,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstring>
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OSCComDriverFlash.h"
-#include "C_OSCLoggingHandler.h"
+#include "C_OscComDriverFlash.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_can;
-using namespace stw_scl;
-using namespace stw_diag_lib;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::can;
+using namespace stw::scl;
+using namespace stw::diag_lib;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -36,7 +36,7 @@ using namespace stw_diag_lib;
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
-extern void XFLSetInternalKey(const uint16 ou16_Key); //lint !e526 !e2701 //very special case here
+extern void XFLSetInternalKey(const uint16_t ou16_Key); //lint !e526 !e2701 !e8001 //very special case here
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
@@ -47,7 +47,7 @@ extern void XFLSetInternalKey(const uint16 ou16_Key); //lint !e526 !e2701 //very
    Formatted serial number string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumber(void) const
+C_SclString C_OscComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumber(void) const
 {
    return this->c_SerialNumber.GetSerialNumberAsFormattedString();
 }
@@ -64,9 +64,9 @@ C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumber(vo
    String with description of the serial number format
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFormatDescription(void) const
+C_SclString C_OscComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFormatDescription(void) const
 {
-   C_SCLString c_Return = "(Format: ";
+   C_SclString c_Return = "(Format: ";
 
    if (this->c_AvailableFeatures.q_ExtendedSerialNumberModeImplemented == false)
    {
@@ -75,7 +75,7 @@ C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFor
    else
    {
       c_Return += "Extended with Manufacturer Format " +
-                  C_SCLString::IntToStr(this->c_SerialNumber.u8_SerialNumberManufacturerFormat);
+                  C_SclString::IntToStr(this->c_SerialNumber.u8_SerialNumberManufacturerFormat);
    }
    c_Return += ")";
 
@@ -91,18 +91,18 @@ C_SCLString C_OSCComDriverFlash::C_FlashloaderInformation::GetEcuSerialNumberFor
    \param[in]  opv_XflReportProgressInstance Instance pointer to pass when invoking opv_XflReportProgressInstance
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode,
-                                         const C_OSCFlashProtocolStwFlashloader::PR_ReportProgress opr_XflReportProgress,
+C_OscComDriverFlash::C_OscComDriverFlash(const bool oq_RoutingActive, const bool oq_UpdateRoutingMode,
+                                         const C_OscFlashProtocolStwFlashloader::PR_ReportProgress opr_XflReportProgress,
                                          void * const opv_XflReportProgressInstance) :
-   C_OSCComDriverProtocol(),
+   C_OscComDriverProtocol(),
    pr_XflReportProgress(opr_XflReportProgress),
    pv_XflReportProgressInstance(opv_XflReportProgressInstance),
    mq_RoutingActive(oq_RoutingActive),
    mq_UpdateRoutingMode(oq_UpdateRoutingMode)
 {
    mc_CompanyId.u8_NumBytes = 2U;
-   mc_CompanyId.au8_Data[0] = static_cast<uint8>('Y');
-   mc_CompanyId.au8_Data[1] = static_cast<uint8>('*');
+   mc_CompanyId.au8_Data[0] = static_cast<uint8_t>('Y');
+   mc_CompanyId.au8_Data[1] = static_cast<uint8_t>('*');
 
    //configure STW Flashloader protocol engine to accept wildcard company ID:
    XFLSetInternalKey(0x3472U);
@@ -114,9 +114,9 @@ C_OSCComDriverFlash::C_OSCComDriverFlash(const bool oq_RoutingActive, const bool
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCComDriverFlash::~C_OSCComDriverFlash(void)
+C_OscComDriverFlash::~C_OscComDriverFlash(void)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->mc_StwFlashProtocols.size(); ++u32_Counter)
    {
@@ -152,13 +152,13 @@ C_OSCComDriverFlash::~C_OSCComDriverFlash(void)
    C_RANGE       Routing configuration failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinition, const uint32 ou32_ActiveBusIndex,
-                                 const std::vector<uint8> & orc_ActiveNodes, C_CAN_Dispatcher * const opc_CanDispatcher,
-                                 C_OSCIpDispatcher * const opc_IpDispatcher,
-                                 C_OSCSecurityPemDatabase * const opc_SecurityPemDb)
+int32_t C_OscComDriverFlash::Init(const C_OscSystemDefinition & orc_SystemDefinition,
+                                  const uint32_t ou32_ActiveBusIndex, const std::vector<uint8_t> & orc_ActiveNodes,
+                                  C_CanDispatcher * const opc_CanDispatcher, C_OscIpDispatcher * const opc_IpDispatcher,
+                                  C_OscSecurityPemDatabase * const opc_SecurityPemDb)
 {
-   sint32 s32_Return = C_OSCComDriverProtocol::Init(orc_SystemDefinition, ou32_ActiveBusIndex, orc_ActiveNodes,
-                                                    opc_CanDispatcher, opc_IpDispatcher, opc_SecurityPemDb);
+   int32_t s32_Return = C_OscComDriverProtocol::Init(orc_SystemDefinition, ou32_ActiveBusIndex, orc_ActiveNodes,
+                                                     opc_CanDispatcher, opc_IpDispatcher, opc_SecurityPemDb);
 
    if (s32_Return == C_NO_ERR)
    {
@@ -185,15 +185,15 @@ sint32 C_OSCComDriverFlash::Init(const C_OSCSystemDefinition & orc_SystemDefinit
    C_CONFIG    No dispatcher installed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
+int32_t C_OscComDriverFlash::InitCanAndSetCanBitrate(const uint32_t ou32_Bitrate)
 {
-   C_CAN_Dispatcher * const pc_CanDispatcher = this->m_GetCanDispatcher();
-   sint32 s32_Return = C_CONFIG;
+   C_CanDispatcher * const pc_CanDispatcher = this->m_GetCanDispatcher();
+   int32_t s32_Return = C_CONFIG;
 
    if (pc_CanDispatcher != NULL)
    {
       pc_CanDispatcher->CAN_Exit();
-      s32_Return = pc_CanDispatcher->CAN_Init(static_cast<sint32>(ou32_Bitrate));
+      s32_Return = pc_CanDispatcher->CAN_Init(static_cast<int32_t>(ou32_Bitrate));
 
       if (s32_Return != C_NO_ERR)
       {
@@ -215,11 +215,11 @@ sint32 C_OSCComDriverFlash::InitCanAndSetCanBitrate(const uint32 ou32_Bitrate)
    C_RANGE    openSYDE protocol not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::OsySetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                 const uint32 ou32_TimeoutMs) const
+int32_t C_OscComDriverFlash::OsySetPollingTimeout(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                  const uint32_t ou32_TimeoutMs) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -240,10 +240,10 @@ sint32 C_OSCComDriverFlash::OsySetPollingTimeout(const C_OSCProtocolDriverOsyNod
    C_RANGE    openSYDE protocol not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
+int32_t C_OscComDriverFlash::OsyResetPollingTimeout(const C_OscProtocolDriverOsyNode & orc_ServerId) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -265,15 +265,15 @@ sint32 C_OSCComDriverFlash::OsyResetPollingTimeout(const C_OSCProtocolDriverOsyN
    Time in ms all nodes need at least to get from application to the Flashloader or from Flashloader to Flashloader
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type)
+uint32_t C_OscComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type)
 const
 {
-   uint32 u32_WaitTime = 500U;
-   uint32 u32_Counter;
+   uint32_t u32_WaitTime = 500U;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesIndexes.size(); ++u32_Counter)
    {
-      uint32 u32_NodeWaitTime = 0;
+      uint32_t u32_NodeWaitTime = 0;
       tgl_assert(m_GetMinimumFlashloaderResetWaitTime(oe_Type, this->mc_ActiveNodesIndexes[u32_Counter],
                                                       u32_NodeWaitTime) == C_NO_ERR);
       if (u32_NodeWaitTime > u32_WaitTime)
@@ -300,13 +300,13 @@ const
    \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type,
-                                                               const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                               uint32 & oru32_TimeValue) const
+int32_t C_OscComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFlashloaderResetWaitTimeType oe_Type,
+                                                                const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                uint32_t & oru32_TimeValue) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
    bool q_Found = false;
-   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+   const uint32_t u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
 
    if (q_Found == true)
    {
@@ -333,19 +333,19 @@ sint32 C_OSCComDriverFlash::GetMinimumFlashloaderResetWaitTime(const E_MinimumFl
    C_RANGE    client and/or server identifier out of range
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::EthConnectNode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                           const uint8 (&orau8_IpAddress)[4],
-                                           C_OSCProtocolDriverOsy & orc_TemporaryProtocol,
-                                           C_OSCProtocolDriverOsyTpIp & orc_TpIp)
+int32_t C_OscComDriverFlash::EthConnectNode(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                            const uint8_t (&orau8_IpAddress)[4],
+                                            C_OscProtocolDriverOsy & orc_TemporaryProtocol,
+                                            C_OscProtocolDriverOsyTpIp & orc_TpIp)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    // Prepare the temporary protocol and its tp
    s32_Return = orc_TpIp.SetNodeIdentifiers(this->GetClientId(), orc_ServerId);
    if (s32_Return == C_NO_ERR)
    {
-      uint32 u32_Handle;
-      C_OSCIpDispatcher * const pc_IpDispatcher = this->m_GetIpDispatcher();
+      uint32_t u32_Handle;
+      C_OscIpDispatcher * const pc_IpDispatcher = this->m_GetIpDispatcher();
       s32_Return = pc_IpDispatcher->InitTcp(orau8_IpAddress, u32_Handle);
       if (s32_Return == C_NO_ERR)
       {
@@ -382,7 +382,7 @@ sint32 C_OSCComDriverFlash::EthConnectNode(const C_OSCProtocolDriverOsyNode & or
    C_NOACT    disconnect failed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::h_EthDisconnectNode(C_OSCProtocolDriverOsy & orc_TemporaryProtocol)
+int32_t C_OscComDriverFlash::h_EthDisconnectNode(C_OscProtocolDriverOsy & orc_TemporaryProtocol)
 {
    return orc_TemporaryProtocol.Disconnect();
 }
@@ -404,19 +404,19 @@ sint32 C_OSCComDriverFlash::h_EthDisconnectNode(C_OSCProtocolDriverOsy & orc_Tem
    C_CONFIG   no transport protocol installed or broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const
+int32_t C_OscComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAccepted) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    orq_NotAccepted = false;
 
    if (this->mpc_CanTransportProtocolBroadcast != NULL)
    {
-      std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastRequestProgrammingResults> c_Results;
+      std::vector<C_OscProtocolDriverOsyTpCan::C_BroadcastRequestProgrammingResults> c_Results;
       s32_Return = this->mpc_CanTransportProtocolBroadcast->BroadcastRequestProgramming(c_Results);
       if (s32_Return == C_NO_ERR)
       {
-         for (uint32 u32_ResponseIndex = 0U; u32_ResponseIndex < c_Results.size(); u32_ResponseIndex++)
+         for (uint32_t u32_ResponseIndex = 0U; u32_ResponseIndex < c_Results.size(); u32_ResponseIndex++)
          {
             if (c_Results[u32_ResponseIndex].q_RequestAccepted == false)
             {
@@ -428,11 +428,11 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAcc
    }
    else
    {
-      std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastRequestProgrammingResults> c_Results;
+      std::vector<C_OscProtocolDriverOsyTpIp::C_BroadcastRequestProgrammingResults> c_Results;
       s32_Return = this->mpc_IpTransportProtocolBroadcast->BroadcastRequestProgramming(c_Results);
       if (s32_Return == C_NO_ERR)
       {
-         for (uint32 u32_ResponseIndex = 0U; u32_ResponseIndex < c_Results.size(); u32_ResponseIndex++)
+         for (uint32_t u32_ResponseIndex = 0U; u32_ResponseIndex < c_Results.size(); u32_ResponseIndex++)
          {
             if (c_Results[u32_ResponseIndex].q_RequestAccepted == false)
             {
@@ -448,7 +448,7 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAcc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Send network reset broadcast
 
-   Use the constants provided by C_OSCProtocolDriverOsyTpBase for the parameter.
+   Use the constants provided by C_OscProtocolDriverOsyTpBase for the parameter.
 
    \param[in]  ou8_ResetType        Reset type (0x02: keyOffOnReset, 0x60: resetToFlashloader)
 
@@ -458,9 +458,9 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastRequestProgramming(bool & orq_NotAcc
    C_CONFIG   no dispatcher installed or broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyBroadcastEcuReset(const uint8 ou8_ResetType) const
+int32_t C_OscComDriverFlash::SendOsyBroadcastEcuReset(const uint8_t ou8_ResetType) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if ((this->mpc_CanTransportProtocolBroadcast == NULL) &&
        (this->mpc_IpTransportProtocolBroadcast == NULL))
@@ -494,9 +494,9 @@ sint32 C_OSCComDriverFlash::SendOsyBroadcastEcuReset(const uint8 ou8_ResetType) 
    C_CONFIG   no CAN dispatcher installed or broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterPreProgrammingSession(void) const
+int32_t C_OscComDriverFlash::SendOsyCanBroadcastEnterPreProgrammingSession(void) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_CanTransportProtocolBroadcast == NULL)
    {
@@ -522,9 +522,9 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterPreProgrammingSession(void) 
    C_CONFIG   no CAN dispatcher installed or broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
+int32_t C_OscComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_CanTransportProtocolBroadcast == NULL)
    {
@@ -549,12 +549,12 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastEnterDefaultSession(void) const
    C_CONFIG   no dispatcher installed or broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
-   std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberResults> & orc_Responses,
-   std::vector<C_OSCProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses)
+int32_t C_OscComDriverFlash::SendOsyCanBroadcastReadSerialNumber(
+   std::vector<C_OscProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberResults> & orc_Responses,
+   std::vector<C_OscProtocolDriverOsyTpCan::C_BroadcastReadEcuSerialNumberExtendedResults> & orc_ExtendedResponses)
 const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_CanTransportProtocolBroadcast == NULL)
    {
@@ -587,11 +587,11 @@ const
    C_COM      error on creating temporary needed protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                  C_SCLString & orc_DeviceName, uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsyReadDeviceName(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                   C_SclString & orc_DeviceName, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    orc_DeviceName = "";
 
@@ -602,8 +602,8 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
    else
    {
       // Only necessary in case of combination of CAN and device configuration initial scan
-      C_OSCProtocolDriverOsyTpCan c_TpCan;
-      C_OSCProtocolDriverOsy c_OsyProtocol;
+      C_OscProtocolDriverOsyTpCan c_TpCan;
+      C_OscProtocolDriverOsy c_OsyProtocol;
 
       // No device with this server id with openSYDE protocol exist. We need a temporary protocol.
       s32_Return = this->m_PrepareTemporaryOsyProtocol(orc_ServerId, c_OsyProtocol, c_TpCan);
@@ -639,12 +639,12 @@ sint32 C_OSCComDriverFlash::SendOsyReadDeviceName(const C_OSCProtocolDriverOsyNo
    C_COM      error on creating temporary needed protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                    C_OSCProtocolSerialNumber & orc_SerialNumberExt,
-                                                    uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsyReadSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                     C_OscProtocolSerialNumber & orc_SerialNumberExt,
+                                                     uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -673,12 +673,12 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumber(const C_OSCProtocolDriverOsy
    C_RANGE    length of read string or serial number does not match
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadSerialNumberExt(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                       C_OSCProtocolSerialNumber & orc_SerialNumberExt,
-                                                       uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsyReadSerialNumberExt(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                        C_OscProtocolSerialNumber & orc_SerialNumberExt,
+                                                        uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -708,12 +708,12 @@ sint32 C_OSCComDriverFlash::SendOsyReadSerialNumberExt(const C_OSCProtocolDriver
    C_OVERFLOW  multiple responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumber(
-   const C_OSCProtocolSerialNumber & orc_SerialNumber, const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-   uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumber(
+   const C_OscProtocolSerialNumber & orc_SerialNumber, const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+   uint8_t * const opu8_NrCode)
 const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_CanTransportProtocolBroadcast == NULL)
    {
@@ -750,11 +750,11 @@ const
    C_OVERFLOW  multiple responses received
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
-   const C_OSCProtocolSerialNumber & orc_SerialNumber, const uint8 ou8_SubNodeId,
-   const C_OSCProtocolDriverOsyNode & orc_NewNodeId, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
+   const C_OscProtocolSerialNumber & orc_SerialNumber, const uint8_t ou8_SubNodeId,
+   const C_OscProtocolDriverOsyNode & orc_NewNodeId, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_CanTransportProtocolBroadcast == NULL)
    {
@@ -784,12 +784,12 @@ sint32 C_OSCComDriverFlash::SendOsyCanBroadcastSetNodeIdBySerialNumberExtended(
    C_CONFIG    no dispatcher installed or ETH broadcast protocol not initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
-   std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> & orc_ReadDeviceInfoResults,
-   std::vector<C_OSCProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults> & orc_ReadDeviceInfoExtendedResults)
+int32_t C_OscComDriverFlash::SendOsyEthBroadcastGetDeviceInformation(
+   std::vector<C_OscProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoResults> & orc_ReadDeviceInfoResults,
+   std::vector<C_OscProtocolDriverOsyTpIp::C_BroadcastGetDeviceInfoExtendedResults> & orc_ReadDeviceInfoExtendedResults)
 const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_IpTransportProtocolBroadcast == NULL)
    {
@@ -836,15 +836,15 @@ const
    C_TIMEOUT   no response within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                                            const uint8 (&orau8_NewIpAddress)[4],
-                                                            const uint8 (&orau8_NetMask)[4],
-                                                            const uint8(&orau8_DefaultGateway)[4],
-                                                            const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-                                                            uint8 (&orau8_ResponseIp)[4],
-                                                            uint8 * const opu8_ErrorResult) const
+int32_t C_OscComDriverFlash::SendOsyEthBroadcastSetIpAddress(const C_OscProtocolSerialNumber & orc_SerialNumber,
+                                                             const uint8_t (&orau8_NewIpAddress)[4],
+                                                             const uint8_t (&orau8_NetMask)[4],
+                                                             const uint8_t(&orau8_DefaultGateway)[4],
+                                                             const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+                                                             uint8_t (&orau8_ResponseIp)[4],
+                                                             uint8_t * const opu8_ErrorResult) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_IpTransportProtocolBroadcast == NULL)
    {
@@ -892,16 +892,16 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddress(const C_OSCProtocolS
    C_TIMEOUT   no response within timeout
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddressExtended(const C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                                                    const uint8 (&orau8_NewIpAddress)[4],
-                                                                    const uint8 (&orau8_NetMask)[4],
-                                                                    const uint8(&orau8_DefaultGateway)[4],
-                                                                    const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-                                                                    const stw_types::uint8 ou8_SubNodeId,
-                                                                    uint8 (&orau8_ResponseIp)[4],
-                                                                    uint8 * const opu8_ErrorResult) const
+int32_t C_OscComDriverFlash::SendOsyEthBroadcastSetIpAddressExtended(const C_OscProtocolSerialNumber & orc_SerialNumber,
+                                                                     const uint8_t (&orau8_NewIpAddress)[4],
+                                                                     const uint8_t (&orau8_NetMask)[4],
+                                                                     const uint8_t(&orau8_DefaultGateway)[4],
+                                                                     const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+                                                                     const uint8_t ou8_SubNodeId,
+                                                                     uint8_t (&orau8_ResponseIp)[4],
+                                                                     uint8_t * const opu8_ErrorResult) const
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    if (this->mpc_IpTransportProtocolBroadcast == NULL)
    {
@@ -938,16 +938,16 @@ sint32 C_OSCComDriverFlash::SendOsyEthBroadcastSetIpAddressExtended(const C_OSCP
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverOsyNode & orc_ServerId) const
+int32_t C_OscComDriverFlash::SendOsyRequestProgramming(const C_OscProtocolDriverOsyNode & orc_ServerId) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
       // If the device is already in flashloader, the preprogramming session is needed.
       // If the device is in the application, this session request will return with an error. This error can be ignored.
-      pc_ExistingProtocol->OsyDiagnosticSessionControl(C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
+      pc_ExistingProtocol->OsyDiagnosticSessionControl(C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
                                                        NULL);
       s32_Return = pc_ExistingProtocol->OsyRequestProgramming();
    }
@@ -972,11 +972,12 @@ sint32 C_OSCComDriverFlash::SendOsyRequestProgramming(const C_OSCProtocolDriverO
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                               uint8 & oru8_SessionId, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                uint8_t & oru8_SessionId,
+                                                                uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1010,23 +1011,23 @@ sint32 C_OSCComDriverFlash::SendOsyReadActiveDiagnosticSession(const C_OSCProtoc
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadAllFlashBlockData(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                         std::vector<C_OSCProtocolDriverOsy::C_FlashBlockInfo> & orc_BlockInfo,
-                                                         uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsyReadAllFlashBlockData(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                          std::vector<C_OscProtocolDriverOsy::C_FlashBlockInfo> & orc_BlockInfo,
+                                                          uint8_t * const opu8_NrCode)
 const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    orc_BlockInfo.resize(0);
 
    if (pc_ExistingProtocol != NULL)
    {
-      for (uint16 u16_Block = 0U; u16_Block <= 0xFFU; u16_Block++)
+      for (uint16_t u16_Block = 0U; u16_Block <= 0xFFU; u16_Block++)
       {
-         uint8 u8_NrCode;
-         C_OSCProtocolDriverOsy::C_FlashBlockInfo c_BlockInfo;
-         s32_Return = pc_ExistingProtocol->OsyReadFlashBlockData(static_cast<uint8>(u16_Block), c_BlockInfo,
+         uint8_t u8_NrCode;
+         C_OscProtocolDriverOsy::C_FlashBlockInfo c_BlockInfo;
+         s32_Return = pc_ExistingProtocol->OsyReadFlashBlockData(static_cast<uint8_t>(u16_Block), c_BlockInfo,
                                                                  &u8_NrCode);
          if (s32_Return == C_NO_ERR)
          {
@@ -1039,7 +1040,7 @@ const
                (*opu8_NrCode) = u8_NrCode;
             }
 
-            if ((s32_Return == C_WARN) && (u8_NrCode == C_OSCProtocolDriverOsy::hu8_NR_CODE_REQUEST_OUT_OF_RANGE))
+            if ((s32_Return == C_WARN) && (u8_NrCode == C_OscProtocolDriverOsy::hu8_NR_CODE_REQUEST_OUT_OF_RANGE))
             {
                //no more blocks
                //done here ... not a real problem
@@ -1072,12 +1073,12 @@ const
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                                  C_FlashloaderInformation & orc_Information,
-                                                                  uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                   C_FlashloaderInformation & orc_Information,
+                                                                   uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1169,12 +1170,13 @@ sint32 C_OSCComDriverFlash::SendOsyReadInformationFromFlashloader(const C_OSCPro
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                             const uint32 ou32_StartAddress, const uint32 ou32_Size,
-                                                             uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                              const uint32_t ou32_StartAddress,
+                                                              const uint32_t ou32_Size,
+                                                              uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1204,14 +1206,14 @@ sint32 C_OSCComDriverFlash::SendOsyCheckFlashMemoryAvailable(const C_OSCProtocol
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                                       const uint8 (&orau8_Date)[3],
-                                                                       const uint8 (&orau8_Time)[3],
-                                                                       const C_SCLString & orc_Username,
-                                                                       uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                        const uint8_t (&orau8_Date)[3],
+                                                                        const uint8_t (&orau8_Time)[3],
+                                                                        const C_SclString & orc_Username,
+                                                                        uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1240,12 +1242,12 @@ sint32 C_OSCComDriverFlash::SendOsyWriteApplicationSoftwareFingerprint(const C_O
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                   const uint32 ou32_StartAddress, const uint32 ou32_Size,
-                                                   uint32 & oru32_MaxBlockLength, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyRequestDownload(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                    const uint32_t ou32_StartAddress, const uint32_t ou32_Size,
+                                                    uint32_t & oru32_MaxBlockLength, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1274,12 +1276,13 @@ sint32 C_OSCComDriverFlash::SendOsyRequestDownload(const C_OSCProtocolDriverOsyN
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                       const C_SCLString & orc_FilePath, const uint32 ou32_FileSize,
-                                                       uint32 & oru32_MaxBlockLength, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyRequestFileTransfer(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                        const C_SclString & orc_FilePath, const uint32_t ou32_FileSize,
+                                                        uint32_t & oru32_MaxBlockLength,
+                                                        uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1307,12 +1310,12 @@ sint32 C_OSCComDriverFlash::SendOsyRequestFileTransfer(const C_OSCProtocolDriver
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                const uint8 ou8_BlockSequenceCounter, std::vector<uint8> & orc_Data,
-                                                uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyTransferData(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                 const uint8_t ou8_BlockSequenceCounter,
+                                                 std::vector<uint8_t> & orc_Data, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1342,13 +1345,13 @@ sint32 C_OSCComDriverFlash::SendOsyTransferData(const C_OSCProtocolDriverOsyNode
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                                   const bool oq_SendSignatureBlockAddress,
-                                                                   const uint32 ou32_SignatureBlockAddress,
-                                                                   uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                    const bool oq_SendSignatureBlockAddress,
+                                                                    const uint32_t ou32_SignatureBlockAddress,
+                                                                    uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1375,21 +1378,21 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitAddressBased(const C_OSCPr
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                                const uint32 ou32_CrcOverData,
-                                                                uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                 const uint32_t ou32_CrcOverData,
+                                                                 uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
-      uint8 au8_Signature[8];
+      uint8_t au8_Signature[8];
       //place the CRC into the first four bytes; rest is reserved
-      au8_Signature[0] = static_cast<uint8>(ou32_CrcOverData >> 24U);
-      au8_Signature[1] = static_cast<uint8>(ou32_CrcOverData >> 16U);
-      au8_Signature[2] = static_cast<uint8>(ou32_CrcOverData >> 8U);
-      au8_Signature[3] = static_cast<uint8>(ou32_CrcOverData);
+      au8_Signature[0] = static_cast<uint8_t>(ou32_CrcOverData >> 24U);
+      au8_Signature[1] = static_cast<uint8_t>(ou32_CrcOverData >> 16U);
+      au8_Signature[2] = static_cast<uint8_t>(ou32_CrcOverData >> 8U);
+      au8_Signature[3] = static_cast<uint8_t>(ou32_CrcOverData);
       au8_Signature[4] = 0U; //reserved: set to zero
       au8_Signature[5] = 0U; //reserved: set to zero
       au8_Signature[6] = 0U; //reserved: set to zero
@@ -1416,12 +1419,12 @@ sint32 C_OSCComDriverFlash::SendOsyRequestTransferExitFileBased(const C_OSCProto
    C_COM       communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyRequestFileBasedTransferExitResult(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                                      C_SCLString & orc_Result,
-                                                                      uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyRequestFileBasedTransferExitResult(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                       C_SclString & orc_Result,
+                                                                       uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1443,11 +1446,11 @@ sint32 C_OSCComDriverFlash::SendOsyRequestFileBasedTransferExitResult(const C_OS
    C_NOACT     Could not put request in Tx queue
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                            const uint8 ou8_ResetType) const
+int32_t C_OscComDriverFlash::SendOsyEcuReset(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                             const uint8_t ou8_ResetType) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1475,12 +1478,12 @@ sint32 C_OSCComDriverFlash::SendOsyEcuReset(const C_OSCProtocolDriverOsyNode & o
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(C_OSCProtocolDriverOsy & orc_Protocol,
-                                                         const bool oq_SessionOnly, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(C_OscProtocolDriverOsy & orc_Protocol,
+                                                          const bool oq_SessionOnly, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = this->m_SetNodeSessionId(&orc_Protocol,
-                                                C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
-                                                false, opu8_NrCode);
+   int32_t s32_Return = this->m_SetNodeSessionId(&orc_Protocol,
+                                                 C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
+                                                 false, opu8_NrCode);
 
    if ((s32_Return == C_NO_ERR) && (oq_SessionOnly == false))
    {
@@ -1508,17 +1511,17 @@ sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(C_OSCProtocolDriverOsy 
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                         const bool oq_SessionOnly, uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsySetPreProgrammingMode(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                          const bool oq_SessionOnly, uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
    bool q_Found = false;
-   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+   const uint32_t u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
 
    if (q_Found == true)
    {
       s32_Return = this->m_SetNodeSessionId(u32_ActiveNodeIndex,
-                                            C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
+                                            C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
                                             false, opu8_NrCode);
 
       if ((s32_Return == C_NO_ERR) && (oq_SessionOnly == false))
@@ -1530,8 +1533,8 @@ sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriv
    {
       // Only necessary in case of combination of CAN and device configuration initial scan
       // In case of ETH and device configuration a ETH specific version of this function exists
-      C_OSCProtocolDriverOsyTpCan c_TpCan;
-      C_OSCProtocolDriverOsy c_OsyProtocol;
+      C_OscProtocolDriverOsyTpCan c_TpCan;
+      C_OscProtocolDriverOsy c_OsyProtocol;
 
       // No device with this server id with openSYDE protocol exist. We need a temporary protocol.
       s32_Return = this->m_PrepareTemporaryOsyProtocol(orc_ServerId, c_OsyProtocol, c_TpCan);
@@ -1539,7 +1542,7 @@ sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriv
       if (s32_Return == C_NO_ERR)
       {
          s32_Return = this->m_SetNodeSessionId(&c_OsyProtocol,
-                                               C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
+                                               C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING,
                                                false, opu8_NrCode);
 
          if ((s32_Return == C_NO_ERR) && (oq_SessionOnly == false))
@@ -1571,23 +1574,23 @@ sint32 C_OSCComDriverFlash::SendOsySetPreProgrammingMode(const C_OSCProtocolDriv
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetProgrammingMode(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                      const uint8 * const opu8_SecurityLevel,
-                                                      uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsySetProgrammingMode(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                       const uint8_t * const opu8_SecurityLevel,
+                                                       uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
    bool q_Found = false;
-   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+   const uint32_t u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
 
    if (q_Found == true)
    {
       s32_Return = this->m_SetNodeSessionId(u32_ActiveNodeIndex,
-                                            C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PROGRAMMING,
+                                            C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PROGRAMMING,
                                             false, opu8_NrCode);
 
       if (s32_Return == C_NO_ERR)
       {
-         uint8 u8_SecurityLevel = 3U;
+         uint8_t u8_SecurityLevel = 3U;
 
          if (opu8_SecurityLevel != NULL)
          {
@@ -1620,12 +1623,12 @@ sint32 C_OSCComDriverFlash::SendOsySetProgrammingMode(const C_OSCProtocolDriverO
                Detailed error codes are logged with opu8_NrCode
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                    const uint8 ou8_Level, uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsySetSecurityLevel(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                     const uint8_t ou8_Level, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
    bool q_Found = false;
-   const uint32 u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
+   const uint32_t u32_ActiveNodeIndex = this->m_GetActiveIndex(orc_ServerId, q_Found);
 
    if (q_Found == true)
    {
@@ -1656,12 +1659,12 @@ sint32 C_OSCComDriverFlash::SendOsySetSecurityLevel(const C_OSCProtocolDriverOsy
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                              const uint8 ou8_ChannelIndex, const uint32 ou32_Bitrate,
-                                              uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsySetBitrate(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                               const uint8_t ou8_ChannelIndex, const uint32_t ou32_Bitrate,
+                                               uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1693,12 +1696,12 @@ sint32 C_OSCComDriverFlash::SendOsySetBitrate(const C_OSCProtocolDriverOsyNode &
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(C_OSCProtocolDriverOsy & orc_Protocol,
-                                                          const uint8 ou8_ChannelIndex,
-                                                          const uint8 (&orau8_IpAddress)[4],
-                                                          const uint8 (&orau8_NetMask)[4],
-                                                          const uint8 (&orau8_DefaultGateway)[4],
-                                                          uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsySetIpAddressForChannel(C_OscProtocolDriverOsy & orc_Protocol,
+                                                           const uint8_t ou8_ChannelIndex,
+                                                           const uint8_t (&orau8_IpAddress)[4],
+                                                           const uint8_t (&orau8_NetMask)[4],
+                                                           const uint8_t (&orau8_DefaultGateway)[4],
+                                                           uint8_t * const opu8_NrCode)
 {
    return orc_Protocol.OsySetIpAddressForChannel(1U, ou8_ChannelIndex, orau8_IpAddress, orau8_NetMask,
                                                  orau8_DefaultGateway, opu8_NrCode);
@@ -1727,15 +1730,15 @@ sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(C_OSCProtocolDriverOsy
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                          const uint8 ou8_ChannelIndex,
-                                                          const uint8 (&orau8_IpAddress)[4],
-                                                          const uint8 (&orau8_NetMask)[4],
-                                                          const uint8 (&orau8_DefaultGateway)[4],
-                                                          uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsySetIpAddressForChannel(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                           const uint8_t ou8_ChannelIndex,
+                                                           const uint8_t (&orau8_IpAddress)[4],
+                                                           const uint8_t (&orau8_NetMask)[4],
+                                                           const uint8_t (&orau8_DefaultGateway)[4],
+                                                           uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1766,10 +1769,10 @@ sint32 C_OSCComDriverFlash::SendOsySetIpAddressForChannel(const C_OSCProtocolDri
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(C_OSCProtocolDriverOsy & orc_Protocol,
-                                                       const uint8 ou8_ChannelType, const uint8 ou8_ChannelIndex,
-                                                       const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-                                                       uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsySetNodeIdForChannel(C_OscProtocolDriverOsy & orc_Protocol,
+                                                        const uint8_t ou8_ChannelType, const uint8_t ou8_ChannelIndex,
+                                                        const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+                                                        uint8_t * const opu8_NrCode)
 {
    return orc_Protocol.OsySetNodeIdForChannel(ou8_ChannelType, ou8_ChannelIndex,
                                               orc_NewNodeId, opu8_NrCode);
@@ -1796,13 +1799,13 @@ sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(C_OSCProtocolDriverOsy & 
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                       const uint8 ou8_ChannelType, const uint8 ou8_ChannelIndex,
-                                                       const C_OSCProtocolDriverOsyNode & orc_NewNodeId,
-                                                       uint8 * const opu8_NrCode)
+int32_t C_OscComDriverFlash::SendOsySetNodeIdForChannel(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                        const uint8_t ou8_ChannelType, const uint8_t ou8_ChannelIndex,
+                                                        const C_OscProtocolDriverOsyNode & orc_NewNodeId,
+                                                        uint8_t * const opu8_NrCode)
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1813,8 +1816,8 @@ sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriver
    {
       // Only necessary in case of combination of CAN and device configuration initial scan
       // In case of ETH and device configuration a ETH specific version of this function exists
-      C_OSCProtocolDriverOsyTpCan c_TpCan;
-      C_OSCProtocolDriverOsy c_OsyProtocol;
+      C_OscProtocolDriverOsyTpCan c_TpCan;
+      C_OscProtocolDriverOsy c_OsyProtocol;
 
       // No device with this server id with openSYDE protocol exist. We need a temporary protocol.
       s32_Return = this->m_PrepareTemporaryOsyProtocol(orc_ServerId, c_OsyProtocol, c_TpCan);
@@ -1851,12 +1854,12 @@ sint32 C_OSCComDriverFlash::SendOsySetNodeIdForChannel(const C_OSCProtocolDriver
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadListOfFeatures(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                      C_OSCProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
-                                                      stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadListOfFeatures(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                       C_OscProtocolDriverOsy::C_ListOfFeatures & orc_ListOfFeatures,
+                                                       uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1887,12 +1890,12 @@ sint32 C_OSCComDriverFlash::SendOsyReadListOfFeatures(const C_OSCProtocolDriverO
    C_RANGE    count of read bytes does not match the expectation (more than 20 bytes received)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadCertificateSerialNumber(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                               std::vector<stw_types::uint8> & orc_SerialNumber,
-                                                               stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadCertificateSerialNumber(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                                std::vector<uint8_t> & orc_SerialNumber,
+                                                                uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1928,14 +1931,14 @@ sint32 C_OSCComDriverFlash::SendOsyReadCertificateSerialNumber(const C_OSCProtoc
                expectation
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyWriteSecurityKey(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                    const std::vector<uint8> & orc_PublicKeyModulus,
-                                                    const std::vector<uint8> & orc_PublicKeyExponent,
-                                                    const std::vector<uint8> & orc_CertificateSerialNumber,
-                                                    stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyWriteSecurityKey(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                     const std::vector<uint8_t> & orc_PublicKeyModulus,
+                                                     const std::vector<uint8_t> & orc_PublicKeyExponent,
+                                                     const std::vector<uint8_t> & orc_CertificateSerialNumber,
+                                                     uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1965,12 +1968,12 @@ sint32 C_OSCComDriverFlash::SendOsyWriteSecurityKey(const C_OSCProtocolDriverOsy
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadSecurityActivation(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                          bool & orq_SecurityOn, uint8 & oru8_SecurityAlgorithm,
-                                                          stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadSecurityActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                           bool & orq_SecurityOn, uint8_t & oru8_SecurityAlgorithm,
+                                                           uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -1999,12 +2002,13 @@ sint32 C_OSCComDriverFlash::SendOsyReadSecurityActivation(const C_OSCProtocolDri
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyWriteSecurityActivation(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                           const bool oq_SecurityOn, const uint8 ou8_SecurityAlgorithm,
-                                                           stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyWriteSecurityActivation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                            const bool oq_SecurityOn,
+                                                            const uint8_t ou8_SecurityAlgorithm,
+                                                            uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -2032,12 +2036,11 @@ sint32 C_OSCComDriverFlash::SendOsyWriteSecurityActivation(const C_OSCProtocolDr
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyReadDebuggerEnabled(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                       bool & orq_DebuggerEnabled,
-                                                       stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyReadDebuggerEnabled(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                        bool & orq_DebuggerEnabled, uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -2065,12 +2068,12 @@ sint32 C_OSCComDriverFlash::SendOsyReadDebuggerEnabled(const C_OSCProtocolDriver
    C_COM      communication driver reported error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendOsyWriteDebuggerEnabled(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                        const bool oq_DebuggerEnabled,
-                                                        stw_types::uint8 * const opu8_NrCode) const
+int32_t C_OscComDriverFlash::SendOsyWriteDebuggerEnabled(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                         const bool oq_DebuggerEnabled,
+                                                         uint8_t * const opu8_NrCode) const
 {
-   sint32 s32_Return = C_RANGE;
-   C_OSCProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
+   int32_t s32_Return = C_RANGE;
+   C_OscProtocolDriverOsy * const pc_ExistingProtocol = this->m_GetOsyProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -2089,13 +2092,13 @@ sint32 C_OSCComDriverFlash::SendOsyWriteDebuggerEnabled(const C_OSCProtocolDrive
    C_CONFIG    Not initialized or not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
+int32_t C_OscComDriverFlash::SendStwRequestNodeReset(void)
 {
-   sint32 s32_Return = C_CONFIG;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
       std::vector<T_STWCAN_Msg_TX> c_ResetMsgs;
 
       s32_Return = C_NO_ERR;
@@ -2105,13 +2108,13 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
       {
          if (this->mc_ActiveNodesIndexes[u32_Counter] < this->mpc_SysDef->c_Nodes.size())
          {
-            T_STWCAN_Msg_TX t_ResetMsg;
+            T_STWCAN_Msg_TX c_ResetMsg;
 
-            s32_Return = this->m_GetStwResetMessage(this->mc_ActiveNodesIndexes[u32_Counter], t_ResetMsg);
+            s32_Return = this->m_GetStwResetMessage(this->mc_ActiveNodesIndexes[u32_Counter], c_ResetMsg);
 
             if (s32_Return == C_NO_ERR)
             {
-               c_ResetMsgs.push_back(t_ResetMsg);
+               c_ResetMsgs.push_back(c_ResetMsg);
             }
             else if (s32_Return == C_NOACT)
             {
@@ -2132,7 +2135,7 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
          {
             if (this->mc_StwFlashProtocols[u32_Counter] != NULL)
             {
-               uint32 u32_MsgCounter;
+               uint32_t u32_MsgCounter;
 
                // Send all reset messages with the same protocol. No dependency to the concrete node id
                for (u32_MsgCounter = 0U; u32_MsgCounter < c_ResetMsgs.size(); ++u32_MsgCounter)
@@ -2167,18 +2170,18 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(void)
    C_NOACT     No reset message configured or node has no STW flashloader
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsyNode & orc_ServerId)
+int32_t C_OscComDriverFlash::SendStwRequestNodeReset(const C_OscProtocolDriverOsyNode & orc_ServerId)
 {
-   sint32 s32_Return = C_CONFIG;
-   uint32 u32_NodeIndex;
+   int32_t s32_Return = C_CONFIG;
 
    if (this->mq_Initialized == true)
    {
+      uint32_t u32_NodeIndex;
       if (this->GetNodeIndex(orc_ServerId, u32_NodeIndex) == true)
       {
-         T_STWCAN_Msg_TX t_ResetMsg;
-         C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-         C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+         T_STWCAN_Msg_TX c_ResetMsg;
+         C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+         C_OscFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
          if (pc_ExistingProtocol == NULL)
          {
@@ -2187,10 +2190,10 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsy
             pc_ExistingProtocol = &c_StwProtocol;
          }
 
-         s32_Return = this->m_GetStwResetMessage(u32_NodeIndex, t_ResetMsg);
+         s32_Return = this->m_GetStwResetMessage(u32_NodeIndex, c_ResetMsg);
          if (s32_Return == C_NO_ERR)
          {
-            s32_Return = pc_ExistingProtocol->RequestNodeReset(&t_ResetMsg);
+            s32_Return = pc_ExistingProtocol->RequestNodeReset(&c_ResetMsg);
 
             if (s32_Return != C_NO_ERR)
             {
@@ -2216,11 +2219,11 @@ sint32 C_OSCComDriverFlash::SendStwRequestNodeReset(const C_OSCProtocolDriverOsy
    C_CONFIG      no STW flashloader protocol initialized
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & orc_ServerId)
+int32_t C_OscComDriverFlash::SendStwSendFlash(const C_OscProtocolDriverOsyNode & orc_ServerId)
 {
-   sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-   C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return;
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
    {
@@ -2242,8 +2245,8 @@ sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Scan for nodes in the network.
 
-   \param[out]     orau8_LocalIDs     Number of responses for each ID.
-                                       e.g. orau8_LocalIDs[1] contains the number of responding
+   \param[out]     orau8_LocalIds     Number of responses for each ID.
+                                       e.g. orau8_LocalIds[1] contains the number of responding
                                        controllers on Local ID 1 after call.
    \param[out]     oru8_NodeFounds    Total number of found nodes
 
@@ -2252,16 +2255,16 @@ sint32 C_OSCComDriverFlash::SendStwSendFlash(const C_OSCProtocolDriverOsyNode & 
    C_COM       error on sending
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwSearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFFERENT_LOCAL_IDS],
-                                            uint8 & oru8_NodeFounds)
+int32_t C_OscComDriverFlash::SendStwSearchId(uint8_t (&orau8_LocalIds)[XFL_NUM_DIFFERENT_LOCAL_IDS],
+                                             uint8_t & oru8_NodeFounds)
 {
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // No concrete device. We need a temporary protocol.
    this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
 
    // Send "FLASH" will be handled separately. Minimum parameter.
-   return c_StwProtocol.SearchId(orau8_LocalIDs, &oru8_NodeFounds, 0, 0);
+   return c_StwProtocol.SearchId(orau8_LocalIds, &oru8_NodeFounds, 0, 0);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2275,11 +2278,11 @@ sint32 C_OSCComDriverFlash::SendStwSearchId(uint8 (&orau8_LocalIDs)[XFL_NUM_DIFF
    C_COM              no response from server
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                 uint8 * const opu8_NodesFound)
+int32_t C_OscComDriverFlash::SendStwWakeupLocalId(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                  uint8_t * const opu8_NodesFound)
 {
-   sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader * const pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return;
+   C_OscFlashProtocolStwFlashloader * const pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    C_XFLCompanyID c_ReceivedCompanyId;
 
@@ -2290,12 +2293,11 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
 
    if (pc_ExistingProtocol != NULL)
    {
-      s32_Return = pc_ExistingProtocol->WakeupLocalId(this->mc_CompanyId, opu8_NodesFound,
-                                                      &c_ReceivedCompanyId);
+      s32_Return = pc_ExistingProtocol->WakeupLocalId(this->mc_CompanyId, opu8_NodesFound, &c_ReceivedCompanyId);
    }
    else
    {
-      C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+      C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
       // No device with this server id with STW protocol exist. We need a temporary protocol.
       this->m_InitFlashProtocolStw(&c_StwProtocol, orc_ServerId.u8_NodeIdentifier);
@@ -2305,9 +2307,9 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
    if (s32_Return == C_WARN)
    {
       // An other company id
-      stw_scl::C_SCLString c_CompanyId;
+      stw::scl::C_SclString c_CompanyId;
 
-      C_OSCFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
+      C_OscFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
 
       osc_write_log_info("SendStwWakeupLocalId", "Other company id found: " + c_CompanyId);
 
@@ -2330,10 +2332,10 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalId(const C_OSCProtocolDriverOsyNod
    C_RANGE            invalid serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber,
-                                                           uint8 & oru8_LocalId)
+int32_t C_OscComDriverFlash::SendStwWakeupLocalSerialNumber(const C_OscProtocolSerialNumber & orc_SerialNumber,
+                                                            uint8_t & oru8_LocalId)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if ((orc_SerialNumber.q_IsValid == true) &&
        (orc_SerialNumber.q_FsnSerialNumber == false) &&
@@ -2341,10 +2343,10 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const C_OSCProtocolSe
    {
       C_XFLCompanyID c_ReceivedCompanyId;
 
-      C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+      C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
       // No concrete device. We need a temporary protocol.
-      this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
+      this->m_InitFlashProtocolStw(&c_StwProtocol, 0U);
 
       s32_Return = c_StwProtocol.WakeupSerialNumber(orc_SerialNumber.au8_SerialNumber, this->mc_CompanyId, oru8_LocalId,
                                                     &c_ReceivedCompanyId);
@@ -2352,9 +2354,9 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const C_OSCProtocolSe
       if (s32_Return == C_WARN)
       {
          // An other company id
-         stw_scl::C_SCLString c_CompanyId;
+         stw::scl::C_SclString c_CompanyId;
 
-         C_OSCFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
+         C_OscFlashProtocolStwFlashloader::CompIDStructToString(c_ReceivedCompanyId, c_CompanyId);
 
          osc_write_log_info("SendStwWakeupLocalId", "Other company id found: " + c_CompanyId);
 
@@ -2381,13 +2383,13 @@ sint32 C_OSCComDriverFlash::SendStwWakeupLocalSerialNumber(const C_OSCProtocolSe
    C_COM          no response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwGetSerialNumbers(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                    uint8 * const opu8_SerialNumbers, const uint8 ou8_NumMax,
-                                                    uint8 & oru8_NumFound)
+int32_t C_OscComDriverFlash::SendStwGetSerialNumbers(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                     uint8_t * const opu8_SerialNumbers, const uint8_t ou8_NumMax,
+                                                     uint8_t & oru8_NumFound)
 {
-   sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-   C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return;
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
    {
@@ -2412,13 +2414,13 @@ sint32 C_OSCComDriverFlash::SendStwGetSerialNumbers(const C_OSCProtocolDriverOsy
    C_NOACT            error response from server
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                               C_SCLString & orc_DeviceName)
+int32_t C_OscComDriverFlash::SendStwGetDeviceId(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                C_SclString & orc_DeviceName)
 {
-   sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-   C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
-   uint16 u16_ProtocolVersion;
+   int32_t s32_Return;
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   uint16_t u16_ProtocolVersion;
    bool q_LongId;
 
    if (pc_ExistingProtocol == NULL)
@@ -2453,12 +2455,12 @@ sint32 C_OSCComDriverFlash::SendStwGetDeviceId(const C_OSCProtocolDriverOsyNode 
    C_NOACT      error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwSetLocalId(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                              const uint8 ou8_NewLocalId)
+int32_t C_OscComDriverFlash::SendStwSetLocalId(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                               const uint8_t ou8_NewLocalId)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // We change the server Id and do not want to change the server Id of existing protocols.
    // We need a temporary protocol.
@@ -2481,12 +2483,12 @@ sint32 C_OSCComDriverFlash::SendStwSetLocalId(const C_OSCProtocolDriverOsyNode &
    C_NOACT    error response
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                 const uint32 ou32_Bitrate)
+int32_t C_OscComDriverFlash::SendStwSetBitrateCan(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                  const uint32_t ou32_Bitrate)
 {
-   sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-   C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return;
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
    {
@@ -2510,11 +2512,11 @@ sint32 C_OSCComDriverFlash::SendStwSetBitrateCan(const C_OSCProtocolDriverOsyNod
    C_COM       Error on sending reset request
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwNetReset(const C_OSCProtocolDriverOsyNode & orc_ServerId)
+int32_t C_OscComDriverFlash::SendStwNetReset(const C_OscProtocolDriverOsyNode & orc_ServerId)
 {
-   sint32 s32_Return;
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
-   C_OSCFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return;
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader * pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol == NULL)
    {
@@ -2541,11 +2543,11 @@ sint32 C_OSCComDriverFlash::SendStwNetReset(const C_OSCProtocolDriverOsyNode & o
    C_COM       Error on sending reset request
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwNetReset(void)
+int32_t C_OscComDriverFlash::SendStwNetReset(void)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
-   C_OSCFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
+   C_OscFlashProtocolStwFlashloader c_StwProtocol(pr_XflReportProgress, pv_XflReportProgressInstance);
 
    // No concrete device. We need a temporary protocol.
    this->m_InitFlashProtocolStw(&c_StwProtocol, 0);
@@ -2576,12 +2578,12 @@ sint32 C_OSCComDriverFlash::SendStwNetReset(void)
    C_CONFIG    node identified by orc_ServerId is unknown or does not speak STW Flashloader
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwReadDeviceInformation(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                         C_XFLInformationFromServer & orc_Information,
-                                                         C_XFLChecksumAreas & orc_ChecksumInformation) const
+int32_t C_OscComDriverFlash::SendStwReadDeviceInformation(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                          C_XFLInformationFromServer & orc_Information,
+                                                          C_XFLChecksumAreas & orc_ChecksumInformation) const
 {
-   sint32 s32_Return = C_CONFIG;
-   C_OSCFlashProtocolStwFlashloader * const pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return = C_CONFIG;
+   C_OscFlashProtocolStwFlashloader * const pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -2622,11 +2624,11 @@ sint32 C_OSCComDriverFlash::SendStwReadDeviceInformation(const C_OSCProtocolDriv
    else        problem during flashing; details can be seen in the progress log
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::SendStwDoFlash(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                           const stw_scl::C_SCLString & orc_HexFilePath) const
+int32_t C_OscComDriverFlash::SendStwDoFlash(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                            const stw::scl::C_SclString & orc_HexFilePath) const
 {
-   sint32 s32_Return = C_CONFIG;
-   C_OSCFlashProtocolStwFlashloader * const pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
+   int32_t s32_Return = C_CONFIG;
+   C_OscFlashProtocolStwFlashloader * const pc_ExistingProtocol = this->m_GetStwFlashloaderProtocol(orc_ServerId);
 
    if (pc_ExistingProtocol != NULL)
    {
@@ -2667,12 +2669,12 @@ sint32 C_OSCComDriverFlash::SendStwDoFlash(const C_OSCProtocolDriverOsyNode & or
    To be called by child classes on shutdown, before they destroy all owned class instances
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverFlash::PrepareForDestructionFlash(void)
+void C_OscComDriverFlash::PrepareForDestructionFlash(void)
 {
    this->PrepareForDestruction();
-   for (uint32 u32_Counter = 0U; u32_Counter < this->mc_StwFlashProtocols.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_StwFlashProtocols.size(); ++u32_Counter)
    {
-      C_OSCFlashProtocolStwFlashloader * const pc_FlashProtocol = this->mc_StwFlashProtocols[u32_Counter];
+      C_OscFlashProtocolStwFlashloader * const pc_FlashProtocol = this->mc_StwFlashProtocols[u32_Counter];
       if (pc_FlashProtocol != NULL)
       {
          pc_FlashProtocol->CfgSetCommDispatcher(NULL);
@@ -2690,15 +2692,15 @@ void C_OSCComDriverFlash::PrepareForDestructionFlash(void)
    false    Routing is not necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComDriverFlash::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore_Mode) const
+bool C_OscComDriverFlash::m_GetRoutingMode(C_OscRoutingCalculation::E_Mode & ore_Mode) const
 {
    if (this->mq_UpdateRoutingMode == true)
    {
-      ore_Mode = C_OSCRoutingCalculation::eUPDATE;
+      ore_Mode = C_OscRoutingCalculation::eUPDATE;
    }
    else
    {
-      ore_Mode = C_OSCRoutingCalculation::eROUTING_CHECK;
+      ore_Mode = C_OscRoutingCalculation::eROUTING_CHECK;
    }
 
    return this->mq_RoutingActive;
@@ -2711,9 +2713,9 @@ bool C_OSCComDriverFlash::m_GetRoutingMode(C_OSCRoutingCalculation::E_Mode & ore
    Session ID for flashloader
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_OSCComDriverFlash::m_GetRoutingSessionId(void) const
+uint8_t C_OscComDriverFlash::m_GetRoutingSessionId(void) const
 {
-   return C_OSCProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING;
+   return C_OscProtocolDriverOsy::hu8_DIAGNOSTIC_SESSION_PREPROGRAMMING;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2726,11 +2728,11 @@ uint8 C_OSCComDriverFlash::m_GetRoutingSessionId(void) const
    false   No specific server and legacy routing necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComDriverFlash::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Node) const
+bool C_OscComDriverFlash::m_IsRoutingSpecificNecessary(const C_OscNode & orc_Node) const
 {
    bool q_Return = false;
 
-   if (orc_Node.c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+   if (orc_Node.c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW)
    {
       q_Return = true;
    }
@@ -2754,22 +2756,22 @@ bool C_OSCComDriverFlash::m_IsRoutingSpecificNecessary(const C_OSCNode & orc_Nod
    C_NOACT     No specific server necessary
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode, const C_OSCNode * const opc_Node,
-                                                   const C_OSCRoutingRoutePoint & orc_LastNodeOfRouting,
-                                                   C_OSCProtocolDriverOsy * const opc_ProtocolOsyOfLastNodeOfRouting,
-                                                   C_OSCCanDispatcherOsyRouter ** const oppc_RoutingDispatcher)
+int32_t C_OscComDriverFlash::m_StartRoutingSpecific(const uint32_t ou32_ActiveNode, const C_OscNode * const opc_Node,
+                                                    const C_OscRoutingRoutePoint & orc_LastNodeOfRouting,
+                                                    C_OscProtocolDriverOsy * const opc_ProtocolOsyOfLastNodeOfRouting,
+                                                    C_OscCanDispatcherOsyRouter ** const oppc_RoutingDispatcher)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
-   if (opc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+   if (opc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW)
    {
-      C_OSCFlashProtocolStwFlashloader * const pc_StwFlashloader =
-         dynamic_cast<C_OSCFlashProtocolStwFlashloader *>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
+      C_OscFlashProtocolStwFlashloader * const pc_StwFlashloader =
+         dynamic_cast<C_OscFlashProtocolStwFlashloader *>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
 
       if ((pc_StwFlashloader != NULL) &&
           (opc_ProtocolOsyOfLastNodeOfRouting != NULL))
       {
-         (*oppc_RoutingDispatcher) = new C_OSCCanDispatcherOsyRouter(*opc_ProtocolOsyOfLastNodeOfRouting);
+         (*oppc_RoutingDispatcher) = new C_OscCanDispatcherOsyRouter(*opc_ProtocolOsyOfLastNodeOfRouting);
 
          // Only 0x52 for Rx is relevant
          (*oppc_RoutingDispatcher)->SetFilterParameters(orc_LastNodeOfRouting.u8_OutInterfaceNumber, 0x00000052,
@@ -2796,14 +2798,14 @@ sint32 C_OSCComDriverFlash::m_StartRoutingSpecific(const uint32 ou32_ActiveNode,
    \param[in]     ou32_ActiveNode                      Active node index of vector mc_ActiveNodes
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
+void C_OscComDriverFlash::m_StopRoutingSpecific(const uint32_t ou32_ActiveNode)
 {
-   const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
+   const C_OscNode * const pc_Node = &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[ou32_ActiveNode]];
 
-   if (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW)
+   if (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW)
    {
-      C_OSCFlashProtocolStwFlashloader * const pc_StwFlashloader =
-         dynamic_cast<C_OSCFlashProtocolStwFlashloader *>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
+      C_OscFlashProtocolStwFlashloader * const pc_StwFlashloader =
+         dynamic_cast<C_OscFlashProtocolStwFlashloader *>(this->mc_StwFlashProtocols[ou32_ActiveNode]);
 
       if (pc_StwFlashloader != NULL)
       {
@@ -2812,7 +2814,7 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
       }
    }
 
-   C_OSCComDriverProtocol::m_StopRoutingSpecific(ou32_ActiveNode);
+   C_OscComDriverProtocol::m_StopRoutingSpecific(ou32_ActiveNode);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2827,7 +2829,7 @@ void C_OSCComDriverFlash::m_StopRoutingSpecific(const uint32 ou32_ActiveNode)
    false    Interface has no relevant functions activated or is not connected
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfaceSettings & orc_ComItfSettings) const
+bool C_OscComDriverFlash::m_CheckInterfaceForFunctions(const C_OscNodeComInterfaceSettings & orc_ComItfSettings) const
 {
    bool q_Return = false;
 
@@ -2851,14 +2853,14 @@ bool C_OSCComDriverFlash::m_CheckInterfaceForFunctions(const C_OSCNodeComInterfa
    NULL           No protocol for server found
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCFlashProtocolStwFlashloader * C_OSCComDriverFlash::m_GetStwFlashloaderProtocol(
-   const C_OSCProtocolDriverOsyNode & orc_ServerId) const
+C_OscFlashProtocolStwFlashloader * C_OscComDriverFlash::m_GetStwFlashloaderProtocol(
+   const C_OscProtocolDriverOsyNode & orc_ServerId) const
 {
-   C_OSCFlashProtocolStwFlashloader * pc_Return = NULL;
+   C_OscFlashProtocolStwFlashloader * pc_Return = NULL;
 
-   for (uint32 u32_Counter = 0U; u32_Counter < this->mc_ServerIDs.size(); ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_ServerIds.size(); ++u32_Counter)
    {
-      if (orc_ServerId == this->mc_ServerIDs[u32_Counter])
+      if (orc_ServerId == this->mc_ServerIds[u32_Counter])
       {
          // Index found
          if ((u32_Counter < this->mc_StwFlashProtocols.size()) &&
@@ -2874,8 +2876,8 @@ C_OSCFlashProtocolStwFlashloader * C_OSCComDriverFlash::m_GetStwFlashloaderProto
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverFlash::m_InitFlashProtocolStw(C_OSCFlashProtocolStwFlashloader * const opc_FlashProtocolStw,
-                                                 const uint8 ou8_LocalId)
+void C_OscComDriverFlash::m_InitFlashProtocolStw(C_OscFlashProtocolStwFlashloader * const opc_FlashProtocolStw,
+                                                 const uint8_t ou8_LocalId)
 {
    opc_FlashProtocolStw->CfgSetCommDispatcher(this->m_GetCanDispatcher());
    // Send and received id have a fixed value here. It is not configurable.
@@ -2899,15 +2901,15 @@ void C_OSCComDriverFlash::m_InitFlashProtocolStw(C_OSCFlashProtocolStwFlashloade
    C_OVERFLOW Unknown diagnostic server for at least one node or invalid node identifier was set in diagnostic protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
+int32_t C_OscComDriverFlash::m_InitFlashProtocol(void)
 {
-   sint32 s32_Return = C_NO_ERR;
-   const uint32 u32_ActiveNodeCount = this->m_GetActiveNodeCount();
+   int32_t s32_Return = C_NO_ERR;
+   const uint32_t u32_ActiveNodeCount = this->m_GetActiveNodeCount();
 
    if ((this->mc_TransportProtocols.size() >= u32_ActiveNodeCount) &&
-       (this->mc_ServerIDs.size() == u32_ActiveNodeCount))
+       (this->mc_ServerIds.size() == u32_ActiveNodeCount))
    {
-      uint32 u32_ActiveNodeCounter;
+      uint32_t u32_ActiveNodeCounter;
 
       //Init protocol driver
       // The last protocol is for broadcasts
@@ -2919,21 +2921,21 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
       {
          if (this->mc_ActiveNodesIndexes[u32_ActiveNodeCounter] < this->mpc_SysDef->c_Nodes.size())
          {
-            const C_OSCNode * const pc_Node =
+            const C_OscNode * const pc_Node =
                &this->mpc_SysDef->c_Nodes[this->mc_ActiveNodesIndexes[u32_ActiveNodeCounter]];
-            C_OSCProtocolDriverOsy * pc_ProtocolOsy;
-            C_OSCFlashProtocolStwFlashloader * pc_ProtocolStw;
+            C_OscProtocolDriverOsy * pc_ProtocolOsy;
+            C_OscFlashProtocolStwFlashloader * pc_ProtocolStw;
 
             switch (pc_Node->c_Properties.e_FlashLoader)
             {
-            case C_OSCNodeProperties::eFL_OPEN_SYDE:
-               pc_ProtocolOsy = new C_OSCProtocolDriverOsy();
-               pc_ProtocolOsy->InitializeHandleWaitTime(&C_OSCComDriverFlash::mh_HandleWaitTime, this);
+            case C_OscNodeProperties::eFL_OPEN_SYDE:
+               pc_ProtocolOsy = new C_OscProtocolDriverOsy();
+               pc_ProtocolOsy->InitializeHandleWaitTime(&C_OscComDriverFlash::mh_HandleWaitTime, this);
                s32_Return = pc_ProtocolOsy->SetTransportProtocol(this->mc_TransportProtocols[u32_ActiveNodeCounter]);
                if (s32_Return == C_NO_ERR)
                {
                   s32_Return = pc_ProtocolOsy->SetNodeIdentifiers(this->GetClientId(),
-                                                                  this->mc_ServerIDs[u32_ActiveNodeCounter]);
+                                                                  this->mc_ServerIds[u32_ActiveNodeCounter]);
                   if (s32_Return != C_NO_ERR)
                   {
                      //Invalid configuration = programming error
@@ -2947,14 +2949,14 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
                }
                this->mc_OsyProtocols[u32_ActiveNodeCounter] = pc_ProtocolOsy;
                break;
-            case C_OSCNodeProperties::eFL_STW:
-               pc_ProtocolStw = new C_OSCFlashProtocolStwFlashloader(pr_XflReportProgress,
+            case C_OscNodeProperties::eFL_STW:
+               pc_ProtocolStw = new C_OscFlashProtocolStwFlashloader(pr_XflReportProgress,
                                                                      pv_XflReportProgressInstance);
                this->m_InitFlashProtocolStw(pc_ProtocolStw,
-                                            this->mc_ServerIDs[u32_ActiveNodeCounter].u8_NodeIdentifier);
+                                            this->mc_ServerIds[u32_ActiveNodeCounter].u8_NodeIdentifier);
                this->mc_StwFlashProtocols[u32_ActiveNodeCounter] = pc_ProtocolStw;
                break;
-            case C_OSCNodeProperties::eFL_NONE:
+            case C_OscNodeProperties::eFL_NONE:
             default:
                s32_Return = C_OVERFLOW;
                break;
@@ -2980,11 +2982,11 @@ sint32 C_OSCComDriverFlash::m_InitFlashProtocol(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::m_PrepareTemporaryOsyProtocol(const C_OSCProtocolDriverOsyNode & orc_ServerId,
-                                                          C_OSCProtocolDriverOsy & orc_OsyProtocol,
-                                                          C_OSCProtocolDriverOsyTpCan & orc_CanTransportProtocol)
+int32_t C_OscComDriverFlash::m_PrepareTemporaryOsyProtocol(const C_OscProtocolDriverOsyNode & orc_ServerId,
+                                                           C_OscProtocolDriverOsy & orc_OsyProtocol,
+                                                           C_OscProtocolDriverOsyTpCan & orc_CanTransportProtocol)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    s32_Return = orc_CanTransportProtocol.SetNodeIdentifiers(this->GetClientId(), orc_ServerId);
    if (s32_Return == C_NO_ERR)
@@ -3005,17 +3007,17 @@ sint32 C_OSCComDriverFlash::m_PrepareTemporaryOsyProtocol(const C_OSCProtocolDri
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::m_GetStwResetMessage(const uint32 ou32_NodeIndex, T_STWCAN_Msg_TX & orc_Message) const
+int32_t C_OscComDriverFlash::m_GetStwResetMessage(const uint32_t ou32_NodeIndex, T_STWCAN_Msg_TX & orc_Message) const
 {
-   const C_OSCNode * const pc_Node = &this->mpc_SysDef->c_Nodes[ou32_NodeIndex];
-   sint32 s32_Return = C_NOACT;
+   const C_OscNode * const pc_Node = &this->mpc_SysDef->c_Nodes[ou32_NodeIndex];
+   int32_t s32_Return = C_NOACT;
 
-   if ((pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW) &&
-       (pc_Node->c_Properties.c_STWFlashloaderSettings.q_ResetMessageActive == true))
+   if ((pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW) &&
+       (pc_Node->c_Properties.c_StwFlashloaderSettings.q_ResetMessageActive == true))
    {
       // Get all values for the reset messages
-      const C_OSCNodeStwFlashloaderSettings & rc_StwFlSettings =
-         pc_Node->c_Properties.c_STWFlashloaderSettings;
+      const C_OscNodeStwFlashloaderSettings & rc_StwFlSettings =
+         pc_Node->c_Properties.c_StwFlashloaderSettings;
 
       orc_Message.u32_ID = rc_StwFlSettings.u32_ResetMessageId;
       if (rc_StwFlSettings.q_ResetMessageExtendedId == false)
@@ -3067,15 +3069,15 @@ sint32 C_OSCComDriverFlash::m_GetStwResetMessage(const uint32 ou32_NodeIndex, T_
    \retval   C_RANGE    Node with orc_ServerId does not exist or is not active
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
-   const C_OSCComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type, const uint32 ou32_NodeIndex,
-   uint32 & oru32_TimeValue) const
+int32_t C_OscComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
+   const C_OscComDriverFlash::E_MinimumFlashloaderResetWaitTimeType oe_Type, const uint32_t ou32_NodeIndex,
+   uint32_t & oru32_TimeValue) const
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (ou32_NodeIndex < this->mpc_SysDef->c_Nodes.size())
    {
-      const C_OSCNode & rc_Node = this->mpc_SysDef->c_Nodes[ou32_NodeIndex];
+      const C_OscNode & rc_Node = this->mpc_SysDef->c_Nodes[ou32_NodeIndex];
 
       tgl_assert(rc_Node.pc_DeviceDefinition != NULL);
       if (rc_Node.pc_DeviceDefinition != NULL)
@@ -3085,32 +3087,32 @@ sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
          tgl_assert(rc_Node.u32_SubDeviceIndex < rc_Node.pc_DeviceDefinition->c_SubDevices.size());
          switch (oe_Type)
          {
-         case C_OSCComDriverFlash::eNO_CHANGES_CAN:
+         case C_OscComDriverFlash::eNO_CHANGES_CAN:
             oru32_TimeValue =
                rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                u32_FlashloaderResetWaitTimeNoChangesCan;
             break;
-         case C_OSCComDriverFlash::eNO_CHANGES_ETHERNET:
+         case C_OscComDriverFlash::eNO_CHANGES_ETHERNET:
             oru32_TimeValue =
                rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                u32_FlashloaderResetWaitTimeNoChangesEthernet;
             break;
-         case C_OSCComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_CAN:
+         case C_OscComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_CAN:
             oru32_TimeValue =
                rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                u32_FlashloaderResetWaitTimeNoFundamentalChangesCan;
             break;
-         case C_OSCComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_ETHERNET:
+         case C_OscComDriverFlash::eNO_FUNDAMENTAL_COM_CHANGES_ETHERNET:
             oru32_TimeValue =
                rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                u32_FlashloaderResetWaitTimeNoFundamentalChangesEthernet;
             break;
-         case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN:
+         case C_OscComDriverFlash::eFUNDAMENTAL_COM_CHANGES_CAN:
             oru32_TimeValue =
                rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                u32_FlashloaderResetWaitTimeFundamentalChangesCan;
             break;
-         case C_OSCComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET:
+         case C_OscComDriverFlash::eFUNDAMENTAL_COM_CHANGES_ETHERNET:
             oru32_TimeValue =
                rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                u32_FlashloaderResetWaitTimeFundamentalChangesEthernet;
@@ -3126,17 +3128,17 @@ sint32 C_OSCComDriverFlash::m_GetMinimumFlashloaderResetWaitTime(
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  In C_OSCProtocolDriverOsy registered function for handling long waiting times
+/*! \brief  In C_OscProtocolDriverOsy registered function for handling long waiting times
 
    See m_HandleWaitTime for detailed description
 
-   \param[in]     opv_Instance     Pointer to the instance of C_OSCComDriverFlash
+   \param[in]     opv_Instance     Pointer to the instance of C_OscComDriverFlash
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
+void C_OscComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OSCComDriverFlash *>(opv_Instance);
+   C_OscComDriverFlash * const pc_ComDriver = reinterpret_cast<C_OscComDriverFlash *>(opv_Instance);
 
    tgl_assert(pc_ComDriver != NULL);
    if (pc_ComDriver != NULL)
@@ -3146,38 +3148,38 @@ void C_OSCComDriverFlash::mh_HandleWaitTime(void * const opv_Instance)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  In C_OSCProtocolDriverOsy registered function for handling long waiting times
+/*! \brief  In C_OscProtocolDriverOsy registered function for handling long waiting times
 
    For example erasing of flash can have a long timeout time. It can be longer than five seconds.
    An active CAN routing would be stopped of the server by the session timeout. This function sends
    the tester present to the last CAN router node on the route to keep the route alive
 
-   \param[in]     opv_Instance     Pointer to the instance of C_OSCComDriverFlash
+   \param[in]     opv_Instance     Pointer to the instance of C_OscComDriverFlash
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCComDriverFlash::m_HandleWaitTime(void)
+void C_OscComDriverFlash::m_HandleWaitTime(void)
 {
    if (this->mq_Initialized == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       for (u32_Counter = 0U; u32_Counter < this->mc_ActiveNodesLastCanRouters.size(); ++u32_Counter)
       {
-         const uint32 u32_ActiveNodeRouter = this->mc_ActiveNodesLastCanRouters[u32_Counter];
+         const uint32_t u32_ActiveNodeRouter = this->mc_ActiveNodesLastCanRouters[u32_Counter];
 
          tgl_assert(u32_ActiveNodeRouter < this->mc_OsyProtocols.size());
          if (u32_ActiveNodeRouter < this->mc_OsyProtocols.size())
          {
-            C_OSCProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeRouter];
+            C_OscProtocolDriverOsy * const pc_ProtocolOsy = this->mc_OsyProtocols[u32_ActiveNodeRouter];
             if (pc_ProtocolOsy != NULL)
             {
                // Send tester present message without expecting a response
-               const sint32 s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
+               const int32_t s32_Return = pc_ProtocolOsy->OsyTesterPresent(1U);
 
                if (s32_Return != C_NO_ERR)
                {
                   osc_write_log_error("Sending Tester Present", "Sending Tester Present failed with error code: " +
-                                      C_OSCLoggingHandler::h_StwError(s32_Return));
+                                      C_OscLoggingHandler::h_StwError(s32_Return));
                }
                else
                {

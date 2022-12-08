@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "TglUtils.hpp"
 
-#include "C_SyvDaChaPlot.h"
+#include "C_SyvDaChaPlot.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,11 +46,11 @@ C_SyvDaChaPlotTriangleItem::C_SyvDaChaPlotTriangleItem(const bool oq_RightTriang
    pc_Position(createPosition(QLatin1String("position")))
 {
    this->pc_Position->setCoords(0.0, 0.0);
-   const float64 f64_WIDTH = 8.0;
-   const float64 f64_Y = 0.0;
-   const float64 f64_X = 0.0;
+   const float64_t f64_WIDTH = 8.0;
+   const float64_t f64_Y = 0.0;
+   const float64_t f64_X = 0.0;
    // Factor for adjusting the "length" of the triangle
-   const float64 f64_FACTOR_MID_POINT = 0.6;
+   const float64_t f64_FACTOR_MID_POINT = 0.6;
 
    if (oq_RightTriangle == true)
    {
@@ -103,8 +102,8 @@ void C_SyvDaChaPlotTriangleItem::UpdateColor(const QColor & orc_Color)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{952,8001,8011,9272}  //name of function and parameters dictated by base class
-float64 C_SyvDaChaPlotTriangleItem::selectTest(const QPointF & orc_Pos, bool oq_OnlySelectable,
-                                               QVariant * const opc_Details) const
+float64_t C_SyvDaChaPlotTriangleItem::selectTest(const QPointF & orc_Pos, bool oq_OnlySelectable,
+                                                 QVariant * const opc_Details) const
 {
    Q_UNUSED(orc_Pos)
    Q_UNUSED(oq_OnlySelectable)
@@ -127,7 +126,7 @@ void C_SyvDaChaPlotTriangleItem::draw(QCPPainter * const opc_Painter)
 {
    const QPointF c_Pos(this->pc_Position->pixelPosition());
    QPointF ac_LineArray[3];
-   sintn sn_LineCounter;
+   int32_t s32_LineCounter;
    QPen c_Pen = opc_Painter->pen();
    QBrush c_Brush = opc_Painter->brush();
 
@@ -138,11 +137,11 @@ void C_SyvDaChaPlotTriangleItem::draw(QCPPainter * const opc_Painter)
    opc_Painter->setBrush(c_Brush);
 
    // Adapt the lines for the triangle to current coordinates
-   for (sn_LineCounter = 0; sn_LineCounter < 3; ++sn_LineCounter)
+   for (s32_LineCounter = 0; s32_LineCounter < 3; ++s32_LineCounter)
    {
-      ac_LineArray[sn_LineCounter] = this->mac_LineArray[sn_LineCounter];
-      ac_LineArray[sn_LineCounter].setX(ac_LineArray[sn_LineCounter].x() + c_Pos.x());
-      ac_LineArray[sn_LineCounter].setY(ac_LineArray[sn_LineCounter].y() + c_Pos.y());
+      ac_LineArray[s32_LineCounter] = this->mac_LineArray[s32_LineCounter];
+      ac_LineArray[s32_LineCounter].setX(ac_LineArray[s32_LineCounter].x() + c_Pos.x());
+      ac_LineArray[s32_LineCounter].setY(ac_LineArray[s32_LineCounter].y() + c_Pos.y());
    }
 
    opc_Painter->drawPolygon(ac_LineArray, 3);
@@ -277,10 +276,10 @@ void C_SyvDaChaPlotCursorTag::UpdateColors(const QColor & orc_LabelColor, const 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the position of the cursor tag
 
-   \param[in]       of64_PosX    New position on X axis
+   \param[in]       of64_PosHorizontal    New position on X axis
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaPlotCursorTag::UpdatePosition(const float64 of64_PosX)
+void C_SyvDaChaPlotCursorTag::UpdatePosition(const float64_t of64_PosHorizontal)
 {
    // since both the arrow and the text label are chained to the dummy tracer (via anchor
    // parent-child relationships) it is sufficient to update the dummy tracer coordinates. The
@@ -288,14 +287,14 @@ void C_SyvDaChaPlotCursorTag::UpdatePosition(const float64 of64_PosX)
    // of the axis rect, it is always kept at 1. The vertical coordinate type was set to
    // ptPlotCoordinates of the passed parent axis, so the vertical coordinate is set to the new
    // value.
-   this->mpc_Tracer->position->setCoords(of64_PosX, 1.0);
+   this->mpc_Tracer->position->setCoords(of64_PosHorizontal, 1.0);
 
    // We want the arrow head to be at the same horizontal position as the axis backbone, even if
    // the axis has a certain offset from the axis rect border (like the added second y axis). Thus we
    // set the horizontal pixel position of the arrow end (head) to the axis offset (the pixel
    // distance to the axis rect border). This works because the parent anchor of the arrow end is
    // the dummy tracer, which, as described earlier, is tied to the right axis rect border.
-   this->mpc_Marker->end->setCoords(0.0, static_cast<float64>(this->mpc_Axis->offset()));
+   this->mpc_Marker->end->setCoords(0.0, static_cast<float64_t>(this->mpc_Axis->offset()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -338,37 +337,37 @@ bool C_SyvDaChaPlotCursorTag::ContainsItem(const QCPAbstractItem * const opc_Ite
 /*! \brief   Default constructor
 
    \param[in,out]  opc_ParentPlot             Pointer to parent plot
-   \param[in]      of64_InitXPos              Initial position of line and tag
+   \param[in]      of64_InitHorizontalPos              Initial position of line and tag
    \param[in]      orc_LabelText              String for label of tag
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaChaPlotCursorItem::C_SyvDaChaPlotCursorItem(QCustomPlot * const opc_ParentPlot,
-                                                   const stw_types::float64 of64_InitXPos,
+                                                   const float64_t of64_InitHorizontalPos,
                                                    const QString & orc_LabelText) :
    QCPItemLine(opc_ParentPlot),
-   msn_WidthLineSelected(1),
-   msn_WidthLineDefault(1),
+   ms32_WidthLineSelected(1),
+   ms32_WidthLineDefault(1),
    mq_ItemsNextToPlotVisible(true)
 {
    QPen c_Pen;
 
    this->start->setTypeX(QCPItemPosition::ptPlotCoords);
    this->start->setTypeY(QCPItemPosition::ptAxisRectRatio);
-   this->start->setCoords(of64_InitXPos, 0.0);
+   this->start->setCoords(of64_InitHorizontalPos, 0.0);
    this->end->setTypeX(QCPItemPosition::ptPlotCoords);
    this->end->setTypeY(QCPItemPosition::ptAxisRectRatio);
-   this->end->setCoords(of64_InitXPos, 1.0);
+   this->end->setCoords(of64_InitHorizontalPos, 1.0);
 
    // Configure the style of the line
    c_Pen = this->pen();
-   c_Pen.setWidth(msn_WidthLineDefault);
+   c_Pen.setWidth(ms32_WidthLineDefault);
    this->setPen(c_Pen);
-   c_Pen.setWidth(msn_WidthLineSelected);
+   c_Pen.setWidth(ms32_WidthLineSelected);
    this->setSelectedPen(c_Pen);
 
    // Create the tag for the cursor
    this->mpc_CursorTag = new C_SyvDaChaPlotCursorTag(opc_ParentPlot->xAxis, orc_LabelText);
-   this->mpc_CursorTag->UpdatePosition(of64_InitXPos);
+   this->mpc_CursorTag->UpdatePosition(of64_InitHorizontalPos);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -405,15 +404,15 @@ void C_SyvDaChaPlotCursorItem::UpdateColors(const QColor & orc_LabelColor, const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the position of the cursor and its components
 
-   \param[in]       of64_PosX    New position on X axis
+   \param[in]       of64_PosHorizontal    New position on X axis
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaChaPlotCursorItem::UpdatePosition(const float64 of64_PosX)
+void C_SyvDaChaPlotCursorItem::UpdatePosition(const float64_t of64_PosHorizontal)
 {
-   this->start->setCoords(of64_PosX, 0.0);
-   this->end->setCoords(of64_PosX, 1.0);
+   this->start->setCoords(of64_PosHorizontal, 0.0);
+   this->end->setCoords(of64_PosHorizontal, 1.0);
 
-   this->mpc_CursorTag->UpdatePosition(of64_PosX);
+   this->mpc_CursorTag->UpdatePosition(of64_PosHorizontal);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -550,11 +549,11 @@ void C_SyvDaChaPlot::mousePressEvent(QMouseEvent * const opc_Event)
                if (pc_AbstractItem != NULL)
                {
                   // Searching for sub items
-                  sintn sn_Counter;
+                  int32_t s32_Counter;
 
-                  for (sn_Counter = 0UL; sn_Counter < this->mc_RegisteredCursorItems.size(); ++sn_Counter)
+                  for (s32_Counter = 0UL; s32_Counter < this->mc_RegisteredCursorItems.size(); ++s32_Counter)
                   {
-                     C_SyvDaChaPlotCursorItem * const pc_CursorItem = this->mc_RegisteredCursorItems.at(sn_Counter);
+                     C_SyvDaChaPlotCursorItem * const pc_CursorItem = this->mc_RegisteredCursorItems.at(s32_Counter);
                      if (pc_CursorItem->ContainsItem(pc_AbstractItem) == true)
                      {
                         this->mpc_ClickedCursor = pc_CursorItem;
@@ -627,11 +626,11 @@ void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
    {
       const QPointF c_Delta = opc_Event->pos() - this->mc_LastItemLineEvent.pos();
       // Get the position in pixel coordinates
-      const float64 f64_CurrPosX = this->xAxis->coordToPixel(this->mpc_ClickedCursor->start->coords().x());
+      const float64_t f64_CurrPosHorizontal = this->xAxis->coordToPixel(this->mpc_ClickedCursor->start->coords().x());
       // Calculate the difference in pixels
-      const float64 f64_NewX = f64_CurrPosX + c_Delta.x();
+      const float64_t f64_NewHorizontal = f64_CurrPosHorizontal + c_Delta.x();
       // Convert to x axis coordinate
-      const float64 f64_NewAxisX = this->xAxis->pixelToCoord(f64_NewX);
+      const float64_t f64_NewAxisX = this->xAxis->pixelToCoord(f64_NewHorizontal);
 
       // Adapt the x position of the cursor
       this->mpc_ClickedCursor->UpdatePosition(f64_NewAxisX);
@@ -643,7 +642,7 @@ void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
       this->replot();
 
       // Inform about the new position
-      Q_EMIT (this->SigCursorItemMovedOnXAxis(this->mpc_ClickedCursor, f64_NewAxisX));
+      Q_EMIT (this->SigCursorItemMovedOnHorizontalAxis(this->mpc_ClickedCursor, f64_NewAxisX));
 
       opc_Event->accept();
    }
@@ -760,7 +759,7 @@ void C_SyvDaChaPlot::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
    QCustomPlot::keyPressEvent(opc_KeyEvent);
 
-   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       // Abort the zooming by using the rubberband with pressing escape
       if (this->selectionRect()->isActive() == true)

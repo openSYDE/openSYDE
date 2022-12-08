@@ -10,25 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCExportParamSet.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscExportParamSet.hpp"
 
-#include "CSCLChecksums.h"
-#include "TGLFile.h"
-#include "TGLUtils.h"
-#include "C_OSCExportUti.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCParamSetHandler.h"
+#include "C_SclChecksums.hpp"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
+#include "C_OscExportUti.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscParamSetHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,27 +52,27 @@ using namespace stw_opensyde_core;
    file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCExportParamSet::h_GetFileName(const C_OSCNodeApplication & orc_DataBlock, const bool oq_IsSafe)
+C_SclString C_OscExportParamSet::h_GetFileName(const C_OscNodeApplication & orc_DataBlock, const bool oq_IsSafe)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    tgl_assert(orc_DataBlock.c_ResultPaths.size() > 0);
 
    if (oq_IsSafe == true)
    {
       // first result path is always safe file
-      c_Retval = TGL_ExtractFileName(orc_DataBlock.c_ResultPaths[0]);
+      c_Retval = TglExtractFileName(orc_DataBlock.c_ResultPaths[0]);
    }
    else
    {
       // if there are two Data Blocks, the first result path is the safe file and the second is the non-safe file
       if (orc_DataBlock.c_ResultPaths.size() > 1)
       {
-         c_Retval = TGL_ExtractFileName(orc_DataBlock.c_ResultPaths[1]);
+         c_Retval = TglExtractFileName(orc_DataBlock.c_ResultPaths[1]);
       }
       else
       {
-         c_Retval = TGL_ExtractFileName(orc_DataBlock.c_ResultPaths[0]);
+         c_Retval = TglExtractFileName(orc_DataBlock.c_ResultPaths[0]);
       }
    }
 
@@ -95,18 +95,18 @@ C_SCLString C_OSCExportParamSet::h_GetFileName(const C_OSCNodeApplication & orc_
    C_CONFIG    Internal data invalid (e.g. incorrect number of lists or datasets in HALC NVM Datapool)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Path, const C_OSCNode & orc_Node,
-                                                      const uint16 ou16_ApplicationIndex,
-                                                      std::vector<C_SCLString> & orc_Files,
-                                                      const C_SCLString & orc_ExportToolName,
-                                                      const C_SCLString & orc_ExportToolVersion)
+int32_t C_OscExportParamSet::h_CreateParameterSetImage(const C_SclString & orc_Path, const C_OscNode & orc_Node,
+                                                       const uint16_t ou16_ApplicationIndex,
+                                                       std::vector<C_SclString> & orc_Files,
+                                                       const C_SclString & orc_ExportToolName,
+                                                       const C_SclString & orc_ExportToolVersion)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[ou16_ApplicationIndex];
+   const C_OscNodeApplication & rc_Application = orc_Node.c_Applications[ou16_ApplicationIndex];
 
    // make sure version is known
-   if (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+   if (rc_Application.u16_GenCodeVersion > C_OscNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
    {
       s32_Retval = C_NOACT;
       osc_write_log_error("Creating PSI file",
@@ -114,8 +114,8 @@ sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Pa
    }
 
    // plausibility check if number of Datablock output paths matches number of files we want to write
-   if ((orc_Node.c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
-       (orc_Node.c_HALCConfig.e_SafetyMode == C_OSCHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING))
+   if ((orc_Node.c_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITH_DROPPING) ||
+       (orc_Node.c_HalcConfig.e_SafetyMode == C_OscHalcDefBase::eTWO_LEVELS_WITHOUT_DROPPING))
    {
       if (rc_Application.c_ResultPaths.size() != 2)
       {
@@ -139,17 +139,17 @@ sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Pa
    // safe part
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_Node.c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
+      if (orc_Node.c_HalcConfig.e_SafetyMode != C_OscHalcDefBase::eONE_LEVEL_ALL_NON_SAFE)
       {
          const bool q_IS_SAFE = true;
-         C_OSCParamSetRawNode c_RawNodeSafe;
-         C_OSCParamSetInterpretedNode c_IntNodeSafe;
+         C_OscParamSetRawNode c_RawNodeSafe;
+         C_OscParamSetInterpretedNode c_IntNodeSafe;
 
          s32_Retval = mh_FillPsiStructure(orc_Node, q_IS_SAFE, ou16_ApplicationIndex, c_RawNodeSafe, c_IntNodeSafe);
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_OSCExportParamSet::mh_WriteParameterSetImage(
+            s32_Retval = C_OscExportParamSet::mh_WriteParameterSetImage(
                c_RawNodeSafe, c_IntNodeSafe, q_IS_SAFE, rc_Application, orc_Path, orc_Files,
                orc_ExportToolName, orc_ExportToolVersion);
          }
@@ -159,18 +159,18 @@ sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Pa
    // non safe part
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_Node.c_HALCConfig.e_SafetyMode != C_OSCHalcDefBase::eONE_LEVEL_ALL_SAFE)
+      if (orc_Node.c_HalcConfig.e_SafetyMode != C_OscHalcDefBase::eONE_LEVEL_ALL_SAFE)
       {
          const bool q_IS_SAFE = false;
-         C_OSCParamSetRawNode c_RawNodeNonSafe;
-         C_OSCParamSetInterpretedNode c_IntNodeNonSafe;
+         C_OscParamSetRawNode c_RawNodeNonSafe;
+         C_OscParamSetInterpretedNode c_IntNodeNonSafe;
 
          s32_Retval =
             mh_FillPsiStructure(orc_Node, q_IS_SAFE, ou16_ApplicationIndex, c_RawNodeNonSafe, c_IntNodeNonSafe);
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_OSCExportParamSet::mh_WriteParameterSetImage(
+            s32_Retval = C_OscExportParamSet::mh_WriteParameterSetImage(
                c_RawNodeNonSafe, c_IntNodeNonSafe, q_IS_SAFE, rc_Application, orc_Path, orc_Files,
                orc_ExportToolName, orc_ExportToolVersion);
          }
@@ -194,22 +194,23 @@ sint32 C_OSCExportParamSet::h_CreateParameterSetImage(const C_SCLString & orc_Pa
    C_CONFIG    Internal data invalid (e.g. incorrect number of lists or datasets in HALC NVM Datapool)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportParamSet::mh_FillPsiStructure(const C_OSCNode & orc_Node, const bool oq_IsSafe,
-                                                const uint16 ou16_ApplicationIndex, C_OSCParamSetRawNode & orc_RawNode,
-                                                C_OSCParamSetInterpretedNode & orc_IntNode)
+int32_t C_OscExportParamSet::mh_FillPsiStructure(const C_OscNode & orc_Node, const bool oq_IsSafe,
+                                                 const uint16_t ou16_ApplicationIndex,
+                                                 C_OscParamSetRawNode & orc_RawNode,
+                                                 C_OscParamSetInterpretedNode & orc_IntNode)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    bool q_DatapoolFound = false;
 
    orc_RawNode.c_Name = orc_Node.c_Properties.c_Name;
    orc_IntNode.c_Name = orc_Node.c_Properties.c_Name;
 
-   const C_OSCNodeDataPool * const pc_FirstDataPool = orc_Node.GetHalDataPoolConst(oq_IsSafe);
+   const C_OscNodeDataPool * const pc_FirstDataPool = orc_Node.GetHalDataPoolConst(oq_IsSafe);
 
    if (pc_FirstDataPool != NULL)
    {
       // get raw data (data from only dataset of list "configuration" of first Datapool)
-      std::vector<uint8> c_ConfigRawBytes;
+      std::vector<uint8_t> c_ConfigRawBytes;
       s32_Retval = mh_GetConfigurationRawBytes(*pc_FirstDataPool, c_ConfigRawBytes);
 
       if (s32_Retval != C_NO_ERR)
@@ -220,16 +221,16 @@ sint32 C_OSCExportParamSet::mh_FillPsiStructure(const C_OSCNode & orc_Node, cons
       }
 
       // add data of all Datapools of specified safety
-      for (uint32 u32_ItDataPool = 0U; (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR);
+      for (uint32_t u32_ItDataPool = 0U; (u32_ItDataPool < orc_Node.c_DataPools.size()) && (s32_Retval == C_NO_ERR);
            ++u32_ItDataPool)
       {
-         const C_OSCNodeDataPool & rc_SdDataPool = orc_Node.c_DataPools[u32_ItDataPool];
+         const C_OscNodeDataPool & rc_SdDataPool = orc_Node.c_DataPools[u32_ItDataPool];
 
          if ((rc_SdDataPool.s32_RelatedDataBlockIndex == ou16_ApplicationIndex) &&
-             (rc_SdDataPool.e_Type == C_OSCNodeDataPool::eHALC_NVM) &&
+             (rc_SdDataPool.e_Type == C_OscNodeDataPool::eHALC_NVM) &&
              (rc_SdDataPool.q_IsSafety == oq_IsSafe))
          {
-            C_OSCParamSetInterpretedDataPool c_IntDatapool;
+            C_OscParamSetInterpretedDataPool c_IntDatapool;
 
             q_DatapoolFound = true;
 
@@ -269,29 +270,29 @@ sint32 C_OSCExportParamSet::mh_FillPsiStructure(const C_OSCNode & orc_Node, cons
    \param[in,out]  orc_IntDataPool  Interpreted Datapool data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCExportParamSet::mh_FillInterpretedDatapool(const C_OSCNodeDataPool & orc_SdDataPool,
-                                                     C_OSCParamSetInterpretedDataPool & orc_IntDataPool)
+void C_OscExportParamSet::mh_FillInterpretedDatapool(const C_OscNodeDataPool & orc_SdDataPool,
+                                                     C_OscParamSetInterpretedDataPool & orc_IntDataPool)
 {
    orc_IntDataPool.c_DataPoolInfo.c_Name = orc_SdDataPool.c_Name;
    orc_SdDataPool.CalcDefinitionHash(orc_IntDataPool.c_DataPoolInfo.u32_DataPoolCrc);
-   orc_IntDataPool.c_DataPoolInfo.u32_NvMStartAddress = orc_SdDataPool.u32_NvMStartAddress;
-   orc_IntDataPool.c_DataPoolInfo.u32_NvMSize = orc_SdDataPool.u32_NvMSize;
+   orc_IntDataPool.c_DataPoolInfo.u32_NvmStartAddress = orc_SdDataPool.u32_NvmStartAddress;
+   orc_IntDataPool.c_DataPoolInfo.u32_NvmSize = orc_SdDataPool.u32_NvmSize;
    (void)memcpy(&orc_IntDataPool.c_DataPoolInfo.au8_Version[0], &orc_SdDataPool.au8_Version[0], 3);
 
    // Add all lists
-   for (uint16 u16_ListIndex = 0U; u16_ListIndex < orc_SdDataPool.c_Lists.size(); u16_ListIndex++)
+   for (uint16_t u16_ListIndex = 0U; u16_ListIndex < orc_SdDataPool.c_Lists.size(); u16_ListIndex++)
    {
-      const C_OSCNodeDataPoolList & rc_SdList = orc_SdDataPool.c_Lists[u16_ListIndex];
+      const C_OscNodeDataPoolList & rc_SdList = orc_SdDataPool.c_Lists[u16_ListIndex];
 
-      C_OSCParamSetInterpretedList c_IntList;
+      C_OscParamSetInterpretedList c_IntList;
       c_IntList.c_Name = rc_SdList.c_Name;
 
       // Add all list elements
-      for (uint16 u16_ElementIndex = 0U; u16_ElementIndex < rc_SdList.c_Elements.size(); u16_ElementIndex++)
+      for (uint16_t u16_ElementIndex = 0U; u16_ElementIndex < rc_SdList.c_Elements.size(); u16_ElementIndex++)
       {
-         const C_OSCNodeDataPoolListElement rc_SdElement = rc_SdList.c_Elements[u16_ElementIndex];
+         const C_OscNodeDataPoolListElement rc_SdElement = rc_SdList.c_Elements[u16_ElementIndex];
 
-         C_OSCParamSetInterpretedElement c_IntElement;
+         C_OscParamSetInterpretedElement c_IntElement;
          c_IntElement.c_Name = rc_SdElement.c_Name;
          c_IntElement.c_NvmValue = rc_SdElement.c_NvmValue;
 
@@ -318,20 +319,20 @@ void C_OSCExportParamSet::mh_FillInterpretedDatapool(const C_OSCNodeDataPool & o
    C_CONFIG    number of Datapool lists or datasets or list elements not as expected
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportParamSet::mh_FillRawEntries(const C_OSCNodeDataPool & orc_SdDataPool,
-                                              const std::vector<uint8> & orc_ConfigRawBytes,
-                                              std::vector<C_OSCParamSetRawEntry> & orc_Entries)
+int32_t C_OscExportParamSet::mh_FillRawEntries(const C_OscNodeDataPool & orc_SdDataPool,
+                                               const std::vector<uint8_t> & orc_ConfigRawBytes,
+                                               std::vector<C_OscParamSetRawEntry> & orc_Entries)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_SdDataPool.c_Lists.size() == 4) // exactly 4 expected: configuration, inputs, outputs, statuses
    {
-      for (uint16 u16_ListIndex = 0U; (u16_ListIndex < orc_SdDataPool.c_Lists.size()) && (s32_Retval == C_NO_ERR);
+      for (uint16_t u16_ListIndex = 0U; (u16_ListIndex < orc_SdDataPool.c_Lists.size()) && (s32_Retval == C_NO_ERR);
            u16_ListIndex++)
       {
-         C_OSCParamSetRawEntry c_RawEntry;
+         C_OscParamSetRawEntry c_RawEntry;
 
-         c_RawEntry.u32_StartAddress = orc_SdDataPool.c_Lists[u16_ListIndex].u32_NvMStartAddress;
+         c_RawEntry.u32_StartAddress = orc_SdDataPool.c_Lists[u16_ListIndex].u32_NvmStartAddress;
          c_RawEntry.c_Bytes.clear();
 
          if (u16_ListIndex == 0)
@@ -341,10 +342,10 @@ sint32 C_OSCExportParamSet::mh_FillRawEntries(const C_OSCNodeDataPool & orc_SdDa
          }
          else
          {
-            c_RawEntry.c_Bytes.resize(orc_SdDataPool.c_Lists[u16_ListIndex].u32_NvMSize, 0);
+            c_RawEntry.c_Bytes.resize(orc_SdDataPool.c_Lists[u16_ListIndex].u32_NvmSize, 0);
          }
 
-         s32_Retval = mh_InsertCRC16(c_RawEntry.c_Bytes);
+         s32_Retval = mh_InsertCrc16(c_RawEntry.c_Bytes);
          orc_Entries.push_back(c_RawEntry);
       }
    }
@@ -366,17 +367,17 @@ sint32 C_OSCExportParamSet::mh_FillRawEntries(const C_OSCNodeDataPool & orc_SdDa
    file info class instance
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetInterpretedFileInfoData C_OSCExportParamSet::mh_GetFileInfo(const C_SCLString & orc_ExportToolName,
-                                                                         const C_SCLString & orc_ExportToolVersion)
+C_OscParamSetInterpretedFileInfoData C_OscExportParamSet::mh_GetFileInfo(const C_SclString & orc_ExportToolName,
+                                                                         const C_SclString & orc_ExportToolVersion)
 {
-   C_OSCParamSetInterpretedFileInfoData c_Info;
+   C_OscParamSetInterpretedFileInfoData c_Info;
 
-   C_SCLString c_Tmp;
-   C_TGLDateTime c_DateTime;
+   C_SclString c_Tmp;
+   C_TglDateTime c_DateTime;
 
-   TGL_GetDateTimeNow(c_DateTime);
-   c_Info.c_DateTime = C_OSCLoggingHandler::h_UtilConvertDateTimeToString(c_DateTime);
-   TGL_GetSystemUserName(c_Tmp);
+   TglGetDateTimeNow(c_DateTime);
+   c_Info.c_DateTime = C_OscLoggingHandler::h_UtilConvertDateTimeToString(c_DateTime);
+   TglGetSystemUserName(c_Tmp);
    c_Info.c_Creator = c_Tmp;
    c_Info.c_ToolName = orc_ExportToolName;
    c_Info.c_ToolVersion = orc_ExportToolVersion;
@@ -405,21 +406,21 @@ C_OSCParamSetInterpretedFileInfoData C_OSCExportParamSet::mh_GetFileInfo(const C
    C_RD_WR     Problems accessing file system
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportParamSet::mh_WriteParameterSetImage(const C_OSCParamSetRawNode & orc_RawNode,
-                                                      const C_OSCParamSetInterpretedNode & orc_IntNode,
-                                                      const bool oq_IsSafe, const C_OSCNodeApplication & orc_DataBlock,
-                                                      const C_SCLString & orc_Path,
-                                                      std::vector<C_SCLString> & orc_Files,
-                                                      const C_SCLString & orc_ExportToolName,
-                                                      const C_SCLString & orc_ExportToolVersion)
+int32_t C_OscExportParamSet::mh_WriteParameterSetImage(const C_OscParamSetRawNode & orc_RawNode,
+                                                       const C_OscParamSetInterpretedNode & orc_IntNode,
+                                                       const bool oq_IsSafe, const C_OscNodeApplication & orc_DataBlock,
+                                                       const C_SclString & orc_Path,
+                                                       std::vector<C_SclString> & orc_Files,
+                                                       const C_SclString & orc_ExportToolName,
+                                                       const C_SclString & orc_ExportToolVersion)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
-   const C_SCLString c_Path = TGL_FileIncludeTrailingDelimiter(orc_Path) +
+   const C_SclString c_Path = TglFileIncludeTrailingDelimiter(orc_Path) +
                               h_GetFileName(orc_DataBlock, oq_IsSafe);
-   const C_OSCParamSetInterpretedFileInfoData c_FileInfo = mh_GetFileInfo(orc_ExportToolName, orc_ExportToolVersion);
+   const C_OscParamSetInterpretedFileInfoData c_FileInfo = mh_GetFileInfo(orc_ExportToolName, orc_ExportToolVersion);
 
-   C_OSCParamSetHandler c_DataHandler;
+   C_OscParamSetHandler c_DataHandler;
 
    // Add raw & interpreted data
    s32_Retval = c_DataHandler.AddInterpretedDataForNode(orc_IntNode);
@@ -438,11 +439,11 @@ sint32 C_OSCExportParamSet::mh_WriteParameterSetImage(const C_OSCParamSetRawNode
    else
    {
       // Remove pre-existing files because PSI writing will else result in an error
-      if (TGL_FileExists(c_Path) == true)
+      if (TglFileExists(c_Path) == true)
       {
-         sintn sn_Return;
-         sn_Return = std::remove(c_Path.c_str());
-         if (sn_Return != 0)
+         int x_Return; //lint !e970 !e8080  //using type to match library interface
+         x_Return = std::remove(c_Path.c_str());
+         if (x_Return != 0)
          {
             osc_write_log_error("Creating PSI file", "Could not erase pre-existing file \"" + c_Path + "\".");
             s32_Retval = C_RD_WR;
@@ -453,20 +454,20 @@ sint32 C_OSCExportParamSet::mh_WriteParameterSetImage(const C_OSCParamSetRawNode
       c_DataHandler.AddInterpretedFileData(c_FileInfo);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = c_DataHandler.CreateCleanFileWithoutCRC(c_Path);
+         s32_Retval = c_DataHandler.CreateCleanFileWithoutCrc(c_Path);
       }
 
       // Add file CRC
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = C_OSCParamSetHandler::h_UpdateCRCForFile(c_Path);
+         s32_Retval = C_OscParamSetHandler::h_UpdateCrcForFile(c_Path);
       }
 
       // Handle file names
       if (s32_Retval == C_NO_ERR)
       {
-         C_OSCExportUti::h_CollectFilePaths(orc_Files, orc_Path,
-                                            C_OSCExportParamSet::h_GetFileName(orc_DataBlock, oq_IsSafe), false);
+         C_OscExportUti::h_CollectFilePaths(orc_Files, orc_Path,
+                                            C_OscExportParamSet::h_GetFileName(orc_DataBlock, oq_IsSafe), false);
       }
       else
       {
@@ -491,16 +492,16 @@ sint32 C_OSCExportParamSet::mh_WriteParameterSetImage(const C_OSCParamSetRawNode
    C_CONFIG    number of Datapool list elements not as expected
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportParamSet::mh_InsertCRC16(std::vector<uint8> & orc_Bytes)
+int32_t C_OscExportParamSet::mh_InsertCrc16(std::vector<uint8_t> & orc_Bytes)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   uint16 u16_Crc = 0x1d0f;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_Bytes.size() > 2)
    {
-      stw_scl::C_SCLChecksums::CalcCRC16(&orc_Bytes[2], static_cast<uint32>(orc_Bytes.size()) - 2, u16_Crc);
-      orc_Bytes[0] = static_cast<uint8>(u16_Crc >> 8U);
-      orc_Bytes[1] = static_cast<uint8>(u16_Crc);
+      uint16_t u16_Crc = 0x1d0f;
+      stw::scl::C_SclChecksums::CalcCRC16(&orc_Bytes[2], static_cast<uint32_t>(orc_Bytes.size()) - 2, u16_Crc);
+      orc_Bytes[0] = static_cast<uint8_t>(u16_Crc >> 8U);
+      orc_Bytes[1] = static_cast<uint8_t>(u16_Crc);
    }
    else
    {
@@ -524,31 +525,31 @@ sint32 C_OSCExportParamSet::mh_InsertCRC16(std::vector<uint8> & orc_Bytes)
    C_CONFIG    number of Datapool lists or datasets not as expected
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCExportParamSet::mh_GetConfigurationRawBytes(const C_OSCNodeDataPool & orc_SdDataPool,
-                                                        std::vector<uint8> & orc_Bytes)
+int32_t C_OscExportParamSet::mh_GetConfigurationRawBytes(const C_OscNodeDataPool & orc_SdDataPool,
+                                                         std::vector<uint8_t> & orc_Bytes)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_SdDataPool.c_Lists.size() > 0)
    {
       orc_Bytes.clear();
-      orc_Bytes.reserve(orc_SdDataPool.c_Lists[0].u32_NvMSize);
+      orc_Bytes.reserve(orc_SdDataPool.c_Lists[0].u32_NvmSize);
 
       // insert dummies for CRC bytes
-      // do not use list's GetCRCAsBigEndianBlob resp. u32_NvMCRC as this members content would need calculation first
-      std::vector<stw_types::uint8> c_CRCDummy;
-      c_CRCDummy.resize(2, 0);
-      orc_Bytes.insert(orc_Bytes.begin(), c_CRCDummy.begin(), c_CRCDummy.end());
+      // do not use list's GetCRCAsBigEndianBlob resp. u32_NvmCrc as this members content would need calculation first
+      std::vector<uint8_t> c_CrcDummy;
+      c_CrcDummy.resize(2, 0);
+      orc_Bytes.insert(orc_Bytes.begin(), c_CrcDummy.begin(), c_CrcDummy.end());
 
       // insert configured data
-      for (uint32 u32_ItElement = 0U;
+      for (uint32_t u32_ItElement = 0U;
            (u32_ItElement < orc_SdDataPool.c_Lists[0].c_Elements.size()) && (s32_Retval == C_NO_ERR);
            ++u32_ItElement)
       {
-         const C_OSCNodeDataPoolListElement & rc_Element = orc_SdDataPool.c_Lists[0].c_Elements[u32_ItElement];
+         const C_OscNodeDataPoolListElement & rc_Element = orc_SdDataPool.c_Lists[0].c_Elements[u32_ItElement];
          if (rc_Element.c_DataSetValues.size() == 1)
          {
-            std::vector<stw_types::uint8> c_NewBytes;
+            std::vector<uint8_t> c_NewBytes;
             rc_Element.c_DataSetValues[0].GetValueAsBigEndianBlob(c_NewBytes);
             orc_Bytes.insert(orc_Bytes.end(), c_NewBytes.begin(), c_NewBytes.end());
          }
@@ -559,7 +560,7 @@ sint32 C_OSCExportParamSet::mh_GetConfigurationRawBytes(const C_OSCNodeDataPool 
       }
 
       // make sure that number of bytes equals specified size of list and fill eventually remaining space with zeroes
-      orc_Bytes.resize(orc_SdDataPool.c_Lists[0].u32_NvMSize, 0);
+      orc_Bytes.resize(orc_SdDataPool.c_Lists[0].u32_NvmSize, 0);
    }
    else
    {

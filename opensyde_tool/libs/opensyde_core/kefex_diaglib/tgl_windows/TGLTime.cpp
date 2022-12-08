@@ -12,21 +12,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h" //pre-compiled headers
-#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
+#include "precomp_headers.hpp" //pre-compiled headers
+#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
 #pragma hdrstop
 #pragma package(smart_init)
 #endif
 
 #include <windows.h>
-#include "stwtypes.h"
-#include "TGLTime.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "TglTime.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_tgl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,7 +45,7 @@ using namespace stw_tgl;
    \param[out] orc_DateTime Current date and time value with milli seconds
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
+void stw::tgl::TglGetDateTimeNow(C_TglDateTime & orc_DateTime)
 {
    SYSTEMTIME c_LocalTimeNow;
 
@@ -55,11 +54,11 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
 
    //Convert to readable format
    orc_DateTime.mu16_Year  = c_LocalTimeNow.wYear;
-   orc_DateTime.mu8_Month  = static_cast<uint8>(c_LocalTimeNow.wMonth);
-   orc_DateTime.mu8_Day    = static_cast<uint8>(c_LocalTimeNow.wDay);
-   orc_DateTime.mu8_Hour   = static_cast<uint8>(c_LocalTimeNow.wHour);
-   orc_DateTime.mu8_Minute = static_cast<uint8>(c_LocalTimeNow.wMinute);
-   orc_DateTime.mu8_Second = static_cast<uint8>(c_LocalTimeNow.wSecond);
+   orc_DateTime.mu8_Month  = static_cast<uint8_t>(c_LocalTimeNow.wMonth);
+   orc_DateTime.mu8_Day    = static_cast<uint8_t>(c_LocalTimeNow.wDay);
+   orc_DateTime.mu8_Hour   = static_cast<uint8_t>(c_LocalTimeNow.wHour);
+   orc_DateTime.mu8_Minute = static_cast<uint8_t>(c_LocalTimeNow.wMinute);
+   orc_DateTime.mu8_Second = static_cast<uint8_t>(c_LocalTimeNow.wSecond);
    orc_DateTime.mu16_MilliSeconds = c_LocalTimeNow.wMilliseconds;
 }
 
@@ -74,11 +73,11 @@ void stw_tgl::TGL_GetDateTimeNow(C_TGLDateTime & orc_DateTime)
    \param[in]   ou32_NumberUs             number of microseconds to block
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
+void stw::tgl::TglDelayUs(const uint32_t ou32_NumberUs)
 {
-   const uint64 u64_StopTime = TGL_GetTickCountUS() + ou32_NumberUs;
+   const uint64_t u64_StopTime = TglGetTickCountUs() + ou32_NumberUs;
 
-   while (TGL_GetTickCountUS() < u64_StopTime)
+   while (TglGetTickCountUs() < u64_StopTime)
    {
    }
 }
@@ -92,10 +91,10 @@ void stw_tgl::TGL_DelayUs(const uint32 ou32_NumberUs)
    System time in micro-seconds.
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64 stw_tgl::TGL_GetTickCountUS(void)
+uint64_t stw::tgl::TglGetTickCountUs(void)
 {
    static bool hq_FirstCall = true;
-   static float64 hf64_CountsPer1US;
+   static float64_t hf64_CountsPer1US;
    LARGE_INTEGER u_Counts;
 
    if (hq_FirstCall == true)
@@ -103,12 +102,13 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
       bool q_Test;
       q_Test = (QueryPerformanceFrequency(&u_Counts) == 0) ? false : true;
       tgl_assert(q_Test == true);
-      hf64_CountsPer1US = static_cast<float64>(u_Counts.QuadPart) / 1000000.0; //we want the result in us not in seconds
+      hf64_CountsPer1US = static_cast<float64_t>(u_Counts.QuadPart) / 1000000.0; //we want the result in us not in
+                                                                                 // seconds
       hq_FirstCall = false;
    }
 
    (void)QueryPerformanceCounter(&u_Counts);
-   return static_cast<uint64>(static_cast<float64>(u_Counts.QuadPart) / hf64_CountsPer1US); //lint !e1960
+   return static_cast<uint64_t>(static_cast<float64_t>(u_Counts.QuadPart) / hf64_CountsPer1US); //lint !e1960
    //dropping the decimals is precise enough
 }
 
@@ -122,9 +122,9 @@ uint64 stw_tgl::TGL_GetTickCountUS(void)
    System time in milliseconds.
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 stw_tgl::TGL_GetTickCount(void)
+uint32_t stw::tgl::TglGetTickCount(void)
 {
-   return static_cast<uint32>(TGL_GetTickCountUS() / 1000U);
+   return static_cast<uint32_t>(TglGetTickCountUs() / 1000U);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ uint32 stw_tgl::TGL_GetTickCount(void)
    \param[in]    ou32_NumberMs    number of milliseconds to delay
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_tgl::TGL_Sleep(const uint32 ou32_NumberMs)
+void stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
 {
    Sleep(ou32_NumberMs);
 }

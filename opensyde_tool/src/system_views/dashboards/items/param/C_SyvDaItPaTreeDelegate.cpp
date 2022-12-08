@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSvgRenderer>
 #include <QEvent>
 
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeCbxParam.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeDpUtil.h"
-#include "C_TblTreDelegateUtil.h"
-#include "C_SyvDaItPaTreeModel.h"
-#include "C_SyvDaItPaTreeDelegate.h"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeCbxParam.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeDpUtil.hpp"
+#include "C_TblTreDelegateUtil.hpp"
+#include "C_SyvDaItPaTreeModel.hpp"
+#include "C_SyvDaItPaTreeDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -92,8 +91,8 @@ QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, cons
    Q_UNUSED(orc_Option)
    if (orc_Index.isValid() == true)
    {
-      C_OSCNodeDataPoolListElementId c_Id;
-      uint32 u32_ValidLayers;
+      C_OscNodeDataPoolListElementId c_Id;
+      uint32_t u32_ValidLayers;
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       const C_SyvDaItPaTreeModel::E_Columns e_Col = C_SyvDaItPaTreeModel::h_ColumnToEnum(orc_Index.column());
@@ -109,15 +108,15 @@ QWidget * C_SyvDaItPaTreeDelegate::createEditor(QWidget * const opc_Parent, cons
             }
             else if (u32_ValidLayers == 3UL)
             {
-               const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
+               const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
                   c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex, c_Id.u32_ListIndex);
                if (pc_List != NULL)
                {
                   pc_ComboBox = new C_OgeCbxParam(opc_Parent);
                   pc_ComboBox->addItem(C_GtGetText::h_GetText("Custom values"));
-                  for (uint32 u32_ItDataSet = 0UL; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
+                  for (uint32_t u32_ItDataSet = 0UL; u32_ItDataSet < pc_List->c_DataSets.size(); ++u32_ItDataSet)
                   {
-                     const C_OSCNodeDataPoolDataSet & rc_DataSet = pc_List->c_DataSets[u32_ItDataSet];
+                     const C_OscNodeDataPoolDataSet & rc_DataSet = pc_List->c_DataSets[u32_ItDataSet];
                      pc_ComboBox->addItem(static_cast<QString>(C_GtGetText::h_GetText("Dataset \"%1\"")).arg(
                                              rc_DataSet.c_Name.c_str()));
                   }
@@ -205,8 +204,8 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
 {
    if ((opc_Editor != NULL) && (orc_Index.isValid() == true))
    {
-      C_OSCNodeDataPoolListElementId c_Id;
-      uint32 u32_ValidLayers;
+      C_OscNodeDataPoolListElementId c_Id;
+      uint32_t u32_ValidLayers;
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       if (u32_ValidLayers > 2UL)
@@ -224,7 +223,7 @@ void C_SyvDaItPaTreeDelegate::setEditorData(QWidget * const opc_Editor, const QM
                if (pc_ComboBox != NULL)
                {
                   bool q_Ok;
-                  pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt(&q_Ok));
+                  pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt(&q_Ok));
                   tgl_assert(q_Ok == true);
                }
             }
@@ -252,8 +251,8 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
 {
    if (((opc_Editor != NULL) && (opc_Model != NULL)) && (orc_Index.isValid() == true))
    {
-      C_OSCNodeDataPoolListElementId c_Id;
-      uint32 u32_ValidLayers;
+      C_OscNodeDataPoolListElementId c_Id;
+      uint32_t u32_ValidLayers;
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       if (u32_ValidLayers > 2UL)
@@ -398,15 +397,15 @@ QWidget * C_SyvDaItPaTreeDelegate::m_CreateEditor(QWidget * const opc_Parent, co
 
    if (orc_Index.isValid() == true)
    {
-      C_OSCNodeDataPoolListElementId c_Id;
-      uint32 u32_ValidLayers;
+      C_OscNodeDataPoolListElementId c_Id;
+      uint32_t u32_ValidLayers;
 
       C_SyvDaItPaTreeModel::h_DecodeIndex(orc_Index, c_Id, u32_ValidLayers);
       if (u32_ValidLayers == 4UL)
       {
          //Core data
-         const C_OSCNodeDataPoolListElement * const pc_Element =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
+         const C_OscNodeDataPoolListElement * const pc_Element =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(c_Id.u32_NodeIndex, c_Id.u32_DataPoolIndex,
                                                                        c_Id.u32_ListIndex, c_Id.u32_ElementIndex);
          if (pc_Element != NULL)
          {

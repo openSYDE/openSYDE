@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvNodeData.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvNodeData.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -70,33 +69,33 @@ C_GiSvNodeData::C_GiSvNodeData() :
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::Init(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex)
+void C_GiSvNodeData::Init(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_NodeSquadIndex;
+   uint32_t u32_NodeSquadIndex;
 
    if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
                                                                        u32_NodeSquadIndex) == C_NO_ERR)
    {
       // part of a node squad
-      const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+      const stw::opensyde_core::C_OscNodeSquad * const pc_NodeSquad =
+         C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_NodeSquadIndex);
       if (pc_NodeSquad != NULL)
       {
-         std::vector<uint8> c_NodeActiveFlags;
+         std::vector<uint8_t> c_NodeActiveFlags;
          // In case of node squads we need to know about deactivated sub nodes
-         const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+         const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
             ou32_ViewIndex,
             c_NodeActiveFlags);
 
          tgl_assert(s32_Retval == C_NO_ERR);
          if (s32_Retval == C_NO_ERR)
          {
-            std::vector<stw_types::uint32>::const_iterator c_ItSubNodeIndices;
+            std::vector<uint32_t>::const_iterator c_ItSubNodeIndices;
             for (c_ItSubNodeIndices = pc_NodeSquad->c_SubNodeIndexes.begin();
                  c_ItSubNodeIndices != pc_NodeSquad->c_SubNodeIndexes.end();
                  ++c_ItSubNodeIndices)
             {
-               const uint32 u32_SubNodeIndex = *c_ItSubNodeIndices;
+               const uint32_t u32_SubNodeIndex = *c_ItSubNodeIndices;
                tgl_assert(u32_SubNodeIndex < c_NodeActiveFlags.size());
                if (u32_SubNodeIndex < c_NodeActiveFlags.size())
                {
@@ -138,7 +137,7 @@ void C_GiSvNodeData::SetConnecting(const bool oq_Active)
 void C_GiSvNodeData::SetConnected(const bool oq_Active)
 {
    this->mq_IsConnected = oq_Active;
-   for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
+   for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
    {
       this->mc_SubNodes[u32_ItSubNodes].SetConnected(oq_Active);
    }
@@ -153,7 +152,7 @@ void C_GiSvNodeData::SetConnected(const bool oq_Active)
 void C_GiSvNodeData::SetUpdating(const bool oq_Active)
 {
    this->mq_UpdateInProgress = oq_Active;
-   for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
+   for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
    {
       this->mc_SubNodes[u32_ItSubNodes].SetUpdating(oq_Active);
    }
@@ -174,20 +173,20 @@ void C_GiSvNodeData::SetUpdating(const bool oq_Active)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeData::SetNodeUpdateInProgress(const bool oq_Active, const bool oq_Aborted,
-                                             const uint32 ou32_FailedApplicationIndex,
-                                             const uint32 ou32_UpdatedNodeIndex, const uint32 ou32_CurrentNodeIndex)
+                                             const uint32_t ou32_FailedApplicationIndex,
+                                             const uint32_t ou32_UpdatedNodeIndex, const uint32_t ou32_CurrentNodeIndex)
 {
    if (oq_Active)
    {
-      const std::vector<uint32> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
+      const std::vector<uint32_t> c_NodeIndices = C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(
          ou32_CurrentNodeIndex);
       if (c_NodeIndices.size() == this->mc_SubNodes.size())
       {
-         for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size();
+         for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size();
               u32_ItSubNodes++)
          {
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItSubNodes]);
+            const C_OscNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndices[u32_ItSubNodes]);
             if ((pc_Node != NULL) && (pc_Node->u32_SubDeviceIndex < this->mc_SubNodes.size()))
             {
                if (ou32_UpdatedNodeIndex == c_NodeIndices[u32_ItSubNodes])
@@ -206,7 +205,7 @@ void C_GiSvNodeData::SetNodeUpdateInProgress(const bool oq_Active, const bool oq
    }
    else
    {
-      for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size();
+      for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size();
            u32_ItSubNodes++)
       {
          this->mc_SubNodes[u32_ItSubNodes].SetNodeUpdateInProgress(oq_Active, oq_Aborted, ou32_FailedApplicationIndex);
@@ -220,9 +219,9 @@ void C_GiSvNodeData::SetNodeUpdateInProgress(const bool oq_Active, const bool oq
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::SetErrorState(const uint32 ou32_NodeIndex)
+void C_GiSvNodeData::SetErrorState(const uint32_t ou32_NodeIndex)
 {
-   const uint32 u32_SubNodeIndex = m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
+   const uint32_t u32_SubNodeIndex = m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
 
    this->mc_SubNodes[u32_SubNodeIndex].SetErrorState();
 }
@@ -234,14 +233,14 @@ void C_GiSvNodeData::SetErrorState(const uint32 ou32_NodeIndex)
    \param[in]       orc_NodePreconditionErrors     Node precondition error states
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::SetNodeConnectStates(const std::vector<C_OSCSuSequencesNodeConnectStates> & orc_NodeStates,
+void C_GiSvNodeData::SetNodeConnectStates(const std::vector<C_OscSuSequencesNodeConnectStates> & orc_NodeStates,
                                           const C_GiSvNodeDataPreconditionErrors & orc_NodePreconditionErrors)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->mc_SubNodes.size(); ++u32_Counter)
    {
-      const uint32 u32_NodeIndex = this->mc_SubNodes[u32_Counter].GetNodeIndex();
+      const uint32_t u32_NodeIndex = this->mc_SubNodes[u32_Counter].GetNodeIndex();
       if (u32_NodeIndex < orc_NodeStates.size())
       {
          C_GiSvSubNodeData::C_GiSvSubNodeDataPreconditionErrors c_PreconditionErrors;
@@ -269,13 +268,13 @@ void C_GiSvNodeData::SetNodeConnectStates(const std::vector<C_OSCSuSequencesNode
    \param[in]       orc_NodeStates     Node connect states
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::SetNodeUpdateStates(const std::vector<C_OSCSuSequencesNodeUpdateStates> & orc_NodeStates)
+void C_GiSvNodeData::SetNodeUpdateStates(const std::vector<C_OscSuSequencesNodeUpdateStates> & orc_NodeStates)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->mc_SubNodes.size(); ++u32_Counter)
    {
-      const uint32 u32_NodeIndex = this->mc_SubNodes[u32_Counter].GetNodeIndex();
+      const uint32_t u32_NodeIndex = this->mc_SubNodes[u32_Counter].GetNodeIndex();
       if (u32_NodeIndex < orc_NodeStates.size())
       {
          this->mc_SubNodes[u32_Counter].SetNodeUpdateStates(orc_NodeStates[u32_NodeIndex]);
@@ -291,9 +290,9 @@ void C_GiSvNodeData::SetNodeUpdateStates(const std::vector<C_OSCSuSequencesNodeU
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeData::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc_DeviceApplicationInfos,
-                                                const uint32 ou32_NodeIndex)
+                                                const uint32_t ou32_NodeIndex)
 {
-   const uint32 u32_SubNodeIndex = m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
+   const uint32_t u32_SubNodeIndex = m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
 
    this->mc_SubNodes[u32_SubNodeIndex].UpdateInitialPackageStatus(orc_DeviceApplicationInfos);
 }
@@ -309,7 +308,7 @@ void C_GiSvNodeData::CopyInitialStatus(C_GiSvNodeData & orc_NodeData) const
    tgl_assert(this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size());
    if (this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size())
    {
-      for (uint32 u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
       {
          this->mc_SubNodes[u32_It].CopyInitialStatus(orc_NodeData.mc_SubNodes[u32_It]);
       }
@@ -327,7 +326,7 @@ void C_GiSvNodeData::CopyUpdateStatus(C_GiSvNodeData & orc_NodeData) const
    tgl_assert(this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size());
    if (this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size())
    {
-      for (uint32 u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
       {
          this->mc_SubNodes[u32_It].CopyUpdateStatus(orc_NodeData.mc_SubNodes[u32_It]);
       }
@@ -340,14 +339,14 @@ void C_GiSvNodeData::CopyUpdateStatus(C_GiSvNodeData & orc_NodeData) const
    \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::CopySTWDeviceInfo(C_GiSvNodeData & orc_NodeData) const
+void C_GiSvNodeData::CopyStwDeviceInfo(C_GiSvNodeData & orc_NodeData) const
 {
    tgl_assert(this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size());
    if (this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size())
    {
-      for (uint32 u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
       {
-         this->mc_SubNodes[u32_It].CopySTWDeviceInfo(orc_NodeData.mc_SubNodes[u32_It]);
+         this->mc_SubNodes[u32_It].CopyStwDeviceInfo(orc_NodeData.mc_SubNodes[u32_It]);
       }
    }
 }
@@ -358,14 +357,14 @@ void C_GiSvNodeData::CopySTWDeviceInfo(C_GiSvNodeData & orc_NodeData) const
    \param[in,out]  orc_NodeData  Node data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvNodeData::CopyOSYDeviceInfo(C_GiSvNodeData & orc_NodeData) const
+void C_GiSvNodeData::CopyOsyDeviceInfo(C_GiSvNodeData & orc_NodeData) const
 {
    tgl_assert(this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size());
    if (this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size())
    {
-      for (uint32 u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
       {
-         this->mc_SubNodes[u32_It].CopyOSYDeviceInfo(orc_NodeData.mc_SubNodes[u32_It]);
+         this->mc_SubNodes[u32_It].CopyOpenSydeDeviceInfo(orc_NodeData.mc_SubNodes[u32_It]);
       }
    }
 }
@@ -381,7 +380,7 @@ void C_GiSvNodeData::CopyDiscardedStatus(C_GiSvNodeData & orc_NodeData) const
    tgl_assert(this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size());
    if (this->mc_SubNodes.size() == orc_NodeData.mc_SubNodes.size())
    {
-      for (uint32 u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
       {
          this->mc_SubNodes[u32_It].CopyDiscardedStatus(orc_NodeData.mc_SubNodes[u32_It]);
       }
@@ -400,7 +399,7 @@ bool C_GiSvNodeData::HasNodeAnAvailableFlashloader(void) const
 {
    bool q_Retval = false;
 
-   for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
+   for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
    {
       if (this->mc_SubNodes[u32_ItSubNodes].HasNodeAnAvailableFlashloader() == true)
       {
@@ -423,7 +422,7 @@ bool C_GiSvNodeData::AreAllNodesValid() const
 {
    bool q_Retval = true;
 
-   for (uint32 u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == true); ++u32_It)
+   for (uint32_t u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == true); ++u32_It)
    {
       q_Retval = this->mc_SubNodes[u32_It].GetValidStatus();
    }
@@ -442,7 +441,7 @@ bool C_GiSvNodeData::IsThereAnyHexFileInformation() const
 {
    bool q_Retval = false;
 
-   for (uint32 u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == false); ++u32_It)
+   for (uint32_t u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == false); ++u32_It)
    {
       q_Retval = this->IsThereAnyHexFileInformationForDevice(u32_It);
    }
@@ -458,7 +457,7 @@ bool C_GiSvNodeData::IsThereAnyHexFileInformation() const
    Device info discarded status
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::IsDeviceInfoDiscarded(const uint32 ou32_SubDeviceIndex) const
+bool C_GiSvNodeData::IsDeviceInfoDiscarded(const uint32_t ou32_SubDeviceIndex) const
 {
    bool q_Retval = false;
 
@@ -479,7 +478,7 @@ bool C_GiSvNodeData::IsDeviceInfoDiscarded(const uint32 ou32_SubDeviceIndex) con
    false Hex file info not present
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::IsThereAnyHexFileInformationForDevice(const uint32 ou32_SubDeviceIndex) const
+bool C_GiSvNodeData::IsThereAnyHexFileInformationForDevice(const uint32_t ou32_SubDeviceIndex) const
 {
    bool q_Retval = false;
 
@@ -500,7 +499,7 @@ bool C_GiSvNodeData::IsThereAnyHexFileInformationForDevice(const uint32 ou32_Sub
    false Sub node is not active
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::IsSubNodeActive(const uint32 ou32_SubDeviceIndex) const
+bool C_GiSvNodeData::IsSubNodeActive(const uint32_t ou32_SubDeviceIndex) const
 {
    bool q_Retval = false;
 
@@ -517,7 +516,7 @@ bool C_GiSvNodeData::IsSubNodeActive(const uint32 ou32_SubDeviceIndex) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeData::DiscardInfo()
 {
-   for (uint32 u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < this->mc_SubNodes.size(); ++u32_It)
    {
       this->mc_SubNodes[u32_It].DiscardInfo();
    }
@@ -534,7 +533,7 @@ bool C_GiSvNodeData::CheckAlwaysUpdate(void) const
 {
    bool q_Retval = false;
 
-   for (uint32 u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == false); ++u32_It)
+   for (uint32_t u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == false); ++u32_It)
    {
       q_Retval = this->mc_SubNodes[u32_It].CheckAlwaysUpdate();
    }
@@ -553,7 +552,7 @@ bool C_GiSvNodeData::CheckUpdateDisabledState(void) const
 {
    bool q_Retval = true;
 
-   for (uint32 u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == true); ++u32_It)
+   for (uint32_t u32_It = 0UL; (u32_It < this->mc_SubNodes.size()) && (q_Retval == true); ++u32_It)
    {
       q_Retval = this->mc_SubNodes[u32_It].CheckUpdateDisabledState();
    }
@@ -614,7 +613,7 @@ C_SyvUtil::E_NodeUpdateStatus C_GiSvNodeData::GetOverallUpdateState() const
    bool q_AtLeastOneUpdateDisabled = false;
    bool q_AtLeastOneUnknown = false;
 
-   for (uint32 u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
+   for (uint32_t u32_ItSubNodes = 0; u32_ItSubNodes < this->mc_SubNodes.size(); u32_ItSubNodes++)
    {
       switch (this->mc_SubNodes[u32_ItSubNodes].GetUpdateStatus())
       {
@@ -706,7 +705,7 @@ C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetOverallInitialState(void
    C_SyvUtil::E_NodeUpdateInitialStatus e_InitialState = C_SyvUtil::eI_UNKNOWN;
    bool q_StopChecking = false;
 
-   for (uint32 u32_ItSubNodes = 0; (u32_ItSubNodes < this->mc_SubNodes.size()) && (q_StopChecking == false);
+   for (uint32_t u32_ItSubNodes = 0; (u32_ItSubNodes < this->mc_SubNodes.size()) && (q_StopChecking == false);
         u32_ItSubNodes++)
    {
       switch (this->mc_SubNodes[u32_ItSubNodes].GetInitialStatus())
@@ -748,7 +747,7 @@ C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetOverallInitialState(void
    Sub node count
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiSvNodeData::GetSubNodeCount() const
+uint32_t C_GiSvNodeData::GetSubNodeCount() const
 {
    return this->mc_SubNodes.size();
 }
@@ -762,10 +761,10 @@ uint32 C_GiSvNodeData::GetSubNodeCount() const
    Initial state for node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetInitialStateByNodeIndex(const uint32 ou32_NodeIndex) const
+C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetInitialStateByNodeIndex(const uint32_t ou32_NodeIndex) const
 {
    C_SyvUtil::E_NodeUpdateInitialStatus e_Retval = C_SyvUtil::eI_UNKNOWN;
-   const uint32 u32_SubDeviceIndex = this->m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
+   const uint32_t u32_SubDeviceIndex = this->m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
    if (u32_SubDeviceIndex < this->mc_SubNodes.size())
    {
       e_Retval = this->mc_SubNodes[u32_SubDeviceIndex].GetInitialStatus();
@@ -782,10 +781,10 @@ C_SyvUtil::E_NodeUpdateInitialStatus C_GiSvNodeData::GetInitialStateByNodeIndex(
    STW device info by node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::GetSTWDeviceInfoByNodeIndex(const uint32 ou32_NodeIndex) const
+bool C_GiSvNodeData::GetStwDeviceInfoByNodeIndex(const uint32_t ou32_NodeIndex) const
 {
    bool q_Retval = false;
-   const uint32 u32_SubDeviceIndex = this->m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
+   const uint32_t u32_SubDeviceIndex = this->m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
 
    if (u32_SubDeviceIndex < this->mc_SubNodes.size())
    {
@@ -803,10 +802,10 @@ bool C_GiSvNodeData::GetSTWDeviceInfoByNodeIndex(const uint32 ou32_NodeIndex) co
    Corresponding sub node by node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeByNodeIndex(const uint32 ou32_NodeIndex) const
+const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeByNodeIndex(const uint32_t ou32_NodeIndex) const
 {
    const C_GiSvSubNodeData * pc_Retval = NULL;
-   const uint32 u32_SubDeviceIndex = this->m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
+   const uint32_t u32_SubDeviceIndex = this->m_GetCorrespondingSubNodeIndex(ou32_NodeIndex);
 
    if (u32_SubDeviceIndex < this->mc_SubNodes.size())
    {
@@ -824,7 +823,7 @@ const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeByNodeIndex(const uint32 ou3
    Corresponding sub node by sub node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeBySubNodeIndex(const uint32 ou32_SubNodeIndex) const
+const C_GiSvSubNodeData * C_GiSvNodeData::GetSubNodeBySubNodeIndex(const uint32_t ou32_SubNodeIndex) const
 {
    const C_GiSvSubNodeData * pc_Retval = NULL;
 
@@ -886,13 +885,13 @@ bool C_GiSvNodeData::IsNodeUpdateStatesSet(void) const
    corresponding sub node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_GiSvNodeData::m_GetCorrespondingSubNodeIndex(const uint32 ou32_NodeIndex) const
+uint32_t C_GiSvNodeData::m_GetCorrespondingSubNodeIndex(const uint32_t ou32_NodeIndex) const
 {
-   uint32 u32_SubNodeIndex = 0;
+   uint32_t u32_SubNodeIndex = 0;
 
    if (this->mc_SubNodes.size() > 1)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
       if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
       {
          if (pc_Node->u32_SubDeviceIndex < this->mc_SubNodes.size())
@@ -915,11 +914,11 @@ uint32 C_GiSvNodeData::m_GetCorrespondingSubNodeIndex(const uint32 ou32_NodeInde
    \retval   false   Current node has no precondition error
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_GiSvNodeData::mh_IsPreconditionErrorSet(const std::vector<uint32> & orc_ErrorIndexes,
-                                               const uint32 ou32_CurrentNodeIndex)
+bool C_GiSvNodeData::mh_IsPreconditionErrorSet(const std::vector<uint32_t> & orc_ErrorIndexes,
+                                               const uint32_t ou32_CurrentNodeIndex)
 {
    bool q_Return = false;
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < orc_ErrorIndexes.size(); ++u32_Counter)
    {

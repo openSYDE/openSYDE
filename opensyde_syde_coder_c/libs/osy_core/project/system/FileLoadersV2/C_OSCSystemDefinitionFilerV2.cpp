@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstdio>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCSystemDefinitionFilerV2.h"
-#include "TGLFile.h"
-#include "TGLUtils.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscSystemDefinitionFilerV2.hpp"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_scl;
+using namespace stw::opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,20 +65,20 @@ using namespace stw_scl;
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinitionFile(C_OSCSystemDefinition & orc_SystemDefinition,
-                                                                const stw_scl::C_SCLString & orc_PathSystemDefinition,
-                                                                const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
-                                                                const bool oq_UseDeviceDefinitions)
+int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinitionFile(C_OscSystemDefinition & orc_SystemDefinition,
+                                                                 const stw::scl::C_SclString & orc_PathSystemDefinition,
+                                                                 const stw::scl::C_SclString & orc_PathDeviceDefinitions,
+                                                                 const bool oq_UseDeviceDefinitions)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (TGL_FileExists(orc_PathSystemDefinition) == true)
+   if (TglFileExists(orc_PathSystemDefinition) == true)
    {
-      C_OSCXMLParser c_XMLParser;
-      s32_Retval = c_XMLParser.LoadFromFile(orc_PathSystemDefinition);
+      C_OscXmlParser c_XmlParser;
+      s32_Retval = c_XmlParser.LoadFromFile(orc_PathSystemDefinition);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions,
+         s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XmlParser, orc_PathDeviceDefinitions,
                                              oq_UseDeviceDefinitions);
       }
       else
@@ -112,17 +112,17 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinitionFile(C_OSCSystemDefin
    C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionFile(const C_OSCSystemDefinition & orc_SystemDefinition,
-                                                                const stw_scl::C_SCLString & orc_Path)
+int32_t C_OscSystemDefinitionFilerV2::h_SaveSystemDefinitionFile(const C_OscSystemDefinition & orc_SystemDefinition,
+                                                                 const stw::scl::C_SclString & orc_Path)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
 
-   if (TGL_FileExists(orc_Path) == true)
+   if (TglFileExists(orc_Path) == true)
    {
       //erase it:
-      sintn sn_Return;
-      sn_Return = std::remove(orc_Path.c_str());
-      if (sn_Return != 0)
+      int x_Return; //lint !e970 !e8080  //using type to match library interface
+      x_Return = std::remove(orc_Path.c_str());
+      if (x_Return != 0)
       {
          osc_write_log_error("Saving System Definition", "Could not erase pre-existing file \"" + orc_Path + "\".");
          s32_Return = C_RD_WR;
@@ -130,10 +130,10 @@ sint32 C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionFile(const C_OSCSyste
    }
    if (s32_Return == C_NO_ERR)
    {
-      C_OSCXMLParser c_XMLParser;
-      h_SaveSystemDefinition(orc_SystemDefinition, c_XMLParser);
+      C_OscXmlParser c_XmlParser;
+      h_SaveSystemDefinition(orc_SystemDefinition, c_XmlParser);
 
-      s32_Return = c_XMLParser.SaveToFile(orc_Path);
+      s32_Return = c_XmlParser.SaveToFile(orc_Path);
       if (s32_Return != C_NO_ERR)
       {
          osc_write_log_error("Saving System Definition", "Could not write to file \"" + orc_Path + "\".");
@@ -165,19 +165,19 @@ sint32 C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionFile(const C_OSCSyste
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinitionString(C_OSCSystemDefinition & orc_SystemDefinition,
-                                                                  const C_SCLString & orc_Content,
-                                                                  const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
-                                                                  const bool oq_UseDeviceDefinitions)
+int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinitionString(C_OscSystemDefinition & orc_SystemDefinition,
+                                                                   const C_SclString & orc_Content,
+                                                                   const stw::scl::C_SclString & orc_PathDeviceDefinitions,
+                                                                   const bool oq_UseDeviceDefinitions)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
    //Set up parser
-   C_OSCXMLParserString c_XMLParser;
+   C_OscXmlParser c_XmlParser;
 
-   s32_Retval = c_XMLParser.LoadFromString(orc_Content);
+   s32_Retval = c_XmlParser.LoadFromString(orc_Content);
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XMLParser, orc_PathDeviceDefinitions,
+      s32_Retval = h_LoadSystemDefinition(orc_SystemDefinition, c_XmlParser, orc_PathDeviceDefinitions,
                                           oq_UseDeviceDefinitions);
    }
    else
@@ -198,14 +198,14 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinitionString(C_OSCSystemDef
    \param[out]  orc_Content            XML Content string
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OSCSystemDefinition & orc_SystemDefinition,
-                                                                C_SCLString & orc_Content)
+void C_OscSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OscSystemDefinition & orc_SystemDefinition,
+                                                                C_SclString & orc_Content)
 {
    //Set up parser
-   C_OSCXMLParserString c_XMLParser;
+   C_OscXmlParser c_XmlParser;
 
-   h_SaveSystemDefinition(orc_SystemDefinition, c_XMLParser);
-   c_XMLParser.SaveToString(orc_Content);
+   h_SaveSystemDefinition(orc_SystemDefinition, c_XmlParser);
+   c_XmlParser.SaveToString(orc_Content);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -216,11 +216,11 @@ void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OSCSyste
    * for each node set a pointer to the used device definition
 
     The caller is responsible to provide a static life-time of orc_DeviceDefinitions.
-    Otherwise the "device definition" pointers in C_OSCNode will point to invalid data.
+    Otherwise the "device definition" pointers in C_OscNode will point to invalid data.
 
    \param[in]      ou16_XmlFormatVersion     version of XML format
    \param[out]     orc_Nodes                 data storage
-   \param[in,out]  orc_XMLParser             XML with "nodes" active
+   \param[in,out]  orc_XmlParser             XML with "nodes" active
    \param[in]      orc_DeviceDefinitions     List of known devices (must contain all device types used by nodes)
    \param[in]      oq_UseDeviceDefinitions   Flag for using device definitions
 
@@ -230,25 +230,26 @@ void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinitionString(const C_OSCSyste
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVersion, std::vector<C_OSCNode> & orc_Nodes,
-                                                 C_OSCXMLParserBase & orc_XMLParser,
-                                                 const C_OSCDeviceManager & orc_DeviceDefinitions,
-                                                 const bool oq_UseDeviceDefinitions)
+int32_t C_OscSystemDefinitionFilerV2::h_LoadNodes(const uint16_t ou16_XmlFormatVersion,
+                                                  std::vector<C_OscNode> & orc_Nodes,
+                                                  C_OscXmlParserBase & orc_XmlParser,
+                                                  const C_OscDeviceManager & orc_DeviceDefinitions,
+                                                  const bool oq_UseDeviceDefinitions)
 
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   int32_t s32_Retval = C_NO_ERR;
+   C_SclString c_SelectedNode;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_Nodes.reserve(u32_ExpectedSize);
    }
 
-   c_SelectedNode = orc_XMLParser.SelectNodeChild("node");
+   c_SelectedNode = orc_XmlParser.SelectNodeChild("node");
 
    //clear list of nodes:
    orc_Nodes.clear();
@@ -257,21 +258,21 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
    {
       do
       {
-         C_OSCNode c_Item;
-         s32_Retval = C_OSCNodeFilerV2::h_LoadNode(ou16_XmlFormatVersion, c_Item, orc_XMLParser);
+         C_OscNode c_Item;
+         s32_Retval = C_OscNodeFilerV2::h_LoadNode(ou16_XmlFormatVersion, c_Item, orc_XmlParser);
          if (s32_Retval != C_NO_ERR)
          {
             break;
          }
          orc_Nodes.push_back(c_Item);
          //Next
-         c_SelectedNode = orc_XMLParser.SelectNodeNext("node");
+         c_SelectedNode = orc_XmlParser.SelectNodeNext("node");
       }
       while (c_SelectedNode == "node");
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "nodes");
       }
    }
    //Compare length
@@ -279,7 +280,7 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
    {
       if (u32_ExpectedSize != orc_Nodes.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected nodes count, expected: %i, got %i", u32_ExpectedSize,
                               orc_Nodes.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -290,9 +291,9 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
        (s32_Retval == C_NO_ERR))
    {
       //set pointers to device definitions
-      for (uint32 u32_NodeIndex = 0U; u32_NodeIndex < orc_Nodes.size(); u32_NodeIndex++)
+      for (uint32_t u32_NodeIndex = 0U; u32_NodeIndex < orc_Nodes.size(); u32_NodeIndex++)
       {
-         const C_OSCDeviceDefinition * const pc_Device =
+         const C_OscDeviceDefinition * const pc_Device =
             orc_DeviceDefinitions.LookForDevice(orc_Nodes[u32_NodeIndex].c_DeviceType, "",
                                                 orc_Nodes[u32_NodeIndex].u32_SubDeviceIndex);
          if (pc_Device == NULL)
@@ -322,55 +323,55 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadNodes(const uint16 ou16_XmlFormatVers
    The bus data will be loaded and the bus will be added.
 
    \param[in,out]  orc_Buses        data storage
-   \param[in,out]  orc_XMLParser    XML with "buses" active
+   \param[in,out]  orc_XmlParser    XML with "buses" active
 
    \return
    C_NO_ERR   no error
    C_CONFIG   content is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFilerV2::h_LoadBuses(std::vector<C_OSCSystemBus> & orc_Buses,
-                                                 C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscSystemDefinitionFilerV2::h_LoadBuses(std::vector<C_OscSystemBus> & orc_Buses,
+                                                  C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_SelectedNode;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   int32_t s32_Retval = C_NO_ERR;
+   C_SclString c_SelectedNode;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_Buses.reserve(u32_ExpectedSize);
    }
 
-   c_SelectedNode = orc_XMLParser.SelectNodeChild("bus");
+   c_SelectedNode = orc_XmlParser.SelectNodeChild("bus");
 
    orc_Buses.clear();
    if (c_SelectedNode == "bus")
    {
       do
       {
-         C_OSCSystemBus c_Item;
-         s32_Retval = C_OSCSystemBusFilerV2::h_LoadBus(c_Item, orc_XMLParser);
+         C_OscSystemBus c_Item;
+         s32_Retval = C_OscSystemBusFilerV2::h_LoadBus(c_Item, orc_XmlParser);
          if (s32_Retval == C_NO_ERR)
          {
             orc_Buses.push_back(c_Item);
          }
 
          //Next
-         c_SelectedNode = orc_XMLParser.SelectNodeNext("bus");
+         c_SelectedNode = orc_XmlParser.SelectNodeNext("bus");
       }
       while (c_SelectedNode == "bus");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "buses");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "buses");
    }
    //Compare length
    if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
    {
       if (u32_ExpectedSize != orc_Buses.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected bus count, expected: %i, got %i", u32_ExpectedSize,
                               orc_Buses.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -386,19 +387,19 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadBuses(std::vector<C_OSCSystemBus> & o
    The node data will be saved and the node will be added.
 
    \param[in]      orc_Nodes        data storage
-   \param[in,out]  orc_XMLParser    XML with "nodes" active
+   \param[in,out]  orc_XmlParser    XML with "nodes" active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinitionFilerV2::h_SaveNodes(const std::vector<C_OSCNode> & orc_Nodes,
-                                               C_OSCXMLParserBase & orc_XMLParser)
+void C_OscSystemDefinitionFilerV2::h_SaveNodes(const std::vector<C_OscNode> & orc_Nodes,
+                                               C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_Nodes.size());
-   for (uint32 u32_Index = 0U; u32_Index < orc_Nodes.size(); u32_Index++)
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Nodes.size()));
+   for (uint32_t u32_Index = 0U; u32_Index < orc_Nodes.size(); u32_Index++)
    {
-      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("node") == "node");
-      C_OSCNodeFilerV2::h_SaveNode(orc_Nodes[u32_Index], orc_XMLParser);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("node") == "node");
+      C_OscNodeFilerV2::h_SaveNode(orc_Nodes[u32_Index], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "nodes");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "nodes");
    }
 }
 
@@ -409,19 +410,19 @@ void C_OSCSystemDefinitionFilerV2::h_SaveNodes(const std::vector<C_OSCNode> & or
    The bus data will be saved and the bus will be added to the system definition (sorted).
 
    \param[in]      orc_Buses        data storage
-   \param[in,out]  orc_XMLParser    XML with "buses" active
+   \param[in,out]  orc_XmlParser    XML with "buses" active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OSCSystemBus> & orc_Buses,
-                                               C_OSCXMLParserBase & orc_XMLParser)
+void C_OscSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OscSystemBus> & orc_Buses,
+                                               C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_Buses.size());
-   for (uint32 u32_Index = 0U; u32_Index < orc_Buses.size(); u32_Index++)
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_Buses.size()));
+   for (uint32_t u32_Index = 0U; u32_Index < orc_Buses.size(); u32_Index++)
    {
-      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("bus") == "bus");
-      C_OSCSystemBusFilerV2::h_SaveBus(orc_Buses[u32_Index], orc_XMLParser);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("bus") == "bus");
+      C_OscSystemBusFilerV2::h_SaveBus(orc_Buses[u32_Index], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "buses");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "buses");
    }
 }
 
@@ -434,7 +435,7 @@ void C_OSCSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OSCSystemBus>
    * for each node set a pointer to the used device definition
 
    \param[out]     orc_SystemDefinition         Pointer to storage
-   \param[in,out]  orc_XMLParser                XML with default state
+   \param[in,out]  orc_XmlParser                XML with default state
    \param[in]      orc_PathDeviceDefinitions    Path to device definition description file
    \param[in]      oq_UseDeviceDefinitions      Flag for using device definitions
 
@@ -445,19 +446,18 @@ void C_OSCSystemDefinitionFilerV2::h_SaveBuses(const std::vector<C_OSCSystemBus>
    C_OVERFLOW  node in system definition references a device not part of the device definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinition & orc_SystemDefinition,
-                                                            C_OSCXMLParserBase & orc_XMLParser,
-                                                            const stw_scl::C_SCLString & orc_PathDeviceDefinitions,
-                                                            const bool oq_UseDeviceDefinitions)
+int32_t C_OscSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OscSystemDefinition & orc_SystemDefinition,
+                                                             C_OscXmlParserBase & orc_XmlParser,
+                                                             const stw::scl::C_SclString & orc_PathDeviceDefinitions,
+                                                             const bool oq_UseDeviceDefinitions)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   uint16 u16_FileVersion = 0U;
+   int32_t s32_Retval = C_NO_ERR;
 
    //do we need to load the device definitions ?
    if ((oq_UseDeviceDefinitions == true) &&
-       (C_OSCSystemDefinition::hc_Devices.WasLoaded() == false))
+       (C_OscSystemDefinition::hc_Devices.WasLoaded() == false))
    {
-      s32_Retval = C_OSCSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false, NULL);
+      s32_Retval = C_OscSystemDefinition::hc_Devices.LoadFromFile(orc_PathDeviceDefinitions, false, NULL);
       if (s32_Retval != C_NO_ERR)
       {
          osc_write_log_error("Loading System Definition", "Could not load Device definitions.");
@@ -465,14 +465,15 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
       }
    }
 
-   if (orc_XMLParser.SelectRoot() == "opensyde-system-definition")
+   if (orc_XmlParser.SelectRoot() == "opensyde-system-definition")
    {
+      uint16_t u16_FileVersion = 0U;
       //File version
-      if (orc_XMLParser.SelectNodeChild("file-version") == "file-version")
+      if (orc_XmlParser.SelectNodeChild("file-version") == "file-version")
       {
          try
          {
-            u16_FileVersion = static_cast<uint16>(orc_XMLParser.GetNodeContent().ToInt());
+            u16_FileVersion = static_cast<uint16_t>(orc_XmlParser.GetNodeContent().ToInt());
          }
          catch (...)
          {
@@ -484,7 +485,7 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
          if (s32_Retval == C_NO_ERR)
          {
             osc_write_log_info("Loading System Definition", "Value of \"file-version\": " +
-                               C_SCLString::IntToStr(u16_FileVersion));
+                               C_SclString::IntToStr(u16_FileVersion));
             if ((u16_FileVersion != hu16_FILE_VERSION_1) && (u16_FileVersion != hu16_FILE_VERSION_2))
             {
                osc_write_log_error("Loading System Definition",
@@ -494,7 +495,7 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
          }
 
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
       }
       else
       {
@@ -505,14 +506,14 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
       orc_SystemDefinition.c_Nodes.clear();
       if (s32_Retval == C_NO_ERR)
       {
-         if (orc_XMLParser.SelectNodeChild("nodes") == "nodes")
+         if (orc_XmlParser.SelectNodeChild("nodes") == "nodes")
          {
-            s32_Retval = h_LoadNodes(u16_FileVersion, orc_SystemDefinition.c_Nodes, orc_XMLParser,
-                                     C_OSCSystemDefinition::hc_Devices, oq_UseDeviceDefinitions);
+            s32_Retval = h_LoadNodes(u16_FileVersion, orc_SystemDefinition.c_Nodes, orc_XmlParser,
+                                     C_OscSystemDefinition::hc_Devices, oq_UseDeviceDefinitions);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
             }
          }
          else
@@ -526,13 +527,13 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
       orc_SystemDefinition.c_Buses.clear();
       if (s32_Retval == C_NO_ERR)
       {
-         if (orc_XMLParser.SelectNodeChild("buses") == "buses")
+         if (orc_XmlParser.SelectNodeChild("buses") == "buses")
          {
-            s32_Retval = h_LoadBuses(orc_SystemDefinition.c_Buses, orc_XMLParser);
+            s32_Retval = h_LoadBuses(orc_SystemDefinition.c_Buses, orc_XmlParser);
             if (s32_Retval == C_NO_ERR)
             {
                //Return
-               tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+               tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
             }
          }
          else
@@ -557,28 +558,28 @@ sint32 C_OSCSystemDefinitionFilerV2::h_LoadSystemDefinition(C_OSCSystemDefinitio
    Does NOT write the device definition file(s)
 
    \param[in]      orc_SystemDefinition   Pointer to storage
-   \param[in,out]  orc_XMLParser          XML with default state
+   \param[in,out]  orc_XmlParser          XML with default state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemDefinitionFilerV2::h_SaveSystemDefinition(const C_OSCSystemDefinition & orc_SystemDefinition,
-                                                          C_OSCXMLParserBase & orc_XMLParser)
+void C_OscSystemDefinitionFilerV2::h_SaveSystemDefinition(const C_OscSystemDefinition & orc_SystemDefinition,
+                                                          C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateNodeChild("opensyde-system-definition");
-   tgl_assert(orc_XMLParser.SelectRoot() == "opensyde-system-definition");
+   orc_XmlParser.CreateNodeChild("opensyde-system-definition");
+   tgl_assert(orc_XmlParser.SelectRoot() == "opensyde-system-definition");
    //File version
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("file-version") == "file-version");
-   orc_XMLParser.SetNodeContent(C_SCLString::IntToStr(hu16_FILE_VERSION_LATEST));
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("file-version") == "file-version");
+   orc_XmlParser.SetNodeContent(C_SclString::IntToStr(hu16_FILE_VERSION_LATEST));
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
    //Node
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("nodes") == "nodes");
-   h_SaveNodes(orc_SystemDefinition.c_Nodes, orc_XMLParser);
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("nodes") == "nodes");
+   h_SaveNodes(orc_SystemDefinition.c_Nodes, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
 
    //Bus
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("buses") == "buses");
-   h_SaveBuses(orc_SystemDefinition.c_Buses, orc_XMLParser);
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("buses") == "buses");
+   h_SaveBuses(orc_SystemDefinition.c_Buses, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "opensyde-system-definition");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-definition");
 }

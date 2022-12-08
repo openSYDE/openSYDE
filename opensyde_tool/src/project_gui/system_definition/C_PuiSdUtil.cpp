@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_PuiSdUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_GtGetText.h"
-#include "C_OSCHALCMagicianUtil.h"
-#include "TGLUtils.h"
+#include "stwerrors.hpp"
+#include "C_PuiSdUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscHalcMagicianUtil.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -52,11 +51,11 @@ using namespace stw_scl;
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_PuiSdUtil::h_CheckNameAvailable(const std::vector<const QString *> & orc_ExistingStrings,
-                                       const QString & orc_Proposal, const uint32 * const opu32_SkipIndex)
+                                       const QString & orc_Proposal, const uint32_t * const opu32_SkipIndex)
 {
    bool q_Retval = true;
 
-   for (uint32 u32_ItString = 0; u32_ItString < orc_ExistingStrings.size(); ++u32_ItString)
+   for (uint32_t u32_ItString = 0; u32_ItString < orc_ExistingStrings.size(); ++u32_ItString)
    {
       bool q_Skip = false;
       if (opu32_SkipIndex != NULL)
@@ -91,16 +90,16 @@ bool C_PuiSdUtil::h_CheckNameAvailable(const std::vector<const QString *> & orc_
    String for bus type
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_ConvertBusTypeToStringUppercase(const C_OSCSystemBus::E_Type & ore_Type)
+QString C_PuiSdUtil::h_ConvertBusTypeToStringUppercase(const C_OscSystemBus::E_Type & ore_Type)
 {
    QString c_Retval;
 
    switch (ore_Type)
    {
-   case stw_opensyde_core::C_OSCSystemBus::eCAN:
+   case stw::opensyde_core::C_OscSystemBus::eCAN:
       c_Retval = C_GtGetText::h_GetText("CAN");
       break;
-   case stw_opensyde_core::C_OSCSystemBus::eETHERNET:
+   case stw::opensyde_core::C_OscSystemBus::eETHERNET:
       c_Retval = C_GtGetText::h_GetText("ETHERNET");
       break;
    default:
@@ -120,22 +119,22 @@ QString C_PuiSdUtil::h_ConvertBusTypeToStringUppercase(const C_OSCSystemBus::E_T
    String for protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_ConvertProtocolTypeToString(const C_OSCCanProtocol::E_Type & ore_Type)
+QString C_PuiSdUtil::h_ConvertProtocolTypeToString(const C_OscCanProtocol::E_Type & ore_Type)
 {
    QString c_ProtocolName;
 
    switch (ore_Type)
    {
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eECES:
       c_ProtocolName = "ECeS";
       break;
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
       c_ProtocolName = "ECoS";
       break;
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eCAN_OPEN:
       c_ProtocolName = "CANopen";
       break;
-   case C_OSCCanProtocol::eLAYER2: // default case
+   case C_OscCanProtocol::eLAYER2: // default case
    default:
       c_ProtocolName = "OSI Layer 2";
       break;
@@ -153,22 +152,22 @@ QString C_PuiSdUtil::h_ConvertProtocolTypeToString(const C_OSCCanProtocol::E_Typ
    String for protocol type datapool name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(const C_OSCCanProtocol::E_Type oe_Type)
+QString C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(const C_OscCanProtocol::E_Type oe_Type)
 {
    QString c_ProtocolName;
 
    switch (oe_Type)
    {
-   case C_OSCCanProtocol::eECES:
+   case C_OscCanProtocol::eECES:
       c_ProtocolName = "ECeS";
       break;
-   case C_OSCCanProtocol::eCAN_OPEN_SAFETY:
+   case C_OscCanProtocol::eCAN_OPEN_SAFETY:
       c_ProtocolName = "ECoS";
       break;
-   case C_OSCCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eCAN_OPEN:
       c_ProtocolName = "CANopen";
       break;
-   case C_OSCCanProtocol::eLAYER2: // default case
+   case C_OscCanProtocol::eLAYER2: // default case
    default:
       // special case layer 2 -> no spaces and no underscore number at the end
       c_ProtocolName = "OSI_Layer2";
@@ -187,23 +186,23 @@ QString C_PuiSdUtil::h_ConvertProtocolTypeToDatapoolNameString(const C_OSCCanPro
    String for protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OSCNodeDataPool::E_Type & ore_Type)
+QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OscNodeDataPool::E_Type & ore_Type)
 {
    QString c_Name;
 
    switch (ore_Type)
    {
-   case C_OSCNodeDataPool::eCOM:
+   case C_OscNodeDataPool::eCOM:
       c_Name = "COMM";
       break;
-   case C_OSCNodeDataPool::eNVM:
+   case C_OscNodeDataPool::eNVM:
       c_Name = "NVM";
       break;
-   case C_OSCNodeDataPool::eHALC:     // For user is no difference between HALC and HALC_NVM Datapools
-   case C_OSCNodeDataPool::eHALC_NVM: // For user is no difference between HALC and HALC_NVM Datapools
+   case C_OscNodeDataPool::eHALC:     // For user is no difference between HALC and HALC_NVM Datapools
+   case C_OscNodeDataPool::eHALC_NVM: // For user is no difference between HALC and HALC_NVM Datapools
       c_Name = "HAL";
       break;
-   case C_OSCNodeDataPool::eDIAG: // default case
+   case C_OscNodeDataPool::eDIAG: // default case
    default:
       c_Name = "DIAG";
       break;
@@ -222,17 +221,17 @@ QString C_PuiSdUtil::h_ConvertDataPoolTypeToString(const C_OSCNodeDataPool::E_Ty
    Interface name
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, const uint8 ou8_InterfaceNumber)
+QString C_PuiSdUtil::h_GetInterfaceName(const C_OscSystemBus::E_Type oe_Type, const uint8_t ou8_InterfaceNumber)
 {
    QString c_Retval;
    QString c_Type;
 
    switch (oe_Type)
    {
-   case C_OSCSystemBus::eCAN:
+   case C_OscSystemBus::eCAN:
       c_Type = C_GtGetText::h_GetText("CAN");
       break;
-   case C_OSCSystemBus::eETHERNET:
+   case C_OscSystemBus::eETHERNET:
       c_Type = C_GtGetText::h_GetText("ETHERNET");
       break;
    default:
@@ -240,7 +239,7 @@ QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, co
       break;
    }
 
-   c_Retval = static_cast<QString>("%1%2").arg(c_Type).arg(static_cast<sintn>(ou8_InterfaceNumber) + 1);
+   c_Retval = static_cast<QString>("%1%2").arg(c_Type).arg(static_cast<int32_t>(ou8_InterfaceNumber) + 1);
    return c_Retval;
 }
 
@@ -256,16 +255,16 @@ QString C_PuiSdUtil::h_GetInterfaceName(const C_OSCSystemBus::E_Type oe_Type, co
    protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanProtocol::E_Type C_PuiSdUtil::h_GetRelatedCANProtocolType(const uint32 ou32_NodeIndex,
-                                                                  const uint32 ou32_DatapoolIndex)
+C_OscCanProtocol::E_Type C_PuiSdUtil::h_GetRelatedCanProtocolType(const uint32_t ou32_NodeIndex,
+                                                                  const uint32_t ou32_DatapoolIndex)
 {
-   C_OSCCanProtocol::E_Type e_Return = C_OSCCanProtocol::eLAYER2;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   C_OscCanProtocol::E_Type e_Return = C_OscCanProtocol::eLAYER2;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
-      const C_OSCCanProtocol * const pc_Protocol = pc_Node->GetRelatedCANProtocolConst(ou32_DatapoolIndex);
+      const C_OscCanProtocol * const pc_Protocol = pc_Node->GetRelatedCanProtocolConst(ou32_DatapoolIndex);
       tgl_assert(pc_Protocol != NULL);
       if (pc_Protocol != NULL)
       {
@@ -279,8 +278,8 @@ C_OSCCanProtocol::E_Type C_PuiSdUtil::h_GetRelatedCANProtocolType(const uint32 o
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert com datapool element index to message ID
 
-   \param[in]   orc_ElementID       Datapool element ID
-   \param[out]  orc_MessageID       Message ID
+   \param[in]   orc_ElementId       Datapool element ID
+   \param[out]  orc_MessageId       Message ID
    \param[out]  oru32_SignalIndex   Signal index
 
    \return
@@ -288,61 +287,61 @@ C_OSCCanProtocol::E_Type C_PuiSdUtil::h_GetRelatedCANProtocolType(const uint32 o
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_ElementID,
-                                   C_OSCCanMessageIdentificationIndices & orc_MessageID, uint32 & oru32_SignalIndex)
+int32_t C_PuiSdUtil::h_ConvertIndex(const C_OscNodeDataPoolListElementId & orc_ElementId,
+                                    C_OscCanMessageIdentificationIndices & orc_MessageId, uint32_t & oru32_SignalIndex)
 {
-   sint32 s32_Retval = C_RANGE;
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_ElementID.u32_NodeIndex);
+   int32_t s32_Retval = C_RANGE;
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_ElementId.u32_NodeIndex);
 
    //Node
-   orc_MessageID.u32_NodeIndex = orc_ElementID.u32_NodeIndex;
-   orc_MessageID.u32_DatapoolIndex = orc_ElementID.u32_DataPoolIndex;
+   orc_MessageId.u32_NodeIndex = orc_ElementId.u32_NodeIndex;
+   orc_MessageId.u32_DatapoolIndex = orc_ElementId.u32_DataPoolIndex;
    if (pc_Node != NULL)
    {
       bool q_Found = false;
       //Protocol
-      for (uint32 u32_ItProtocol = 0UL; u32_ItProtocol < pc_Node->c_ComProtocols.size(); ++u32_ItProtocol)
+      for (uint32_t u32_ItProtocol = 0UL; u32_ItProtocol < pc_Node->c_ComProtocols.size(); ++u32_ItProtocol)
       {
-         const C_OSCCanProtocol & rc_CurProtocol = pc_Node->c_ComProtocols[u32_ItProtocol];
-         if (rc_CurProtocol.u32_DataPoolIndex == orc_ElementID.u32_DataPoolIndex)
+         const C_OscCanProtocol & rc_CurProtocol = pc_Node->c_ComProtocols[u32_ItProtocol];
+         if (rc_CurProtocol.u32_DataPoolIndex == orc_ElementId.u32_DataPoolIndex)
          {
             q_Found = true;
-            orc_MessageID.e_ComProtocol = rc_CurProtocol.e_Type;
-            orc_MessageID.u32_InterfaceIndex = orc_ElementID.u32_ListIndex / 2;
+            orc_MessageId.e_ComProtocol = rc_CurProtocol.e_Type;
+            orc_MessageId.u32_InterfaceIndex = orc_ElementId.u32_ListIndex / 2;
          }
       }
       if (q_Found == true)
       {
-         const C_OSCNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(
-            orc_ElementID.u32_NodeIndex, orc_ElementID.u32_DataPoolIndex, orc_ElementID.u32_ListIndex);
-         const C_OSCCanMessageContainer * const pc_Container =
-            C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageID.u32_NodeIndex,
-                                                                            orc_MessageID.e_ComProtocol,
-                                                                            orc_MessageID.u32_InterfaceIndex,
-                                                                            orc_MessageID.u32_DatapoolIndex);
+         const C_OscNodeDataPoolList * const pc_List = C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(
+            orc_ElementId.u32_NodeIndex, orc_ElementId.u32_DataPoolIndex, orc_ElementId.u32_ListIndex);
+         const C_OscCanMessageContainer * const pc_Container =
+            C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainer(orc_MessageId.u32_NodeIndex,
+                                                                            orc_MessageId.e_ComProtocol,
+                                                                            orc_MessageId.u32_InterfaceIndex,
+                                                                            orc_MessageId.u32_DatapoolIndex);
          if ((pc_Container != NULL) && (pc_List != NULL))
          {
-            const std::vector<C_OSCCanMessage> * pc_Messages;
+            const std::vector<C_OscCanMessage> * pc_Messages;
 
-            if (C_OSCCanProtocol::h_ListIsComTx(*pc_List) == true)
+            if (C_OscCanProtocol::h_ListIsComTx(*pc_List) == true)
             {
-               orc_MessageID.q_MessageIsTx = true;
+               orc_MessageId.q_MessageIsTx = true;
                pc_Messages = &pc_Container->c_TxMessages;
             }
             else
             {
-               orc_MessageID.q_MessageIsTx = false;
+               orc_MessageId.q_MessageIsTx = false;
                pc_Messages = &pc_Container->c_RxMessages;
             }
-            for (uint32 u32_ItMessage = 0UL; u32_ItMessage < pc_Messages->size(); ++u32_ItMessage)
+            for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < pc_Messages->size(); ++u32_ItMessage)
             {
-               const C_OSCCanMessage & rc_CurMessage = (*pc_Messages)[u32_ItMessage];
-               for (uint32 u32_ItSignal = 0UL; u32_ItSignal < rc_CurMessage.c_Signals.size(); ++u32_ItSignal)
+               const C_OscCanMessage & rc_CurMessage = (*pc_Messages)[u32_ItMessage];
+               for (uint32_t u32_ItSignal = 0UL; u32_ItSignal < rc_CurMessage.c_Signals.size(); ++u32_ItSignal)
                {
-                  const C_OSCCanSignal & rc_Signal = rc_CurMessage.c_Signals[u32_ItSignal];
-                  if (rc_Signal.u32_ComDataElementIndex == orc_ElementID.u32_ElementIndex)
+                  const C_OscCanSignal & rc_Signal = rc_CurMessage.c_Signals[u32_ItSignal];
+                  if (rc_Signal.u32_ComDataElementIndex == orc_ElementId.u32_ElementIndex)
                   {
-                     orc_MessageID.u32_MessageIndex = u32_ItMessage;
+                     orc_MessageId.u32_MessageIndex = u32_ItMessage;
                      oru32_SignalIndex = u32_ItSignal;
                      s32_Retval = C_NO_ERR;
                   }
@@ -357,39 +356,39 @@ sint32 C_PuiSdUtil::h_ConvertIndex(const C_OSCNodeDataPoolListElementId & orc_El
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert Signal index to datapool index
 
-   \param[in]   orc_MessageID       Message ID
+   \param[in]   orc_MessageId       Message ID
    \param[in]   ou32_SignalIndex    Signal index in message
-   \param[out]  orc_ElementID       According element ID if any
+   \param[out]  orc_ElementId       According element ID if any
 
    \return
    C_NO_ERR Operation success
    C_RANGE  Operation failure: parameter invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OSCCanMessageIdentificationIndices & orc_MessageID,
-                                             const uint32 ou32_SignalIndex,
-                                             C_OSCNodeDataPoolListElementId & orc_ElementID)
+int32_t C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                              const uint32_t ou32_SignalIndex,
+                                              C_OscNodeDataPoolListElementId & orc_ElementId)
 {
-   sint32 s32_Retval = C_RANGE;
-   const C_OSCNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPool(
-      orc_MessageID.u32_NodeIndex, orc_MessageID.e_ComProtocol, orc_MessageID.u32_DatapoolIndex);
+   int32_t s32_Retval = C_RANGE;
+   const C_OscNodeDataPool * const pc_DataPool = C_PuiSdHandler::h_GetInstance()->GetOscCanDataPool(
+      orc_MessageId.u32_NodeIndex, orc_MessageId.e_ComProtocol, orc_MessageId.u32_DatapoolIndex);
 
    //Node
-   orc_ElementID.u32_NodeIndex = orc_MessageID.u32_NodeIndex;
+   orc_ElementId.u32_NodeIndex = orc_MessageId.u32_NodeIndex;
    if (pc_DataPool != NULL)
    {
-      const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageID);
+      const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
       //Datapool
-      orc_ElementID.u32_DataPoolIndex = orc_MessageID.u32_DatapoolIndex;
+      orc_ElementId.u32_DataPoolIndex = orc_MessageId.u32_DatapoolIndex;
       //List
-      if (((C_OSCCanProtocol::h_GetComListIndex(*pc_DataPool, orc_MessageID.u32_InterfaceIndex,
-                                                orc_MessageID.q_MessageIsTx,
-                                                orc_ElementID.u32_ListIndex) == C_NO_ERR) && (pc_Message != NULL)) &&
+      if (((C_OscCanProtocol::h_GetComListIndex(*pc_DataPool, orc_MessageId.u32_InterfaceIndex,
+                                                orc_MessageId.q_MessageIsTx,
+                                                orc_ElementId.u32_ListIndex) == C_NO_ERR) && (pc_Message != NULL)) &&
           (ou32_SignalIndex < pc_Message->c_Signals.size()))
       {
-         const C_OSCCanSignal & rc_Signal = pc_Message->c_Signals[ou32_SignalIndex];
+         const C_OscCanSignal & rc_Signal = pc_Message->c_Signals[ou32_SignalIndex];
          //Element
-         orc_ElementID.u32_ElementIndex = rc_Signal.u32_ComDataElementIndex;
+         orc_ElementId.u32_ElementIndex = rc_Signal.u32_ComDataElementIndex;
          //Signal success
          s32_Retval = C_NO_ERR;
       }
@@ -404,7 +403,7 @@ sint32 C_PuiSdUtil::h_ConvertFromSignalIndex(const C_OSCCanMessageIdentification
    Default message cycle time
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSdUtil::h_GetDefaultMessageCycleTime(void)
+uint32_t C_PuiSdUtil::h_GetDefaultMessageCycleTime(void)
 {
    return 100U;
 }
@@ -420,7 +419,7 @@ uint32 C_PuiSdUtil::h_GetDefaultMessageCycleTime(void)
    Calculated timeout time
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSdUtil::h_GetMessageAutoTimeoutTime(const uint32 ou32_CycleTime)
+uint32_t C_PuiSdUtil::h_GetMessageAutoTimeoutTime(const uint32_t ou32_CycleTime)
 {
    return (ou32_CycleTime * 3U) + 10U;
 }
@@ -434,21 +433,21 @@ uint32 C_PuiSdUtil::h_GetMessageAutoTimeoutTime(const uint32 ou32_CycleTime)
    Namespace node::datapool::list::element resp. node::datapool::message::signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetNamespace(const C_OSCNodeDataPoolListElementId & orc_Id)
+QString C_PuiSdUtil::h_GetNamespace(const C_OscNodeDataPoolListElementId & orc_Id)
 {
    QString c_Retval;
 
-   const C_OSCNode * const pc_Node =
-      C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_Id.u32_NodeIndex);
-   const C_OSCNodeDataPool * const pc_DataPool =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
+   const C_OscNode * const pc_Node =
+      C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_Id.u32_NodeIndex);
+   const C_OscNodeDataPool * const pc_DataPool =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_Id.u32_NodeIndex,
                                                       orc_Id.u32_DataPoolIndex);
-   const C_OSCNodeDataPoolList * const pc_List =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(orc_Id.u32_NodeIndex,
+   const C_OscNodeDataPoolList * const pc_List =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(orc_Id.u32_NodeIndex,
                                                           orc_Id.u32_DataPoolIndex,
                                                           orc_Id.u32_ListIndex);
-   const C_OSCNodeDataPoolListElement * const pc_Element =
-      C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_Id.u32_NodeIndex,
+   const C_OscNodeDataPoolListElement * const pc_Element =
+      C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_Id.u32_NodeIndex,
                                                                  orc_Id.u32_DataPoolIndex,
                                                                  orc_Id.u32_ListIndex,
                                                                  orc_Id.u32_ElementIndex);
@@ -456,15 +455,15 @@ QString C_PuiSdUtil::h_GetNamespace(const C_OSCNodeDataPoolListElementId & orc_I
    if ((((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL)) && (pc_Element != NULL))
    {
       // special handling for signals: instead of list better show message name
-      if (pc_DataPool->e_Type == C_OSCNodeDataPool::eCOM)
+      if (pc_DataPool->e_Type == C_OscNodeDataPool::eCOM)
       {
          QString c_ElementName = pc_Element->c_Name.c_str(); // to have an adequate default
-         C_OSCCanMessageIdentificationIndices c_MessageID;
-         uint32 u32_SignalIndex;
+         C_OscCanMessageIdentificationIndices c_MessageId;
+         uint32_t u32_SignalIndex;
 
-         if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageID, u32_SignalIndex) == C_NO_ERR)
+         if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageId, u32_SignalIndex) == C_NO_ERR)
          {
-            const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageID);
+            const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
             if (pc_Message != NULL)
             {
                c_ElementName = static_cast<QString>("%1::%2").arg(pc_Message->c_Name.c_str()).arg(
@@ -484,7 +483,7 @@ QString C_PuiSdUtil::h_GetNamespace(const C_OSCNodeDataPoolListElementId & orc_I
                     arg(pc_DataPool->c_Name.c_str()).
                     arg(pc_List->c_Name.c_str()).
                     arg(pc_Element->c_Name.c_str());
-         // HALC extra handling not possible if only C_OSCNodeDataPoolListElementId is provided
+         // HALC extra handling not possible if only C_OscNodeDataPoolListElementId is provided
       }
    }
 
@@ -500,25 +499,25 @@ QString C_PuiSdUtil::h_GetNamespace(const C_OSCNodeDataPoolListElementId & orc_I
    Namespace
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetSignalNamespace(const C_OSCNodeDataPoolListElementId & orc_Id)
+QString C_PuiSdUtil::h_GetSignalNamespace(const C_OscNodeDataPoolListElementId & orc_Id)
 {
    QString c_Retval;
-   C_OSCCanMessageIdentificationIndices c_MessageID;
-   uint32 u32_SignalIndex;
+   C_OscCanMessageIdentificationIndices c_MessageId;
+   uint32_t u32_SignalIndex;
 
-   if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageID, u32_SignalIndex) == C_NO_ERR)
+   if (C_PuiSdUtil::h_ConvertIndex(orc_Id, c_MessageId, u32_SignalIndex) == C_NO_ERR)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_MessageID.u32_NodeIndex);
-      if ((pc_Node != NULL) && (c_MessageID.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_MessageId.u32_NodeIndex);
+      if ((pc_Node != NULL) && (c_MessageId.u32_InterfaceIndex < pc_Node->c_Properties.c_ComInterfaces.size()))
       {
-         const C_OSCNodeComInterfaceSettings & rc_Interface =
-            pc_Node->c_Properties.c_ComInterfaces[c_MessageID.u32_InterfaceIndex];
+         const C_OscNodeComInterfaceSettings & rc_Interface =
+            pc_Node->c_Properties.c_ComInterfaces[c_MessageId.u32_InterfaceIndex];
          if (rc_Interface.GetBusConnected() == true)
          {
-            const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(rc_Interface.u32_BusIndex);
-            const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageID);
-            const C_OSCNodeDataPoolListElement * const pc_Element =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(orc_Id.u32_NodeIndex,
+            const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(rc_Interface.u32_BusIndex);
+            const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MessageId);
+            const C_OscNodeDataPoolListElement * const pc_Element =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(orc_Id.u32_NodeIndex,
                                                                           orc_Id.u32_DataPoolIndex,
                                                                           orc_Id.u32_ListIndex,
                                                                           orc_Id.u32_ElementIndex);
@@ -545,22 +544,22 @@ QString C_PuiSdUtil::h_GetSignalNamespace(const C_OSCNodeDataPoolListElementId &
    HALC namespace
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
+QString C_PuiSdUtil::h_GetHalcNamespace(const C_PuiSvDbNodeDataPoolListElementId & orc_Id)
 {
    QString c_Retval = C_GtGetText::h_GetText("Unknown HAL data element");
-   uint32 u32_DomainIndex;
+   uint32_t u32_DomainIndex;
    bool q_UseChannelIndex;
-   uint32 u32_ChannelIndex;
+   uint32_t u32_ChannelIndex;
 
-   C_OSCHalcDefDomain::E_VariableSelector e_Selector;
-   uint32 u32_ParameterIndex;
+   C_OscHalcDefDomain::E_VariableSelector e_Selector;
+   uint32_t u32_ParameterIndex;
    bool q_UseElementIndex;
-   uint32 u32_ParameterElementIndex;
+   uint32_t u32_ParameterElementIndex;
    bool q_IsUseCaseIndex;
    bool q_IsChanNumIndex;
    bool q_IsSafetyFlagIndex;
 
-   if (C_PuiSdHandler::h_GetInstance()->TranslateToHALCIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
+   if (C_PuiSdHandler::h_GetInstance()->TranslateToHalcIndex(orc_Id, orc_Id.GetArrayElementIndexOrZero(),
                                                              u32_DomainIndex, q_UseChannelIndex,
                                                              u32_ChannelIndex, e_Selector, u32_ParameterIndex,
                                                              q_UseElementIndex,
@@ -568,22 +567,22 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
                                                              q_IsChanNumIndex, q_IsSafetyFlagIndex) == C_NO_ERR)
    {
       {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(orc_Id.u32_NodeIndex);
-         const C_OSCNodeDataPool * const pc_DataPool =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(orc_Id.u32_NodeIndex,
+         const C_OscNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(orc_Id.u32_NodeIndex);
+         const C_OscNodeDataPool * const pc_DataPool =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPool(orc_Id.u32_NodeIndex,
                                                             orc_Id.u32_DataPoolIndex);
-         const C_OSCNodeDataPoolList * const pc_List =
-            C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolList(orc_Id.u32_NodeIndex,
+         const C_OscNodeDataPoolList * const pc_List =
+            C_PuiSdHandler::h_GetInstance()->GetOscDataPoolList(orc_Id.u32_NodeIndex,
                                                                 orc_Id.u32_DataPoolIndex,
                                                                 orc_Id.u32_ListIndex);
-         const C_OSCHalcConfigChannel * const pc_Config =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainChannelConfigData(orc_Id.u32_NodeIndex,
+         const C_OscHalcConfigChannel * const pc_Config =
+            C_PuiSdHandler::h_GetInstance()->GetHalcDomainChannelConfigData(orc_Id.u32_NodeIndex,
                                                                             u32_DomainIndex,
                                                                             u32_ChannelIndex,
                                                                             q_UseChannelIndex);
-         const C_OSCHalcDefDomain * const pc_Domain =
-            C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileDataConst(orc_Id.u32_NodeIndex,
+         const C_OscHalcDefDomain * const pc_Domain =
+            C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileDataConst(orc_Id.u32_NodeIndex,
                                                                         u32_DomainIndex);
 
          if (((((pc_Node != NULL) && (pc_DataPool != NULL)) && (pc_List != NULL)) && (pc_Config != NULL)) &&
@@ -593,20 +592,20 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
 
             if (q_IsUseCaseIndex)
             {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetUseCaseVariableName(pc_Domain->c_SingularName).c_str();
+               c_ElementName = C_OscHalcMagicianUtil::h_GetUseCaseVariableName(pc_Domain->c_SingularName).c_str();
             }
             else if (q_IsChanNumIndex)
             {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
+               c_ElementName = C_OscHalcMagicianUtil::h_GetChanNumVariableName(pc_Domain->c_SingularName).c_str();
             }
             else if (q_IsSafetyFlagIndex)
             {
-               c_ElementName = C_OSCHALCMagicianUtil::h_GetSafetyFlagVariableName(pc_Domain->c_SingularName).c_str();
+               c_ElementName = C_OscHalcMagicianUtil::h_GetSafetyFlagVariableName(pc_Domain->c_SingularName).c_str();
             }
             else
             {
-               const C_OSCHalcDefStruct * const pc_Param =
-                  C_PuiSdHandler::h_GetInstance()->GetHALCDomainFileVariableData(orc_Id.u32_NodeIndex,
+               const C_OscHalcDefStruct * const pc_Param =
+                  C_PuiSdHandler::h_GetInstance()->GetHalcDomainFileVariableData(orc_Id.u32_NodeIndex,
                                                                                  u32_DomainIndex, e_Selector,
                                                                                  u32_ParameterIndex);
                c_ElementName = pc_Param->c_Display.c_str();
@@ -614,7 +613,7 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
                {
                   if (u32_ParameterElementIndex < pc_Param->c_StructElements.size())
                   {
-                     const C_OSCHalcDefElement & rc_Param = pc_Param->c_StructElements[u32_ParameterElementIndex];
+                     const C_OscHalcDefElement & rc_Param = pc_Param->c_StructElements[u32_ParameterElementIndex];
                      c_ElementName = rc_Param.c_Display.c_str();
                   }
                }
@@ -642,10 +641,10 @@ QString C_PuiSdUtil::h_GetHALCNamespace(const C_PuiSvDbNodeDataPoolListElementId
    sub node name from sub device definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetSubNodeDeviceName(const uint32 ou32_NodeIndex)
+QString C_PuiSdUtil::h_GetSubNodeDeviceName(const uint32_t ou32_NodeIndex)
 {
    QString c_Retval = "";
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL))
    {
@@ -669,17 +668,17 @@ QString C_PuiSdUtil::h_GetSubNodeDeviceName(const uint32 ou32_NodeIndex)
    node base name if sub node, else node name (or empty string if index is invalid)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_PuiSdUtil::h_GetNodeBaseNameOrName(const uint32 ou32_NodeIndex)
+QString C_PuiSdUtil::h_GetNodeBaseNameOrName(const uint32_t ou32_NodeIndex)
 {
    QString c_Return = "";
-   uint32 u32_NodeSquadIndex;
+   uint32_t u32_NodeSquadIndex;
 
    if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
                                                                        u32_NodeSquadIndex) == C_NO_ERR)
    {
       // part of a node squad
-      const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+      const stw::opensyde_core::C_OscNodeSquad * const pc_NodeSquad =
+         C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_NodeSquadIndex);
       if (pc_NodeSquad != NULL)
       {
          c_Return = pc_NodeSquad->c_BaseName.c_str();
@@ -688,8 +687,8 @@ QString C_PuiSdUtil::h_GetNodeBaseNameOrName(const uint32 ou32_NodeIndex)
    else
    {
       // normal node
-      const stw_opensyde_core::C_OSCNode * const pc_Node =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      const stw::opensyde_core::C_OscNode * const pc_Node =
+         C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
       if (pc_Node != NULL)
       {
          c_Return = pc_Node->c_Properties.c_Name.c_str();
@@ -712,17 +711,17 @@ QString C_PuiSdUtil::h_GetNodeBaseNameOrName(const uint32 ou32_NodeIndex)
    index of first node in squad
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(const uint32 ou32_NodeIndex)
+uint32_t C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(const uint32_t ou32_NodeIndex)
 {
-   uint32 u32_FirstNodeIndex = ou32_NodeIndex;
+   uint32_t u32_FirstNodeIndex = ou32_NodeIndex;
 
-   uint32 u32_NodeSquadIndex;
+   uint32_t u32_NodeSquadIndex;
 
    if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(ou32_NodeIndex,
                                                                        u32_NodeSquadIndex) == C_NO_ERR)
    {
-      const stw_opensyde_core::C_OSCNodeSquad * const pc_NodeSquad =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeSquadConst(u32_NodeSquadIndex);
+      const stw::opensyde_core::C_OscNodeSquad * const pc_NodeSquad =
+         C_PuiSdHandler::h_GetInstance()->GetOscNodeSquadConst(u32_NodeSquadIndex);
       if ((pc_NodeSquad != NULL) && (pc_NodeSquad->c_SubNodeIndexes.size() > 0))
       {
          u32_FirstNodeIndex = pc_NodeSquad->c_SubNodeIndexes[0];
@@ -742,16 +741,16 @@ uint32 C_PuiSdUtil::h_GetIndexOfFirstNodeInGroup(const uint32 ou32_NodeIndex)
    Is first in any group or not in any
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(const uint32 ou32_NodeIndex,
-                                                     const std::vector<C_OSCNodeSquad> & orc_AvailableGroups)
+bool C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(const uint32_t ou32_NodeIndex,
+                                                     const std::vector<C_OscNodeSquad> & orc_AvailableGroups)
 {
    bool q_IsFirst = true;
 
-   for (uint32 u32_ItGroup = 0; u32_ItGroup < orc_AvailableGroups.size(); ++u32_ItGroup)
+   for (uint32_t u32_ItGroup = 0; u32_ItGroup < orc_AvailableGroups.size(); ++u32_ItGroup)
    {
-      const C_OSCNodeSquad & rc_Group = orc_AvailableGroups[u32_ItGroup];
+      const C_OscNodeSquad & rc_Group = orc_AvailableGroups[u32_ItGroup];
 
-      for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
+      for (uint32_t u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
       {
          if (ou32_NodeIndex == rc_Group.c_SubNodeIndexes[u32_ItSubDevice])
          {
@@ -774,37 +773,37 @@ bool C_PuiSdUtil::h_CheckIsFirstInAnyGroupOrNotInAny(const uint32 ou32_NodeIndex
    \param[in,out]  orc_Properties      Properties
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32 ou32_NodeIndex,
+void C_PuiSdUtil::h_GetInterfaceDataForNode(const uint32_t ou32_NodeIndex,
                                             const C_PuiSdNodeConnectionId & orc_ConnectionId,
                                             std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties)
 {
-   const std::vector<uint32> c_NodeIndices =
+   const std::vector<uint32_t> c_NodeIndices =
       C_PuiSdHandler::h_GetInstance()->GetAllNodeGroupIndicesUsingNodeIndex(ou32_NodeIndex);
 
    orc_Properties.clear();
    orc_Properties.reserve(c_NodeIndices.size());
-   for (uint32 u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
+   for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeIndices.size(); ++u32_ItNode)
    {
-      const C_OSCNode * const pc_NodeData =
-         C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndices[u32_ItNode]);
+      const C_OscNode * const pc_NodeData =
+         C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndices[u32_ItNode]);
       if (pc_NodeData != NULL)
       {
-         for (uint32 u32_ItComInterface =
+         for (uint32_t u32_ItComInterface =
                  0; u32_ItComInterface < pc_NodeData->c_Properties.c_ComInterfaces.size();
               ++u32_ItComInterface)
          {
-            const C_OSCNodeComInterfaceSettings & rc_ComInterface =
+            const C_OscNodeComInterfaceSettings & rc_ComInterface =
                pc_NodeData->c_Properties.c_ComInterfaces[u32_ItComInterface];
             if ((rc_ComInterface.u8_InterfaceNumber == orc_ConnectionId.u8_InterfaceNumber) &&
                 (orc_ConnectionId.e_InterfaceType == rc_ComInterface.e_InterfaceType))
             {
                C_PuiSdNodeInterfaceAutomaticProperties c_Property;
-               c_Property.c_IP.reserve(4);
-               for (uint32 u32_It = 0UL; u32_It < 4; ++u32_It)
+               c_Property.c_Ip.reserve(4);
+               for (uint32_t u32_It = 0UL; u32_It < 4; ++u32_It)
                {
-                  c_Property.c_IP.push_back(rc_ComInterface.c_Ip.au8_IpAddress[u32_It]);
+                  c_Property.c_Ip.push_back(rc_ComInterface.c_Ip.au8_IpAddress[u32_It]);
                }
-               c_Property.u8_NodeId = rc_ComInterface.u8_NodeID;
+               c_Property.u8_NodeId = rc_ComInterface.u8_NodeId;
                orc_Properties.push_back(c_Property);
             }
          }

@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "stwtypes.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SdNdeUnoLeDataPoolListElementMoveCommand.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeUnoUtil.h"
+#include "C_Uti.hpp"
+#include "stwtypes.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SdNdeUnoLeDataPoolListElementMoveCommand.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeUnoUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,10 +48,10 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out] opc_Parent                       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoLeDataPoolListElementMoveCommand::C_SdNdeUnoLeDataPoolListElementMoveCommand(const uint32 & oru32_NodeIndex,
-                                                                                       const uint32 & oru32_DataPoolIndex, const uint32 & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                                                       const std::vector<uint32> & orc_SourceRow,
-                                                                                       const std::vector<uint32> & orc_TargetRow, const bool & orq_AdaptIndices,
+C_SdNdeUnoLeDataPoolListElementMoveCommand::C_SdNdeUnoLeDataPoolListElementMoveCommand(const uint32_t & oru32_NodeIndex,
+                                                                                       const uint32_t & oru32_DataPoolIndex, const uint32_t & oru32_DataPoolListIndex, C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
+                                                                                       const std::vector<uint32_t> & orc_SourceRow,
+                                                                                       const std::vector<uint32_t> & orc_TargetRow, const bool & orq_AdaptIndices,
                                                                                        QUndoCommand * const opc_Parent)
    :
    C_SdNdeUnoLeDataPoolListElementAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
@@ -79,9 +78,9 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::redo(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
-         const uint16 u16_TimerId = osc_write_log_performance_start();
+         const uint16_t u16_TimerId = osc_write_log_performance_start();
 
-         std::vector<std::vector<uint32> > c_Items;
+         std::vector<std::vector<uint32_t> > c_Items;
 
          pc_Model->DoMoveRows(mc_SourceRow, mc_TargetRow);
          //Sort ascending, only done for the "source" row which is not necessary here
@@ -107,9 +106,9 @@ void C_SdNdeUnoLeDataPoolListElementMoveCommand::undo(void)
          this->mu32_NodeIndex, this->mu32_DataPoolIndex, this->mu32_DataPoolListIndex);
       if (pc_Model != NULL)
       {
-         const uint16 u16_TimerId = osc_write_log_performance_start();
+         const uint16_t u16_TimerId = osc_write_log_performance_start();
 
-         std::vector<std::vector<uint32> > c_Items;
+         std::vector<std::vector<uint32_t> > c_Items;
 
          pc_Model->DoMoveRows(mc_TargetRow, mc_SourceRow);
          //Sort ascending, only done for the "source" row which is not necessary here

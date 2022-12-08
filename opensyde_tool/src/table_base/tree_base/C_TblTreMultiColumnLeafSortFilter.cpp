@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_TblTreMultiColumnLeafSortFilter.h"
+#include "stwtypes.hpp"
+#include "C_TblTreMultiColumnLeafSortFilter.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,10 +52,10 @@ bool C_TblTreMultiColumnLeafSortFilter::m_Contains(const QModelIndex & orc_Index
 {
    bool q_Retval = false;
 
-   for (sintn sn_Col = 0; (sn_Col < orc_Index.model()->columnCount()) && (q_Retval == false); ++sn_Col)
+   for (int32_t s32_Col = 0; (s32_Col < orc_Index.model()->columnCount()) && (q_Retval == false); ++s32_Col)
    {
-      const QModelIndex c_Index = orc_Index.model()->index(orc_Index.row(), sn_Col, orc_Index.parent());
-      const QString c_Name = orc_Index.model()->data(c_Index, static_cast<sintn>(Qt::DisplayRole)).toString();
+      const QModelIndex c_Index = orc_Index.model()->index(orc_Index.row(), s32_Col, orc_Index.parent());
+      const QString c_Name = orc_Index.model()->data(c_Index, static_cast<int32_t>(Qt::DisplayRole)).toString();
       q_Retval = c_Name.contains(filterRegExp());
    }
 
@@ -89,17 +88,17 @@ bool C_TblTreMultiColumnLeafSortFilter::lessThan(const QModelIndex & orc_SourceL
       const QModelIndex c_ParentChildRight = orc_SourceRight.model()->index(
          orc_SourceRight.row(), 0, orc_SourceRight.parent());
       q_Retval = true;
-      for (sintn sn_ChildLeft = 0;
-           (sn_ChildLeft < orc_SourceLeft.model()->rowCount(c_ParentChildLeft)) && (q_Retval == true);
-           ++sn_ChildLeft)
+      for (int32_t s32_ChildLeft = 0;
+           (s32_ChildLeft < orc_SourceLeft.model()->rowCount(c_ParentChildLeft)) && (q_Retval == true);
+           ++s32_ChildLeft)
       {
-         const QModelIndex c_ChildLeft = orc_SourceLeft.model()->index(sn_ChildLeft,
+         const QModelIndex c_ChildLeft = orc_SourceLeft.model()->index(s32_ChildLeft,
                                                                        orc_SourceLeft.column(), c_ParentChildLeft);
-         for (sintn sn_ChildRight = 0;
-              (sn_ChildRight < orc_SourceRight.model()->rowCount(c_ParentChildRight)) && (q_Retval == true);
-              ++sn_ChildRight)
+         for (int32_t s32_ChildRight = 0;
+              (s32_ChildRight < orc_SourceRight.model()->rowCount(c_ParentChildRight)) && (q_Retval == true);
+              ++s32_ChildRight)
          {
-            const QModelIndex c_ChildRight = orc_SourceRight.model()->index(sn_ChildRight,
+            const QModelIndex c_ChildRight = orc_SourceRight.model()->index(s32_ChildRight,
                                                                             orc_SourceRight.column(),
                                                                             c_ParentChildRight);
             if (!this->lessThan(c_ChildLeft, c_ChildRight))

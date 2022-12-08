@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GiSdArrow.h"
-#include "C_PuiSdHandler.h"
+#include "stwtypes.hpp"
+#include "C_GiSdArrow.hpp"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,23 +38,23 @@ using namespace stw_opensyde_gui_logic;
    Set up GUI with all elements.
 
    \param[in]     ors32_Index Index of data element in system definition
-   \param[in]     oru64_ID    Unique ID
+   \param[in]     oru64_Id    Unique ID
    \param[in]     opc_Points  Points for line
    \param[in,out] opc_Parent  Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSdArrow::C_GiSdArrow(const sint32 & ors32_Index, const uint64 & oru64_ID,
+C_GiSdArrow::C_GiSdArrow(const int32_t & ors32_Index, const uint64_t & oru64_Id,
                          const std::vector<QPointF> * const opc_Points, QGraphicsItem * const opc_Parent) :
-   C_GiBiArrow(oru64_ID, opc_Points, opc_Parent),
+   C_GiBiArrow(oru64_Id, opc_Points, opc_Parent),
    C_PuiSdDataElement(ors32_Index, C_PuiSdDataElement::eLINE_ARROW)
 {
    if (opc_Points == NULL)
    {
       if ((this->ms32_Index >= 0) &&
-          (static_cast<uint32>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
+          (static_cast<uint32_t>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
       {
          C_PuiBsLineArrow & rc_ArrowData = C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows[this->ms32_Index];
-         m_Init(rc_ArrowData.c_UIInteractionPoints);
+         m_Init(rc_ArrowData.c_UiInteractionPoints);
          this->C_GiSdArrow::LoadData();
       }
    }
@@ -70,7 +69,7 @@ C_GiSdArrow::C_GiSdArrow(const sint32 & ors32_Index, const uint64 & oru64_ID,
 void C_GiSdArrow::LoadData(void)
 {
    if ((this->ms32_Index >= 0) &&
-       (static_cast<uint32>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
+       (static_cast<uint32_t>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
    {
       m_LoadFromData(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows[this->ms32_Index]);
    }
@@ -85,7 +84,7 @@ void C_GiSdArrow::LoadData(void)
 void C_GiSdArrow::UpdateData(void)
 {
    if ((this->ms32_Index >= 0) &&
-       (static_cast<uint32>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
+       (static_cast<uint32_t>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
    {
       m_UpdateData(C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows[this->ms32_Index]);
    }
@@ -98,22 +97,22 @@ void C_GiSdArrow::UpdateData(void)
 void C_GiSdArrow::DeleteData(void)
 {
    if ((this->ms32_Index >= 0) &&
-       (static_cast<uint32>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
+       (static_cast<uint32_t>(this->ms32_Index) < C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.size()))
    {
       C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.erase(
-         C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.begin() + static_cast<uint32>(this->ms32_Index));
+         C_PuiSdHandler::h_GetInstance()->c_Elements.c_LineArrows.begin() + static_cast<uint32_t>(this->ms32_Index));
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSdArrow::SetZValueCustom(const float64 of64_ZValue)
+void C_GiSdArrow::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiBiArrow::SetZValueCustom(of64_ZValue);
+   C_GiBiArrow::SetZetValueCustom(of64_ZetValue);
    //Apply to data
    this->UpdateData();
 }

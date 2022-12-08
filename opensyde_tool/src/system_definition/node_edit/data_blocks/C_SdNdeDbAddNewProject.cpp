@@ -10,37 +10,36 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDir>
 #include <QFileDialog>
 
-#include "C_Uti.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_ImpUtil.h"
-#include "C_PuiUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_OSCUtils.h"
-#include "C_GtGetText.h"
-#include "C_OSCZipFile.h"
-#include "C_PuiProject.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_SdNdeDbAddNewProject.h"
+#include "C_Uti.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscZipFile.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_SdNdeDbAddNewProject.hpp"
 #include "ui_C_SdNdeDbAddNewProject.h"
-#include "C_OSCTargetSupportPackageFiler.h"
+#include "C_OscTargetSupportPackageFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SdNdeDbAddNewProject::mhc_START_TD = "<td style=\"padding: 0 9px 0 0;\">";
@@ -66,8 +65,8 @@ const QString C_SdNdeDbAddNewProject::mhc_SUFFIX = "syde_tsp";
    \param[in,out] orc_Parent            Reference to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
-                                               stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32_t ou32_NodeIndex,
+                                               stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbAddNewProject),
    ms32_TSPReadResult(-1),
@@ -94,11 +93,11 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeDbAddNewProject::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_SdNdeDbAddNewProject::m_CancelClicked);
    connect(this->mpc_Ui->pc_PushButtonTSP, &QPushButton::clicked, this,
-           &C_SdNdeDbAddNewProject::m_TSPButtonClicked);
+           &C_SdNdeDbAddNewProject::m_TspButtonClicked);
    connect(this->mpc_Ui->pc_PushButtonCreateIn, &QPushButton::clicked, this,
            &C_SdNdeDbAddNewProject::m_CreateInButtonClicked);
    connect(this->mpc_Ui->pc_LineEditTSP, &C_OgeLeFilePath::editingFinished,
-           this, &C_SdNdeDbAddNewProject::m_OnLoadTSP);
+           this, &C_SdNdeDbAddNewProject::m_OnLoadTsp);
    connect(this->mpc_Ui->pc_LineEditCreateIn, &C_OgeLeFilePath::SigPathDropped,
            this, &C_SdNdeDbAddNewProject::m_OnDroppedCreatinPath);
 }
@@ -107,7 +106,7 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32 ou32_NodeIndex,
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeDbAddNewProject::~C_SdNdeDbAddNewProject(void)
+C_SdNdeDbAddNewProject::~C_SdNdeDbAddNewProject(void) noexcept
 {
    delete this->mpc_Ui;
 }
@@ -152,7 +151,7 @@ void C_SdNdeDbAddNewProject::InitStaticNames(void) const
    Current TSP path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SdNdeDbAddNewProject::GetTSPPath(void) const
+QString C_SdNdeDbAddNewProject::GetTspPath(void) const
 {
    return C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath());
 }
@@ -166,10 +165,10 @@ QString C_SdNdeDbAddNewProject::GetTSPPath(void) const
    \param[in] orc_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::SetTSPPath(const QString & orc_New)
+void C_SdNdeDbAddNewProject::SetTspPath(const QString & orc_New)
 {
    this->mpc_Ui->pc_LineEditTSP->SetPath(orc_New, C_PuiProject::h_GetInstance()->GetFolderPath());
-   this->m_OnLoadTSP();
+   this->m_OnLoadTsp();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -179,7 +178,7 @@ void C_SdNdeDbAddNewProject::SetTSPPath(const QString & orc_New)
    Number of applications in current TSP
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDbAddNewProject::GetTSPApplicationCount(void) const
+uint32_t C_SdNdeDbAddNewProject::GetTspApplicationCount(void) const
 {
    return this->mc_Package.c_Applications.size();
 }
@@ -187,18 +186,18 @@ uint32 C_SdNdeDbAddNewProject::GetTSPApplicationCount(void) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Add selected project to application
 
-   \param[in]     ou32_TSPIndex     Application index in TSP
+   \param[in]     ou32_TspIndex     Application index in TSP
    \param[in,out] orc_Application   Application to apply new properties to
    \param[out]    orc_Warnings      Warnings that occured
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OSCNodeApplication & orc_Application,
+void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32_t ou32_TspIndex, C_OscNodeApplication & orc_Application,
                                                 QString & orc_Warnings) const
 {
-   if (ou32_TSPIndex < this->mc_Package.c_Applications.size())
+   if (ou32_TspIndex < this->mc_Package.c_Applications.size())
    {
       QString c_CodeGeneratorPath;
-      const C_OSCTSPApplication & rc_SelectedApp = this->mc_Package.c_Applications[ou32_TSPIndex];
+      const C_OscTspApplication & rc_SelectedApp = this->mc_Package.c_Applications[ou32_TspIndex];
       const QString c_ProjectPath =
          C_Uti::h_ConcatPathIfNecessary(this->mpc_Ui->pc_LineEditCreateIn->GetPath(),
                                         rc_SelectedApp.c_ProjectFolder.c_str());
@@ -209,7 +208,7 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
       orc_Application.u8_ProcessId = rc_SelectedApp.u8_ProcessId;
       // do not concatenate project path with syde-file path because we support relative paths here
       orc_Application.c_ProjectPath = c_ProjectPath.toStdString().c_str();
-      orc_Application.c_IDECall = rc_SelectedApp.c_IdeCall;
+      orc_Application.c_IdeCall = rc_SelectedApp.c_IdeCall;
       orc_Application.u16_GenCodeVersion = rc_SelectedApp.u16_GenCodeVersion;
 
       // for psi generation the generation path can not be edited and therefore should be empty;
@@ -232,9 +231,9 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
       }
 
       //Handle default file generator flag
-      if (rc_SelectedApp.q_IsStandardSydeCoderC == true)
+      if (rc_SelectedApp.q_IsStandardSydeCoderCe == true)
       {
-         c_CodeGeneratorPath = C_ImpUtil::h_GetSydeCoderCPath();
+         c_CodeGeneratorPath = C_ImpUtil::h_GetSydeCoderCePath();
       }
       else
       {
@@ -245,17 +244,17 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
       // Handle file generation flags
       if (rc_SelectedApp.q_IsProgrammable == true)
       {
-         orc_Application.e_Type = C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION;
+         orc_Application.e_Type = C_OscNodeApplication::ePROGRAMMABLE_APPLICATION;
       }
       else
       {
          if (rc_SelectedApp.q_GeneratesPsiFiles == true)
          {
-            orc_Application.e_Type = C_OSCNodeApplication::ePARAMETER_SET_HALC;
+            orc_Application.e_Type = C_OscNodeApplication::ePARAMETER_SET_HALC;
          }
          else
          {
-            orc_Application.e_Type = C_OSCNodeApplication::eBINARY;
+            orc_Application.e_Type = C_OscNodeApplication::eBINARY;
          }
       }
    }
@@ -267,15 +266,15 @@ void C_SdNdeDbAddNewProject::AddSelectedProject(const uint32 ou32_TSPIndex, C_OS
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::HandleCodeGenerationConfig(void) const
 {
-   C_OSCNodeOpenSYDEServerSettings c_DPDSettings;
-   const C_OSCNodeCodeExportSettings c_GeneralSettings = this->mc_Package.c_CodeExportSettings;
+   C_OscNodeOpenSydeServerSettings c_DdpSettings;
+   const C_OscNodeCodeExportSettings c_GeneralSettings = this->mc_Package.c_CodeExportSettings;
 
-   c_DPDSettings.s16_DPDDataBlockIndex = static_cast<uint16>(this->mc_Package.u8_ApplicationIndex);
-   c_DPDSettings.u16_MaxMessageBufferTx = this->mc_Package.u16_MaxMessageBufferTx;
-   c_DPDSettings.u16_MaxRoutingMessageBufferRx = this->mc_Package.u16_MaxRoutingMessageBufferRx;
-   c_DPDSettings.u8_MaxParallelTransmissions = this->mc_Package.u8_MaxParallelTransmissions;
+   c_DdpSettings.s16_DpdDataBlockIndex = static_cast<uint16_t>(this->mc_Package.u8_ApplicationIndex);
+   c_DdpSettings.u16_MaxMessageBufferTx = this->mc_Package.u16_MaxMessageBufferTx;
+   c_DdpSettings.u16_MaxRoutingMessageBufferRx = this->mc_Package.u16_MaxRoutingMessageBufferRx;
+   c_DdpSettings.u8_MaxParallelTransmissions = this->mc_Package.u8_MaxParallelTransmissions;
 
-   C_PuiSdHandler::h_GetInstance()->SetNodeOpenSYDEServerSettings(this->mu32_NodeIndex, c_DPDSettings);
+   C_PuiSdHandler::h_GetInstance()->SetNodeOpenSydeServerSettings(this->mu32_NodeIndex, c_DdpSettings);
    C_PuiSdHandler::h_GetInstance()->SetNodeCodeExportSettings(this->mu32_NodeIndex, c_GeneralSettings);
 }
 
@@ -300,7 +299,7 @@ QString C_SdNdeDbAddNewProject::GetHalcDefinitionFileName()
 //----------------------------------------------------------------------------------------------------------------------
 QString C_SdNdeDbAddNewProject::GetProcessedHalcDefinitionPath(void)
 {
-   QString const c_Path = this->mpc_Ui->pc_LineEditCreateIn->GetPath();
+   const QString c_Path = this->mpc_Ui->pc_LineEditCreateIn->GetPath();
    QString c_HalcDefPath = mc_Package.c_HalcDefPath.c_str();
 
    c_HalcDefPath.remove(0, 1);
@@ -322,8 +321,8 @@ void C_SdNdeDbAddNewProject::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -348,7 +347,7 @@ void C_SdNdeDbAddNewProject::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_OkClicked(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    QDir c_CreateInFolder(
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditCreateIn->GetPath()));
 
@@ -425,13 +424,13 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
 
          C_OgeWiCustomMessage c_Warning(this, C_OgeWiCustomMessage::eWARNING);
          c_Warning.SetHeading(C_GtGetText::h_GetText("Import TSP"));
-         c_Warning.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
+         c_Warning.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
          c_Warning.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
 
          // Currently there are datablocks for this node and the TSP contains datablocks AND additionally
          // there is a current halc config and TSP contains a halc config -> both gets deleted
          if (((pc_Node->c_Applications.empty() == false) && (mc_Package.c_Applications.size() > 0)) &&
-             ((pc_Node->c_HALCConfig.IsClear() == false) && (mc_Package.c_HalcDefPath != "")))
+             ((pc_Node->c_HalcConfig.IsClear() == false) && (mc_Package.c_HalcDefPath != "")))
          {
             c_Warning.SetDescription(C_GtGetText::h_GetText(
                                         "All existing Data Blocks will be deleted and the hardware configuration will be cleared. Do you really want to continue?"));
@@ -444,7 +443,7 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
                                         "All existing Data Blocks will be deleted. Do you really want to continue?"));
          }
          // Currently there is a halc def and TSP contains halc def.
-         else if ((pc_Node->c_HALCConfig.IsClear() == false) && (mc_Package.c_HalcDefPath != ""))
+         else if ((pc_Node->c_HalcConfig.IsClear() == false) && (mc_Package.c_HalcDefPath != ""))
          {
             c_Warning.SetDescription(C_GtGetText::h_GetText(
                                         "The existing hardware configuration will be cleared. Do you really want to continue?"));
@@ -479,8 +478,8 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
             C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eQUESTION);
             c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
             c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Cancel"));
-            c_Message.SetNOButtonText(C_GtGetText::h_GetText("Continue without Clearing"));
-            c_Message.SetOKButtonText(C_GtGetText::h_GetText("Clear and Continue"));
+            c_Message.SetNoButtonText(C_GtGetText::h_GetText("Continue without Clearing"));
+            c_Message.SetOkButtonText(C_GtGetText::h_GetText("Clear and Continue"));
             c_Message.SetDescription(
                static_cast<QString>(C_GtGetText::h_GetText(
                                        "Directory \"%1\" is not empty. \n\nShould this directory be cleared? "
@@ -523,13 +522,13 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
 
          if (q_Continue == true)
          {
-            const QFileInfo c_TSPFileInfo(this->GetTSPPath()); // file path -> use absoluteDir() to get directory of
+            const QFileInfo c_TspFileInfo(this->GetTspPath()); // file path -> use absoluteDir() to get directory of
                                                                // file
-            stw_scl::C_SCLString c_ErrorText;
+            stw::scl::C_SclString c_ErrorText;
             const QString c_Path =
-               QDir::cleanPath(c_TSPFileInfo.absoluteDir().absoluteFilePath(this->mc_Package.c_TemplatePath.c_str()));
+               QDir::cleanPath(c_TspFileInfo.absoluteDir().absoluteFilePath(this->mc_Package.c_TemplatePath.c_str()));
             QApplication::setOverrideCursor(Qt::WaitCursor);
-            if (C_OSCZipFile::h_UnpackZipFile(c_Path.toStdString().c_str(),
+            if (C_OscZipFile::h_UnpackZipFile(c_Path.toStdString().c_str(),
                                               C_PuiUtil::h_GetAbsolutePathFromProject(
                                                  this->mpc_Ui->pc_LineEditCreateIn->GetPath()).toStdString().c_str(),
                                               &c_ErrorText) == C_NO_ERR)
@@ -571,7 +570,7 @@ void C_SdNdeDbAddNewProject::m_CancelClicked(void)
 /*! \brief   Handle TSP path button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
+void C_SdNdeDbAddNewProject::m_TspButtonClicked(void)
 {
    QString c_FolderName; // for default folder
    QString c_FilePath = "";
@@ -593,7 +592,7 @@ void C_SdNdeDbAddNewProject::m_TSPButtonClicked(void)
                                      c_FolderName, c_FilterName, mhc_SUFFIX);
    if (c_FilePath != "")
    {
-      this->SetTSPPath(c_FilePath);
+      this->SetTspPath(c_FilePath);
    }
 }
 
@@ -658,9 +657,9 @@ void C_SdNdeDbAddNewProject::m_SetCreateInPath(const QString & orc_New)
 /*! \brief   Handle loading TSP
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::m_OnLoadTSP(void)
+void C_SdNdeDbAddNewProject::m_OnLoadTsp(void)
 {
-   this->ms32_TSPReadResult = C_OSCTargetSupportPackageFiler::h_Load(
+   this->ms32_TSPReadResult = C_OscTargetSupportPackageFiler::h_Load(
       this->mc_Package,
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()).toStdString().c_str());
 
@@ -716,9 +715,9 @@ void C_SdNdeDbAddNewProject::m_AddTopSection(QString & orc_Content) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
 {
-   for (uint32 u32_ItTemplate = 0UL; u32_ItTemplate < this->mc_Package.c_Applications.size(); ++u32_ItTemplate)
+   for (uint32_t u32_ItTemplate = 0UL; u32_ItTemplate < this->mc_Package.c_Applications.size(); ++u32_ItTemplate)
    {
-      const C_OSCTSPApplication & rc_Template = this->mc_Package.c_Applications[u32_ItTemplate];
+      const C_OscTspApplication & rc_Template = this->mc_Package.c_Applications[u32_ItTemplate];
       orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("Data Block %1")).arg(u32_ItTemplate + 1UL) +
                      "</h4>";
       orc_Content += "<table>";
@@ -773,14 +772,14 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
    \param[in] ou32_NodeIndex        Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbAddNewProject::m_Init(const uint32 ou32_NodeIndex) const
+void C_SdNdeDbAddNewProject::m_Init(const uint32_t ou32_NodeIndex) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    if (pc_Node != NULL)
    {
       //Use default
-      const QString c_NodePath = C_OSCUtils::h_NiceifyStringForFileName(pc_Node->c_Properties.c_Name).c_str();
+      const QString c_NodePath = C_OscUtils::h_NiceifyStringForFileName(pc_Node->c_Properties.c_Name).c_str();
       this->mpc_Ui->pc_LineEditCreateIn->SetPath(c_NodePath, C_PuiProject::h_GetInstance()->GetFolderPath());
    }
 }

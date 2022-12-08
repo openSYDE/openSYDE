@@ -8,19 +8,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OSCNodeSquad.h"
+#include "C_OscNodeSquad.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_scl::C_SCLString C_OSCNodeSquad::hc_SEPARATOR = "::";
+const stw::scl::C_SclString C_OscNodeSquad::hc_SEPARATOR = "::";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -36,7 +36,7 @@ const stw_scl::C_SCLString C_OSCNodeSquad::hc_SEPARATOR = "::";
 /*! \brief    Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeSquad::C_OSCNodeSquad(void)
+C_OscNodeSquad::C_OscNodeSquad(void)
 {
 }
 
@@ -44,7 +44,7 @@ C_OSCNodeSquad::C_OSCNodeSquad(void)
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeSquad::~C_OSCNodeSquad(void)
+C_OscNodeSquad::~C_OscNodeSquad(void)
 {
 }
 
@@ -58,10 +58,10 @@ C_OSCNodeSquad::~C_OSCNodeSquad(void)
    Combined name, if possible
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_scl::C_SCLString C_OSCNodeSquad::h_CombineNames(const stw_scl::C_SCLString & orc_MainDeviceName,
-                                                    const stw_scl::C_SCLString & orc_SubDeviceName)
+stw::scl::C_SclString C_OscNodeSquad::h_CombineNames(const stw::scl::C_SclString & orc_MainDeviceName,
+                                                     const stw::scl::C_SclString & orc_SubDeviceName)
 {
-   stw_scl::C_SCLString c_Retval;
+   stw::scl::C_SclString c_Retval;
    if (orc_MainDeviceName.IsEmpty())
    {
       c_Retval = orc_SubDeviceName;
@@ -72,7 +72,7 @@ stw_scl::C_SCLString C_OSCNodeSquad::h_CombineNames(const stw_scl::C_SCLString &
    }
    else
    {
-      c_Retval = orc_MainDeviceName + C_OSCNodeSquad::hc_SEPARATOR + orc_SubDeviceName;
+      c_Retval = orc_MainDeviceName + C_OscNodeSquad::hc_SEPARATOR + orc_SubDeviceName;
    }
    return c_Retval;
 }
@@ -88,11 +88,11 @@ stw_scl::C_SCLString C_OSCNodeSquad::h_CombineNames(const stw_scl::C_SCLString &
    \retval   C_CONFIG   At least one sub node device definition is not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeSquad::SetBaseName(std::vector<C_OSCNode> & orc_Nodes, const stw_scl::C_SCLString & orc_NodeBaseName)
+int32_t C_OscNodeSquad::SetBaseName(std::vector<C_OscNode> & orc_Nodes, const stw::scl::C_SclString & orc_NodeBaseName)
 {
    // Check the indexes first
-   uint32 u32_NodeIndexCounter;
-   sint32 s32_Return = C_NO_ERR;
+   uint32_t u32_NodeIndexCounter;
+   int32_t s32_Return = C_NO_ERR;
 
    this->c_BaseName = orc_NodeBaseName;
 
@@ -110,18 +110,18 @@ sint32 C_OSCNodeSquad::SetBaseName(std::vector<C_OSCNode> & orc_Nodes, const stw
    {
       for (u32_NodeIndexCounter = 0U; u32_NodeIndexCounter < this->c_SubNodeIndexes.size(); ++u32_NodeIndexCounter)
       {
-         const uint32 u32_NodeIndex = this->c_SubNodeIndexes[u32_NodeIndexCounter];
+         const uint32_t u32_NodeIndex = this->c_SubNodeIndexes[u32_NodeIndexCounter];
 
          if (u32_NodeIndex < orc_Nodes.size())
          {
-            C_OSCNode & rc_Node = orc_Nodes[u32_NodeIndex];
+            C_OscNode & rc_Node = orc_Nodes[u32_NodeIndex];
 
             if ((rc_Node.pc_DeviceDefinition != NULL) &&
                 (rc_Node.u32_SubDeviceIndex < rc_Node.pc_DeviceDefinition->c_SubDevices.size()))
             {
                // Setting the new name for the sub node
                rc_Node.c_Properties.c_Name =
-                  C_OSCNodeSquad::h_CombineNames(orc_NodeBaseName,
+                  C_OscNodeSquad::h_CombineNames(orc_NodeBaseName,
                                                  rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].
                                                  c_SubDeviceName);
             }
@@ -149,9 +149,9 @@ sint32 C_OSCNodeSquad::SetBaseName(std::vector<C_OSCNode> & orc_Nodes, const stw
    Is multi device
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCNodeSquad::h_CheckIsMultiDevice(const uint32 ou32_NodeIndex,
-                                          const std::vector<C_OSCNodeSquad> & orc_AvailableGroups,
-                                          uint32 * const opu32_GroupIndex)
+bool C_OscNodeSquad::h_CheckIsMultiDevice(const uint32_t ou32_NodeIndex,
+                                          const std::vector<C_OscNodeSquad> & orc_AvailableGroups,
+                                          uint32_t * const opu32_GroupIndex)
 {
    bool q_Retval = false;
 
@@ -160,11 +160,11 @@ bool C_OSCNodeSquad::h_CheckIsMultiDevice(const uint32 ou32_NodeIndex,
       *opu32_GroupIndex = 0UL;
    }
 
-   for (uint32 u32_ItGroup = 0; u32_ItGroup < orc_AvailableGroups.size(); ++u32_ItGroup)
+   for (uint32_t u32_ItGroup = 0; u32_ItGroup < orc_AvailableGroups.size(); ++u32_ItGroup)
    {
-      const C_OSCNodeSquad & rc_Group = orc_AvailableGroups[u32_ItGroup];
+      const C_OscNodeSquad & rc_Group = orc_AvailableGroups[u32_ItGroup];
 
-      for (uint32 u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
+      for (uint32_t u32_ItSubDevice = 0UL; u32_ItSubDevice < rc_Group.c_SubNodeIndexes.size(); ++u32_ItSubDevice)
       {
          if (ou32_NodeIndex == rc_Group.c_SubNodeIndexes[u32_ItSubDevice])
          {

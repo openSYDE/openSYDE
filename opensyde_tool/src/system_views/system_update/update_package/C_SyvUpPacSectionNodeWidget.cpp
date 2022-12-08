@@ -8,43 +8,42 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QScrollBar>
 
-#include "C_SyvUpPacSectionNodeWidget.h"
+#include "C_SyvUpPacSectionNodeWidget.hpp"
 #include "ui_C_SyvUpPacSectionNodeWidget.h"
 
-#include "stwerrors.h"
-#include "constants.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
 
-#include "C_Uti.h"
-#include "C_OgeWiUtil.h"
+#include "C_Uti.hpp"
+#include "C_OgeWiUtil.hpp"
 
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_OSCNode.h"
-#include "C_PuiProject.h"
-#include "C_PuiSvData.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OsyHexFile.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_ImpUtil.h"
-#include "C_PuiUtil.h"
-#include "C_SyvUpPacListNodeItemParamSetWidget.h"
-#include "C_SyvUpPacListNodeItemPemFileWidget.h"
-#include "C_SyvUpPacParamSetFileAddPopUp.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_OscNode.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSvData.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OsyHexFile.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_SyvUpPacListNodeItemParamSetWidget.hpp"
+#include "C_SyvUpPacListNodeItemPemFileWidget.hpp"
+#include "C_SyvUpPacParamSetFileAddPopUp.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -142,9 +141,9 @@ C_SyvUpPacSectionNodeWidget::~C_SyvUpPacSectionNodeWidget()
    \param[in]  ou32_DataBlockPathNumber   Number of Data Block output file
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::InitWidget(const uint32 ou32_ViewIndex, const uint32 ou32_PositionNumber,
-                                             const uint32 ou32_NodeIndex, const QString & orc_NodeName,
-                                             const uint32 ou32_SectionNumber, const uint32 ou32_DataBlockPathNumber)
+void C_SyvUpPacSectionNodeWidget::InitWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_PositionNumber,
+                                             const uint32_t ou32_NodeIndex, const QString & orc_NodeName,
+                                             const uint32_t ou32_SectionNumber, const uint32_t ou32_DataBlockPathNumber)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -177,7 +176,7 @@ void C_SyvUpPacSectionNodeWidget::InitStaticNames(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::SetConnected(void)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    this->mq_Connected = true;
    this->mpc_Ui->pc_WidgetAdd->setEnabled(false);
@@ -226,7 +225,7 @@ void C_SyvUpPacSectionNodeWidget::SetUpdateFinished(void)
 {
    if (this->mq_FileBased == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       // Special case: After updating a file based node, it is not possible to read back or confirm
       // the state of the node. Reset the state of all applications
@@ -243,7 +242,7 @@ void C_SyvUpPacSectionNodeWidget::SetUpdateFinished(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::DiscardApplicationStatus(void)
 {
-   for (uint32 u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
+   for (uint32_t u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
    {
       this->m_SetFileState(u32_Counter, C_SyvUpPacListNodeItemWidget::hu32_STATE_TO_DO);
    }
@@ -257,7 +256,7 @@ void C_SyvUpPacSectionNodeWidget::DiscardApplicationStatus(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::SetDisconnected(void)
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    this->mq_Connected = false;
 
@@ -283,7 +282,7 @@ void C_SyvUpPacSectionNodeWidget::SetDisconnected(void)
    \param[in]  ou32_PositionNumber  New position number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::UpdatePositionNumber(const uint32 ou32_PositionNumber)
+void C_SyvUpPacSectionNodeWidget::UpdatePositionNumber(const uint32_t ou32_PositionNumber)
 {
    this->mu32_PositionNumber = ou32_PositionNumber;
 }
@@ -365,11 +364,11 @@ void C_SyvUpPacSectionNodeWidget::RemoveFile(C_SyvUpPacListNodeItemWidget * cons
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::RemoveAllFiles(void)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
-   for (sn_Counter = this->mpc_Ui->pc_FileVerticalLayout->count() - 1; sn_Counter >= 0; --sn_Counter)
+   for (s32_Counter = this->mpc_Ui->pc_FileVerticalLayout->count() - 1; s32_Counter >= 0; --s32_Counter)
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_Counter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_Counter);
 
       if (pc_Item != NULL)
       {
@@ -395,16 +394,16 @@ void C_SyvUpPacSectionNodeWidget::RemoveAllFiles(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::UpdateDeviceInformation(const C_SyvUpDeviceInfo & orc_DeviceInformation)
 {
-   sintn sn_AppWidgetCounter;
+   int32_t s32_AppWidgetCounter;
    bool q_AtLeastOneFileToDo = false;
 
    Q_UNUSED(orc_DeviceInformation)
 
    //go through all applications in the UI
-   for (sn_AppWidgetCounter = 0; sn_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
-        ++sn_AppWidgetCounter)
+   for (s32_AppWidgetCounter = 0; s32_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
+        ++s32_AppWidgetCounter)
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_AppWidgetCounter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_AppWidgetCounter);
 
       if (pc_Item != NULL)
       {
@@ -457,18 +456,17 @@ void C_SyvUpPacSectionNodeWidget::OpenPemFileSettings(C_SyvUpPacListNodeItemWidg
    C_CONFIG    Minimum one file was not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacSectionNodeWidget::CheckAllFiles(stw_types::uint32 & oru32_CountFiles,
-                                                  QStringList * const opc_MissingFiles,
-                                                  QStringList * const opc_MissingParamSetFiles,
-                                                  QStringList * const opc_FlashwareWarningsApps)
+int32_t C_SyvUpPacSectionNodeWidget::CheckAllFiles(uint32_t & oru32_CountFiles, QStringList * const opc_MissingFiles,
+                                                   QStringList * const opc_MissingParamSetFiles,
+                                                   QStringList * const opc_FlashwareWarningsApps)
 {
-   sintn sn_Counter = 0;
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Counter = 0;
+   int32_t s32_Return = C_NO_ERR;
 
-   while (sn_Counter < this->mpc_Ui->pc_FileVerticalLayout->count())
+   while (s32_Counter < this->mpc_Ui->pc_FileVerticalLayout->count())
    {
       bool q_NewItemAtCurrentPosition = false;
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_Counter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_Counter);
 
       if (pc_Item != NULL)
       {
@@ -478,7 +476,7 @@ sint32 C_SyvUpPacSectionNodeWidget::CheckAllFiles(stw_types::uint32 & oru32_Coun
          if (pc_App != NULL)
          {
             // Check the app path
-            const sint32 s32_CheckPathResult = pc_App->CheckPath();
+            const int32_t s32_CheckPathResult = pc_App->CheckPath();
             // missing files
             if (s32_CheckPathResult == C_CONFIG)
             {
@@ -552,7 +550,7 @@ sint32 C_SyvUpPacSectionNodeWidget::CheckAllFiles(stw_types::uint32 & oru32_Coun
       }
       if (q_NewItemAtCurrentPosition == false)
       {
-         ++sn_Counter;
+         ++s32_Counter;
       }
    }
 
@@ -594,22 +592,22 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPacListNodeItemWidget * C_SyvUpPacSectionNodeWidget::GetApplication(const QPoint & orc_Pos,
-                                                                           uint32 * const opu32_Number)
+                                                                           uint32_t * const opu32_Number)
 const
 {
    C_SyvUpPacListNodeItemWidget * pc_Return = NULL;
 
    if (this->mpc_Ui->pc_PbExpColl->isChecked() == true)
    {
-      sintn sn_Counter;
+      int32_t s32_Counter;
       const QPoint c_AdaptedPos = this->mpc_Ui->pc_WidgetFileList->mapFrom(this->parentWidget(), orc_Pos);
 
       // The header widget area shall be excluded, it can cause problems if a scrollbar is in the list available
       if (c_AdaptedPos.y() > 0)
       {
-         for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++sn_Counter)
+         for (s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++s32_Counter)
          {
-            QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_Counter);
+            QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_Counter);
 
             if (pc_Item != NULL)
             {
@@ -626,7 +624,7 @@ const
 
                      if (opu32_Number != NULL)
                      {
-                        *opu32_Number = static_cast<uint32>(sn_Counter);
+                        *opu32_Number = static_cast<uint32_t>(s32_Counter);
                      }
                      break;
                   }
@@ -646,7 +644,7 @@ const
    \param[in]  oq_Select         Flag if application should be selected
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::SetApplicationSelect(const uint32 ou32_Application, const bool oq_Select) const
+void C_SyvUpPacSectionNodeWidget::SetApplicationSelect(const uint32_t ou32_Application, const bool oq_Select) const
 {
    QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(ou32_Application);
 
@@ -670,7 +668,7 @@ void C_SyvUpPacSectionNodeWidget::SetApplicationSelect(const uint32 ou32_Applica
    Number of files
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::GetFileCount(void) const
+uint32_t C_SyvUpPacSectionNodeWidget::GetFileCount(void) const
 {
    return this->mu32_FileCount;
 }
@@ -682,7 +680,7 @@ uint32 C_SyvUpPacSectionNodeWidget::GetFileCount(void) const
    Number of files
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::GetPrimaryFileCount(void) const
+uint32_t C_SyvUpPacSectionNodeWidget::GetPrimaryFileCount(void) const
 {
    return this->mu32_PrimaryFileCount;
 }
@@ -694,7 +692,7 @@ uint32 C_SyvUpPacSectionNodeWidget::GetPrimaryFileCount(void) const
    Number of files
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::GetParamSetFileCount(void) const
+uint32_t C_SyvUpPacSectionNodeWidget::GetParamSetFileCount(void) const
 {
    return this->mu32_ParamSetFileCount;
 }
@@ -706,7 +704,7 @@ uint32 C_SyvUpPacSectionNodeWidget::GetParamSetFileCount(void) const
    Number of files
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::GetPemFileCount(void) const
+uint32_t C_SyvUpPacSectionNodeWidget::GetPemFileCount(void) const
 {
    return this->mu32_PemFileCount;
 }
@@ -718,9 +716,9 @@ uint32 C_SyvUpPacSectionNodeWidget::GetPemFileCount(void) const
    State value
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::GetSectionState(void) const
+uint32_t C_SyvUpPacSectionNodeWidget::GetSectionState(void) const
 {
-   uint32 u32_State = this->mu32_State;
+   uint32_t u32_State = this->mu32_State;
 
    if (this->m_AreAllFilesSkipped() == true)
    {
@@ -741,12 +739,12 @@ uint32 C_SyvUpPacSectionNodeWidget::GetSectionState(void) const
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpPacSectionNodeWidget::IsUpdateNecessary(void) const
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
    bool q_ApplicationUpdateNecessary = false;
 
-   for (sn_Counter = 0; sn_Counter < (this->mpc_Ui->pc_FileVerticalLayout->count()); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < (this->mpc_Ui->pc_FileVerticalLayout->count()); ++s32_Counter)
    {
-      if (this->m_GetApplicationState(sn_Counter) != C_SyvUpPacListNodeItemWidget::hu32_STATE_FINISHED)
+      if (this->m_GetApplicationState(s32_Counter) != C_SyvUpPacListNodeItemWidget::hu32_STATE_FINISHED)
       {
          q_ApplicationUpdateNecessary = true;
       }
@@ -767,16 +765,16 @@ bool C_SyvUpPacSectionNodeWidget::IsUpdateNecessary(void) const
    C_NOACT     No files for applications to write added
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash & orc_ApplicationsToWrite,
-                                                     C_OSCSuSequences::C_DoFlash * const opc_AllApplications,
-                                                     stw_types::uint32 & oru32_FilesUpdated) const
+int32_t C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OscSuSequences::C_DoFlash & orc_ApplicationsToWrite,
+                                                      C_OscSuSequences::C_DoFlash * const opc_AllApplications,
+                                                      uint32_t & oru32_FilesUpdated) const
 {
-   sint32 s32_Return = C_NO_ERR;
-   sintn sn_Counter;
+   int32_t s32_Return = C_NO_ERR;
+   int32_t s32_Counter;
 
-   for (sn_Counter = 0; sn_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++sn_Counter)
+   for (s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++s32_Counter)
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_Counter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_Counter);
 
       if (pc_Item != NULL)
       {
@@ -819,11 +817,11 @@ sint32 C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash
                   if ((q_ParamSetFile == false) &&
                       (q_PemFile == false))
                   {
-                     orc_ApplicationsToWrite.c_FilesToFlash.push_back(c_Path.toStdString().c_str());
+                     orc_ApplicationsToWrite.c_FilesToFlash.emplace_back(c_Path.toStdString().c_str());
                   }
                   else if (q_ParamSetFile == true)
                   {
-                     orc_ApplicationsToWrite.c_FilesToWriteToNvm.push_back(c_Path.toStdString().c_str());
+                     orc_ApplicationsToWrite.c_FilesToWriteToNvm.emplace_back(c_Path.toStdString().c_str());
                   }
                   else
                   {
@@ -851,11 +849,11 @@ sint32 C_SyvUpPacSectionNodeWidget::GetUpdatePackage(C_OSCSuSequences::C_DoFlash
                   if ((q_ParamSetFile == false) &&
                       (q_PemFile == false))
                   {
-                     opc_AllApplications->c_FilesToFlash.push_back(c_Path.toStdString().c_str());
+                     opc_AllApplications->c_FilesToFlash.emplace_back(c_Path.toStdString().c_str());
                   }
                   else if (q_ParamSetFile == true)
                   {
-                     opc_AllApplications->c_FilesToWriteToNvm.push_back(c_Path.toStdString().c_str());
+                     opc_AllApplications->c_FilesToWriteToNvm.emplace_back(c_Path.toStdString().c_str());
                   }
                   else
                   {
@@ -942,8 +940,8 @@ bool C_SyvUpPacSectionNodeWidget::CheckMime(QStringList & orc_PathList, const QP
    // One application is only usable in case of one specific path
    if (orc_PathList.size() == 1)
    {
-      uint32 u32_FoundAppNumber;
-      uint32 u32_CounterApp;
+      uint32_t u32_FoundAppNumber;
+      uint32_t u32_CounterApp;
       // Address based nodes can only adapt existing applications
       C_SyvUpPacListNodeItemWidget * const pc_App = this->GetApplication(orc_Pos, &u32_FoundAppNumber);
 
@@ -1022,7 +1020,7 @@ void C_SyvUpPacSectionNodeWidget::m_UpdateTitle(void)
 {
    this->mpc_Ui->pc_LabTitle->setText(C_Uti::h_AdaptStringToSize(this->mc_Title,
                                                                  this->mpc_Ui->pc_LabTitle->fontMetrics(),
-                                                                 this->width() - mhsn_TITLE_OFFSET));
+                                                                 this->width() - mhs32_TITLE_OFFSET));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1036,7 +1034,7 @@ void C_SyvUpPacSectionNodeWidget::m_UpdateTitle(void)
    Adapted number of param set file
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::m_AdaptParamSetNumber(const uint32 ou32_Number)
+uint32_t C_SyvUpPacSectionNodeWidget::m_AdaptParamSetNumber(const uint32_t ou32_Number)
 {
    return ou32_Number;
 }
@@ -1050,7 +1048,7 @@ uint32 C_SyvUpPacSectionNodeWidget::m_AdaptParamSetNumber(const uint32 ou32_Numb
    Path of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpPacSectionNodeWidget::m_GetApplicationPath(const uint32 ou32_Application) const
+QString C_SyvUpPacSectionNodeWidget::m_GetApplicationPath(const uint32_t ou32_Application) const
 {
    QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(ou32_Application);
    QString c_Path = "";
@@ -1079,14 +1077,14 @@ QString C_SyvUpPacSectionNodeWidget::m_GetApplicationPath(const uint32 ou32_Appl
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpPacSectionNodeWidget::m_AreAllFilesSkipped(void) const
 {
-   sintn sn_FileCounter;
+   int32_t s32_FileCounter;
    bool q_Return = false;
    bool q_AtLeastOneFileNotSkipped = false;
    bool q_AtLeastOneFileExist = false;
 
-   for (sn_FileCounter = 0; sn_FileCounter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++sn_FileCounter)
+   for (s32_FileCounter = 0; s32_FileCounter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++s32_FileCounter)
    {
-      QLayoutItem * const pc_CurrentItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_FileCounter);
+      QLayoutItem * const pc_CurrentItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_FileCounter);
 
       if (pc_CurrentItem != NULL)
       {
@@ -1123,10 +1121,10 @@ bool C_SyvUpPacSectionNodeWidget::m_AreAllFilesSkipped(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::m_FileCountChanged(void)
 {
-   const sintn sn_HeightFileList = static_cast<sintn>((this->mu32_FileCount * 23U));
-   const sintn sn_Height = sn_HeightFileList + 31;
+   const int32_t s32_HeightFileList = static_cast<int32_t>((this->mu32_FileCount * 23U));
+   const int32_t s32_Height = s32_HeightFileList + 31;
 
-   this->resize(this->mpc_Ui->pc_WidgetFileList->width(), sn_Height);
+   this->resize(this->mpc_Ui->pc_WidgetFileList->width(), s32_Height);
 
    this->mpc_Ui->pc_LabCount->setText("(" + QString::number(this->mu32_FileCount) + ")");
 
@@ -1141,7 +1139,7 @@ void C_SyvUpPacSectionNodeWidget::m_FileCountChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::m_SetFileState(const uint32 ou32_File, const uint32 ou32_State)
+void C_SyvUpPacSectionNodeWidget::m_SetFileState(const uint32_t ou32_File, const uint32_t ou32_State)
 {
    QLayoutItem * const pc_CurrentItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(ou32_File);
 
@@ -1163,13 +1161,13 @@ void C_SyvUpPacSectionNodeWidget::m_SetFileState(const uint32 ou32_File, const u
    case C_SyvUpPacListNodeItemWidget::hu32_STATE_FINISHED:
       {
          // In this case all other files must be set to finished already
-         sintn sn_AppWidgetCounter;
+         int32_t s32_AppWidgetCounter;
          bool q_IsAtLeastOneFileNotFinished = false;
 
-         for (sn_AppWidgetCounter = 0; sn_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
-              ++sn_AppWidgetCounter)
+         for (s32_AppWidgetCounter = 0; s32_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
+              ++s32_AppWidgetCounter)
          {
-            QLayoutItem * const pc_WidgetItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_AppWidgetCounter);
+            QLayoutItem * const pc_WidgetItem = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_AppWidgetCounter);
 
             if (pc_WidgetItem != NULL)
             {
@@ -1220,7 +1218,7 @@ void C_SyvUpPacSectionNodeWidget::m_SetFileState(const uint32 ou32_File, const u
    \param[in]  ou32_State  State of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::m_SetState(const uint32 ou32_State)
+void C_SyvUpPacSectionNodeWidget::m_SetState(const uint32_t ou32_State)
 {
    const QSize c_SIZE(20, 20);
 
@@ -1302,13 +1300,13 @@ void C_SyvUpPacSectionNodeWidget::m_AdaptParamSetFile(const QString & orc_File,
    C_NO_ERR    File read
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacSectionNodeWidget::m_GetParamsetFileInfo(const QString & orc_File,
-                                                          C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo)
+int32_t C_SyvUpPacSectionNodeWidget::m_GetParamsetFileInfo(const QString & orc_File,
+                                                           C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo)
 {
-   sint32 s32_Return = C_NOACT;
+   int32_t s32_Return = C_NOACT;
 
    bool q_NewFile = true;
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Check if file was already added
    for (u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
@@ -1324,19 +1322,19 @@ sint32 C_SyvUpPacSectionNodeWidget::m_GetParamsetFileInfo(const QString & orc_Fi
    // Add the file
    if (q_NewFile == true)
    {
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpPacParamSetFileAddPopUp * const pc_InfoDialog =
          new C_SyvUpPacParamSetFileAddPopUp(*c_New, C_PuiUtil::h_GetAbsolutePathFromProject(orc_File), orc_File,
                                             this->mu32_NodeIndex);
 
       //Read file info
-      const sint32 s32_ReadFileResult = pc_InfoDialog->ReadFile();
+      const int32_t s32_ReadFileResult = pc_InfoDialog->ReadFile();
       if (s32_ReadFileResult == C_NO_ERR)
       {
          //Resize
          c_New->SetSize(QSize(1000, 761));
 
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             orc_ParamFileInfo = pc_InfoDialog->GetParamInfo();
             s32_Return = C_NO_ERR;
@@ -1487,7 +1485,7 @@ void C_SyvUpPacSectionNodeWidget::m_OnExpand(const bool oq_Expand)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::m_InitItems(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
@@ -1500,7 +1498,7 @@ void C_SyvUpPacSectionNodeWidget::m_InitItems(void)
       tgl_assert(pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size());
       this->mq_FileBased =
          pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased;
-      this->mq_StwFlashloader = (pc_Node->c_Properties.e_FlashLoader == C_OSCNodeProperties::eFL_STW);
+      this->mq_StwFlashloader = (pc_Node->c_Properties.e_FlashLoader == C_OscNodeProperties::eFL_STW);
 
       if (pc_View != NULL)
       {
@@ -1534,12 +1532,12 @@ void C_SyvUpPacSectionNodeWidget::m_InitItems(void)
    Status of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::m_GetApplicationState(const uint32 ou32_Application,
-                                                          uint32 * const opu32_Type) const
+uint32_t C_SyvUpPacSectionNodeWidget::m_GetApplicationState(const uint32_t ou32_Application,
+                                                            uint32_t * const opu32_Type) const
 {
    QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(ou32_Application);
    // Undefined state in error case
-   uint32 u32_Return = 0xFFFFFFFFUL;
+   uint32_t u32_Return = 0xFFFFFFFFUL;
 
    // Adapt the icon of the finished application
    if (pc_Item != NULL)
@@ -1561,7 +1559,7 @@ uint32 C_SyvUpPacSectionNodeWidget::m_GetApplicationState(const uint32 ou32_Appl
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacSectionNodeWidget::m_SetApplicationConnected(const uint32 ou32_Application,
+void C_SyvUpPacSectionNodeWidget::m_SetApplicationConnected(const uint32_t ou32_Application,
                                                             const bool oq_Connected) const
 {
    QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(ou32_Application);
@@ -1580,10 +1578,10 @@ void C_SyvUpPacSectionNodeWidget::m_SetApplicationConnected(const uint32 ou32_Ap
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacSectionNodeWidget::m_GetFirstNotFinishedApplication(void) const
+uint32_t C_SyvUpPacSectionNodeWidget::m_GetFirstNotFinishedApplication(void) const
 {
-   sint32 s32_ApplicationCounter;
-   uint32 u32_TypeCounter;
+   int32_t s32_ApplicationCounter;
+   uint32_t u32_TypeCounter;
 
    // The order of application type is relevant and different to the shown order
    // Transfer order:
@@ -1594,7 +1592,7 @@ uint32 C_SyvUpPacSectionNodeWidget::m_GetFirstNotFinishedApplication(void) const
 
    for (u32_TypeCounter = 0U; u32_TypeCounter <= mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM; ++u32_TypeCounter)
    {
-      uint32 u32_ExpectedType;
+      uint32_t u32_ExpectedType;
       bool q_Found = false;
 
       // Order of type numbers does not match the expected types, so a little remap is necessary
@@ -1618,12 +1616,12 @@ uint32 C_SyvUpPacSectionNodeWidget::m_GetFirstNotFinishedApplication(void) const
 
       // Search all applications
       for (s32_ApplicationCounter = 0U;
-           s32_ApplicationCounter < static_cast<sint32>(this->mpc_Ui->pc_FileVerticalLayout->count());
+           s32_ApplicationCounter < static_cast<int32_t>(this->mpc_Ui->pc_FileVerticalLayout->count());
            ++s32_ApplicationCounter)
       {
          // Check state and type to get the correct order
-         uint32 u32_CurrentType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
-         const uint32 u32_State = this->m_GetApplicationState(s32_ApplicationCounter, &u32_CurrentType);
+         uint32_t u32_CurrentType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
+         const uint32_t u32_State = this->m_GetApplicationState(s32_ApplicationCounter, &u32_CurrentType);
          if ((u32_State != C_SyvUpPacListNodeItemWidget::hu32_STATE_FINISHED) &&
              (u32_CurrentType == u32_ExpectedType))
          {
@@ -1638,23 +1636,23 @@ uint32 C_SyvUpPacSectionNodeWidget::m_GetFirstNotFinishedApplication(void) const
       }
    }
 
-   return static_cast<uint32>(s32_ApplicationCounter);
+   return static_cast<uint32_t>(s32_ApplicationCounter);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::m_UpdateNumbers(void)
 {
-   sintn sn_AppWidgetCounter;
+   int32_t s32_AppWidgetCounter;
 
    // Recount the different types of files
    this->mu32_PrimaryFileCount = 0U;
    this->mu32_ParamSetFileCount = 0U;
    this->mu32_PemFileCount = 0U;
 
-   for (sn_AppWidgetCounter = 0; sn_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
-        ++sn_AppWidgetCounter)
+   for (s32_AppWidgetCounter = 0; s32_AppWidgetCounter < this->mpc_Ui->pc_FileVerticalLayout->count();
+        ++s32_AppWidgetCounter)
    {
-      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(sn_AppWidgetCounter);
+      QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_AppWidgetCounter);
 
       if (pc_Item != NULL)
       {
@@ -1702,7 +1700,7 @@ void C_SyvUpPacSectionNodeWidget::m_RestartMovie(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::mh_FillDoFlashWithPemStates(const C_SyvUpPacListNodeItemWidget * const opc_App,
-                                                              C_OSCSuSequences::C_DoFlash & orc_DoFlash)
+                                                              C_OscSuSequences::C_DoFlash & orc_DoFlash)
 {
    const C_SyvUpPacListNodeItemPemFileWidget * const pc_PemApp =
       dynamic_cast<const C_SyvUpPacListNodeItemPemFileWidget *>(opc_App);

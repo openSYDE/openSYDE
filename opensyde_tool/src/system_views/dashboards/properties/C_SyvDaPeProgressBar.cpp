@@ -8,32 +8,31 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "TGLUtils.h"
-#include "C_SyvDaPeProgressBar.h"
+#include "TglUtils.hpp"
+#include "C_SyvDaPeProgressBar.hpp"
 #include "ui_C_SyvDaPeProgressBar.h"
 
-#include "C_GiSvDaProgressBarBase.h"
-#include "C_GtGetText.h"
+#include "C_GiSvDaProgressBarBase.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE1 = 0;
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE2 = 1;
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE3 = 2;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE1 = 0;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE2 = 1;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE3 = 2;
 
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_LEFT = 0;
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_RIGHT = 1;
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_TOP = 0;
-const sintn C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_BOTTOM = 1;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_LEFT = 0;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_RIGHT = 1;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_TOP = 0;
+const int32_t C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_BOTTOM = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -74,11 +73,11 @@ C_SyvDaPeProgressBar::C_SyvDaPeProgressBar(C_SyvDaPeBase & orc_Parent, const boo
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeProgressBar::m_TypeChanged);
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxAlignment,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeProgressBar::m_UpdatePreview);
    connect(this->mpc_Ui->pc_CheckBoxMinMax, &QCheckBox::toggled, this, &C_SyvDaPeProgressBar::m_UpdatePreview);
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeProgressBar::m_UpdatePreview);
@@ -146,10 +145,10 @@ C_PuiSvDbProgressBar::E_Type C_SyvDaPeProgressBar::GetType(void) const
 
    switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
    {
-   case C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE2:
+   case C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE2:
       e_Retval = C_PuiSvDbProgressBar::eTYPE_2;
       break;
-   case C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE3:
+   case C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE3:
       e_Retval = C_PuiSvDbProgressBar::eTYPE_3;
       break;
    default:
@@ -173,10 +172,10 @@ C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
 
    switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
    {
-   case C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE1:
+   case C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE1:
       switch (this->mpc_Ui->pc_ComboBoxAlignment->currentIndex())
       {
-      case C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_BOTTOM:
+      case C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_BOTTOM:
          e_Retval = C_PuiSvDbProgressBar::eBOTTOM;
          break;
       default:
@@ -187,7 +186,7 @@ C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
    default:
       switch (this->mpc_Ui->pc_ComboBoxAlignment->currentIndex())
       {
-      case C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_LEFT:
+      case C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_LEFT:
          e_Retval = C_PuiSvDbProgressBar::eLEFT;
          break;
       default:
@@ -222,13 +221,13 @@ void C_SyvDaPeProgressBar::SetType(const C_PuiSvDbProgressBar::E_Type oe_Type)
    switch (oe_Type)
    {
    case C_PuiSvDbProgressBar::eTYPE_1:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE1);
       break;
    case C_PuiSvDbProgressBar::eTYPE_2:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE2);
       break;
    case C_PuiSvDbProgressBar::eTYPE_3:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_STYLE_TYPE3);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE3);
       break;
    default:
       tgl_assert(false);
@@ -249,16 +248,16 @@ void C_SyvDaPeProgressBar::SetAlignment(const C_PuiSvDbProgressBar::E_Alignment 
    switch (oe_Alignment)
    {
    case C_PuiSvDbProgressBar::eTOP:
-      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_TOP);
+      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_TOP);
       break;
    case C_PuiSvDbProgressBar::eLEFT:
-      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_LEFT);
+      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_LEFT);
       break;
    case C_PuiSvDbProgressBar::eRIGHT:
-      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_RIGHT);
+      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_RIGHT);
       break;
    case C_PuiSvDbProgressBar::eBOTTOM:
-      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhsn_INDEX_ALIGNMENT_BOTTOM);
+      this->mpc_Ui->pc_ComboBoxAlignment->setCurrentIndex(C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_BOTTOM);
       break;
    default:
       tgl_assert(false);
@@ -276,11 +275,11 @@ void C_SyvDaPeProgressBar::m_TypeChanged(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const sintn osn_Type) const
+void C_SyvDaPeProgressBar::m_FillAlignmentComboBox(const int32_t os32_Type) const
 {
    this->mpc_Ui->pc_ComboBoxAlignment->clear();
 
-   if (osn_Type == mhsn_INDEX_STYLE_TYPE1)
+   if (os32_Type == mhs32_INDEX_STYLE_TYPE1)
    {
       this->mpc_Ui->pc_ComboBoxAlignment->addItem(C_GtGetText::h_GetText("Top"));
       this->mpc_Ui->pc_ComboBoxAlignment->addItem(C_GtGetText::h_GetText("Bottom"));

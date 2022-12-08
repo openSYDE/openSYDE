@@ -1,4 +1,4 @@
-stw_opensyde_gui_elements--C_OgeContextMenu
+stw--opensyde_gui_elements--C_OgeContextMenu
 {
 border-style: solid;
 border-width: 1px;
@@ -8,28 +8,28 @@ padding: 4px;
 margin: 10px;
 }
 
-stw_opensyde_gui_elements--C_OgeContextMenu::item
+stw--opensyde_gui_elements--C_OgeContextMenu::item
 {
 border-style: solid;
 border-left-width: 4px;
 padding: 3px;
 }
 
-stw_opensyde_gui_elements--C_OgeContextMenu::separator
+stw--opensyde_gui_elements--C_OgeContextMenu::separator
 {
 margin-top: 4px;
 margin-bottom: 4px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_CamOgeMuRecentProjects
+stw--opensyde_gui_elements--C_CamOgeMuRecentProjects
 {
 border-style: solid;
 border-width: 1px;
 padding: 0px;
 }
 
-stw_opensyde_gui_elements--C_CamOgeMuRecentProjects::item
+stw--opensyde_gui_elements--C_CamOgeMuRecentProjects::item
 {
 height: 28px;
 border-style: solid;
@@ -39,13 +39,13 @@ padding-left: 11px;
 padding-right: 11px;
 }
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeMuSections
+stw--opensyde_gui_elements--C_OgeMuSections
 {
 border-style: solid;
 border-width: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeMuSections::item
+stw--opensyde_gui_elements--C_OgeMuSections::item
 {
 padding: 5px;
 padding-left: 10px;

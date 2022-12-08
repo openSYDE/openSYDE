@@ -8,24 +8,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QMouseEvent>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeCoPdoTableView.h"
-#include "C_SdNdeCoPdoTableModel.h"
-#include "C_SdNdeSingleHeaderView.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeCoPdoTableView.hpp"
+#include "C_SdNdeCoPdoTableModel.hpp"
+#include "C_SdNdeSingleHeaderView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -53,7 +52,7 @@ C_SdNdeCoPdoTableView::C_SdNdeCoPdoTableView(QWidget * const opc_Parent) :
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(static_cast<sintn>(Qt::EditRole));
+   this->mc_SortProxyModel.setSortRole(static_cast<int32_t>(Qt::EditRole));
    this->C_SdNdeCoPdoTableView::setModel(&mc_SortProxyModel);
    this->mc_Delegate.SetModel(&mc_Model);
    //Delete last selection model, see Qt documentation for setModel
@@ -115,13 +114,13 @@ C_SdNdeCoPdoTableView::~C_SdNdeCoPdoTableView()
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoTableView::LoadUserSettings(void)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       this->mc_Model.GetDeviceNodeIndex());
 
    if (pc_Node != NULL)
    {
       const C_UsNode c_Node = C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
-      if (this->m_SetColumnWidths(c_Node.GetCANopenPdoOverviewColumnWidth()) == false)
+      if (this->m_SetColumnWidths(c_Node.GetCanOpenPdoOverviewColumnWidth()) == false)
       {
          m_InitColumns();
       }
@@ -134,12 +133,12 @@ void C_SdNdeCoPdoTableView::LoadUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoTableView::SaveUserSettings(void) const
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       this->mc_Model.GetDeviceNodeIndex());
 
    if (pc_Node != NULL)
    {
-      C_UsHandler::h_GetInstance()->SetProjSdNodeCANopenPdoOverviewColumnWidth(
+      C_UsHandler::h_GetInstance()->SetProjSdNodeCanOpenPdoOverviewColumnWidth(
          pc_Node->c_Properties.c_Name.c_str(), this->m_GetColumnWidths());
    }
 }
@@ -161,12 +160,12 @@ void C_SdNdeCoPdoTableView::UpdateData()
    \param[in]  orc_DeviceInterfaceId              CAN node interface id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoPdoTableView::SetNodeIndexAndInterfaceId(const stw_types::uint32 ou32_ManagerNodeIndex,
-                                                       const stw_types::uint8 ou8_ManagerInterfaceId,
-                                                       const stw_opensyde_core::C_OSCCanInterfaceId & orc_DeviceInterfaceId)
+void C_SdNdeCoPdoTableView::SetNodeIndexAndInterfaceId(const uint32_t ou32_ManagerNodeIndex,
+                                                       const uint8_t ou8_ManagerInterfaceId,
+                                                       const stw::opensyde_core::C_OscCanInterfaceId & orc_DeviceInterfaceId)
 {
    this->mc_Model.SetNodeIndexAndInterfaceId(ou32_ManagerNodeIndex, ou8_ManagerInterfaceId, orc_DeviceInterfaceId);
-   this->sortByColumn(static_cast<sintn>(C_SdNdeCoPdoTableModel::eINDEX), Qt::AscendingOrder);
+   this->sortByColumn(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eINDEX), Qt::AscendingOrder);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -176,7 +175,7 @@ void C_SdNdeCoPdoTableView::SetNodeIndexAndInterfaceId(const stw_types::uint32 o
    Number of items in table
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sintn C_SdNdeCoPdoTableView::GetCountRows() const
+int32_t C_SdNdeCoPdoTableView::GetCountRows() const
 {
    return this->mc_Model.rowCount();
 }
@@ -191,7 +190,7 @@ stw_types::sintn C_SdNdeCoPdoTableView::GetCountRows() const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoTableView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
-   sint32 s32_HoveredRow = -1;
+   int32_t s32_HoveredRow = -1;
    const QModelIndex c_HoveredIndex = this->indexAt(opc_Event->pos());
 
    QTableView::mouseMoveEvent(opc_Event);
@@ -242,7 +241,7 @@ void C_SdNdeCoPdoTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
       const QModelIndex c_ClickedIndex = this->mc_SortProxyModel.mapToSource(c_ClickedIndexProxy);
       if (c_ClickedIndex.isValid() == true)
       {
-         stw_opensyde_core::C_OSCCanMessageIdentificationIndices c_MsgId;
+         stw::opensyde_core::C_OscCanMessageIdentificationIndices c_MsgId;
          if (this->mc_Model.MapRowToMsgId(c_ClickedIndex.row(), c_MsgId) == C_NO_ERR)
          {
             Q_EMIT (this->SigSwitchToBusProtocolMessage(c_MsgId));
@@ -257,15 +256,15 @@ void C_SdNdeCoPdoTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoPdoTableView::m_InitColumns(void)
 {
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eINDEX), 44);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eENABLED), 60);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eNAME), 180);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eCOMMENT), 200);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eCOTYPE), 60);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eEXTENDED), 60);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eCOBID), 170);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eDLC), 50);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eTXMETHOD), 170);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eINHIBITTIME), 70);
-   this->setColumnWidth(static_cast<sintn>(C_SdNdeCoPdoTableModel::eEVENTTIME), 70);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eINDEX), 44);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eENABLED), 60);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eNAME), 180);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eCOMMENT), 200);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eCOTYPE), 60);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eEXTENDED), 60);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eCOBID), 170);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eDLC), 50);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eTXMETHOD), 170);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eINHIBITTIME), 70);
+   this->setColumnWidth(static_cast<int32_t>(C_SdNdeCoPdoTableModel::eEVENTTIME), 70);
 }

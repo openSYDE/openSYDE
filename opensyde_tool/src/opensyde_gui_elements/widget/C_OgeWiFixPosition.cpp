@@ -11,23 +11,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsDropShadowEffect>
 
-#include "C_OgeWiFixPosition.h"
+#include "C_OgeWiFixPosition.hpp"
 #include "ui_C_OgeWiFixPosition.h"
-#include "C_OgeWiUtil.h"
-#include "constants.h"
+#include "C_OgeWiUtil.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-static const sintn msn_SHADOW_WIDTH = 8;
+static const int32_t ms32_SHADOW_WIDTH = 8;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ static const sintn msn_SHADOW_WIDTH = 8;
    \param[in,out] orc_Geometry Position of fix position widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeWiFixPosition::C_OgeWiFixPosition(const QString oc_Title, const QString oc_IconPath, QRect const & orc_Geometry,
+C_OgeWiFixPosition::C_OgeWiFixPosition(const QString oc_Title, const QString oc_IconPath, const QRect & orc_Geometry,
                                        QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_OgeWiFixPosition)
@@ -66,8 +65,8 @@ C_OgeWiFixPosition::C_OgeWiFixPosition(const QString oc_Title, const QString oc_
    c_Icon.load(oc_IconPath);
    this->mpc_Ui->pc_LabelIcon->setPixmap(QPixmap::fromImage(c_Icon));
    this->setGeometry(orc_Geometry);
-   this->mpc_Ui->pc_GroupBox->setMaximumSize(orc_Geometry.width() - msn_SHADOW_WIDTH,
-                                             orc_Geometry.height() - msn_SHADOW_WIDTH);
+   this->mpc_Ui->pc_GroupBox->setMaximumSize(orc_Geometry.width() - ms32_SHADOW_WIDTH,
+                                             orc_Geometry.height() - ms32_SHADOW_WIDTH);
 
    // Activate shadow
    this->m_ApplyShadow();

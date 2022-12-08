@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_GtGetText.h"
-#include "TGLUtils.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdUtil.h"
+#include "stwtypes.hpp"
+#include "C_GtGetText.hpp"
+#include "TglUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdUtil.hpp"
 
-#include "C_CieImportDatapoolSelectWidget.h"
+#include "C_CieImportDatapoolSelectWidget.hpp"
 #include "ui_C_CieImportDatapoolSelectWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,8 +49,8 @@ using namespace stw_opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieImportDatapoolSelectWidget::C_CieImportDatapoolSelectWidget(
-   stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32 ou32_NodeIndex,
-   const C_OSCCanProtocol::E_Type oe_ComProtocolType) :
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const uint32_t ou32_NodeIndex,
+   const C_OscCanProtocol::E_Type oe_ComProtocolType) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieImportDatapoolSelectWidget),
    mrc_ParentDialog(orc_Parent),
@@ -112,22 +111,22 @@ void C_CieImportDatapoolSelectWidget::InitStaticNames(void) const
 
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CieImportDatapoolSelectWidget::GetSelectedDatapoolIndex(void) const
+uint32_t C_CieImportDatapoolSelectWidget::GetSelectedDatapoolIndex(void) const
 {
-   uint32 u32_Return = 0;
+   uint32_t u32_Return = 0;
    bool q_IndexFound = false;
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    if (pc_Node != NULL)
    {
       // convert combo box index to datapool index
-      sint32 s32_ItProtocolDatapool = 0;
-      for (uint32 u32_ItDatapool = 0; u32_ItDatapool < pc_Node->c_DataPools.size(); ++u32_ItDatapool)
+      int32_t s32_ItProtocolDatapool = 0;
+      for (uint32_t u32_ItDatapool = 0; u32_ItDatapool < pc_Node->c_DataPools.size(); ++u32_ItDatapool)
       {
-         if (pc_Node->c_DataPools[u32_ItDatapool].e_Type == C_OSCNodeDataPool::eCOM)
+         if (pc_Node->c_DataPools[u32_ItDatapool].e_Type == C_OscNodeDataPool::eCOM)
          {
-            if (C_PuiSdUtil::h_GetRelatedCANProtocolType(this->mu32_NodeIndex,
+            if (C_PuiSdUtil::h_GetRelatedCanProtocolType(this->mu32_NodeIndex,
                                                          u32_ItDatapool) == this->me_ComProtocolType)
             {
                if (this->mpc_Ui->pc_CbxDatapools->currentIndex() == s32_ItProtocolDatapool)
@@ -161,8 +160,8 @@ void C_CieImportDatapoolSelectWidget::keyPressEvent(QKeyEvent * const opc_KeyEve
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -205,15 +204,15 @@ void C_CieImportDatapoolSelectWidget::m_CancelClicked(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportDatapoolSelectWidget::m_InitComboBox(void) const
 {
-   const std::vector< const C_OSCNodeDataPool *> & rc_Datapools =
-      C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPools(this->mu32_NodeIndex, this->me_ComProtocolType);
+   const std::vector< const C_OscNodeDataPool *> & rc_Datapools =
+      C_PuiSdHandler::h_GetInstance()->GetOscCanDataPools(this->mu32_NodeIndex, this->me_ComProtocolType);
 
-   for (std::vector< const C_OSCNodeDataPool *>::const_iterator c_It = rc_Datapools.begin(); c_It != rc_Datapools.end();
+   for (std::vector< const C_OscNodeDataPool *>::const_iterator c_It = rc_Datapools.begin(); c_It != rc_Datapools.end();
         ++c_It)
    {
       if (*c_It != NULL)
       {
-         const C_OSCNodeDataPool & rc_Datapool = **c_It;
+         const C_OscNodeDataPool & rc_Datapool = **c_It;
          this->mpc_Ui->pc_CbxDatapools->addItem(rc_Datapool.c_Name.c_str());
       }
    }

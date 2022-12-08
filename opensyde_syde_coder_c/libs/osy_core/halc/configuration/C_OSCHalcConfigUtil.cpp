@@ -8,16 +8,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OSCHalcConfigUtil.h"
+#include "C_OscHalcConfigUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCHalcConfigUtil::C_OSCHalcConfigUtil()
+C_OscHalcConfigUtil::C_OscHalcConfigUtil()
 {
 }
 
@@ -46,29 +46,29 @@ C_OSCHalcConfigUtil::C_OSCHalcConfigUtil()
    \param[out]      orc_ConfigStandalone  Standalone HALC configuration as result with the configuration of orc_Config
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCHalcConfigUtil::h_GetConfigStandalone(const C_OSCHalcConfig & orc_Config,
-                                                C_OSCHalcConfigStandalone & orc_ConfigStandalone)
+void C_OscHalcConfigUtil::h_GetConfigStandalone(const C_OscHalcConfig & orc_Config,
+                                                C_OscHalcConfigStandalone & orc_ConfigStandalone)
 {
-   uint32 u32_DomainCounter;
+   uint32_t u32_DomainCounter;
 
    orc_ConfigStandalone.c_DeviceType = orc_Config.c_DeviceName;
    orc_ConfigStandalone.u32_DefinitionContentVersion = orc_Config.u32_ContentVersion;
 
    for (u32_DomainCounter = 0U; u32_DomainCounter < orc_Config.GetDomainSize(); ++u32_DomainCounter)
    {
-      const C_OSCHalcConfigDomain * const pc_Domain = orc_Config.GetDomainConfigDataConst(u32_DomainCounter);
+      const C_OscHalcConfigDomain * const pc_Domain = orc_Config.GetDomainConfigDataConst(u32_DomainCounter);
 
       if (pc_Domain != NULL)
       {
-         uint32 u32_Channels;
-         std::vector<C_OSCHalcConfigStandaloneChannel> c_ChannelIds;
+         uint32_t u32_Channels;
+         std::vector<C_OscHalcConfigStandaloneChannel> c_ChannelIds;
 
          c_ChannelIds.resize(pc_Domain->c_Channels.size());
 
          // Get the information of the channels
          for (u32_Channels = 0UL; u32_Channels < c_ChannelIds.size(); ++u32_Channels)
          {
-            uint32 u32_Parameter;
+            uint32_t u32_Parameter;
 
             c_ChannelIds[u32_Channels].c_ParameterIds.resize(pc_Domain->c_ChannelValues.c_Parameters.size());
 
@@ -82,7 +82,7 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const C_OSCHalcConfig & orc_Conf
 
          {
             // Add the standalone domain
-            const C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
+            const C_OscHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
             orc_ConfigStandalone.c_Domains.push_back(c_StandaloneDomain);
          }
       }
@@ -103,16 +103,16 @@ void C_OSCHalcConfigUtil::h_GetConfigStandalone(const C_OSCHalcConfig & orc_Conf
    \retval   C_RANGE    ou32_DomainIndex or ou32_ChannelIndex is invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const C_OSCHalcConfig & orc_Config,
-                                                         const uint32 ou32_DomainIndex, const uint32 ou32_ChannelIndex,
-                                                         const bool oq_DomainOnly,
-                                                         C_OSCHalcConfigStandalone & orc_ConfigStandalone)
+int32_t C_OscHalcConfigUtil::h_GetConfigStandaloneChannel(const C_OscHalcConfig & orc_Config,
+                                                          const uint32_t ou32_DomainIndex,
+                                                          const uint32_t ou32_ChannelIndex, const bool oq_DomainOnly,
+                                                          C_OscHalcConfigStandalone & orc_ConfigStandalone)
 {
-   sint32 s32_Return = C_RANGE;
+   int32_t s32_Return = C_RANGE;
 
    if (ou32_DomainIndex < orc_Config.GetDomainSize())
    {
-      const C_OSCHalcConfigDomain * const pc_Domain = orc_Config.GetDomainConfigDataConst(ou32_DomainIndex);
+      const C_OscHalcConfigDomain * const pc_Domain = orc_Config.GetDomainConfigDataConst(ou32_DomainIndex);
 
       if (pc_Domain != NULL)
       {
@@ -121,8 +121,7 @@ sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const C_OSCHalcConfig &
                (ou32_ChannelIndex < pc_Domain->c_ChannelConfigs.size()))) &&
              (pc_Domain->c_Channels.size() == pc_Domain->c_ChannelConfigs.size()))
          {
-            uint32 u32_Parameter;
-            std::vector<C_OSCHalcConfigStandaloneChannel> c_ChannelIds;
+            std::vector<C_OscHalcConfigStandaloneChannel> c_ChannelIds;
 
             s32_Return = C_NO_ERR;
 
@@ -133,6 +132,7 @@ sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const C_OSCHalcConfig &
             // Channel Id with the channel parameters
             if (oq_DomainOnly == false)
             {
+               uint32_t u32_Parameter;
                c_ChannelIds.resize(1);
                c_ChannelIds[0].c_ParameterIds.resize(pc_Domain->c_ChannelValues.c_Parameters.size());
 
@@ -147,15 +147,15 @@ sint32 C_OSCHalcConfigUtil::h_GetConfigStandaloneChannel(const C_OSCHalcConfig &
 
             {
                // Add the standalone domain
-               C_OSCHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
+               C_OscHalcConfigStandaloneDomain c_StandaloneDomain(*pc_Domain, c_ChannelIds);
 
                if (oq_DomainOnly == false)
                {
                   // Remove the not necessary channels of the original configuration
                   if ((c_StandaloneDomain.c_ChannelConfigs.size() > 1) &&
-                      (ou32_ChannelIndex < static_cast<uint32>(c_StandaloneDomain.c_ChannelConfigs.size() - 1UL)))
+                      (ou32_ChannelIndex < static_cast<uint32_t>(c_StandaloneDomain.c_ChannelConfigs.size() - 1UL)))
                   {
-                     const uint32 u32_NextIndex = (ou32_ChannelIndex + 1UL);
+                     const uint32_t u32_NextIndex = (ou32_ChannelIndex + 1UL);
                      c_StandaloneDomain.c_ChannelConfigs.erase(
                         c_StandaloneDomain.c_ChannelConfigs.begin() + u32_NextIndex,
                         c_StandaloneDomain.c_ChannelConfigs.begin() + c_StandaloneDomain.c_ChannelConfigs.size());

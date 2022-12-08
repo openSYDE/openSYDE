@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_CamProHandler.h"
-#include "C_CamGenKeySelect.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamGenKeySelect.hpp"
 #include "ui_C_CamGenKeySelect.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,8 +47,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     ou32_MessageIndex Index of message the key belongs to
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamGenKeySelect::C_CamGenKeySelect(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                     const stw_types::uint32 ou32_MessageIndex) :
+C_CamGenKeySelect::C_CamGenKeySelect(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                     const uint32_t ou32_MessageIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CamGenKeySelect),
    mrc_ParentDialog(orc_Parent),
@@ -133,8 +132,8 @@ void C_CamGenKeySelect::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

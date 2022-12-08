@@ -8,12 +8,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgePubIconChart.h"
+#include "C_OgePubIconChart.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,7 +40,7 @@ C_OgePubIconChart::C_OgePubIconChart(QWidget * const opc_Parent) :
 {
    this->setIconSize(QSize(24, 24));
    this->SetMargins(0, 0);
-   this->msn_LeftBorderEnabledWidth = 0;
+   this->ms32_LeftBorderEnabledWidth = 0;
 
    // those colors are styled in style sheets
    this->mc_BackgroundColorDisabled = Qt::transparent;

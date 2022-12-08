@@ -1,5 +1,5 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_CamMetTreeView
+stw--opensyde_gui--C_CamMetTreeView
 {
 border-style: solid;
 border-top-width: 0px;
@@ -8,7 +8,7 @@ border-left-width: 0px;
 border-right-width: 0px;
 }
 
-stw_opensyde_gui--C_CamMetTreeView QHeaderView::section
+stw--opensyde_gui--C_CamMetTreeView QHeaderView::section
 {
 margin-top: 1px;
 margin-bottom: 1px;
@@ -22,12 +22,12 @@ border-left-width: 0px;
 border-right-width: 1px;
 }
 
-stw_opensyde_gui--C_CamMetTreeView QHeaderView::section:first
+stw--opensyde_gui--C_CamMetTreeView QHeaderView::section:first
 {
 padding-left: 8px;
 }
 
-stw_opensyde_gui--C_CamMetTreeView QHeaderView
+stw--opensyde_gui--C_CamMetTreeView QHeaderView
 {
 border-style: solid;
 border-top-width: 1px;
@@ -36,67 +36,67 @@ border-left-width: 0px;
 border-right-width: 0px;
 }
 
-stw_opensyde_gui--C_CamMosDatabaseSelectionView,
-stw_opensyde_gui--C_CamMetTreeView
+stw--opensyde_gui--C_CamMosDatabaseSelectionView,
+stw--opensyde_gui--C_CamMetTreeView
 {
 outline:none;
 }
 
 /* Database selection tree */
-stw_opensyde_gui--C_CamMosDatabaseSelectionView {
+stw--opensyde_gui--C_CamMosDatabaseSelectionView {
 border-style: none;
 }
 
-stw_opensyde_gui--C_CamMosDatabaseSelectionView::item {
+stw--opensyde_gui--C_CamMosDatabaseSelectionView::item {
 border-style: none;
 margin-top: 3px;
 margin-bottom: 3px;
 }
 
-stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch {
+stw--opensyde_gui--C_CamMosDatabaseSelectionView::branch {
 margin-top:3px;
 margin-bottom:3px;
 }
 
 /* Icons */
 /* closed */
-stw_opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_CamMetTreeView::branch:closed:has-children:has-siblings
+stw--opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_CamMetTreeView::branch:closed:has-children:has-siblings
 {
 border-image: none;
 image:url(:/images/IconArrowSmallOpen.png);
 }
 
-stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:has-children:!has-siblings:closed,
-stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:closed:has-children:has-siblings
+stw--opensyde_gui--C_CamMosDatabaseSelectionView::branch:has-children:!has-siblings:closed,
+stw--opensyde_gui--C_CamMosDatabaseSelectionView::branch:closed:has-children:has-siblings
 {
 border-image: none;
 image:url(://images/IconArrowSmallOpenBlue.png);
 }
 
 /* open */
-stw_opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:open,
-stw_opensyde_gui--C_CamMetTreeView::branch:open:has-children:has-siblings
+stw--opensyde_gui--C_CamMetTreeView::branch:has-children:!has-siblings:open,
+stw--opensyde_gui--C_CamMetTreeView::branch:open:has-children:has-siblings
 {
 border-image: none;
 image:url(:/images/IconArrowSmallCloseGray.png);
 }
 
-stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:!has-siblings,
-stw_opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:has-siblings
+stw--opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:!has-siblings,
+stw--opensyde_gui--C_CamMosDatabaseSelectionView::branch:open:has-children:has-siblings
 {
 border-image: none;
 image:url(://images/IconArrowSmallClose.png);
 }
 
 /* -- Sort indicator -- */
-stw_opensyde_gui--C_CamMetTreeView QHeaderView::down-arrow {
+stw--opensyde_gui--C_CamMetTreeView QHeaderView::down-arrow {
 width: 21px;
 height: 21px;
 image: url(://images/IconMoveDown.svg) 0 0 0 0 stretch stretch;
 }
 
-stw_opensyde_gui--C_CamMetTreeView QHeaderView::up-arrow {
+stw--opensyde_gui--C_CamMetTreeView QHeaderView::up-arrow {
 width: 21px;
 height: 21px;
 image: url(://images/IconMoveUp.svg) 0 0 0 0 stretch stretch;

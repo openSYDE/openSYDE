@@ -8,34 +8,33 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "TGLUtils.h"
-#include "C_PuiSdHandler.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OgePopUpDialog.h"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "TglUtils.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OgePopUpDialog.hpp"
 
-#include "C_SyvUpPacListNodeItemDatablockWidget.h"
+#include "C_SyvUpPacListNodeItemDatablockWidget.hpp"
 #include "ui_C_SyvUpPacListNodeItemWidget.h"
 
-#include "C_PuiSvHandler.h"
-#include "C_OsyHexFile.h"
-#include "C_SyvUpPacHexFileView.h"
+#include "C_PuiSvHandler.hpp"
+#include "C_OsyHexFile.hpp"
+#include "C_SyvUpPacHexFileView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -62,8 +61,8 @@ using namespace stw_opensyde_core;
    \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacListNodeItemDatablockWidget::C_SyvUpPacListNodeItemDatablockWidget(const uint32 ou32_ViewIndex,
-                                                                             const uint32 ou32_NodeIndex,
+C_SyvUpPacListNodeItemDatablockWidget::C_SyvUpPacListNodeItemDatablockWidget(const uint32_t ou32_ViewIndex,
+                                                                             const uint32_t ou32_NodeIndex,
                                                                              const QString & orc_DeviceName,
                                                                              const bool oq_FileBased,
                                                                              const bool oq_StwFlashloader,
@@ -82,7 +81,7 @@ C_SyvUpPacListNodeItemDatablockWidget::C_SyvUpPacListNodeItemDatablockWidget(con
    Type of return values, e.g. STW error codes
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacListNodeItemDatablockWidget::GetType(void) const
+uint32_t C_SyvUpPacListNodeItemDatablockWidget::GetType(void) const
 {
    return mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
 }
@@ -127,7 +126,7 @@ void C_SyvUpPacListNodeItemDatablockWidget::ViewFileInfo(void)
 {
    if (this->GetAppFilePath().compare("") != 0)
    {
-      QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvUpPacHexFileView * const pc_InfoDialog =
          new C_SyvUpPacHexFileView(*c_New, this->GetAppAbsoluteFilePath());
 
@@ -136,7 +135,7 @@ void C_SyvUpPacListNodeItemDatablockWidget::ViewFileInfo(void)
       //Resize
       c_New->SetSize(QSize(1000, 761));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          //No confirmation
       }
@@ -195,10 +194,10 @@ void C_SyvUpPacListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_Fil
          C_OsyHexFile * const pc_HexFile = new C_OsyHexFile();
 
          // File information
-         if (pc_HexFile->LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str()) == stw_hex_file::NO_ERR)
+         if (pc_HexFile->LoadFromFile(this->mc_AbsoluteFilePath.toStdString().c_str()) == stw::hex_file::NO_ERR)
          {
-            stw_diag_lib::C_XFLECUInformation c_FileApplicationInfo;
-            const sint32 s32_Result = pc_HexFile->ScanApplicationInformationBlockFromHexFile(c_FileApplicationInfo);
+            stw::diag_lib::C_XFLECUInformation c_FileApplicationInfo;
+            const int32_t s32_Result = pc_HexFile->ScanApplicationInformationBlockFromHexFile(c_FileApplicationInfo);
 
             if ((s32_Result == C_NO_ERR) || (s32_Result == C_WARN))
             {
@@ -246,12 +245,12 @@ void C_SyvUpPacListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_Fil
                   else
                   {
                      bool q_FileIsOk = false;
-                     const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                     const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                         this->mu32_NodeIndex);
                      if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
                          (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
                      {
-                        for (uint32 u32_ItName = 0UL;
+                        for (uint32_t u32_ItName = 0UL;
                              u32_ItName <
                              pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
                              c_OtherAcceptedNames.

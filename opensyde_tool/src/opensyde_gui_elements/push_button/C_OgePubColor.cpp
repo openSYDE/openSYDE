@@ -12,15 +12,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgePubColor.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgePubColor.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -59,7 +58,7 @@ void C_OgePubColor::SetColors(const QColor & orc_BackgroundColor, const QColor &
                               const QColor & orc_RestBorderColor)
 {
    this->setStyleSheet(
-      "stw_opensyde_gui_elements--C_OgePubColor"
+      "stw--opensyde_gui_elements--C_OgePubColor"
       "{"
       "   background-color: " + orc_BackgroundColor.name() + ";"
       "   border-top-color: " + orc_TopBorderColor.name() + ";"

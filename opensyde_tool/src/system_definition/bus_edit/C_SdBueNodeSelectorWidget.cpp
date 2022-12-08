@@ -10,30 +10,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <vector>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
 
-#include "C_SdBueNodeSelectorWidget.h"
+#include "C_SdBueNodeSelectorWidget.hpp"
 #include "ui_C_SdBueNodeSelectorWidget.h"
 
-#include "C_OSCNode.h"
-#include "C_OSCSystemBus.h"
-#include "C_PuiSdHandler.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_SdUtil.h"
-#include "C_CieUtil.h"
+#include "C_OscNode.hpp"
+#include "C_OscSystemBus.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdUtil.hpp"
+#include "C_CieUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -59,7 +58,7 @@ C_SdBueNodeSelectorWidget::C_SdBueNodeSelectorWidget(QWidget * const opc_Parent)
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueNodeSelectorWidget),
    mu32_BusIndex(0U),
-   me_Protocol(C_OSCCanProtocol::eLAYER2)
+   me_Protocol(C_OscCanProtocol::eLAYER2)
 {
    mpc_Ui->setupUi(this);
 
@@ -104,16 +103,16 @@ void C_SdBueNodeSelectorWidget::InitStaticNames(void) const
    \param[in]     ou32_BusIndex     Bus id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorWidget::SetBusId(const stw_types::uint32 ou32_BusIndex)
+void C_SdBueNodeSelectorWidget::SetBusId(const uint32_t ou32_BusIndex)
 {
-   std::vector<uint32> c_NodeIndexes;
-   std::vector<uint32> c_InterfaceIndexes;
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
    std::vector<QString> c_NodeNames;
 
    // save the bus index
    this->mu32_BusIndex = ou32_BusIndex;
 
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes,
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex, c_NodeIndexes,
                                                                                       c_InterfaceIndexes);
    if (C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames, true) == C_NO_ERR)
    {
@@ -143,14 +142,14 @@ void C_SdBueNodeSelectorWidget::SetBusId(const stw_types::uint32 ou32_BusIndex)
    \param[in]     oe_Protocol     Protocol id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Protocol)
+void C_SdBueNodeSelectorWidget::SetProtocol(const C_OscCanProtocol::E_Type oe_Protocol)
 {
-   uint32 u32_NodeCounter;
+   uint32_t u32_NodeCounter;
 
-   std::vector<uint32> c_NodeIndexes;
-   std::vector<uint32> c_InterfaceIndexes;
-   std::vector<uint32> c_NodeIndexesWithInterfaceDuplicates;
-   std::vector<uint32> c_ReducedInterfaceIndexes;
+   std::vector<uint32_t> c_NodeIndexes;
+   std::vector<uint32_t> c_InterfaceIndexes;
+   std::vector<uint32_t> c_NodeIndexesWithInterfaceDuplicates;
+   std::vector<uint32_t> c_ReducedInterfaceIndexes;
 
    disconnect(this->mpc_Ui->pc_NodeSelectorListWidget, &C_SdBueNodeSelectorCheckBoxListWidget::SigNodeToggled,
               this, &C_SdBueNodeSelectorWidget::m_NodeToggled);
@@ -160,7 +159,7 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
    // save the protocol
    this->me_Protocol = oe_Protocol;
 
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
                                                                                       c_NodeIndexes,
                                                                                       c_InterfaceIndexes);
 
@@ -169,21 +168,21 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
       // get all the nodes using the protocol
       for (u32_NodeCounter = 0U; u32_NodeCounter < c_NodeIndexes.size(); ++u32_NodeCounter)
       {
-         const C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(c_NodeIndexes[u32_NodeCounter]);
+         const C_OscNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndexes[u32_NodeCounter]);
 
          if (pc_Node != NULL)
          {
             // get the protocols
-            std::vector<const C_OSCCanProtocol *> c_Protocols = pc_Node->GetCANProtocolsConst(oe_Protocol);
-            uint32 u32_Counter;
+            std::vector<const C_OscCanProtocol *> c_Protocols = pc_Node->GetCanProtocolsConst(oe_Protocol);
+            uint32_t u32_Counter;
 
             for (u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
             {
-               const C_OSCCanProtocol * const pc_Protcol = c_Protocols[u32_Counter];
+               const C_OscCanProtocol * const pc_Protcol = c_Protocols[u32_Counter];
                if (c_InterfaceIndexes[u32_NodeCounter] < pc_Protcol->c_ComMessages.size())
                {
-                  const C_OSCCanMessageContainer & rc_MessageContainer =
+                  const C_OscCanMessageContainer & rc_MessageContainer =
                      pc_Protcol->c_ComMessages[c_InterfaceIndexes[u32_NodeCounter]];
                   // check which interfaces are using the protocol
                   if (rc_MessageContainer.q_IsComProtocolUsedByInterface == true)
@@ -201,24 +200,24 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
 
    this->mpc_Ui->pc_NodeSelectorListWidget->SetProtocol(oe_Protocol);
 
-   if (oe_Protocol == C_OSCCanProtocol::eCAN_OPEN)
+   if (oe_Protocol == C_OscCanProtocol::eCAN_OPEN)
    {
       // Special case CANopen: The CANopen Manager on this bus gets a link
-      uint32 u32_ManagerNodeIndex;
-      uint8 u8_ManagerIntfNumber;
+      uint32_t u32_ManagerNodeIndex;
+      uint8_t u8_ManagerIntfNumber;
       if (C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerNodeOnBus(this->mu32_BusIndex, u32_ManagerNodeIndex,
                                                                       &u8_ManagerIntfNumber) == C_NO_ERR)
       {
-         const C_OSCNode * const pc_NodeManager =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ManagerNodeIndex);
+         const C_OscNode * const pc_NodeManager =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ManagerNodeIndex);
 
          if (pc_NodeManager != NULL)
          {
-            uint32 u32_IntfCounter;
-            uint32 u32_ManagerIntfIndex = 0U;
+            uint32_t u32_IntfCounter;
+            uint32_t u32_ManagerIntfIndex = 0U;
             // The devices have to be added manually as checked due to not having own protocol information about
             // CANopen. Only the manager has all information.
-            const std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_ItManagerInfo =
+            const std::map<uint8_t, C_OscCanOpenManagerInfo>::const_iterator c_ItManagerInfo =
                pc_NodeManager->c_CanOpenManagers.find(u8_ManagerIntfNumber);
 
             // Set the info for the manager
@@ -241,14 +240,14 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OSCCanProtocol::E_Type oe_Pr
             tgl_assert(c_ItManagerInfo != pc_NodeManager->c_CanOpenManagers.end());
             if (c_ItManagerInfo != pc_NodeManager->c_CanOpenManagers.end())
             {
-               const C_OSCCanOpenManagerInfo & rc_ManagerInfo = c_ItManagerInfo->second;
-               std::map<C_OSCCanInterfaceId, C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice;
+               const C_OscCanOpenManagerInfo & rc_ManagerInfo = c_ItManagerInfo->second;
+               std::map<C_OscCanInterfaceId, C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice;
 
                for (c_ItDevice = rc_ManagerInfo.c_CanOpenDevices.begin();
                     c_ItDevice != rc_ManagerInfo.c_CanOpenDevices.end(); ++c_ItDevice)
                {
-                  const C_OSCCanInterfaceId & rc_DeviceId = c_ItDevice->first;
-                  const C_OSCNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+                  const C_OscCanInterfaceId & rc_DeviceId = c_ItDevice->first;
+                  const C_OscNode * const pc_DeviceNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                      rc_DeviceId.u32_NodeIndex);
 
                   if (pc_DeviceNode != NULL)
@@ -300,18 +299,18 @@ void C_SdBueNodeSelectorWidget::Refresh(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32 ou32_NodeIndex, const stw_types::uint32 ou32_InterfaceIndex,
+void C_SdBueNodeSelectorWidget::m_NodeToggled(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
                                               const bool oq_Checked) const
 {
    if (oq_Checked == true)
    {
       // protocol will be used by this node on this bus
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
       if (pc_Node != NULL)
       {
          // check if a protocol and therefore a Datapool exist
-         const bool q_ProtocolAndDbExists = (pc_Node->GetCANProtocolsConst(this->me_Protocol).size() > 0U);
+         const bool q_ProtocolAndDbExists = (pc_Node->GetCanProtocolsConst(this->me_Protocol).size() > 0U);
 
          if (q_ProtocolAndDbExists == true)
          {

@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_UsSystemViewDashboard.h"
+#include "C_UsSystemViewDashboard.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,7 +39,7 @@ C_UsSystemViewDashboard::C_UsSystemViewDashboard(void) :
    c_TornOffWindowSize(1000, 800),
    q_TornOffWindowMinimized(false),
    q_TornOffWindowMaximized(false),
-   sn_SceneZoom(100),
+   s32_SceneZoom(100),
    c_ScenePos(0, 0)
 {
 }

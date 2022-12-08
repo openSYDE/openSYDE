@@ -38,7 +38,7 @@
       <number>0</number>
      </property>
      <item row="0" column="0">
-      <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardLabelCaption" name="pc_LabelCaption">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardLabelCaption" name="pc_LabelCaption">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -61,7 +61,7 @@
       <number>4</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabDashboardLabelValue" name="pc_LabelValue">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabDashboardLabelValue" name="pc_LabelValue">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -79,14 +79,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDashboardLabelValue</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDashboardLabelValue</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDashboardLabelValue.h</header>
+   <header>C_OgeLabDashboardLabelValue.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDashboardLabelCaption</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDashboardLabelCaption</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDashboardLabelCaption.h</header>
+   <header>C_OgeLabDashboardLabelCaption.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

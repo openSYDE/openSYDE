@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QBitArray>
 
-#include "C_Uti.h"
-#include "cam_constants.h"
-#include "C_TblDelegateUtil.h"
+#include "C_Uti.hpp"
+#include "cam_constants.hpp"
+#include "C_TblDelegateUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -49,8 +48,8 @@ using namespace stw_opensyde_gui_logic;
    \param[in]      orc_HighlightBackgroundColor    Highlight background color
    \param[in]      orc_HighlightBorderColor        Highlight border color
    \param[in]      orc_HighlightFont               Highlight font
-   \param[in]      osn_HexSpacing                  In between spacing when using HEX format
-   \param[in]      osn_DecimalSpacing              In between spacing when using decimal format
+   \param[in]      os32_HexSpacing                  In between spacing when using HEX format
+   \param[in]      os32_DecimalSpacing              In between spacing when using decimal format
 
    \return
    True  Section painted
@@ -64,56 +63,56 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
                                           const QColor & orc_HighlightForegroundColor,
                                           const QColor & orc_HighlightBackgroundColor,
                                           const QColor & orc_HighlightBorderColor, const QFont & orc_HighlightFont,
-                                          const sintn osn_HexSpacing, const sintn osn_DecimalSpacing)
+                                          const int32_t os32_HexSpacing, const int32_t os32_DecimalSpacing)
 {
    bool q_Retval = true;
    QBitArray c_Array;
 
    //Get data AFTER unlocking the data
    //Get the highlighted sections (Warning: only expected to be non zero for data column
-   c_Array = orc_Index.data(msn_USER_ROLE_MARKER).toBitArray();
+   c_Array = orc_Index.data(ms32_USER_ROLE_MARKER).toBitArray();
 
    //Only draw manually if necessary
    if (c_Array.isEmpty() == false)
    {
       bool q_IsHex;
       //Acquire data via special user role to not have a conflict with the default drawing engine
-      const QString c_Data = orc_Index.data(msn_USER_ROLE_MARKER_TEXT).toString();
+      const QString c_Data = orc_Index.data(ms32_USER_ROLE_MARKER_TEXT).toString();
       //Separate data bytes
       const QStringList c_List = mh_CreateAndStandardizeStringList(c_Data, q_IsHex);
       //GreyOutValues
-      const QByteArray c_TransparencyValues = orc_Index.data(msn_USER_ROLE_MARKER_TRANSPARENCY).toByteArray();
+      const QByteArray c_TransparencyValues = orc_Index.data(ms32_USER_ROLE_MARKER_TRANSPARENCY).toByteArray();
       //Check if expected size (Number of bytes and flags to highlight should match)
       //Transparency may be bigger, but not smaller
       if ((c_List.size() == c_Array.size()) && (c_List.size() <= c_TransparencyValues.size()))
       {
          const QFontMetrics c_MetricsDefault(orc_DefaultFont);
          const QColor c_ForegroundInformation =
-            orc_Index.data(static_cast<sint32>(Qt::ForegroundRole)).value<QColor>();
+            orc_Index.data(static_cast<int32_t>(Qt::ForegroundRole)).value<QColor>();
          QColor c_NonHighlightedColorWithTransparency = c_ForegroundInformation;
          const QColor c_HighlightedColorWithTransparency = orc_HighlightForegroundColor;
-         sint32 s32_SectionWidth;
+         int32_t s32_SectionWidth;
          QStringList c_P1;
          QStringList c_P2;
          QStringList c_P3;
-         sint32 s32_SelectionMargin;
+         int32_t s32_SelectionMargin;
          QRect c_RectSegment;
          bool q_Start = true;
-         sintn sn_ItTransparency = 0;
+         int32_t s32_ItTransparency = 0;
          QPoint c_CurTopLeft = orc_CellRect.topLeft();
-         const sint32 s32_HalfSpaceWidth = static_cast<sint32>(c_MetricsDefault.horizontalAdvance(" ") / 2);
+         const int32_t s32_HalfSpaceWidth = static_cast<int32_t>(c_MetricsDefault.horizontalAdvance(" ") / 2);
 
          //Handle dynamic section width
          if (q_IsHex)
          {
             //Hex section width
-            s32_SectionWidth = osn_HexSpacing;
+            s32_SectionWidth = os32_HexSpacing;
             s32_SelectionMargin = -s32_HalfSpaceWidth * 2L;
          }
          else
          {
             //Decimal section width (one more number)
-            s32_SectionWidth = osn_DecimalSpacing;
+            s32_SectionWidth = os32_DecimalSpacing;
             s32_SelectionMargin = -s32_HalfSpaceWidth * 4L;
          }
 
@@ -133,7 +132,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
          }
 
          //Extract string parts
-         for (sint32 s32_ItLits = 0UL; s32_ItLits < c_List.size(); ++s32_ItLits)
+         for (int32_t s32_ItLits = 0UL; s32_ItLits < c_List.size(); ++s32_ItLits)
          {
             //Next byte value
             const QString & rc_NewItem = c_List.at(s32_ItLits);
@@ -166,7 +165,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
          {
             const QColor c_TextColor =
                oq_Selected ? c_NonHighlightedColorWithTransparency : C_TblDelegateUtil::mh_GetColorTransparent(
-                  c_NonHighlightedColorWithTransparency, c_TransparencyValues.at(sn_ItTransparency));
+                  c_NonHighlightedColorWithTransparency, c_TransparencyValues.at(s32_ItTransparency));
             C_TblDelegateUtil::h_PaintStringWithRestriction(opc_Painter, c_CurTopLeft, orc_CellRect, *c_It,
                                                             orc_DefaultBackgroundColor,
                                                             orc_DefaultBorderColor,
@@ -175,7 +174,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
                                                             Qt::AlignLeft | Qt::AlignVCenter, s32_SectionWidth,
                                                             s32_HalfSpaceWidth, s32_HalfSpaceWidth);
             //Transparency iteration
-            ++sn_ItTransparency;
+            ++s32_ItTransparency;
          }
 
          //Handle highlighted section
@@ -185,7 +184,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
             //Use the current top left NOT the one from the start -> don't move this line to the start!
             c_RectSegment =
                QRect(c_CurTopLeft,
-                     QSize(static_cast<sintn>(static_cast<sint32>(c_P2.size()) * s32_SectionWidth),
+                     QSize(static_cast<int32_t>(static_cast<int32_t>(c_P2.size()) * s32_SectionWidth),
                            orc_CellRect.height()));
             opc_Painter->setBrush(orc_HighlightBackgroundColor);
             opc_Painter->setPen(orc_HighlightBorderColor);
@@ -203,7 +202,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
                                                                Qt::AlignLeft | Qt::AlignVCenter, s32_SectionWidth,
                                                                s32_HalfSpaceWidth, s32_HalfSpaceWidth);
                //Transparency iteration
-               ++sn_ItTransparency;
+               ++s32_ItTransparency;
             }
          }
 
@@ -213,7 +212,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
          {
             const QColor c_TextColor =
                oq_Selected ? c_NonHighlightedColorWithTransparency : C_TblDelegateUtil::mh_GetColorTransparent(
-                  c_NonHighlightedColorWithTransparency, c_TransparencyValues.at(sn_ItTransparency));
+                  c_NonHighlightedColorWithTransparency, c_TransparencyValues.at(s32_ItTransparency));
             C_TblDelegateUtil::h_PaintStringWithRestriction(opc_Painter, c_CurTopLeft, orc_CellRect, *c_It,
                                                             orc_DefaultBackgroundColor,
                                                             orc_DefaultBorderColor,
@@ -222,7 +221,7 @@ bool C_TblDelegateUtil::h_PaintMarkedCell(QPainter * const opc_Painter, const QR
                                                             Qt::AlignLeft | Qt::AlignVCenter, s32_SectionWidth,
                                                             s32_HalfSpaceWidth, s32_HalfSpaceWidth);
             //Transparency iteration
-            ++sn_ItTransparency;
+            ++s32_ItTransparency;
          }
 
          opc_Painter->restore();
@@ -267,15 +266,15 @@ bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painte
                                                      const QColor & orc_Background, const QColor & orc_Border,
                                                      const QColor & orc_Foreground, const QFont & orc_Font,
                                                      const QFlags<Qt::AlignmentFlag> & orc_Alignment,
-                                                     const sint32 os32_CellWidth, const sint32 os32_MarginFront,
-                                                     const sint32 os32_MarginBack)
+                                                     const int32_t os32_CellWidth, const int32_t os32_MarginFront,
+                                                     const int32_t os32_MarginBack)
 {
    bool q_Retval;
    const QTextOption c_Option(orc_Alignment);
    QString c_DrawnText = orc_Text;
-   const sint32 s32_SegmentWidth = C_TblDelegateUtil::mh_GetSegmentWidth(orc_TopLeft, orc_CompleteCell, c_DrawnText,
-                                                                         orc_Font, os32_CellWidth, os32_MarginFront,
-                                                                         os32_MarginBack, q_Retval);
+   const int32_t s32_SegmentWidth = C_TblDelegateUtil::mh_GetSegmentWidth(orc_TopLeft, orc_CompleteCell, c_DrawnText,
+                                                                          orc_Font, os32_CellWidth, os32_MarginFront,
+                                                                          os32_MarginBack, q_Retval);
    //Rect segment to draw in
    const QRect c_RectSegment(orc_TopLeft, QSize(s32_SegmentWidth, orc_CompleteCell.height()));
 
@@ -295,7 +294,7 @@ bool C_TblDelegateUtil::h_PaintStringWithRestriction(QPainter * const opc_Painte
       opc_Painter->drawText(c_RectSegment.adjusted(os32_MarginFront, 0, 0, 0), c_DrawnText, c_Option);
    }
    //Update point
-   orc_TopLeft.setX(orc_TopLeft.x() + static_cast<sintn>(s32_SegmentWidth));
+   orc_TopLeft.setX(orc_TopLeft.x() + static_cast<int32_t>(s32_SegmentWidth));
    return q_Retval;
 }
 
@@ -323,12 +322,12 @@ C_TblDelegateUtil::C_TblDelegateUtil(void)
    Calculated segment width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const QRect & orc_CompleteCell,
-                                             QString & orc_DrawnText, const QFont & orc_Font,
-                                             const sint32 os32_CellWidth, const sint32 os32_MarginFront,
-                                             const sint32 os32_MarginBack, bool & orq_Changed)
+int32_t C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const QRect & orc_CompleteCell,
+                                              QString & orc_DrawnText, const QFont & orc_Font,
+                                              const int32_t os32_CellWidth, const int32_t os32_MarginFront,
+                                              const int32_t os32_MarginBack, bool & orq_Changed)
 {
-   sint32 s32_SegmentWidth = os32_CellWidth;
+   int32_t s32_SegmentWidth = os32_CellWidth;
    const QFontMetrics c_Metrics(orc_Font);
 
    //Default
@@ -340,13 +339,13 @@ sint32 C_TblDelegateUtil::mh_GetSegmentWidth(const QPoint & orc_TopLeft, const Q
       s32_SegmentWidth = os32_MarginFront + c_Metrics.horizontalAdvance(orc_DrawnText) + os32_MarginBack;
    }
    //Check if the segment width does exceed the complete cell boundaries
-   if ((static_cast<sint32>(orc_TopLeft.x()) + s32_SegmentWidth) >
-       (static_cast<sint32>(orc_CompleteCell.topLeft().x()) + static_cast<sint32>(orc_CompleteCell.width())))
+   if ((static_cast<int32_t>(orc_TopLeft.x()) + s32_SegmentWidth) >
+       (static_cast<int32_t>(orc_CompleteCell.topLeft().x()) + static_cast<int32_t>(orc_CompleteCell.width())))
    {
       s32_SegmentWidth =
-         static_cast<sint32>((orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()) - orc_TopLeft.x()) -
+         static_cast<int32_t>((orc_CompleteCell.topLeft().x() + orc_CompleteCell.width()) - orc_TopLeft.x()) -
          os32_MarginFront;
-      orc_DrawnText = C_Uti::h_AdaptStringToSize(orc_DrawnText, c_Metrics, static_cast<sintn>(s32_SegmentWidth));
+      orc_DrawnText = C_Uti::h_AdaptStringToSize(orc_DrawnText, c_Metrics, static_cast<int32_t>(s32_SegmentWidth));
       orq_Changed = true;
    }
    return s32_SegmentWidth;
@@ -394,13 +393,13 @@ QStringList C_TblDelegateUtil::mh_CreateAndStandardizeStringList(const QString &
    Color with specified transparency value
 */
 //----------------------------------------------------------------------------------------------------------------------
-QColor C_TblDelegateUtil::mh_GetColorTransparent(const QColor & orc_ColorBase, const charn ocn_Transparency)
+QColor C_TblDelegateUtil::mh_GetColorTransparent(const QColor & orc_ColorBase, const char_t ocn_Transparency)
 {
    QColor c_Retval = orc_ColorBase;
    //Subtract of 255 as the value is the transparency value, not the alpha value
-   //Cast to uint8 first as the alpha value negative range should be handled unsigned
-   const uint8 u8_AlphaValue = 0xFFU - static_cast<uint8>(ocn_Transparency);
+   //Cast to uint8_t first as the alpha value negative range should be handled unsigned
+   const uint8_t u8_AlphaValue = 0xFFU - static_cast<uint8_t>(ocn_Transparency);
 
-   c_Retval.setAlpha(static_cast<sintn>(u8_AlphaValue));
+   c_Retval.setAlpha(static_cast<int32_t>(u8_AlphaValue));
    return c_Retval;
 }

@@ -10,25 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QGraphicsColorizeEffect>
 #include <QGraphicsDropShadowEffect>
 
-#include "stwtypes.h"
-#include "C_HeHandler.h"
-#include "C_OgePopUpDialog.h"
+#include "stwtypes.hpp"
+#include "C_HeHandler.hpp"
+#include "C_OgePopUpDialog.hpp"
 #include "ui_C_OgePopUpDialog.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeWiUtil.hpp"
 
-#include "constants.h"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -140,15 +140,15 @@ void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
 {
    if (opc_Widget != NULL)
    {
-      stw_types::sintn sn_Index;
+      int32_t s32_Index;
 
       //save class name for help call
       this->mc_WidgetClassName = opc_Widget->metaObject()->className();
 
       opc_Widget->setParent(this);
       this->mpc_Ui->pc_VerticalLayout->addWidget(opc_Widget);
-      sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(opc_Widget);
-      this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+      s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(opc_Widget);
+      this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
       opc_Widget->setAutoFillBackground(true);
    }
 }
@@ -321,9 +321,9 @@ void C_OgePopUpDialog::SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
 {
-   if (stw_opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
+   if (stw::opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
    {
-      stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->mc_WidgetClassName);
+      stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(this->mc_WidgetClassName);
    }
    QDialog::keyPressEvent(opc_KeyEvent);
 }

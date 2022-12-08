@@ -8,26 +8,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDaPeUpdateModeNodeHeader.h"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDaPeUpdateModeNodeHeader.hpp"
 #include "ui_C_SyvDaPeUpdateModeNodeHeader.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HEADER_HEIGHT = 40;
+const uint32_t C_SyvDaPeUpdateModeNodeHeader::mhu32_HEADER_HEIGHT = 40;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -50,8 +49,8 @@ const uint32 C_SyvDaPeUpdateModeNodeHeader::mhu32_HEADER_HEIGHT = 40;
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::uint32 ou32_ViewIndex,
-                                                             const stw_types::uint32 ou32_NodeIndex,
+C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const uint32_t ou32_ViewIndex,
+                                                             const uint32_t ou32_NodeIndex,
                                                              QTreeWidgetItem * const opc_Item,
                                                              QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -60,7 +59,7 @@ C_SyvDaPeUpdateModeNodeHeader::C_SyvDaPeUpdateModeNodeHeader(const stw_types::ui
    mu32_ViewIndex(ou32_ViewIndex),
    mu32_NodeIndex(ou32_NodeIndex)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
 
    mpc_Ui->setupUi(this);
 
@@ -136,17 +135,17 @@ void C_SyvDaPeUpdateModeNodeHeader::InitStaticNames(void) const
                            >= 0: Valid count assumed
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const sint32 os32_Count) const
+void C_SyvDaPeUpdateModeNodeHeader::UpdateCount(const int32_t os32_Count) const
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    tgl_assert(pc_View != NULL);
    if (pc_View != NULL)
    {
-      uint32 u32_Cur;
+      uint32_t u32_Cur;
       if (os32_Count >= 0)
       {
-         u32_Cur = static_cast<uint32>(os32_Count);
+         u32_Cur = static_cast<uint32_t>(os32_Count);
       }
       else
       {

@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 //Html help
 #include <windows.h>
@@ -18,14 +18,13 @@
 #include <QProcess>
 #include <QKeyEvent>
 #include <iostream>
-#include "C_HeHandler.h"
-#include "TGLUtils.h"
-#include "C_Uti.h"
+#include "C_HeHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -84,13 +83,13 @@ void C_HeHandler::CallSpecificHelpPage(const QString & orc_ClassName)
       }
       else
       {
-         charn * const pcn_Text = new charn[static_cast<uint32>(c_PageSearchName.count() + 1)];
+         char_t * const pcn_Text = new char_t[static_cast<uint32_t>(c_PageSearchName.count() + 1)];
          HH_AKLINK c_Link;
-         for (sint32 s32_It = 0; s32_It < c_PageSearchName.count(); ++s32_It)
+         for (int32_t s32_It = 0; s32_It < c_PageSearchName.count(); ++s32_It)
          {
-            pcn_Text[static_cast<uint32>(s32_It)] = c_PageSearchName.at(s32_It).toLatin1();
+            pcn_Text[static_cast<uint32_t>(s32_It)] = c_PageSearchName.at(s32_It).toLatin1();
          }
-         pcn_Text[static_cast<uint32>(c_PageSearchName.count())] = '\0';
+         pcn_Text[static_cast<uint32_t>(c_PageSearchName.count())] = '\0';
          c_Link.cbStruct =     sizeof(HH_AKLINK);
          c_Link.fReserved =    FALSE;
          //Cast char * to wchar * but still interpreted as char * for some reason ...
@@ -124,14 +123,13 @@ bool C_HeHandler::h_CheckHelpKey(const QKeyEvent * const opc_KeyEvent)
 {
    bool q_Retval;
 
-   switch (opc_KeyEvent->key())
+   if (static_cast<Qt::Key>(opc_KeyEvent->key()) == Qt::Key_F1)
    {
-   case Qt::Key_F1:
       q_Retval = true;
-      break;
-   default:
+   }
+   else
+   {
       q_Retval = false;
-      break;
    }
    return q_Retval;
 }
@@ -158,12 +156,12 @@ C_HeHandler::C_HeHandler() :
    m_InitSpecialHelpPages();
 
    //Load DLL
-   this->mpv_InstHtmlHelp = LoadLibraryA("HHCtrl.ocx");
-   if (this->mpv_InstHtmlHelp != NULL)
+   this->mpc_InstHtmlHelp = LoadLibraryA("HHCtrl.ocx");
+   if (this->mpc_InstHtmlHelp != NULL)
    {
       //Load function
       //lint -e{740,929,1924,9176} Working code
-      (FARPROC &)mpr_HtmlHelp = GetProcAddress(this->mpv_InstHtmlHelp, "HtmlHelpA");
+      (FARPROC &)mpr_HtmlHelp = GetProcAddress(this->mpc_InstHtmlHelp, "HtmlHelpA");
    }
    else
    {
@@ -179,9 +177,9 @@ C_HeHandler::C_HeHandler() :
 C_HeHandler::~C_HeHandler()
 {
    //Free DLL
-   if (this->mpv_InstHtmlHelp != NULL)
+   if (this->mpc_InstHtmlHelp != NULL)
    {
-      FreeLibrary(this->mpv_InstHtmlHelp);
+      FreeLibrary(this->mpc_InstHtmlHelp);
    }
 }
 
@@ -194,39 +192,40 @@ void C_HeHandler::m_InitSpecialHelpPages(void)
    //System Definition
 
    //Network Topology
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdHandlerWidget", "System Definition");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdHandlerWidget", "System Definition");
    //Node Edit
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeNodeEditWidget", "Node Properties");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDbViewWidget", "Datapool");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDbProperties", "Data Block Properties");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeHalcChannelWidget", "Hardware Configurator");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeNodeEditWidget", "Node Properties");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeDbViewWidget", "Datapool");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeDbProperties", "Data Block Properties");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeHalcChannelWidget", "Hardware Configurator");
 
    //Bus Edit
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdBueBusEditWidget", "Bus Properties");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdBueComIfDescriptionWidget", "Message Properties");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdBueBusEditWidget", "Bus Properties");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdBueComIfDescriptionWidget", "Message Properties");
    //Pop-Ups
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNodeComIfSetupWidget", "Communication Interface Setup");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNodeToNodeConnectionSetupWidget",
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNodeComIfSetupWidget", "Communication Interface Setup");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNodeToNodeConnectionSetupWidget",
                                       "Node to Node - Connection Setup");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDpProperties", "Datapool Properties");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeDpListDataSetWidget", "Datasets");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SdNdeProgrammingOptions", "File Generation - Settings");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeDpProperties", "Datapool Properties");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeDpListDataSetWidget", "Datasets");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SdNdeProgrammingOptions", "File Generation - Settings");
 
    //System Commissioning
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvSeSetupWidget", "Setup");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvUpUpdateWidget", "Update");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDaDashboardsWidget", "Dashboards");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvSeSetupWidget", "Setup");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvUpUpdateWidget", "Update");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDaDashboardsWidget", "Dashboards");
    //Pop-Ups
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDaPeBase", "Widget Properties");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDaPeUpdateModeConfiguration", "Dashboards Configuration");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDaItPaWriteWidget",
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDaPeBase", "Widget Properties");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDaPeUpdateModeConfiguration",
+                                      "Dashboards Configuration");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDaItPaWriteWidget",
                                       "Parametrization - Write Values to Device");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_SyvDcWidget", "Configure Device");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_SyvDcWidget", "Configure Device");
 
    //openSYDE CAN Monitor
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_CamMainWindow", "openSYDE CAN Monitor");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_CamMosFilterPopup", "openSYDE CAN Monitor");
-   this->mc_LookUpHelpPageName.insert("stw_opensyde_gui::C_CamTitleBarWidget", "openSYDE CAN Monitor");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_CamMainWindow", "openSYDE CAN Monitor");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_CamMosFilterPopup", "openSYDE CAN Monitor");
+   this->mc_LookUpHelpPageName.insert("stw::opensyde_gui::C_CamTitleBarWidget", "openSYDE CAN Monitor");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

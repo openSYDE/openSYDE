@@ -10,14 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdManUnoTopologyAddBaseCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdManUnoTopologyAddBaseCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,19 +34,19 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Default constructor
 
    \param[in,out] opc_Scene               Pointer to currently active scene
-   \param[in]     orc_IDs                 Affected unique IDs
+   \param[in]     orc_Ids                 Affected unique IDs
    \param[in]     orc_Text                Command description
    \param[in,out] opc_Parent              Optional pointer to parent
    \param[in]     orc_InitialSnapshotData Initial snapshot data
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdManUnoTopologyAddBaseCommand::C_SdManUnoTopologyAddBaseCommand(QGraphicsScene * const opc_Scene,
-                                                                   const std::vector<uint64> & orc_IDs,
+                                                                   const std::vector<uint64_t> & orc_Ids,
                                                                    const QString & orc_Text,
                                                                    QUndoCommand * const opc_Parent,
                                                                    const C_SdTopologyDataSnapshot & orc_InitialSnapshotData)
    :
-   C_SdManUnoTopologyAddDeleteBaseCommand(opc_Scene, orc_IDs, orc_Text,
+   C_SdManUnoTopologyAddDeleteBaseCommand(opc_Scene, orc_Ids, orc_Text,
                                           opc_Parent, orc_InitialSnapshotData),
    mq_InitialStep(true)
 {

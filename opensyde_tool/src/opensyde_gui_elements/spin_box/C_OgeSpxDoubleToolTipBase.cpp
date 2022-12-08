@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QHelpEvent>
 #include <QLineEdit>
-#include "C_GtGetText.h"
-#include "C_OgeSpxDoubleToolTipBase.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeSpxDoubleToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -77,7 +76,7 @@ bool C_OgeSpxDoubleToolTipBase::event(QEvent * const opc_Event)
    \param[in] orc_Display String display value for minimum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxDoubleToolTipBase::SetMinimumCustom(const stw_types::float64 of64_Value, const QString & orc_Display)
+void C_OgeSpxDoubleToolTipBase::SetMinimumCustom(const float64_t of64_Value, const QString & orc_Display)
 {
    this->setMinimum(of64_Value);
    this->mc_UserMinValString = orc_Display;
@@ -91,7 +90,7 @@ void C_OgeSpxDoubleToolTipBase::SetMinimumCustom(const stw_types::float64 of64_V
    \param[in] orc_Display String display value for maximum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxDoubleToolTipBase::SetMaximumCustom(const stw_types::float64 of64_Value, const QString & orc_Display)
+void C_OgeSpxDoubleToolTipBase::SetMaximumCustom(const float64_t of64_Value, const QString & orc_Display)
 {
    this->setMaximum(of64_Value);
    this->mc_UserMaxValString = orc_Display;
@@ -187,37 +186,37 @@ void C_OgeSpxDoubleToolTipBase::m_SetupContextMenu(void)
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Undo"),
                                        this,
                                        &C_OgeSpxDoubleToolTipBase::m_Undo,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_Z));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_Z));
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Redo"),
                                        this,
                                        &C_OgeSpxDoubleToolTipBase::m_Redo,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_Y));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_Y));
 
       this->mpc_ContextMenu->addSeparator();
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Cut"),
                                        this,
                                        &C_OgeSpxDoubleToolTipBase::m_Cut,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_X));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_X));
    }
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy"),
                                     this,
                                     &C_OgeSpxDoubleToolTipBase::m_Copy,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_C));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
 
    if (!this->isReadOnly())
    {
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Paste"),
                                        this,
                                        &C_OgeSpxDoubleToolTipBase::m_Paste,
-                                       static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_V));
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_V));
 
       this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Delete"),
                                        this,
                                        &C_OgeSpxDoubleToolTipBase::m_Delete,
-                                       static_cast<sintn>(Qt::Key_Delete));
+                                       static_cast<int32_t>(Qt::Key_Delete));
    }
 
    this->mpc_ContextMenu->addSeparator();
@@ -225,7 +224,7 @@ void C_OgeSpxDoubleToolTipBase::m_SetupContextMenu(void)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select All"),
                                     this,
                                     &C_OgeSpxDoubleToolTipBase::selectAll,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
 
    this->mpc_ContextMenu->addSeparator();
 

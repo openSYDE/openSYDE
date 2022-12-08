@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPen>
@@ -18,33 +18,32 @@
 #include <QCursor>
 #include <cmath>
 
-#include "C_GiBiRectBaseGroup.h"
-#include "TGLUtils.h"
-#include "C_GiCustomFunctions.h"
-#include "C_PuiBsLineBase.h"
-#include "C_OSCUtils.h"
+#include "C_GiBiRectBaseGroup.hpp"
+#include "TglUtils.hpp"
+#include "C_GiCustomFunctions.hpp"
+#include "C_PuiBsLineBase.hpp"
+#include "C_OscUtils.hpp"
 
-#include "gitypes.h"
-#include "constants.h"
+#include "gitypes.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn msn_INDEX_TOP_LEFT = 0;
-const sintn msn_INDEX_TOP_RIGHT = 1;
-const sintn msn_INDEX_BOTTOM_LEFT = 2;
-const sintn msn_INDEX_BOTTOM_RIGHT = 3;
-const sintn msn_INDEX_ELEMENT_KEEP_RATIO_MAX = 4;
-const sintn msn_INDEX_TOP = 4;
-const sintn msn_INDEX_BOTTOM = 5;
-const sintn msn_INDEX_LEFT = 6;
-const sintn msn_INDEX_RIGHT = 7;
-const sintn msn_INDEX_ELEMENT_MAX = 8;
+const int32_t ms32_INDEX_TOP_LEFT = 0;
+const int32_t ms32_INDEX_TOP_RIGHT = 1;
+const int32_t ms32_INDEX_BOTTOM_LEFT = 2;
+const int32_t ms32_INDEX_BOTTOM_RIGHT = 3;
+const int32_t ms32_INDEX_ELEMENT_KEEP_RATIO_MAX = 4;
+const int32_t ms32_INDEX_TOP = 4;
+const int32_t ms32_INDEX_BOTTOM = 5;
+const int32_t ms32_INDEX_LEFT = 6;
+const int32_t ms32_INDEX_RIGHT = 7;
+const int32_t ms32_INDEX_ELEMENT_MAX = 8;
 
-const float64 mf64_BOUNDINGRECT_BORDER = 10.0;
+const float64_t mf64_BOUNDINGRECT_BORDER = 10.0;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -62,7 +61,7 @@ const float64 mf64_BOUNDINGRECT_BORDER = 10.0;
    Set up GUI with all elements.
    Function m_SetBiggestItem must be called after construction.
 
-   \param[in]     oru64_ID               Unique ID
+   \param[in]     oru64_Id               Unique ID
    \param[in]     of64_MinWidth          Min width of node
    \param[in]     of64_MinHeight         Min height of node
    \param[in]     of64_ActionPointOffset Action point offset
@@ -72,14 +71,14 @@ const float64 mf64_BOUNDINGRECT_BORDER = 10.0;
                                          Negative value deactivates the function
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 of64_MinWidth,
-                                         const float64 of64_MinHeight, const stw_types::float64 of64_ActionPointOffset,
+C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64_t & oru64_Id, const float64_t of64_MinWidth,
+                                         const float64_t of64_MinHeight, const float64_t of64_ActionPointOffset,
                                          const bool oq_KeepAspectRatio, QGraphicsItem * const opc_Parent,
                                          const QPointF & orc_PosOffset) :
-   C_GiUnique(oru64_ID),
+   C_GiUnique(oru64_Id),
    QGraphicsItemGroup(opc_Parent),
    mq_ResizingActive(false),
-   msn_ActiveResizeMode(msn_INDEX_ELEMENT_MAX),
+   ms32_ActiveResizeMode(ms32_INDEX_ELEMENT_MAX),
    mpc_BiggestSubItem(NULL),
    mc_LastKnownPosition(),
    mc_LastKnownSize(),
@@ -90,8 +89,8 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
    mf64_MinHeight(of64_MinHeight),
    mc_PosOffset(orc_PosOffset)
 {
-   sint32 s32_Counter;
-   sint32 s32_Limit;
+   int32_t s32_Counter;
+   int32_t s32_Limit;
 
    this->setFlag(ItemIsMovable);
    this->setFlag(ItemIsSelectable);
@@ -100,12 +99,12 @@ C_GiBiRectBaseGroup::C_GiBiRectBaseGroup(const uint64 & oru64_ID, const float64 
 
    if (this->mq_KeepAspectRatio == false)
    {
-      s32_Limit = msn_INDEX_ELEMENT_MAX;
+      s32_Limit = ms32_INDEX_ELEMENT_MAX;
    }
    else
    {
       // only four elements necessary
-      s32_Limit = msn_INDEX_ELEMENT_KEEP_RATIO_MAX;
+      s32_Limit = ms32_INDEX_ELEMENT_KEEP_RATIO_MAX;
    }
 
    for (s32_Counter = 0; s32_Counter < s32_Limit; ++s32_Counter)
@@ -182,18 +181,18 @@ void C_GiBiRectBaseGroup::m_InitActionPoints()
    this->m_UpdateActionPoints();
 
    // set the cursor of all interaction points
-   this->mc_ActionPoints[msn_INDEX_TOP_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
-   this->mc_ActionPoints[msn_INDEX_TOP_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
+   this->mc_ActionPoints[ms32_INDEX_TOP_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
+   this->mc_ActionPoints[ms32_INDEX_TOP_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
 
-   this->mc_ActionPoints[msn_INDEX_BOTTOM_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
-   this->mc_ActionPoints[msn_INDEX_BOTTOM_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
+   this->mc_ActionPoints[ms32_INDEX_BOTTOM_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeBDiagCursor));
+   this->mc_ActionPoints[ms32_INDEX_BOTTOM_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeFDiagCursor));
 
    if (this->mq_KeepAspectRatio == false)
    {
-      this->mc_ActionPoints[msn_INDEX_TOP]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
-      this->mc_ActionPoints[msn_INDEX_BOTTOM]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
-      this->mc_ActionPoints[msn_INDEX_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
-      this->mc_ActionPoints[msn_INDEX_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
+      this->mc_ActionPoints[ms32_INDEX_TOP]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
+      this->mc_ActionPoints[ms32_INDEX_BOTTOM]->setCursor(static_cast<QCursor>(Qt::SizeVerCursor));
+      this->mc_ActionPoints[ms32_INDEX_LEFT]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
+      this->mc_ActionPoints[ms32_INDEX_RIGHT]->setCursor(static_cast<QCursor>(Qt::SizeHorCursor));
    }
 
    // configure the points
@@ -216,33 +215,33 @@ void C_GiBiRectBaseGroup::m_UpdateActionPoints(void)
    this->mc_ShowBoundingRect.setWidth(this->mc_ShowBoundingRect.width() + mf64_ActionPointOffset);
    this->mc_ShowBoundingRect.setHeight(this->mc_ShowBoundingRect.height() + mf64_ActionPointOffset);
 
-   this->mc_ActionPoints[msn_INDEX_TOP_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
-                                                     this->mc_ShowBoundingRect.y());
-   this->mc_ActionPoints[msn_INDEX_TOP_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
-                                                       this->mc_ShowBoundingRect.x()),
+   this->mc_ActionPoints[ms32_INDEX_TOP_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
                                                       this->mc_ShowBoundingRect.y());
+   this->mc_ActionPoints[ms32_INDEX_TOP_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
+                                                        this->mc_ShowBoundingRect.x()),
+                                                       this->mc_ShowBoundingRect.y());
 
-   this->mc_ActionPoints[msn_INDEX_BOTTOM_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
-                                                        (this->mc_ShowBoundingRect.height() +
-                                                         this->mc_ShowBoundingRect.y()));
-   this->mc_ActionPoints[msn_INDEX_BOTTOM_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
-                                                          this->mc_ShowBoundingRect.x()),
+   this->mc_ActionPoints[ms32_INDEX_BOTTOM_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
                                                          (this->mc_ShowBoundingRect.height() +
                                                           this->mc_ShowBoundingRect.y()));
+   this->mc_ActionPoints[ms32_INDEX_BOTTOM_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
+                                                           this->mc_ShowBoundingRect.x()),
+                                                          (this->mc_ShowBoundingRect.height() +
+                                                           this->mc_ShowBoundingRect.y()));
 
    if (this->mq_KeepAspectRatio == false)
    {
-      this->mc_ActionPoints[msn_INDEX_TOP]->setPos(this->mc_ShowBoundingRect.center().x(),
-                                                   this->mc_ShowBoundingRect.y());
-      this->mc_ActionPoints[msn_INDEX_BOTTOM]->setPos(this->mc_ShowBoundingRect.center().x(),
-                                                      (this->mc_ShowBoundingRect.height() +
-                                                       this->mc_ShowBoundingRect.y()));
+      this->mc_ActionPoints[ms32_INDEX_TOP]->setPos(this->mc_ShowBoundingRect.center().x(),
+                                                    this->mc_ShowBoundingRect.y());
+      this->mc_ActionPoints[ms32_INDEX_BOTTOM]->setPos(this->mc_ShowBoundingRect.center().x(),
+                                                       (this->mc_ShowBoundingRect.height() +
+                                                        this->mc_ShowBoundingRect.y()));
 
-      this->mc_ActionPoints[msn_INDEX_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
-                                                    this->mc_ShowBoundingRect.center().y());
-      this->mc_ActionPoints[msn_INDEX_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
-                                                      this->mc_ShowBoundingRect.x()),
+      this->mc_ActionPoints[ms32_INDEX_LEFT]->setPos(this->mc_ShowBoundingRect.x(),
                                                      this->mc_ShowBoundingRect.center().y());
+      this->mc_ActionPoints[ms32_INDEX_RIGHT]->setPos((this->mc_ShowBoundingRect.width() +
+                                                       this->mc_ShowBoundingRect.x()),
+                                                      this->mc_ShowBoundingRect.center().y());
    }
 }
 
@@ -323,9 +322,9 @@ void C_GiBiRectBaseGroup::m_BlockMoveAndResize(void)
    Interaction point width
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_GiBiRectBaseGroup::m_GetInteractionPointSceneWidth(void) const
+float64_t C_GiBiRectBaseGroup::m_GetInteractionPointSceneWidth(void) const
 {
-   float64 f64_Retval = 1.0;
+   float64_t f64_Retval = 1.0;
 
    if (this->mc_ActionPoints.size() > 0)
    {
@@ -383,7 +382,7 @@ void C_GiBiRectBaseGroup::paint(QPainter * const opc_Painter, const QStyleOption
 QRectF C_GiBiRectBaseGroup::boundingRect() const
 {
    QRectF c_BoundingRect = this->mc_ShowBoundingRect;
-   float64 f64_Border = mf64_BOUNDINGRECT_BORDER;
+   float64_t f64_Border = mf64_BOUNDINGRECT_BORDER;
 
    if (this->mc_ActionPoints.size() > 0)
    {
@@ -424,12 +423,12 @@ void C_GiBiRectBaseGroup::FindClosestPoint(const QPointF & orc_ScenePoint, QPoin
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiRectBaseGroup::SetZValueCustom(const float64 of64_ZValue)
+void C_GiBiRectBaseGroup::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   this->setZValue(of64_ZValue);
+   this->setZValue(of64_ZetValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -477,11 +476,11 @@ QSizeF C_GiBiRectBaseGroup::GetSize(void) const
    \param[in,out] orc_Data Data element to load
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiRectBaseGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsBox & orc_Data)
+void C_GiBiRectBaseGroup::LoadBasicData(const stw::opensyde_gui_logic::C_PuiBsBox & orc_Data)
 {
-   this->m_SetAdaptedPos(orc_Data.c_UIPosition);
+   this->m_SetAdaptedPos(orc_Data.c_UiPosition);
    //Don't trigger data update at this point
-   this->setZValue(orc_Data.f64_ZOrder);
+   this->setZValue(orc_Data.f64_ZetOrder);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -490,7 +489,7 @@ void C_GiBiRectBaseGroup::LoadBasicData(const stw_opensyde_gui_logic::C_PuiBsBox
    \param[in,out] orc_Data Data element to update
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiBiRectBaseGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsBox & orc_Data) const
+void C_GiBiRectBaseGroup::UpdateBasicData(stw::opensyde_gui_logic::C_PuiBsBox & orc_Data) const
 {
    tgl_assert(this->mpc_BiggestSubItem != NULL);
 
@@ -505,8 +504,8 @@ void C_GiBiRectBaseGroup::UpdateBasicData(stw_opensyde_gui_logic::C_PuiBsBox & o
       orc_Data.f64_Height = 0.0;
    }
 
-   orc_Data.c_UIPosition = this->pos();
-   orc_Data.f64_ZOrder = this->zValue();
+   orc_Data.c_UiPosition = this->pos();
+   orc_Data.f64_ZetOrder = this->zValue();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -520,8 +519,8 @@ void C_GiBiRectBaseGroup::ApplySizeChange(const QPointF & orc_NewPos, const QSiz
 {
    QPointF c_Pos = orc_NewPos;
    QSizeF c_Size = orc_NewSize;
-   float64 f64_DiffWidth;
-   float64 f64_DiffHeight;
+   float64_t f64_DiffWidth;
+   float64_t f64_DiffHeight;
 
    // keep GraphicsScene up to date and get a clean drawing
    this->prepareGeometryChange();
@@ -615,10 +614,10 @@ void C_GiBiRectBaseGroup::UpdateTransform(const QTransform & orc_Transform)
    for (QVector<C_GiPointInteraction *>::iterator pc_ItActionPoint = this->mc_ActionPoints.begin();
         pc_ItActionPoint != this->mc_ActionPoints.end(); ++pc_ItActionPoint)
    {
-      C_GiPointInteraction * const pc_ActionPointP = *pc_ItActionPoint;
-      if (pc_ActionPointP != NULL)
+      C_GiPointInteraction * const pc_ActionPoint = *pc_ItActionPoint;
+      if (pc_ActionPoint != NULL)
       {
-         pc_ActionPointP->UpdateTransform(orc_Transform);
+         pc_ActionPoint->UpdateTransform(orc_Transform);
       }
    }
 }
@@ -710,44 +709,44 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
    {
       const QPointF c_Pos = opc_Event->scenePos();
 
-      if (this->mc_ActionPoints[msn_INDEX_BOTTOM_RIGHT]->IsPointInside(c_Pos) == true)
+      if (this->mc_ActionPoints[ms32_INDEX_BOTTOM_RIGHT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_INDEX_BOTTOM_RIGHT;
+         this->ms32_ActiveResizeMode = ms32_INDEX_BOTTOM_RIGHT;
       }
-      else if (this->mc_ActionPoints[msn_INDEX_BOTTOM_LEFT]->IsPointInside(c_Pos) == true)
+      else if (this->mc_ActionPoints[ms32_INDEX_BOTTOM_LEFT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_INDEX_BOTTOM_LEFT;
+         this->ms32_ActiveResizeMode = ms32_INDEX_BOTTOM_LEFT;
       }
-      else if (this->mc_ActionPoints[msn_INDEX_TOP_LEFT]->IsPointInside(c_Pos) == true)
+      else if (this->mc_ActionPoints[ms32_INDEX_TOP_LEFT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_INDEX_TOP_LEFT;
+         this->ms32_ActiveResizeMode = ms32_INDEX_TOP_LEFT;
       }
-      else if (this->mc_ActionPoints[msn_INDEX_TOP_RIGHT]->IsPointInside(c_Pos) == true)
+      else if (this->mc_ActionPoints[ms32_INDEX_TOP_RIGHT]->IsPointInside(c_Pos) == true)
       {
-         this->msn_ActiveResizeMode = msn_INDEX_TOP_RIGHT;
+         this->ms32_ActiveResizeMode = ms32_INDEX_TOP_RIGHT;
       }
       else if (this->mq_KeepAspectRatio == false)
       {
-         if (this->mc_ActionPoints[msn_INDEX_TOP]->IsPointInside(c_Pos) == true)
+         if (this->mc_ActionPoints[ms32_INDEX_TOP]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_INDEX_TOP;
+            this->ms32_ActiveResizeMode = ms32_INDEX_TOP;
          }
-         else if (this->mc_ActionPoints[msn_INDEX_BOTTOM]->IsPointInside(c_Pos) == true)
+         else if (this->mc_ActionPoints[ms32_INDEX_BOTTOM]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_INDEX_BOTTOM;
+            this->ms32_ActiveResizeMode = ms32_INDEX_BOTTOM;
          }
-         else if (this->mc_ActionPoints[msn_INDEX_LEFT]->IsPointInside(c_Pos) == true)
+         else if (this->mc_ActionPoints[ms32_INDEX_LEFT]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_INDEX_LEFT;
+            this->ms32_ActiveResizeMode = ms32_INDEX_LEFT;
          }
-         else if (this->mc_ActionPoints[msn_INDEX_RIGHT]->IsPointInside(c_Pos) == true)
+         else if (this->mc_ActionPoints[ms32_INDEX_RIGHT]->IsPointInside(c_Pos) == true)
          {
-            this->msn_ActiveResizeMode = msn_INDEX_RIGHT;
+            this->ms32_ActiveResizeMode = ms32_INDEX_RIGHT;
          }
          else
          {
             // No interaction point clicked
-            this->msn_ActiveResizeMode = msn_INDEX_ELEMENT_MAX;
+            this->ms32_ActiveResizeMode = ms32_INDEX_ELEMENT_MAX;
 
             QGraphicsItemGroup::mousePressEvent(opc_Event);
          }
@@ -755,7 +754,7 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
       else
       {
          // No interaction point clicked
-         this->msn_ActiveResizeMode = msn_INDEX_ELEMENT_MAX;
+         this->ms32_ActiveResizeMode = ms32_INDEX_ELEMENT_MAX;
 
          QGraphicsItemGroup::mousePressEvent(opc_Event);
       }
@@ -774,7 +773,7 @@ void C_GiBiRectBaseGroup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_E
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
-   if ((this->msn_ActiveResizeMode != msn_INDEX_ELEMENT_MAX) &&
+   if ((this->ms32_ActiveResizeMode != ms32_INDEX_ELEMENT_MAX) &&
        (this->mq_BlockMoveAndResize == false))
    {
       QPointF c_MousePos = opc_Event->scenePos();
@@ -785,20 +784,20 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
       C_GiCustomFunctions::h_AdaptMouseRangePos(c_MousePos,
                                                 QPointF(mf64_BOUNDINGRECT_BORDER, mf64_BOUNDINGRECT_BORDER));
 
-      c_Delta = c_MousePos - this->mc_ActionPoints[this->msn_ActiveResizeMode]->scenePos();
+      c_Delta = c_MousePos - this->mc_ActionPoints[this->ms32_ActiveResizeMode]->scenePos();
 
       if (this->mq_KeepAspectRatio == true)
       {
          C_GiCustomFunctions::E_AspectRatioMovement e_AspectRatioMovement;
-         if (this->msn_ActiveResizeMode == msn_INDEX_BOTTOM_LEFT)
+         if (this->ms32_ActiveResizeMode == ms32_INDEX_BOTTOM_LEFT)
          {
             e_AspectRatioMovement = C_GiCustomFunctions::eARM_BOTTOM_LEFT;
          }
-         else if (this->msn_ActiveResizeMode == msn_INDEX_TOP_RIGHT)
+         else if (this->ms32_ActiveResizeMode == ms32_INDEX_TOP_RIGHT)
          {
             e_AspectRatioMovement = C_GiCustomFunctions::eARM_TOP_RIGHT;
          }
-         else if (this->msn_ActiveResizeMode == msn_INDEX_TOP_LEFT)
+         else if (this->ms32_ActiveResizeMode == ms32_INDEX_TOP_LEFT)
          {
             e_AspectRatioMovement = C_GiCustomFunctions::eARM_TOP_LEFT;
          }
@@ -811,9 +810,9 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
       }
 
       // adapt size and position
-      switch (this->msn_ActiveResizeMode)
+      switch (this->ms32_ActiveResizeMode)
       {
-      case msn_INDEX_TOP_LEFT:
+      case ms32_INDEX_TOP_LEFT:
          c_Size.setWidth(c_Size.width() - c_Delta.x());
          c_Pos.setX(c_Pos.x() + c_Delta.x());
 
@@ -821,40 +820,40 @@ void C_GiBiRectBaseGroup::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Ev
          c_Pos.setY(c_Pos.y() + c_Delta.y());
          break;
 
-      case msn_INDEX_TOP_RIGHT:
+      case ms32_INDEX_TOP_RIGHT:
          c_Size.setWidth(c_Size.width() + c_Delta.x());
 
          c_Size.setHeight(c_Size.height() - c_Delta.y());
          c_Pos.setY(c_Pos.y() + c_Delta.y());
          break;
 
-      case msn_INDEX_BOTTOM_LEFT:
+      case ms32_INDEX_BOTTOM_LEFT:
          c_Size.setWidth(c_Size.width() - c_Delta.x());
          c_Pos.setX(c_Pos.x() + c_Delta.x());
 
          c_Size.setHeight(c_Size.height() + c_Delta.y());
          break;
 
-      case msn_INDEX_BOTTOM_RIGHT:
+      case ms32_INDEX_BOTTOM_RIGHT:
          c_Size.setHeight(c_Size.height() + c_Delta.y());
 
          c_Size.setWidth(c_Size.width() + c_Delta.x());
          break;
 
-      case msn_INDEX_RIGHT:
+      case ms32_INDEX_RIGHT:
          c_Size.setWidth(c_Size.width() + c_Delta.x());
          break;
 
-      case msn_INDEX_LEFT:
+      case ms32_INDEX_LEFT:
          c_Size.setWidth(c_Size.width() - c_Delta.x());
          c_Pos.setX(c_Pos.x() + c_Delta.x());
          break;
 
-      case msn_INDEX_BOTTOM:
+      case ms32_INDEX_BOTTOM:
          c_Size.setHeight(c_Size.height() + c_Delta.y());
          break;
 
-      case msn_INDEX_TOP:
+      case ms32_INDEX_TOP:
          c_Size.setHeight(c_Size.height() - c_Delta.y());
          c_Pos.setY(c_Pos.y() + c_Delta.y());
          break;
@@ -886,7 +885,7 @@ void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc
       //Signal complete move step
       if (opc_Event->button() == Qt::LeftButton)
       {
-         if (this->msn_ActiveResizeMode != msn_INDEX_ELEMENT_MAX)
+         if (this->ms32_ActiveResizeMode != ms32_INDEX_ELEMENT_MAX)
          {
             Q_EMIT this->SigItemWasResized(this->mc_LastKnownPosition, this->mc_LastKnownSize,
                                            this->pos(), this->GetSize());
@@ -900,7 +899,7 @@ void C_GiBiRectBaseGroup::mouseReleaseEvent(QGraphicsSceneMouseEvent * const opc
          }
       }
       // deactivate resizing
-      this->msn_ActiveResizeMode = msn_INDEX_ELEMENT_MAX;
+      this->ms32_ActiveResizeMode = ms32_INDEX_ELEMENT_MAX;
    }
    else
    {
@@ -927,7 +926,7 @@ bool C_GiBiRectBaseGroup::sceneEventFilter(QGraphicsItem * const opc_Watched, QE
 {
    bool q_Return = true;
 
-   if (opc_Watched->type() == msn_GRAPHICS_ITEM_POINTINTERACTION)
+   if (opc_Watched->type() == ms32_GRAPHICS_ITEM_POINTINTERACTION)
    {
       QGraphicsSceneMouseEvent * const pc_MouseEvent = dynamic_cast<QGraphicsSceneMouseEvent *>(opc_Event);
 

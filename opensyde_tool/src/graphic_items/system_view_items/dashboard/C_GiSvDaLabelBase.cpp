@@ -10,29 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsView>
 
-#include "gitypes.h"
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SyvDaPeBase.h"
-#include "C_SyvDaPeLabel.h"
-#include "C_GiSvDaLabelBase.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "gitypes.hpp"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SyvDaPeBase.hpp"
+#include "C_SyvDaPeLabel.hpp"
+#include "C_GiSvDaLabelBase.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,15 +53,15 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     oru32_ViewIndex      Index of system view
    \param[in]     oru32_DashboardIndex Index of dashboard in system view
    \param[in]     ors32_DataIndex      Index of data element in dashboard in system view
-   \param[in]     oru64_ID             Unique ID
+   \param[in]     oru64_Id             Unique ID
    \param[in,out] opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvDaLabelBase::C_GiSvDaLabelBase(const uint32 & oru32_ViewIndex, const uint32 & oru32_DashboardIndex,
-                                     const sint32 & ors32_DataIndex, const uint64 & oru64_ID,
+C_GiSvDaLabelBase::C_GiSvDaLabelBase(const uint32_t & oru32_ViewIndex, const uint32_t & oru32_DashboardIndex,
+                                     const int32_t & ors32_DataIndex, const uint64_t & oru64_Id,
                                      QGraphicsItem * const opc_Parent) :
    C_GiSvDaRectBaseGroup(oru32_ViewIndex, oru32_DashboardIndex, ors32_DataIndex, C_PuiSvDbDataElement::eLABEL, 1,
-                         oru64_ID, 35.0, 25.6, 180.0, 100.0, false, true, opc_Parent)
+                         oru64_Id, 35.0, 25.6, 180.0, 100.0, false, true, opc_Parent)
 {
    this->mpc_LabelWidget = new C_SyvDaItDashboardLabelWidget();
    this->mpc_Widget->SetWidget(this->mpc_LabelWidget);
@@ -86,9 +85,9 @@ C_GiSvDaLabelBase::~C_GiSvDaLabelBase(void)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvDaLabelBase::type(void) const
+int32_t C_GiSvDaLabelBase::type(void) const
 {
-   return msn_GRAPHICS_ITEM_DB_LABEL;
+   return ms32_GRAPHICS_ITEM_DB_LABEL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -106,7 +105,7 @@ void C_GiSvDaLabelBase::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_St
       const C_PuiSvDashboard * const pc_Dashboard = this->m_GetSvDashboard();
       if (pc_Dashboard != NULL)
       {
-         const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32>(this->ms32_Index));
+         const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32_t>(this->ms32_Index));
          tgl_assert(pc_Box != NULL);
          if (pc_Box != NULL)
          {
@@ -140,7 +139,7 @@ void C_GiSvDaLabelBase::LoadData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -165,7 +164,7 @@ void C_GiSvDaLabelBase::UpdateData(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
@@ -173,7 +172,7 @@ void C_GiSvDaLabelBase::UpdateData(void)
          this->UpdateSvBasicData(c_Box);
          tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                         this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         &c_Box, this->me_Type) == C_NO_ERR);
       }
    }
@@ -188,7 +187,7 @@ void C_GiSvDaLabelBase::DeleteData(void)
    if (this->ms32_Index >= 0)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->DeleteDashboardWidget(this->mu32_ViewIndex, this->mu32_DashboardIndex,
-                                                                        static_cast<uint32>(this->ms32_Index),
+                                                                        static_cast<uint32_t>(this->ms32_Index),
                                                                         this->me_Type) ==
                  C_NO_ERR);
    }
@@ -200,14 +199,12 @@ void C_GiSvDaLabelBase::DeleteData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaLabelBase::UpdateShowValue(void)
 {
-   float64 f64_Value;
-
-   if (this->m_GetLastValue(0UL, f64_Value, false) == C_NO_ERR)
+   if (this->mpc_LabelWidget != NULL)
    {
-      if (this->mpc_LabelWidget != NULL)
+      QString c_Value;
+      if (this->m_GetLastValue(0UL, c_Value, NULL) == C_NO_ERR)
       {
-         const QString c_Text = this->GetUnscaledValueAsScaledString(f64_Value);
-         this->mpc_LabelWidget->SetValue(c_Text);
+         this->mpc_LabelWidget->SetValue(c_Value);
       }
    }
 
@@ -221,12 +218,12 @@ void C_GiSvDaLabelBase::UpdateShowValue(void)
    can not be adapted by stylesheets the derived class must reimplement this function.
 
    \param[in]     ou32_DataElementIndex     Index of shown datapool element in widget
-   \param[in]     osn_Value                 Value for transparency (0..255)
+   \param[in]     os32_Value                 Value for transparency (0..255)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaLabelBase::UpdateTransparency(const uint32 ou32_DataElementIndex, const sintn osn_Value)
+void C_GiSvDaLabelBase::UpdateTransparency(const uint32_t ou32_DataElementIndex, const int32_t os32_Value)
 {
-   C_GiSvDaRectBaseGroup::UpdateTransparency(ou32_DataElementIndex, osn_Value);
+   C_GiSvDaRectBaseGroup::UpdateTransparency(ou32_DataElementIndex, os32_Value);
    if (this->mpc_LabelWidget != NULL)
    {
       this->mpc_LabelWidget->ResetFont();
@@ -269,20 +266,22 @@ bool C_GiSvDaLabelBase::CallProperties(void)
 
    if (pc_Dashboard != NULL)
    {
-      const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32>(this->ms32_Index));
+      const C_PuiSvDbLabel * const pc_Box = pc_Dashboard->GetLabel(static_cast<uint32_t>(this->ms32_Index));
       tgl_assert(pc_Box != NULL);
       if (pc_Box != NULL)
       {
          C_PuiSvDbNodeDataPoolListElementId c_ElementId;
          C_PuiSvDbDataElementScaling c_Scaling;
+         C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig;
          QGraphicsView * const pc_View = this->scene()->views().at(0);
-         QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(pc_View, pc_View);
+         const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(pc_View, pc_View);
          C_SyvDaPeBase * pc_Dialog;
          C_SyvDaPeLabel * pc_PropertiesWidget;
          if (pc_Box->c_DataPoolElementsConfig.size() > 0)
          {
             c_ElementId = pc_Box->c_DataPoolElementsConfig[0].c_ElementId;
             c_Scaling = pc_Box->c_DataPoolElementsConfig[0].c_ElementScaling;
+            c_FormatterConfig = pc_Box->c_DataPoolElementsConfig[0].c_DisplayFormatter;
          }
          else
          {
@@ -295,7 +294,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
 
          pc_Dialog = new C_SyvDaPeBase(*c_New, this->mu32_ViewIndex, this->mu32_DashboardIndex, "Value Label",
                                        c_ElementId,
-                                       c_Scaling, true, this->mq_DarkMode);
+                                       c_Scaling, true, c_FormatterConfig, true, this->mq_DarkMode);
          pc_PropertiesWidget = new C_SyvDaPeLabel(*pc_Dialog, this->mq_DarkMode);
 
          pc_Dialog->SetWidget(pc_PropertiesWidget);
@@ -309,7 +308,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
          pc_PropertiesWidget->SetShowCaption(pc_Box->q_ShowCaption);
          pc_PropertiesWidget->SetShowUnit(pc_Box->q_ShowUnit);
 
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             C_PuiSvDbLabel c_Box = *pc_Box;
             C_PuiSvDbNodeDataElementConfig c_Tmp;
@@ -323,6 +322,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
 
             c_Tmp.c_ElementId = pc_Dialog->GetDataElementId();
             c_Tmp.c_ElementScaling = pc_Dialog->GetScalingInformation();
+            c_Tmp.c_DisplayFormatter = pc_Dialog->GetFormatterInformation();
             c_Box.c_DataPoolElementsConfig.clear();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
@@ -335,7 +335,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
             tgl_assert(C_PuiSvHandler::h_GetInstance()->CheckAndHandleNewElement(c_Tmp.c_ElementId) == C_NO_ERR);
             tgl_assert(C_PuiSvHandler::h_GetInstance()->SetDashboardWidget(this->mu32_ViewIndex,
                                                                            this->mu32_DashboardIndex,
-                                                                           static_cast<uint32>(this->ms32_Index),
+                                                                           static_cast<uint32_t>(this->ms32_Index),
                                                                            &c_Box, this->me_Type) == C_NO_ERR);
             //Apply
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
@@ -345,7 +345,8 @@ bool C_GiSvDaLabelBase::CallProperties(void)
             this->ClearDataPoolElements();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
-               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(), pc_Dialog->GetScalingInformation());
+               this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(),
+                                             pc_Dialog->GetScalingInformation(), pc_Dialog->GetFormatterInformation());
             }
 
             //Signal for error change
@@ -446,13 +447,13 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
          const C_PuiSvDbNodeDataElementConfig & rc_CurItem = orc_Data.c_DataPoolElementsConfig[0];
          if (rc_CurItem.c_ElementId.GetIsValid() == true)
          {
-            const C_OSCNodeDataPoolListElement * const pc_Element =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_CurItem.c_ElementId.u32_NodeIndex,
+            const C_OscNodeDataPoolListElement * const pc_Element =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_CurItem.c_ElementId.u32_NodeIndex,
                                                                           rc_CurItem.c_ElementId.u32_DataPoolIndex,
                                                                           rc_CurItem.c_ElementId.u32_ListIndex,
                                                                           rc_CurItem.c_ElementId.u32_ElementIndex);
-            const C_OSCNodeDataPool * const pc_Datapool =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPool(rc_CurItem.c_ElementId.u32_NodeIndex,
+            const C_OscNodeDataPool * const pc_Datapool =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPool(rc_CurItem.c_ElementId.u32_NodeIndex,
                                                                rc_CurItem.c_ElementId.u32_DataPoolIndex);
 
             if (pc_Element != NULL)
@@ -460,8 +461,8 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
                QString c_Caption;
                if (pc_Datapool != NULL)
                {
-                  if ((pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC) ||
-                      (pc_Datapool->e_Type == C_OSCNodeDataPool::eHALC_NVM))
+                  if ((pc_Datapool->e_Type == C_OscNodeDataPool::eHALC) ||
+                      (pc_Datapool->e_Type == C_OscNodeDataPool::eHALC_NVM))
                   {
                      c_Caption = C_PuiSvHandler::h_GetShortNamespace(rc_CurItem.c_ElementId);
                   }
@@ -505,7 +506,7 @@ void C_GiSvDaLabelBase::m_UpdateCaption(const C_PuiSvDbLabel & orc_Data) const
    \param[in] orc_Label Current label item
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvDaLabelBase::m_UpdateStaticValue(const stw_opensyde_gui_logic::C_PuiSvDbLabel & orc_Label)
+void C_GiSvDaLabelBase::m_UpdateStaticValue(const stw::opensyde_gui_logic::C_PuiSvDbLabel & orc_Label)
 {
    if (this->mpc_LabelWidget != NULL)
    {
@@ -516,15 +517,15 @@ void C_GiSvDaLabelBase::m_UpdateStaticValue(const stw_opensyde_gui_logic::C_PuiS
          const C_PuiSvDbNodeDataElementConfig & rc_Config = orc_Label.c_DataPoolElementsConfig[0];
          if (rc_Config.c_ElementId.GetIsValid() == true)
          {
-            const C_OSCNodeDataPoolListElement * const pc_Element =
-               C_PuiSdHandler::h_GetInstance()->GetOSCDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
+            const C_OscNodeDataPoolListElement * const pc_Element =
+               C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(rc_Config.c_ElementId.u32_NodeIndex,
                                                                           rc_Config.c_ElementId.u32_DataPoolIndex,
                                                                           rc_Config.c_ElementId.u32_ListIndex,
                                                                           rc_Config.c_ElementId.u32_ElementIndex);
             if (pc_Element != NULL)
             {
-               float64 f64_Value;
-               uint32 u32_Index;
+               float64_t f64_Value;
+               uint32_t u32_Index;
                if (rc_Config.c_ElementId.GetUseArrayElementIndex())
                {
                   u32_Index = rc_Config.c_ElementId.GetArrayElementIndex();

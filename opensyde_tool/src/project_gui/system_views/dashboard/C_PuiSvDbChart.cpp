@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_PuiSvDbChart.h"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSvDbChart.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,14 +50,14 @@ C_PuiSvDbChart::C_PuiSvDbChart() :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbChart::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_PuiSvDbChart::CalcHash(uint32_t & oru32_HashValue) const
 {
-   for (stw_types::uint32 u32_ItActive = 0; u32_ItActive < this->c_DataPoolElementsActive.size(); ++u32_ItActive)
+   for (uint32_t u32_ItActive = 0; u32_ItActive < this->c_DataPoolElementsActive.size(); ++u32_ItActive)
    {
       const bool q_Data = this->c_DataPoolElementsActive[u32_ItActive];
-      stw_scl::C_SCLChecksums::CalcCRC32(&q_Data, sizeof(q_Data), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&q_Data, sizeof(q_Data), oru32_HashValue);
    }
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_SettingZoomMode, sizeof(this->e_SettingZoomMode), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_SettingZoomMode, sizeof(this->e_SettingZoomMode), oru32_HashValue);
 
    C_PuiSvDbWidgetBase::CalcHash(oru32_HashValue);
 }
@@ -85,9 +84,10 @@ bool C_PuiSvDbChart::IsReadElement(void) const
    \retval   C_RANGE    Index not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_PuiSvDbChart::RemoveElement(const stw_types::uint32 & oru32_Index)
+int32_t C_PuiSvDbChart::RemoveElement(const uint32_t & oru32_Index)
 {
-   stw_types::sint32 s32_Retval = C_PuiSvDbWidgetBase::RemoveElement(oru32_Index);
+   int32_t s32_Retval = C_PuiSvDbWidgetBase::RemoveElement(oru32_Index);
+
    if (s32_Retval == C_NO_ERR)
    {
       if (oru32_Index < this->c_DataPoolElementsActive.size())

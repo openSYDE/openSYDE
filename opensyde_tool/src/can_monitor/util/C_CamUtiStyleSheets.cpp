@@ -8,19 +8,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFile>
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_CamUtiStyleSheets.h"
+#include "C_CamUtiStyleSheets.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 // Configuration for dynamic transparency color configuration of elements
@@ -36,12 +35,12 @@ const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyle
 
 const std::vector<QString> C_CamUtiStyleSheets::mhc_SCROLL_BAR_ELEMENTS_BRIGHT(
 {
-   "stw_opensyde_gui--C_CamGenTableView QScrollBar",
-   "stw_opensyde_gui--C_CamGenSigTableView QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar",
-   "stw_opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
-   "stw_opensyde_gui--C_CamMetWidget QScrollBar",
-   "stw_opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar"
+   "stw--opensyde_gui--C_CamGenTableView QScrollBar",
+   "stw--opensyde_gui--C_CamGenSigTableView QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTebMessageDetails QScrollBar",
+   "stw--opensyde_gui_elements--C_OgeTransparentScrollArea QScrollBar",
+   "stw--opensyde_gui--C_CamMetWidget QScrollBar",
+   "stw--opensyde_gui_elements--C_CamOgeCbxTable QAbstractItemView QScrollBar"
 }
    );
 const std::vector<C_CamUtiStyleSheets::C_PropertyValueColorConfig> C_CamUtiStyleSheets::mhc_SCROLL_BAR_PROPERTIES_BRIGHT(
@@ -207,17 +206,17 @@ void C_CamUtiStyleSheets::mh_AppendScrollBarStyleSheet(const std::vector<QString
    {
       orc_Stylesheet += "\n";
       //Each property
-      for (uint32 u32_ItProperty = 0; u32_ItProperty < orc_ScrollBarProperties.size(); ++u32_ItProperty)
+      for (uint32_t u32_ItProperty = 0; u32_ItProperty < orc_ScrollBarProperties.size(); ++u32_ItProperty)
       {
          QString c_Value;
          const C_CamUtiStyleSheets::C_PropertyValueColorConfig & rc_Property = orc_ScrollBarProperties[u32_ItProperty];
          //Add elements
-         for (uint32 u32_ItElement = 0; u32_ItElement < orc_ScrollBarElements.size(); ++u32_ItElement)
+         for (uint32_t u32_ItElement = 0; u32_ItElement < orc_ScrollBarElements.size(); ++u32_ItElement)
          {
             QString c_Entry;
             const QString & rc_Element = orc_ScrollBarElements[u32_ItElement];
             c_Entry = static_cast<QString>("%1%2").arg(rc_Element, rc_Property.c_PropertyName);
-            if (u32_ItElement < (static_cast<uint32>(orc_ScrollBarElements.size()) - 1UL))
+            if (u32_ItElement < (static_cast<uint32_t>(orc_ScrollBarElements.size()) - 1UL))
             {
                c_Entry += ",";
             }

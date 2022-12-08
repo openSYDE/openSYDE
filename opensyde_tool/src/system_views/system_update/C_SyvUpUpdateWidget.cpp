@@ -9,43 +9,42 @@
 #include <QApplication>
 #include <QFileInfo>
 
-#include "C_SyvUpUpdateWidget.h"
+#include "C_SyvUpUpdateWidget.hpp"
 #include "ui_C_SyvUpUpdateWidget.h"
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "CSCLString.h"
-#include "TGLTime.h"
-#include "TGLFile.h"
-#include "C_Uti.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCUtils.h"
-#include "C_SyvUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_UsHandler.h"
-#include "C_SyvUpDeviceInfo.h"
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
-#include "C_PuiSdHandler.h"
-#include "DLLocalize.h"
-#include "C_OgeWiCustomMessage.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SclString.hpp"
+#include "TglTime.hpp"
+#include "TglFile.hpp"
+#include "C_Uti.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_SyvUpDeviceInfo.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "DLLocalize.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_tgl;
-using namespace stw_scl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::tgl;
+using namespace stw::scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvUpUpdateWidget::mhc_TEMP_FOLDER = "system_update_temp";
-const sintn C_SyvUpUpdateWidget::mhsn_WIDGET_BORDER = 12;
-const sintn C_SyvUpUpdateWidget::mhsn_TOOLBOX_INIT_POS_Y = 150;
-const stw_types::uint32 C_SyvUpUpdateWidget::mhu32_WAIT_TIME = 5100U;
+const int32_t C_SyvUpUpdateWidget::mhs32_WIDGET_BORDER = 12;
+const int32_t C_SyvUpUpdateWidget::mhs32_TOOLBOX_INIT_POS_Y = 150;
+const uint32_t C_SyvUpUpdateWidget::mhu32_WAIT_TIME = 5100U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -67,7 +66,7 @@ const stw_types::uint32 C_SyvUpUpdateWidget::mhu32_WAIT_TIME = 5100U;
    \param[in,out]  opc_Parent             Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * const opc_ProgressLogParent,
+C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32_t ou32_ViewIndex, QWidget * const opc_ProgressLogParent,
                                          QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvUpUpdateWidget),
@@ -113,8 +112,8 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
 
    // configure scene
    this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->width()),
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->height()));
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->width()),
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->height()));
    this->mpc_Ui->pc_GraphicsView->SetSceneAndConnect(this->mpc_Scene);
    this->mpc_Scene->SetDrawingBackground(false);
    this->mpc_Ui->pc_GraphicsView->SetDrawingBackground(false);
@@ -129,7 +128,7 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
       c_Name = "";
    }
    this->mpc_Ui->pc_GraphicsView->SetZoomValue(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                  c_Name).sn_UpdateViewZoom, true);
+                                                  c_Name).s32_UpdateViewZoom, true);
    this->mpc_Ui->pc_GraphicsView->SetViewPos(C_UsHandler::h_GetInstance()->GetProjSvSetupView(c_Name).c_UpdateViewPos);
 
    // Initialize the GUI
@@ -149,13 +148,13 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    connect(this->mpc_Ui->pc_GraphicsView, &C_SebGraphicsView::SigShowToolTip, this->mpc_Scene,
            &C_SebScene::DisplayToolTip);
    // Connects
-   connect(this->mpc_Ui->pc_PbConnect, &stw_opensyde_gui_elements::C_OgePubUpdate::clicked, this,
+   connect(this->mpc_Ui->pc_PbConnect, &stw::opensyde_gui_elements::C_OgePubUpdate::clicked, this,
            &C_SyvUpUpdateWidget::m_Connect);
-   connect(this->mpc_Ui->pc_PbUpdate, &stw_opensyde_gui_elements::C_OgePubUpdate::clicked, this,
+   connect(this->mpc_Ui->pc_PbUpdate, &stw::opensyde_gui_elements::C_OgePubUpdate::clicked, this,
            &C_SyvUpUpdateWidget::m_Update);
-   connect(this->mpc_Ui->pc_PbDisconnnect, &stw_opensyde_gui_elements::C_OgePubUpdate::clicked, this,
+   connect(this->mpc_Ui->pc_PbDisconnnect, &stw::opensyde_gui_elements::C_OgePubUpdate::clicked, this,
            &C_SyvUpUpdateWidget::m_Disconnect);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubUpdate::clicked, this,
+   connect(this->mpc_Ui->pc_PbCancel, &stw::opensyde_gui_elements::C_OgePubUpdate::clicked, this,
            &C_SyvUpUpdateWidget::m_Cancel);
    connect(this->mpc_Scene, &C_SyvUpScene::SigDiscardInfo, this, &C_SyvUpUpdateWidget::m_DiscardInfo);
    connect(this, &C_SyvUpUpdateWidget::SigNodeConnectStates, this->mpc_Scene, &C_SyvUpScene::SetNodeConnectStates);
@@ -166,9 +165,9 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32 ou32_ViewIndex, QWidget * 
    // Progress signals
    // We need a signal which is emitted in the other thread
    // We have to register the type and use the queued connections. Auto is default, but did not work.
-   qRegisterMetaType<uint32>("uint32");
-   qRegisterMetaType<sint32>("sint32");
-   qRegisterMetaType<uint8>("uint8");
+   qRegisterMetaType<uint32_t>("uint32_t");
+   qRegisterMetaType<int32_t>("int32_t");
+   qRegisterMetaType<uint8_t>("uint8_t");
 
    connect(this->mpc_Ui->pc_WiUpdateInformation, &C_SyvUpInformationWidget::SigUpdatePackageState,
            this, &C_SyvUpUpdateWidget::m_UpdatePackageState);
@@ -191,10 +190,10 @@ C_SyvUpUpdateWidget::~C_SyvUpUpdateWidget()
    if (pc_View != NULL)
    {
       //Splitter
-      const QList<sintn> c_Sizes = this->mpc_Ui->pc_SplitterHori->sizes();
+      const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterHori->sizes();
       if (c_Sizes.count() > 1)
       {
-         C_UsHandler::h_GetInstance()->SetProjSvUpdateHorizontalSplitterY(pc_View->GetName(), c_Sizes.at(1));
+         C_UsHandler::h_GetInstance()->SetProjSvUpdateHorizontalSplitterVertical(pc_View->GetName(), c_Sizes.at(1));
       }
 
       //Scene
@@ -287,8 +286,8 @@ bool C_SyvUpUpdateWidget::PrepareToClose(void)
          c_MessageBox.SetHeading(C_GtGetText::h_GetText("System Update abort"));
          c_MessageBox.SetDescription(
             C_GtGetText::h_GetText("System Update is running. Do you really want to abort the current System Update?"));
-         c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue Update"));
-         c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Abort Update"));
+         c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue Update"));
+         c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Abort Update"));
          c_MessageBox.SetCustomMinWidth(650);
          c_MessageBox.SetCustomMinHeight(180, 180);
          e_ReturnMessageBox = c_MessageBox.Execute();
@@ -316,11 +315,11 @@ bool C_SyvUpUpdateWidget::PrepareToClose(void)
       if (q_Disconnect == true)
       {
          // Make a disconnect
-         sint32 s32_Result = this->mpc_UpSequences->StartResetSystem();
+         int32_t s32_Result = this->mpc_UpSequences->StartResetSystem();
 
          if (s32_Result == C_NO_ERR)
          {
-            sint32 s32_SequenceResult;
+            int32_t s32_SequenceResult;
             const QString c_Text =  C_GtGetText::h_GetText("Disconnect: Start");
 
             this->m_UpdateReportText(c_Text);
@@ -374,7 +373,7 @@ void C_SyvUpUpdateWidget::showEvent(QShowEvent * const opc_Event)
    if (pc_View != NULL)
    {
       const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
-      sint32 s32_LastSegmentWidth = c_UserView.GetUpdateHorizontalSplitterY();
+      int32_t s32_LastSegmentWidth = c_UserView.GetUpdateHorizontalSplitterVertical();
 
       //Revert to default if necessary
       if (s32_LastSegmentWidth <= 0)
@@ -432,38 +431,38 @@ void C_SyvUpUpdateWidget::resizeEvent(QResizeEvent * const opc_Event)
       }
 
       // would the toolbox be outside of the widget in x direction
-      if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhsn_WIDGET_BORDER) > pc_Widget->width())
+      if ((this->mpc_ProgressLog->x() + this->mpc_ProgressLog->width() + mhs32_WIDGET_BORDER) > pc_Widget->width())
       {
          // is the toolbox to big?
-         if ((this->mpc_ProgressLog->width() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->width())
+         if ((this->mpc_ProgressLog->width() + (2 * mhs32_WIDGET_BORDER)) > pc_Widget->width())
          {
-            c_Size.setWidth(pc_Widget->width() - (2 * mhsn_WIDGET_BORDER));
+            c_Size.setWidth(pc_Widget->width() - (2 * mhs32_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhsn_WIDGET_BORDER);
+            c_Point.setX((pc_Widget->width() - this->mpc_ProgressLog->width()) - mhs32_WIDGET_BORDER);
          }
       }
 
       // would the toolbox be outside of the widget in y direction
-      if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhsn_WIDGET_BORDER) > pc_Widget->height())
+      if ((this->mpc_ProgressLog->y() + this->mpc_ProgressLog->height() + mhs32_WIDGET_BORDER) > pc_Widget->height())
       {
          // is the toolbox to big?
-         if ((this->mpc_ProgressLog->height() + (2 * mhsn_WIDGET_BORDER)) > pc_Widget->height())
+         if ((this->mpc_ProgressLog->height() + (2 * mhs32_WIDGET_BORDER)) > pc_Widget->height())
          {
-            c_Size.setHeight(pc_Widget->height() - (2 * mhsn_WIDGET_BORDER));
+            c_Size.setHeight(pc_Widget->height() - (2 * mhs32_WIDGET_BORDER));
          }
          else
          {
             // adapt position of toolbox
-            c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhsn_WIDGET_BORDER);
+            c_Point.setY((pc_Widget->height() - this->mpc_ProgressLog->height()) - mhs32_WIDGET_BORDER);
          }
       }
 
       // adapt position of fix minimized toolbox
       c_PointFixMiniProgressLog.setX((pc_Widget->width() - this->mpc_FixMinimizedProgressLog->width()) -
-                                     mhsn_WIDGET_BORDER);
+                                     mhs32_WIDGET_BORDER);
 
       this->mpc_ProgressLog->setGeometry(QRect(c_Point, c_Size));
       this->mpc_FixMinimizedProgressLog->setGeometry(QRect(c_PointFixMiniProgressLog,
@@ -484,10 +483,10 @@ void C_SyvUpUpdateWidget::m_CheckError(void)
 
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
-   sintn sn_ColorID;
+   int32_t s32_ColorId;
    this->mq_ErrorDetected = C_SyvUtil::h_GetViewStatusLabelInfo(
       this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_UPDATE, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip,
-      e_ToolTipType, c_IconPath, sn_ColorID);
+      e_ToolTipType, c_IconPath, s32_ColorId);
 
    if (this->mq_ErrorDetected == true)
    {
@@ -497,11 +496,11 @@ void C_SyvUpUpdateWidget::m_CheckError(void)
       this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
       this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
                                                              c_ErrorTextTooltip, e_ToolTipType);
-      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(s32_ColorId);
       this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
       this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
                                                               c_ErrorTextTooltip, e_ToolTipType);
-      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(s32_ColorId);
       this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
    }
@@ -519,11 +518,11 @@ void C_SyvUpUpdateWidget::m_CheckError(void)
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
+int32_t C_SyvUpUpdateWidget::m_InitSequence(void)
 {
    bool q_IsEthernet = false;
    QString c_Message;
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    //Check if ethernet
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -532,11 +531,11 @@ sint32 C_SyvUpUpdateWidget::m_InitSequence(void)
    {
       if (pc_View->GetPcData().GetConnected())
       {
-         const C_OSCSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOSCBus(
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
             pc_View->GetPcData().GetBusIndex());
          if (pc_Bus != NULL)
          {
-            if (pc_Bus->e_Type == C_OSCSystemBus::eETHERNET)
+            if (pc_Bus->e_Type == C_OscSystemBus::eETHERNET)
             {
                q_IsEthernet = true;
             }
@@ -686,7 +685,7 @@ void C_SyvUpUpdateWidget::m_CleanUpSequence(void)
    \param[in]  os32_State  State of update package
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_UpdatePackageState(const sint32 os32_State)
+void C_SyvUpUpdateWidget::m_UpdatePackageState(const int32_t os32_State)
 {
    if ((os32_State == C_NO_ERR) &&
        (this->mq_ErrorDetected == false))
@@ -714,15 +713,16 @@ void C_SyvUpUpdateWidget::m_UpdatePackageState(const sint32 os32_State)
    \param[in]  ou8_Progress   Progress of sequence in percentage (goes from 0..100 for each function)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_ReportProgress(const uint32 ou32_Step, const sint32 os32_Result, const uint8 ou8_Progress)
+void C_SyvUpUpdateWidget::m_ReportProgress(const uint32_t ou32_Step, const int32_t os32_Result,
+                                           const uint8_t ou8_Progress)
 {
-   const C_OSCSuSequences::E_ProgressStep e_Step = static_cast<C_OSCSuSequences::E_ProgressStep>(ou32_Step);
+   const C_OscSuSequences::E_ProgressStep e_Step = static_cast<C_OscSuSequences::E_ProgressStep>(ou32_Step);
 
    (void)os32_Result;  //details not reported by this layer
    (void)ou8_Progress; //[...]
 
    //Stop animation
-   if (e_Step == C_OSCSuSequences::eUPDATE_SYSTEM_FINISHED)
+   if (e_Step == C_OscSuSequences::eUPDATE_SYSTEM_FINISHED)
    {
       if (this->mpc_Scene != NULL)
       {
@@ -753,15 +753,15 @@ void C_SyvUpUpdateWidget::m_ReportProgress(const uint32 ou32_Step, const sint32 
    \param[in]  ou8_NodeIdentifier   Node Id of affected node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, const sint32 os32_Result,
-                                                    const uint8 ou8_Progress, const uint8 ou8_BusIdentifier,
-                                                    const uint8 ou8_NodeIdentifier)
+void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32_t ou32_Step, const int32_t os32_Result,
+                                                    const uint8_t ou8_Progress, const uint8_t ou8_BusIdentifier,
+                                                    const uint8_t ou8_NodeIdentifier)
 {
-   const C_OSCSuSequences::E_ProgressStep e_Step = static_cast<C_OSCSuSequences::E_ProgressStep>(ou32_Step);
-   uint32 u32_NodeIndex;
-   uint32 u32_BusIndex;
-   const sint32 s32_Result = C_SyvUtil::h_GetIndicesFromBusId(ou8_BusIdentifier, ou8_NodeIdentifier, u32_NodeIndex,
-                                                              u32_BusIndex);
+   const C_OscSuSequences::E_ProgressStep e_Step = static_cast<C_OscSuSequences::E_ProgressStep>(ou32_Step);
+   uint32_t u32_NodeIndex;
+   uint32_t u32_BusIndex;
+   const int32_t s32_Result = C_SyvUtil::h_GetIndicesFromBusId(ou8_BusIdentifier, ou8_NodeIdentifier, u32_NodeIndex,
+                                                               u32_BusIndex);
 
    (void)os32_Result;
 
@@ -781,7 +781,7 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
       }
       else if (C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(e_Step) == true)
       {
-         const C_PuiSdNode * const pc_UINode = C_PuiSdHandler::h_GetInstance()->GetUINode(u32_NodeIndex);
+         const C_PuiSdNode * const pc_UiNode = C_PuiSdHandler::h_GetInstance()->GetUiNode(u32_NodeIndex);
          this->mu32_ApplicationIndex = 0;
          //Signal progress
          this->mpc_Ui->pc_WiUpdateInformation->SetUpdateNodeStarted(u32_NodeIndex);
@@ -793,15 +793,15 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
             this->mpc_Scene->StartProgressAnimation(u32_NodeIndex);
          }
          //Scroll scene
-         if (pc_UINode != NULL)
+         if (pc_UiNode != NULL)
          {
-            this->mpc_Ui->pc_GraphicsView->ScrollTo(pc_UINode->c_UIPosition,
-                                                    QSizeF(pc_UINode->f64_Width, pc_UINode->f64_Height));
+            this->mpc_Ui->pc_GraphicsView->ScrollTo(pc_UiNode->c_UiPosition,
+                                                    QSizeF(pc_UiNode->f64_Width, pc_UiNode->f64_Height));
          }
          //Signal progress log
          if (this->mpc_ProgressLogContent != NULL)
          {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodeIndex);
+            const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
             if (pc_Node != NULL)
             {
                const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("Update %1...")).arg(
@@ -884,14 +884,14 @@ void C_SyvUpUpdateWidget::m_ReportProgressForServer(const uint32 ou32_Step, cons
       {
          switch (e_Step) //lint !e788 //we do not handle all steps here
          {
-         case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START: // The normal flash progress
-         case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:     // The normal flash progress
-         case C_OSCSuSequences::eXFL_PROGRESS:                                         // The normal flash progress
+         case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START: // The normal flash progress
+         case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:     // The normal flash progress
+         case C_OscSuSequences::eXFL_PROGRESS:                                         // The normal flash progress
             if (ou8_Progress != 0xFF)
             {
                this->mpc_Ui->pc_WiUpdateInformation->SetNodeProgress(u32_NodeIndex, ou8_Progress);
                //Signal summary
-               this->mpc_Ui->pc_WiUpdateInformation->UpdateProgress(static_cast<uint16>(ou8_Progress), false);
+               this->mpc_Ui->pc_WiUpdateInformation->UpdateProgress(static_cast<uint16_t>(ou8_Progress), false);
             }
 
             break;
@@ -914,16 +914,16 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
 {
    if (this->mpc_UpSequences != NULL)
    {
-      std::vector<uint32> c_NodeIndexes;
-      std::vector<C_OSCSuSequences::C_OsyDeviceInformation> c_DeviceInformation;
+      std::vector<uint32_t> c_NodeIndexes;
+      std::vector<C_OscSuSequences::C_OsyDeviceInformation> c_DeviceInformation;
       std::vector<C_SyvUpDeviceInfo> c_Devices;
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       this->mpc_UpSequences->GetOsyDeviceInformation(c_NodeIndexes, c_DeviceInformation);
 
       for (u32_Counter = 0U; u32_Counter < c_NodeIndexes.size(); ++u32_Counter)
       {
-         const C_OSCSuSequences::C_OsyDeviceInformation & rc_Info = c_DeviceInformation[u32_Counter];
+         const C_OscSuSequences::C_OsyDeviceInformation & rc_Info = c_DeviceInformation[u32_Counter];
          QString c_Temp;
 
          this->m_UpdateReportText(
@@ -936,10 +936,10 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
             static_cast<QString>(C_GtGetText::h_GetText("Number of applications: %1")).arg(rc_Info.c_Applications.
                                                                                            size()));
 
-         for (uint8 u8_Application = 0U; u8_Application < rc_Info.c_Applications.size(); u8_Application++)
+         for (uint8_t u8_Application = 0U; u8_Application < rc_Info.c_Applications.size(); u8_Application++)
          {
             this->m_UpdateReportText(
-               static_cast<QString>(C_GtGetText::h_GetText("Application %1")).arg(static_cast<uint32>(u8_Application)));
+               static_cast<QString>(C_GtGetText::h_GetText("Application %1")).arg(static_cast<uint32_t>(u8_Application)));
             this->m_UpdateReportText(
                static_cast<QString>(C_GtGetText::h_GetText(" Name: %1")).arg(
                   rc_Info.c_Applications[u8_Application].c_ApplicationName.c_str()));
@@ -996,8 +996,8 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
          else
          {
             c_Temp = static_cast<QString>(C_GtGetText::h_GetText("(Format: Extended with Manufacturer Format %1)")).arg(
-               QString::number(static_cast<uint32>(rc_Info.c_MoreInformation.c_SerialNumber.
-                                                   u8_SerialNumberManufacturerFormat)));
+               QString::number(static_cast<uint32_t>(rc_Info.c_MoreInformation.c_SerialNumber.
+                                                     u8_SerialNumberManufacturerFormat)));
          }
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText("Device serial number: %1 %2")).arg(
@@ -1010,19 +1010,19 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
                                      rc_Info.c_MoreInformation.c_EcuHardwareVersionNumber.c_str()));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText("Flash fingerprint date: %1-%2-%3 (yy-mm-dd)")).arg(
-               QString::number(static_cast<uint32>(
+               QString::number(static_cast<uint32_t>(
                                   rc_Info.c_MoreInformation.au8_FlashFingerprintDate[0])).rightJustified(2, '0'),
-               QString::number(static_cast<uint32>(
+               QString::number(static_cast<uint32_t>(
                                   rc_Info.c_MoreInformation.au8_FlashFingerprintDate[1])).rightJustified(2, '0'),
-               QString::number(static_cast<uint32>(
+               QString::number(static_cast<uint32_t>(
                                   rc_Info.c_MoreInformation.au8_FlashFingerprintDate[2])).rightJustified(2, '0')));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText("Flash fingerprint time: %1:%2:%3")).arg(
-               QString::number(static_cast<uint32>(rc_Info.c_MoreInformation.au8_FlashFingerprintTime[0])).
+               QString::number(static_cast<uint32_t>(rc_Info.c_MoreInformation.au8_FlashFingerprintTime[0])).
                rightJustified(2, '0'),
-               QString::number(static_cast<uint32>(rc_Info.c_MoreInformation.au8_FlashFingerprintTime[1])).
+               QString::number(static_cast<uint32_t>(rc_Info.c_MoreInformation.au8_FlashFingerprintTime[1])).
                rightJustified(2, '0'),
-               QString::number(static_cast<uint32>(rc_Info.c_MoreInformation.au8_FlashFingerprintTime[2])).
+               QString::number(static_cast<uint32_t>(rc_Info.c_MoreInformation.au8_FlashFingerprintTime[2])).
                rightJustified(2, '0')));
          this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText("Flash fingerprint username: %1")).arg(
                                      rc_Info.c_MoreInformation.c_FlashFingerprintUserName.c_str()));
@@ -1043,34 +1043,34 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
          }
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(" NVM writing available: %1")).arg(
-               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
-                                                  q_FlashloaderCanWriteToNvm))));
+               QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                    q_FlashloaderCanWriteToNvm))));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(" Security supported: %1")).arg(
-               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
-                                                  q_SupportsSecurity))));
+               QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                    q_SupportsSecurity))));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(" Disabling debugger supported: %1")).arg(
-               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
-                                                  q_SupportsDebuggerOff))));
+               QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                    q_SupportsDebuggerOff))));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(" Enabling debugger supported: %1")).arg(
-               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
-                                                  q_SupportsDebuggerOn))));
+               QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                    q_SupportsDebuggerOn))));
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(
                                     " Ethernet2Ethernet routing supported: %1")).arg(
-               QString::number(static_cast<uint8>(rc_Info.c_MoreInformation.c_AvailableFeatures.
-                                                  q_EthernetToEthernetRoutingSupported))));
+               QString::number(static_cast<uint8_t>(rc_Info.c_MoreInformation.c_AvailableFeatures.
+                                                    q_EthernetToEthernetRoutingSupported))));
       }
 
       //Convert to same basic class
       c_Devices.reserve(c_DeviceInformation.size());
-      for (uint32 u32_ItDevice = 0; u32_ItDevice < c_DeviceInformation.size(); ++u32_ItDevice)
+      for (uint32_t u32_ItDevice = 0; u32_ItDevice < c_DeviceInformation.size(); ++u32_ItDevice)
       {
          C_SyvUpDeviceInfo c_NewDevice;
-         const C_OSCSuSequences::C_OsyDeviceInformation & rc_Info = c_DeviceInformation[u32_ItDevice];
-         c_NewDevice.pc_OSYDevice = &rc_Info;
+         const C_OscSuSequences::C_OsyDeviceInformation & rc_Info = c_DeviceInformation[u32_ItDevice];
+         c_NewDevice.pc_OpenSydeDevice = &rc_Info;
          c_Devices.push_back(c_NewDevice);
       }
 
@@ -1095,25 +1095,25 @@ void C_SyvUpUpdateWidget::m_ReportStwFlashloaderInformationRead(void)
 {
    if (this->mpc_UpSequences != NULL)
    {
-      std::vector<uint32> c_NodeIndexes;
-      std::vector<C_OSCSuSequences::C_XflDeviceInformation> c_DeviceInformation;
+      std::vector<uint32_t> c_NodeIndexes;
+      std::vector<C_OscSuSequences::C_XflDeviceInformation> c_DeviceInformation;
       std::vector<C_SyvUpDeviceInfo> c_Devices;
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       this->mpc_UpSequences->GetXflDeviceInformation(c_NodeIndexes, c_DeviceInformation);
 
       for (u32_Counter = 0U; u32_Counter < c_NodeIndexes.size(); ++u32_Counter)
       {
-         C_SCLStringList c_Strings;
+         C_SclStringList c_Strings;
 
          this->m_UpdateReportText(
             static_cast<QString>(C_GtGetText::h_GetText(
                                     "STW Flashloader device information found for node with index %1")).arg(
                c_NodeIndexes[u32_Counter]));
 
-         C_OSCSuSequences::h_StwFlashloaderInformationToText(c_DeviceInformation[u32_Counter], c_Strings);
+         C_OscSuSequences::h_StwFlashloaderInformationToText(c_DeviceInformation[u32_Counter], c_Strings);
 
-         for (uint32 u32_StringIndex = 0U; u32_StringIndex < c_Strings.GetCount(); u32_StringIndex++)
+         for (uint32_t u32_StringIndex = 0U; u32_StringIndex < c_Strings.GetCount(); u32_StringIndex++)
          {
             this->m_UpdateReportText(c_Strings.Strings[u32_StringIndex].c_str());
          }
@@ -1121,11 +1121,11 @@ void C_SyvUpUpdateWidget::m_ReportStwFlashloaderInformationRead(void)
 
       //Convert to same basic class
       c_Devices.reserve(c_DeviceInformation.size());
-      for (uint32 u32_ItDevice = 0; u32_ItDevice < c_DeviceInformation.size(); ++u32_ItDevice)
+      for (uint32_t u32_ItDevice = 0; u32_ItDevice < c_DeviceInformation.size(); ++u32_ItDevice)
       {
          C_SyvUpDeviceInfo c_NewDevice;
-         const C_OSCSuSequences::C_XflDeviceInformation & rc_Info = c_DeviceInformation[u32_ItDevice];
-         c_NewDevice.pc_STWDevice = &rc_Info;
+         const C_OscSuSequences::C_XflDeviceInformation & rc_Info = c_DeviceInformation[u32_ItDevice];
+         c_NewDevice.pc_StwDevice = &rc_Info;
          c_Devices.push_back(c_NewDevice);
       }
 
@@ -1149,17 +1149,17 @@ void C_SyvUpUpdateWidget::m_ReportStwFlashloaderInformationRead(void)
    \param[in]  orc_OsyDeviceInformation   All device information associated to the node index in the same order
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vector<uint32> & orc_OsyNodeIndexes,
-                                                                const std::vector<C_OSCSuSequences::C_OsyDeviceInformation> & orc_OsyDeviceInformation)
+void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vector<uint32_t> & orc_OsyNodeIndexes,
+                                                                const std::vector<C_OscSuSequences::C_OsyDeviceInformation> & orc_OsyDeviceInformation)
 {
-   uint32 u32_NodesInformationCounter;
+   uint32_t u32_NodesInformationCounter;
 
    tgl_assert(orc_OsyNodeIndexes.size() == orc_OsyDeviceInformation.size());
 
    for (u32_NodesInformationCounter = 0U; u32_NodesInformationCounter < orc_OsyNodeIndexes.size();
         ++u32_NodesInformationCounter)
    {
-      uint32 u32_NodesPackageCounter;
+      uint32_t u32_NodesPackageCounter;
       // u32_NodesPackageCounter equals node index in system definition
       for (u32_NodesPackageCounter = 0U; u32_NodesPackageCounter < this->mc_NodesToFlash.size();
            ++u32_NodesPackageCounter)
@@ -1167,11 +1167,11 @@ void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vecto
          if (orc_OsyNodeIndexes[u32_NodesInformationCounter] == u32_NodesPackageCounter)
          {
             // Same node index
-            const C_OSCSuSequences::C_OsyDeviceInformation & rc_Info =
+            const C_OscSuSequences::C_OsyDeviceInformation & rc_Info =
                orc_OsyDeviceInformation[u32_NodesInformationCounter];
-            const C_OSCNode * const pc_Node =
-               C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_NodesPackageCounter);
-            stw_scl::C_SCLString c_NodeName;
+            const C_OscNode * const pc_Node =
+               C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodesPackageCounter);
+            stw::scl::C_SclString c_NodeName;
 
             if (pc_Node != NULL)
             {
@@ -1263,7 +1263,7 @@ void C_SyvUpUpdateWidget::m_CheckOpenSydeFlashloaderInformation(const std::vecto
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_Connect(void)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -1287,7 +1287,7 @@ void C_SyvUpUpdateWidget::m_Connect(void)
    }
 
    // Is a new connect already possible
-   while ((this->mu32_DisconnectTime + mhu32_WAIT_TIME) > TGL_GetTickCount())
+   while ((this->mu32_DisconnectTime + mhu32_WAIT_TIME) > TglGetTickCount())
    {
       // Wait till it is possible
    }
@@ -1347,8 +1347,8 @@ void C_SyvUpUpdateWidget::m_Connect(void)
                                            "\n"
                                            "Are you sure you want to continue?\n"));
             c_MessageBox.SetCustomMinHeight(240, 240);
-            c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue"));
-            c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Cancel"));
+            c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue"));
+            c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Cancel"));
             e_Output = c_MessageBox.Execute();
             switch (e_Output)
             {
@@ -1368,8 +1368,8 @@ void C_SyvUpUpdateWidget::m_Connect(void)
       if (s32_Return == C_NO_ERR)
       {
          QString c_ErrorPath;
-         const C_SCLString c_ExePath = C_Uti::h_GetExePath().toStdString().c_str();
-         const C_SCLString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER.toStdString().c_str() + "/";
+         const C_SclString c_ExePath = C_Uti::h_GetExePath().toStdString().c_str();
+         const C_SclString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER.toStdString().c_str() + "/";
 
          // Copy the application paths
          // Saving both, the original and temporary, paths will help to map changed relevant applications
@@ -1561,12 +1561,12 @@ void C_SyvUpUpdateWidget::m_Update(void)
 
             if (pc_View != NULL)
             {
-               sint32 s32_Return;
+               int32_t s32_Return;
 
                this->m_UpdateReportText(C_GtGetText::h_GetText("Update System started"));
 
                // Is a new update already possible
-               while ((this->mu32_UpdateTime + mhu32_WAIT_TIME) > TGL_GetTickCount())
+               while ((this->mu32_UpdateTime + mhu32_WAIT_TIME) > TglGetTickCount())
                {
                   // Wait till it is possible
                }
@@ -1713,7 +1713,7 @@ void C_SyvUpUpdateWidget::m_DisconnectAction(void)
 {
    if (this->mpc_UpSequences != NULL)
    {
-      sint32 s32_Return;
+      int32_t s32_Return;
 
       this->me_Step = C_SyvUpSequences::eRESET_SYSTEM;
       s32_Return = this->mpc_UpSequences->StartResetSystem();
@@ -1769,8 +1769,8 @@ void C_SyvUpUpdateWidget::m_Cancel(void)
       c_MessageBox.SetHeading(C_GtGetText::h_GetText("System Update"));
       c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                      "System Update is running. Do you really want to abort the current System Update?"));
-      c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Continue Update"));
-      c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Abort Update"));
+      c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Continue Update"));
+      c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Abort Update"));
       c_MessageBox.SetCustomMinWidth(650);
       c_MessageBox.SetCustomMinHeight(180, 180);
       e_ReturnMessageBox = c_MessageBox.Execute();
@@ -1785,8 +1785,8 @@ void C_SyvUpUpdateWidget::m_Cancel(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_Timer(void)
 {
-   sint32 s32_Result = C_CONFIG;
-   sint32 s32_SequenceResult;
+   int32_t s32_Result = C_CONFIG;
+   int32_t s32_SequenceResult = C_UNKNOWN_ERR;
    QString c_Message = "";
 
    if (this->mpc_UpSequences != NULL)
@@ -1827,7 +1827,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          }
          else
          {
-            std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> c_NodeStates;
+            std::vector<stw::opensyde_core::C_OscSuSequencesNodeConnectStates> c_NodeStates;
 
             // Sequence failed
             this->me_Step = C_SyvUpSequences::eNOT_ACTIVE;
@@ -1849,7 +1849,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          this->me_Step = C_SyvUpSequences::eNOT_ACTIVE;
          {
             // Get the connect status of the nodes and inform the UI
-            std::vector<stw_opensyde_core::C_OSCSuSequencesNodeConnectStates> c_NodeStates;
+            std::vector<stw::opensyde_core::C_OscSuSequencesNodeConnectStates> c_NodeStates;
 
             tgl_assert(this->mpc_UpSequences->GetConnectStates(c_NodeStates) == C_NO_ERR);
             Q_EMIT (this->SigNodeConnectStates(c_NodeStates, this->mc_NodePreconditionErrors));
@@ -1991,7 +1991,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
 
          {
             // Get the connect status of the nodes and inform the UI
-            std::vector<stw_opensyde_core::C_OSCSuSequencesNodeUpdateStates> c_NodeStates;
+            std::vector<stw::opensyde_core::C_OscSuSequencesNodeUpdateStates> c_NodeStates;
 
             tgl_assert(this->mpc_UpSequences->GetUpdateStates(c_NodeStates) == C_NO_ERR);
             Q_EMIT (this->SigNodeUpdateStates(c_NodeStates));
@@ -2048,9 +2048,9 @@ void C_SyvUpUpdateWidget::m_Timer(void)
 
          if (s32_SequenceResult != C_NO_ERR)
          {
-            uint32 u32_ErrorNodeIndex;
-            uint32 u32_ErrorFileIndex;
-            uint32 u32_Position;
+            uint32_t u32_ErrorNodeIndex;
+            uint32_t u32_ErrorFileIndex;
+            uint32_t u32_Position;
 
             // Adapt the update configuration. Remove all applications which are updated successfully
             // in case of a retry without new connect
@@ -2059,7 +2059,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                // Remove all applications of the finished nodes
                for (u32_Position = 0U; u32_Position < this->mc_NodesOrder.size(); u32_Position++)
                {
-                  const uint32 u32_NodeIndex = this->mc_NodesOrder[u32_Position];
+                  const uint32_t u32_NodeIndex = this->mc_NodesOrder[u32_Position];
 
                   if (u32_NodeIndex != u32_ErrorNodeIndex)
                   {
@@ -2119,7 +2119,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          this->m_UpdateUpdatePackageStatus();
 
          // Save the time of update
-         this->mu32_UpdateTime = TGL_GetTickCount();
+         this->mu32_UpdateTime = TglGetTickCount();
 
          break;
       case C_SyvUpSequences::eRESET_SYSTEM:
@@ -2141,7 +2141,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          Q_EMIT (this->SigBlockDragAndDrop(false));
 
          // Save the time of disconnect
-         this->mu32_DisconnectTime = TGL_GetTickCount();
+         this->mu32_DisconnectTime = TglGetTickCount();
 
          // Close sequence
          this->m_CleanUpSequence();
@@ -2155,7 +2155,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
       {
          C_OgeWiCustomMessage c_MessageAuth(this, C_OgeWiCustomMessage::E_Type::eERROR);
 
-         C_OSCLoggingHandler::h_Flush();
+         C_OscLoggingHandler::h_Flush();
          c_MessageAuth.SetHeading(C_GtGetText::h_GetText("System Update"));
          c_MessageAuth.SetDescription(C_GtGetText::h_GetText(
                                          "Authentication between openSYDE Tool and device(s) has failed. Access denied."));
@@ -2164,7 +2164,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
                                                          "- Failure during authenfication process<br/>"
                                                          "For more information see ") +
                                   C_Uti::h_GetLink(C_GtGetText::h_GetText("log file"), mc_STYLESHEET_GUIDE_COLOR_LINK,
-                                                   C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
+                                                   C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()) +
                                   C_GtGetText::h_GetText("."));
          c_MessageAuth.SetCustomMinHeight(200, 300);
          c_MessageAuth.Execute();
@@ -2180,7 +2180,7 @@ void C_SyvUpUpdateWidget::m_Timer(void)
    \param[in,out]   orc_DetailsStart         Beginning of the details text of the message box
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_HandlePreconditionErrorType(const std::vector<uint32> & orc_ErrorNodeIndexes,
+void C_SyvUpUpdateWidget::m_HandlePreconditionErrorType(const std::vector<uint32_t> & orc_ErrorNodeIndexes,
                                                         const QString & orc_Description,
                                                         const QString & orc_DetailsStart)
 {
@@ -2188,7 +2188,7 @@ void C_SyvUpUpdateWidget::m_HandlePreconditionErrorType(const std::vector<uint32
 
    c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
    QString c_Details = orc_DetailsStart;
-   uint32 u32_NodeCounter;
+   uint32_t u32_NodeCounter;
 
    for (u32_NodeCounter = 0U; u32_NodeCounter < orc_ErrorNodeIndexes.size(); ++u32_NodeCounter)
    {
@@ -2211,9 +2211,9 @@ void C_SyvUpUpdateWidget::m_HandlePreconditionErrorType(const std::vector<uint32
    \param[in]       ou32_ErrorNodeIndex     Node index in system definition of node with error
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_HandleNodePreconditionError(QString & orc_ErrorText, const uint32 ou32_ErrorNodeIndex)
+void C_SyvUpUpdateWidget::m_HandleNodePreconditionError(QString & orc_ErrorText, const uint32_t ou32_ErrorNodeIndex)
 {
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
       ou32_ErrorNodeIndex);
 
    if (pc_Node != NULL)
@@ -2275,48 +2275,47 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(const bool oq_SuppressMessag
 
    if ((this->mpc_Scene != NULL) && (this->mpc_ProgressLogContent != NULL))
    {
-      uint32 u32_AddedNodes = 0;
       //All nodes with any response
-      const std::vector<uint32> c_RespondedNodes = this->mpc_ProgressLogContent->GetConnectNodeEntryIndices();
+      const std::vector<uint32_t> c_RespondedNodes = this->mpc_ProgressLogContent->GetConnectNodeEntryIndices();
       //All nodes which require an update
-      const std::vector<uint32> c_ActiveNoneThirdPartyNodeIndices =
+      const std::vector<uint32_t> c_ActiveNoneThirdPartyNodeIndices =
          this->mpc_Scene->GetActiveNoneThirdPartyNodeIndices();
       //All nodes which require a response
-      std::vector<uint32> c_NodeIndicesWhichRequireAResponse;
+      std::vector<uint32_t> c_NodeIndicesWhichRequireResponse;
 
       //Check which nodes are either directly required or indirectly required for routing
-      c_NodeIndicesWhichRequireAResponse.reserve(
+      c_NodeIndicesWhichRequireResponse.reserve(
          c_ActiveNoneThirdPartyNodeIndices.size() * c_ActiveNoneThirdPartyNodeIndices.size());
-      for (uint32 u32_ItNoneThirdPartyNode = 0; u32_ItNoneThirdPartyNode < c_ActiveNoneThirdPartyNodeIndices.size();
+      for (uint32_t u32_ItNoneThirdPartyNode = 0; u32_ItNoneThirdPartyNode < c_ActiveNoneThirdPartyNodeIndices.size();
            ++u32_ItNoneThirdPartyNode)
       {
          const C_SyvRoRouteCalculation c_Calc(this->mu32_ViewIndex,
                                               c_ActiveNoneThirdPartyNodeIndices[u32_ItNoneThirdPartyNode],
-                                              C_OSCRoutingCalculation::eUPDATE);
-         const C_OSCRoutingRoute * const pc_Route = c_Calc.GetBestRoute();
+                                              C_OscRoutingCalculation::eUPDATE);
+         const C_OscRoutingRoute * const pc_Route = c_Calc.GetBestRoute();
          //Directly required
-         c_NodeIndicesWhichRequireAResponse.push_back(c_ActiveNoneThirdPartyNodeIndices[u32_ItNoneThirdPartyNode]);
+         c_NodeIndicesWhichRequireResponse.push_back(c_ActiveNoneThirdPartyNodeIndices[u32_ItNoneThirdPartyNode]);
          if (pc_Route != NULL)
          {
-            for (uint32 u32_ItRoute = 0; u32_ItRoute < pc_Route->c_VecRoutePoints.size(); ++u32_ItRoute)
+            for (uint32_t u32_ItRoute = 0; u32_ItRoute < pc_Route->c_VecRoutePoints.size(); ++u32_ItRoute)
             {
-               const C_OSCRoutingRoutePoint & rc_RountingPoint = pc_Route->c_VecRoutePoints[u32_ItRoute];
+               const C_OscRoutingRoutePoint & rc_RountingPoint = pc_Route->c_VecRoutePoints[u32_ItRoute];
                //Indirectly required
-               c_NodeIndicesWhichRequireAResponse.push_back(rc_RountingPoint.u32_NodeIndex);
+               c_NodeIndicesWhichRequireResponse.push_back(rc_RountingPoint.u32_NodeIndex);
             }
          }
       }
-      C_Uti::h_Uniqueify(c_NodeIndicesWhichRequireAResponse);
+      C_Uti::h_Uniqueify(c_NodeIndicesWhichRequireResponse);
 
       //Add missing routing nodes
-      for (uint32 u32_ItActiveNode = 0; u32_ItActiveNode < c_NodeIndicesWhichRequireAResponse.size();
+      for (uint32_t u32_ItActiveNode = 0; u32_ItActiveNode < c_NodeIndicesWhichRequireResponse.size();
            ++u32_ItActiveNode)
       {
-         const uint32 & ru32_CurActiveNodeIndex = c_NodeIndicesWhichRequireAResponse[u32_ItActiveNode];
+         const uint32_t & ru32_CurActiveNodeIndex = c_NodeIndicesWhichRequireResponse[u32_ItActiveNode];
          //Check if active
          bool q_AlreadyAdded = false;
          //Check if already added
-         for (uint32 u32_AddedNode = 0; u32_AddedNode < c_RespondedNodes.size(); ++u32_AddedNode)
+         for (uint32_t u32_AddedNode = 0; u32_AddedNode < c_RespondedNodes.size(); ++u32_AddedNode)
          {
             if (c_RespondedNodes[u32_AddedNode] == ru32_CurActiveNodeIndex)
             {
@@ -2334,15 +2333,13 @@ void C_SyvUpUpdateWidget::m_HandleConnectionFailure(const bool oq_SuppressMessag
 
             //Signal scene
             this->mpc_Scene->SetNodeError(ru32_CurActiveNodeIndex);
-            //Always remember
-            ++u32_AddedNodes;
          }
       }
 
       //Display message
       if (oq_SuppressMessageBox == false)
       {
-         const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+         const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
          c_Message.SetDescription(C_GtGetText::h_GetText(
@@ -2376,7 +2373,7 @@ void C_SyvUpUpdateWidget::m_HandleUpdateFailure(void)
 
    //Display message
    {
-      const QString c_Log = C_OSCLoggingHandler::h_GetCompleteLogFileLocation().c_str();
+      const QString c_Log = C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str();
       C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
       c_Message.SetHeading(C_GtGetText::h_GetText("System Update"));
       c_Message.SetDescription(C_GtGetText::h_GetText(
@@ -2431,15 +2428,15 @@ void C_SyvUpUpdateWidget::m_InitProgressLog(void)
       if (this->mpc_ProgressLogParent == NULL)
       {
          // default value in this error case
-         this->mpc_ProgressLog->move(mhsn_WIDGET_BORDER, mhsn_TOOLBOX_INIT_POS_Y);
+         this->mpc_ProgressLog->move(mhs32_WIDGET_BORDER, mhs32_TOOLBOX_INIT_POS_Y);
       }
       else
       {
          // default value
          this->mpc_ProgressLog->setGeometry(QRect(QPoint((((this->mpc_ProgressLogParent->width() -
                                                             this->mpc_ProgressLog->width()) -
-                                                           mhsn_WIDGET_BORDER) -  static_cast<sintn> (100)),
-                                                         mhsn_TOOLBOX_INIT_POS_Y),
+                                                           mhs32_WIDGET_BORDER) -  static_cast<int32_t> (100)),
+                                                         mhs32_TOOLBOX_INIT_POS_Y),
                                                   QSize(400, 319)));
 
          this->mpc_ProgressLog->SetMaximizedHeight(319);
@@ -2496,11 +2493,11 @@ void C_SyvUpUpdateWidget::m_CleanUpProgressLog(void)
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_AddProgressLogConnectEntry(const uint32 ou32_NodeIndex)
+void C_SyvUpUpdateWidget::m_AddProgressLogConnectEntry(const uint32_t ou32_NodeIndex)
 {
    if (this->mpc_ProgressLogContent != NULL)
    {
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
       if (pc_Node != NULL)
       {
          const QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("Get status from %1...")).arg(
@@ -2521,7 +2518,7 @@ void C_SyvUpUpdateWidget::m_AddProgressLogConnectEntry(const uint32 ou32_NodeInd
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
 {
-   uint32 u32_NodeCounter;
+   uint32_t u32_NodeCounter;
 
    // All vector must have the size of the count of nodes in the system
    tgl_assert(this->mc_NodesToFlash.size() == this->mc_NodesWithAllApplications.size());
@@ -2529,14 +2526,14 @@ void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
 
    for (u32_NodeCounter = 0U; u32_NodeCounter < this->mc_NodesToFlash.size(); ++u32_NodeCounter)
    {
-      uint32 u32_FileCounter;
+      uint32_t u32_FileCounter;
 
       // Files for updating
       for (u32_FileCounter = 0U;
            u32_FileCounter < this->mc_NodesToFlash[u32_NodeCounter].c_FilesToFlash.size();
            ++u32_FileCounter)
       {
-         uint32 u32_AllApplCounter;
+         uint32_t u32_AllApplCounter;
 
          for (u32_AllApplCounter = 0U;
               u32_AllApplCounter < this->mc_NodesWithAllApplications[u32_NodeCounter].c_FilesToFlash.size();
@@ -2560,7 +2557,7 @@ void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
            u32_FileCounter < this->mc_NodesToFlash[u32_NodeCounter].c_FilesToWriteToNvm.size();
            ++u32_FileCounter)
       {
-         uint32 u32_AllParamFileCounter;
+         uint32_t u32_AllParamFileCounter;
 
          for (u32_AllParamFileCounter = 0U;
               u32_AllParamFileCounter < this->mc_NodesWithAllApplications[u32_NodeCounter].c_FilesToWriteToNvm.size();
@@ -2597,7 +2594,7 @@ void C_SyvUpUpdateWidget::m_ReplaceOriginalWithTempPaths(void)
    \param[in]  ou32_NodeIndex    Node index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32 ou32_NodeIndex)
+void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32_t ou32_NodeIndex)
 {
    this->mpc_Ui->pc_WiUpdateInformation->DiscardApplicationStatus(ou32_NodeIndex);
 
@@ -2614,18 +2611,18 @@ void C_SyvUpUpdateWidget::m_DiscardInfo(const uint32 ou32_NodeIndex)
 std::vector<bool> C_SyvUpUpdateWidget::m_GetIsFileBasedFlagForEach(void) const
 {
    std::vector<bool> c_Retval;
-   std::vector<uint8> c_NodeActiveFlags;
-   const sint32 s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+   std::vector<uint8_t> c_NodeActiveFlags;
+   const int32_t s32_FuncRetval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
       this->mu32_ViewIndex,
       c_NodeActiveFlags);
 
    if (s32_FuncRetval == C_NO_ERR)
    {
-      for (uint32 u32_ItActiveNode = 0UL; u32_ItActiveNode < c_NodeActiveFlags.size(); ++u32_ItActiveNode)
+      for (uint32_t u32_ItActiveNode = 0UL; u32_ItActiveNode < c_NodeActiveFlags.size(); ++u32_ItActiveNode)
       {
-         if (c_NodeActiveFlags[u32_ItActiveNode] == true)
+         if (c_NodeActiveFlags[u32_ItActiveNode] == 1U)
          {
-            const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(u32_ItActiveNode);
+            const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ItActiveNode);
             if ((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) &&
                 (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
             {
@@ -2655,11 +2652,11 @@ std::vector<bool> C_SyvUpUpdateWidget::m_GetIsFileBasedFlagForEach(void) const
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsConnectionStart(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsConnectionStart(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
-   if (oe_Step == C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START)
+   if (oe_Step == C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START)
    {
       q_Retval = true;
    }
@@ -2680,14 +2677,14 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionStart(const C_OSCSuSequences::E_Progres
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsConnectionSuccess(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsConnectionSuccess(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
       q_Retval = true;
       break;
    default:
@@ -2707,31 +2704,31 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionSuccess(const C_OSCSuSequences::E_Progr
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
       q_Retval = true;
       break;
    default:
@@ -2753,26 +2750,26 @@ bool C_SyvUpUpdateWidget::mh_IsConnectionFailure(const C_OSCSuSequences::E_Progr
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam,
+bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OscSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam,
                                               bool & orq_IsPemFile)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:  // Application start state
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START: // Application start state
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:  // Application start state
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:  // Application start state
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START: // Application start state
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:  // Application start state
       q_Retval = true;
       orq_IsParam = false;
       orq_IsPemFile = false;
       break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
       q_Retval = true;
       orq_IsParam = true;
       orq_IsPemFile = false;
       break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
       q_Retval = true;
       orq_IsParam = false;
       orq_IsPemFile = true;
@@ -2798,26 +2795,26 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppStart(const C_OSCSuSequences::E_Progress
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam,
+bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OscSuSequences::E_ProgressStep oe_Step, bool & orq_IsParam,
                                                 bool & orq_IsPemFile)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:  // Finished application state
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED: // Finished application state
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:  // Finished application state
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:  // Finished application state
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED: // Finished application state
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:  // Finished application state
       orq_IsParam = false;
       q_Retval = true;
       orq_IsPemFile = false;
       break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
       q_Retval = true;
       orq_IsParam = true;
       orq_IsPemFile = false;
       break;
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
       q_Retval = true;
       orq_IsParam = false;
       orq_IsPemFile = true;
@@ -2841,14 +2838,14 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAppSuccess(const C_OSCSuSequences::E_Progre
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_START: // Application start state
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_START: // Application start state
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_START: // Application start state
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_START: // Application start state
       q_Retval = true;
       break;
    default:
@@ -2868,14 +2865,14 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateNodeStart(const C_OSCSuSequences::E_Progres
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateNodeSuccess(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsUpdateNodeSuccess(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED: // Finished application state
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED: // Finished application state
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED: // Finished application state
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED: // Finished application state
       q_Retval = true;
       break;
    default:
@@ -2895,47 +2892,47 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateNodeSuccess(const C_OSCSuSequences::E_Progr
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
    switch (oe_Step) //lint !e788 //we do not handle all steps here
    {
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
       q_Retval = true;
       break;
    default:
@@ -2955,11 +2952,11 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateFailure(const C_OSCSuSequences::E_ProgressS
    False Irrelevant step
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SyvUpUpdateWidget::mh_IsUpdateAbort(const C_OSCSuSequences::E_ProgressStep oe_Step)
+bool C_SyvUpUpdateWidget::mh_IsUpdateAbort(const C_OscSuSequences::E_ProgressStep oe_Step)
 {
    bool q_Retval;
 
-   if (oe_Step == C_OSCSuSequences::eUPDATE_SYSTEM_ABORTED)
+   if (oe_Step == C_OscSuSequences::eUPDATE_SYSTEM_ABORTED)
    {
       q_Retval = true;
    }
@@ -2983,13 +2980,13 @@ bool C_SyvUpUpdateWidget::mh_IsUpdateAbort(const C_OSCSuSequences::E_ProgressSte
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvUpUpdateWidget::mh_IsSecurityWarningNecessary(
-   const std::vector<C_OSCSuSequences::C_DoFlash> & orc_NodesToFlash)
+   const std::vector<C_OscSuSequences::C_DoFlash> & orc_NodesToFlash)
 {
    bool q_Retval = false;
 
-   for (uint32 u32_It = 0UL; u32_It < orc_NodesToFlash.size(); ++u32_It)
+   for (uint32_t u32_It = 0UL; u32_It < orc_NodesToFlash.size(); ++u32_It)
    {
-      const C_OSCSuSequences::C_DoFlash & rc_Flash = orc_NodesToFlash[u32_It];
+      const C_OscSuSequences::C_DoFlash & rc_Flash = orc_NodesToFlash[u32_It];
       if (!rc_Flash.c_PemFile.IsEmpty())
       {
          q_Retval = true;

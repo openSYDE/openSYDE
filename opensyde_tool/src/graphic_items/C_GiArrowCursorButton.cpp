@@ -10,20 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPixmap>
 
-#include "stwtypes.h"
-#include "gitypes.h"
-#include "C_GtGetText.h"
-#include "C_GiArrowCursorButton.h"
+#include "stwtypes.hpp"
+#include "gitypes.hpp"
+#include "C_GtGetText.hpp"
+#include "C_GiArrowCursorButton.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -111,9 +110,9 @@ void C_GiArrowCursorButton::AttachToNode(const C_GiNode * const opc_Node)
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiArrowCursorButton::type() const
+int32_t C_GiArrowCursorButton::type() const
 {
-   return msn_GRAPHICS_ITEM_ARROWCURSORBTN;
+   return ms32_GRAPHICS_ITEM_ARROWCURSORBTN;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

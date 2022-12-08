@@ -26,7 +26,7 @@
       <number>20</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperatorUp">
+      <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperatorUp">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -88,7 +88,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubTreeWidgetRoot" name="pc_PbTreeWidgetRoot">
+         <widget class="stw::opensyde_gui_elements::C_OgePubTreeWidgetRoot" name="pc_PbTreeWidgetRoot">
           <property name="text">
            <string>Messages</string>
           </property>
@@ -121,7 +121,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoMessages">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoMessages">
      <property name="title">
       <string>No messages</string>
      </property>
@@ -155,7 +155,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgePubOptions" name="pc_PbAddMessage">
+       <widget class="stw::opensyde_gui_elements::C_OgePubOptions" name="pc_PbAddMessage">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -190,7 +190,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget" name="pc_MessageTreeWidget">
+    <widget class="stw::opensyde_gui::C_SdBueMessageSelectorTreeWidget" name="pc_MessageTreeWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
        <horstretch>0</horstretch>
@@ -219,7 +219,7 @@
       <number>20</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperatorBottom">
+      <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperatorBottom">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -272,31 +272,31 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubOptions</class>
+   <class>stw::opensyde_gui_elements::C_OgePubOptions</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubOptions.h</header>
+   <header>C_OgePubOptions.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdBueMessageSelectorTreeWidget</class>
+   <class>stw::opensyde_gui::C_SdBueMessageSelectorTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>C_SdBueMessageSelectorTreeWidget.h</header>
+   <header>C_SdBueMessageSelectorTreeWidget.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubTreeWidgetRoot</class>
+   <class>stw::opensyde_gui_elements::C_OgePubTreeWidgetRoot</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubTreeWidgetRoot.h</header>
+   <header>C_OgePubTreeWidgetRoot.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

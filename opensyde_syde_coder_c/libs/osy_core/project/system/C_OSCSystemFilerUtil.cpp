@@ -10,23 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstdio>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLFile.h"
-#include "C_OSCUtils.h"
-#include "C_OSCSystemFilerUtil.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglFile.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_errors;
+
+using namespace stw::opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,11 +48,11 @@ using namespace stw_errors;
    \return  string representation of oe_Type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::h_BusTypeEnumToString(const C_OSCSystemBus::E_Type oe_Type)
+C_SclString C_OscSystemFilerUtil::h_BusTypeEnumToString(const C_OscSystemBus::E_Type oe_Type)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
-   if (oe_Type == C_OSCSystemBus::eETHERNET)
+   if (oe_Type == C_OscSystemBus::eETHERNET)
    {
       c_Retval = "ethernet";
    }
@@ -74,18 +74,18 @@ C_SCLString C_OSCSystemFilerUtil::h_BusTypeEnumToString(const C_OSCSystemBus::E_
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::h_BusTypeStringToEnum(const stw_scl::C_SCLString & orc_Type,
-                                                   C_OSCSystemBus::E_Type & ore_Type)
+int32_t C_OscSystemFilerUtil::h_BusTypeStringToEnum(const stw::scl::C_SclString & orc_Type,
+                                                    C_OscSystemBus::E_Type & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_Type == "ethernet")
    {
-      ore_Type = C_OSCSystemBus::eETHERNET;
+      ore_Type = C_OscSystemBus::eETHERNET;
    }
    else if (orc_Type == "can")
    {
-      ore_Type = C_OSCSystemBus::eCAN;
+      ore_Type = C_OscSystemBus::eCAN;
    }
    else
    {
@@ -100,7 +100,7 @@ sint32 C_OSCSystemFilerUtil::h_BusTypeStringToEnum(const stw_scl::C_SCLString & 
 
    Warning: includes error logging
 
-   \param[in,out]  orc_FileXMLParser   XML parser
+   \param[in,out]  orc_FileXmlParser   XML parser
    \param[in]      orc_Path            File path
    \param[in]      orc_RootNode        Root node name
 
@@ -111,17 +111,17 @@ sint32 C_OSCSystemFilerUtil::h_BusTypeStringToEnum(const stw_scl::C_SCLString & 
    C_CONFIG   root node not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::h_GetParserForExistingFile(C_OSCXMLParser & orc_FileXMLParser,
-                                                        const C_SCLString & orc_Path, const C_SCLString & orc_RootNode)
+int32_t C_OscSystemFilerUtil::h_GetParserForExistingFile(C_OscXmlParser & orc_FileXmlParser,
+                                                         const C_SclString & orc_Path, const C_SclString & orc_RootNode)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (TGL_FileExists(orc_Path))
+   if (TglFileExists(orc_Path))
    {
-      s32_Retval = orc_FileXMLParser.LoadFromFile(orc_Path);
+      s32_Retval = orc_FileXmlParser.LoadFromFile(orc_Path);
       if (s32_Retval == C_NO_ERR)
       {
-         if (orc_FileXMLParser.SelectRoot() != orc_RootNode)
+         if (orc_FileXmlParser.SelectRoot() != orc_RootNode)
          {
             s32_Retval = C_CONFIG;
             osc_write_log_error("Loading files", "Unexpected content for file \"" + orc_Path + "\"");
@@ -145,7 +145,7 @@ sint32 C_OSCSystemFilerUtil::h_GetParserForExistingFile(C_OSCXMLParser & orc_Fil
 
    Warning: includes error logging
 
-   \param[in,out]  orc_FileXMLParser   XML parser
+   \param[in,out]  orc_FileXmlParser   XML parser
    \param[in]      orc_Path            File path
    \param[in]      orc_RootNode        Root node name
 
@@ -154,12 +154,12 @@ sint32 C_OSCSystemFilerUtil::h_GetParserForExistingFile(C_OSCXMLParser & orc_Fil
    C_NOACT    existing file could not be deleted
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::h_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLParser, const C_SCLString & orc_Path,
-                                                   const C_SCLString & orc_RootNode)
+int32_t C_OscSystemFilerUtil::h_GetParserForNewFile(C_OscXmlParser & orc_FileXmlParser, const C_SclString & orc_Path,
+                                                    const C_SclString & orc_RootNode)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (TGL_FileExists(orc_Path))
+   if (TglFileExists(orc_Path))
    {
       if (std::remove(orc_Path.c_str()) == 0)
       {
@@ -171,7 +171,7 @@ sint32 C_OSCSystemFilerUtil::h_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLP
          osc_write_log_error("Saving files", "Could not delete file \"" + orc_Path + "\"");
       }
    }
-   orc_FileXMLParser.CreateAndSelectNodeChild(orc_RootNode);
+   orc_FileXmlParser.CreateAndSelectNodeChild(orc_RootNode);
    return s32_Retval;
 }
 
@@ -187,17 +187,17 @@ sint32 C_OSCSystemFilerUtil::h_GetParserForNewFile(C_OSCXMLParser & orc_FileXMLP
    C_NOACT    folder could not be created
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::h_CreateFolder(const C_SCLString & orc_Path)
+int32_t C_OscSystemFilerUtil::h_CreateFolder(const C_SclString & orc_Path)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
-   if (TGL_DirectoryExists(orc_Path))
+   if (TglDirectoryExists(orc_Path))
    {
       s32_Retval = C_NO_ERR;
    }
    else
    {
-      if (TGL_CreateDirectory(orc_Path) == 0)
+      if (TglCreateDirectory(orc_Path) == 0)
       {
          s32_Retval = C_NO_ERR;
       }
@@ -220,9 +220,9 @@ sint32 C_OSCSystemFilerUtil::h_CreateFolder(const C_SCLString & orc_Path)
    Item name ready for file name usage
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(const C_SCLString & orc_ItemName)
+C_SclString C_OscSystemFilerUtil::h_PrepareItemNameForFileName(const C_SclString & orc_ItemName)
 {
-   return C_OSCUtils::h_NiceifyStringForFileName(orc_ItemName.LowerCase());
+   return C_OscUtils::h_NiceifyStringForFileName(orc_ItemName.LowerCase());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -235,10 +235,10 @@ C_SCLString C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(const C_SCLString
    Full, combined path
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::h_CombinePaths(const C_SCLString & orc_BasePathName,
-                                                 const C_SCLString & orc_SubFolderFileName)
+C_SclString C_OscSystemFilerUtil::h_CombinePaths(const C_SclString & orc_BasePathName,
+                                                 const C_SclString & orc_SubFolderFileName)
 {
-   const C_SCLString c_BasePath = TGL_ExtractFilePath(orc_BasePathName);
+   const C_SclString c_BasePath = TglExtractFilePath(orc_BasePathName);
 
    return c_BasePath + orc_SubFolderFileName;
 }
@@ -260,18 +260,18 @@ C_SCLString C_OSCSystemFilerUtil::h_CombinePaths(const C_SCLString & orc_BasePat
    \retval   C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::h_SaveStringToFile(const C_SCLString & orc_CompleteFileAsString,
-                                                const C_SCLString & orc_CompleteFilePath,
-                                                const C_SCLString & orc_LogHeading)
+int32_t C_OscSystemFilerUtil::h_SaveStringToFile(const C_SclString & orc_CompleteFileAsString,
+                                                 const C_SclString & orc_CompleteFilePath,
+                                                 const C_SclString & orc_LogHeading)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (TGL_FileExists(orc_CompleteFilePath) == true)
+   if (TglFileExists(orc_CompleteFilePath) == true)
    {
       //erase it:
-      sintn sn_Return;
-      sn_Return = std::remove(orc_CompleteFilePath.c_str());
-      if (sn_Return != 0)
+      int x_Return; //lint !e970 !e8080  //using type to match library interface
+      x_Return = std::remove(orc_CompleteFilePath.c_str());
+      if (x_Return != 0)
       {
          osc_write_log_error(orc_LogHeading,
                              "Could not erase pre-existing file \"" + orc_CompleteFilePath + "\".");
@@ -280,10 +280,10 @@ sint32 C_OSCSystemFilerUtil::h_SaveStringToFile(const C_SCLString & orc_Complete
    }
    if (s32_Retval == C_NO_ERR)
    {
-      const C_SCLString c_Folder = TGL_ExtractFilePath(orc_CompleteFilePath);
-      if (TGL_DirectoryExists(c_Folder) == false)
+      const C_SclString c_Folder = TglExtractFilePath(orc_CompleteFilePath);
+      if (TglDirectoryExists(c_Folder) == false)
       {
-         if (TGL_CreateDirectory(c_Folder) != 0)
+         if (TglCreateDirectory(c_Folder) != 0)
          {
             osc_write_log_error(orc_LogHeading, "Could not create folder \"" + c_Folder + "\".");
             s32_Retval = C_RD_WR;
@@ -314,20 +314,20 @@ sint32 C_OSCSystemFilerUtil::h_SaveStringToFile(const C_SCLString & orc_Complete
    Stringified export scaling support type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCSystemFilerUtil::h_CodeExportScalingTypeToString(
-   const C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling)
+C_SclString C_OscSystemFilerUtil::h_CodeExportScalingTypeToString(
+   const C_OscNodeCodeExportSettings::E_Scaling & ore_Scaling)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_Scaling)
    {
-   case C_OSCNodeCodeExportSettings::eFLOAT32:
+   case C_OscNodeCodeExportSettings::eFLOAT32:
       c_Retval = "float32";
       break;
-   case C_OSCNodeCodeExportSettings::eFLOAT64:
+   case C_OscNodeCodeExportSettings::eFLOAT64:
       c_Retval = "float64";
       break;
-   case C_OSCNodeCodeExportSettings::eNONE:
+   case C_OscNodeCodeExportSettings::eNONE:
       c_Retval = "none";
       break;
    default:
@@ -349,22 +349,22 @@ C_SCLString C_OSCSystemFilerUtil::h_CodeExportScalingTypeToString(
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSystemFilerUtil::h_StringToCodeExportScalingType(const C_SCLString & orc_String,
-                                                             C_OSCNodeCodeExportSettings::E_Scaling & ore_Scaling)
+int32_t C_OscSystemFilerUtil::h_StringToCodeExportScalingType(const C_SclString & orc_String,
+                                                              C_OscNodeCodeExportSettings::E_Scaling & ore_Scaling)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "float32")
    {
-      ore_Scaling = C_OSCNodeCodeExportSettings::eFLOAT32;
+      ore_Scaling = C_OscNodeCodeExportSettings::eFLOAT32;
    }
    else if (orc_String == "float64")
    {
-      ore_Scaling = C_OSCNodeCodeExportSettings::eFLOAT64;
+      ore_Scaling = C_OscNodeCodeExportSettings::eFLOAT64;
    }
    else if (orc_String == "none")
    {
-      ore_Scaling = C_OSCNodeCodeExportSettings::eNONE;
+      ore_Scaling = C_OscNodeCodeExportSettings::eNONE;
    }
    else
    {

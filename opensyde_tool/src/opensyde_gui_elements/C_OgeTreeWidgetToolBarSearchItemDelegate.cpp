@@ -8,23 +8,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QStyleOptionViewItem>
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "C_OgeTreeWidgetToolBarSearchItemDelegate.h"
+#include "C_OgeTreeWidgetToolBarSearchItemDelegate.hpp"
 
-#include "C_OgeTreeWidgetToolBarSearchItemWidget.h"
-#include "C_Uti.h"
+#include "C_OgeTreeWidgetToolBarSearchItemWidget.hpp"
+#include "C_Uti.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,13 +65,13 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
    if ((orc_Index.isValid() == true) &&
        (orc_Index.parent().isValid() == true)) // not on root
    {
-      const QIcon c_Icon = qvariant_cast<QIcon>(orc_Index.data(static_cast<sintn>(Qt::DecorationRole)));
+      const QIcon c_Icon = qvariant_cast<QIcon>(orc_Index.data(static_cast<int32_t>(Qt::DecorationRole)));
 
       // creating local QWidget (that's why i think it should be fasted, cause we
       // don't touch the heap and don't deal with a QWidget except painting)
       C_OgeTreeWidgetToolBarSearchItemWidget c_ItemWidget(
-         orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString(),
-         orc_Index.data(static_cast<sintn>(Qt::UserRole) + 1).toString()); //mhsn_DATAROLE_SUBTITLE
+         orc_Index.data(static_cast<int32_t>(Qt::DisplayRole)).toString(),
+         orc_Index.data(static_cast<int32_t>(Qt::UserRole) + 1).toString()); //mhs32_DATAROLE_SUBTITLE
 
       // paint the background
       if ((C_Uti::h_CheckStyleState(orc_Option.state, QStyle::State_MouseOver) == true) ||
@@ -86,7 +85,7 @@ void C_OgeTreeWidgetToolBarSearchItemDelegate::paint(QPainter * const opc_Painte
          c_Option.rect.setX(orc_Option.rect.x() - 10);
 
          c_Brush = opc_Painter->brush();
-         c_Brush.setColor(stw_opensyde_gui::mc_STYLE_GUIDE_COLOR_11);
+         c_Brush.setColor(stw::opensyde_gui::mc_STYLE_GUIDE_COLOR_11);
          c_Brush.setStyle(Qt::SolidPattern);
          c_Pen.setColor(Qt::transparent);
          opc_Painter->setBrush(c_Brush);

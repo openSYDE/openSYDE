@@ -8,22 +8,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QKeyEvent>
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_OgeWiSpinBoxGroup.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_OgeWiSpinBoxGroup.hpp"
 #include "ui_C_OgeWiSpinBoxGroup.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -103,10 +102,10 @@ QString C_OgeWiSpinBoxGroup::GetText(void) const
    \param[in]  ou32_Index     Optional data index (used if array)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C_OSCNodeDataPoolContent & orc_Max,
-                               const float64 of64_Factor, const float64 of64_Offset, const uint32 ou32_Index)
+void C_OgeWiSpinBoxGroup::Init(const C_OscNodeDataPoolContent & orc_Min, const C_OscNodeDataPoolContent & orc_Max,
+                               const float64_t of64_Factor, const float64_t of64_Offset, const uint32_t ou32_Index)
 {
-   std::vector<C_OSCNodeDataPoolContent::E_Type> c_Types;
+   std::vector<C_OscNodeDataPoolContent::E_Type> c_Types;
    m_DeactivateConnections();
    if (C_SdNdeDpContentUtil::h_GetMinimalTypeAfterScaling(orc_Min, orc_Max, of64_Factor, of64_Offset,
                                                           c_Types) == C_NO_ERR)
@@ -115,10 +114,10 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
       {
          switch (c_Types[ou32_Index])
          {
-         case C_OSCNodeDataPoolContent::eSINT8:
-         case C_OSCNodeDataPoolContent::eSINT16:
-         case C_OSCNodeDataPoolContent::eSINT32:
-         case C_OSCNodeDataPoolContent::eSINT64:
+         case C_OscNodeDataPoolContent::eSINT8:
+         case C_OscNodeDataPoolContent::eSINT16:
+         case C_OscNodeDataPoolContent::eSINT32:
+         case C_OscNodeDataPoolContent::eSINT64:
             this->mpc_Ui->pc_SpinBox64->setVisible(true);
             this->mpc_Ui->pc_DoubleSpinBox->setVisible(false);
             this->mq_DoubleMode = false;
@@ -127,10 +126,10 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 
             this->mpc_Ui->pc_SpinBox64->Init(orc_Min, orc_Max, of64_Factor, of64_Offset, ou32_Index);
             break;
-         case C_OSCNodeDataPoolContent::eUINT8:
-         case C_OSCNodeDataPoolContent::eUINT16:
-         case C_OSCNodeDataPoolContent::eUINT32:
-         case C_OSCNodeDataPoolContent::eUINT64:
+         case C_OscNodeDataPoolContent::eUINT8:
+         case C_OscNodeDataPoolContent::eUINT16:
+         case C_OscNodeDataPoolContent::eUINT32:
+         case C_OscNodeDataPoolContent::eUINT64:
             this->mpc_Ui->pc_SpinBox64->setVisible(true);
             this->mpc_Ui->pc_DoubleSpinBox->setVisible(false);
             this->mq_DoubleMode = false;
@@ -139,8 +138,8 @@ void C_OgeWiSpinBoxGroup::Init(const C_OSCNodeDataPoolContent & orc_Min, const C
 
             this->mpc_Ui->pc_SpinBox64->Init(orc_Min, orc_Max, of64_Factor, of64_Offset, ou32_Index);
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT32:
-         case C_OSCNodeDataPoolContent::eFLOAT64:
+         case C_OscNodeDataPoolContent::eFLOAT32:
+         case C_OscNodeDataPoolContent::eFLOAT64:
             this->mpc_Ui->pc_SpinBox64->setVisible(false);
             this->mpc_Ui->pc_DoubleSpinBox->setVisible(true);
             this->mq_DoubleMode = true;
@@ -190,20 +189,20 @@ void C_OgeWiSpinBoxGroup::SetValue(const QVariant & orc_Value) const
    }
    else
    {
-      float64 f64_Value;
+      float64_t f64_Value;
       switch (orc_Value.type()) //lint !e788  //we do not need to handle all types here
       {
       case QVariant::Int:
-         f64_Value = static_cast<float64>(orc_Value.toInt());
+         f64_Value = static_cast<float64_t>(orc_Value.toInt());
          break;
       case QVariant::UInt:
-         f64_Value = static_cast<float64>(orc_Value.toUInt());
+         f64_Value = static_cast<float64_t>(orc_Value.toUInt());
          break;
       case QVariant::LongLong:
-         f64_Value = static_cast<float64>(orc_Value.toLongLong());
+         f64_Value = static_cast<float64_t>(orc_Value.toLongLong());
          break;
       case QVariant::ULongLong:
-         f64_Value = static_cast<float64>(orc_Value.toULongLong());
+         f64_Value = static_cast<float64_t>(orc_Value.toULongLong());
          break;
       case QVariant::Double:
          f64_Value = orc_Value.toDouble();
@@ -279,7 +278,7 @@ void C_OgeWiSpinBoxGroup::SelectAll(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiSpinBoxGroup::SetToolTipInformation(const QString & orc_Heading, const QString & orc_Content,
-                                                const stw_opensyde_gui::C_NagToolTip::E_Type oe_Type) const
+                                                const stw::opensyde_gui::C_NagToolTip::E_Type oe_Type) const
 {
    if (this->mq_DoubleMode == false)
    {
@@ -458,15 +457,15 @@ void C_OgeWiSpinBoxGroup::focusOutEvent(QFocusEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Resize to specified height
 
-   \param[in]  osn_Height  New height (optional)
+   \param[in]  os32_Height  New height (optional)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiSpinBoxGroup::m_Resize(const stw_types::sintn osn_Height) const
+void C_OgeWiSpinBoxGroup::m_Resize(const int32_t os32_Height) const
 {
-   this->mpc_Ui->pc_SpinBox64->setMinimumHeight(osn_Height);
-   this->mpc_Ui->pc_DoubleSpinBox->setMinimumHeight(osn_Height);
-   this->mpc_Ui->pc_SpinBox64->setMaximumHeight(osn_Height);
-   this->mpc_Ui->pc_DoubleSpinBox->setMaximumHeight(osn_Height);
+   this->mpc_Ui->pc_SpinBox64->setMinimumHeight(os32_Height);
+   this->mpc_Ui->pc_DoubleSpinBox->setMinimumHeight(os32_Height);
+   this->mpc_Ui->pc_SpinBox64->setMaximumHeight(os32_Height);
+   this->mpc_Ui->pc_DoubleSpinBox->setMaximumHeight(os32_Height);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -476,21 +475,21 @@ void C_OgeWiSpinBoxGroup::m_Resize(const stw_types::sintn osn_Height) const
    Current spin button width
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiSpinBoxGroup::m_GetSpinButtonWidth(void) const
+int32_t C_OgeWiSpinBoxGroup::m_GetSpinButtonWidth(void) const
 {
-   sintn sn_Retval;
-   sintn sn_LineEditWidth;
+   int32_t s32_Retval;
+   int32_t s32_LineEditWidth;
 
    if (this->mq_DoubleMode == true)
    {
-      sn_LineEditWidth = this->mpc_Ui->pc_DoubleSpinBox->GetLineEditWidth();
+      s32_LineEditWidth = this->mpc_Ui->pc_DoubleSpinBox->GetLineEditWidth();
    }
    else
    {
-      sn_LineEditWidth = this->mpc_Ui->pc_SpinBox64->GetLineEditWidth();
+      s32_LineEditWidth = this->mpc_Ui->pc_SpinBox64->GetLineEditWidth();
    }
-   sn_Retval = (this->width() - 2) - sn_LineEditWidth;
-   return sn_Retval;
+   s32_Retval = (this->width() - 2) - s32_LineEditWidth;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

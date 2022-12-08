@@ -8,7 +8,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDrag>
 #include <QEvent>
@@ -16,23 +16,22 @@
 #include <QHelpEvent>
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_SdTopologyListWidget.h"
-#include "C_OgeWiCustomMessage.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdTopologyListWidget.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-static const sintn msn_GRID_HEIGHT = 70;
-static const sintn msn_GRID_WIDTH = 90;
-static const sintn msn_ICON_HEIGHT = 48;
-static const sintn msn_ICON_WIDTH = 48;
+static const int32_t ms32_GRID_HEIGHT = 70;
+static const int32_t ms32_GRID_WIDTH = 90;
+static const int32_t ms32_ICON_HEIGHT = 48;
+static const int32_t ms32_ICON_WIDTH = 48;
 const QString C_SdTopologyListWidget::hc_GROUP_NAME = "application/stw/opensyde/system/element";
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
@@ -61,8 +60,8 @@ C_SdTopologyListWidget::C_SdTopologyListWidget(QWidget * const opc_Parent) :
    this->setViewMode(QListView::IconMode);
    this->setFlow(QListView::LeftToRight);
    this->setResizeMode(QListView::Adjust);
-   this->setGridSize(QSize(msn_GRID_WIDTH, msn_GRID_HEIGHT));
-   this->setIconSize(QSize(msn_ICON_WIDTH, msn_ICON_HEIGHT));
+   this->setGridSize(QSize(ms32_GRID_WIDTH, ms32_GRID_HEIGHT));
+   this->setIconSize(QSize(ms32_ICON_WIDTH, ms32_ICON_HEIGHT));
    this->setMovement(QListView::Static);
    this->setDragEnabled(true);
    this->setDropIndicatorShown(false);
@@ -115,19 +114,19 @@ void C_SdTopologyListWidget::SetMaximumHeightAdaption(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdTopologyListWidget::ApplyDarkMode(const bool oq_Active) const
 {
-   for (sintn sn_ItItem = 0; sn_ItItem < this->count(); ++sn_ItItem)
+   for (int32_t s32_ItItem = 0; s32_ItItem < this->count(); ++s32_ItItem)
    {
-      QListWidgetItem * const pc_Item = this->item(sn_ItItem);
+      QListWidgetItem * const pc_Item = this->item(s32_ItItem);
       if (pc_Item != NULL)
       {
          QPixmap c_Pixmap;
          if (oq_Active == false)
          {
-            c_Pixmap = pc_Item->data(msn_USER_ROLE_PIXMAP_BRIGHT_MODE).value<QPixmap>();
+            c_Pixmap = pc_Item->data(ms32_USER_ROLE_PIXMAP_BRIGHT_MODE).value<QPixmap>();
          }
          else
          {
-            c_Pixmap = pc_Item->data(msn_USER_ROLE_PIXMAP_DARK_MODE).value<QPixmap>();
+            c_Pixmap = pc_Item->data(ms32_USER_ROLE_PIXMAP_DARK_MODE).value<QPixmap>();
          }
          if (c_Pixmap.isNull() == false)
          {
@@ -158,30 +157,31 @@ void C_SdTopologyListWidget::SetGroupName(const QString & orc_Name)
 void C_SdTopologyListWidget::UpdateSize(void)
 {
    // Items on each row
-   sintn sn_ItemsRow = this->width() / msn_GRID_WIDTH;
-   sintn sn_RowCount;
+   int32_t s32_ItemsRow = this->width() / ms32_GRID_WIDTH;
 
    if (this->mq_MinimumSize == true)
    {
-      if (sn_ItemsRow < 1)
+      int32_t s32_RowCount;
+
+      if (s32_ItemsRow < 1)
       {
-         sn_ItemsRow = 1;
+         s32_ItemsRow = 1;
       }
 
       // calculate the necessary rows
-      sn_RowCount = this->count() / sn_ItemsRow;
+      s32_RowCount = this->count() / s32_ItemsRow;
 
       // correct rounding error
-      if ((this->count() % sn_ItemsRow) > 0)
+      if ((this->count() % s32_ItemsRow) > 0)
       {
-         ++sn_RowCount;
+         ++s32_RowCount;
       }
 
-      this->setMinimumHeight(sn_RowCount * msn_GRID_HEIGHT);
+      this->setMinimumHeight(s32_RowCount * ms32_GRID_HEIGHT);
       // in some cases it is not necessary to adapt the maximum height
       if (this->mq_AdaptMaximumHeight == true)
       {
-         this->setMaximumHeight(sn_RowCount * msn_GRID_HEIGHT);
+         this->setMaximumHeight(s32_RowCount * ms32_GRID_HEIGHT);
       }
    }
 }
@@ -227,9 +227,9 @@ void C_SdTopologyListWidget::startDrag(const Qt::DropActions oc_SupportedActions
          QDrag * const pc_Drag = new QDrag(this);
          QMimeData * const pc_MimeData = new QMimeData();
 
-         pc_MimeData->setText(pc_Item->data(msn_USER_ROLE_ADDITIONAL_INFORMATION).toString());
+         pc_MimeData->setText(pc_Item->data(ms32_USER_ROLE_ADDITIONAL_INFORMATION).toString());
          pc_MimeData->setData(C_SdTopologyListWidget::hc_GROUP_NAME, this->mc_Name.toStdString().c_str());
-         c_Pix = c_SelectedItems[0]->icon().pixmap(msn_ICON_WIDTH, msn_ICON_HEIGHT);
+         c_Pix = c_SelectedItems[0]->icon().pixmap(ms32_ICON_WIDTH, ms32_ICON_HEIGHT);
          pc_Drag->setPixmap(c_Pix);
          pc_Drag->setHotSpot(c_Pix.rect().center());
          pc_Drag->setMimeData(pc_MimeData);
@@ -289,8 +289,8 @@ void C_SdTopologyListWidget::m_DeleteTriggered(void)
    c_MessageBox.SetHeading(C_GtGetText::h_GetText("Delete User Nodes"));
    c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                   "Do you really want to delete this user node?"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Delete"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+   c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
    c_MessageBox.SetCustomMinHeight(180, 180);
 
    if (c_MessageBox.Execute() == C_OgeWiCustomMessage::eYES)

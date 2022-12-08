@@ -8,14 +8,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPen>
-#include "C_GiRect.h"
+#include "C_GiRect.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -60,7 +59,7 @@ void C_GiRect::Redraw(void)
 {
    QRectF c_Rect = this->GetSizeRect();
    const QPen c_Pen = this->pen();
-   const float64 f64_PenWidth = static_cast<float64>(c_Pen.width());
+   const float64_t f64_PenWidth = static_cast<float64_t>(c_Pen.width());
 
    //Resize
    //Move top left and bottom right inside by the pen width

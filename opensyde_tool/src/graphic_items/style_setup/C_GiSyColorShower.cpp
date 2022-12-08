@@ -11,13 +11,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GiSyColorShower.h"
+#include "C_GiSyColorShower.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,7 +40,7 @@ using namespace stw_opensyde_gui;
 //----------------------------------------------------------------------------------------------------------------------
 C_GiSyColorShower::C_GiSyColorShower(QWidget * const opc_Parent) :
    QPushButton(opc_Parent),
-   msn_Alpha(0)
+   ms32_Alpha(0)
 {
 }
 
@@ -56,41 +55,40 @@ C_GiSyColorShower::~C_GiSyColorShower(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set a hue, sat and value to color shower
 
-   \param[in]   osn_Hue     new hue value
-   \param[in]   osn_Sat     new sat value
-   \param[in]   osn_Value   new value value
+   \param[in]   os32_Hue     new hue value
+   \param[in]   os32_Sat     new sat value
+   \param[in]   os32_Value   new value value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorShower::SetHsv(const sintn osn_Hue, const sintn osn_Sat, const sintn osn_Value)
+void C_GiSyColorShower::SetHsv(const int32_t os32_Hue, const int32_t os32_Sat, const int32_t os32_Value)
 {
-   if ((osn_Hue < -1) || (osn_Sat > 255) || (osn_Value > 255))
+   if ((os32_Hue >= -1) && (os32_Sat <= 255) && (os32_Value <= 255))
    {
-      return;
+      QColor c_Color;
+      c_Color.setHsv(os32_Hue, os32_Sat, os32_Value);
+      this->mc_CurrentRgbaColor = c_Color.rgba();
+      this->mc_CurrentRgbaColor.setAlpha(this->ms32_Alpha);
+      Q_EMIT (this->SigChangeColor(CurrentColor()));
    }
-   QColor c_Color;
-   c_Color.setHsv(osn_Hue, osn_Sat, osn_Value);
-   this->mc_CurrentRGBAColor = c_Color.rgba();
-   this->mc_CurrentRGBAColor.setAlpha(this->msn_Alpha);
-   Q_EMIT (this->SigChangeColor(CurrentColor()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set the rgba value to color shower
 
-   \param[in, out]   oun_Rgb   new rgb value
+   \param[in, out]   ou32_Rgb   new rgb value
 
    \return
    The current color
 */
 //----------------------------------------------------------------------------------------------------------------------
-QColor C_GiSyColorShower::SetRgb(const uintn oun_Rgb)
+QColor C_GiSyColorShower::SetRgb(const uint32_t ou32_Rgb)
 {
-   this->mc_CurrentRGBAColor.setRgba(qRgba(qRed(oun_Rgb),
-                                           qGreen(oun_Rgb),
-                                           qBlue(oun_Rgb),
-                                           this->msn_Alpha));
+   this->mc_CurrentRgbaColor.setRgba(qRgba(qRed(ou32_Rgb),
+                                           qGreen(ou32_Rgb),
+                                           qBlue(ou32_Rgb),
+                                           this->ms32_Alpha));
    Q_EMIT (this->SigChangeColor(CurrentColor()));
-   return this->mc_CurrentRGBAColor;
+   return this->mc_CurrentRgbaColor;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -102,7 +100,7 @@ QColor C_GiSyColorShower::SetRgb(const uintn oun_Rgb)
 //----------------------------------------------------------------------------------------------------------------------
 QColor C_GiSyColorShower::CurrentColor(void) const
 {
-   return this->mc_CurrentRGBAColor;
+   return this->mc_CurrentRgbaColor;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -111,19 +109,19 @@ QColor C_GiSyColorShower::CurrentColor(void) const
    \param[in]   orc_Color   Reference of new current color
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorShower::SetCurrentColor(QColor const & orc_Color)
+void C_GiSyColorShower::SetCurrentColor(const QColor & orc_Color)
 {
-   this->mc_CurrentRGBAColor = orc_Color;
+   this->mc_CurrentRgbaColor = orc_Color;
    Q_EMIT (this->SigChangeColor(CurrentColor()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set current alpha of current color
 
-   \param[in]   osn_Alpha   New alpha value
+   \param[in]   os32_Alpha   New alpha value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorShower::SetCurrentAlpha(const sintn osn_Alpha)
+void C_GiSyColorShower::SetCurrentAlpha(const int32_t os32_Alpha)
 {
-   this->msn_Alpha = osn_Alpha;
+   this->ms32_Alpha = os32_Alpha;
 }

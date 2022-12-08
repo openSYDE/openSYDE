@@ -8,28 +8,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsView>
 
-#include "gitypes.h"
-#include "stwerrors.h"
-#include "constants.h"
+#include "gitypes.hpp"
+#include "stwerrors.hpp"
+#include "constants.hpp"
 
-#include "C_GtGetText.h"
-#include "C_ImpUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_GiSvNodeSyvSetup.h"
+#include "C_GtGetText.hpp"
+#include "C_ImpUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GiSvNodeSyvSetup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,17 +49,17 @@ using namespace stw_opensyde_gui_logic;
 
    \param[in]       ou32_ViewIndex       Index of system view
    \param[in]       ors32_NodeIndex      Index of data element in system view
-   \param[in]       oru64_ID             Unique ID
+   \param[in]       oru64_Id             Unique ID
    \param[in]       orf64_Width          Width of node
    \param[in]       orf64_Height         Height of node
    \param[in,out]   opc_Parent           Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32 ou32_ViewIndex, const sint32 & ors32_NodeIndex,
-                                       const uint64 & oru64_ID, const float64 & orf64_Width,
-                                       const float64 & orf64_Height, QGraphicsItem * const opc_Parent) :
+C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32_t ou32_ViewIndex, const int32_t & ors32_NodeIndex,
+                                       const uint64_t & oru64_Id, const float64_t & orf64_Width,
+                                       const float64_t & orf64_Height, QGraphicsItem * const opc_Parent) :
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   C_GiSvNodeSyvBase(ou32_ViewIndex, ors32_NodeIndex, oru64_ID, orf64_Width, orf64_Height, opc_Parent),
+   C_GiSvNodeSyvBase(ou32_ViewIndex, ors32_NodeIndex, oru64_Id, orf64_Width, orf64_Height, opc_Parent),
    mq_EditMode(false)
 {
    this->m_InitCheckBox();
@@ -131,7 +130,8 @@ void C_GiSvNodeSyvSetup::SetEditMode(const bool oq_Active)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::UpdateData(void)
 {
-   C_PuiSvHandler::h_GetInstance()->SetViewNodeCheckedState(this->mu32_ViewIndex, static_cast<uint32>(this->ms32_Index),
+   C_PuiSvHandler::h_GetInstance()->SetViewNodeCheckedState(this->mu32_ViewIndex,
+                                                            static_cast<uint32_t>(this->ms32_Index),
                                                             this->IsViewConnected());
 }
 
@@ -190,7 +190,7 @@ void C_GiSvNodeSyvSetup::mousePressEvent(QGraphicsSceneMouseEvent * const opc_Ev
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvNodeSyvSetup::m_InitCheckBox(void)
 {
-   const sint32 s32_IconSize = this->m_GetIconSize();
+   const int32_t s32_IconSize = this->m_GetIconSize();
 
    this->mpc_CheckBox = new C_GiCheckBox(QRect(9, 9, s32_IconSize, s32_IconSize));
 

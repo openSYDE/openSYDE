@@ -8,27 +8,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "TGLUtils.h"
-#include "C_SyvDaPeSpinBox.h"
+#include "TglUtils.hpp"
+#include "C_SyvDaPeSpinBox.hpp"
 #include "ui_C_SyvDaPeSpinBox.h"
 
-#include "C_GtGetText.h"
-#include "C_GiSvDaSpinBoxBase.h"
-#include "C_OgeCbxText.h"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaSpinBoxBase.hpp"
+#include "C_OgeCbxText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE1 = 0;
-const sintn C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE2 = 1;
+const int32_t C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE1 = 0;
+const int32_t C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE2 = 1;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -69,7 +68,7 @@ C_SyvDaPeSpinBox::C_SyvDaPeSpinBox(C_SyvDaPeBase & orc_Parent, const bool oq_Dar
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeSpinBox::m_UpdatePreview);
    connect(this->mpc_Ui->pc_CheckBoxUnit, &QCheckBox::toggled, this, &C_SyvDaPeSpinBox::m_UpdatePreview);
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeSpinBox::m_UpdatePreview);
@@ -143,7 +142,7 @@ C_PuiSvDbSpinBox::E_Type C_SyvDaPeSpinBox::GetType(void) const
 
    switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
    {
-   case C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE2:
+   case C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE2:
       e_Retval = C_PuiSvDbSpinBox::eTYPE2;
       break;
    default:
@@ -165,10 +164,10 @@ void C_SyvDaPeSpinBox::SetType(const C_PuiSvDbSpinBox::E_Type oe_Type) const
    switch (oe_Type)
    {
    case C_PuiSvDbSpinBox::eTYPE1:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE1);
       break;
    case C_PuiSvDbSpinBox::eTYPE2:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhsn_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE2);
       break;
    default:
       tgl_assert(false);
@@ -183,15 +182,15 @@ void C_SyvDaPeSpinBox::SetType(const C_PuiSvDbSpinBox::E_Type oe_Type) const
 void C_SyvDaPeSpinBox::m_UpdatePreview(void)
 {
    //Also include the fix offset to the right
-   const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
+   const float64_t f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    C_GiSvDaSpinBoxBase * const pc_Item = new C_GiSvDaSpinBoxBase(0UL, 0UL, -1L, 0ULL, NULL);
-   const QSizeF c_ItemSize(static_cast<float64>(c_ViewSize.width()) / 1.5,
-                           static_cast<float64>(c_ViewSize.height()) / 3.0);
+   const QSizeF c_ItemSize(static_cast<float64_t>(c_ViewSize.width()) / 1.5,
+                           static_cast<float64_t>(c_ViewSize.height()) / 3.0);
    // 10 =  Vertical center adjustment
    const QPointF c_ItemPos(
-      ((static_cast<float64>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
-      ((static_cast<float64>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0) - 10.0);
+      ((static_cast<float64_t>(c_ViewSize.width()) - c_ItemSize.width()) / 2.0) + (f64_IconOffset / 2.0),
+      ((static_cast<float64_t>(c_ViewSize.height()) - c_ItemSize.height()) / 2.0) - 10.0);
 
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateTypePe(this->GetType(), this->GetShowUnit());

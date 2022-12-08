@@ -8,28 +8,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
+#include "stwtypes.hpp"
 
-#include "TGLUtils.h"
-#include "C_SyvDaPeToggle.h"
+#include "TglUtils.hpp"
+#include "C_SyvDaPeToggle.hpp"
 #include "ui_C_SyvDaPeToggle.h"
 
-#include "C_GtGetText.h"
-#include "C_GiSvDaToggleBase.h"
-#include "C_PuiSvDbWidgetBase.h"
+#include "C_GtGetText.hpp"
+#include "C_GiSvDaToggleBase.hpp"
+#include "C_PuiSvDbWidgetBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1 = 0;
-const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE2 = 1;
-const sintn C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE3 = 2;
+const int32_t C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE1 = 0;
+const int32_t C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE2 = 1;
+const int32_t C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE3 = 2;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -67,7 +66,7 @@ C_SyvDaPeToggle::C_SyvDaPeToggle(C_SyvDaPeBase & orc_Parent, const bool oq_DarkM
 
    //lint -e{929} Cast required to avoid ambiguous signal of qt interface
    connect(this->mpc_Ui->pc_ComboBoxType,
-           static_cast<void (QComboBox::*)(sintn)>(&C_OgeCbxText::currentIndexChanged), this,
+           static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
            &C_SyvDaPeToggle::m_UpdatePreview);
    connect(&this->mrc_ParentDialog, &C_SyvDaPeBase::SigRefresh, this, &C_SyvDaPeToggle::m_UpdatePreview);
 }
@@ -114,13 +113,13 @@ C_PuiSvDbToggle::E_Type C_SyvDaPeToggle::GetType(void) const
 
    switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
    {
-   case C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1:
+   case C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE1:
       e_Retval = C_PuiSvDbToggle::eTYPE1;
       break;
-   case C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE2:
+   case C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE2:
       e_Retval = C_PuiSvDbToggle::eTYPE2;
       break;
-   case C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE3:
+   case C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE3:
       e_Retval = C_PuiSvDbToggle::eTYPE3;
       break;
    default:
@@ -142,13 +141,13 @@ void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const
    switch (oe_Type)
    {
    case C_PuiSvDbToggle::eTYPE1:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE1);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE1);
       break;
    case C_PuiSvDbToggle::eTYPE2:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE2);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE2);
       break;
    case C_PuiSvDbToggle::eTYPE3:
-      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhsn_INDEX_STYLE_TYPE3);
+      this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(C_SyvDaPeToggle::mhs32_INDEX_STYLE_TYPE3);
       break;
    default:
       tgl_assert(false);
@@ -163,14 +162,14 @@ void C_SyvDaPeToggle::SetType(const C_PuiSvDbToggle::E_Type oe_Type) const
 void C_SyvDaPeToggle::m_UpdatePreview(void)
 {
    //Also include the fix offset to the right
-   const float64 f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
+   const float64_t f64_IconOffset = C_SyvDaPeBase::h_GetFixIconOffset();
    const QSize c_ViewSize = C_SyvDaPeBase::h_GetSceneViewSize();
    C_GiSvDaToggleBase * const pc_Item = new C_GiSvDaToggleBase(0UL, 0UL, -1L, 0ULL, NULL);
    const QSizeF c_ITEM_SIZE(150.0, 100.0);
    // 20 =  Vertical center adjustment
    const QPointF c_ItemPos(
-      ((static_cast<float64>(c_ViewSize.width()) - c_ITEM_SIZE.width()) / 2.0) + (f64_IconOffset / 2.0),
-      ((static_cast<float64>(c_ViewSize.height()) - c_ITEM_SIZE.height()) / 2.0) + 20.0);
+      ((static_cast<float64_t>(c_ViewSize.width()) - c_ITEM_SIZE.width()) / 2.0) + (f64_IconOffset / 2.0),
+      ((static_cast<float64_t>(c_ViewSize.height()) - c_ITEM_SIZE.height()) / 2.0) + 20.0);
 
    pc_Item->SetDisplayStyle(this->mrc_ParentDialog.GetTheme(), this->mq_DarkMode);
    pc_Item->UpdateType(this->GetType());

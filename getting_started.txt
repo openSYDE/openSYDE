@@ -1,0 +1,86 @@
+Getting started for building an openSYDE based application
+
+Getting the needed and used components:
+=======================================
+
+Used OS: Windows
+Used Compiler: MinGW 8.1.0
+Used Qt version: 5.15.2
+
+Installation of Qt framework and its tools
+* The simplest way to get the Qt package is to use the online installer: https://www.qt.io/download-qt-installer
+* An account is necessary and the licensing of the Qt open source license must be considered
+* Running the online installer (Verified with Version 4.4.2 of the online installer)
+* Select the entire Qt 5.15.2 package (the version must match exactly, other versions could not be compatible)
+* The used compiler MinGW 8.1.0 must be selected in the "Developer and Designer Tools"
+* Check for selected Qt Creator, Debugging Tools for Windows, Qt Design Studio, CMake and Ninja in the "Developer and Designer Tools" too
+** Verified with this versions
+*** Qt Creator: v8.0.1
+*** Qt Design Studio: v3.7.0
+*** CMake: v3.23.2
+*** Ninja: 1.10.2
+*** Newer versions should have no effect and should work too, but is not verified
+
+
+Get the openSYDE package on GitHub: https://github.com/openSYDE/
+
+Build already existing projects:
+================================
+
+Building the openSYDE GUI
+1. Open with the Qt Creator the qmake "openSYDE.pro" project in the opensyde_tool\pjt folder
+2. Select the already configured Kit "Desktop Qt 5.15.2 MinGW 32-bit"
+3. Select your preferred build target and build the project
+
+Building a non GUI application like SYDEsup
+1. Open with the Qt Creator the CMake "CMakeLists.txt" project in the opensyde_syde_sup\pjt folder
+2. Select the already configured Kit "Desktop Qt 5.15.2 MinGW 32-bit" or "Desktop Qt 5.15.2 MinGW 64-bit"
+2.1. The Qt creator can handle pro file based qmake projects and cmake projects with the same kit
+3. Select your preferred build target and build the project
+
+Set up a new project based on the openSYDE Core:
+================================================
+
+Building a console application
+1. Create with the Qt Creator a new project as "Non-Qt Project" - "Plain C++ Application"
+2. Select CMake as Build System
+3. Select the already configured Kit "Desktop Qt 5.15.2 MinGW 32-bit" or "Desktop Qt 5.15.2 MinGW 64-bit"
+4. Get the openSYDE Core and the openssl folders accessible to your project (both can be found in opensyde_tool\libs folder)
+5. Add depending of your path of the openSYDE Core following elements to the CMakeLists.txt of your new project
+5.1 In this example following paths are used: "../libs/opensyde_core" and "../libs/openssl"). The Project name is "project_name"
+5.2 The entries should be added to the CMakeLists.txt in this order
+5.3 Add with "include_directories" multiple paths after "project(...)"
+5.3.1 for path of precompiled header before the position target_precompile_headers in CMakeLists.txt
+5.3.2 the include path for openssl (in this example "../libs/openssl/include")
+5.4. By adding "set(OPENSYDE_CORE_SKIP_IMPORTS 1)" specific parts of the openSYDE Core can be excluded.
+5.4.1. For getting all defined OPENSYDE_CORE_SKIP_* open the CMakeLists.txt of the openSYDE Core
+5.5. "add_subdirectory(../libs/opensyde_core ${CMAKE_BINARY_DIR}/opensyde_core)"
+5.6. "link_directories(../libs/openssl)"
+5.6. "target_link_libraries" with both names (not as path): "project_name" and "opensyde_core"
+5.6.1 This should be added after the automatically generated "add_executable(...)"
+5.7. The openSYDE Core requires the precompiled header "precomp_headers.hpp". Create and add the header file to the project for the openSYDE Core and the project
+5.7.1. target_precompile_headers(opensyde_core PRIVATE ../src/precomp_headers.hpp)
+5.7.2. target_precompile_headers(project_name PRIVATE ../src/precomp_headers.hpp)
+6. The project should be buildable now
+
+Building a GUI application
+1. Create with the Qt Creator a new project as "Application (Qt)" - "Qt Widgets Application"
+2. Repeat all steps of building a console application beginning with step two
+
+Using openSYDE Core in another language than C++:
+==================================================
+
+The language must support Standard Windows DLLs with C API. If the support is given, the openSYDE Core and the application specific use case
+implementation must be built as encapsulated DLL wrapper.
+For example, the application SYDEsup is not build as executable binary, but the update sequence is encapsulated as an exported DLL C function which can
+be called by an application in another language.
+
+Using openSYDE Core in a Linux application:
+===========================================
+
+The project SYDEsup in opensyde_syde_sup is already configured to be built for Windows (32 bit) and Linux (32 bit and 64 bit). This project configuration
+can be used as template for Linux openSYDE Core applications. Relevant files to look at are:
+* doc/build.txt
+* pjt/CMakeLists.txt
+* The different bat/script files in the bat folder
+* The three toolchain files in pjt: toolchain_windows.cmake, toolchain_ubuntu_64bit.cmake, toolchain_ubuntu.cmake referenced by the build script/bat files

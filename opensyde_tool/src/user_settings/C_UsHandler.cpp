@@ -10,28 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 #include <QDir>
 #include <QStandardPaths>
-#include "C_UsFiler.h"
-#include "C_GtGetText.h"
-#include "stwerrors.h"
-#include "C_UsHandler.h"
-#include "C_Uti.h"
-#include "constants.h"
+#include "C_UsFiler.hpp"
+#include "C_GtGetText.hpp"
+#include "stwerrors.hpp"
+#include "C_UsHandler.hpp"
+#include "C_Uti.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint8 C_UsHandler::mhu8_MAX_RECENT_PROJECTS = 42;
+const uint8_t C_UsHandler::mhu8_MAX_RECENT_PROJECTS = 42;
 const QPoint C_UsHandler::mhc_DEFAULT_VIEW_POS = QPoint(0, 0);
-const stw_types::sintn C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL = 100;
+const int32_t C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL = 100;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -123,7 +122,7 @@ void C_UsHandler::SetDefault(void)
    this->ms32_ProjLastKnownMode = 0;
 
    this->mc_ProjSdTopologyViewPos = C_UsHandler::mhc_DEFAULT_VIEW_POS;
-   this->msn_ProjSdTopologyViewZoom = C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL;
+   this->ms32_ProjSdTopologyViewZoom = C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL;
 
    this->ms32_SysDefSubMode = 0;
    this->mu32_SysDefIndex = 0U;
@@ -133,8 +132,8 @@ void C_UsHandler::SetDefault(void)
    this->mu32_SysViewIndex = 0U;
    this->mu32_SysViewFlag = 0U;
 
-   this->msn_SysDefNodeEditTabIndex = 0;
-   this->msn_SysDefBusEditTabIndex = 0;
+   this->ms32_SysDefNodeEditTabIndex = 0;
+   this->ms32_SysDefBusEditTabIndex = 0;
 
    this->mc_RecentColors.fill(QColor(255, 255, 255, 255), 6);
 }
@@ -254,7 +253,7 @@ bool C_UsHandler::GetSdTopologyToolboxMaximized(void) const
    Current navigation bar size
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetNaviBarSize(void) const
+int32_t C_UsHandler::GetNaviBarSize(void) const
 {
    return this->ms32_NaviBarSize;
 }
@@ -266,7 +265,7 @@ sint32 C_UsHandler::GetNaviBarSize(void) const
    Current navigation bar node section size
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetNaviBarNodeSectionSize(void) const
+int32_t C_UsHandler::GetNaviBarNodeSectionSize(void) const
 {
    return this->ms32_NaviBarNodeSectionSize;
 }
@@ -278,9 +277,9 @@ sint32 C_UsHandler::GetNaviBarNodeSectionSize(void) const
    Current node edit splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSdNodeEditSplitterX(void) const
+int32_t C_UsHandler::GetSdNodeEditSplitterHorizontal(void) const
 {
-   return this->ms32_SdNodeEditSplitterX;
+   return this->ms32_SdNodeEditSplitterHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -290,9 +289,9 @@ sint32 C_UsHandler::GetSdNodeEditSplitterX(void) const
    Current HALC screen splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSdNodeEditHalcSplitterX(void) const
+int32_t C_UsHandler::GetSdNodeEditHalcSplitterHorizontal(void) const
 {
-   return this->ms32_SdNodEditHalcSplitterX;
+   return this->ms32_SdNodEditHalcSplitterHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -302,9 +301,9 @@ sint32 C_UsHandler::GetSdNodeEditHalcSplitterX(void) const
    Current HALC screen splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSdNodeEditCoManagerSplitterX(void) const
+int32_t C_UsHandler::GetSdNodeEditCoManagerSplitterHorizontal(void) const
 {
-   return this->ms32_SdNodEditCoManagerSplitterX;
+   return this->ms32_SdNodEditCoManagerSplitterHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -314,9 +313,9 @@ sint32 C_UsHandler::GetSdNodeEditCoManagerSplitterX(void) const
    Current bus edit tree splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSdBusEditTreeSplitterX(void) const
+int32_t C_UsHandler::GetSdBusEditTreeSplitterHorizontal(void) const
 {
-   return this->ms32_SdBusEditTreeSplitterX;
+   return this->ms32_SdBusEditTreeSplitterHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -326,9 +325,9 @@ sint32 C_UsHandler::GetSdBusEditTreeSplitterX(void) const
    Current bus edit tree splitter x position 2 value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSdBusEditTreeSplitterX2() const
+int32_t C_UsHandler::GetSdBusEditTreeSplitterHorizontal2() const
 {
-   return this->ms32_SdBusEditTreeSplitterX2;
+   return this->ms32_SdBusEditTreeSplitterHorizontal2;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -338,9 +337,9 @@ sint32 C_UsHandler::GetSdBusEditTreeSplitterX2() const
    Current bus edit layout splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetSdBusEditLayoutSplitterX(void) const
+int32_t C_UsHandler::GetSdBusEditLayoutSplitterHorizontal(void) const
 {
-   return this->ms32_SdBusEditLayoutSplitterX;
+   return this->ms32_SdBusEditLayoutSplitterHorizontal;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -350,7 +349,7 @@ sint32 C_UsHandler::GetSdBusEditLayoutSplitterX(void) const
    Maximum number of recent projects entries
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::uint8 C_UsHandler::h_GetMaxRecentProjects(void)
+uint8_t C_UsHandler::h_GetMaxRecentProjects(void)
 {
    return C_UsHandler::mhu8_MAX_RECENT_PROJECTS;
 }
@@ -386,9 +385,9 @@ QVector<QColor> C_UsHandler::GetRecentColors(void) const
    Next recent color button number to color picker
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_UsHandler::GetNextRecentColorButtonNumber(void) const
+int32_t C_UsHandler::GetNextRecentColorButtonNumber(void) const
 {
-   return this->msn_NextRecentColorButtonNumber;
+   return this->ms32_NextRecentColorButtonNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -444,7 +443,7 @@ void C_UsHandler::GetRecentFolders(QStringList & orc_Folders) const
    bool q_Exists;
 
    orc_Folders.clear();
-   for (uint8 u8_It = 0; u8_It < this->mc_RecentProjects.size(); ++u8_It)
+   for (uint8_t u8_It = 0; u8_It < this->mc_RecentProjects.size(); ++u8_It)
    {
       c_Cur = this->mc_RecentProjects.at(u8_It);
       //Extract parent
@@ -452,7 +451,7 @@ void C_UsHandler::GetRecentFolders(QStringList & orc_Folders) const
       {
          //Check if parent already in list
          q_Exists = false;
-         for (uint8 u8_It2 = 0; u8_It2 < orc_Folders.size(); ++u8_It2)
+         for (uint8_t u8_It2 = 0; u8_It2 < orc_Folders.size(); ++u8_It2)
          {
             c_Cur = orc_Folders.at(u8_It2);
             if (c_Cur.compare(c_CurFolder) == 0)
@@ -494,7 +493,7 @@ void C_UsHandler::h_GetLanguages(QStringList & orc_List)
    mode (SD/SC/MAIN)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::GetProjLastMode() const
+int32_t C_UsHandler::GetProjLastMode() const
 {
    return this->ms32_ProjLastKnownMode;
 }
@@ -508,9 +507,9 @@ sint32 C_UsHandler::GetProjLastMode() const
    Zoom value
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_UsHandler::GetProjSdTopologyViewZoom(void) const
+int32_t C_UsHandler::GetProjSdTopologyViewZoom(void) const
 {
-   return this->msn_ProjSdTopologyViewZoom;
+   return this->ms32_ProjSdTopologyViewZoom;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -534,9 +533,9 @@ QPoint C_UsHandler::GetProjSdTopologyViewPos(void) const
    Last known TSP path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_UsHandler::GetProjSdTopologyLastKnownTSPPath(void) const
+QString C_UsHandler::GetProjSdTopologyLastKnownTspPath(void) const
 {
-   return this->mc_ProjSdTopologyLastKnownTSPPath;
+   return this->mc_ProjSdTopologyLastKnownTspPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -666,9 +665,9 @@ QString C_UsHandler::GetProjSdTopologyLastKnownImportPath(void) const
    Last known CAN open path
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_UsHandler::GetProjSdTopologyLastKnownCANopenEDSPath(void) const
+QString C_UsHandler::GetProjSdTopologyLastKnownCanOpenEdsPath(void) const
 {
-   return this->mc_ProjSdTopologyLastKnownCANopenEDSPath;
+   return this->mc_ProjSdTopologyLastKnownCanOpenEdsPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -722,7 +721,7 @@ C_UsCommunication C_UsHandler::GetProjSdBus(const QString & orc_BusName) const
 //----------------------------------------------------------------------------------------------------------------------
 C_UsSystemView C_UsHandler::GetProjSvSetupView(const QString & orc_ViewName) const
 {
-   return this->mc_ProjSvSetupView.value(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL,
+   return this->mc_ProjSvSetupView.value(orc_ViewName, C_UsSystemView(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL,
                                                                       C_UsHandler::mhc_DEFAULT_VIEW_POS));
 }
 
@@ -773,9 +772,9 @@ const QList<QString> C_UsHandler::GetProjSvSetupViewKeysInternal(void) const
    \param[out]  oru32_SysViewFlag      Last flag value of system view
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::GetProjLastScreenMode(sint32 & ors32_SysDefSubMode, uint32 & oru32_SysDefIndex,
-                                        uint32 & oru32_SysDefFlag, sint32 & ors32_SysViewSubMode,
-                                        uint32 & oru32_SysViewIndex, uint32 & oru32_SysViewFlag) const
+void C_UsHandler::GetProjLastScreenMode(int32_t & ors32_SysDefSubMode, uint32_t & oru32_SysDefIndex,
+                                        uint32_t & oru32_SysDefFlag, int32_t & ors32_SysViewSubMode,
+                                        uint32_t & oru32_SysViewIndex, uint32_t & oru32_SysViewFlag) const
 {
    ors32_SysDefSubMode = this->ms32_SysDefSubMode;
    oru32_SysDefIndex = this->mu32_SysDefIndex;
@@ -792,9 +791,9 @@ void C_UsHandler::GetProjLastScreenMode(sint32 & ors32_SysDefSubMode, uint32 & o
    \return     Tab index of node edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_UsHandler::GetProjLastSysDefNodeTabIndex(void) const
+int32_t C_UsHandler::GetProjLastSysDefNodeTabIndex(void) const
 {
-   return this->msn_SysDefNodeEditTabIndex;
+   return this->ms32_SysDefNodeEditTabIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -803,9 +802,9 @@ sintn C_UsHandler::GetProjLastSysDefNodeTabIndex(void) const
    \return     Tab index of bus edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_UsHandler::GetProjLastSysDefBusTabIndex(void) const
+int32_t C_UsHandler::GetProjLastSysDefBusTabIndex(void) const
 {
-   return this->msn_SysDefBusEditTabIndex;
+   return this->ms32_SysDefBusEditTabIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -841,9 +840,9 @@ std::array<bool, 3> C_UsHandler::GetViewPermissions(const QString & orc_ViewName
    C_RANGE:  does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::SetLanguage(const QString & orc_Lang)
+int32_t C_UsHandler::SetLanguage(const QString & orc_Lang)
 {
-   const sint32 s32_Retval = h_CheckLanguageExists(orc_Lang);
+   const int32_t s32_Retval = h_CheckLanguageExists(orc_Lang);
 
    if (s32_Retval == C_NO_ERR)
    {
@@ -935,7 +934,7 @@ void C_UsHandler::SetSdTopologyToolboxSize(const QSize & orc_New)
    \param[in]  os32_Value  New navigation bar size
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetNaviBarSize(const sint32 os32_Value)
+void C_UsHandler::SetNaviBarSize(const int32_t os32_Value)
 {
    this->ms32_NaviBarSize = os32_Value;
 }
@@ -946,7 +945,7 @@ void C_UsHandler::SetNaviBarSize(const sint32 os32_Value)
    \param[in]  os32_Value  New navigation bar node section size
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetNaviBarNodeSectionSize(const sint32 os32_Value)
+void C_UsHandler::SetNaviBarNodeSectionSize(const int32_t os32_Value)
 {
    this->ms32_NaviBarNodeSectionSize = os32_Value;
 }
@@ -957,9 +956,9 @@ void C_UsHandler::SetNaviBarNodeSectionSize(const sint32 os32_Value)
    \param[in]  os32_Value  New node edit splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSdNodeEditSplitterX(const sint32 os32_Value)
+void C_UsHandler::SetSdNodeEditSplitterHorizontal(const int32_t os32_Value)
 {
-   this->ms32_SdNodeEditSplitterX = os32_Value;
+   this->ms32_SdNodeEditSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -968,9 +967,9 @@ void C_UsHandler::SetSdNodeEditSplitterX(const sint32 os32_Value)
    \param[in]  os32_Value  New splitter position x value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSdNodeEditHalcSplitterX(const sint32 os32_Value)
+void C_UsHandler::SetSdNodeEditHalcSplitterHorizontal(const int32_t os32_Value)
 {
-   this->ms32_SdNodEditHalcSplitterX = os32_Value;
+   this->ms32_SdNodEditHalcSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -979,9 +978,9 @@ void C_UsHandler::SetSdNodeEditHalcSplitterX(const sint32 os32_Value)
    \param[in]  os32_Value  New splitter position x value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSdNodeEditCoManagerSplitterX(const sint32 os32_Value)
+void C_UsHandler::SetSdNodeEditCoManagerSplitterHorizontal(const int32_t os32_Value)
 {
-   this->ms32_SdNodEditCoManagerSplitterX = os32_Value;
+   this->ms32_SdNodEditCoManagerSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -990,9 +989,9 @@ void C_UsHandler::SetSdNodeEditCoManagerSplitterX(const sint32 os32_Value)
    \param[in]  os32_Value  New bus edit tree splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSdBusEditTreeSplitterX(const sint32 os32_Value)
+void C_UsHandler::SetSdBusEditTreeSplitterHorizontal(const int32_t os32_Value)
 {
-   this->ms32_SdBusEditTreeSplitterX = os32_Value;
+   this->ms32_SdBusEditTreeSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1001,9 +1000,9 @@ void C_UsHandler::SetSdBusEditTreeSplitterX(const sint32 os32_Value)
    \param[in]  os32_Value  New bus edit tree splitter x position 2 value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSdBusEditTreeSplitterX2(const sint32 os32_Value)
+void C_UsHandler::SetSdBusEditTreeSplitterHorizontal2(const int32_t os32_Value)
 {
-   this->ms32_SdBusEditTreeSplitterX2 = os32_Value;
+   this->ms32_SdBusEditTreeSplitterHorizontal2 = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1012,9 +1011,9 @@ void C_UsHandler::SetSdBusEditTreeSplitterX2(const sint32 os32_Value)
    \param[in]  os32_Value  New bus edit layout splitter x position value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetSdBusEditLayoutSplitterX(const sint32 os32_Value)
+void C_UsHandler::SetSdBusEditLayoutSplitterHorizontal(const int32_t os32_Value)
 {
-   this->ms32_SdBusEditLayoutSplitterX = os32_Value;
+   this->ms32_SdBusEditLayoutSplitterHorizontal = os32_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1053,12 +1052,12 @@ void C_UsHandler::SetRecentColors(const QVector<QColor> & orc_RecentColorsVector
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set next recent color button number from color picker
 
-   \param[in]  osn_NextRecentColorButtonNumber  Next recent color button number from color picker
+   \param[in]  os32_NextRecentColorButtonNumber  Next recent color button number from color picker
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetNextRecentColorButtonNumber(const sintn osn_NextRecentColorButtonNumber)
+void C_UsHandler::SetNextRecentColorButtonNumber(const int32_t os32_NextRecentColorButtonNumber)
 {
-   this->msn_NextRecentColorButtonNumber = osn_NextRecentColorButtonNumber;
+   this->ms32_NextRecentColorButtonNumber = os32_NextRecentColorButtonNumber;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1111,7 +1110,7 @@ void C_UsHandler::ClearRecentProjects(void)
    \param[in]  os32_New    New last mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjLastMode(const sint32 os32_New)
+void C_UsHandler::SetProjLastMode(const int32_t os32_New)
 {
    this->ms32_ProjLastKnownMode = os32_New;
 }
@@ -1121,12 +1120,12 @@ void C_UsHandler::SetProjLastMode(const sint32 os32_New)
 
    A project shall be set in the constructor to save a value
 
-   \param[in]  osn_New  New zoom value
+   \param[in]  os32_New  New zoom value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdTopologyViewZoom(const sintn osn_New)
+void C_UsHandler::SetProjSdTopologyViewZoom(const int32_t os32_New)
 {
-   this->msn_ProjSdTopologyViewZoom = osn_New;
+   this->ms32_ProjSdTopologyViewZoom = os32_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1148,9 +1147,9 @@ void C_UsHandler::SetProjSdTopologyViewPos(const QPoint & orc_New)
    \param[in]  orc_New  New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdTopologyLastKnownTSPPath(const QString & orc_New)
+void C_UsHandler::SetProjSdTopologyLastKnownTspPath(const QString & orc_New)
 {
-   this->mc_ProjSdTopologyLastKnownTSPPath = orc_New;
+   this->mc_ProjSdTopologyLastKnownTspPath = orc_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1269,9 +1268,9 @@ void C_UsHandler::SetProjSdTopologyLastKnownImportPath(const QString & orc_New)
    \param[in]  orc_New  New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdTopologyLastKnownCANopenEDSPath(const QString & orc_New)
+void C_UsHandler::SetProjSdTopologyLastKnownCanOpenEdsPath(const QString & orc_New)
 {
-   this->mc_ProjSdTopologyLastKnownCANopenEDSPath = orc_New;
+   this->mc_ProjSdTopologyLastKnownCanOpenEdsPath = orc_New;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1315,7 +1314,7 @@ void C_UsHandler::SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
-                                                const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_Protocol)
+                                                const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1337,8 +1336,7 @@ void C_UsHandler::SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
    \param[in]  ou32_SelectedInterface  Selected CAN interface
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeSelectedInterface(const QString & orc_NodeName,
-                                                 const stw_types::uint32 ou32_SelectedInterface)
+void C_UsHandler::SetProjSdNodeSelectedInterface(const QString & orc_NodeName, const uint32_t ou32_SelectedInterface)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1438,7 +1436,7 @@ void C_UsHandler::SetProjSdNodeDatapoolSelectedVariableNames(const QString & orc
 void C_UsHandler::SetProjSdNodeDatapoolCommMessageOverviewColumnWidth(const QString & orc_NodeName,
                                                                       const QString & orc_DatapoolName,
                                                                       const QString & orc_ListName,
-                                                                      const std::vector<sint32> & orc_Value)
+                                                                      const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1467,7 +1465,7 @@ void C_UsHandler::SetProjSdNodeDatapoolCommMessageOverviewColumnWidth(const QStr
 void C_UsHandler::SetProjSdNodeDatapoolCommSignalOverviewColumnWidth(const QString & orc_NodeName,
                                                                      const QString & orc_DatapoolName,
                                                                      const QString & orc_ListName,
-                                                                     const std::vector<sint32> & orc_Value)
+                                                                     const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1499,7 +1497,7 @@ void C_UsHandler::SetProjSdNodeDatapoolCommSignalOverviewColumnWidth(const QStri
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolListSelectedMessage(const QString & orc_NodeName,
                                                            const QString & orc_DatapoolName,
-                                                           const QString & orc_ListName, const stw_opensyde_core::C_OSCCanProtocol::E_Type
+                                                           const QString & orc_ListName, const stw::opensyde_core::C_OscCanProtocol::E_Type
                                                            oe_SelectedProtocol, const bool oq_MessageSelected,
                                                            const QString & orc_SelectedMessageName,
                                                            const bool oq_SignalSelected,
@@ -1535,7 +1533,7 @@ void C_UsHandler::SetProjSdNodeDatapoolListSelectedMessage(const QString & orc_N
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeName, const QString & orc_DatapoolName,
                                                        const QString & orc_ListName,
-                                                       const std::vector<sint32> & orc_ColumnWidths)
+                                                       const std::vector<int32_t> & orc_ColumnWidths)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1558,18 +1556,18 @@ void C_UsHandler::SetProjSdNodeDatapoolListColumnSizes(const QString & orc_NodeN
    \param[in]  orc_Value      Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeCANopenOverviewColumnWidth(const QString & orc_NodeName,
-                                                          const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetProjSdNodeCanOpenOverviewColumnWidth(const QString & orc_NodeName,
+                                                          const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetCANopenOverviewColumnWidth(orc_Value);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetCanOpenOverviewColumnWidth(orc_Value);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetCANopenOverviewColumnWidth(orc_Value);
+      c_Node.SetCanOpenOverviewColumnWidth(orc_Value);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1581,18 +1579,18 @@ void C_UsHandler::SetProjSdNodeCANopenOverviewColumnWidth(const QString & orc_No
    \param[in]  orc_Value      Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeCANopenPdoOverviewColumnWidth(const QString & orc_NodeName,
-                                                             const std::vector<sint32> & orc_Value)
+void C_UsHandler::SetProjSdNodeCanOpenPdoOverviewColumnWidth(const QString & orc_NodeName,
+                                                             const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetCANopenPdoOverviewColumnWidth(orc_Value);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetCanOpenPdoOverviewColumnWidth(orc_Value);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetCANopenPdoOverviewColumnWidth(orc_Value);
+      c_Node.SetCanOpenPdoOverviewColumnWidth(orc_Value);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1604,17 +1602,17 @@ void C_UsHandler::SetProjSdNodeCANopenPdoOverviewColumnWidth(const QString & orc
    \param[in]  oru8_Value      Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeSelectedCANopenManager(const QString & orc_NodeName, const stw_types::uint8 & oru8_Value)
+void C_UsHandler::SetProjSdNodeSelectedCanOpenManager(const QString & orc_NodeName, const uint8_t & oru8_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCANopenManager(oru8_Value);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCanOpenManager(oru8_Value);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetSelectedCANopenManager(oru8_Value);
+      c_Node.SetSelectedCanOpenManager(oru8_Value);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1627,18 +1625,18 @@ void C_UsHandler::SetProjSdNodeSelectedCANopenManager(const QString & orc_NodeNa
    \param[in]  orc_Value         Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeSelectedCANopenDevice(const QString & orc_NodeName, const stw_types::uint8 & oru8_Number,
+void C_UsHandler::SetProjSdNodeSelectedCanOpenDevice(const QString & orc_NodeName, const uint8_t & oru8_Number,
                                                      const QString & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCANopenDevice(oru8_Number, orc_Value);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCanOpenDevice(oru8_Number, orc_Value);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetSelectedCANopenDevice(oru8_Number, orc_Value);
+      c_Node.SetSelectedCanOpenDevice(oru8_Number, orc_Value);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1650,18 +1648,18 @@ void C_UsHandler::SetProjSdNodeSelectedCANopenDevice(const QString & orc_NodeNam
    \param[in]  oru32_Value      Value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeSelectedCANopenDeviceUseCaseIndex(const QString & orc_NodeName,
-                                                                 const uint32 & oru32_Value)
+void C_UsHandler::SetProjSdNodeSelectedCanOpenDeviceUseCaseIndex(const QString & orc_NodeName,
+                                                                 const uint32_t & oru32_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCANopenDeviceUseCaseIndex(oru32_Value);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetSelectedCanOpenDeviceUseCaseIndex(oru32_Value);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetSelectedCANopenDeviceUseCaseIndex(oru32_Value);
+      c_Node.SetSelectedCanOpenDeviceUseCaseIndex(oru32_Value);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1675,28 +1673,27 @@ void C_UsHandler::SetProjSdNodeSelectedCANopenDeviceUseCaseIndex(const QString &
    \param[in]  orc_Device        Expanded device
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeExpandedCANopenTree(const QString & orc_NodeName, const std::map<stw_types::uint8,
+void C_UsHandler::SetProjSdNodeExpandedCanOpenTree(const QString & orc_NodeName, const std::map<uint8_t,
                                                                                                 bool> & orc_Interfaces,
-                                                   const std::map<stw_types::uint8,
-                                                                  bool> & orc_Devices,
-                                                   const std::map<std::pair<stw_types::uint8,
-                                                                            std::pair<stw_types::uint8,
-                                                                                      stw_scl::C_SCLString> >,
-                                                                  bool> & orc_Device)
+                                                   const std::map<uint8_t,
+                                                                  bool> & orc_Devices, const std::map<std::pair<uint8_t,
+                                                                                                                std::pair<uint8_t,
+                                                                                                                          stw::scl::C_SclString> >,
+                                                                                                      bool> & orc_Device)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCANopenManager(orc_Interfaces);
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCANopenDevices(orc_Devices);
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCANopenDevice(orc_Device);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCanOpenManager(orc_Interfaces);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCanOpenDevices(orc_Devices);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetExpandedCanOpenDevice(orc_Device);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetExpandedCANopenManager(orc_Interfaces);
-      c_Node.SetExpandedCANopenDevices(orc_Devices);
-      c_Node.SetExpandedCANopenDevice(orc_Device);
+      c_Node.SetExpandedCanOpenManager(orc_Interfaces);
+      c_Node.SetExpandedCanOpenDevices(orc_Devices);
+      c_Node.SetExpandedCanOpenDevice(orc_Device);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1708,18 +1705,18 @@ void C_UsHandler::SetProjSdNodeExpandedCANopenTree(const QString & orc_NodeName,
    \param[in]  orq_IsUseCaseSelected      Selected or not
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSdNodeCANopenSelectedUseCaseOrInterface(const QString & orc_NodeName,
+void C_UsHandler::SetProjSdNodeCanOpenSelectedUseCaseOrInterface(const QString & orc_NodeName,
                                                                  const bool & orq_IsUseCaseSelected)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSdNode.operator [](orc_NodeName).SetCANopenSelectedUseCaseOrInterface(orq_IsUseCaseSelected);
+      this->mc_ProjSdNode.operator [](orc_NodeName).SetCanOpenSelectedUseCaseOrInterface(orq_IsUseCaseSelected);
    }
    else
    {
       C_UsNode c_Node;
-      c_Node.SetCANopenSelectedUseCaseOrInterface(orq_IsUseCaseSelected);
+      c_Node.SetCanOpenSelectedUseCaseOrInterface(orq_IsUseCaseSelected);
       this->mc_ProjSdNode.insert(orc_NodeName, c_Node);
    }
 }
@@ -1732,7 +1729,7 @@ void C_UsHandler::SetProjSdNodeCANopenSelectedUseCaseOrInterface(const QString &
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeHalcOverviewColumnWidth(const QString & orc_NodeName,
-                                                       const std::vector<sint32> & orc_Value)
+                                                       const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1755,7 +1752,7 @@ void C_UsHandler::SetProjSdNodeHalcOverviewColumnWidth(const QString & orc_NodeN
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdNodeHalcConfigColumnWidth(const QString & orc_NodeName,
-                                                     const std::vector<sint32> & orc_Value)
+                                                     const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdNode.contains(orc_NodeName) == true)
    {
@@ -1826,7 +1823,7 @@ void C_UsHandler::SetProjSdNodeSelectedHalcChannel(const QString & orc_NodeName,
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdBusSelectedMessage(const QString & orc_BusName,
-                                              const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
+                                              const stw::opensyde_core::C_OscCanProtocol::E_Type oe_SelectedProtocol,
                                               const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
                                               const bool oq_SignalSelected, const QString & orc_SelectedSignalName)
 {
@@ -1854,7 +1851,7 @@ void C_UsHandler::SetProjSdBusSelectedMessage(const QString & orc_BusName,
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdBusCommMessageOverviewColumnWidth(const QString & orc_BusName,
-                                                             const std::vector<sint32> & orc_Value)
+                                                             const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdBus.contains(orc_BusName) == true)
    {
@@ -1877,7 +1874,7 @@ void C_UsHandler::SetProjSdBusCommMessageOverviewColumnWidth(const QString & orc
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSdBusCommSignalOverviewColumnWidth(const QString & orc_BusName,
-                                                            const std::vector<sint32> & orc_Value)
+                                                            const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_ProjSdBus.contains(orc_BusName) == true)
    {
@@ -1909,7 +1906,7 @@ void C_UsHandler::SetProjSvNavigationExpandedStatus(const QString & orc_ViewName
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetNavigationExpandedStatus(oq_NavigationExpandedStatus);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -1919,19 +1916,19 @@ void C_UsHandler::SetProjSvNavigationExpandedStatus(const QString & orc_ViewName
 /*! \brief   Set project system view setup view zoom
 
    \param[in]  orc_ViewName   Project system view name (identifier)
-   \param[in]  osn_New        Project system view setup view zoom
+   \param[in]  os32_New       Project system view setup view zoom
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSvSetupViewZoom(const QString & orc_ViewName, const sintn osn_New)
+void C_UsHandler::SetProjSvSetupViewZoom(const QString & orc_ViewName, const int32_t os32_New)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
-      this->mc_ProjSvSetupView.operator [](orc_ViewName).sn_SetupViewZoom = osn_New;
+      this->mc_ProjSvSetupView.operator [](orc_ViewName).s32_SetupViewZoom = os32_New;
    }
    else
    {
-      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(osn_New, C_UsHandler::mhc_DEFAULT_VIEW_POS));
+      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(os32_New, C_UsHandler::mhc_DEFAULT_VIEW_POS));
    }
 }
 
@@ -1951,7 +1948,7 @@ void C_UsHandler::SetProjSvSetupViewPos(const QString & orc_ViewName, const QPoi
    }
    else
    {
-      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, orc_New));
+      this->mc_ProjSvSetupView.insert(orc_ViewName, C_UsSystemView(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, orc_New));
    }
 }
 
@@ -1959,21 +1956,21 @@ void C_UsHandler::SetProjSvSetupViewPos(const QString & orc_ViewName, const QPoi
 /*! \brief   Set project system view update scene zoom level
 
    \param[in]  orc_ViewName   Project system view name (identifier)
-   \param[in]  osn_New        New value
+   \param[in]  os32_New       New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSvUpdateViewZoom(const QString & orc_ViewName, const sintn osn_New)
+void C_UsHandler::SetProjSvUpdateViewZoom(const QString & orc_ViewName, const int32_t os32_New)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
-      rc_View.sn_UpdateViewZoom = osn_New;
+      rc_View.s32_UpdateViewZoom = os32_New;
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
-      c_View.sn_UpdateViewZoom = osn_New;
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      c_View.s32_UpdateViewZoom = os32_New;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
 }
@@ -1995,7 +1992,7 @@ void C_UsHandler::SetProjSvUpdateViewPos(const QString & orc_ViewName, const QPo
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_UpdateViewPos = orc_New;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2018,7 +2015,7 @@ void C_UsHandler::SetProjSvParamExport(const QString & orc_ViewName, const QStri
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_ParamExportPath = orc_Path;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2041,7 +2038,7 @@ void C_UsHandler::SetProjSvParamImport(const QString & orc_ViewName, const QStri
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_ParamImportPath = orc_Path;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2067,7 +2064,7 @@ void C_UsHandler::SetProjSvParamRecord(const QString & orc_ViewName, const QStri
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.c_ParamRecordPath = orc_Path;
       c_View.c_ParamRecordFileName = orc_FileName;
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
@@ -2084,7 +2081,7 @@ void C_UsHandler::SetProjSvParamRecord(const QString & orc_ViewName, const QStri
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::AddProjSvNodeUpdateDataRate(const QString & orc_ViewName, const QString & orc_NodeName,
-                                              const uint32 ou32_Checksum, const float64 of64_DataRateBytesPerMs)
+                                              const uint32_t ou32_Checksum, const float64_t of64_DataRateBytesPerMs)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
@@ -2094,7 +2091,7 @@ void C_UsHandler::AddProjSvNodeUpdateDataRate(const QString & orc_ViewName, cons
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.AddNodeUpdateDataRate(orc_NodeName, ou32_Checksum, of64_DataRateBytesPerMs);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2107,18 +2104,18 @@ void C_UsHandler::AddProjSvNodeUpdateDataRate(const QString & orc_ViewName, cons
    \param[in]  os32_Value     New update splitter X value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSvUpdateSplitterX(const QString & orc_ViewName, const sint32 os32_Value)
+void C_UsHandler::SetProjSvUpdateSplitterHorizontal(const QString & orc_ViewName, const int32_t os32_Value)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
-      rc_View.SetUpdateSplitterX(os32_Value);
+      rc_View.SetUpdateSplitterHorizontal(os32_Value);
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
-      c_View.SetUpdateSplitterX(os32_Value);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      c_View.SetUpdateSplitterHorizontal(os32_Value);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
 }
@@ -2130,18 +2127,18 @@ void C_UsHandler::SetProjSvUpdateSplitterX(const QString & orc_ViewName, const s
    \param[in]  os32_Value     New horizontal update splitter Y value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSvUpdateHorizontalSplitterY(const QString & orc_ViewName, const sint32 os32_Value)
+void C_UsHandler::SetProjSvUpdateHorizontalSplitterVertical(const QString & orc_ViewName, const int32_t os32_Value)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
-      rc_View.SetUpdateHorizontalSplitterY(os32_Value);
+      rc_View.SetUpdateHorizontalSplitterVertical(os32_Value);
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
-      c_View.SetUpdateHorizontalSplitterY(os32_Value);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      c_View.SetUpdateHorizontalSplitterVertical(os32_Value);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
 }
@@ -2168,7 +2165,7 @@ void C_UsHandler::SetProjSvUpdateProgressLog(const QString & orc_ViewName, const
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateProgressLogPos(orc_Position);
       c_View.SetUpdateProgressLogSize(orc_Size);
       c_View.SetUpdateProgressLogMaximized(orq_Maximized);
@@ -2193,7 +2190,7 @@ void C_UsHandler::SetProjSvUpdateSummaryBig(const QString & orc_ViewName, const 
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateSummaryBig(oq_BigVisible);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2216,7 +2213,7 @@ void C_UsHandler::SetProjSvUpdateEmptyOptionalSectionsVisible(const QString & or
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetUpdateEmptyOptionalSectionsVisible(oq_Visible);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2241,7 +2238,7 @@ void C_UsHandler::SetProjSvUpdateSectionsExpandedFlags(const QString & orc_ViewN
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetNodeSectionsExpanded(orc_NodeName, orc_SectionsExpanded);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2269,7 +2266,7 @@ void C_UsHandler::SetProjSvDashboardToolbox(const QString & orc_ViewName, const 
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardToolboxPos(orc_Position);
       c_View.SetDashboardToolboxSize(orc_Size);
       c_View.SetDashboardToolboxMaximized(orq_Maximized);
@@ -2284,7 +2281,7 @@ void C_UsHandler::SetProjSvDashboardToolbox(const QString & orc_ViewName, const 
    \param[in]  os32_Index     Dashboard selected tab index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewName, const sint32 os32_Index)
+void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewName, const int32_t os32_Index)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
@@ -2294,7 +2291,7 @@ void C_UsHandler::SetProjSvDashboardSelectedTabIndex(const QString & orc_ViewNam
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardSelectedTabIndex(os32_Index);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2317,7 +2314,7 @@ void C_UsHandler::SetProjSvDashboardMainTab(const QString & orc_ViewName, const 
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardMainTab(orc_DashboardName);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
@@ -2348,7 +2345,7 @@ void C_UsHandler::SetProjSvDashboardTearOffPosition(const QString & orc_ViewName
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
       c_View.SetDashboardTearOffPosition(orc_DashboardName, orc_Position, orc_Size, oq_TornOffWindowMinimized,
                                          oq_TornOffWindowMaximized);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
@@ -2361,23 +2358,23 @@ void C_UsHandler::SetProjSvDashboardTearOffPosition(const QString & orc_ViewName
    \param[in]  orc_ViewName         Project system view name (identifier)
    \param[in]  orc_DashboardName    Dashboard name (identifier)
    \param[in]  orc_Position         Scene position
-   \param[in]  osn_Zoom             Scene zoom
+   \param[in]  os32_Zoom            Scene zoom
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsHandler::SetProjSvDashboardScenePositionAndZoom(const QString & orc_ViewName,
                                                          const QString & orc_DashboardName, const QPoint & orc_Position,
-                                                         const sintn osn_Zoom)
+                                                         const int32_t os32_Zoom)
 {
    if (this->mc_ProjSvSetupView.contains(orc_ViewName) == true)
    {
       //Do not insert as this will replace all currently known user settings for this item
       C_UsSystemView & rc_View = this->mc_ProjSvSetupView.operator [](orc_ViewName);
-      rc_View.SetProjSvDashboardScenePositionAndZoom(orc_DashboardName, orc_Position, osn_Zoom);
+      rc_View.SetProjSvDashboardScenePositionAndZoom(orc_DashboardName, orc_Position, os32_Zoom);
    }
    else
    {
-      C_UsSystemView c_View(C_UsHandler::mhsn_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
-      c_View.SetProjSvDashboardScenePositionAndZoom(orc_DashboardName, orc_Position, osn_Zoom);
+      C_UsSystemView c_View(C_UsHandler::mhs32_DEFAULT_ZOOM_LEVEL, C_UsHandler::mhc_DEFAULT_VIEW_POS);
+      c_View.SetProjSvDashboardScenePositionAndZoom(orc_DashboardName, orc_Position, os32_Zoom);
       this->mc_ProjSvSetupView.insert(orc_ViewName, c_View);
    }
 }
@@ -2393,9 +2390,9 @@ void C_UsHandler::SetProjSvDashboardScenePositionAndZoom(const QString & orc_Vie
    \param[in]  ou32_SysViewFlag     Last flag value of system view
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjLastScreenMode(const sint32 os32_SysDefSubMode, const uint32 ou32_SysDefIndex,
-                                        const uint32 ou32_SysDefFlag, const sint32 os32_SysViewSubMode,
-                                        const uint32 ou32_SysViewIndex, const uint32 ou32_SysViewFlag)
+void C_UsHandler::SetProjLastScreenMode(const int32_t os32_SysDefSubMode, const uint32_t ou32_SysDefIndex,
+                                        const uint32_t ou32_SysDefFlag, const int32_t os32_SysViewSubMode,
+                                        const uint32_t ou32_SysViewIndex, const uint32_t ou32_SysViewFlag)
 {
    this->ms32_SysDefSubMode = os32_SysDefSubMode;
    this->mu32_SysDefIndex = ou32_SysDefIndex;
@@ -2409,23 +2406,23 @@ void C_UsHandler::SetProjLastScreenMode(const sint32 os32_SysDefSubMode, const u
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get the last index for system definition node edit tab
 
-   \param[out]  osn_SysDefNodeEditTabIndex   Tab index of node edit
+   \param[out]  os32_SysDefNodeEditTabIndex   Tab index of node edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjLastSysDefNodeTabIndex(const sintn osn_SysDefNodeEditTabIndex)
+void C_UsHandler::SetProjLastSysDefNodeTabIndex(const int32_t os32_SysDefNodeEditTabIndex)
 {
-   this->msn_SysDefNodeEditTabIndex = osn_SysDefNodeEditTabIndex;
+   this->ms32_SysDefNodeEditTabIndex = os32_SysDefNodeEditTabIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get the last index for system definition bus edit tabs
 
-   \param[out]  osn_SysDefBusEditTabIndex    Tab index of bus edit
+   \param[out]  os32_SysDefBusEditTabIndex    Tab index of bus edit
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsHandler::SetProjLastSysDefBusTabIndex(const sintn osn_SysDefBusEditTabIndex)
+void C_UsHandler::SetProjLastSysDefBusTabIndex(const int32_t os32_SysDefBusEditTabIndex)
 {
-   this->msn_SysDefBusEditTabIndex = osn_SysDefBusEditTabIndex;
+   this->ms32_SysDefBusEditTabIndex = os32_SysDefBusEditTabIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2496,13 +2493,13 @@ void C_UsHandler::Save(void) const
    C_RANGE:  does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
+int32_t C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
 {
    QStringList c_List;
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
    C_UsHandler::h_GetLanguages(c_List);
-   for (uint8 u8_It = 0; u8_It < c_List.count(); ++u8_It)
+   for (uint8_t u8_It = 0; u8_It < c_List.count(); ++u8_It)
    {
       if (orc_Str.compare(c_List.at(u8_It)) == 0)
       {
@@ -2528,10 +2525,10 @@ sint32 C_UsHandler::h_CheckLanguageExists(const QString & orc_Str)
                 Path does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString & orc_Parent,
-                                      const bool & orq_CompletePathContainsFile)
+int32_t C_UsHandler::h_GetParentFolder(const QString & orc_CompletePath, QString & orc_Parent,
+                                       const bool & orq_CompletePathContainsFile)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    if (orc_CompletePath.compare("") == 0)
    {
@@ -2579,11 +2576,11 @@ C_UsHandler::C_UsHandler(void) :
    mc_IniPathAndName(C_Uti::h_GetExePath() + "/User/user_settings.ini"),
    mc_ActualProject(""),
    mc_DefaultProjectsFolder(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/openSYDE/Projects"),
-   ms32_SdNodeEditSplitterX(1000),
-   ms32_SdNodEditHalcSplitterX(400),
-   ms32_SdNodEditCoManagerSplitterX(400),
-   ms32_SdBusEditTreeSplitterX(0),
-   ms32_SdBusEditLayoutSplitterX(0)
+   ms32_SdNodeEditSplitterHorizontal(1000),
+   ms32_SdNodEditHalcSplitterHorizontal(400),
+   ms32_SdNodEditCoManagerSplitterHorizontal(400),
+   ms32_SdBusEditTreeSplitterHorizontal(0),
+   ms32_SdBusEditLayoutSplitterHorizontal(0)
 {
    // Load all project independent information
    C_UsFiler::h_Load(*this, mc_IniPathAndName, "");

@@ -13,13 +13,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamOgeLeIDPopUp.h"
+#include "C_CamOgeLeIdPopUp.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,7 +41,7 @@ using namespace stw_opensyde_gui;
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamOgeLeIDPopUp::C_CamOgeLeIDPopUp(QWidget * const opc_Parent) :
+C_CamOgeLeIdPopUp::C_CamOgeLeIdPopUp(QWidget * const opc_Parent) :
    C_TblEditLineEditBase(opc_Parent)
 {
 }

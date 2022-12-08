@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_Uti.h"
-#include "constants.h"
-#include "C_TblDelegateUtil.h"
-#include "C_CamGenTableDelegate.h"
-#include "TGLUtils.h"
+#include "C_Uti.hpp"
+#include "constants.hpp"
+#include "C_TblDelegateUtil.hpp"
+#include "C_CamGenTableDelegate.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QColor C_CamGenTableDelegate::mhc_DEFAULT_BORDER_COLOR = Qt::transparent;
@@ -81,6 +80,6 @@ void C_CamGenTableDelegate::paint(QPainter * const opc_Painter, const QStyleOpti
                                             C_CamGenTableDelegate::mhc_HIGHLIGHT_FONT, 19, 25) == true)
    {
       // to make sure text is not painted twice
-      tgl_assert(orc_Index.data(static_cast<sintn>(Qt::DisplayRole)).toString().isEmpty());
+      tgl_assert(orc_Index.data(static_cast<int32_t>(Qt::DisplayRole)).toString().isEmpty());
    }
 }

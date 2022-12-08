@@ -11,12 +11,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeChxDefaultSmall.h"
+#include "C_OgeChxDefaultSmall.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,7 +55,7 @@ C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(QWidget * const opc_Parent) :
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(const stw_types::uint32 ou32_Index, const stw_types::uint32 ou32_SubIndex,
+C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(const uint32_t ou32_Index, const uint32_t ou32_SubIndex,
                                            QWidget * const opc_Parent) :
    C_OgeChxToolTipBase(opc_Parent),
    mu32_Index(ou32_Index),
@@ -71,7 +71,7 @@ C_OgeChxDefaultSmall::C_OgeChxDefaultSmall(const stw_types::uint32 ou32_Index, c
    \param[out]  oru32_SubIndex   Second index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeChxDefaultSmall::GetIndexes(stw_types::uint32 & oru32_Index, stw_types::uint32 & oru32_SubIndex) const
+void C_OgeChxDefaultSmall::GetIndexes(uint32_t & oru32_Index, uint32_t & oru32_SubIndex) const
 {
    oru32_Index = this->mu32_Index;
    oru32_SubIndex = this->mu32_SubIndex;

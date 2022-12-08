@@ -10,15 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QEvent>
 #include <QTabBar>
 #include <QHelpEvent>
-#include "C_OgeTawToolTipBase.h"
+#include "C_OgeTawToolTipBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,14 +65,14 @@ C_OgeTawToolTipBase::~C_OgeTawToolTipBase()
    \param[in] orc_Content Tool tip content
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeTawToolTipBase::SetToolTipInformation(const stw_types::uint32 ou32_Index, const QString & orc_Heading,
+void C_OgeTawToolTipBase::SetToolTipInformation(const uint32_t ou32_Index, const QString & orc_Heading,
                                                 const QString & orc_Content)
 {
    C_ToolTipContent c_ToolTip;
 
    c_ToolTip.c_Heading = orc_Heading;
    c_ToolTip.c_Content = orc_Content;
-   this->mc_ToolTips[static_cast<stw_types::sint32>(ou32_Index)] = c_ToolTip;
+   this->mc_ToolTips[static_cast<int32_t>(ou32_Index)] = c_ToolTip;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
       //show tooltip
       if (mpc_ToolTip == NULL)
       {
-         mpc_ToolTip = new stw_opensyde_gui::C_NagToolTip();
+         mpc_ToolTip = new stw::opensyde_gui::C_NagToolTip();
       }
 
       if (this->mpc_ToolTip->isVisible() == false)
@@ -119,11 +119,11 @@ bool C_OgeTawToolTipBase::event(QEvent * const opc_Event)
 
          if (pc_HelpEvent != NULL)
          {
-            const stw_types::sint32 s32_TabIndex =
+            const int32_t s32_TabIndex =
                this->tabBar()->tabAt(this->tabBar()->mapFromGlobal(pc_HelpEvent->globalPos()));
             if (s32_TabIndex >= 0)
             {
-               std::map<stw_types::sint32, C_ToolTipContent>::const_iterator c_It;
+               std::map<int32_t, C_ToolTipContent>::const_iterator c_It;
                c_It = this->mc_ToolTips.find(s32_TabIndex);
                if (c_It != this->mc_ToolTips.end())
                {
@@ -206,7 +206,7 @@ void C_OgeTawToolTipBase::m_HandleMouseMoveToolTip(const QPoint & orc_GlobalPos)
 {
    if (this->ms32_CurrentHoveredIndex >= 0)
    {
-      const stw_types::sint32 s32_TabIndex =
+      const int32_t s32_TabIndex =
          this->tabBar()->tabAt(this->tabBar()->mapFromGlobal(orc_GlobalPos));
       if (s32_TabIndex >= 0)
       {

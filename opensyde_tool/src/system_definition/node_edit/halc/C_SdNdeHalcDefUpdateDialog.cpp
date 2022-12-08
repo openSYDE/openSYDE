@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_ImpUtil.h"
-#include "TGLUtils.h"
-#include "C_SdNdeHalcDefUpdateDialog.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_ImpUtil.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeHalcDefUpdateDialog.hpp"
 #include "ui_C_SdNdeHalcDefUpdateDialog.h"
-#include "C_PuiSdHandler.h"
+#include "C_PuiSdHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,9 +53,9 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      orc_FilePath           File path of loaded HALC definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeHalcDefUpdateDialog::C_SdNdeHalcDefUpdateDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                       const uint32 ou32_NodeIndex,
-                                                       const C_OSCHalcConfig & orc_LoadedHalcConfig,
+C_SdNdeHalcDefUpdateDialog::C_SdNdeHalcDefUpdateDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                       const uint32_t ou32_NodeIndex,
+                                                       const C_OscHalcConfig & orc_LoadedHalcConfig,
                                                        const QString & orc_FilePath) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeHalcDefUpdateDialog),
@@ -90,7 +89,7 @@ C_SdNdeHalcDefUpdateDialog::C_SdNdeHalcDefUpdateDialog(stw_opensyde_gui_elements
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeHalcDefUpdateDialog::~C_SdNdeHalcDefUpdateDialog(void)
+C_SdNdeHalcDefUpdateDialog::~C_SdNdeHalcDefUpdateDialog(void) noexcept
 {
    delete this->mpc_Ui;
 }
@@ -119,7 +118,7 @@ void C_SdNdeHalcDefUpdateDialog::InitStaticNames(void) const
    \retval   C_NOACT    No error, nothing done, user did not accepted or the content version did not changed
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeHalcDefUpdateDialog::GetResult(C_OSCHalcConfig & orc_UpdatedHalcConfig, QString & orc_ErrorDetails) const
+int32_t C_SdNdeHalcDefUpdateDialog::GetResult(C_OscHalcConfig & orc_UpdatedHalcConfig, QString & orc_ErrorDetails) const
 {
    // Error details
    switch (this->ms32_Result)
@@ -155,8 +154,8 @@ void C_SdNdeHalcDefUpdateDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -270,7 +269,7 @@ QString C_SdNdeHalcDefUpdateDialog::m_AddSection(const QString & orc_SectionName
       c_Text += "</td>";
       c_Text += "</tr>";
 
-      for (sint32 s32_ItEntry = 0U; s32_ItEntry < orc_Content.length(); s32_ItEntry++)
+      for (int32_t s32_ItEntry = 0U; s32_ItEntry < orc_Content.length(); s32_ItEntry++)
       {
          c_Text += "<tr>";
          c_Text += c_TableDataStart;
@@ -296,14 +295,14 @@ QString C_SdNdeHalcDefUpdateDialog::m_AddSection(const QString & orc_SectionName
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
 {
-   const C_OSCHalcConfig * const pc_CurrentConfig =
-      C_PuiSdHandler::h_GetInstance()->GetHALCConfig(this->mu32_NodeIndex);
+   const C_OscHalcConfig * const pc_CurrentConfig =
+      C_PuiSdHandler::h_GetInstance()->GetHalcConfig(this->mu32_NodeIndex);
 
    tgl_assert(pc_CurrentConfig != NULL);
    if (pc_CurrentConfig != NULL)
    {
-      uint32 u32_UpdatedDomainCounter;
-      uint32 u32_CurrentDomainCounter;
+      uint32_t u32_UpdatedDomainCounter;
+      uint32_t u32_CurrentDomainCounter;
 
       // Copy the entire loaded configuration for further editing
       this->mc_UpdatedHalcConfig = this->mrc_LoadedHalcConfig;
@@ -314,7 +313,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
       for (u32_UpdatedDomainCounter = 0UL; u32_UpdatedDomainCounter < this->mc_UpdatedHalcConfig.GetDomainSize();
            ++u32_UpdatedDomainCounter)
       {
-         const C_OSCHalcConfigDomain * const pc_UpdatedDomain = this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(
+         const C_OscHalcConfigDomain * const pc_UpdatedDomain = this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(
             u32_UpdatedDomainCounter);
 
          tgl_assert(pc_UpdatedDomain != NULL);
@@ -326,14 +325,14 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
             for (u32_CurrentDomainCounter = 0UL; u32_CurrentDomainCounter < pc_CurrentConfig->GetDomainSize();
                  ++u32_CurrentDomainCounter)
             {
-               const C_OSCHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
+               const C_OscHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
                   u32_CurrentDomainCounter);
 
                tgl_assert(pc_CurrentDomain != NULL);
                if ((pc_CurrentDomain != NULL) &&
                    (pc_UpdatedDomain->c_Id == pc_CurrentDomain->c_Id))
                {
-                  C_OSCHalcConfigDomain c_AdatedUpdatedDomain = *pc_UpdatedDomain;
+                  C_OscHalcConfigDomain c_AdatedUpdatedDomain = *pc_UpdatedDomain;
 
                   // Same Id -> Compare and if necessary update
                   C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(*pc_CurrentDomain, c_AdatedUpdatedDomain);
@@ -358,7 +357,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
       for (u32_CurrentDomainCounter = 0UL; u32_CurrentDomainCounter < pc_CurrentConfig->GetDomainSize();
            ++u32_CurrentDomainCounter)
       {
-         const C_OSCHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
+         const C_OscHalcConfigDomain * const pc_CurrentDomain = pc_CurrentConfig->GetDomainConfigDataConst(
             u32_CurrentDomainCounter);
 
          tgl_assert(pc_CurrentDomain != NULL);
@@ -370,7 +369,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
                  u32_UpdatedDomainCounter < this->mc_UpdatedHalcConfig.GetDomainSize();
                  ++u32_UpdatedDomainCounter)
             {
-               const C_OSCHalcConfigDomain * const pc_UpdatedDomain =
+               const C_OscHalcConfigDomain * const pc_UpdatedDomain =
                   this->mc_UpdatedHalcConfig.GetDomainConfigDataConst(u32_UpdatedDomainCounter);
 
                tgl_assert(pc_UpdatedDomain != NULL);
@@ -400,11 +399,11 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateHalcConfiguration(void)
                                          with the channel configuration of the loaded definition
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(const C_OSCHalcConfigDomain & orc_CurrentConfig,
-                                                             C_OSCHalcConfigDomain & orc_UpdatedConfig)
+void C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(const C_OscHalcConfigDomain & orc_CurrentConfig,
+                                                             C_OscHalcConfigDomain & orc_UpdatedConfig)
 {
-   uint32 u32_UpdatedChannelCounter;
-   uint32 u32_CurrentChannelCounter;
+   uint32_t u32_UpdatedChannelCounter;
+   uint32_t u32_CurrentChannelCounter;
 
    // Getting the set domain configuration data of the current configuration
    C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(orc_CurrentConfig, orc_UpdatedConfig,
@@ -493,24 +492,24 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateDomainConfiguration(const C_OSCHalcConf
                                               (if q_IsDomainConfiguration == false)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcConfigDomain & orc_CurrentConfig,
-                                                              C_OSCHalcConfigDomain & orc_UpdatedConfig,
-                                                              const C_SCLString & orc_PreviousDefChannelName,
+void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OscHalcConfigDomain & orc_CurrentConfig,
+                                                              C_OscHalcConfigDomain & orc_UpdatedConfig,
+                                                              const C_SclString & orc_PreviousDefChannelName,
                                                               const bool oq_IsDomainConfiguration,
-                                                              const uint32 ou32_CurrentChannelIndex,
-                                                              const uint32 ou32_UpdatedChannelIndex)
+                                                              const uint32_t ou32_CurrentChannelIndex,
+                                                              const uint32_t ou32_UpdatedChannelIndex)
 {
-   const C_OSCHalcConfigChannel & rc_CurrentChannelConfig = (oq_IsDomainConfiguration == true) ?
+   const C_OscHalcConfigChannel & rc_CurrentChannelConfig = (oq_IsDomainConfiguration == true) ?
                                                             orc_CurrentConfig.c_DomainConfig :
                                                             orc_CurrentConfig.c_ChannelConfigs[ou32_CurrentChannelIndex];
-   C_OSCHalcConfigChannel & rc_UpdatedChannelConfig = (oq_IsDomainConfiguration == true) ?
+   C_OscHalcConfigChannel & rc_UpdatedChannelConfig = (oq_IsDomainConfiguration == true) ?
                                                       orc_UpdatedConfig.c_DomainConfig :
                                                       orc_UpdatedConfig.c_ChannelConfigs[ou32_UpdatedChannelIndex];
    bool q_ResetToDefault = false;
 
    // Parameters to compare
-   std::vector<C_OSCHalcDefStruct> * pc_UpdatedParametersToCompare = NULL;
-   const std::vector<C_OSCHalcDefStruct> * pc_CurrentParametersToCompare = NULL;
+   std::vector<C_OscHalcDefStruct> * pc_UpdatedParametersToCompare = NULL;
+   const std::vector<C_OscHalcDefStruct> * pc_CurrentParametersToCompare = NULL;
 
    // Update all users adaption of configuration in loaded configuration except parameters
    // Check if name was changed by user. If it equals the definition name of the current definition
@@ -525,21 +524,21 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
 
    if (oq_IsDomainConfiguration == false)
    {
-      uint32 u32_UseCaseCounter;
+      uint32_t u32_UseCaseCounter;
       bool q_UseCaseFound = false;
       bool q_UseCaseAvailable = false;
-      const C_OSCHalcDefChannelUseCase & rc_CurrentUseCase =
+      const C_OscHalcDefChannelUseCase & rc_CurrentUseCase =
          orc_CurrentConfig.c_ChannelUseCases[rc_CurrentChannelConfig.u32_UseCaseIndex];
 
       // Check previous use case. Only relevant for channels, not domains
       for (u32_UseCaseCounter = 0U; u32_UseCaseCounter < orc_UpdatedConfig.c_ChannelUseCases.size();
            ++u32_UseCaseCounter)
       {
-         const C_OSCHalcDefChannelUseCase & rc_UseCase = orc_UpdatedConfig.c_ChannelUseCases[u32_UseCaseCounter];
+         const C_OscHalcDefChannelUseCase & rc_UseCase = orc_UpdatedConfig.c_ChannelUseCases[u32_UseCaseCounter];
 
          if (rc_CurrentUseCase.c_Id == rc_UseCase.c_Id)
          {
-            uint32 u32_AvailabilityCounter;
+            uint32_t u32_AvailabilityCounter;
 
             // Use case does still exist
             q_UseCaseFound = true;
@@ -550,7 +549,7 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
             {
                if (rc_UseCase.c_Availability[u32_AvailabilityCounter].u32_ValueIndex == ou32_UpdatedChannelIndex)
                {
-                  const uint32 u32_UseCaseIndex = static_cast<uint32>(rc_UseCase.c_Value.GetValueU8());
+                  const uint32_t u32_UseCaseIndex = static_cast<uint32_t>(rc_UseCase.c_Value.GetValueU8());
                   // Use case is available too. Can be updated. Check of parameters
                   rc_UpdatedChannelConfig.u32_UseCaseIndex = u32_UseCaseIndex;
                   q_UseCaseAvailable = true;
@@ -593,8 +592,8 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
        (pc_UpdatedParametersToCompare != NULL) &&
        (pc_CurrentParametersToCompare != NULL))
    {
-      uint32 u32_UpdatedDefParameterCounter;
-      uint32 u32_CurrentDefParameterCounter;
+      uint32_t u32_UpdatedDefParameterCounter;
+      uint32_t u32_CurrentDefParameterCounter;
 
       tgl_assert(rc_CurrentChannelConfig.c_Parameters.size() == pc_CurrentParametersToCompare->size());
       tgl_assert(rc_UpdatedChannelConfig.c_Parameters.size() == pc_UpdatedParametersToCompare->size());
@@ -606,14 +605,14 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
            ++u32_UpdatedDefParameterCounter)
       {
          bool q_ParameterFound = false;
-         const C_OSCHalcDefStruct & rc_UpdatedParameterDef =
+         const C_OscHalcDefStruct & rc_UpdatedParameterDef =
             (*pc_UpdatedParametersToCompare)[u32_UpdatedDefParameterCounter];
 
          for (u32_CurrentDefParameterCounter = 0UL;
               u32_CurrentDefParameterCounter < pc_CurrentParametersToCompare->size();
               ++u32_CurrentDefParameterCounter)
          {
-            const C_OSCHalcDefStruct & rc_CurrentParameterDef =
+            const C_OscHalcDefStruct & rc_CurrentParameterDef =
                (*pc_CurrentParametersToCompare)[u32_CurrentDefParameterCounter];
 
             // Search the matching parameters by comparing the names of the definition
@@ -719,29 +718,29 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateChannelConfiguration(const C_OSCHalcCon
    \param[in]     orc_ChannelName             Name of channel for reporting only
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeHalcDefUpdateDialog::m_UpdateSubParameterConfiguration(const C_OSCHalcDefStruct & orc_CurrentParameterDef,
-                                                                   const C_OSCHalcDefStruct & orc_UpdatedParameterDef,
+void C_SdNdeHalcDefUpdateDialog::m_UpdateSubParameterConfiguration(const C_OscHalcDefStruct & orc_CurrentParameterDef,
+                                                                   const C_OscHalcDefStruct & orc_UpdatedParameterDef,
                                                                    const bool oq_IsDomainConfiguration,
-                                                                   const uint32 ou32_UseCaseIndex,
-                                                                   const C_OSCHalcConfigParameterStruct & orc_CurrentParameterConfig, C_OSCHalcConfigParameterStruct & orc_UpdatedParameterConfig,
-                                                                   const C_SCLString & orc_ChannelName)
+                                                                   const uint32_t ou32_UseCaseIndex,
+                                                                   const C_OscHalcConfigParameterStruct & orc_CurrentParameterConfig, C_OscHalcConfigParameterStruct & orc_UpdatedParameterConfig,
+                                                                   const C_SclString & orc_ChannelName)
 {
-   uint32 u32_UpdatedDefSubParameterCounter;
-   uint32 u32_CurrentDefSubParameterCounter;
+   uint32_t u32_UpdatedDefSubParameterCounter;
+   uint32_t u32_CurrentDefSubParameterCounter;
 
    for (u32_UpdatedDefSubParameterCounter = 0UL;
         u32_UpdatedDefSubParameterCounter < orc_UpdatedParameterDef.c_StructElements.size();
         ++u32_UpdatedDefSubParameterCounter)
    {
       bool q_ParameterFound = false;
-      const C_OSCHalcDefElement & rc_UpdatedParameterDef =
+      const C_OscHalcDefElement & rc_UpdatedParameterDef =
          orc_UpdatedParameterDef.c_StructElements[u32_UpdatedDefSubParameterCounter];
 
       for (u32_CurrentDefSubParameterCounter = 0UL;
            u32_CurrentDefSubParameterCounter < orc_CurrentParameterDef.c_StructElements.size();
            ++u32_CurrentDefSubParameterCounter)
       {
-         const C_OSCHalcDefElement & rc_CurrentParameterDef =
+         const C_OscHalcDefElement & rc_CurrentParameterDef =
             orc_CurrentParameterDef.c_StructElements[u32_CurrentDefSubParameterCounter];
 
          // Search the matching parameters by comparing the names of the definition
@@ -825,10 +824,10 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateSubParameterConfiguration(const C_OSCHa
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcDefUpdateDialog::m_UpdateParameterElementConfiguration(
-   const C_OSCHalcDefElement & orc_CurrentParameterDef, const C_OSCHalcDefElement & orc_UpdatedParameterDef,
-   const bool oq_IsDomainConfiguration, const uint32 ou32_UseCaseIndex,
-   const C_OSCHalcConfigParameter & orc_CurrentParameterConfig, C_OSCHalcConfigParameter & orc_UpdatedParameterConfig,
-   const C_SCLString & orc_ChannelName)
+   const C_OscHalcDefElement & orc_CurrentParameterDef, const C_OscHalcDefElement & orc_UpdatedParameterDef,
+   const bool oq_IsDomainConfiguration, const uint32_t ou32_UseCaseIndex,
+   const C_OscHalcConfigParameter & orc_CurrentParameterConfig, C_OscHalcConfigParameter & orc_UpdatedParameterConfig,
+   const C_SclString & orc_ChannelName)
 {
    // Check if compatible
    // Check use case of current parameter
@@ -906,15 +905,15 @@ void C_SdNdeHalcDefUpdateDialog::m_UpdateParameterElementConfiguration(
    \retval   false  Parameter definition is not relevant for the use case index
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeHalcDefUpdateDialog::mh_CheckParameterDefForUseCase(const C_OSCHalcDefElement & orc_ParameterDef,
+bool C_SdNdeHalcDefUpdateDialog::mh_CheckParameterDefForUseCase(const C_OscHalcDefElement & orc_ParameterDef,
                                                                 const bool oq_IsDomainConfiguration,
-                                                                const uint32 ou32_UseCaseIndex)
+                                                                const uint32_t ou32_UseCaseIndex)
 {
    bool q_ParameterRelevantAndCompatible = false;
 
    if (oq_IsDomainConfiguration == false)
    {
-      uint32 u32_UseCaseAvailabilitiesCounter;
+      uint32_t u32_UseCaseAvailabilitiesCounter;
 
       for (u32_UseCaseAvailabilitiesCounter = 0U;
            u32_UseCaseAvailabilitiesCounter < orc_ParameterDef.c_UseCaseAvailabilities.size();

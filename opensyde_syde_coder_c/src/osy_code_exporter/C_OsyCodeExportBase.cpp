@@ -10,31 +10,30 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
 #include <getopt.h> //note: as we use getopt.h this application is not portable to all compilers
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCProjectFiler.h"
-#include "C_OSCProject.h"
-#include "CSCLString.h"
-#include "C_OSCSystemDefinition.h"
-#include "C_OSCSystemDefinitionFiler.h"
-#include "C_OSCLoggingHandler.h"
-#include "TGLFile.h"
-#include "C_OsyCodeExportBase.h"
-#include "C_OSCUtils.h"
-#include "C_OSCBinaryHash.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscProjectFiler.hpp"
+#include "C_OscProject.hpp"
+#include "C_SclString.hpp"
+#include "C_OscSystemDefinition.hpp"
+#include "C_OscSystemDefinitionFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "TGLFile.hpp"
+#include "C_OsyCodeExportBase.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscBinaryHash.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -92,30 +91,30 @@ void C_OsyCodeExportBase::m_PrintCommandLineParameters(void) const
    string with version information ("V?.??r?" on error)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SCLString & orc_FileName)
+C_SclString C_OsyCodeExportBase::h_GetApplicationVersion(const C_SclString & orc_FileName)
 {
-   VS_FIXEDFILEINFO * pt_Info;
-   uintn un_ValSize;
-   sint32 s32_InfoSize;
-   uint8 * pu8_Buffer;
-   C_SCLString c_Version;
+   VS_FIXEDFILEINFO * pc_Info;
+   uint32_t u32_ValSize;
+   int32_t s32_InfoSize;
+   uint8_t * pu8_Buffer;
+   C_SclString c_Version;
 
    c_Version = "V?.\?\?r?";
 
    s32_InfoSize = GetFileVersionInfoSizeA(orc_FileName.c_str(), NULL);
    if (s32_InfoSize != 0)
    {
-      pu8_Buffer = new uint8[static_cast<uintn>(s32_InfoSize)];
+      pu8_Buffer = new uint8_t[static_cast<uint32_t>(s32_InfoSize)];
       if (GetFileVersionInfoA(orc_FileName.c_str(), 0, s32_InfoSize, pu8_Buffer) != FALSE)
       {
          //reinterpret_cast required due to function interface
          if (VerQueryValueA(pu8_Buffer, "\\",
-                            reinterpret_cast<PVOID *>(&pt_Info), //lint !e9176
-                            &un_ValSize) != FALSE)
+                            reinterpret_cast<PVOID *>(&pc_Info), //lint !e9176
+                            &u32_ValSize) != FALSE)
          {
-            c_Version.PrintFormatted("V%d.%02dr%d", (pt_Info->dwFileVersionMS >> 16U),
-                                     pt_Info->dwFileVersionMS & 0x0000FFFFUL,
-                                     (pt_Info->dwFileVersionLS >> 16U));
+            c_Version.PrintFormatted("V%d.%02dr%d", (pc_Info->dwFileVersionMS >> 16U),
+                                     pc_Info->dwFileVersionMS & 0x0000FFFFUL,
+                                     (pc_Info->dwFileVersionLS >> 16U));
          }
       }
       delete[] pu8_Buffer;
@@ -143,19 +142,19 @@ C_OsyCodeExportBase::~C_OsyCodeExportBase(void)
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 {
    E_ResultCode e_Return = eRESULT_OK;
-   charn acn_ApplicationName[MAX_PATH + 1];
-   sintn sn_Return = GetModuleFileNameA(NULL, &acn_ApplicationName[0], MAX_PATH + 1);
+   char_t acn_ApplicationName[MAX_PATH + 1];
+   uint32_t u32_Return = GetModuleFileNameA(NULL, &acn_ApplicationName[0], MAX_PATH + 1);
 
-   tgl_assert(sn_Return != 0);
+   tgl_assert(u32_Return != 0);
 
    mq_EraseTargetFolder = false;
 
    mc_ExeName = acn_ApplicationName;
    mc_ExeVersion = h_GetApplicationVersion(mc_ExeName);
-   mc_BinaryHash = stw_opensyde_core::C_OSCBinaryHash::h_CreateBinaryHash();
+   mc_BinaryHash = stw::opensyde_core::C_OscBinaryHash::h_CreateBinaryHash();
 
-   mc_LogFileName = TGL_ChangeFileExtension(mc_ExeName, ".log");
-   mc_ListOfFilesFileName = TGL_ChangeFileExtension(mc_ExeName, "") + "_file_list.txt";
+   mc_LogFileName = TglChangeFileExtension(mc_ExeName, ".log");
+   mc_ListOfFilesFileName = TglChangeFileExtension(mc_ExeName, "") + "_file_list.txt";
 
    m_PrintBanner();
 
@@ -165,17 +164,17 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
    //configure logging engine to log to local file:
    //remove pre-existing file:
    (void)std::remove(mc_LogFileName.c_str());
-   stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
-   stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
-   stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFileName);
+   stw::opensyde_core::C_OscLoggingHandler::h_SetWriteToFileActive(true);
+   stw::opensyde_core::C_OscLoggingHandler::h_SetWriteToConsoleActive(false);
+   stw::opensyde_core::C_OscLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFileName);
    osc_write_log_info("Starting tool", mc_ExeName + " Version: " + mc_ExeVersion + ", MD5-Checksum: " + mc_BinaryHash);
 
    //try to remove list-of-files file if it already exists
-   if (stw_tgl::TGL_FileExists(mc_ListOfFilesFileName) == true)
+   if (stw::tgl::TglFileExists(mc_ListOfFilesFileName) == true)
    {
       //file does exist -> erase it
-      sn_Return = remove(mc_ListOfFilesFileName.c_str());
-      if (sn_Return != 0)
+      u32_Return = remove(mc_ListOfFilesFileName.c_str());
+      if (u32_Return != 0)
       {
          e_Return = eRESULT_ERASE_FILE_LIST_ERROR;
       }
@@ -197,12 +196,12 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Init(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{952}  the function getopt_long expects a non const opacn_Argv parameter
-C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const sintn osn_Argc,
-                                                                        charn * const opacn_Argv[])
+C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const int32_t os32_Argc,
+                                                                        char_t * const opacn_Argv[])
 {
    E_ResultCode e_Return = eRESULT_OK;
-   sintn sn_Result;
-   C_SCLString c_Info = "";
+   int32_t s32_Result;
+   C_SclString c_Info = "";
    bool q_PrintCommandLineParameters = false;
    bool q_ParseError = false;
 
@@ -240,12 +239,12 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
 
    do
    {
-      sintn sn_Index;
+      int32_t s32_Index;
 
-      sn_Result = getopt_long(osn_Argc, opacn_Argv, "s:d:o:n:a:he", &ac_Options[0], &sn_Index);
-      if (sn_Result != -1)
+      s32_Result = getopt_long(os32_Argc, opacn_Argv, "s:d:o:n:a:he", &ac_Options[0], &s32_Index);
+      if (s32_Result != -1)
       {
-         switch (sn_Result)
+         switch (s32_Result)
          {
          case 'd':
             c_Info = "Information: Command line parameter --devicedefinition ignored "
@@ -280,7 +279,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
          }
       }
    }
-   while (sn_Result != -1);
+   while (s32_Result != -1);
 
    // Print command line parameters to the console?
    if (q_PrintCommandLineParameters == true)
@@ -326,8 +325,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::ParseCommandLine(const si
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void)
 {
    E_ResultCode e_Return = eRESULT_OK;
-   sint32 s32_Return;
-   const C_SCLString * pc_DeviceToLoad = NULL;
+   int32_t s32_Return;
+   const C_SclString * pc_DeviceToLoad = NULL;
 
    //single device operation ?
    if (mc_DeviceName != "")
@@ -340,7 +339,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
       // Load whole system definition (keep pointer to NULL)
    }
 
-   s32_Return = C_OSCSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_SystemDefinition,
+   s32_Return = C_OscSystemDefinitionFiler::h_LoadSystemDefinitionFile(mc_SystemDefinition,
                                                                        mc_SystemDefinitionFilePath, "",
                                                                        false, NULL, NULL, false, pc_DeviceToLoad);
 
@@ -374,8 +373,8 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::LoadSystemDefinition(void
    eRESULT_APPLICATION_UNKNOWN_CODE_VERSION  at least one application has unknown code structure version
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_OSCNode & orc_Node,
-                                                                        const C_SCLString & orc_OutputPath)
+C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_OscNode & orc_Node,
+                                                                        const C_SclString & orc_OutputPath)
 {
    const bool q_OneApplicationOnly = (mc_ApplicationName != "");
    E_ResultCode e_Return = eRESULT_OK;
@@ -384,28 +383,28 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
    if (q_OneApplicationOnly == true)
    {
       bool q_Found = false;
-      for (uint32 u32_Application = 0U; u32_Application < orc_Node.c_Applications.size(); u32_Application++)
+      for (uint32_t u32_Application = 0U; u32_Application < orc_Node.c_Applications.size(); u32_Application++)
       {
-         const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[u32_Application];
+         const C_OscNodeApplication & rc_Application = orc_Node.c_Applications[u32_Application];
 
          if (rc_Application.c_Name.UpperCase() == mc_ApplicationName.UpperCase())
          {
-            std::vector<C_SCLString> c_CreatedFiles;
-            if ((rc_Application.e_Type != C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) &&
-                (rc_Application.e_Type != C_OSCNodeApplication::ePARAMETER_SET_HALC))
+            std::vector<C_SclString> c_CreatedFiles;
+            if ((rc_Application.e_Type != C_OscNodeApplication::ePROGRAMMABLE_APPLICATION) &&
+                (rc_Application.e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC))
             {
                e_Return = eRESULT_APPLICATION_NOT_PROGRAMMABLE;
                this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application, false,
                                                     c_CreatedFiles);
             }
-            else if (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+            else if (rc_Application.u16_GenCodeVersion > C_OscNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
             {
                this->m_PrintCodeFormatUnknownInfo(orc_Node.c_Properties.c_Name, rc_Application);
                e_Return = eRESULT_APPLICATION_UNKNOWN_CODE_VERSION;
             }
             else
             {
-               e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application),
+               e_Return = m_CreateApplicationCode(orc_Node, static_cast<uint16_t>(u32_Application),
                                                   orc_OutputPath, c_CreatedFiles);
 
                this->m_PrintCodeCreationInformation(orc_Node.c_Properties.c_Name, rc_Application,
@@ -423,27 +422,28 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
    else
    {
       bool q_AtLeastOne = false;
-      for (uint32 u32_Application = 0U; (u32_Application < orc_Node.c_Applications.size()) && (e_Return == eRESULT_OK);
+      for (uint32_t u32_Application =
+              0U; (u32_Application < orc_Node.c_Applications.size()) && (e_Return == eRESULT_OK);
            u32_Application++)
       {
-         const C_OSCNodeApplication & rc_Application = orc_Node.c_Applications[u32_Application];
-         if ((rc_Application.e_Type == C_OSCNodeApplication::ePROGRAMMABLE_APPLICATION) ||
-             (rc_Application.e_Type == C_OSCNodeApplication::ePARAMETER_SET_HALC))
+         const C_OscNodeApplication & rc_Application = orc_Node.c_Applications[u32_Application];
+         if ((rc_Application.e_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION) ||
+             (rc_Application.e_Type == C_OscNodeApplication::ePARAMETER_SET_HALC))
          {
-            std::vector<C_SCLString> c_CreatedFiles;
+            std::vector<C_SclString> c_CreatedFiles;
             q_AtLeastOne = true;
-            if (rc_Application.u16_GenCodeVersion > C_OSCNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
+            if (rc_Application.u16_GenCodeVersion > C_OscNodeApplication::hu16_HIGHEST_KNOWN_CODE_VERSION)
             {
                this->m_PrintCodeFormatUnknownInfo(orc_Node.c_Properties.c_Name, rc_Application);
                e_Return = eRESULT_APPLICATION_UNKNOWN_CODE_VERSION;
             }
             else
             {
-               const C_SCLString c_Path =
-                  TGL_FileIncludeTrailingDelimiter(orc_OutputPath) +
-                  C_OSCUtils::h_NiceifyStringForFileName(rc_Application.c_Name);
+               const C_SclString c_Path =
+                  TglFileIncludeTrailingDelimiter(orc_OutputPath) +
+                  C_OscUtils::h_NiceifyStringForFileName(rc_Application.c_Name);
                e_Return =
-                  m_CreateApplicationCode(orc_Node, static_cast<uint16>(u32_Application), c_Path,
+                  m_CreateApplicationCode(orc_Node, static_cast<uint16_t>(u32_Application), c_Path,
                                           c_CreatedFiles);
                if (e_Return == eRESULT_OK)
                {
@@ -460,7 +460,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
       }
       if (q_AtLeastOne == false)
       {
-         const C_SCLString c_Info = "Not generating code for device \"" + orc_Node.c_Properties.c_Name +
+         const C_SclString c_Info = "Not generating code for device \"" + orc_Node.c_Properties.c_Name +
                                     "\" as it has no programmable application defined.";
          std::cout << c_Info.c_str() << &std::endl;
          osc_write_log_info("Code Generation", c_Info);
@@ -469,7 +469,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
 
    if (e_Return != eRESULT_OK)
    {
-      const C_SCLString c_Info = "Error occured on code generation for device \"" + orc_Node.c_Properties.c_Name +
+      const C_SclString c_Info = "Error occured on code generation for device \"" + orc_Node.c_Properties.c_Name +
                                  "\". Stopped code generation.";
       std::cout << c_Info.c_str() << &std::endl;
       osc_write_log_error("Code Generation", c_Info);
@@ -485,12 +485,12 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::m_CreateNodeCode(const C_
    \param[in]       orc_Application          Application information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OsyCodeExportBase::m_PrintCodeFormatUnknownInfo(const C_SCLString & orc_NodeName,
-                                                       const C_OSCNodeApplication & orc_Application)
+void C_OsyCodeExportBase::m_PrintCodeFormatUnknownInfo(const C_SclString & orc_NodeName,
+                                                       const stw::opensyde_core::C_OscNodeApplication & orc_Application)
 {
-   std::vector<C_SCLString> c_CreatedFiles; // not used but necessary for m_PrintCodeCreationInformation
-   const C_SCLString c_Info = "Code version 0x" +
-                              C_SCLString::IntToHex(orc_Application.u16_GenCodeVersion, 4U) + " is unknown.";
+   std::vector<C_SclString> c_CreatedFiles; // not used but necessary for m_PrintCodeCreationInformation
+   const C_SclString c_Info = "Code version 0x" +
+                              C_SclString::IntToHex(orc_Application.u16_GenCodeVersion, 4U) + " is unknown.";
    this->m_PrintCodeCreationInformation(orc_NodeName, orc_Application, false, c_CreatedFiles);
 
    std::cout << c_Info.c_str() << &std::endl;
@@ -506,12 +506,12 @@ void C_OsyCodeExportBase::m_PrintCodeFormatUnknownInfo(const C_SCLString & orc_N
    \param[in]       orc_CreatedFiles         List of generated files (only valid if oq_GenerationSuccessful is true)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OsyCodeExportBase::m_PrintCodeCreationInformation(const C_SCLString & orc_NodeName,
-                                                         const C_OSCNodeApplication & orc_Application,
+void C_OsyCodeExportBase::m_PrintCodeCreationInformation(const C_SclString & orc_NodeName,
+                                                         const C_OscNodeApplication & orc_Application,
                                                          const bool oq_GenerationSuccessful,
-                                                         std::vector<C_SCLString> & orc_CreatedFiles)
+                                                         std::vector<C_SclString> & orc_CreatedFiles)
 {
-   C_SCLString c_Text;
+   C_SclString c_Text;
 
    if (oq_GenerationSuccessful == true)
    {
@@ -522,12 +522,12 @@ void C_OsyCodeExportBase::m_PrintCodeCreationInformation(const C_SCLString & orc
       c_Text += "Could not generate code ";
    }
    c_Text += "for device \"" + orc_NodeName + "\" application \"" + orc_Application.c_Name +
-             "\" in code format version 0x" + C_SCLString::IntToHex(orc_Application.u16_GenCodeVersion, 4U) + ".";
+             "\" in code format version 0x" + C_SclString::IntToHex(orc_Application.u16_GenCodeVersion, 4U) + ".";
 
    if (oq_GenerationSuccessful == true)
    {
       c_Text += "\nGenerated files:";
-      for (uint32 u32_File = 0U; u32_File < orc_CreatedFiles.size(); u32_File++)
+      for (uint32_t u32_File = 0U; u32_File < orc_CreatedFiles.size(); u32_File++)
       {
          c_Text += "\n " + orc_CreatedFiles[u32_File];
          //append list of files:
@@ -578,15 +578,15 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
    //erase target folder if requested
    if (mq_EraseTargetFolder == true)
    {
-      if (TGL_DirectoryExists(mc_OutputPath) == true)
+      if (TglDirectoryExists(mc_OutputPath) == true)
       {
-         sint32 s32_Return;
-         C_SCLString c_Info = "Clearing pre-existing target folder (" + mc_OutputPath + ").";
+         int32_t s32_Return;
+         C_SclString c_Info = "Clearing pre-existing target folder (" + mc_OutputPath + ").";
          std::cout << c_Info.c_str() << &std::endl;
          osc_write_log_info("Code Generation", c_Info);
 
          //remove all folder contents (but keep folder itself)
-         s32_Return = TGL_RemoveDirectory(mc_OutputPath, true);
+         s32_Return = TglRemoveDirectory(mc_OutputPath, true);
          if (s32_Return != 0)
          {
             c_Info = "Could not clear pre-existing target folder (" + mc_OutputPath + ").";
@@ -599,15 +599,15 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
    }
    else
    {
-      if (TGL_DirectoryExists(mc_OutputPath) == false)
+      if (TglDirectoryExists(mc_OutputPath) == false)
       {
-         sint32 s32_Return;
-         C_SCLString c_Info = "Creating target folder (" + mc_OutputPath + ").";
+         int32_t s32_Return;
+         C_SclString c_Info = "Creating target folder (" + mc_OutputPath + ").";
          std::cout << c_Info.c_str() << &std::endl;
          osc_write_log_info("Code Generation", c_Info);
 
          //create target folder if required:
-         s32_Return = C_OSCUtils::h_CreateFolderRecursively(mc_OutputPath);
+         s32_Return = C_OscUtils::h_CreateFolderRecursively(mc_OutputPath);
          if (s32_Return != C_NO_ERR)
          {
             c_Info = "Could not create target folder (" + mc_OutputPath + ").";
@@ -625,13 +625,13 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
       if (q_OneNodeOnly == true)
       {
          bool q_Found = false;
-         for (uint32 u32_Node = 0U; u32_Node < mc_SystemDefinition.c_Nodes.size(); u32_Node++)
+         for (uint32_t u32_Node = 0U; u32_Node < mc_SystemDefinition.c_Nodes.size(); u32_Node++)
          {
-            const C_OSCNode & rc_Node = mc_SystemDefinition.c_Nodes[u32_Node];
+            const C_OscNode & rc_Node = mc_SystemDefinition.c_Nodes[u32_Node];
             if (rc_Node.c_Properties.c_Name.UpperCase() == mc_DeviceName.UpperCase())
             {
                q_Found = true;
-               if ((rc_Node.c_Properties.e_DiagnosticServer != C_OSCNodeProperties::eDS_OPEN_SYDE))
+               if ((rc_Node.c_Properties.e_DiagnosticServer != C_OscNodeProperties::eDS_OPEN_SYDE))
                {
                   e_Return = eRESULT_DEVICE_NOT_COMPATIBLE;
                }
@@ -650,13 +650,13 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
       else
       {
          //generate code for all nodes
-         for (uint32 u32_Node = 0U; u32_Node < mc_SystemDefinition.c_Nodes.size(); u32_Node++)
+         for (uint32_t u32_Node = 0U; u32_Node < mc_SystemDefinition.c_Nodes.size(); u32_Node++)
          {
-            const C_OSCNode & rc_Node = mc_SystemDefinition.c_Nodes[u32_Node];
-            if ((rc_Node.c_Properties.e_DiagnosticServer == C_OSCNodeProperties::eDS_OPEN_SYDE))
+            const C_OscNode & rc_Node = mc_SystemDefinition.c_Nodes[u32_Node];
+            if ((rc_Node.c_Properties.e_DiagnosticServer == C_OscNodeProperties::eDS_OPEN_SYDE))
             {
-               const C_SCLString c_Path = TGL_FileIncludeTrailingDelimiter(mc_OutputPath) +
-                                          C_OSCUtils::h_NiceifyStringForFileName(rc_Node.c_Properties.c_Name);
+               const C_SclString c_Path = TglFileIncludeTrailingDelimiter(mc_OutputPath) +
+                                          C_OscUtils::h_NiceifyStringForFileName(rc_Node.c_Properties.c_Name);
                e_Return = m_CreateNodeCode(mc_SystemDefinition.c_Nodes[u32_Node], c_Path);
                if (e_Return != eRESULT_OK)
                {
@@ -665,7 +665,7 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
             }
             else
             {
-               const C_SCLString c_Info = "Not generating code for device \"" + rc_Node.c_Properties.c_Name +
+               const C_SclString c_Info = "Not generating code for device \"" + rc_Node.c_Properties.c_Name +
                                           "\" as it is not an openSYDE node.";
                std::cout << c_Info.c_str() << &std::endl;
                osc_write_log_info("Code Generation", c_Info);
@@ -688,15 +688,15 @@ C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::GenerateSourceCode(void)
 C_OsyCodeExportBase::E_ResultCode C_OsyCodeExportBase::Exit(const E_ResultCode oe_ResultCode)
 {
    //print enum as number; so the user can see what he/she would need to check for as ERRORLEVEL
-   C_SCLString c_Text = "Tool result code: " +
-                        C_SCLString::IntToStr(oe_ResultCode) + " "; //lint !e641  see comment above
+   C_SclString c_Text = "Tool result code: " +
+                        C_SclString::IntToStr(oe_ResultCode) + " "; //lint !e641  see comment above
    E_ResultCode e_Return = oe_ResultCode;
 
    if (oe_ResultCode == C_OsyCodeExportBase::eRESULT_OK)
    {
       //write list of created files to file:
-      C_SCLStringList c_List;
-      for (uint32 u32_String = 0U; u32_String < mc_CreatedFiles.size(); u32_String++)
+      C_SclStringList c_List;
+      for (uint32_t u32_String = 0U; u32_String < mc_CreatedFiles.size(); u32_String++)
       {
          c_List.Add(mc_CreatedFiles[u32_String]);
       }

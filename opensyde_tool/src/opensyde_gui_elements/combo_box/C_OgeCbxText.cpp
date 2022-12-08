@@ -10,14 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OgeCbxText.h"
-#include "C_OgeWiUtil.h"
+#include "C_OgeCbxText.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -56,7 +56,7 @@ C_OgeCbxTextLineEdit::C_OgeCbxTextLineEdit(QWidget * const opc_Parent) :
 C_OgeCbxText::C_OgeCbxText(QWidget * const opc_Parent) :
    C_OgeCbxIconOnly(opc_Parent),
    mc_TemporaryText(""),
-   msn_TemporaryIndex(-1),
+   ms32_TemporaryIndex(-1),
    mq_Error(false),
    mq_SuppressHide(false)
 {
@@ -81,22 +81,22 @@ void C_OgeCbxText::SetTemporaryText(const QString & orc_Text, const bool oq_Erro
    if (this->mc_TemporaryText != "")
    {
       // remove the old text
-      this->removeItem(this->msn_TemporaryIndex);
-      this->msn_TemporaryIndex = -1;
+      this->removeItem(this->ms32_TemporaryIndex);
+      this->ms32_TemporaryIndex = -1;
    }
 
    this->mc_TemporaryText = orc_Text;
 
    if (this->mc_TemporaryText != "")
    {
-      this->msn_TemporaryIndex = this->findText(this->mc_TemporaryText);
-      if (this->msn_TemporaryIndex < 0)
+      this->ms32_TemporaryIndex = this->findText(this->mc_TemporaryText);
+      if (this->ms32_TemporaryIndex < 0)
       {
          // add the new temporary text if it is not here yet
          this->addItem(this->mc_TemporaryText);
-         this->msn_TemporaryIndex = this->findText(this->mc_TemporaryText);
+         this->ms32_TemporaryIndex = this->findText(this->mc_TemporaryText);
       }
-      this->setCurrentIndex(this->msn_TemporaryIndex);
+      this->setCurrentIndex(this->ms32_TemporaryIndex);
    }
 
    this->mq_Error = oq_Error;
@@ -126,7 +126,7 @@ void C_OgeCbxText::showPopup(void)
       this->setEditable(true);
 
       // Remove the temporary item. When showing all items in the combo box list, the temporary item shall not be showed
-      this->removeItem(this->msn_TemporaryIndex);
+      this->removeItem(this->ms32_TemporaryIndex);
 
       this->setLineEdit(pc_Edit);
       this->lineEdit()->setReadOnly(true);
@@ -146,14 +146,14 @@ void C_OgeCbxText::hidePopup(void)
    {
       if (this->mc_TemporaryText != "")
       {
-         this->msn_TemporaryIndex = this->findText(this->mc_TemporaryText);
-         if (this->msn_TemporaryIndex < 0)
+         this->ms32_TemporaryIndex = this->findText(this->mc_TemporaryText);
+         if (this->ms32_TemporaryIndex < 0)
          {
             // Add the item again if it was not added already again
             this->addItem(this->mc_TemporaryText);
-            this->msn_TemporaryIndex = this->findText(this->mc_TemporaryText);
+            this->ms32_TemporaryIndex = this->findText(this->mc_TemporaryText);
          }
-         this->setCurrentIndex(this->msn_TemporaryIndex);
+         this->setCurrentIndex(this->ms32_TemporaryIndex);
 
          this->setEditable(false);
 
@@ -184,9 +184,9 @@ void C_OgeCbxText::m_Activated(const QString & orc_Text)
       this->setCurrentText(orc_Text);
 
       // Remove the temporary text and its error
-      this->removeItem(this->msn_TemporaryIndex);
+      this->removeItem(this->ms32_TemporaryIndex);
       this->mc_TemporaryText = "";
-      this->msn_TemporaryIndex = -1;
+      this->ms32_TemporaryIndex = -1;
 
       if (this->mq_Error == true)
       {

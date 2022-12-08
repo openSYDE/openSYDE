@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "gitypes.h"
-#include "TGLUtils.h"
-#include "stwtypes.h"
-#include "constants.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_SyvDaDashboardScene.h"
-#include "C_SyvDaUnoAddCommand.h"
+#include "gitypes.hpp"
+#include "TglUtils.hpp"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvDaDashboardScene.hpp"
+#include "C_SyvDaUnoAddCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,28 +42,27 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief   Default constructor for adding a generic element
 
    \param[in,out] opc_Scene                         Pointer to currently active scene
-   \param[in]     orc_IDs                           Affected unique IDs
+   \param[in]     orc_Ids                           Affected unique IDs
    \param[in]     ore_Type                          Item type
    \param[in]     orc_NewPos                        New position
-   \param[in]     of64_ZValue                       Z value
+   \param[in]     of64_ZetValue                       Z value
    \param[in]     orc_AdditionalInformation         Additional string information
    \param[in,out] opc_Parent                        Optional pointer to parent
    \param[in]     orq_ForceUseAdditionalInformation Optional flag to force use of additional string information
    \param[in]     orq_DarkModeDefault               Optional flag to change default values
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaUnoAddCommand::C_SyvDaUnoAddCommand(QGraphicsScene * const opc_Scene,
-                                           const std::vector<stw_types::uint64> & orc_IDs,
+C_SyvDaUnoAddCommand::C_SyvDaUnoAddCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
                                            const C_PuiSvDbDataElement::E_Type & ore_Type, const QPointF & orc_NewPos,
-                                           const float64 of64_ZValue, const QString & orc_AdditionalInformation,
+                                           const float64_t of64_ZetValue, const QString & orc_AdditionalInformation,
                                            QUndoCommand * const opc_Parent,
                                            const bool & orq_ForceUseAdditionalInformation,
                                            const bool & orq_DarkModeDefault) :
-   C_SyvDaUnoAddBaseCommand(opc_Scene, orc_IDs, "Add drawing element(s)",
+   C_SyvDaUnoAddBaseCommand(opc_Scene, orc_Ids, "Add drawing element(s)",
                             opc_Parent),
    me_Type(ore_Type),
    mc_NewPos(orc_NewPos),
-   mf64_ZValue(of64_ZValue),
+   mf64_ZetValue(of64_ZetValue),
    mc_AdditionalInformation(orc_AdditionalInformation),
    mq_ForceUseAdditionalInformation(orq_ForceUseAdditionalInformation),
    mq_DarkModeDefault(orq_DarkModeDefault)
@@ -89,10 +87,10 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
 
    if (pc_Scene != NULL)
    {
-      const std::vector<stw_types::uint64> c_IDs = this->m_GetIDs();
-      if (c_IDs.size() > 0)
+      const std::vector<uint64_t> c_Ids = this->m_GetIds();
+      if (c_Ids.size() > 0)
       {
-         QMap<C_PuiBsTemporaryDataID, uint64> c_IDMap;
+         QMap<C_PuiBsTemporaryDataId, uint64_t> c_IdMap;
          C_PuiSvDashboard c_InitialData;
          C_PuiSvDbLabel c_LabelData;
          C_PuiSvDbParam c_ParamWidgetData;
@@ -112,8 +110,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_LabelData, this->mc_AdditionalInformation);
             //Specific settings
-            c_LabelData.f64_ZOrder = this->mf64_ZValue;
-            c_LabelData.c_UIPosition = mc_NewPos;
+            c_LabelData.f64_ZetOrder = this->mf64_ZetValue;
+            c_LabelData.c_UiPosition = mc_NewPos;
             c_LabelData.f64_Height = 84.0;
             c_LabelData.f64_Width = 150.0;
             tgl_assert(c_InitialData.AddWidget(&c_LabelData, this->me_Type) == C_NO_ERR);
@@ -123,8 +121,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Fix
             c_ParamWidgetData.e_DisplayStyle = C_PuiSvDbWidgetBase::eOPENSYDE;
             //Specific settings
-            c_ParamWidgetData.f64_ZOrder = this->mf64_ZValue;
-            c_ParamWidgetData.c_UIPosition = mc_NewPos;
+            c_ParamWidgetData.f64_ZetOrder = this->mf64_ZetValue;
+            c_ParamWidgetData.c_UiPosition = mc_NewPos;
             c_ParamWidgetData.f64_Height = 246.0;
             c_ParamWidgetData.f64_Width = 981.0;
             tgl_assert(c_InitialData.AddWidget(&c_ParamWidgetData, this->me_Type) == C_NO_ERR);
@@ -133,8 +131,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_PieChartData, this->mc_AdditionalInformation);
             //Specific settings
-            c_PieChartData.f64_ZOrder = this->mf64_ZValue;
-            c_PieChartData.c_UIPosition = mc_NewPos;
+            c_PieChartData.f64_ZetOrder = this->mf64_ZetValue;
+            c_PieChartData.c_UiPosition = mc_NewPos;
             c_PieChartData.f64_Height = 150.0;
             c_PieChartData.f64_Width = 150.0;
             tgl_assert(c_InitialData.AddWidget(&c_PieChartData, this->me_Type) == C_NO_ERR);
@@ -143,8 +141,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_SpinBoxData, this->mc_AdditionalInformation);
             //Specific settings
-            c_SpinBoxData.f64_ZOrder = this->mf64_ZValue;
-            c_SpinBoxData.c_UIPosition = mc_NewPos;
+            c_SpinBoxData.f64_ZetOrder = this->mf64_ZetValue;
+            c_SpinBoxData.c_UiPosition = mc_NewPos;
             c_SpinBoxData.f64_Height = 60.0;
             c_SpinBoxData.f64_Width = 200.0;
             c_InitialData.AddWidget(&c_SpinBoxData, this->me_Type);
@@ -153,8 +151,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_SliderData, this->mc_AdditionalInformation);
             //Specific settings
-            c_SliderData.f64_ZOrder = this->mf64_ZValue;
-            c_SliderData.c_UIPosition = mc_NewPos;
+            c_SliderData.f64_ZetOrder = this->mf64_ZetValue;
+            c_SliderData.c_UiPosition = mc_NewPos;
             c_SliderData.f64_Height = 40.0;
             c_SliderData.f64_Width = 400.0 * (7.0 / 9.0);
             c_InitialData.AddWidget(&c_SliderData, this->me_Type);
@@ -163,8 +161,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_TableData, this->mc_AdditionalInformation);
             //Specific settings
-            c_TableData.f64_ZOrder = this->mf64_ZValue;
-            c_TableData.c_UIPosition = mc_NewPos;
+            c_TableData.f64_ZetOrder = this->mf64_ZetValue;
+            c_TableData.c_UiPosition = mc_NewPos;
             c_TableData.f64_Height = 120.0;
             c_TableData.f64_Width = 511.0;
             c_InitialData.AddWidget(&c_TableData, this->me_Type);
@@ -173,8 +171,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_ProgressBarData, this->mc_AdditionalInformation);
             //Specific settings
-            c_ProgressBarData.f64_ZOrder = this->mf64_ZValue;
-            c_ProgressBarData.c_UIPosition = mc_NewPos;
+            c_ProgressBarData.f64_ZetOrder = this->mf64_ZetValue;
+            c_ProgressBarData.c_UiPosition = mc_NewPos;
             c_ProgressBarData.f64_Height = 100.0;
             c_ProgressBarData.f64_Width = 100.0;
             c_ProgressBarData.e_Type = C_PuiSvDbProgressBar::eTYPE_2;
@@ -185,42 +183,42 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             //Theme
             mh_DecodeTheme(c_ToggleData, this->mc_AdditionalInformation);
             //Specific settings
-            c_ToggleData.f64_ZOrder = this->mf64_ZValue;
-            c_ToggleData.c_UIPosition = mc_NewPos;
+            c_ToggleData.f64_ZetOrder = this->mf64_ZetValue;
+            c_ToggleData.c_UiPosition = mc_NewPos;
             c_ToggleData.f64_Height = 50.0;
             c_ToggleData.f64_Width = 83.0;
             c_InitialData.AddWidget(&c_ToggleData, this->me_Type);
             break;
          case C_PuiSvDbDataElement::eLINE_ARROW:
-            c_LineArrowData.f64_ZOrder = this->mf64_ZValue;
-            c_LineArrowData.c_UIInteractionPoints.push_back(mc_NewPos);
-            c_LineArrowData.c_UIInteractionPoints.push_back(mc_NewPos + QPointF(200.0, 0.0));
+            c_LineArrowData.f64_ZetOrder = this->mf64_ZetValue;
+            c_LineArrowData.c_UiInteractionPoints.push_back(mc_NewPos);
+            c_LineArrowData.c_UiInteractionPoints.push_back(mc_NewPos + QPointF(200.0, 0.0));
             c_InitialData.AddLineArrow(c_LineArrowData);
             break;
          case C_PuiSvDbDataElement::eBOUNDARY:
-            c_BoundaryData.c_UIPosition = mc_NewPos;
+            c_BoundaryData.c_UiPosition = mc_NewPos;
             c_BoundaryData.f64_Height = 100.0;
             c_BoundaryData.f64_Width = 100.0;
-            c_BoundaryData.f64_ZOrder = this->mf64_ZValue;
+            c_BoundaryData.f64_ZetOrder = this->mf64_ZetValue;
             c_InitialData.AddBoundary(c_BoundaryData);
             break;
          case C_PuiSvDbDataElement::eTEXT_ELEMENT:
-            c_TextData.f64_ZOrder = this->mf64_ZValue;
-            c_TextData.c_UIPosition = mc_NewPos;
+            c_TextData.f64_ZetOrder = this->mf64_ZetValue;
+            c_TextData.c_UiPosition = mc_NewPos;
             c_TextData.f64_Height = 50.0;
             c_TextData.f64_Width = 50.0;
-            c_TextData.c_UIText = this->mc_AdditionalInformation;
+            c_TextData.c_UiText = this->mc_AdditionalInformation;
             c_InitialData.AddTextElement(c_TextData);
             break;
          case C_PuiSvDbDataElement::eIMAGE:
             if (this->mc_AdditionalInformation.compare("") != 0)
             {
                const QPixmap c_Image(this->mc_AdditionalInformation);
-               c_ImageData.c_UIPosition = mc_NewPos;
-               c_ImageData.f64_Height = static_cast<float64>(c_Image.height());
-               c_ImageData.f64_Width = static_cast<float64>(c_Image.width());
-               c_ImageData.c_UIImagePixmap = c_Image;
-               c_ImageData.f64_ZOrder = this->mf64_ZValue;
+               c_ImageData.c_UiPosition = mc_NewPos;
+               c_ImageData.f64_Height = static_cast<float64_t>(c_Image.height());
+               c_ImageData.f64_Width = static_cast<float64_t>(c_Image.width());
+               c_ImageData.c_UiImagePixmap = c_Image;
+               c_ImageData.f64_ZetOrder = this->mf64_ZetValue;
                c_InitialData.AddImage(c_ImageData);
             }
             break;
@@ -232,8 +230,8 @@ void C_SyvDaUnoAddCommand::m_AddNew(void)
             break;
          }
          //ID map
-         c_IDMap.insert(C_PuiBsTemporaryDataID(static_cast<sint32>(this->me_Type), 0), c_IDs[0]);
-         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &c_IDMap);
+         c_IdMap.insert(C_PuiBsTemporaryDataId(static_cast<int32_t>(this->me_Type), 0), c_Ids[0]);
+         pc_Scene->CopyFromSnapshotToScene(c_InitialData, &c_IdMap);
       }
    }
 }

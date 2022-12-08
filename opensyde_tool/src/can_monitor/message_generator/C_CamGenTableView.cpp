@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QSpinBox>
 #include <QFileInfo>
@@ -18,33 +18,32 @@
 #include <QHeaderView>
 #include <QApplication>
 
-#include "C_Uti.h"
-#include "TGLTime.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "cam_constants.h"
-#include "C_CamDbHandler.h"
-#include "C_CamGenSigUtil.h"
-#include "C_CamProHandler.h"
-#include "C_CamGenTableView.h"
-#include "C_CamGenKeySelect.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_CamMosDatabaseSelectionPopup.h"
-#include "C_OSCNodeDataPoolContentUtil.h"
+#include "C_Uti.hpp"
+#include "TglTime.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "cam_constants.hpp"
+#include "C_CamDbHandler.hpp"
+#include "C_CamGenSigUtil.hpp"
+#include "C_CamProHandler.hpp"
+#include "C_CamGenTableView.hpp"
+#include "C_CamGenKeySelect.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_CamMosDatabaseSelectionPopup.hpp"
+#include "C_OscNodeDataPoolContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_CamGenTableView::mhsn_COL_WIDTH_DATA = 170;
+const int32_t C_CamGenTableView::mhs32_COL_WIDTH_DATA = 170;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -72,7 +71,7 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    QItemSelectionModel * const pc_LastSelectionModel = this->selectionModel();
 
    this->mc_SortProxyModel.setSourceModel(&mc_Model);
-   this->mc_SortProxyModel.setSortRole(msn_USER_ROLE_SORT);
+   this->mc_SortProxyModel.setSortRole(ms32_USER_ROLE_SORT);
    this->C_CamGenTableView::setModel(&mc_SortProxyModel);
    //Delete last selection model, see Qt documentation for setModel
    delete pc_LastSelectionModel;
@@ -102,7 +101,7 @@ C_CamGenTableView::C_CamGenTableView(QWidget * const opc_Parent) :
    this->mpc_PushButtonScrollTop->SetCustomIcons("://images/HeadingPart.svg", "", "", "");
 
    connect(&this->mc_Model, &C_CamGenTableModel::SigItemCountChanged, this, &C_CamGenTableView::SigItemCountChanged);
-   connect(&this->mc_Model, &C_CamGenTableModel::SigUpdateMessageDLC, this, &C_CamGenTableView::SigUpdateMessageDLC);
+   connect(&this->mc_Model, &C_CamGenTableModel::SigUpdateMessageDlc, this, &C_CamGenTableView::SigUpdateMessageDlc);
    connect(&this->mc_Model, &C_CamGenTableModel::SigRegisterCyclicMessage, this,
            &C_CamGenTableView::m_ModelRegisterCyclicMessage);
    connect(this, &C_CamGenTableView::SigLinkClicked, this, &C_CamGenTableView::m_HandleLinkClicked);
@@ -134,7 +133,7 @@ void C_CamGenTableView::AddMessageFromDatabase(void)
    c_New->SetSize(QSize(700, 800));
 
    // Update settings on accept
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       QApplication::setOverrideCursor(Qt::WaitCursor);
       const std::vector<std::array<QString, 2> > c_SelectedItems = pc_Dialog->GetSelectedDataElements();
@@ -155,7 +154,7 @@ void C_CamGenTableView::AddMessageFromDatabase(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::AddMessage(void)
 {
-   uint32 u32_Item;
+   uint32_t u32_Item;
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    u32_Item = this->mc_Model.AddNewItem(this->m_GetSelectedRows());
@@ -181,7 +180,7 @@ void C_CamGenTableView::CopyMessage(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::PasteMessage(void)
 {
-   std::vector<uint32> c_Items;
+   std::vector<uint32_t> c_Items;
    QApplication::setOverrideCursor(Qt::WaitCursor);
    c_Items = this->mc_Model.PasteItems(this->m_GetSelectedRows());
    this->m_HandleNewItemScrollingAndSelection(c_Items);
@@ -194,8 +193,8 @@ void C_CamGenTableView::PasteMessage(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::CutMessage(void)
 {
-   uint32 u32_NewSelection;
-   const std::vector<uint32> c_Selection = this->m_GetSelectedRows();
+   uint32_t u32_NewSelection;
+   const std::vector<uint32_t> c_Selection = this->m_GetSelectedRows();
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    m_StopCyclicCommunication(c_Selection);
@@ -210,8 +209,8 @@ void C_CamGenTableView::CutMessage(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::DeleteMessage(void)
 {
-   uint32 u32_NewSelection;
-   const std::vector<uint32> c_Selection = this->m_GetSelectedRows();
+   uint32_t u32_NewSelection;
+   const std::vector<uint32_t> c_Selection = this->m_GetSelectedRows();
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    m_StopCyclicCommunication(c_Selection);
@@ -226,7 +225,7 @@ void C_CamGenTableView::DeleteMessage(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::MoveMessageUp(void)
 {
-   const std::vector<uint32> c_Input = this->m_GetSelectedRows();
+   const std::vector<uint32_t> c_Input = this->m_GetSelectedRows();
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    this->mc_Model.MoveSelectedItems(c_Input, true);
@@ -239,7 +238,7 @@ void C_CamGenTableView::MoveMessageUp(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::MoveMessageDown(void)
 {
-   const std::vector<uint32> c_Input = this->m_GetSelectedRows();
+   const std::vector<uint32_t> c_Input = this->m_GetSelectedRows();
 
    QApplication::setOverrideCursor(Qt::WaitCursor);
    this->mc_Model.MoveSelectedItems(c_Input, false);
@@ -252,13 +251,13 @@ void C_CamGenTableView::MoveMessageDown(void)
    \param[in]  orc_ColumnWidths  Stored column widths (Restores default values if empty)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_ColumnWidths)
+void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<int32_t> & orc_ColumnWidths)
 {
    if (orc_ColumnWidths.size() > 0)
    {
-      for (uint32 u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
+      for (uint32_t u32_ItCol = 0; u32_ItCol < orc_ColumnWidths.size(); ++u32_ItCol)
       {
-         this->setColumnWidth(static_cast<sintn>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
+         this->setColumnWidth(static_cast<int32_t>(u32_ItCol), orc_ColumnWidths[u32_ItCol]);
       }
    }
    else
@@ -269,7 +268,7 @@ void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_C
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eXTD), 52);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eRTR), 51);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDLC), 51);
-      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDATA), mhsn_COL_WIDTH_DATA);
+      this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eDATA), mhs32_COL_WIDTH_DATA);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eCYCLIC_TRIGGER), 63);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eCYCLIC_TIME), 94);
       this->setColumnWidth(C_CamGenTableModel::h_EnumToColumn(C_CamGenTableModel::eKEY), 60);
@@ -284,11 +283,11 @@ void C_CamGenTableView::SetCurrentColumnWidths(const std::vector<sint32> & orc_C
    Current column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamGenTableView::GetCurrentColumnWidths(void) const
+std::vector<int32_t> C_CamGenTableView::GetCurrentColumnWidths(void) const
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(this->model()->columnCount());
-   for (sint32 s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
+   for (int32_t s32_ItCol = 0; s32_ItCol < this->model()->columnCount(); ++s32_ItCol)
    {
       c_Retval.push_back(this->columnWidth(s32_ItCol));
    }
@@ -322,10 +321,9 @@ void C_CamGenTableView::LoadUserSettings(void)
    \param[in]  opc_Indices    Optional indices to specify which messages should be deleted instead of all
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::RemoveMessagesForFile(const QString & orc_File,
-                                              const std::vector<stw_types::uint32> * const opc_Indices)
+void C_CamGenTableView::RemoveMessagesForFile(const QString & orc_File, const std::vector<uint32_t> * const opc_Indices)
 {
-   std::vector<uint32> c_Indices;
+   std::vector<uint32_t> c_Indices;
    QApplication::setOverrideCursor(Qt::WaitCursor);
    if (opc_Indices != NULL)
    {
@@ -370,7 +368,7 @@ void C_CamGenTableView::SetCyclicActive(const bool oq_Active)
    \param[in]  ou32_MessageIndex    Message index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::UpdateMessageData(const uint32 ou32_MessageIndex)
+void C_CamGenTableView::UpdateMessageData(const uint32_t ou32_MessageIndex)
 {
    this->mc_Model.UpdateMessageData(ou32_MessageIndex);
 }
@@ -384,7 +382,7 @@ void C_CamGenTableView::UpdateMessageData(const uint32 ou32_MessageIndex)
    \param[in]  oq_Active            Change of cyclic message state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::TriggerModelUpdateCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
+void C_CamGenTableView::TriggerModelUpdateCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active)
 {
    this->mc_Model.TriggerModelUpdateCyclicMessage(ou32_MessageIndex, oq_Active);
 }
@@ -407,7 +405,7 @@ bool C_CamGenTableView::CheckAndHandleKey(const QString & orc_Input)
    if (this->mq_CommunicationActive)
    {
       //Check all messages
-      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < C_CamProHandler::h_GetInstance()->GetMessages().size();
+      for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < C_CamProHandler::h_GetInstance()->GetMessages().size();
            ++u32_ItMessage)
       {
          const C_CamProMessageData * const pc_Message =
@@ -423,7 +421,7 @@ bool C_CamGenTableView::CheckAndHandleKey(const QString & orc_Input)
                   //Don't stop here as multiple messages can have the same key
                   q_Retval = true;
                   //Trigger sending
-                  Q_EMIT (this->SigSendMessage(u32_ItMessage, TGL_GetTickCount() + pc_Message->u32_KeyPressOffset));
+                  Q_EMIT (this->SigSendMessage(u32_ItMessage, TglGetTickCount() + pc_Message->u32_KeyPressOffset));
                }
             }
          }
@@ -591,13 +589,13 @@ void C_CamGenTableView::resizeEvent(QResizeEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, const QItemSelection & orc_Deselected)
 {
-   std::vector<uint32> c_Selection;
+   std::vector<uint32_t> c_Selection;
 
    C_TblViewInteraction::selectionChanged(orc_Selected, orc_Deselected);
    c_Selection = this->m_GetSelectedRows();
    if (c_Selection.size() == 1UL)
    {
-      const uint32 u32_Size = c_Selection.size();
+      const uint32_t u32_Size = c_Selection.size();
       Q_EMIT (this->SigSelected(u32_Size, c_Selection[0UL]));
    }
    else
@@ -612,27 +610,26 @@ void C_CamGenTableView::selectionChanged(const QItemSelection & orc_Selected, co
    Will be used when resizeColumnToContents is used for the specific column.
    resizeColumnToContents is used by double click on the separator in the header too.
 
-   \param[in]  osn_Column  Index of column
+   \param[in]  os32_Column  Index of column
 
    \return
    Width of column in pixel
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamGenTableView::sizeHintForColumn(const sintn osn_Column) const
+int32_t C_CamGenTableView::sizeHintForColumn(const int32_t os32_Column) const
 {
-   sintn sn_Size;
+   int32_t s32_Size;
 
-   switch (osn_Column)
+   if (os32_Column == static_cast<int32_t>(C_CamGenTableModel::eDATA))
    {
-   case C_CamGenTableModel::eDATA:
-      sn_Size = mhsn_COL_WIDTH_DATA;
-      break;
-   default:
-      sn_Size = C_TblViewInteraction::sizeHintForColumn(osn_Column);
-      break;
+      s32_Size = mhs32_COL_WIDTH_DATA;
+   }
+   else
+   {
+      s32_Size = C_TblViewInteraction::sizeHintForColumn(os32_Column);
    }
 
-   return sn_Size;
+   return s32_Size;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -642,19 +639,19 @@ sintn C_CamGenTableView::sizeHintForColumn(const sintn osn_Column) const
    Selected row index
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<uint32> C_CamGenTableView::m_GetSelectedRows(void) const
+std::vector<uint32_t> C_CamGenTableView::m_GetSelectedRows(void) const
 {
-   std::vector<uint32> c_Retval;
+   std::vector<uint32_t> c_Retval;
    const QModelIndexList c_Indices = this->selectedIndexes();
 
    c_Retval.reserve(c_Indices.size());
    for (QModelIndexList::const_iterator c_It = c_Indices.begin(); c_It != c_Indices.end(); ++c_It)
    {
       const QModelIndex & rc_Index = *c_It;
-      const sint32 s32_Row = this->mc_SortProxyModel.mapToSource(rc_Index).row();
+      const int32_t s32_Row = this->mc_SortProxyModel.mapToSource(rc_Index).row();
       if (s32_Row >= 0)
       {
-         c_Retval.push_back(static_cast<uint32>(s32_Row));
+         c_Retval.push_back(static_cast<uint32_t>(s32_Row));
       }
    }
    //Unique!
@@ -675,22 +672,23 @@ void C_CamGenTableView::m_SetupContextMenu(void)
                                                                       &C_CamGenTableView::AddMessageFromDatabase);
    this->mpc_ActionAdd = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                              "Add new message"), this, &C_CamGenTableView::AddMessage,
-                                                          static_cast<sintn>(Qt::CTRL) +
-                                                          static_cast<sintn>(Qt::Key_Plus));
+                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                          static_cast<int32_t>(Qt::Key_Plus));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionCut = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                              "Cut"), this, &C_CamGenTableView::CutMessage,
-                                                          static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_X));
+                                                          static_cast<int32_t>(Qt::CTRL) +
+                                                          static_cast<int32_t>(Qt::Key_X));
    this->mpc_ActionCopy = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                               "Copy"), this, &C_CamGenTableView::CopyMessage,
-                                                           static_cast<sintn>(Qt::CTRL) +
-                                                           static_cast<sintn>(Qt::Key_C));
+                                                           static_cast<int32_t>(Qt::CTRL) +
+                                                           static_cast<int32_t>(Qt::Key_C));
    this->mpc_ActionPaste = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                "Paste"), this, &C_CamGenTableView::PasteMessage,
-                                                            static_cast<sintn>(Qt::CTRL) +
-                                                            static_cast<sintn>(Qt::Key_V));
+                                                            static_cast<int32_t>(Qt::CTRL) +
+                                                            static_cast<int32_t>(Qt::Key_V));
 
    //Deactivate move (kept for fast reactivation if necessary)
    //   this->mpc_ContextMenu->addSeparator();
@@ -698,19 +696,19 @@ void C_CamGenTableView::m_SetupContextMenu(void)
    //   this->mpc_ActionMoveUp = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
    //                                                                "Move Up"), this,
    //                                                             &C_CamGenTableView::MoveMessageUp,
-   //                                                             static_cast<sintn>(Qt::CTRL) +
-   //                                                             static_cast<sintn>(Qt::Key_Up));
+   //                                                             static_cast<int32_t>(Qt::CTRL) +
+   //                                                             static_cast<int32_t>(Qt::Key_Up));
    //   this->mpc_ActionMoveDown = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
    //                                                                  "Move Down"), this,
    //                                                               &C_CamGenTableView::MoveMessageDown,
-   //                                                               static_cast<sintn>(Qt::CTRL) +
-   //                                                               static_cast<sintn>(Qt::Key_Down));
+   //                                                               static_cast<int32_t>(Qt::CTRL) +
+   //                                                               static_cast<int32_t>(Qt::Key_Down));
 
    this->mpc_ContextMenu->addSeparator();
 
    this->mpc_ActionDelete = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                 "Delete"), this, &C_CamGenTableView::DeleteMessage,
-                                                             static_cast<sintn>(Qt::Key_Delete));
+                                                             static_cast<int32_t>(Qt::Key_Delete));
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(this, &C_CamGenTableView::customContextMenuRequested, this,
@@ -750,12 +748,12 @@ void C_CamGenTableView::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
    \param[in]  orc_Items   Rows to select, expected sorted ascending
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_SelectRange(const std::vector<uint32> & orc_Items)
+void C_CamGenTableView::m_SelectRange(const std::vector<uint32_t> & orc_Items)
 {
    if (orc_Items.size() > 0UL)
    {
       this->clearSelection();
-      for (uint32 u32_It = 0UL; u32_It < orc_Items.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < orc_Items.size(); ++u32_It)
       {
          this->m_SelectRow(orc_Items[u32_It], QItemSelectionModel::Select);
       }
@@ -768,7 +766,7 @@ void C_CamGenTableView::m_SelectRange(const std::vector<uint32> & orc_Items)
    \param[in]  ou32_Row    Row index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_SelectAndScrollToRow(const uint32 ou32_Row)
+void C_CamGenTableView::m_SelectAndScrollToRow(const uint32_t ou32_Row)
 {
    const QModelIndex c_Index = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(ou32_Row, 0));
 
@@ -799,7 +797,7 @@ void C_CamGenTableView::m_RepositionButtons(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
 {
-   const sint32 s32_Row = this->mc_SortProxyModel.mapToSource(orc_Index).row();
+   const int32_t s32_Row = this->mc_SortProxyModel.mapToSource(orc_Index).row();
 
    if (s32_Row >= 0)
    {
@@ -808,7 +806,7 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
       {
          if (this->mq_CommunicationActive)
          {
-            Q_EMIT (this->SigSendMessage(static_cast<uint32>(s32_Row), TGL_GetTickCount()));
+            Q_EMIT (this->SigSendMessage(static_cast<uint32_t>(s32_Row), TglGetTickCount()));
          }
 
          else
@@ -826,16 +824,16 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
       {
          const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
          C_CamGenKeySelect * const pc_Dialog =
-            new C_CamGenKeySelect(*c_New, static_cast<uint32>(s32_Row));
+            new C_CamGenKeySelect(*c_New, static_cast<uint32_t>(s32_Row));
 
          //Resize
          c_New->SetSize(QSize(600, 375));
 
          // Update settings on accept
-         if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+         if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {
             Q_UNUSED(pc_Dialog)
-            this->mc_Model.UpdateMessageKey(static_cast<uint32>(s32_Row));
+            this->mc_Model.UpdateMessageKey(static_cast<uint32_t>(s32_Row));
          }
          if (c_New != NULL)
          {
@@ -855,13 +853,13 @@ void C_CamGenTableView::m_HandleLinkClicked(const QModelIndex & orc_Index)
    \param[in]  orc_Items   Item indices to change the state for
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & orc_Items)
+void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32_t> & orc_Items)
 {
    //only relevant if communication active
    if ((this->mq_CommunicationActive == true) && (this->mq_CyclicTransmissionActive == true))
    {
       //Each item
-      for (uint32 u32_It = 0UL; u32_It < orc_Items.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < orc_Items.size(); ++u32_It)
       {
          const C_CamProMessageData * const pc_Message =
             C_CamProHandler::h_GetInstance()->GetMessageConst(orc_Items[u32_It]);
@@ -886,7 +884,7 @@ void C_CamGenTableView::m_StopCyclicCommunication(const std::vector<uint32> & or
    \param[in]  oq_Active            Flag if cyclic message is active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_ModelRegisterCyclicMessage(const uint32 ou32_MessageIndex, const bool oq_Active)
+void C_CamGenTableView::m_ModelRegisterCyclicMessage(const uint32_t ou32_MessageIndex, const bool oq_Active)
 {
    //only relevant if communication active or while paused
    if ((this->mq_CommunicationActive == true) && (this->mq_CyclicTransmissionActive == true))
@@ -906,14 +904,14 @@ void C_CamGenTableView::m_ModelRegisterCyclicMessage(const uint32 ou32_MessageIn
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QString, 2> > & orc_NewItems)
 {
-   std::vector<uint32> c_NewItems;
+   std::vector<uint32_t> c_NewItems;
    std::vector<C_CamProMessageData> c_NewMessages;
-   for (uint32 u32_ItNewItem = 0UL; u32_ItNewItem < orc_NewItems.size(); ++u32_ItNewItem)
+   for (uint32_t u32_ItNewItem = 0UL; u32_ItNewItem < orc_NewItems.size(); ++u32_ItNewItem)
    {
       const QFileInfo c_FileInfo(orc_NewItems[u32_ItNewItem][0UL]);
       C_CamProMessageData c_NewMessage;
 
-      std::vector<uint8> c_Bytes;
+      std::vector<uint8_t> c_Bytes;
 
       //Common attributes
       c_NewMessage.c_DataBaseFilePath = orc_NewItems[u32_ItNewItem][0UL].toStdString().c_str();
@@ -931,7 +929,7 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                                                              orc_NewItems[u32_ItNewItem][1UL]) == C_NO_ERR)
          {
             //Get data
-            const C_CieConverter::C_CIECanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetDbcMessage(
+            const C_CieConverter::C_CieCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetDbcMessage(
                orc_NewItems[u32_ItNewItem][0UL], orc_NewItems[u32_ItNewItem][1UL], false, 0UL);
             if (pc_Message != NULL)
             {
@@ -942,7 +940,7 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                c_NewMessage.u32_Id = pc_Message->u32_CanId;
 
                //Cyclic
-               if (pc_Message->e_TxMethod == C_OSCCanMessage::eTX_METHOD_CYCLIC)
+               if (pc_Message->e_TxMethod == C_OscCanMessage::eTX_METHOD_CYCLIC)
                {
                   c_NewMessage.q_DoCyclicTrigger = true;
                }
@@ -954,25 +952,25 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                //Get bytes AFTER the DLC is valid
                c_Bytes = C_CamGenSigUtil::h_ConvertRawDataFormat(c_NewMessage);
                //Init message data to signal init values
-               for (uint32 u32_ItSignal = 0UL; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
+               for (uint32_t u32_ItSignal = 0UL; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                {
-                  const C_CieConverter::C_CIECanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
-                  const C_OSCCanSignal c_OSCSignal = C_CamGenSigUtil::h_ConvertDBCToOSY(rc_Signal);
+                  const C_CieConverter::C_CieCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
+                  const C_OscCanSignal c_OscSignal = C_CamGenSigUtil::h_ConvertDbcToOsy(rc_Signal);
 
                   // set unused multiplexed signals to zero
                   // (i.e. those with mux value != 0, the initial multiplexer value)
-                  if ((rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                  if ((rc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
                       (rc_Signal.u16_MultiplexValue != 0U))
                   {
-                     C_OSCNodeDataPoolContent c_ZeroContent = rc_Signal.c_Element.c_MinValue; // init appropriately
-                     C_OSCNodeDataPoolContentUtil::h_ZeroContent(c_ZeroContent);
-                     C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OSCSignal, c_ZeroContent);
+                     C_OscNodeDataPoolContent c_ZeroContent = rc_Signal.c_Element.c_MinValue; // init appropriately
+                     C_OscNodeDataPoolContentUtil::h_ZeroContent(c_ZeroContent);
+                     C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OscSignal, c_ZeroContent);
                   }
                   else
                   {
                      if (rc_Signal.c_Element.c_DataSetValues.size() > 0UL)
                      {
-                        C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OSCSignal,
+                        C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, c_OscSignal,
                                                                   rc_Signal.c_Element.c_DataSetValues[0UL]);
                      }
                   }
@@ -996,22 +994,22 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                                                              orc_NewItems[u32_ItNewItem][1UL]) == C_NO_ERR)
          {
             //Get data
-            const C_OSCCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOSCMessage(
+            const C_OscCanMessage * const pc_Message = C_CamDbHandler::h_GetInstance()->GetOscMessage(
                orc_NewItems[u32_ItNewItem][0UL], orc_NewItems[u32_ItNewItem][1UL], false, 0UL);
-            const C_OSCNodeDataPoolList * const pc_List = C_CamDbHandler::h_GetInstance()->GetOSCList(
+            const C_OscNodeDataPoolList * const pc_List = C_CamDbHandler::h_GetInstance()->GetOscList(
                orc_NewItems[u32_ItNewItem][0UL], orc_NewItems[u32_ItNewItem][1UL], false, 0UL);
             if ((pc_Message != NULL) && (pc_List != NULL))
             {
-               std::vector<C_OSCNodeDataPoolListElement> c_DatapoolPart;
+               std::vector<C_OscNodeDataPoolListElement> c_DatapoolPart;
 
                //Copy values
                c_NewMessage.SetMessageBoolValue(C_CamProMessageData::eGBODS_EXTENDED, pc_Message->q_IsExtended);
-               c_NewMessage.u16_Dlc = static_cast<uint8>(pc_Message->u16_Dlc);
+               c_NewMessage.u16_Dlc = static_cast<uint8_t>(pc_Message->u16_Dlc);
                c_NewMessage.u32_CyclicTriggerTime = pc_Message->u32_CycleTimeMs;
                c_NewMessage.u32_Id = pc_Message->u32_CanId;
 
                //Cyclic
-               if (pc_Message->IsTransmissionTypeACyclicType())
+               if (pc_Message->IsTransmissionTypeOfCyclicType())
                {
                   c_NewMessage.q_DoCyclicTrigger = true;
                }
@@ -1023,22 +1021,22 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
                //Get bytes AFTER the DLC is valid
                c_Bytes = C_CamGenSigUtil::h_ConvertRawDataFormat(c_NewMessage);
                //Init message data to signal init values
-               for (uint32 u32_ItSignal = 0UL; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
+               for (uint32_t u32_ItSignal = 0UL; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
                {
-                  const C_OSCCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
+                  const C_OscCanSignal & rc_Signal = pc_Message->c_Signals[u32_ItSignal];
 
                   if (rc_Signal.u32_ComDataElementIndex < pc_List->c_Elements.size())
                   {
-                     const C_OSCNodeDataPoolListElement & rc_Element =
+                     const C_OscNodeDataPoolListElement & rc_Element =
                         pc_List->c_Elements[rc_Signal.u32_ComDataElementIndex];
                      c_DatapoolPart.push_back(rc_Element);
                      // set unused multiplexed signals to zero
                      // (i.e. those with mux value != 0, the initial multiplexer value)
-                     if ((rc_Signal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                     if ((rc_Signal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
                          (rc_Signal.u16_MultiplexValue != 0U))
                      {
-                        C_OSCNodeDataPoolContent c_ZeroContent = rc_Element.c_MinValue; // init appropriately
-                        C_OSCNodeDataPoolContentUtil::h_ZeroContent(c_ZeroContent);
+                        C_OscNodeDataPoolContent c_ZeroContent = rc_Element.c_MinValue; // init appropriately
+                        C_OscNodeDataPoolContentUtil::h_ZeroContent(c_ZeroContent);
                         C_CamGenSigUtil::h_DecodeSignalValueToRaw(c_Bytes, rc_Signal, c_ZeroContent);
                      }
                      else
@@ -1079,17 +1077,17 @@ void C_CamGenTableView::m_AddMessageFromDatabase(const std::vector<std::array<QS
    \param[in]  orc_Indices    New item indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<uint32> & orc_Indices)
+void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<uint32_t> & orc_Indices)
 {
    //Select newest items
-   const std::vector<uint32> c_Items = C_Uti::h_UniquifyAndSortAscending(orc_Indices);
+   const std::vector<uint32_t> c_Items = C_Uti::h_UniquifyAndSortAscending(orc_Indices);
 
    this->clearSelection();
    this->m_SelectRange(c_Items);
    //Scroll to last new item
    if (c_Items.size() > 0UL)
    {
-      const uint32 u32_HighestItem = c_Items[static_cast<std::vector<uint32>::size_type>(c_Items.size() - 1UL)];
+      const uint32_t u32_HighestItem = c_Items[static_cast<std::vector<uint32_t>::size_type>(c_Items.size() - 1UL)];
 
       if (c_Items.size() > 1)
       {
@@ -1105,7 +1103,7 @@ void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<u
    if ((this->mq_CommunicationActive == true) && (this->mq_CyclicTransmissionActive == true))
    {
       //Activate all copied cyclic items
-      for (uint32 u32_It = 0UL; u32_It < c_Items.size(); ++u32_It)
+      for (uint32_t u32_It = 0UL; u32_It < c_Items.size(); ++u32_It)
       {
          const C_CamProMessageData * const pc_Message = C_CamProHandler::h_GetInstance()->GetMessageConst(
             c_Items[u32_It]);
@@ -1122,7 +1120,7 @@ void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<u
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Convert uint32 vector to sint32
+/*! \brief  Convert uint32_t vector to int32_t
 
    \param[in]  orc_Input   Vector to convert
 
@@ -1130,13 +1128,13 @@ void C_CamGenTableView::m_HandleNewItemScrollingAndSelection(const std::vector<u
    Converted vector
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamGenTableView::mh_ConvertVector(const std::vector<uint32> & orc_Input)
+std::vector<int32_t> C_CamGenTableView::mh_ConvertVector(const std::vector<uint32_t> & orc_Input)
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    c_Retval.reserve(orc_Input.size());
-   for (uint32 u32_ItInput = 0UL; u32_ItInput < orc_Input.size(); ++u32_ItInput)
+   for (uint32_t u32_ItInput = 0UL; u32_ItInput < orc_Input.size(); ++u32_ItInput)
    {
-      c_Retval.push_back(static_cast<sint32>(orc_Input[u32_ItInput]));
+      c_Retval.push_back(static_cast<int32_t>(orc_Input[u32_ItInput]));
    }
    return c_Retval;
 }
@@ -1147,10 +1145,10 @@ std::vector<sint32> C_CamGenTableView::mh_ConvertVector(const std::vector<uint32
    \param[in]  orc_SelectedIndices  Indices of items to select
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_SetSelectedMessages(const std::vector<sint32> & orc_SelectedIndices)
+void C_CamGenTableView::m_SetSelectedMessages(const std::vector<int32_t> & orc_SelectedIndices)
 {
    this->selectionModel()->clearSelection();
-   for (uint32 u32_ItInput = 0UL; u32_ItInput < orc_SelectedIndices.size(); ++u32_ItInput)
+   for (uint32_t u32_ItInput = 0UL; u32_ItInput < orc_SelectedIndices.size(); ++u32_ItInput)
    {
       m_SelectRow(orc_SelectedIndices[u32_ItInput], QItemSelectionModel::Select);
    }
@@ -1163,7 +1161,7 @@ void C_CamGenTableView::m_SetSelectedMessages(const std::vector<sint32> & orc_Se
    \param[in]  orc_Flags   Flags
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamGenTableView::m_SelectRow(const sint32 os32_Row, const QItemSelectionModel::SelectionFlags & orc_Flags)
+void C_CamGenTableView::m_SelectRow(const int32_t os32_Row, const QItemSelectionModel::SelectionFlags & orc_Flags)
 {
    const QModelIndex c_StartIndex = this->mc_SortProxyModel.mapFromSource(this->mc_Model.index(os32_Row, 0));
    const QModelIndex c_EndIndex =
@@ -1198,7 +1196,7 @@ void C_CamGenTableView::m_RegisterAllCyclicMessages(void)
    if ((this->mq_CyclicTransmissionActive == true) && (this->mq_CommunicationActive == true))
    {
       // register all cyclic messages
-      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < C_CamProHandler::h_GetInstance()->GetMessages().size();
+      for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < C_CamProHandler::h_GetInstance()->GetMessages().size();
            ++u32_ItMessage)
       {
          const C_CamProMessageData * const pc_Message =

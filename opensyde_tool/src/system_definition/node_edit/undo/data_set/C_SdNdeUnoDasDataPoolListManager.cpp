@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_SdNdeUnoDasDataPoolListManager.h"
-#include "C_SdNdeUnoDasDataPoolListMoveCommand.h"
-#include "C_SdNdeUnoDasDataPoolListDeleteCommand.h"
-#include "C_SdNdeUnoDasDataPoolListAddCommand.h"
-#include "C_SdNdeUnoDasDataPoolListAddSpecificCommand.h"
-#include "C_SdNdeUnoDasDataPoolListDataChangeCommand.h"
-#include "C_SdNdeDpListTableView.h"
-#include "C_SdNdeDpListTableModel.h"
-#include "C_SdClipBoardHelper.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_SdNdeUnoDasDataPoolListManager.hpp"
+#include "C_SdNdeUnoDasDataPoolListMoveCommand.hpp"
+#include "C_SdNdeUnoDasDataPoolListDeleteCommand.hpp"
+#include "C_SdNdeUnoDasDataPoolListAddCommand.hpp"
+#include "C_SdNdeUnoDasDataPoolListAddSpecificCommand.hpp"
+#include "C_SdNdeUnoDasDataPoolListDataChangeCommand.hpp"
+#include "C_SdNdeDpListTableView.hpp"
+#include "C_SdNdeDpListTableModel.hpp"
+#include "C_SdClipBoardHelper.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_tgl;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,10 +64,10 @@ C_SdNdeUnoDasDataPoolListManager::C_SdNdeUnoDasDataPoolListManager(void) :
    \param[in]     orq_AdaptIndices                 Flag, if target columns should be adapted to source column deletion
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeIndex,
-                                                      const uint32 & oru32_DataPoolIndex,
-                                                      const uint32 & oru32_DataPoolListIndex,
-                                                      C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_StartIndex, const std::vector<uint32> & orc_TargetIndex,
+void C_SdNdeUnoDasDataPoolListManager::DoMoveElements(const uint32_t & oru32_NodeIndex,
+                                                      const uint32_t & oru32_DataPoolIndex,
+                                                      const uint32_t & oru32_DataPoolListIndex,
+                                                      C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32_t> & orc_StartIndex, const std::vector<uint32_t> & orc_TargetIndex,
                                                       const bool & orq_AdaptIndices)
 {
    if (((orc_StartIndex.size() > 0) && (orc_TargetIndex.size() > 0)) &&
@@ -97,11 +96,11 @@ void C_SdNdeUnoDasDataPoolListManager::DoMoveElements(const uint32 & oru32_NodeI
    \param[in]     orc_Indices                      Node data pool list indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListManager::DoDeleteElements(const uint32 & oru32_NodeIndex,
-                                                        const uint32 & oru32_DataPoolIndex,
-                                                        const uint32 & oru32_DataPoolListIndex,
+void C_SdNdeUnoDasDataPoolListManager::DoDeleteElements(const uint32_t & oru32_NodeIndex,
+                                                        const uint32_t & oru32_DataPoolIndex,
+                                                        const uint32_t & oru32_DataPoolListIndex,
                                                         C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                        const std::vector<uint32> & orc_Indices)
+                                                        const std::vector<uint32_t> & orc_Indices)
 {
    if (orc_Indices.size() > 0)
    {
@@ -128,23 +127,23 @@ void C_SdNdeUnoDasDataPoolListManager::DoDeleteElements(const uint32 & oru32_Nod
    \param[in]     oru32_InsertListIndex            Node data pool list index to insert new elements at
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                               const uint32 & oru32_DataPoolListIndex,
+void C_SdNdeUnoDasDataPoolListManager::DoPaste(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                               const uint32_t & oru32_DataPoolListIndex,
                                                C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                               const uint32 & oru32_InsertListIndex)
+                                               const uint32_t & oru32_InsertListIndex)
 {
-   std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> c_OSCNames;
-   std::vector<std::vector<stw_opensyde_core::C_OSCNodeDataPoolContent> > c_OSCDataSetValues;
-   if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OSCNames,
-                                                                      c_OSCDataSetValues) == stw_errors::C_NO_ERR)
+   std::vector<stw::opensyde_core::C_OscNodeDataPoolDataSet> c_OscNames;
+   std::vector<std::vector<stw::opensyde_core::C_OscNodeDataPoolContent> > c_OscDataSetValues;
+   if (C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromClipBoard(c_OscNames,
+                                                                      c_OscDataSetValues) == stw::errors::C_NO_ERR)
    {
-      std::vector<stw_types::uint32> c_Indices;
+      std::vector<uint32_t> c_Indices;
 
-      if (c_OSCNames.size() == c_OSCDataSetValues.size())
+      if (c_OscNames.size() == c_OscDataSetValues.size())
       {
          QUndoCommand * pc_Command;
-         c_Indices.reserve(c_OSCNames.size());
-         for (uint32 u32_NewIndices = 0; u32_NewIndices < c_OSCNames.size(); ++u32_NewIndices)
+         c_Indices.reserve(c_OscNames.size());
+         for (uint32_t u32_NewIndices = 0; u32_NewIndices < c_OscNames.size(); ++u32_NewIndices)
          {
             c_Indices.push_back(oru32_InsertListIndex + u32_NewIndices);
          }
@@ -152,8 +151,8 @@ void C_SdNdeUnoDasDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, c
          pc_Command = new C_SdNdeUnoDasDataPoolListAddSpecificCommand(oru32_NodeIndex,
                                                                       oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                                                       opc_DataPoolListModelViewManager,
-                                                                      c_Indices, c_OSCNames,
-                                                                      c_OSCDataSetValues, this->mpc_UndoCommand);
+                                                                      c_Indices, c_OscNames,
+                                                                      c_OscDataSetValues, this->mpc_UndoCommand);
          //Do action once
          pc_Command->redo();
       } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
@@ -170,10 +169,11 @@ void C_SdNdeUnoDasDataPoolListManager::DoPaste(const uint32 & oru32_NodeIndex, c
    \param[in]     orc_Indices                      Node data pool list indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListManager::DoAddElements(const uint32 & oru32_NodeIndex, const uint32 & oru32_DataPoolIndex,
-                                                     const uint32 & oru32_DataPoolListIndex,
+void C_SdNdeUnoDasDataPoolListManager::DoAddElements(const uint32_t & oru32_NodeIndex,
+                                                     const uint32_t & oru32_DataPoolIndex,
+                                                     const uint32_t & oru32_DataPoolListIndex,
                                                      C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                     const std::vector<uint32> & orc_Indices)
+                                                     const std::vector<uint32_t> & orc_Indices)
 {
    if (orc_Indices.size() > 0)
    {
@@ -197,15 +197,15 @@ void C_SdNdeUnoDasDataPoolListManager::DoAddElements(const uint32 & oru32_NodeIn
    \param[in]     oru32_DataPoolListIndex          Node data pool list index
    \param[in,out] opc_DataPoolListModelViewManager Data pool lists model view manager to get objects to perform actions on
    \param[in]     orc_Indices                      Node data pool list indices
-   \param[in]     orc_OSCNames                     Initial Data set names
-   \param[in]     orc_OSCDataSetValues             Initial Data set values
+   \param[in]     orc_OscNames                     Initial Data set names
+   \param[in]     orc_OscDataSetValues             Initial Data set values
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListManager::DoAddSpecificElements(const uint32 & oru32_NodeIndex,
-                                                             const uint32 & oru32_DataPoolIndex,
-                                                             const uint32 & oru32_DataPoolListIndex,
-                                                             C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32> & orc_Indices, const std::vector<stw_opensyde_core::C_OSCNodeDataPoolDataSet> & orc_OSCNames,
-                                                             const std::vector<std::vector<C_OSCNodeDataPoolContent> > & orc_OSCDataSetValues)
+void C_SdNdeUnoDasDataPoolListManager::DoAddSpecificElements(const uint32_t & oru32_NodeIndex,
+                                                             const uint32_t & oru32_DataPoolIndex,
+                                                             const uint32_t & oru32_DataPoolListIndex,
+                                                             C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const std::vector<uint32_t> & orc_Indices, const std::vector<stw::opensyde_core::C_OscNodeDataPoolDataSet> & orc_OscNames,
+                                                             const std::vector<std::vector<C_OscNodeDataPoolContent> > & orc_OscDataSetValues)
 {
    if (orc_Indices.size() > 0)
    {
@@ -215,7 +215,7 @@ void C_SdNdeUnoDasDataPoolListManager::DoAddSpecificElements(const uint32 & oru3
          oru32_NodeIndex,
          oru32_DataPoolIndex, oru32_DataPoolListIndex,
          opc_DataPoolListModelViewManager,
-         orc_Indices, orc_OSCNames, orc_OSCDataSetValues, this->mpc_UndoCommand);
+         orc_Indices, orc_OscNames, orc_OscDataSetValues, this->mpc_UndoCommand);
       //Do action once
       pc_Command->redo();
    } //lint !e429  //no memory leak because of the parent of pc_Command and the Qt memory management
@@ -233,10 +233,10 @@ void C_SdNdeUnoDasDataPoolListManager::DoAddSpecificElements(const uint32 & oru3
    \param[in]     ore_DataChangeType               Data change type
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeUnoDasDataPoolListManager::DoDataChangeElements(const uint32 & oru32_NodeIndex,
-                                                            const uint32 & oru32_DataPoolIndex,
-                                                            const uint32 & oru32_DataPoolListIndex,
-                                                            C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32 & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData,
+void C_SdNdeUnoDasDataPoolListManager::DoDataChangeElements(const uint32_t & oru32_NodeIndex,
+                                                            const uint32_t & oru32_DataPoolIndex,
+                                                            const uint32_t & oru32_DataPoolListIndex,
+                                                            C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager, const uint32_t & oru32_DataPoolListDataSetIndex, const QVariant & orc_NewData,
                                                             const C_SdNdeDpUtil::E_DataSetDataChangeType & ore_DataChangeType)
 {
    QUndoCommand * pc_Command;

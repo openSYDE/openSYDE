@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OgeSpxAutoFixBase.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OgeSpxAutoFixBase.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -66,8 +65,8 @@ C_OgeSpxAutoFixBase::~C_OgeSpxAutoFixBase(void)
    \param[in] ou32_Index  Optional data index (used if array)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeSpxAutoFixBase::Init(const C_OSCNodeDataPoolContent & orc_Min, const C_OSCNodeDataPoolContent & orc_Max,
-                               const float64 of64_Factor, const float64 of64_Offset, const uint32 ou32_Index)
+void C_OgeSpxAutoFixBase::Init(const C_OscNodeDataPoolContent & orc_Min, const C_OscNodeDataPoolContent & orc_Max,
+                               const float64_t of64_Factor, const float64_t of64_Offset, const uint32_t ou32_Index)
 {
    this->mc_UnscaledMin = orc_Min;
    this->mc_UnscaledMax = orc_Max;

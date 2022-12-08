@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "CSCLChecksums.h"
-#include "C_PuiSvDbNodeDataElementConfig.h"
+#include "stwtypes.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSvDbNodeDataElementConfig.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -39,6 +38,7 @@ using namespace stw_opensyde_gui_logic;
 C_PuiSvDbNodeDataElementConfig::C_PuiSvDbNodeDataElementConfig(void) :
    c_ElementId(),
    c_ElementScaling(),
+   c_DisplayFormatter(),
    c_DisplayName("")
 {
 }
@@ -61,10 +61,11 @@ C_PuiSvDbNodeDataElementConfig::~C_PuiSvDbNodeDataElementConfig(void)
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbNodeDataElementConfig::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSvDbNodeDataElementConfig::CalcHash(uint32_t & oru32_HashValue) const
 {
    this->c_ElementId.CalcHash(oru32_HashValue);
    this->c_ElementScaling.CalcHash(oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_DisplayName.toStdString().c_str(),
-                                      this->c_DisplayName.length(), oru32_HashValue);
+   this->c_DisplayFormatter.CalcHash(oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_DisplayName.toStdString().c_str(),
+                                       this->c_DisplayName.length(), oru32_HashValue);
 }

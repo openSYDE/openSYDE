@@ -52,7 +52,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeGbxMouseMove" name="pc_GroupBoxBackground">
+      <widget class="stw::opensyde_gui_elements::C_OgeGbxMouseMove" name="pc_GroupBoxBackground">
        <property name="minimumSize">
         <size>
          <width>450</width>
@@ -126,7 +126,7 @@
            <number>9</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingMessage" name="pc_LabelHeading">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingMessage" name="pc_LabelHeading">
             <property name="focusPolicy">
              <enum>Qt::NoFocus</enum>
             </property>
@@ -155,7 +155,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabDescriptionMessage" name="pc_LabelDescription">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabDescriptionMessage" name="pc_LabelDescription">
             <property name="text">
              <string>Description</string>
             </property>
@@ -173,7 +173,7 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingMessage" name="pc_LabelDetails">
+             <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingMessage" name="pc_LabelDetails">
               <property name="text">
                <string>DETAILS</string>
               </property>
@@ -192,7 +192,7 @@
                 <number>7</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_ButtonDetails">
+                <widget class="stw::opensyde_gui_elements::C_OgePubSvgIconOnly" name="pc_ButtonDetails">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -238,7 +238,7 @@
            </layout>
           </item>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeTebMessageDetails" name="pc_TebDetails">
+           <widget class="stw::opensyde_gui_elements::C_OgeTebMessageDetails" name="pc_TebDetails">
             <property name="minimumSize">
              <size>
               <width>350</width>
@@ -291,7 +291,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubMessageCancel" name="pc_ButtonCancel">
+             <widget class="stw::opensyde_gui_elements::C_OgePubMessageCancel" name="pc_ButtonCancel">
               <property name="minimumSize">
                <size>
                 <width>120</width>
@@ -310,7 +310,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubMessageCancel" name="pc_ButtonNo">
+             <widget class="stw::opensyde_gui_elements::C_OgePubMessageCancel" name="pc_ButtonNo">
               <property name="minimumSize">
                <size>
                 <width>120</width>
@@ -329,7 +329,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgePubMessageOk" name="pc_ButtonOk">
+             <widget class="stw::opensyde_gui_elements::C_OgePubMessageOk" name="pc_ButtonOk">
               <property name="minimumSize">
                <size>
                 <width>120</width>
@@ -386,40 +386,40 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTebMessageDetails</class>
+   <class>stw::opensyde_gui_elements::C_OgeTebMessageDetails</class>
    <extends>QTextBrowser</extends>
-   <header>C_OgeTebMessageDetails.h</header>
+   <header>C_OgeTebMessageDetails.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingMessage</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingMessage</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingMessage.h</header>
+   <header>C_OgeLabHeadingMessage.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxMouseMove</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxMouseMove</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxMouseMove.h</header>
+   <header>C_OgeGbxMouseMove.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabDescriptionMessage</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabDescriptionMessage</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabDescriptionMessage.h</header>
+   <header>C_OgeLabDescriptionMessage.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSvgIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubSvgIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubSvgIconOnly.h</header>
+   <header>C_OgePubSvgIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubMessageOk</class>
+   <class>stw::opensyde_gui_elements::C_OgePubMessageOk</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubMessageOk.h</header>
+   <header>C_OgePubMessageOk.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubMessageCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubMessageCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubMessageCancel.h</header>
+   <header>C_OgePubMessageCancel.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

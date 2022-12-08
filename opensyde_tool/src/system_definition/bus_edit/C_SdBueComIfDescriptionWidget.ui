@@ -35,7 +35,7 @@
       <number>3</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeTawSelector" name="pc_ProtocolTabWidget">
+      <widget class="stw::opensyde_gui_elements::C_OgeTawSelector" name="pc_ProtocolTabWidget">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -113,7 +113,7 @@
          <number>11</number>
         </property>
         <item row="0" column="0">
-         <widget class="stw_opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
+         <widget class="stw::opensyde_gui_elements::C_OgeSpiStandard" name="pc_Splitter">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
@@ -128,7 +128,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeWiBorder" name="pc_BueSelectorWidget" native="true">
+               <widget class="stw::opensyde_gui_elements::C_OgeWiBorder" name="pc_BueSelectorWidget" native="true">
                 <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
                  <property name="spacing">
                   <number>0</number>
@@ -146,7 +146,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="stw_opensyde_gui::C_SdBueNodeSelectorWidget" name="pc_NodeSelectorWidget" native="true">
+                  <widget class="stw::opensyde_gui::C_SdBueNodeSelectorWidget" name="pc_NodeSelectorWidget" native="true">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                      <horstretch>0</horstretch>
@@ -238,7 +238,7 @@
                         </widget>
                        </item>
                        <item>
-                        <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_InterfaceSelectorTitleLabel">
+                        <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_InterfaceSelectorTitleLabel">
                          <property name="text">
                           <string>Nodes</string>
                          </property>
@@ -279,7 +279,7 @@
                         <number>1</number>
                        </property>
                        <item>
-                        <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_CbInterface">
+                        <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_CbInterface">
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
@@ -309,7 +309,7 @@
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="stw_opensyde_gui::C_SdBueMessageSelectorWidget" name="pc_MessageSelectorWidget" native="true"/>
+                    <widget class="stw::opensyde_gui::C_SdBueMessageSelectorWidget" name="pc_MessageSelectorWidget" native="true"/>
                    </item>
                    <item>
                     <widget class="QWidget" name="pc_CanOpenNoUsageWidget" native="true">
@@ -346,7 +346,7 @@
                        </spacer>
                       </item>
                       <item>
-                       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintNoUsageLabel">
+                       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintNoUsageLabel">
                         <property name="text">
                          <string>TextLabel</string>
                         </property>
@@ -406,7 +406,7 @@
                        </spacer>
                       </item>
                       <item>
-                       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintToBusLabel">
+                       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_HintToBusLabel">
                         <property name="text">
                          <string>TextLabel</string>
                         </property>
@@ -416,7 +416,7 @@
                        </widget>
                       </item>
                       <item>
-                       <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LinkToBusLabel">
+                       <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LinkToBusLabel">
                         <property name="text">
                          <string>TextLabel</string>
                         </property>
@@ -490,10 +490,10 @@
             <item>
              <layout class="QVBoxLayout" name="pc_VerticalLayout">
               <item>
-               <widget class="stw_opensyde_gui::C_SdBueMessageSignalEditWidget" name="pc_MsgSigEditWidget" native="true"/>
+               <widget class="stw::opensyde_gui::C_SdBueMessageSignalEditWidget" name="pc_MsgSigEditWidget" native="true"/>
               </item>
               <item>
-               <widget class="stw_opensyde_gui::C_SdBueMessageSignalTableWidget" name="pc_MsgSigTableWidget" native="true"/>
+               <widget class="stw::opensyde_gui::C_SdBueMessageSignalTableWidget" name="pc_MsgSigTableWidget" native="true"/>
               </item>
              </layout>
             </item>
@@ -510,60 +510,60 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeSpiStandard</class>
+   <class>stw::opensyde_gui_elements::C_OgeSpiStandard</class>
    <extends>QSplitter</extends>
-   <header>C_OgeSpiStandard.h</header>
+   <header>C_OgeSpiStandard.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdBueNodeSelectorWidget</class>
+   <class>stw::opensyde_gui::C_SdBueNodeSelectorWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdBueNodeSelectorWidget.h</header>
+   <header>C_SdBueNodeSelectorWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdBueMessageSignalEditWidget</class>
+   <class>stw::opensyde_gui::C_SdBueMessageSignalEditWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdBueMessageSignalEditWidget.h</header>
+   <header>C_SdBueMessageSignalEditWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdBueMessageSignalTableWidget</class>
+   <class>stw::opensyde_gui::C_SdBueMessageSignalTableWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdBueMessageSignalTableWidget.h</header>
+   <header>C_SdBueMessageSignalTableWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdBueMessageSelectorWidget</class>
+   <class>stw::opensyde_gui::C_SdBueMessageSelectorWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdBueMessageSelectorWidget.h</header>
+   <header>C_SdBueMessageSelectorWidget.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiBorder</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiBorder</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiBorder.h</header>
+   <header>C_OgeWiBorder.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTawSelector</class>
+   <class>stw::opensyde_gui_elements::C_OgeTawSelector</class>
    <extends>QTabWidget</extends>
-   <header>C_OgeTawSelector.h</header>
+   <header>C_OgeTawSelector.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

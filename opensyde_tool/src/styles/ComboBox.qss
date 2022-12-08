@@ -35,7 +35,7 @@ border-style: solid;
 /* --------------------------------------------------------------------- */
 /*Setup style specific*/
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeCbxLine
+stw--opensyde_gui_elements--C_OgeCbxLine
 {
 padding-right: 0px;
 padding-left: 5px;
@@ -43,20 +43,20 @@ padding-bottom: 0px;
 padding-top: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxLine QAbstractItemView
+stw--opensyde_gui_elements--C_OgeCbxLine QAbstractItemView
 {
 margin-left: 0px;
 margin-right: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxLine QAbstractItemView::item
+stw--opensyde_gui_elements--C_OgeCbxLine QAbstractItemView::item
 {
 padding-top: 12px;
 padding-bottom: 12px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeCbxArrow
+stw--opensyde_gui_elements--C_OgeCbxArrow
 {
 padding-right: 0px;
 padding-left: 5px;
@@ -64,24 +64,24 @@ padding-bottom: 0px;
 padding-top: 1px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxArrow QAbstractItemView
+stw--opensyde_gui_elements--C_OgeCbxArrow QAbstractItemView
 {
 margin-left: 0px;
 margin-right: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxArrow QAbstractItemView::item
+stw--opensyde_gui_elements--C_OgeCbxArrow QAbstractItemView::item
 {
 padding-top: 5px;
 padding-bottom: 5px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui_elements--C_OgeCbxFontProperties,
-stw_opensyde_gui_elements--C_OgeCbxTable,
-stw_opensyde_gui_elements--C_OgeCbxText,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
-stw_opensyde_gui_elements--C_OgeCbxTableHalc
+stw--opensyde_gui_elements--C_OgeCbxFontProperties,
+stw--opensyde_gui_elements--C_OgeCbxTable,
+stw--opensyde_gui_elements--C_OgeCbxText,
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc,
+stw--opensyde_gui_elements--C_OgeCbxTableHalc
 {
 padding-right: 0px;
 padding-left: 8px;
@@ -89,7 +89,7 @@ padding-bottom: 2px;
 padding-top: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxParam
+stw--opensyde_gui_elements--C_OgeCbxParam
 {
 padding-right: 0px;
 padding-left: 2px;
@@ -101,35 +101,35 @@ margin-top: 0px;
 max-height: 20px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxTable
+stw--opensyde_gui_elements--C_OgeCbxTable
 {
 border-style: solid;
 border-width: 1px;
 max-height: 24px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView,
-stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView
+stw--opensyde_gui_elements--C_OgeCbxParam QAbstractItemView,
+stw--opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView,
+stw--opensyde_gui_elements--C_OgeCbxTable QAbstractItemView,
+stw--opensyde_gui_elements--C_OgeCbxText QAbstractItemView,
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView,
+stw--opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView
 {
 margin-left: 0px;
 margin-right: 0px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView::item,
-stw_opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item,
-stw_opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item,
-stw_opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView::item,
-stw_opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView::item
+stw--opensyde_gui_elements--C_OgeCbxFontProperties QAbstractItemView::item,
+stw--opensyde_gui_elements--C_OgeCbxTable QAbstractItemView::item,
+stw--opensyde_gui_elements--C_OgeCbxText QAbstractItemView::item,
+stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QAbstractItemView::item,
+stw--opensyde_gui_elements--C_OgeCbxTableHalc QAbstractItemView::item
 {
 padding-top: 5px;
 padding-bottom: 5px;
 }
 
-stw_opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item
+stw--opensyde_gui_elements--C_OgeCbxParam QAbstractItemView::item
 {
 padding-top: 2px;
 padding-bottom: 2px;

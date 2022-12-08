@@ -10,22 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OSCDeviceGroup.h"
-#include "C_OSCDeviceDefinitionFiler.h"
-#include "TGLFile.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OscDeviceGroup.hpp"
+#include "C_OscDeviceDefinitionFiler.hpp"
+#include "TglFile.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
-using namespace stw_opensyde_core;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
+using namespace stw::opensyde_core;
+
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -43,7 +43,7 @@ using namespace stw_tgl;
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDeviceGroup::C_OSCDeviceGroup(void)
+C_OscDeviceGroup::C_OscDeviceGroup(void)
 {
 }
 
@@ -63,13 +63,13 @@ C_OSCDeviceGroup::C_OSCDeviceGroup(void)
    NULL:      define not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString & orc_Name,
-                                                              const C_SCLString & orc_MainDeviceName,
-                                                              uint32 & oru32_SubDeviceIndex) const
+const C_OscDeviceDefinition * C_OscDeviceGroup::LookForDevice(const C_SclString & orc_Name,
+                                                              const C_SclString & orc_MainDeviceName,
+                                                              uint32_t & oru32_SubDeviceIndex) const
 {
-   const C_OSCDeviceDefinition * pc_Device = NULL;
+   const C_OscDeviceDefinition * pc_Device = NULL;
 
-   for (uint32 u32_ItDevice = 0U; (u32_ItDevice < this->mc_Devices.size()) && (pc_Device == NULL); ++u32_ItDevice)
+   for (uint32_t u32_ItDevice = 0U; (u32_ItDevice < this->mc_Devices.size()) && (pc_Device == NULL); ++u32_ItDevice)
    {
       if (orc_MainDeviceName.IsEmpty())
       {
@@ -83,10 +83,10 @@ const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString 
       {
          if (this->mc_Devices[u32_ItDevice].c_DeviceName == orc_MainDeviceName)
          {
-            for (uint32 u32_ItSubDevice = 0U; u32_ItSubDevice < this->mc_Devices[u32_ItDevice].c_SubDevices.size();
+            for (uint32_t u32_ItSubDevice = 0U; u32_ItSubDevice < this->mc_Devices[u32_ItDevice].c_SubDevices.size();
                  ++u32_ItSubDevice)
             {
-               const C_OSCSubDeviceDefinition & rc_SubDeviceDefinition =
+               const C_OscSubDeviceDefinition & rc_SubDeviceDefinition =
                   this->mc_Devices[u32_ItDevice].c_SubDevices[u32_ItSubDevice];
                if (rc_SubDeviceDefinition.c_SubDeviceName == orc_Name)
                {
@@ -121,14 +121,14 @@ const C_OSCDeviceDefinition * C_OSCDeviceGroup::LookForDevice(const C_SCLString 
    true     Device exists
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCDeviceGroup::PreCheckDevice(const C_SCLString & orc_DeviceName, const C_SCLString & orc_DeviceNameAlias,
-                                      const C_SCLString & orc_DevicePath) const
+bool C_OscDeviceGroup::PreCheckDevice(const C_SclString & orc_DeviceName, const C_SclString & orc_DeviceNameAlias,
+                                      const C_SclString & orc_DevicePath) const
 {
    bool q_IsEqual = false;
 
-   for (uint32 u32_ItDevice = 0U; u32_ItDevice < this->mc_Devices.size(); ++u32_ItDevice)
+   for (uint32_t u32_ItDevice = 0U; u32_ItDevice < this->mc_Devices.size(); ++u32_ItDevice)
    {
-      const C_OSCDeviceDefinition & rc_DeviceDefinition = this->mc_Devices[u32_ItDevice];
+      const C_OscDeviceDefinition & rc_DeviceDefinition = this->mc_Devices[u32_ItDevice];
 
       if ((orc_DeviceName == rc_DeviceDefinition.c_DeviceName) ||
           (orc_DeviceNameAlias == rc_DeviceDefinition.c_DeviceName) ||
@@ -158,33 +158,33 @@ bool C_OSCDeviceGroup::PreCheckDevice(const C_SCLString & orc_DeviceName, const 
    C_RD_WR    could not load information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & orc_BasePath)
+int32_t C_OscDeviceGroup::LoadGroup(C_SclIniFile & orc_Ini, const C_SclString & orc_BasePath)
 {
-   C_SCLString c_DevicePath;
-   sintn sn_NumDevices;
-   sint32 s32_Return = C_NO_ERR;
+   C_SclString c_DevicePath;
+   int32_t s32_NumDevices;
+   int32_t s32_Return = C_NO_ERR;
 
    this->mc_Devices.clear();
    //Check number of devices in group
-   sn_NumDevices = orc_Ini.ReadInteger(this->mc_GroupName, "DeviceCount", 0);
-   if (sn_NumDevices > 0)
+   s32_NumDevices = orc_Ini.ReadInteger(this->mc_GroupName, "DeviceCount", 0);
+   if (s32_NumDevices > 0)
    {
-      this->mc_Devices.reserve(sn_NumDevices);
+      this->mc_Devices.reserve(s32_NumDevices);
       //Read in all devices in the list in order
-      for (sintn sn_ItDevice = 0; sn_ItDevice < sn_NumDevices; ++sn_ItDevice)
+      for (int32_t s32_ItDevice = 0; s32_ItDevice < s32_NumDevices; ++s32_ItDevice)
       {
-         c_DevicePath = orc_Ini.ReadString(this->mc_GroupName, "Device" + C_SCLString::IntToStr(sn_ItDevice + 1), "");
+         c_DevicePath = orc_Ini.ReadString(this->mc_GroupName, "Device" + C_SclString::IntToStr(s32_ItDevice + 1), "");
          if (c_DevicePath == "")
          {
-            osc_write_log_error("Load device descriptions", "Empty name of \"Device" + C_SCLString::IntToStr(
-                                   sn_ItDevice + 1) + "\" in device group \"" + this->mc_GroupName + "\".");
+            osc_write_log_error("Load device descriptions", "Empty name of \"Device" + C_SclString::IntToStr(
+                                   s32_ItDevice + 1) + "\" in device group \"" + this->mc_GroupName + "\".");
             s32_Return = C_RD_WR;
          }
          else
          {
-            C_SCLString c_FullDevicePath;
-            C_OSCDeviceDefinition c_DeviceDefinition;
-            if (TGL_FileExists(c_DevicePath) == 0)
+            C_SclString c_FullDevicePath;
+            C_OscDeviceDefinition c_DeviceDefinition;
+            if (TglFileExists(c_DevicePath) == 0)
             {
                c_FullDevicePath = orc_BasePath + c_DevicePath;
             }
@@ -193,7 +193,7 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
                c_FullDevicePath = c_DevicePath;
             }
 
-            if (C_OSCDeviceDefinitionFiler::h_Load(c_DeviceDefinition, c_FullDevicePath) == C_NO_ERR)
+            if (C_OscDeviceDefinitionFiler::h_Load(c_DeviceDefinition, c_FullDevicePath) == C_NO_ERR)
             {
                this->mc_Devices.push_back(c_DeviceDefinition);
             }
@@ -214,7 +214,7 @@ sint32 C_OSCDeviceGroup::LoadGroup(C_SCLIniFile & orc_Ini, const C_SCLString & o
    \param[in]  orc_GroupName  New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDeviceGroup::SetGroupName(const C_SCLString & orc_GroupName)
+void C_OscDeviceGroup::SetGroupName(const C_SclString & orc_GroupName)
 {
    this->mc_GroupName = orc_GroupName;
 }
@@ -226,7 +226,7 @@ void C_OSCDeviceGroup::SetGroupName(const C_SCLString & orc_GroupName)
    group name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCDeviceGroup::GetGroupName(void) const
+C_SclString C_OscDeviceGroup::GetGroupName(void) const
 {
    return mc_GroupName;
 }
@@ -238,7 +238,7 @@ C_SCLString C_OSCDeviceGroup::GetGroupName(void) const
    copy of device definitions owned by this class
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<stw_opensyde_core::C_OSCDeviceDefinition> C_OSCDeviceGroup::GetDevices(void) const
+std::vector<stw::opensyde_core::C_OscDeviceDefinition> C_OscDeviceGroup::GetDevices(void) const
 {
    return mc_Devices;
 }

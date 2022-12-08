@@ -8,22 +8,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
-#include "stwerrors.h"
+#include "precomp_headers.hpp"
+#include "stwerrors.hpp"
 
-#include "TGLUtils.h"
+#include "TglUtils.hpp"
 #include <QScrollBar>
 
-#include "C_OgeTreeViewToolTipBaseCheckable.h"
+#include "C_OgeTreeViewToolTipBaseCheckable.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -75,14 +74,14 @@ C_OgeTreeViewToolTipBaseCheckable::~C_OgeTreeViewToolTipBaseCheckable(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeViewToolTipBaseCheckable::Init(C_TblTreeModelCheckable * const opc_Model,
-                                             const std::vector<uint32> & orc_ElementIndices)
+                                             const std::vector<uint32_t> & orc_ElementIndices)
 {
    if (opc_Model != NULL)
    {
       this->mpc_Model = opc_Model;
       this->setModel(mpc_Model);
       tgl_assert(mpc_Model->Init(orc_ElementIndices) == C_NO_ERR);
-      const uint32 u32_CheckedElements = mpc_Model->GetCheckedItemCount();
+      const uint32_t u32_CheckedElements = mpc_Model->GetCheckedItemCount();
       this->expandAll();
       connect(mpc_Model, &C_TblTreeModelCheckable::dataChanged,
               this, &C_OgeTreeViewToolTipBaseCheckable::m_ChangedData);
@@ -99,8 +98,8 @@ void C_OgeTreeViewToolTipBaseCheckable::Init(C_TblTreeModelCheckable * const opc
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTreeViewToolTipBaseCheckable::GetCheckedItems(const C_TblTreeModelCheckable * const opc_Model,
-                                                        std::vector<uint32> & orc_ElementIndices,
-                                                        std::vector<std::vector<uint32> > & orc_ChildIndicesPerElement)
+                                                        std::vector<uint32_t> & orc_ElementIndices,
+                                                        std::vector<std::vector<uint32_t> > & orc_ChildIndicesPerElement)
 const
 {
    if (opc_Model != NULL)

@@ -39,7 +39,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_TxInfoLabel">
+    <widget class="stw::opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_TxInfoLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -74,7 +74,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_ActiveFiltersLabel">
+    <widget class="stw::opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_ActiveFiltersLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -109,7 +109,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_BusLoadLabel">
+    <widget class="stw::opensyde_gui_elements::C_CamOgeLabStatusBar" name="pc_BusLoadLabel">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -160,9 +160,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeLabStatusBar</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeLabStatusBar</class>
    <extends>QLabel</extends>
-   <header>C_CamOgeLabStatusBar.h</header>
+   <header>C_CamOgeLabStatusBar.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

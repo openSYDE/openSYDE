@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdNdeUnoDasDataPoolListMoveCommand.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdNdeUnoUtil.h"
-#include "C_SdUtil.h"
+#include "stwtypes.hpp"
+#include "C_SdNdeUnoDasDataPoolListMoveCommand.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdNdeUnoUtil.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -47,12 +46,12 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out]  opc_Parent                         Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const uint32 & oru32_NodeIndex,
-                                                                           const uint32 & oru32_DataPoolIndex,
-                                                                           const uint32 & oru32_DataPoolListIndex,
+C_SdNdeUnoDasDataPoolListMoveCommand::C_SdNdeUnoDasDataPoolListMoveCommand(const uint32_t & oru32_NodeIndex,
+                                                                           const uint32_t & oru32_DataPoolIndex,
+                                                                           const uint32_t & oru32_DataPoolListIndex,
                                                                            C_SdNdeDpListModelViewManager * const opc_DataPoolListModelViewManager,
-                                                                           const std::vector<uint32> & orc_SourceCol,
-                                                                           const std::vector<uint32> & orc_TargetCol, const bool & orq_AdaptIndices,
+                                                                           const std::vector<uint32_t> & orc_SourceCol,
+                                                                           const std::vector<uint32_t> & orc_TargetCol, const bool & orq_AdaptIndices,
                                                                            QUndoCommand * const opc_Parent) :
    C_SdNdeUnoDasDataPoolListAddDeleteBaseCommand(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
                                                  opc_DataPoolListModelViewManager, orc_SourceCol,

@@ -8,12 +8,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_SyvUpPacConfig.h"
+#include "C_SyvUpPacConfig.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -32,7 +32,7 @@ using namespace stw_opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPacConfigNodeApp::C_SyvUpPacConfigNodeApp() :
-   e_Type(stw_opensyde_core::C_OSCNodeApplication::eBINARY),
+   e_Type(stw::opensyde_core::C_OscNodeApplication::eBINARY),
    c_Name(""),
    c_Path("")
 {

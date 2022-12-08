@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "gitypes.h"
-#include "constants.h"
-#include "C_GiSvPcBusConnector.h"
-#include "C_PuiSvHandler.h"
+#include "stwtypes.hpp"
+#include "gitypes.hpp"
+#include "constants.hpp"
+#include "C_GiSvPcBusConnector.hpp"
+#include "C_PuiSvHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,27 +39,27 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     ou64_UniqueID           Unique ID
+   \param[in]     ou64_UniqueId           Unique ID
    \param[in]     ou32_ViewIndex          View index
    \param[in]     orc_InteractionPoints   Interaction points
    \param[in]     opc_BusItem             Bus item for initial connection
    \param[in,out] opc_GenericItem         PC item to connect to
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiSvPcBusConnector::C_GiSvPcBusConnector(const uint64 ou64_UniqueID, const uint32 ou32_ViewIndex,
+C_GiSvPcBusConnector::C_GiSvPcBusConnector(const uint64_t ou64_UniqueId, const uint32_t ou32_ViewIndex,
                                            const std::vector<QPointF> & orc_InteractionPoints,
                                            const C_GiLiBus * const opc_BusItem,
                                            C_GiBiConnectableItem * const opc_GenericItem) :
-   C_GiLiBusConnectorBase(ou64_UniqueID, orc_InteractionPoints, opc_BusItem),
+   C_GiLiBusConnectorBase(ou64_UniqueId, orc_InteractionPoints, opc_BusItem),
    mu32_ViewIndex(ou32_ViewIndex)
 {
    this->SetEditMode(false);
    this->m_UpdateGenericItem(opc_GenericItem);
    this->mpc_GenericPositionItem = opc_GenericItem;
-   if (orc_InteractionPoints.size() > static_cast<uint32>(C_GiLiBusConnectorBase::mh_GetGenericInteractionIndex()))
+   if (orc_InteractionPoints.size() > static_cast<uint32_t>(C_GiLiBusConnectorBase::mh_GetGenericInteractionIndex()))
    {
-      this->m_CalcInitialLocalPos(orc_InteractionPoints[static_cast<uint32>(C_GiLiBusConnectorBase::
-                                                                            mh_GetGenericInteractionIndex())]);
+      this->m_CalcInitialLocalPos(orc_InteractionPoints[static_cast<uint32_t>(C_GiLiBusConnectorBase::
+                                                                              mh_GetGenericInteractionIndex())]);
    }
    this->m_UpdateExternal();
    this->m_UpdateInternal();
@@ -72,9 +71,9 @@ C_GiSvPcBusConnector::C_GiSvPcBusConnector(const uint64 ou64_UniqueID, const uin
    \return  ID
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_GiSvPcBusConnector::type(void) const
+int32_t C_GiSvPcBusConnector::type(void) const
 {
-   return msn_GRAPHICS_ITEM_PC_CONNECTION;
+   return ms32_GRAPHICS_ITEM_PC_CONNECTION;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -120,14 +119,14 @@ void C_GiSvPcBusConnector::UpdateData(void) const
    C_PuiBsLineBase c_UiData;
 
    this->m_UpdateBasicData(c_UiData);
-   C_PuiSvHandler::h_GetInstance()->SetViewPCConnection(this->mu32_ViewIndex, c_UiData);
+   C_PuiSvHandler::h_GetInstance()->SetViewPcConnection(this->mu32_ViewIndex, c_UiData);
    if (this->GetBusItem() != NULL)
    {
-      C_PuiSvHandler::h_GetInstance()->SetViewPCConnected(this->mu32_ViewIndex, true, this->GetBusItem()->GetIndex());
+      C_PuiSvHandler::h_GetInstance()->SetViewPcConnected(this->mu32_ViewIndex, true, this->GetBusItem()->GetIndex());
    }
    else
    {
-      C_PuiSvHandler::h_GetInstance()->SetViewPCConnected(this->mu32_ViewIndex, false, 0);
+      C_PuiSvHandler::h_GetInstance()->SetViewPcConnected(this->mu32_ViewIndex, false, 0);
    }
 }
 
@@ -224,5 +223,5 @@ void C_GiSvPcBusConnector::m_AdaptStyleToBus(const C_GiLiBus * const opc_Bus)
    this->SetColor(mc_STYLE_GUIDE_COLOR_9);
    this->SetMiddleLineColor(opc_Bus->GetMiddleLineColor());
    this->SetMiddleLine(false);
-   this->mpc_LinePath->SetLineStyle(stw_opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH);
+   this->mpc_LinePath->SetLineStyle(stw::opensyde_gui_logic::C_PuiBsLineArrow::E_LineType::eDASH);
 }

@@ -15,20 +15,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_OSCCanDispatcherOsyRouter.h"
+#include "C_OscCanDispatcherOsyRouter.hpp"
 
-#include "TGLTime.h"
-#include "TGLUtils.h"
+#include "TglTime.hpp"
+#include "TglUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_can;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::can;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,14 +50,14 @@ using namespace stw_can;
    Initialize instance
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy & orc_OsyProtocol) :
-   C_CAN_Dispatcher(0U),
+C_OscCanDispatcherOsyRouter::C_OscCanDispatcherOsyRouter(C_OscProtocolDriverOsy & orc_OsyProtocol) :
+   C_CanDispatcher(0U),
    mrc_OsyProtocol(orc_OsyProtocol),
    mu8_RoutingChannel(0U),
    mu32_FilterId(0U),
    mu32_FilterMask(0xFFFFFFFFU)
 {
-   orc_OsyProtocol.InitializeTunnelCanMessage(&C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
+   orc_OsyProtocol.InitializeTunnelCanMessage(&C_OscCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -69,15 +69,15 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
    \param[in]  ou8_CommChannel  communication driver channel
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy & orc_OsyProtocol,
-                                                         const uint8 ou8_CommChannel) :
-   C_CAN_Dispatcher(ou8_CommChannel),
+C_OscCanDispatcherOsyRouter::C_OscCanDispatcherOsyRouter(C_OscProtocolDriverOsy & orc_OsyProtocol,
+                                                         const uint8_t ou8_CommChannel) :
+   C_CanDispatcher(ou8_CommChannel),
    mrc_OsyProtocol(orc_OsyProtocol),
    mu8_RoutingChannel(0U),
    mu32_FilterId(0U),
    mu32_FilterMask(0xFFFFFFFFU)
 {
-   orc_OsyProtocol.InitializeTunnelCanMessage(&C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
+   orc_OsyProtocol.InitializeTunnelCanMessage(&C_OscCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived, this);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -95,8 +95,8 @@ C_OSCCanDispatcherOsyRouter::C_OSCCanDispatcherOsyRouter(C_OSCProtocolDriverOsy 
                                           Bits 29, 30 and 31 are reserved (shall be set to zero)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingChannel, const uint32 ou32_FilterId,
-                                                      const uint32 ou32_FilterMask)
+void C_OscCanDispatcherOsyRouter::SetFilterParameters(const uint8_t ou8_RoutingChannel, const uint32_t ou32_FilterId,
+                                                      const uint32_t ou32_FilterMask)
 {
    this->mu8_RoutingChannel = ou8_RoutingChannel;
    this->mu32_FilterId = ou32_FilterId;
@@ -119,7 +119,7 @@ void C_OSCCanDispatcherOsyRouter::SetFilterParameters(const uint8 ou8_RoutingCha
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
+int32_t C_OscCanDispatcherOsyRouter::CAN_Init(void)
 {
    return this->mrc_OsyProtocol.OsySetTunnelCanMessages(this->mu8_RoutingChannel, this->mu32_FilterId,
                                                         this->mu32_FilterMask);
@@ -138,7 +138,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
+int32_t C_OscCanDispatcherOsyRouter::CAN_Init(const int32_t os32_BitrateKBitS)
 {
    (void)os32_BitrateKBitS;
    return C_NOACT;
@@ -158,7 +158,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Init(const sint32 os32_BitrateKBitS)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
+int32_t C_OscCanDispatcherOsyRouter::CAN_Exit(void)
 {
    return this->mrc_OsyProtocol.OsyStopTunnelCanMessages();
 }
@@ -177,9 +177,9 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Exit(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
+int32_t C_OscCanDispatcherOsyRouter::CAN_Reset(void)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    s32_Return = this->CAN_Exit();
 
@@ -208,7 +208,7 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Reset(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX & orc_Message)
+int32_t C_OscCanDispatcherOsyRouter::CAN_Send_Msg(const stw::can::T_STWCAN_Msg_TX & orc_Message)
 {
    return this->mrc_OsyProtocol.OsySendCanMessage(this->mu8_RoutingChannel, orc_Message);
 }
@@ -227,9 +227,9 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Send_Msg(const stw_can::T_STWCAN_Msg_TX 
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTimeUs) const
+int32_t C_OscCanDispatcherOsyRouter::CAN_Get_System_Time(uint64_t & oru64_SystemTimeUs) const
 {
-   oru64_SystemTimeUs = stw_tgl::TGL_GetTickCountUS();
+   oru64_SystemTimeUs = stw::tgl::TglGetTickCountUs();
 
    return C_NO_ERR;
 }
@@ -247,15 +247,15 @@ sint32 C_OSCCanDispatcherOsyRouter::CAN_Get_System_Time(uint64 & oru64_SystemTim
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{8001}  //name of function dictated by base class
-sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & orc_Message)
+int32_t C_OscCanDispatcherOsyRouter::m_CAN_Read_Msg(stw::can::T_STWCAN_Msg_RX & orc_Message)
 {
-   sint32 s32_Return = C_WARN;
+   int32_t s32_Return = C_WARN;
 
    mrc_OsyProtocol.Cycle();
 
    if (this->mc_AsyncMessages.size() > 0)
    {
-      std::list<stw_can::T_STWCAN_Msg_RX>::iterator c_ItItem;
+      std::list<stw::can::T_STWCAN_Msg_RX>::iterator c_ItItem;
 
       // Get the first message
       c_ItItem = this->mc_AsyncMessages.begin();
@@ -270,19 +270,19 @@ sint32 C_OSCCanDispatcherOsyRouter::m_CAN_Read_Msg(stw_can::T_STWCAN_Msg_RX & or
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
+/*! \brief   In C_OscProtocolDriverOsy registered function for receiving asynchronous messages
 
-   \param[in]     opv_Instance     Pointer to the instance of C_OSCCanDispatcherOsyRouter
+   \param[in]     opv_Instance     Pointer to the instance of C_OscCanDispatcherOsyRouter
    \param[in]     ou8_Channel      Channel the message was received on
    \param[in]     orc_CanMessage   Async received CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const opv_Instance, const uint8 ou8_Channel,
-                                                                 const stw_can::T_STWCAN_Msg_RX & orc_CanMessage)
+void C_OscCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const opv_Instance, const uint8_t ou8_Channel,
+                                                                 const stw::can::T_STWCAN_Msg_RX & orc_CanMessage)
 {
    //lint -e{9079}  This class is the only one which registers itself at the caller of this function. It must match.
-   C_OSCCanDispatcherOsyRouter * const pc_Dispatcher =
-      reinterpret_cast<C_OSCCanDispatcherOsyRouter *>(opv_Instance);
+   C_OscCanDispatcherOsyRouter * const pc_Dispatcher =
+      reinterpret_cast<C_OscCanDispatcherOsyRouter *>(opv_Instance);
 
    tgl_assert(pc_Dispatcher != NULL);
    if (pc_Dispatcher != NULL)
@@ -292,14 +292,14 @@ void C_OSCCanDispatcherOsyRouter::mh_OsyTunnelCanMessageReceived(void * const op
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   In C_OSCProtocolDriverOsy registered function for receiving asynchronous messages
+/*! \brief   In C_OscProtocolDriverOsy registered function for receiving asynchronous messages
 
    \param[in]     ou8_Channel      Channel the message was received on
    \param[in]     orc_CanMessage   Async received CAN message
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanDispatcherOsyRouter::m_OsyTunnelCanMessageReceived(const uint8 ou8_Channel,
-                                                                const stw_can::T_STWCAN_Msg_RX & orc_CanMessage)
+void C_OscCanDispatcherOsyRouter::m_OsyTunnelCanMessageReceived(const uint8_t ou8_Channel,
+                                                                const stw::can::T_STWCAN_Msg_RX & orc_CanMessage)
 {
    if (ou8_Channel == mu8_RoutingChannel)
    {

@@ -6,33 +6,32 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
+#include "stwerrors.hpp"
 
-#include "C_SyvSeSetupWidget.h"
+#include "C_SyvSeSetupWidget.hpp"
 
 #include "ui_C_SyvSeSetupWidget.h"
 
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSvHandler.h"
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCNode.h"
-#include "C_SyvDcWidget.h"
-#include "C_OgePopUpDialog.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_OgeWiCustomMessage.h"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNode.hpp"
+#include "C_SyvDcWidget.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -55,7 +54,7 @@ using namespace stw_opensyde_gui_logic;
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * const opc_Parent) :
+C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32_t ou32_ViewIndex, QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SyvSeSetupWidget),
    mpc_Scene(NULL),
@@ -89,8 +88,8 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
 
    // configure scene
    this->mpc_Scene->setSceneRect(0.0, 0.0,
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->width()),
-                                 static_cast<float64>(this->mpc_Ui->pc_GraphicsView->height()));
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->width()),
+                                 static_cast<float64_t>(this->mpc_Ui->pc_GraphicsView->height()));
    this->mpc_Ui->pc_GraphicsView->SetSceneAndConnect(this->mpc_Scene);
 
    this->InitText();
@@ -110,11 +109,12 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
    connect(this->mpc_Scene, &C_SebScene::SigTriggerUpdateTransform, this->mpc_Ui->pc_GraphicsView,
            &C_SebGraphicsView::UpdateTransform);
    // Connect buttons
-   connect(this->mpc_Ui->pc_CheckBoxSelectAll, &stw_opensyde_gui_elements::C_OgeChxSystemCommisioningEdit::stateChanged,
+   connect(this->mpc_Ui->pc_CheckBoxSelectAll,
+           &stw::opensyde_gui_elements::C_OgeChxSystemCommisioningEdit::stateChanged,
            this, &C_SyvSeSetupWidget::m_SelectAllStateChanged);
-   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
+   connect(this->mpc_Ui->pc_PbConfirm, &stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvSeSetupWidget::m_ConfirmClicked);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
+   connect(this->mpc_Ui->pc_PbCancel, &stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvSeSetupWidget::m_CancelClicked);
    // Scene forwarding
    connect(this->mpc_Scene, &C_SebScene::SigChanged, this, &C_SyvSeSetupWidget::m_ViewChanged);
@@ -131,7 +131,7 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32 ou32_ViewIndex, QWidget * co
       c_Name = "";
    }
    this->mpc_Ui->pc_GraphicsView->SetZoomValue(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                  c_Name).sn_SetupViewZoom, true);
+                                                  c_Name).s32_SetupViewZoom, true);
    this->mpc_Ui->pc_GraphicsView->SetViewPos(C_UsHandler::h_GetInstance()->GetProjSvSetupView(c_Name).c_SetupViewPos);
    this->m_CheckViewForError();
 }
@@ -280,8 +280,8 @@ void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
    bool q_DeviceConfigPossible = true;
 
    // Check for special case of a automatically deactivated sub node
-   std::vector<uint8> c_NodeActiveFlagsWithDeactivatedSubNodes;
-   const sint32 s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
+   std::vector<uint8_t> c_NodeActiveFlagsWithDeactivatedSubNodes;
+   const int32_t s32_Retval = C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
       this->mu32_ViewIndex,
       c_NodeActiveFlagsWithDeactivatedSubNodes);
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
@@ -289,8 +289,8 @@ void C_SyvSeSetupWidget::StartDeviceConfiguration(void)
    if ((pc_View != NULL) &&
        (s32_Retval == C_NO_ERR))
    {
-      const std::vector<uint8> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
-      uint32 u32_Counter;
+      const std::vector<uint8_t> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
+      uint32_t u32_Counter;
 
       tgl_assert(rc_NodeActiveFlags.size() == c_NodeActiveFlagsWithDeactivatedSubNodes.size());
       for (u32_Counter = 0U; u32_Counter < rc_NodeActiveFlags.size(); ++u32_Counter)
@@ -368,7 +368,7 @@ void C_SyvSeSetupWidget::PrepareToClose(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvSeSetupWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Escape)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape)) &&
        (this->mq_EditModeActive == true))
    {
       this->m_CancelClicked();
@@ -403,10 +403,10 @@ void C_SyvSeSetupWidget::m_CheckViewForError(const bool oq_SendError) const
 
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
-   sintn sn_ColorID;
+   int32_t s32_ColorId;
    const bool q_ViewSetupError = C_SyvUtil::h_GetViewStatusLabelInfo(
       this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_SETUP, c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip,
-      e_ToolTipType, c_IconPath, sn_ColorID);
+      e_ToolTipType, c_IconPath, s32_ColorId);
 
    if (q_ViewSetupError == true)
    {
@@ -426,11 +426,11 @@ void C_SyvSeSetupWidget::m_CheckViewForError(const bool oq_SendError) const
       this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
       this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(c_ToolTipHeading,
                                                              c_ErrorTextTooltip, e_ToolTipType);
-      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(s32_ColorId);
       this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
       this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(c_ToolTipHeading,
                                                               c_ErrorTextTooltip, e_ToolTipType);
-      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+      this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(s32_ColorId);
       this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
       this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
    }
@@ -456,9 +456,9 @@ void C_SyvSeSetupWidget::m_OnViewConnectionChange(void)
    if (pc_View != NULL)
    {
       // Get original active flags
-      const std::vector<uint8> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
+      const std::vector<uint8_t> & rc_ActiveFlags = pc_View->GetNodeActiveFlags();
       bool q_AllActive = true;
-      for (uint32 u32_ItActive = 0UL; u32_ItActive < rc_ActiveFlags.size(); ++u32_ItActive)
+      for (uint32_t u32_ItActive = 0UL; u32_ItActive < rc_ActiveFlags.size(); ++u32_ItActive)
       {
          if (rc_ActiveFlags[u32_ItActive] == 0U)
          {
@@ -480,7 +480,7 @@ void C_SyvSeSetupWidget::m_SelectAllStateChanged(void)
    //Flag to ignore automated changes triggering this function
    if ((this->mq_IgnoreSelectAllCheckboxChanges == false) && (this->mpc_Scene != NULL))
    {
-      const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+      const uint16_t u16_Timer = osc_write_log_performance_start();
       if (this->mpc_Ui->pc_CheckBoxSelectAll->isChecked())
       {
          this->mpc_Scene->SetAllNodesConnected(true);

@@ -8,16 +8,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_OSCNodeCodeExportSettings.h"
+#include "stwtypes.hpp"
+#include "C_OscNodeCodeExportSettings.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
+
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor/destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeCodeExportSettings::C_OSCNodeCodeExportSettings(void)
+C_OscNodeCodeExportSettings::C_OscNodeCodeExportSettings(void)
 {
    this->Initialize();
 }
@@ -44,7 +44,7 @@ C_OSCNodeCodeExportSettings::C_OSCNodeCodeExportSettings(void)
 /*! \brief  Initialize
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeCodeExportSettings::Initialize()
+void C_OscNodeCodeExportSettings::Initialize()
 {
    e_ScalingSupport = eFLOAT32;
 }
@@ -57,7 +57,7 @@ void C_OSCNodeCodeExportSettings::Initialize()
    \param[in,out] oru32_HashValue    Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeCodeExportSettings::CalcHash(stw_types::uint32 & oru32_HashValue) const
+void C_OscNodeCodeExportSettings::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ScalingSupport, sizeof(this->e_ScalingSupport), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_ScalingSupport, sizeof(this->e_ScalingSupport), oru32_HashValue);
 }

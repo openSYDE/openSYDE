@@ -9,30 +9,29 @@
 #include <QFileInfo>
 #include <QFontMetrics>
 #include <QWinTaskbarButton>
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_OsyHexFile.h"
-#include "C_PuiProject.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvUpSummaryWidget.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OsyHexFile.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvUpSummaryWidget.hpp"
 #include "ui_C_SyvUpSummaryWidget.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 //System update layout state thresholds
-const stw_types::sint32 C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_1 = 120;
-const stw_types::sint32 C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_2 = 160; // Keep synced with update package widget
-const stw_types::sint32 C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_3 = 250;
-const stw_types::sint32 C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_4 = 300;
+const int32_t C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_1 = 120;
+const int32_t C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_2 = 160; // Keep synced with update package widget
+const int32_t C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_3 = 250;
+const int32_t C_SyvUpSummaryWidget::mhs32_LAYOUT_THRESHOLD_4 = 300;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -145,12 +144,12 @@ void C_SyvUpSummaryWidget::SetHeading(const QString & orc_Icon, const QString & 
    \param[in]   oq_Finished       Flag if already finished
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpSummaryWidget::SetProgress(const uint16 ou16_Progress100, const bool oq_Finished) const
+void C_SyvUpSummaryWidget::SetProgress(const uint16_t ou16_Progress100, const bool oq_Finished) const
 {
    this->mpc_Ui->pc_WidgetProgress->SetProgress100(ou16_Progress100, oq_Finished);
-   this->mpc_Ui->pc_ProgressBarBig->SetProgress(static_cast<sint32>(ou16_Progress100), oq_Finished);
+   this->mpc_Ui->pc_ProgressBarBig->SetProgress(static_cast<int32_t>(ou16_Progress100), oq_Finished);
    this->mpc_Ui->pc_LabelPercentBig->setText(QString::number(ou16_Progress100) + "%");
-   this->mpc_Ui->pc_ProgressBarSmall->SetProgress(static_cast<sint32>(ou16_Progress100), oq_Finished);
+   this->mpc_Ui->pc_ProgressBarSmall->SetProgress(static_cast<int32_t>(ou16_Progress100), oq_Finished);
    this->mpc_Ui->pc_LabelPercentSmall->setText(QString::number(ou16_Progress100) + "%");
 }
 

@@ -10,27 +10,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
-#include "C_NagViewItem.h"
-#include "C_PuiSvHandler.h"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
+#include "C_NagViewItem.hpp"
+#include "C_PuiSvHandler.hpp"
 #include "ui_C_NagViewItem.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::sintn C_NagViewItem::mhsn_SIZE_TOP = 48;
-const stw_types::sintn C_NagViewItem::mhsn_SIZE_SUB = 30;
-const stw_types::sintn C_NagViewItem::mhsn_FIX_SIZE_BOTTOM = 18;
+const int32_t C_NagViewItem::mhs32_SIZE_TOP = 48;
+const int32_t C_NagViewItem::mhs32_SIZE_SUB = 30;
+const int32_t C_NagViewItem::mhs32_FIX_SIZE_BOTTOM = 18;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -110,36 +109,36 @@ C_NagViewItem::C_NagViewItem(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LineEditHeading->setVisible(false);
 
    //Connects
-   connect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
+   connect(this->mpc_Ui->pc_LineEditHeading, &stw::opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
            &C_NagViewItem::m_OnNameEditFinished);
-   connect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::SigEscape, this,
+   connect(this->mpc_Ui->pc_LineEditHeading, &stw::opensyde_gui_elements::C_OgeLeNavigation::SigEscape, this,
            &C_NagViewItem::m_OnNameEditCancelled);
-   mc_Conn = connect(this->mpc_Ui->pc_WidgetTopButton, &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled,
+   mc_Conn = connect(this->mpc_Ui->pc_WidgetTopButton, &stw::opensyde_gui_elements::C_OgePubNavigationHover::toggled,
                      this,
                      &C_NagViewItem::m_SetExpanded);
-   connect(this->mpc_Ui->pc_PushButtonCopy, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonCopy, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
            &C_NagViewItem::m_OnDuplicate);
-   connect(this->mpc_Ui->pc_PushButtonDelete, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonDelete, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
            &C_NagViewItem::m_OnDelete);
-   connect(this->mpc_Ui->pc_PushButtonEdit, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
+   connect(this->mpc_Ui->pc_PushButtonEdit, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::clicked, this,
            &C_NagViewItem::m_OnEditButton);
-   connect(this->mpc_Ui->pc_WidgetSetup, &stw_opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
+   connect(this->mpc_Ui->pc_WidgetSetup, &stw::opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
            &C_NagViewItem::m_OnSetupClicked);
-   connect(this->mpc_Ui->pc_WidgetUpdate, &stw_opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
+   connect(this->mpc_Ui->pc_WidgetUpdate, &stw::opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
            &C_NagViewItem::m_OnUpdateClicked);
-   connect(this->mpc_Ui->pc_WidgetDashboard, &stw_opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
+   connect(this->mpc_Ui->pc_WidgetDashboard, &stw::opensyde_gui_elements::C_OgePubNavigationHover::clicked, this,
            &C_NagViewItem::m_OnDashboardClicked);
-   connect(this->mpc_Ui->pc_PushButtonCopy, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
+   connect(this->mpc_Ui->pc_PushButtonCopy, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
            &C_NagViewItem::m_ButtonPressed);
-   connect(this->mpc_Ui->pc_PushButtonDelete, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
+   connect(this->mpc_Ui->pc_PushButtonDelete, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
            &C_NagViewItem::m_ButtonPressed);
-   connect(this->mpc_Ui->pc_PushButtonEdit, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
+   connect(this->mpc_Ui->pc_PushButtonEdit, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::pressed, this,
            &C_NagViewItem::m_ButtonPressed);
-   connect(this->mpc_Ui->pc_PushButtonCopy, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
+   connect(this->mpc_Ui->pc_PushButtonCopy, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
            &C_NagViewItem::m_ButtonReleased);
-   connect(this->mpc_Ui->pc_PushButtonDelete, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
+   connect(this->mpc_Ui->pc_PushButtonDelete, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
            &C_NagViewItem::m_ButtonReleased);
-   connect(this->mpc_Ui->pc_PushButtonEdit, &stw_opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
+   connect(this->mpc_Ui->pc_PushButtonEdit, &stw::opensyde_gui_elements::C_OgePubSvgIconOnly::released, this,
            &C_NagViewItem::m_ButtonReleased);
 }
 
@@ -238,12 +237,12 @@ void C_NagViewItem::UpdateDeco(void) const
 
    C_NagToolTip::E_Type e_ToolTipType;
    QString c_IconPath;
-   sintn sn_ColorID;
+   int32_t s32_ColorId;
    // Sub mode of setup is used due to show here only errors on every view sub mode
    const bool q_Error = C_SyvUtil::h_GetViewStatusLabelInfo(this->mu32_ViewIndex, ms32_SUBMODE_SYSVIEW_SETUP,
                                                             c_ErrorTextHeading, c_Error,
                                                             c_ErrorTextTooltip,
-                                                            e_ToolTipType, c_IconPath, sn_ColorID);
+                                                            e_ToolTipType, c_IconPath, s32_ColorId);
 
    if ((q_Error) && (e_ToolTipType == C_NagToolTip::eERROR))
    {
@@ -301,7 +300,7 @@ void C_NagViewItem::SetDragged(const bool oq_Active)
    \param[in]  ou32_ViewIndex    New view index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagViewItem::Init(const uint32 ou32_ViewIndex)
+void C_NagViewItem::Init(const uint32_t ou32_ViewIndex)
 {
    this->mu32_ViewIndex = ou32_ViewIndex;
    this->UpdateName();
@@ -316,7 +315,7 @@ void C_NagViewItem::Init(const uint32 ou32_ViewIndex)
    \param[in]  os32_SubMode   New active sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagViewItem::SetActive(const bool oq_Active, const sint32 os32_SubMode)
+void C_NagViewItem::SetActive(const bool oq_Active, const int32_t os32_SubMode)
 {
    this->mq_Active = oq_Active;
    this->mpc_Ui->pc_GroupBoxActive->SetActive(oq_Active);
@@ -402,7 +401,7 @@ void C_NagViewItem::HandleServiceMode(void)
       if (!this->mc_Conn)
       {
          this->mc_Conn = connect(this->mpc_Ui->pc_WidgetTopButton,
-                                 &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled,
+                                 &stw::opensyde_gui_elements::C_OgePubNavigationHover::toggled,
                                  this,
                                  &C_NagViewItem::m_SetExpanded);
       }
@@ -425,10 +424,10 @@ void C_NagViewItem::HandleServiceMode(void)
          this->mpc_Ui->pc_WidgetSetup->setVisible(false);
          this->mpc_Ui->pc_WidgetUpdate->setVisible(false);
          this->mpc_Ui->pc_WidgetDashboard->setVisible(false);
-         //lint -e{909} Only possible this way
+         //lint -e{909,9177} Only possible this way
          if (this->mc_Conn)
          {
-            disconnect(this->mpc_Ui->pc_WidgetTopButton, &stw_opensyde_gui_elements::C_OgePubNavigationHover::toggled,
+            disconnect(this->mpc_Ui->pc_WidgetTopButton, &stw::opensyde_gui_elements::C_OgePubNavigationHover::toggled,
                        this,
                        &C_NagViewItem::m_SetExpanded);
          }
@@ -451,15 +450,15 @@ void C_NagViewItem::HandleServiceMode(void)
 QSize C_NagViewItem::sizeHint(void) const
 {
    QSize c_Retval = QWidget::sizeHint();
-   sintn sn_Height = C_NagViewItem::mhsn_SIZE_TOP;
+   int32_t s32_Height = C_NagViewItem::mhs32_SIZE_TOP;
 
    if (this->m_IsExpanded() == true)
    {
-      sn_Height += (3 * C_NagViewItem::mhsn_SIZE_SUB) + C_NagViewItem::mhsn_FIX_SIZE_BOTTOM;
+      s32_Height += (3 * C_NagViewItem::mhs32_SIZE_SUB) + C_NagViewItem::mhs32_FIX_SIZE_BOTTOM;
    }
 
    c_Retval.setWidth(this->width());
-   c_Retval.setHeight(sn_Height);
+   c_Retval.setHeight(s32_Height);
    return c_Retval;
 }
 
@@ -508,7 +507,7 @@ bool C_NagViewItem::event(QEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }
@@ -535,17 +534,17 @@ void C_NagViewItem::m_OnNameEditFinished(void)
    bool q_Found = false;
 
    // avoid second "editingFinished" signal when line edit looses focus (occurs on enter key press)
-   disconnect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
+   disconnect(this->mpc_Ui->pc_LineEditHeading, &stw::opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
               &C_NagViewItem::m_OnNameEditFinished);
 
    this->mpc_Ui->pc_LabelHeading->setVisible(true);
    this->mpc_Ui->pc_LineEditHeading->setVisible(false);
 
-   connect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
+   connect(this->mpc_Ui->pc_LineEditHeading, &stw::opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
            &C_NagViewItem::m_OnNameEditFinished);
 
    //Check new name
-   for (uint32 u32_ItView = 0; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
    {
       //Skip the current name
       if (u32_ItView != this->mu32_ViewIndex)
@@ -562,8 +561,8 @@ void C_NagViewItem::m_OnNameEditFinished(void)
    }
    if (q_Found == true)
    {
-      stw_opensyde_gui_elements::C_OgeWiCustomMessage
-         c_ImportWarnings(this, stw_opensyde_gui_elements::C_OgeWiCustomMessage::eERROR);
+      stw::opensyde_gui_elements::C_OgeWiCustomMessage
+         c_ImportWarnings(this, stw::opensyde_gui_elements::C_OgeWiCustomMessage::eERROR);
       c_ImportWarnings.SetHeading(C_GtGetText::h_GetText("View rename"));
       c_ImportWarnings.SetDescription(
          static_cast<QString>(C_GtGetText::h_GetText(
@@ -585,12 +584,12 @@ void C_NagViewItem::m_OnNameEditFinished(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagViewItem::m_OnNameEditCancelled(void)
 {
-   disconnect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
+   disconnect(this->mpc_Ui->pc_LineEditHeading, &stw::opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
               &C_NagViewItem::m_OnNameEditFinished);
    this->mpc_Ui->pc_LabelHeading->setVisible(true);
    this->mpc_Ui->pc_LineEditHeading->setVisible(false);
    //Don't allow accepting the current input
-   connect(this->mpc_Ui->pc_LineEditHeading, &stw_opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
+   connect(this->mpc_Ui->pc_LineEditHeading, &stw::opensyde_gui_elements::C_OgeLeNavigation::editingFinished, this,
            &C_NagViewItem::m_OnNameEditFinished);
 }
 
@@ -687,7 +686,7 @@ void C_NagViewItem::m_OnExpand(void)
    //Check if is expanded NOW (after action was executed)
    if (((this->mq_Active == false) && (this->mq_IgnoreActiveOnExpand == false)) && (this->m_IsExpanded() == true))
    {
-      sint32 s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
+      int32_t s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
       bool q_Continue = true;
       if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive())
       {

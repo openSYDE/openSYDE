@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
 #include <QMouseEvent>
 
-#include "stwtypes.h"
-#include "C_CamMosDatabaseSelectionView.h"
+#include "stwtypes.hpp"
+#include "C_CamMosDatabaseSelectionView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 std::vector<QString> C_CamMosDatabaseSelectionView::mhc_LastKnownExpandedTopLevelItems;
@@ -192,9 +191,9 @@ void C_CamMosDatabaseSelectionView::selectionChanged(const QItemSelection & orc_
 void C_CamMosDatabaseSelectionView::m_AppendExpandedIndices(std::vector<QString> & orc_FoundItems)
 {
    orc_FoundItems.clear();
-   for (sintn sn_ItChild = 0; sn_ItChild < this->mc_Model.rowCount(); ++sn_ItChild)
+   for (int32_t s32_ItChild = 0; s32_ItChild < this->mc_Model.rowCount(); ++s32_ItChild)
    {
-      const QModelIndex c_CurItem = this->mc_Model.index(sn_ItChild, 0);
+      const QModelIndex c_CurItem = this->mc_Model.index(s32_ItChild, 0);
       if (this->isExpanded(m_ManualMapFromSource(c_CurItem)) == true)
       {
          orc_FoundItems.push_back(this->mc_Model.data(c_CurItem).toString());
@@ -212,7 +211,7 @@ void C_CamMosDatabaseSelectionView::m_RestoreExpandedIndices(void)
    {
       this->collapseAll();
       QModelIndexList c_List;
-      for (uint32 u32_ItExpandedItem = 0UL;
+      for (uint32_t u32_ItExpandedItem = 0UL;
            u32_ItExpandedItem < C_CamMosDatabaseSelectionView::mhc_LastKnownExpandedTopLevelItems.size();
            ++u32_ItExpandedItem)
       {

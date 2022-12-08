@@ -8,15 +8,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamComDriverBase.h"
+#include "C_CamComDriverBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +34,7 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CamComDriverBase::C_CamComDriverBase(void) :
-   C_OSCComDriverBase()
+   C_OscComDriverBase()
 {
 }
 
@@ -59,12 +58,12 @@ C_CamComDriverBase::~C_CamComDriverBase(void)
    C_CONFIG                          CAN dispatcher is not set
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
+int32_t C_CamComDriverBase::StartLogging(const int32_t os32_Bitrate)
 {
-   sint32 s32_Return;
+   int32_t s32_Return;
 
    this->mc_CriticalSectionMsg.Acquire();
-   s32_Return = C_OSCComDriverBase::StartLogging(os32_Bitrate);
+   s32_Return = C_OscComDriverBase::StartLogging(os32_Bitrate);
    this->mc_CriticalSectionMsg.Release();
 
    return s32_Return;
@@ -79,7 +78,7 @@ sint32 C_CamComDriverBase::StartLogging(const stw_types::sint32 os32_Bitrate)
 void C_CamComDriverBase::StopLogging(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::StopLogging();
+   C_OscComDriverBase::StopLogging();
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -92,7 +91,7 @@ void C_CamComDriverBase::StopLogging(void)
 void C_CamComDriverBase::ContinueLogging(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::ContinueLogging();
+   C_OscComDriverBase::ContinueLogging();
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -105,7 +104,7 @@ void C_CamComDriverBase::ContinueLogging(void)
 void C_CamComDriverBase::PauseLogging(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::PauseLogging();
+   C_OscComDriverBase::PauseLogging();
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -115,15 +114,15 @@ void C_CamComDriverBase::PauseLogging(void)
    \param[in]  os32_Bitrate          CAN bitrate in kBit/s. Is used for the bus load calculation not the initialization
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamComDriverBase::UpdateBitrate(const sint32 os32_Bitrate)
+void C_CamComDriverBase::UpdateBitrate(const int32_t os32_Bitrate)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::UpdateBitrate(os32_Bitrate);
+   C_OscComDriverBase::UpdateBitrate(os32_Bitrate);
    this->mc_CriticalSectionMsg.Release();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Distributes the CAN message to all registered C_OSCMessageLogger instances.
+/*! \brief   Distributes the CAN message to all registered C_OscMessageLogger instances.
 
    This function is thread safe
 */
@@ -131,7 +130,7 @@ void C_CamComDriverBase::UpdateBitrate(const sint32 os32_Bitrate)
 void C_CamComDriverBase::DistributeMessages(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::DistributeMessages();
+   C_OscComDriverBase::DistributeMessages();
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -143,10 +142,10 @@ void C_CamComDriverBase::DistributeMessages(void)
    This function is thread safe
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamComDriverBase::SendCanMessageQueued(const stw_can::T_STWCAN_Msg_TX & orc_Msg)
+void C_CamComDriverBase::SendCanMessageQueued(const stw::can::T_STWCAN_Msg_TX & orc_Msg)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::SendCanMessageQueued(orc_Msg);
+   C_OscComDriverBase::SendCanMessageQueued(orc_Msg);
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -159,10 +158,10 @@ void C_CamComDriverBase::SendCanMessageQueued(const stw_can::T_STWCAN_Msg_TX & o
    \param[in]     orc_MsgCfg         CAN message configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamComDriverBase::SendCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
+void C_CamComDriverBase::SendCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::SendCanMessage(orc_MsgCfg);
+   C_OscComDriverBase::SendCanMessage(orc_MsgCfg);
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -172,10 +171,10 @@ void C_CamComDriverBase::SendCanMessage(const C_OSCComDriverBaseCanMessage & orc
    \param[in]     orc_MsgCfg         CAN message configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamComDriverBase::AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
+void C_CamComDriverBase::AddCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::AddCyclicCanMessage(orc_MsgCfg);
+   C_OscComDriverBase::AddCyclicCanMessage(orc_MsgCfg);
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -185,10 +184,10 @@ void C_CamComDriverBase::AddCyclicCanMessage(const C_OSCComDriverBaseCanMessage 
    \param[in]     orc_MsgCfg         CAN message configuration
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessage & orc_MsgCfg)
+void C_CamComDriverBase::RemoveCyclicCanMessage(const C_OscComDriverBaseCanMessage & orc_MsgCfg)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::RemoveCyclicCanMessage(orc_MsgCfg);
+   C_OscComDriverBase::RemoveCyclicCanMessage(orc_MsgCfg);
    this->mc_CriticalSectionMsg.Release();
 }
 
@@ -199,6 +198,6 @@ void C_CamComDriverBase::RemoveCyclicCanMessage(const C_OSCComDriverBaseCanMessa
 void C_CamComDriverBase::RemoveAllCyclicCanMessages(void)
 {
    this->mc_CriticalSectionMsg.Acquire();
-   C_OSCComDriverBase::RemoveAllCyclicCanMessages();
+   C_OscComDriverBase::RemoveAllCyclicCanMessages();
    this->mc_CriticalSectionMsg.Release();
 }

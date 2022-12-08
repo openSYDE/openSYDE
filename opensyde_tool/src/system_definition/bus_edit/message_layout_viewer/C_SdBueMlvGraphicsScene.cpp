@@ -10,7 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstdlib>
 
@@ -20,34 +20,33 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneContextMenuEvent>
 
-#include "stwtypes.h"
-#include "constants.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
 
-#include "TGLUtils.h"
-#include "TGLTime.h"
-#include "C_SdBueMlvGraphicsScene.h"
+#include "TglUtils.hpp"
+#include "TglTime.hpp"
+#include "C_SdBueMlvGraphicsScene.hpp"
 
-#include "C_SdBueMlvBaseItem.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSdNodeCanSignal.h"
-#include "C_GtGetText.h"
-#include "C_OSCCanMessage.h"
+#include "C_SdBueMlvBaseItem.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSdNodeCanSignal.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscCanMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_SPACE = 2.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_BELOW_ALL_ITEMS = -1.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT = 0.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_INTERACTION = 1.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_EMPTY_ITEM = 10000.0;
-const stw_types::float64 C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_HINT_ITEM = 10001.0;
-const stw_types::uint8 C_SdBueMlvGraphicsScene::mhu8_MAX_NUM_BITS = 64U;
+const float64_t C_SdBueMlvGraphicsScene::mhf64_SPACE = 2.0;
+const float64_t C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_BELOW_ALL_ITEMS = -1.0;
+const float64_t C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT = 0.0;
+const float64_t C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_INTERACTION = 1.0;
+const float64_t C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_EMPTY_ITEM = 10000.0;
+const float64_t C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_HINT_ITEM = 10001.0;
+const uint8_t C_SdBueMlvGraphicsScene::mhu8_MAX_NUM_BITS = 64U;
 
 const C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[64] =
 {
@@ -138,7 +137,7 @@ C_SdBueMlvGraphicsScene::C_SdBueMlvGraphicsScene(QObject * const opc_Parent) :
    QGraphicsScene(opc_Parent),
    mpc_ContextMenu(NULL),
    mpc_MessageSyncManager(NULL),
-   me_Protocol(C_OSCCanProtocol::eLAYER2),
+   me_Protocol(C_OscCanProtocol::eLAYER2),
    mc_MessageId(),
    mq_MultiplexedMessage(false),
    mu16_MultiplexerValue(0),
@@ -188,7 +187,7 @@ C_SdBueMlvGraphicsScene::~C_SdBueMlvGraphicsScene(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::SetMessageSyncManager(
-   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
+   stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value)
 {
    this->mpc_MessageSyncManager = opc_Value;
 }
@@ -199,9 +198,9 @@ void C_SdBueMlvGraphicsScene::SetMessageSyncManager(
    \param[in] ore_Value New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
+void C_SdBueMlvGraphicsScene::SetComProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Value)
 {
-   const bool q_CanOpen =  (ore_Value == C_OSCCanProtocol::eCAN_OPEN);
+   const bool q_CanOpen =  (ore_Value == C_OscCanProtocol::eCAN_OPEN);
 
    this->me_Protocol = ore_Value;
    this->mq_ResizingEnabled = !q_CanOpen;
@@ -218,18 +217,18 @@ void C_SdBueMlvGraphicsScene::SetComProtocol(const stw_opensyde_core::C_OSCCanPr
    \param[in]  ou16_MultiplexValue     Value of the multiplexer signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                         const bool oq_MultiplexedMessage, const uint16 ou16_MultiplexValue)
+void C_SdBueMlvGraphicsScene::SetMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                         const bool oq_MultiplexedMessage, const uint16_t ou16_MultiplexValue)
 {
-   const C_OSCCanMessage * const pc_Message =
-      stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
+   const C_OscCanMessage * const pc_Message =
+      stw::opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
 
    tgl_assert(pc_Message != NULL);
    if (pc_Message != NULL)
    {
-      uint16 u16_Counter;
-      uint32 u32_Counter;
-      sint32 s32_Counter;
+      uint16_t u16_Counter;
+      uint32_t u32_Counter;
+      int32_t s32_Counter;
 
       // save the identification information
       this->mc_MessageId = orc_MessageId;
@@ -240,16 +239,16 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
 
       this->mpc_AddMultiplexed->setVisible(this->mq_MultiplexedMessage);
 
-      if (this->me_Protocol == C_OSCCanProtocol::eECES)
+      if (this->me_Protocol == C_OscCanProtocol::eECES)
       {
          // special case DLC is always 8, but byte 7 and byte 8 are reserved for message counter and CRC
-         this->mu16_MaximumCountBits = static_cast<uint16>(mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX);
-         this->mapc_ECeSHints[0]->setVisible(true);
-         this->mapc_ECeSHints[1]->setVisible(true);
+         this->mu16_MaximumCountBits = static_cast<uint16_t>(mu32_PROTOCOL_ECES_SIGNALCOUNT_MAX);
+         this->mapc_EcesHints[0]->setVisible(true);
+         this->mapc_EcesHints[1]->setVisible(true);
       }
       else
       {
-         if (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN)
+         if (this->me_Protocol == C_OscCanProtocol::eCAN_OPEN)
          {
             // special case CANopen: Auto DLC functionality adapt the DLC depending of the current signal configuration
             // In this case all 8 byte must be available always
@@ -257,10 +256,10 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
          }
          else
          {
-            this->mu16_MaximumCountBits = static_cast<uint16>(pc_Message->u16_Dlc * 8U);
+            this->mu16_MaximumCountBits = static_cast<uint16_t>(pc_Message->u16_Dlc * 8U);
          }
-         this->mapc_ECeSHints[0]->setVisible(false);
-         this->mapc_ECeSHints[1]->setVisible(false);
+         this->mapc_EcesHints[0]->setVisible(false);
+         this->mapc_EcesHints[1]->setVisible(false);
       }
 
       // remove all previous signals
@@ -283,7 +282,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
          // special case CANopen: Auto DLC functionality adapt the DLC depending of the current signal configuration
          // In this case all 8 byte must be available always
          if ((s32_Counter < pc_Message->u16_Dlc) ||
-             (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN))
+             (this->me_Protocol == C_OscCanProtocol::eCAN_OPEN))
          {
             this->mc_VecBorderItemsVertical[s32_Counter]->SetActive(true);
          }
@@ -295,7 +294,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
 
       // Deactivate the top header too if DLC is zero and not CANopen
       {
-         const bool q_Active = (pc_Message->u16_Dlc != 0) || (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN);
+         const bool q_Active = (pc_Message->u16_Dlc != 0) || (this->me_Protocol == C_OscCanProtocol::eCAN_OPEN);
          this->mpc_BorderItemUpperLeft->SetActive(q_Active);
          for (s32_Counter = 0U; s32_Counter < mc_VecBorderItemsHorizontal.size(); ++s32_Counter)
          {
@@ -306,11 +305,11 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
       // add the signals
       for (u32_Counter = 0; u32_Counter < pc_Message->c_Signals.size(); ++u32_Counter)
       {
-         const C_OSCCanSignal & rc_Sig = pc_Message->c_Signals[u32_Counter];
+         const C_OscCanSignal & rc_Sig = pc_Message->c_Signals[u32_Counter];
 
          if (this->mq_MultiplexedMessage == false)
          {
-            if (rc_Sig.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            if (rc_Sig.e_MultiplexerType != C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
                // No multiplexing active, add all signals except invalid multiplexed signals
                this->m_AddSignal(u32_Counter);
@@ -320,7 +319,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
          {
             // Multiplexed message. Add always the non multiplexed signals, the multiplexer signal and the
             // multiplexed signal which has the same multiplexer value as the selected value
-            if ((rc_Sig.e_MultiplexerType != C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) ||
+            if ((rc_Sig.e_MultiplexerType != C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL) ||
                 (rc_Sig.u16_MultiplexValue == this->mu16_MultiplexerValue))
             {
                this->m_AddSignal(u32_Counter);
@@ -348,7 +347,7 @@ void C_SdBueMlvGraphicsScene::SetMessage(const C_OSCCanMessageIdentificationIndi
    \param[in]  ou16_MultiplexValue     Value of the multiplexer signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::SetMultiplexValue(const uint16 ou16_MultiplexValue)
+void C_SdBueMlvGraphicsScene::SetMultiplexValue(const uint16_t ou16_MultiplexValue)
 {
    this->SetMessage(this->mc_MessageId, this->mq_MultiplexedMessage, ou16_MultiplexValue);
 }
@@ -359,9 +358,9 @@ void C_SdBueMlvGraphicsScene::SetMultiplexValue(const uint16 ou16_MultiplexValue
    \param[in] ou32_SignalIndex     Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::SetSignal(const uint32 ou32_SignalIndex)
+void C_SdBueMlvGraphicsScene::SetSignal(const uint32_t ou32_SignalIndex)
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
    for (s32_Counter = 0U; s32_Counter < this->mc_VecSignals.size(); ++s32_Counter)
    {
@@ -396,7 +395,7 @@ void C_SdBueMlvGraphicsScene::Clear(void)
 void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
 {
    //Check if item is hovered
-   sint32 s32_Counter;
+   int32_t s32_Counter;
    C_SdBueMlvSignalManager * pc_HoveredItem = NULL;
 
    for (s32_Counter = 0U; s32_Counter < this->mc_VecSignals.size(); ++s32_Counter)
@@ -412,7 +411,7 @@ void C_SdBueMlvGraphicsScene::DisplayToolTip(const QPointF & orc_ScenePos)
    //Do not reopen tool tip if there already is an active tool tip
    if (pc_HoveredItem != NULL)
    {
-      const sint32 s32_GridIndex = this->m_GetGridIndex(orc_ScenePos);
+      const int32_t s32_GridIndex = this->m_GetGridIndex(orc_ScenePos);
 
       // Check for multiple signals on one spot
       if ((s32_GridIndex >= 0) && (s32_GridIndex < mhu8_MAX_NUM_BITS) &&
@@ -532,28 +531,28 @@ void C_SdBueMlvGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent * const o
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const opc_Event)
 {
-   const sint32 s32_ActGridIndex = this->m_GetGridIndex(opc_Event->scenePos());
+   const int32_t s32_ActGridIndex = this->m_GetGridIndex(opc_Event->scenePos());
 
    if ((s32_ActGridIndex >= 0) &&
        (this->mpc_ActualSignal != NULL) &&
        (s32_ActGridIndex != this->ms32_LastGridIndex))
    {
-      const uint16 u16_StartBit = this->mpc_ActualSignal->GetStartBit();
-      const uint16 u16_LastBit = this->mpc_ActualSignal->GetLastBit();
+      const uint16_t u16_StartBit = this->mpc_ActualSignal->GetStartBit();
+      const uint16_t u16_LastBit = this->mpc_ActualSignal->GetLastBit();
 
       if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_MOVE)
       {
          // move an item
-         sint32 s32_IndexDif = s32_ActGridIndex - this->ms32_LastGridIndex;
+         int32_t s32_IndexDif = s32_ActGridIndex - this->ms32_LastGridIndex;
          bool q_OffsetAdapted = false;
 
          if (this->mq_ByteAligned == true)
          {
-            const uint16 u16_AlignmentOffset = u16_StartBit % 8U;
+            const uint16_t u16_AlignmentOffset = u16_StartBit % 8U;
             // Special case: auto fixing a not aligned start bit
             if (u16_AlignmentOffset != 0)
             {
-               s32_IndexDif -= static_cast<sint32>(u16_AlignmentOffset);
+               s32_IndexDif -= static_cast<int32_t>(u16_AlignmentOffset);
 
                q_OffsetAdapted = true;
             }
@@ -569,19 +568,19 @@ void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const op
       else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZELEFT_INTEL)
       {
          // item will resized on the "left" side
-         if (s32_ActGridIndex >= static_cast<sint32>(u16_StartBit))
+         if (s32_ActGridIndex >= static_cast<int32_t>(u16_StartBit))
          {
             // update the item
-            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
             }
          }
-         else if (s32_ActGridIndex <= static_cast<sint32>(u16_LastBit))
+         else if (s32_ActGridIndex <= static_cast<int32_t>(u16_LastBit))
          {
             // the resizing changed to the other direction
             // update the item and change the mode
-            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
                this->me_InteractionMode = C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_INTEL;
@@ -595,19 +594,19 @@ void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const op
       else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_INTEL)
       {
          // item will resized on the "right" side
-         if (s32_ActGridIndex <= static_cast<sint32>(u16_LastBit))
+         if (s32_ActGridIndex <= static_cast<int32_t>(u16_LastBit))
          {
             // update the item
-            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
             }
          }
-         else if (s32_ActGridIndex >= static_cast<sint32>(u16_StartBit))
+         else if (s32_ActGridIndex >= static_cast<int32_t>(u16_StartBit))
          {
             // the resizing changed to the other direction
             // update the item and change the mode
-            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
                this->me_InteractionMode = C_SdBueMlvSignalManager::eIAM_RESIZELEFT_INTEL;
@@ -621,28 +620,28 @@ void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const op
       else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZELEFT_MOTOROLA)
       {
          // item will resized on the "left" side with Motorola format
-         const uint16 u16_RowNewStartBit = static_cast<uint16>(s32_ActGridIndex) / 8U;
-         const uint16 u16_RowLastBit = u16_LastBit / 8U;
+         const uint16_t u16_RowNewStartBit = static_cast<uint16_t>(s32_ActGridIndex) / 8U;
+         const uint16_t u16_RowLastBit = u16_LastBit / 8U;
 
          if ((u16_RowNewStartBit < u16_RowLastBit) ||
-             ((s32_ActGridIndex >= static_cast<sint32>(u16_LastBit)) &&
+             ((s32_ActGridIndex >= static_cast<int32_t>(u16_LastBit)) &&
               (u16_RowNewStartBit == u16_RowLastBit)))
          {
             // the start bit is not in the same row as the last bit or
             // special case: the start bit is in the same row and is with
             // Motorola format on a higher index as the last bit
             // update the item
-            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
             }
          }
-         else if ((s32_ActGridIndex <= static_cast<sint32>(u16_StartBit)) &&
+         else if ((s32_ActGridIndex <= static_cast<int32_t>(u16_StartBit)) &&
                   (u16_RowNewStartBit == u16_RowLastBit))
          {
             // the resizing changed to the other direction
             // update the item and change the mode
-            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
                this->me_InteractionMode = C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_MOTOROLA;
@@ -656,25 +655,25 @@ void C_SdBueMlvGraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent * const op
       else if (this->me_InteractionMode == C_SdBueMlvSignalManager::eIAM_RESIZERIGHT_MOTOROLA)
       {
          // item will resized on the "right" side with Motorola format
-         const uint16 u16_RowNewLastBit = static_cast<uint16>(s32_ActGridIndex) / 8U;
-         const uint16 u16_RowStartBit = u16_StartBit / 8U;
+         const uint16_t u16_RowNewLastBit = static_cast<uint16_t>(s32_ActGridIndex) / 8U;
+         const uint16_t u16_RowStartBit = u16_StartBit / 8U;
 
          if ((u16_RowNewLastBit > u16_RowStartBit) ||
-             ((s32_ActGridIndex <= static_cast<sint32>(u16_StartBit)) &&
+             ((s32_ActGridIndex <= static_cast<int32_t>(u16_StartBit)) &&
               (u16_RowNewLastBit == u16_RowStartBit)))
          {
             // update the item
-            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetLastBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
             }
          }
-         else if ((s32_ActGridIndex >= static_cast<sint32>(u16_LastBit)) &&
+         else if ((s32_ActGridIndex >= static_cast<int32_t>(u16_LastBit)) &&
                   (u16_RowNewLastBit == u16_RowStartBit))
          {
             // the resizing changed to the other direction
             // update the item and change the mode
-            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16>(s32_ActGridIndex)) == true)
+            if (this->mpc_ActualSignal->SetStartBit(static_cast<uint16_t>(s32_ActGridIndex)) == true)
             {
                this->m_UpdateConcreteSignalManager(this->mpc_ActualSignal);
                this->me_InteractionMode = C_SdBueMlvSignalManager::eIAM_RESIZELEFT_MOTOROLA;
@@ -745,7 +744,7 @@ void C_SdBueMlvGraphicsScene::contextMenuEvent(QGraphicsSceneContextMenuEvent * 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitBorderItems(void)
 {
-   uint8 u8_Counter;
+   uint8_t u8_Counter;
    C_SdBueMlvBorderItem * pc_Item;
 
    // item in the upper left corner
@@ -775,7 +774,7 @@ void C_SdBueMlvGraphicsScene::m_InitBorderItems(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
 {
-   uint8 u8_Counter;
+   uint8_t u8_Counter;
 
    // fill the vector
    for (u8_Counter = 0U; u8_Counter < mhu8_MAX_NUM_BITS; ++u8_Counter)
@@ -792,26 +791,26 @@ void C_SdBueMlvGraphicsScene::m_InitEmptyItems(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_InitProtocolItems(void)
 {
-   this->mapc_ECeSHints[0] = new C_SdBueMlvBaseItem(QColor(0, 0, 0, 0),
+   this->mapc_EcesHints[0] = new C_SdBueMlvBaseItem(QColor(0, 0, 0, 0),
                                                     mc_STYLE_GUIDE_COLOR_10, mc_STYLE_GUIDE_FONT_REGULAR_16,
-                                                    stw_opensyde_gui_logic::C_GtGetText::h_GetText(
+                                                    stw::opensyde_gui_logic::C_GtGetText::h_GetText(
                                                        "Reserved by Message Counter"), true);
-   this->mapc_ECeSHints[1] = new C_SdBueMlvBaseItem(QColor(0, 0, 0, 0),
+   this->mapc_EcesHints[1] = new C_SdBueMlvBaseItem(QColor(0, 0, 0, 0),
                                                     mc_STYLE_GUIDE_COLOR_10, mc_STYLE_GUIDE_FONT_REGULAR_16,
-                                                    stw_opensyde_gui_logic::C_GtGetText::h_GetText(
+                                                    stw::opensyde_gui_logic::C_GtGetText::h_GetText(
                                                        "Reserved by Checksum"), true);
 
-   this->mapc_ECeSHints[0]->setZValue(mhf64_Z_ORDER_HINT_ITEM);
-   this->mapc_ECeSHints[1]->setZValue(mhf64_Z_ORDER_HINT_ITEM);
+   this->mapc_EcesHints[0]->setZValue(mhf64_Z_ORDER_HINT_ITEM);
+   this->mapc_EcesHints[1]->setZValue(mhf64_Z_ORDER_HINT_ITEM);
 
-   this->mapc_ECeSHints[0]->setVisible(false);
-   this->mapc_ECeSHints[1]->setVisible(false);
+   this->mapc_EcesHints[0]->setVisible(false);
+   this->mapc_EcesHints[1]->setVisible(false);
 
-   this->addItem(this->mapc_ECeSHints[0]);
-   this->addItem(this->mapc_ECeSHints[1]);
+   this->addItem(this->mapc_EcesHints[0]);
+   this->addItem(this->mapc_EcesHints[1]);
 
    this->m_UpdateProtocolItems();
-} //lint !e429  //no memory leak because of the parent of mapc_ECeSHints by addItem and the Qt memory management
+} //lint !e429  //no memory leak because of the parent of mapc_EcesHints by addItem and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load the EDS file restrictions and adapt the ui
@@ -821,21 +820,21 @@ void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestricitions(void)
 {
    this->mq_CoFixedMapping = false;
 
-   if (this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN)
+   if (this->me_Protocol == C_OscCanProtocol::eCAN_OPEN)
    {
       // The manager must be the only node associated by this message
-      const C_OSCCanOpenManagerDeviceInfo * const pc_Manager =
+      const C_OscCanOpenManagerDeviceInfo * const pc_Manager =
          C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerDevice(this->mc_MessageId);
 
       tgl_assert(pc_Manager != NULL);
       if (pc_Manager != NULL)
       {
-         const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
+         const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(this->mc_MessageId);
          if (pc_Message != NULL)
          {
             // Message Tx flag is relative to the device, not the manager when using the EDS file content
             // PDO Mapping
-            pc_Manager->c_EDSFileContent.IsPDOMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
+            pc_Manager->c_EdsFileContent.IsPdoMappingRo(pc_Message->u16_CanOpenManagerPdoIndex,
                                                         !this->mc_MessageId.q_MessageIsTx, this->mq_CoFixedMapping);
          }
       }
@@ -848,14 +847,14 @@ void C_SdBueMlvGraphicsScene::m_CoLoadEdsRestricitions(void)
    \param[in]     ou32_SignalIndex    Index of the signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
+void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32_t ou32_SignalIndex)
 {
    C_SdBueMlvSignalManager * pc_Item;
 
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
-   const stw_opensyde_gui_logic::C_PuiSdNodeCanSignal * const pc_SignalUiItem =
-      stw_opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetUiCanSignal(this->mc_MessageId,
-                                                                              ou32_SignalIndex);
+   const stw::opensyde_gui_logic::C_PuiSdNodeCanSignal * const pc_SignalUiItem =
+      stw::opensyde_gui_logic::C_PuiSdHandler::h_GetInstance()->GetUiCanSignal(this->mc_MessageId,
+                                                                               ou32_SignalIndex);
 
    tgl_assert(pc_SignalUiItem != NULL);
    if (pc_SignalUiItem != NULL)
@@ -880,7 +879,7 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
                                          C_SdBueMlvGraphicsScene::mhf64_SPACE, this);
 
    this->mc_VecSignals.push_back(pc_Item);
-   pc_Item->SetZOrder(C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT);
+   pc_Item->SetZeOrder(C_SdBueMlvGraphicsScene::mhf64_Z_ORDER_DEFAULT);
 
    connect(pc_Item, &C_SdBueMlvSignalManager::SigAddItem, this, &C_SdBueMlvGraphicsScene::m_AddItemSlot);
    connect(pc_Item, &C_SdBueMlvSignalManager::SigRemoveItem, this, &C_SdBueMlvGraphicsScene::m_RemoveItemSlot);
@@ -909,16 +908,15 @@ void C_SdBueMlvGraphicsScene::m_AddSignal(const uint32 ou32_SignalIndex)
    \param[in]     ou32_SignalIndex    Index of the signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::m_RemoveSignal(const uint32 ou32_SignalIndex)
+void C_SdBueMlvGraphicsScene::m_RemoveSignal(const uint32_t ou32_SignalIndex)
 {
    QVector<C_SdBueMlvSignalManager *>::iterator pc_ItItem;
    C_SdBueMlvSignalManager * pc_Item;
-   uint32 u32_Index;
 
    // search the signal
    for (pc_ItItem = this->mc_VecSignals.begin(); pc_ItItem != this->mc_VecSignals.end(); ++pc_ItItem)
    {
-      u32_Index = (*pc_ItItem)->GetSignalIndex();
+      const uint32_t u32_Index = (*pc_ItItem)->GetSignalIndex();
 
       if (u32_Index == ou32_SignalIndex)
       {
@@ -963,7 +961,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateAll(void)
 void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
 {
    QVector<C_SdBueMlvBorderItem *>::const_iterator pc_ItItem;
-   sint32 s32_Pos = 8;
+   int32_t s32_Pos = 8;
 
    this->mpc_BorderItemUpperLeft->SetSize(QSizeF(this->mf64_SingleItemWidth, this->mf64_SingleItemHeight));
 
@@ -974,7 +972,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
    {
       (*pc_ItItem)->SetSize(QSizeF(this->mf64_SingleItemWidth, this->mf64_SingleItemHeight));
       // the first item is at the right side of the scene (Bit 7 - Bit 0)
-      (*pc_ItItem)->setPos(static_cast<float64>(s32_Pos) *
+      (*pc_ItItem)->setPos(static_cast<float64_t>(s32_Pos) *
                            (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_SPACE), 0.0);
 
       --s32_Pos;
@@ -989,7 +987,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
         ++pc_ItItem)
    {
       (*pc_ItItem)->SetSize(QSizeF(this->mf64_SingleItemWidth, this->mf64_SingleItemHeight));
-      (*pc_ItItem)->setPos(0.0, static_cast<float64>(s32_Pos) *
+      (*pc_ItItem)->setPos(0.0, static_cast<float64_t>(s32_Pos) *
                            (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_SPACE));
 
       ++s32_Pos;
@@ -999,15 +997,16 @@ void C_SdBueMlvGraphicsScene::m_UpdateBorderItems(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateEmptyItems(void)
 {
-   sint32 s32_PosHorizontal;
-   sint32 s32_PosVertical;
-   sint32 s32_BitPosition;
-   float64 f64_PosX;
-   float64 f64_PosY;
+   int32_t s32_BitPosition;
 
    // the horizontal "internal" vector
    for (s32_BitPosition = 0; s32_BitPosition < this->mc_VecEmptyItems.size(); ++s32_BitPosition)
    {
+      int32_t s32_PosHorizontal;
+      int32_t s32_PosVertical;
+      float64_t f64_PosHorizontal;
+      float64_t f64_PosVertical;
+
       this->mc_VecEmptyItems[s32_BitPosition]->SetSize(QSizeF(this->mf64_SingleItemWidth, this->mf64_SingleItemHeight));
 
       // counting starts at the right side
@@ -1015,12 +1014,12 @@ void C_SdBueMlvGraphicsScene::m_UpdateEmptyItems(void)
       // compensate the border items
       s32_PosVertical = (s32_BitPosition / 8) + 1;
 
-      f64_PosX = static_cast<float64>(s32_PosHorizontal) *
-                 (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_SPACE);
-      f64_PosY = (static_cast<float64>(s32_PosVertical) *
-                  (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_SPACE));
+      f64_PosHorizontal = static_cast<float64_t>(s32_PosHorizontal) *
+                          (this->mf64_SingleItemWidth + C_SdBueMlvGraphicsScene::mhf64_SPACE);
+      f64_PosVertical = (static_cast<float64_t>(s32_PosVertical) *
+                         (this->mf64_SingleItemHeight + C_SdBueMlvGraphicsScene::mhf64_SPACE));
 
-      this->mc_VecEmptyItems[s32_BitPosition]->setPos(f64_PosX, f64_PosY);
+      this->mc_VecEmptyItems[s32_BitPosition]->setPos(f64_PosHorizontal, f64_PosVertical);
    }
 }
 
@@ -1058,33 +1057,32 @@ void C_SdBueMlvGraphicsScene::m_UpdateProtocolItems(void)
    c_Size.setWidth((8.0 * this->mf64_SingleItemWidth) + (7.0 * mhf64_SPACE));
 
    // set the size
-   if (this->mapc_ECeSHints[0] != NULL)
+   if (this->mapc_EcesHints[0] != NULL)
    {
-      this->mapc_ECeSHints[0]->SetSize(c_Size);
-      this->mapc_ECeSHints[0]->setPos(this->mc_VecEmptyItems[55]->pos());
+      this->mapc_EcesHints[0]->SetSize(c_Size);
+      this->mapc_EcesHints[0]->setPos(this->mc_VecEmptyItems[55]->pos());
    }
-   if (this->mapc_ECeSHints[1] != NULL)
+   if (this->mapc_EcesHints[1] != NULL)
    {
-      this->mapc_ECeSHints[1]->SetSize(c_Size);
-      this->mapc_ECeSHints[1]->setPos(this->mc_VecEmptyItems[63]->pos());
+      this->mapc_EcesHints[1]->SetSize(c_Size);
+      this->mapc_EcesHints[1]->setPos(this->mc_VecEmptyItems[63]->pos());
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
-   uint16 u16_Counter;
-   uint16 u16_GridPos;
+   uint16_t u16_Counter;
 
    for (u16_Counter = 0; u16_Counter < opc_Item->GetLength(); ++u16_Counter)
    {
-      u16_GridPos = opc_Item->GetDataBytesBitPosOfSignalBit(u16_Counter);
+      const uint16_t u16_GridPos = opc_Item->GetDataBytesBitPosOfSignalBit(u16_Counter);
 
       if (u16_GridPos < this->mu16_MaximumCountBits)
       {
          this->mac_SetGridState[u16_GridPos].insert(opc_Item);
 
-         if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+         if ((this->me_Protocol == C_OscCanProtocol::eCAN_OPEN) &&
              (this->mu16_LastGridPosFilled < u16_GridPos))
          {
             // Need to know on which bit the last grid has at least one signal
@@ -1103,10 +1101,10 @@ void C_SdBueMlvGraphicsScene::m_AddSignalToGridMapping(C_SdBueMlvSignalManager *
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
-   uint16 u16_Counter;
+   uint16_t u16_Counter;
 
-   std::set<uint16> c_SetGridPositions;
-   std::set<uint16>::iterator c_ItSetGridPosition;
+   std::set<uint16_t> c_SetGridPositions;
+   std::set<uint16_t>::iterator c_ItSetGridPosition;
 
    // get all grid positions for this signal. necessary for motorola byte order
    opc_Item->GetDataBytesBitPositionsOfSignal(c_SetGridPositions);
@@ -1125,7 +1123,7 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManage
 
          this->mac_SetGridState[u16_Counter].insert(opc_Item);
 
-         if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+         if ((this->me_Protocol == C_OscCanProtocol::eCAN_OPEN) &&
              (this->mu16_LastGridPosFilled < u16_Counter))
          {
             // Need to know on which bit the last grid has at least one signal
@@ -1150,17 +1148,17 @@ void C_SdBueMlvGraphicsScene::m_UpdateSignalInGridMapping(C_SdBueMlvSignalManage
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMapping(C_SdBueMlvSignalManager * const opc_Item)
 {
-   sint16 s16_Counter;
+   int16_t s16_Counter;
 
-   for (s16_Counter = static_cast<sint16>(mhu8_MAX_NUM_BITS - 1U); s16_Counter >= 0; --s16_Counter)
+   for (s16_Counter = static_cast<int16_t>(mhu8_MAX_NUM_BITS - 1U); s16_Counter >= 0; --s16_Counter)
    {
-      this->m_RemoveSignalFromGridMappingPosition(opc_Item, static_cast<uint16>(s16_Counter));
+      this->m_RemoveSignalFromGridMappingPosition(opc_Item, static_cast<uint16_t>(s16_Counter));
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSignalManager * const opc_Item,
-                                                                    const uint16 ou16_Pos)
+                                                                    const uint16_t ou16_Pos)
 {
    tgl_assert(ou16_Pos < mhu8_MAX_NUM_BITS);
    if (ou16_Pos < mhu8_MAX_NUM_BITS)
@@ -1176,7 +1174,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSi
          // are there any other items left?
          if (this->mac_SetGridState[ou16_Pos].size() == 0)
          {
-            if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+            if ((this->me_Protocol == C_OscCanProtocol::eCAN_OPEN) &&
                 (ou16_Pos == this->mu16_LastGridPosFilled) &&
                 (ou16_Pos > 0U))
             {
@@ -1184,7 +1182,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSi
                // Only necessary when the already highest bit signal holder was removed
                // and it is not already the first bit
 
-               uint16 u16_Counter;
+               uint16_t u16_Counter;
 
                // This position value is need for checking in case of CANopen for gaps
                // In case of the first bit as last bit with signal it is not necessary for this check to
@@ -1212,7 +1210,7 @@ void C_SdBueMlvGraphicsScene::m_RemoveSignalFromGridMappingPosition(C_SdBueMlvSi
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16 ou16_Pos)
+void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16_t ou16_Pos)
 {
    if (this->mac_SetGridState[ou16_Pos].size() > 1)
    {
@@ -1221,7 +1219,7 @@ void C_SdBueMlvGraphicsScene::m_CheckGridMappingPositionForError(const uint16 ou
    }
    else
    {
-      if ((this->me_Protocol == C_OSCCanProtocol::eCAN_OPEN) &&
+      if ((this->me_Protocol == C_OscCanProtocol::eCAN_OPEN) &&
           (this->mac_SetGridState[ou16_Pos].size() == 0) &&
           (ou16_Pos < this->mu16_LastGridPosFilled))
       {
@@ -1273,15 +1271,14 @@ void C_SdBueMlvGraphicsScene::m_RemoveItemSlot(C_SdBueMlvSignalItem * const opc_
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNotUsedColors(void)
 {
-   sintn sn_ColorCounter;
-   uint32 u32_ItFree;
-   uint32 u32_SectionNumber;
+   uint32_t u32_ItFree;
+   uint32_t u32_SectionNumber;
    bool q_FreeColorFound = false;
    bool q_RandomColorFound = false;
 
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
-   srand(stw_tgl::TGL_GetTickCount());
+   srand(stw::tgl::TglGetTickCount());
 
    // Check for a free color in the already existing sections
    // Use the oldest section, if a free color is available
@@ -1314,13 +1311,15 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    // search a not used color with a random number in a section with at least one free entry
    do
    {
-      sn_ColorCounter = rand() % static_cast<sintn>(mhu8_MAX_NUM_BITS);
+      int32_t s32_ColorCounter;
 
-      if (this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] == false)
+      s32_ColorCounter = rand() % static_cast<int32_t>(mhu8_MAX_NUM_BITS);
+
+      if (this->mc_SignalsColorsUsed[u32_SectionNumber][s32_ColorCounter] == false)
       {
-         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[sn_ColorCounter];
+         c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[s32_ColorCounter];
          // set the color variant as used
-         this->mc_SignalsColorsUsed[u32_SectionNumber][sn_ColorCounter] = true;
+         this->mc_SignalsColorsUsed[u32_SectionNumber][s32_ColorCounter] = true;
          q_RandomColorFound = true;
       }
    }
@@ -1341,9 +1340,9 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetNextNo
    Specific signal item color with specific index
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcreteColors(const uint8 ou8_Index)
+C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcreteColors(const uint8_t ou8_Index)
 {
-   uint32 u32_ColorCounter;
+   uint32_t u32_ColorCounter;
 
    C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
 
@@ -1352,7 +1351,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
    {
       if (ou8_Index == C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter].u8_Index)
       {
-         uint32 u32_SectionCounter;
+         uint32_t u32_SectionCounter;
          bool q_FreeSectionFound = false;
 
          c_ColorConfig = C_SdBueMlvGraphicsScene::mhac_SIGNALS_COLORS[u32_ColorCounter];
@@ -1397,7 +1396,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SetColorsUnused(const C_SdBueMlvSignalManager::C_SignalItemColors & orc_Colors)
 {
-   uint32 u32_ColorCounter;
+   uint32_t u32_ColorCounter;
 
    std::vector<std::array<bool, 64> >::reverse_iterator c_ItSection;
 
@@ -1472,7 +1471,7 @@ void C_SdBueMlvGraphicsScene::m_SceneRectChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
 {
-   const sint32 s32_Counter = this->m_GetGridIndex(orc_Pos);
+   const int32_t s32_Counter = this->m_GetGridIndex(orc_Pos);
 
    this->mpc_ActualSignal = NULL;
    this->ms32_LastGridIndex = -1;
@@ -1482,20 +1481,20 @@ void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
       if (this->mac_SetGridState[s32_Counter].size() > 0)
       {
          std::set<C_SdBueMlvSignalManager *>::iterator c_ItSetGridPosition;
-         float64 f64_ZOrderActual;
-         float64 f64_ZOrderHighest = mhf64_Z_ORDER_BELOW_ALL_ITEMS;
+         float64_t f64_ZetOrderActual;
+         float64_t f64_ZetOrderHighest = mhf64_Z_ORDER_BELOW_ALL_ITEMS;
 
          // search the item with the highest ZOrder
          for (c_ItSetGridPosition = this->mac_SetGridState[s32_Counter].begin();
               c_ItSetGridPosition != this->mac_SetGridState[s32_Counter].end();
               ++c_ItSetGridPosition)
          {
-            f64_ZOrderActual = (*c_ItSetGridPosition)->GetZOrder();
+            f64_ZetOrderActual = (*c_ItSetGridPosition)->GetZeOrder();
 
-            if (f64_ZOrderActual > f64_ZOrderHighest)
+            if (f64_ZetOrderActual > f64_ZetOrderHighest)
             {
                // set the actual item with the highest zorder
-               f64_ZOrderHighest = f64_ZOrderActual;
+               f64_ZetOrderHighest = f64_ZetOrderActual;
                this->mpc_ActualSignal = (*c_ItSetGridPosition);
             }
          }
@@ -1511,18 +1510,18 @@ void C_SdBueMlvGraphicsScene::m_SearchClickedItem(const QPointF & orc_Pos)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_BringActualSignalToTop(void)
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
 
    // reset all items in the first step
    for (s32_Counter = 0; s32_Counter < this->mc_VecSignals.size(); ++s32_Counter)
    {
-      this->mc_VecSignals[s32_Counter]->SetZOrder(mhf64_Z_ORDER_DEFAULT);
+      this->mc_VecSignals[s32_Counter]->SetZeOrder(mhf64_Z_ORDER_DEFAULT);
    }
 
    // set the actual item on top
    if (this->mpc_ActualSignal != NULL)
    {
-      this->mpc_ActualSignal->SetZOrder(mhf64_Z_ORDER_INTERACTION);
+      this->mpc_ActualSignal->SetZeOrder(mhf64_Z_ORDER_INTERACTION);
    }
 }
 
@@ -1537,9 +1536,9 @@ void C_SdBueMlvGraphicsScene::m_ChangeCursor(const Qt::CursorShape oe_Cursor)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueMlvGraphicsScene::m_GetGridIndex(const QPointF & orc_Pos) const
+int32_t C_SdBueMlvGraphicsScene::m_GetGridIndex(const QPointF & orc_Pos) const
 {
-   sint32 s32_Counter;
+   int32_t s32_Counter;
    bool q_Found = false;
 
    for (s32_Counter = 0; s32_Counter < this->mc_VecEmptyItems.size(); ++s32_Counter)
@@ -1575,7 +1574,7 @@ void C_SdBueMlvGraphicsScene::m_HandleHideToolTip(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_SetupContextMenu(void)
 {
-   this->mpc_ContextMenu = new stw_opensyde_gui_elements::C_OgeContextMenu();
+   this->mpc_ContextMenu = new stw::opensyde_gui_elements::C_OgeContextMenu();
 
    this->mpc_Add = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new Signal"), this,
                                                     &C_SdBueMlvGraphicsScene::m_ActionAdd);
@@ -1618,7 +1617,7 @@ void C_SdBueMlvGraphicsScene::m_OnCustomContextMenuRequested(const QGraphicsScen
    }
 
    // Not all functions are available with CANopen
-   if (this->me_Protocol != C_OSCCanProtocol::eCAN_OPEN)
+   if (this->me_Protocol != C_OscCanProtocol::eCAN_OPEN)
    {
       this->mpc_Copy->setEnabled(q_Enabled);
       this->mpc_Cut->setEnabled(q_Enabled);
@@ -1640,27 +1639,27 @@ void C_SdBueMlvGraphicsScene::m_OnCustomContextMenuRequested(const QGraphicsScen
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionAdd(void)
 {
-   sint32 s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
+   int32_t s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
 
    if (s32_Counter < 0)
    {
       s32_Counter = 0;
    }
 
-   Q_EMIT (this->SigAddSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter)));
+   Q_EMIT (this->SigAddSignal(this->mc_MessageId, static_cast<uint16_t>(s32_Counter)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionAddMultiplexed(void)
 {
-   sint32 s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
+   int32_t s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
 
    if (s32_Counter < 0)
    {
       s32_Counter = 0;
    }
 
-   Q_EMIT (this->SigAddSignalMultiplexed(this->mc_MessageId, static_cast<uint16>(s32_Counter),
+   Q_EMIT (this->SigAddSignalMultiplexed(this->mc_MessageId, static_cast<uint16_t>(s32_Counter),
                                          this->mu16_MultiplexerValue));
 }
 
@@ -1676,7 +1675,7 @@ void C_SdBueMlvGraphicsScene::m_ActionCopy(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
 {
-   sint32 s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
+   int32_t s32_Counter = this->m_GetGridIndex(this->mc_LastMousePos);
 
    if (s32_Counter < 0)
    {
@@ -1685,7 +1684,7 @@ void C_SdBueMlvGraphicsScene::m_ActionPaste(void)
 
    if (this->mc_VecSignals.size() < mhu8_MAX_NUM_BITS)
    {
-      Q_EMIT (this->SigPasteSignal(this->mc_MessageId, static_cast<uint16>(s32_Counter)));
+      Q_EMIT (this->SigPasteSignal(this->mc_MessageId, static_cast<uint16_t>(s32_Counter)));
    }
 }
 

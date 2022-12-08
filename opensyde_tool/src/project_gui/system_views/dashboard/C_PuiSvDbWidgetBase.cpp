@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "CSCLChecksums.h"
-#include "C_PuiSvDbWidgetBase.h"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_PuiSvDbWidgetBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -54,16 +53,16 @@ C_PuiSvDbWidgetBase::C_PuiSvDbWidgetBase(void) :
    \param[in,out]  oru32_HashValue  Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSvDbWidgetBase::CalcHash(uint32_t & oru32_HashValue) const
 {
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < this->c_DataPoolElementsConfig.size(); ++u32_Counter)
    {
       this->c_DataPoolElementsConfig[u32_Counter].CalcHash(oru32_HashValue);
    }
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_ElementWriteMode, sizeof(this->e_ElementWriteMode), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->e_DisplayStyle, sizeof(this->e_DisplayStyle), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_ElementWriteMode, sizeof(this->e_ElementWriteMode), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->e_DisplayStyle, sizeof(this->e_DisplayStyle), oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);
 }
@@ -79,11 +78,11 @@ void C_PuiSvDbWidgetBase::CalcHash(uint32 & oru32_HashValue) const
    C_RANGE  Data element id not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbWidgetBase::GetIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, uint32 & oru32_Index) const
+int32_t C_PuiSvDbWidgetBase::GetIndex(const C_PuiSvDbNodeDataPoolListElementId & orc_Id, uint32_t & oru32_Index) const
 {
-   sint32 s32_Retval = C_RANGE;
+   int32_t s32_Retval = C_RANGE;
 
-   for (uint32 u32_It = 0; u32_It < this->c_DataPoolElementsConfig.size(); ++u32_It)
+   for (uint32_t u32_It = 0; u32_It < this->c_DataPoolElementsConfig.size(); ++u32_It)
    {
       const C_PuiSvDbNodeDataElementConfig & rc_Config = this->c_DataPoolElementsConfig[u32_It];
       if (rc_Config.c_ElementId == orc_Id)
@@ -104,9 +103,9 @@ sint32 C_PuiSvDbWidgetBase::GetIndex(const C_PuiSvDbNodeDataPoolListElementId & 
    \retval   C_RANGE    Index not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_PuiSvDbWidgetBase::RemoveElement(const uint32 & oru32_Index)
+int32_t C_PuiSvDbWidgetBase::RemoveElement(const uint32_t & oru32_Index)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (oru32_Index < this->c_DataPoolElementsConfig.size())
    {
@@ -127,7 +126,7 @@ sint32 C_PuiSvDbWidgetBase::RemoveElement(const uint32 & oru32_Index)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvDbWidgetBase::RemoveAllReferencesToElementId(const C_PuiSvDbNodeDataPoolListElementId & orc_DataElementId)
 {
-   for (uint32 u32_It = 0; u32_It < this->c_DataPoolElementsConfig.size();)
+   for (uint32_t u32_It = 0; u32_It < this->c_DataPoolElementsConfig.size();)
    {
       const C_PuiSvDbNodeDataElementConfig & rc_Config = this->c_DataPoolElementsConfig[u32_It];
       if (rc_Config.c_ElementId == orc_DataElementId)

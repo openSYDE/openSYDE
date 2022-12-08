@@ -10,23 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <sstream>
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCSystemFilerUtil.h"
-#include "C_OSCNodeDataPoolFiler.h"
-#include "TGLUtils.h"
-#include "C_OSCLoggingHandler.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscNodeDataPoolFiler.hpp"
+#include "TglUtils.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_core;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_tgl;
+
+using namespace stw::opensyde_core;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::tgl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,7 +44,7 @@ using namespace stw_tgl;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
+C_OscNodeDataPoolFiler::C_OscNodeDataPoolFiler(void)
 {
 }
 
@@ -59,20 +59,20 @@ C_OSCNodeDataPoolFiler::C_OSCNodeDataPoolFiler(void)
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDataPool,
-                                                  const C_SCLString & orc_FilePath)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolFile(C_OscNodeDataPool & orc_NodeDataPool,
+                                                   const C_SclString & orc_FilePath)
 {
-   C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForExistingFile(c_XMLParser, orc_FilePath,
-                                                                        "opensyde-dp-core-definition");
+   C_OscXmlParser c_XmlParser;
+   int32_t s32_Retval = C_OscSystemFilerUtil::h_GetParserForExistingFile(c_XmlParser, orc_FilePath,
+                                                                         "opensyde-dp-core-definition");
 
    //File version
-   if (c_XMLParser.SelectNodeChild("file-version") == "file-version")
+   if (c_XmlParser.SelectNodeChild("file-version") == "file-version")
    {
-      uint16 u16_FileVersion = 0U;
+      uint16_t u16_FileVersion = 0U;
       try
       {
-         u16_FileVersion = static_cast<uint16>(c_XMLParser.GetNodeContent().ToInt());
+         u16_FileVersion = static_cast<uint16_t>(c_XmlParser.GetNodeContent().ToInt());
       }
       catch (...)
       {
@@ -84,7 +84,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
       if (s32_Retval == C_NO_ERR)
       {
          osc_write_log_info("Loading Datapool", "Value of \"file-version\": " +
-                            C_SCLString::IntToStr(u16_FileVersion));
+                            C_SclString::IntToStr(u16_FileVersion));
          //Check file version
          if (u16_FileVersion != 1U)
          {
@@ -95,7 +95,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
       }
 
       //Return
-      c_XMLParser.SelectNodeParent();
+      c_XmlParser.SelectNodeParent();
    }
    else
    {
@@ -104,9 +104,9 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (c_XMLParser.SelectNodeChild("data-pool") == "data-pool")
+      if (c_XmlParser.SelectNodeChild("data-pool") == "data-pool")
       {
-         s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPool(orc_NodeDataPool, c_XMLParser);
+         s32_Retval = C_OscNodeDataPoolFiler::h_LoadDataPool(orc_NodeDataPool, c_XmlParser);
       }
       else
       {
@@ -130,44 +130,44 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolFile(C_OSCNodeDataPool & orc_NodeDa
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
    \param[out]     orc_NodeDataPool    data storage
-   \param[in,out]  orc_XMLParser       XML with data-pool active
+   \param[in,out]  orc_XmlParser       XML with data-pool active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPool, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPool(C_OscNodeDataPool & orc_NodeDataPool, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    //Related application
-   if (orc_XMLParser.AttributeExists("related-application-index") == true)
+   if (orc_XmlParser.AttributeExists("related-application-index") == true)
    {
-      orc_NodeDataPool.s32_RelatedDataBlockIndex = orc_XMLParser.GetAttributeSint32("related-application-index");
+      orc_NodeDataPool.s32_RelatedDataBlockIndex = orc_XmlParser.GetAttributeSint32("related-application-index");
    }
    else
    {
       orc_NodeDataPool.s32_RelatedDataBlockIndex = -1;
    }
-   orc_NodeDataPool.q_IsSafety = orc_XMLParser.GetAttributeBool("is-safety");
-   if (orc_XMLParser.AttributeExists("scope-is-private") == true)
+   orc_NodeDataPool.q_IsSafety = orc_XmlParser.GetAttributeBool("is-safety");
+   if (orc_XmlParser.AttributeExists("scope-is-private") == true)
    {
-      orc_NodeDataPool.q_ScopeIsPrivate = orc_XMLParser.GetAttributeBool("scope-is-private");
+      orc_NodeDataPool.q_ScopeIsPrivate = orc_XmlParser.GetAttributeBool("scope-is-private");
    }
    else
    {
       orc_NodeDataPool.q_ScopeIsPrivate = true;
    }
-   orc_NodeDataPool.u32_NvMStartAddress = orc_XMLParser.GetAttributeUint32("nvm-start-address");
-   orc_NodeDataPool.u32_NvMSize = orc_XMLParser.GetAttributeUint32("nvm-size");
-   if (orc_XMLParser.SelectNodeChild("type") == "type")
+   orc_NodeDataPool.u32_NvmStartAddress = orc_XmlParser.GetAttributeUint32("nvm-start-address");
+   orc_NodeDataPool.u32_NvmSize = orc_XmlParser.GetAttributeUint32("nvm-size");
+   if (orc_XmlParser.SelectNodeChild("type") == "type")
    {
-      s32_Retval = h_StringToDataPool(orc_XMLParser.GetNodeContent(), orc_NodeDataPool.e_Type);
+      s32_Retval = h_StringToDataPool(orc_XmlParser.GetNodeContent(), orc_NodeDataPool.e_Type);
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
       }
    }
    else
@@ -175,49 +175,49 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
       osc_write_log_error("Loading Datapool", "Could not find \"type\" node.");
       s32_Retval = C_CONFIG;
    }
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_NodeDataPool.c_Name = orc_XMLParser.GetNodeContent();
+      orc_NodeDataPool.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
    }
    else
    {
       osc_write_log_error("Loading Datapool", "Could not find \"name\" node.");
       s32_Retval = C_CONFIG;
    }
-   if (orc_XMLParser.SelectNodeChild("version") == "version")
+   if (orc_XmlParser.SelectNodeChild("version") == "version")
    {
-      orc_NodeDataPool.au8_Version[0] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("major"));
-      orc_NodeDataPool.au8_Version[1] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("minor"));
-      orc_NodeDataPool.au8_Version[2] = static_cast<uint8>(orc_XMLParser.GetAttributeUint32("release"));
+      orc_NodeDataPool.au8_Version[0] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("major"));
+      orc_NodeDataPool.au8_Version[1] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("minor"));
+      orc_NodeDataPool.au8_Version[2] = static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("release"));
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
    }
    else
    {
       osc_write_log_error("Loading Datapool", "Could not find \"version\" node.");
       s32_Retval = C_CONFIG;
    }
-   if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+   if (orc_XmlParser.SelectNodeChild("comment") == "comment")
    {
-      orc_NodeDataPool.c_Comment = orc_XMLParser.GetNodeContent();
+      orc_NodeDataPool.c_Comment = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
    }
    else
    {
       osc_write_log_error("Loading Datapool", "Could not find \"comment\" node.");
       s32_Retval = C_CONFIG;
    }
-   if ((orc_XMLParser.SelectNodeChild("lists") == "lists") && (s32_Retval == C_NO_ERR))
+   if ((orc_XmlParser.SelectNodeChild("lists") == "lists") && (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = h_LoadDataPoolLists(orc_NodeDataPool.c_Lists, orc_XMLParser);
+      s32_Retval = h_LoadDataPoolLists(orc_NodeDataPool.c_Lists, orc_XmlParser);
 
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
       }
    }
    else
@@ -237,33 +237,33 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPool(C_OSCNodeDataPool & orc_NodeDataPo
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
    \param[in]      orc_NodeDataPool    data storage
-   \param[in,out]  orc_XMLParser       XML with data-pool active
+   \param[in,out]  orc_XmlParser       XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDataPool,
-                                            C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPool(const C_OscNodeDataPool & orc_NodeDataPool,
+                                            C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeSint32("related-application-index", orc_NodeDataPool.s32_RelatedDataBlockIndex);
-   orc_XMLParser.SetAttributeBool("is-safety", orc_NodeDataPool.q_IsSafety);
-   orc_XMLParser.SetAttributeBool("scope-is-private", orc_NodeDataPool.q_ScopeIsPrivate);
-   orc_XMLParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPool.u32_NvMStartAddress);
-   orc_XMLParser.SetAttributeUint32("nvm-size", orc_NodeDataPool.u32_NvMSize);
-   orc_XMLParser.CreateNodeChild("type", h_DataPoolToString(orc_NodeDataPool.e_Type));
-   orc_XMLParser.CreateNodeChild("name", orc_NodeDataPool.c_Name);
-   orc_XMLParser.CreateAndSelectNodeChild("version");
-   orc_XMLParser.SetAttributeUint32("major", orc_NodeDataPool.au8_Version[0]);
-   orc_XMLParser.SetAttributeUint32("minor", orc_NodeDataPool.au8_Version[1]);
-   orc_XMLParser.SetAttributeUint32("release", orc_NodeDataPool.au8_Version[2]);
+   orc_XmlParser.SetAttributeSint32("related-application-index", orc_NodeDataPool.s32_RelatedDataBlockIndex);
+   orc_XmlParser.SetAttributeBool("is-safety", orc_NodeDataPool.q_IsSafety);
+   orc_XmlParser.SetAttributeBool("scope-is-private", orc_NodeDataPool.q_ScopeIsPrivate);
+   orc_XmlParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPool.u32_NvmStartAddress);
+   orc_XmlParser.SetAttributeUint32("nvm-size", orc_NodeDataPool.u32_NvmSize);
+   orc_XmlParser.CreateNodeChild("type", h_DataPoolToString(orc_NodeDataPool.e_Type));
+   orc_XmlParser.CreateNodeChild("name", orc_NodeDataPool.c_Name);
+   orc_XmlParser.CreateAndSelectNodeChild("version");
+   orc_XmlParser.SetAttributeUint32("major", orc_NodeDataPool.au8_Version[0]);
+   orc_XmlParser.SetAttributeUint32("minor", orc_NodeDataPool.au8_Version[1]);
+   orc_XmlParser.SetAttributeUint32("release", orc_NodeDataPool.au8_Version[2]);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
 
-   orc_XMLParser.CreateNodeChild("comment", orc_NodeDataPool.c_Comment);
+   orc_XmlParser.CreateNodeChild("comment", orc_NodeDataPool.c_Comment);
    //Lists
-   orc_XMLParser.CreateAndSelectNodeChild("lists");
-   h_SaveDataPoolLists(orc_NodeDataPool.c_Lists, orc_XMLParser);
+   orc_XmlParser.CreateAndSelectNodeChild("lists");
+   h_SaveDataPoolLists(orc_NodeDataPool.c_Lists, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "data-pool");
-   orc_XMLParser.CreateNodeChild("export-settings", "");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "data-pool");
+   orc_XmlParser.CreateNodeChild("export-settings", "");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -274,38 +274,38 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPool(const C_OSCNodeDataPool & orc_NodeDa
    post-condition: the passed XML parser has the active node set to the same "list"
 
    \param[out]     orc_NodeDataPoolList   data storage
-   \param[in,out]  orc_XMLParser          XML with data-pool active
+   \param[in,out]  orc_XmlParser          XML with data-pool active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_NodeDataPoolList,
-                                                  C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolList(C_OscNodeDataPoolList & orc_NodeDataPoolList,
+                                                   C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   orc_NodeDataPoolList.q_NvMCRCActive = orc_XMLParser.GetAttributeBool("nvm-crc-active");
-   orc_NodeDataPoolList.u32_NvMCRC = orc_XMLParser.GetAttributeUint32("nvm-crc");
-   orc_NodeDataPoolList.u32_NvMStartAddress = orc_XMLParser.GetAttributeUint32("nvm-start-address");
-   orc_NodeDataPoolList.u32_NvMSize = orc_XMLParser.GetAttributeUint32("nvm-size");
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   orc_NodeDataPoolList.q_NvmCrcActive = orc_XmlParser.GetAttributeBool("nvm-crc-active");
+   orc_NodeDataPoolList.u32_NvmCrc = orc_XmlParser.GetAttributeUint32("nvm-crc");
+   orc_NodeDataPoolList.u32_NvmStartAddress = orc_XmlParser.GetAttributeUint32("nvm-start-address");
+   orc_NodeDataPoolList.u32_NvmSize = orc_XmlParser.GetAttributeUint32("nvm-size");
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_NodeDataPoolList.c_Name = orc_XMLParser.GetNodeContent();
+      orc_NodeDataPoolList.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
    }
    else
    {
       osc_write_log_error("Loading Datapool", "Could not find \"lists\".\"list\".\"name\" node.");
       s32_Retval = C_CONFIG;
    }
-   if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+   if (orc_XmlParser.SelectNodeChild("comment") == "comment")
    {
-      orc_NodeDataPoolList.c_Comment = orc_XMLParser.GetNodeContent();
+      orc_NodeDataPoolList.c_Comment = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
    }
    else
    {
@@ -315,13 +315,13 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
    //Data elements
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("data-elements") == "data-elements")
+      if (orc_XmlParser.SelectNodeChild("data-elements") == "data-elements")
       {
-         s32_Retval = h_LoadDataPoolListElements(orc_NodeDataPoolList.c_Elements, orc_XMLParser);
+         s32_Retval = h_LoadDataPoolListElements(orc_NodeDataPoolList.c_Elements, orc_XmlParser);
          if (s32_Retval == C_NO_ERR)
          {
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
          }
       }
       else
@@ -331,13 +331,13 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
       }
    }
    //Data sets
-   if ((orc_XMLParser.SelectNodeChild("data-sets") == "data-sets") && (s32_Retval == C_NO_ERR))
+   if ((orc_XmlParser.SelectNodeChild("data-sets") == "data-sets") && (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = h_LoadDataPoolListDataSets(orc_NodeDataPoolList.c_DataSets, orc_XMLParser);
+      s32_Retval = h_LoadDataPoolListDataSets(orc_NodeDataPoolList.c_DataSets, orc_XmlParser);
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
       }
    }
    else
@@ -356,28 +356,28 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolList(C_OSCNodeDataPoolList & orc_No
    post-condition: the passed XML parser has the active node set to the same "list"
 
    \param[in]      orc_NodeDataPoolList   data storage
-   \param[in,out]  orc_XMLParser          XML with data-pool active
+   \param[in,out]  orc_XmlParser          XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & orc_NodeDataPoolList,
-                                                C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolList(const C_OscNodeDataPoolList & orc_NodeDataPoolList,
+                                                C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeBool("nvm-crc-active", orc_NodeDataPoolList.q_NvMCRCActive);
-   orc_XMLParser.SetAttributeUint32("nvm-crc", orc_NodeDataPoolList.u32_NvMCRC);
-   orc_XMLParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPoolList.u32_NvMStartAddress);
-   orc_XMLParser.SetAttributeUint32("nvm-size", orc_NodeDataPoolList.u32_NvMSize);
-   orc_XMLParser.CreateNodeChild("name", orc_NodeDataPoolList.c_Name);
-   orc_XMLParser.CreateNodeChild("comment", orc_NodeDataPoolList.c_Comment);
+   orc_XmlParser.SetAttributeBool("nvm-crc-active", orc_NodeDataPoolList.q_NvmCrcActive);
+   orc_XmlParser.SetAttributeUint32("nvm-crc", orc_NodeDataPoolList.u32_NvmCrc);
+   orc_XmlParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPoolList.u32_NvmStartAddress);
+   orc_XmlParser.SetAttributeUint32("nvm-size", orc_NodeDataPoolList.u32_NvmSize);
+   orc_XmlParser.CreateNodeChild("name", orc_NodeDataPoolList.c_Name);
+   orc_XmlParser.CreateNodeChild("comment", orc_NodeDataPoolList.c_Comment);
    //Data elements
-   orc_XMLParser.CreateAndSelectNodeChild("data-elements");
-   h_SaveDataPoolListElements(orc_NodeDataPoolList.c_Elements, orc_XMLParser);
+   orc_XmlParser.CreateAndSelectNodeChild("data-elements");
+   h_SaveDataPoolListElements(orc_NodeDataPoolList.c_Elements, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
    //Data sets
-   orc_XMLParser.CreateAndSelectNodeChild("data-sets");
-   h_SaveDataPoolListDataSets(orc_NodeDataPoolList.c_DataSets, orc_XMLParser);
+   orc_XmlParser.CreateAndSelectNodeChild("data-sets");
+   h_SaveDataPoolListDataSets(orc_NodeDataPoolList.c_DataSets, orc_XmlParser);
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -388,27 +388,27 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolList(const C_OSCNodeDataPoolList & or
    post-condition: the passed XML parser has the active node set to the same "data-element"
 
    \param[out]     orc_NodeDataPoolListElement  data storage
-   \param[in,out]  orc_XMLParser                XML with list active
+   \param[in,out]  orc_XmlParser                XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
-                                                     C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolElement(C_OscNodeDataPoolListElement & orc_NodeDataPoolListElement,
+                                                      C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   orc_NodeDataPoolListElement.f64_Factor = orc_XMLParser.GetAttributeFloat64("factor");
-   orc_NodeDataPoolListElement.f64_Offset = orc_XMLParser.GetAttributeFloat64("offset");
-   orc_NodeDataPoolListElement.q_DiagEventCall = orc_XMLParser.GetAttributeBool("diag-event-call");
-   orc_NodeDataPoolListElement.u32_NvMStartAddress = orc_XMLParser.GetAttributeUint32("nvm-start-address");
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   orc_NodeDataPoolListElement.f64_Factor = orc_XmlParser.GetAttributeFloat64("factor");
+   orc_NodeDataPoolListElement.f64_Offset = orc_XmlParser.GetAttributeFloat64("offset");
+   orc_NodeDataPoolListElement.q_DiagEventCall = orc_XmlParser.GetAttributeBool("diag-event-call");
+   orc_NodeDataPoolListElement.u32_NvmStartAddress = orc_XmlParser.GetAttributeUint32("nvm-start-address");
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_NodeDataPoolListElement.c_Name = orc_XMLParser.GetNodeContent();
+      orc_NodeDataPoolListElement.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
    }
    else
    {
@@ -417,21 +417,21 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
    }
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = h_LoadDataPoolElementType(orc_NodeDataPoolListElement.c_Value, orc_XMLParser);
+      s32_Retval = h_LoadDataPoolElementType(orc_NodeDataPoolListElement.c_Value, orc_XmlParser);
    }
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("min-value") == "min-value")
+      if (orc_XmlParser.SelectNodeChild("min-value") == "min-value")
       {
          //copy over value so we have the correct type:
          orc_NodeDataPoolListElement.c_MinValue = orc_NodeDataPoolListElement.c_Value;
 
-         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MinValue, orc_XMLParser, false);
+         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MinValue, orc_XmlParser, false);
          // Use minimum value as init value for value and NVM value
          orc_NodeDataPoolListElement.c_NvmValue = orc_NodeDataPoolListElement.c_MinValue;
          orc_NodeDataPoolListElement.c_Value = orc_NodeDataPoolListElement.c_MinValue;
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
       }
       else
       {
@@ -442,14 +442,14 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("max-value") == "max-value")
+      if (orc_XmlParser.SelectNodeChild("max-value") == "max-value")
       {
          //copy over value so we have the correct type:
          orc_NodeDataPoolListElement.c_MaxValue = orc_NodeDataPoolListElement.c_Value;
 
-         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MaxValue, orc_XMLParser, false);
+         s32_Retval = h_LoadDataPoolElementValue(orc_NodeDataPoolListElement.c_MaxValue, orc_XmlParser, false);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
       }
       else
       {
@@ -460,11 +460,11 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+      if (orc_XmlParser.SelectNodeChild("comment") == "comment")
       {
-         orc_NodeDataPoolListElement.c_Comment = orc_XMLParser.GetNodeContent();
+         orc_NodeDataPoolListElement.c_Comment = orc_XmlParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
       }
       else
       {
@@ -475,11 +475,11 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("unit") == "unit")
+      if (orc_XmlParser.SelectNodeChild("unit") == "unit")
       {
-         orc_NodeDataPoolListElement.c_Unit = orc_XMLParser.GetNodeContent();
+         orc_NodeDataPoolListElement.c_Unit = orc_XmlParser.GetNodeContent();
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
       }
       else
       {
@@ -490,12 +490,12 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("access") == "access")
+      if (orc_XmlParser.SelectNodeChild("access") == "access")
       {
          s32_Retval =
-            mh_StringToNodeDataPoolElementAccess(orc_XMLParser.GetNodeContent(), orc_NodeDataPoolListElement.e_Access);
+            mh_StringToNodeDataPoolElementAccess(orc_XmlParser.GetNodeContent(), orc_NodeDataPoolListElement.e_Access);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
       }
       else
       {
@@ -506,13 +506,13 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
 
    if (s32_Retval == C_NO_ERR)
    {
-      if (orc_XMLParser.SelectNodeChild("data-set-values") == "data-set-values")
+      if (orc_XmlParser.SelectNodeChild("data-set-values") == "data-set-values")
       {
          s32_Retval = h_LoadDataPoolListElementDataSetValues(orc_NodeDataPoolListElement.c_Value,
                                                              orc_NodeDataPoolListElement.c_DataSetValues,
-                                                             orc_XMLParser);
+                                                             orc_XmlParser);
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
       }
       else
       {
@@ -532,27 +532,27 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElement(C_OSCNodeDataPoolListElemen
    post-condition: the passed XML parser has the active node set to the same "data-element"
 
    \param[in]      orc_NodeDataPoolListElement  data storage
-   \param[in,out]  orc_XMLParser                XML with list active
+   \param[in,out]  orc_XmlParser                XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListElement & orc_NodeDataPoolListElement,
-                                                   C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolElement(const C_OscNodeDataPoolListElement & orc_NodeDataPoolListElement,
+                                                   C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeFloat64("factor", orc_NodeDataPoolListElement.f64_Factor);
-   orc_XMLParser.SetAttributeFloat64("offset", orc_NodeDataPoolListElement.f64_Offset);
-   orc_XMLParser.SetAttributeBool("diag-event-call", orc_NodeDataPoolListElement.q_DiagEventCall);
-   orc_XMLParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPoolListElement.u32_NvMStartAddress);
-   orc_XMLParser.CreateNodeChild("name", orc_NodeDataPoolListElement.c_Name);
-   h_SaveDataPoolElementType(orc_NodeDataPoolListElement.c_Value, orc_XMLParser);
-   orc_XMLParser.CreateNodeChild("comment", orc_NodeDataPoolListElement.c_Comment);
-   h_SaveDataPoolElementValue("min-value", orc_NodeDataPoolListElement.c_MinValue, orc_XMLParser);
-   h_SaveDataPoolElementValue("max-value", orc_NodeDataPoolListElement.c_MaxValue, orc_XMLParser);
-   orc_XMLParser.CreateNodeChild("unit", orc_NodeDataPoolListElement.c_Unit);
-   orc_XMLParser.CreateNodeChild("access", mh_NodeDataPoolElementAccessToString(orc_NodeDataPoolListElement.e_Access));
-   orc_XMLParser.CreateAndSelectNodeChild("data-set-values");
-   h_SaveDataPoolListElementDataSetValues(orc_NodeDataPoolListElement.c_DataSetValues, orc_XMLParser);
+   orc_XmlParser.SetAttributeFloat64("factor", orc_NodeDataPoolListElement.f64_Factor);
+   orc_XmlParser.SetAttributeFloat64("offset", orc_NodeDataPoolListElement.f64_Offset);
+   orc_XmlParser.SetAttributeBool("diag-event-call", orc_NodeDataPoolListElement.q_DiagEventCall);
+   orc_XmlParser.SetAttributeUint32("nvm-start-address", orc_NodeDataPoolListElement.u32_NvmStartAddress);
+   orc_XmlParser.CreateNodeChild("name", orc_NodeDataPoolListElement.c_Name);
+   h_SaveDataPoolElementType(orc_NodeDataPoolListElement.c_Value, orc_XmlParser);
+   orc_XmlParser.CreateNodeChild("comment", orc_NodeDataPoolListElement.c_Comment);
+   h_SaveDataPoolElementValue("min-value", orc_NodeDataPoolListElement.c_MinValue, orc_XmlParser);
+   h_SaveDataPoolElementValue("max-value", orc_NodeDataPoolListElement.c_MaxValue, orc_XmlParser);
+   orc_XmlParser.CreateNodeChild("unit", orc_NodeDataPoolListElement.c_Unit);
+   orc_XmlParser.CreateNodeChild("access", mh_NodeDataPoolElementAccessToString(orc_NodeDataPoolListElement.e_Access));
+   orc_XmlParser.CreateAndSelectNodeChild("data-set-values");
+   h_SaveDataPoolListElementDataSetValues(orc_NodeDataPoolListElement.c_DataSetValues, orc_XmlParser);
    //Return to parent
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "data-element");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "data-element");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -563,29 +563,29 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElement(const C_OSCNodeDataPoolListEl
    post-condition: the passed XML parser has the active node set to the same "lists"
 
    \param[out]     orc_NodeDataPoolLists  data storage
-   \param[in,out]  orc_XMLParser          XML with data-pool active
+   \param[in,out]  orc_XmlParser          XML with data-pool active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
-                                                   C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OscNodeDataPoolList> & orc_NodeDataPoolLists,
+                                                    C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_CurNodeList;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   int32_t s32_Retval = C_NO_ERR;
+   C_SclString c_CurNodeList;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_NodeDataPoolLists.reserve(u32_ExpectedSize);
    }
 
-   c_CurNodeList = orc_XMLParser.SelectNodeChild("list");
+   c_CurNodeList = orc_XmlParser.SelectNodeChild("list");
 
    //Clear
    orc_NodeDataPoolLists.clear();
@@ -593,23 +593,23 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
    {
       do
       {
-         C_OSCNodeDataPoolList c_CurList;
+         C_OscNodeDataPoolList c_CurList;
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadDataPoolList(c_CurList, orc_XMLParser);
+            s32_Retval = h_LoadDataPoolList(c_CurList, orc_XmlParser);
          }
 
          orc_NodeDataPoolLists.push_back(c_CurList);
          //Next
-         c_CurNodeList = orc_XMLParser.SelectNodeNext("list");
+         c_CurNodeList = orc_XmlParser.SelectNodeNext("list");
       }
       while (c_CurNodeList == "list");
 
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "lists");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "lists");
       }
    }
    //Compare length
@@ -617,7 +617,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
    {
       if (u32_ExpectedSize != orc_NodeDataPoolLists.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected list count, expected: %i, got %i", u32_ExpectedSize,
                               orc_NodeDataPoolLists.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -634,19 +634,19 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolLists(std::vector<C_OSCNodeDataPool
    post-condition: the passed XML parser has the active node set to the same "data-pool"
 
    \param[in]      orc_NodeDataPoolLists  data storage
-   \param[in,out]  orc_XMLParser          XML with data-pool active
+   \param[in,out]  orc_XmlParser          XML with data-pool active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeDataPoolList> & orc_NodeDataPoolLists,
-                                                 C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OscNodeDataPoolList> & orc_NodeDataPoolLists,
+                                                 C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPoolLists.size());
-   for (uint32 u32_ItList = 0; u32_ItList < orc_NodeDataPoolLists.size(); ++u32_ItList)
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeDataPoolLists.size()));
+   for (uint32_t u32_ItList = 0; u32_ItList < orc_NodeDataPoolLists.size(); ++u32_ItList)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("list");
-      h_SaveDataPoolList(orc_NodeDataPoolLists[u32_ItList], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("list");
+      h_SaveDataPoolList(orc_NodeDataPoolLists[u32_ItList], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "lists");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "lists");
    }
 }
 
@@ -658,29 +658,29 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolLists(const std::vector<C_OSCNodeData
    post-condition: the passed XML parser has the active node set to the same "data-elements"
 
    \param[out]     orc_NodeDataPoolListElements    data storage
-   \param[in,out]  orc_XMLParser                   XML with list active
+   \param[in,out]  orc_XmlParser                   XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
-   std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolListElements(
+   std::vector<C_OscNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_CurNodeDataElement;
-   uint32 u32_ExpectedSize = 0UL;
-   const bool q_ExpectedSizeHere = orc_XMLParser.AttributeExists("length");
+   int32_t s32_Retval = C_NO_ERR;
+   C_SclString c_CurNodeDataElement;
+   uint32_t u32_ExpectedSize = 0UL;
+   const bool q_ExpectedSizeHere = orc_XmlParser.AttributeExists("length");
 
    //Check optional length
    if (q_ExpectedSizeHere == true)
    {
-      u32_ExpectedSize = orc_XMLParser.GetAttributeUint32("length");
+      u32_ExpectedSize = orc_XmlParser.GetAttributeUint32("length");
       orc_NodeDataPoolListElements.reserve(u32_ExpectedSize);
    }
 
-   c_CurNodeDataElement = orc_XMLParser.SelectNodeChild("data-element");
+   c_CurNodeDataElement = orc_XmlParser.SelectNodeChild("data-element");
 
    //Clear
    orc_NodeDataPoolListElements.clear();
@@ -688,29 +688,29 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
    {
       do
       {
-         C_OSCNodeDataPoolListElement c_CurDataElement;
+         C_OscNodeDataPoolListElement c_CurDataElement;
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadDataPoolElement(c_CurDataElement, orc_XMLParser);
+            s32_Retval = h_LoadDataPoolElement(c_CurDataElement, orc_XmlParser);
          }
 
          //Append
          orc_NodeDataPoolListElements.push_back(c_CurDataElement);
 
          //Next
-         c_CurNodeDataElement = orc_XMLParser.SelectNodeNext("data-element");
+         c_CurNodeDataElement = orc_XmlParser.SelectNodeNext("data-element");
       }
       while (c_CurNodeDataElement == "data-element");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-elements");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-elements");
    }
    //Compare length
    if ((s32_Retval == C_NO_ERR) && (q_ExpectedSizeHere == true))
    {
       if (u32_ExpectedSize != orc_NodeDataPoolListElements.size())
       {
-         C_SCLString c_Tmp;
+         C_SclString c_Tmp;
          c_Tmp.PrintFormatted("Unexpected data element count, expected: %i, got %i", u32_ExpectedSize,
                               orc_NodeDataPoolListElements.size());
          osc_write_log_warning("Load file", c_Tmp.c_str());
@@ -727,20 +727,20 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElements(
    post-condition: the passed XML parser has the active node set to the same "data-elements"
 
    \param[in]      orc_NodeDataPoolListElements    data storage
-   \param[in,out]  orc_XMLParser                   XML with list active
+   \param[in,out]  orc_XmlParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
-   const std::vector<C_OSCNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(
+   const std::vector<C_OscNodeDataPoolListElement> & orc_NodeDataPoolListElements, C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeUint32("length", orc_NodeDataPoolListElements.size());
-   for (uint32 u32_ItDataElement = 0; u32_ItDataElement < orc_NodeDataPoolListElements.size();
+   orc_XmlParser.SetAttributeUint32("length", static_cast<uint32_t>(orc_NodeDataPoolListElements.size()));
+   for (uint32_t u32_ItDataElement = 0; u32_ItDataElement < orc_NodeDataPoolListElements.size();
         ++u32_ItDataElement)
    {
-      orc_XMLParser.CreateAndSelectNodeChild("data-element");
-      h_SaveDataPoolElement(orc_NodeDataPoolListElements[u32_ItDataElement], orc_XMLParser);
+      orc_XmlParser.CreateAndSelectNodeChild("data-element");
+      h_SaveDataPoolElement(orc_NodeDataPoolListElements[u32_ItDataElement], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-elements");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-elements");
    }
 }
 
@@ -755,40 +755,40 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElements(
 
    \param[in]      orc_ContentType                             type reference (see description)
    \param[out]     orc_NodeDataPoolListElementDataSetValues    data storage
-   \param[in,out]  orc_XMLParser                               XML with list active
+   \param[in,out]  orc_XmlParser                               XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OSCNodeDataPoolContent & orc_ContentType,
-                                                                      std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
-                                                                      C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OscNodeDataPoolContent & orc_ContentType,
+                                                                       std::vector<C_OscNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
+                                                                       C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_CurNodeDataSetValue = orc_XMLParser.SelectNodeChild("data-set-value");
+   int32_t s32_Retval = C_NO_ERR;
+   C_SclString c_CurNodeDataSetValue = orc_XmlParser.SelectNodeChild("data-set-value");
 
    if (c_CurNodeDataSetValue == "data-set-value")
    {
       do
       {
-         C_OSCNodeDataPoolContent c_CurDataSetValue = orc_ContentType; //pre set content type
+         C_OscNodeDataPoolContent c_CurDataSetValue = orc_ContentType; //pre set content type
 
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = h_LoadDataPoolElementValue(c_CurDataSetValue, orc_XMLParser, false);
+            s32_Retval = h_LoadDataPoolElementValue(c_CurDataSetValue, orc_XmlParser, false);
          }
 
          //Append
          orc_NodeDataPoolListElementDataSetValues.push_back(c_CurDataSetValue);
 
          //Next
-         c_CurNodeDataSetValue = orc_XMLParser.SelectNodeNext("data-set-value");
+         c_CurNodeDataSetValue = orc_XmlParser.SelectNodeNext("data-set-value");
       }
       while (c_CurNodeDataSetValue == "data-set-value");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-set-values");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-set-values");
    }
    return s32_Retval;
 }
@@ -801,19 +801,19 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListElementDataSetValues(const C_OS
    post-condition: the passed XML parser has the active node set to the same "data-set-values"
 
    \param[in]      orc_NodeDataPoolListElementDataSetValues    data storage
-   \param[in,out]  orc_XMLParser                               XML with list active
+   \param[in,out]  orc_XmlParser                               XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
-   const std::vector<C_OSCNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
-   C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
+   const std::vector<C_OscNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
+   C_OscXmlParserBase & orc_XmlParser)
 {
    //Data set values
-   for (uint32 u32_ItDataSetValue = 0; u32_ItDataSetValue < orc_NodeDataPoolListElementDataSetValues.size();
+   for (uint32_t u32_ItDataSetValue = 0; u32_ItDataSetValue < orc_NodeDataPoolListElementDataSetValues.size();
         ++u32_ItDataSetValue)
    {
       h_SaveDataPoolElementValue("data-set-value", orc_NodeDataPoolListElementDataSetValues[u32_ItDataSetValue],
-                                 orc_XMLParser);
+                                 orc_XmlParser);
    }
 }
 
@@ -825,42 +825,42 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListElementDataSetValues(
    post-condition: the passed XML parser has the active node set to the same "data-sets"
 
    \param[out]     orc_NodeDataPoolListDataSets    data storage
-   \param[in,out]  orc_XMLParser                   XML with list active
+   \param[in,out]  orc_XmlParser                   XML with list active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
-   std::vector<C_OSCNodeDataPoolDataSet> & orc_NodeDataPoolListDataSets, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolListDataSets(
+   std::vector<C_OscNodeDataPoolDataSet> & orc_NodeDataPoolListDataSets, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   C_SCLString c_CurNodeDataSet = orc_XMLParser.SelectNodeChild("data-set");
+   int32_t s32_Retval = C_NO_ERR;
+   C_SclString c_CurNodeDataSet = orc_XmlParser.SelectNodeChild("data-set");
 
    orc_NodeDataPoolListDataSets.clear();
    if (c_CurNodeDataSet == "data-set")
    {
       do
       {
-         C_OSCNodeDataPoolDataSet c_CurDataSet;
+         C_OscNodeDataPoolDataSet c_CurDataSet;
 
-         if (orc_XMLParser.SelectNodeChild("name") == "name")
+         if (orc_XmlParser.SelectNodeChild("name") == "name")
          {
-            c_CurDataSet.c_Name = orc_XMLParser.GetNodeContent();
+            c_CurDataSet.c_Name = orc_XmlParser.GetNodeContent();
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "data-set");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "data-set");
          }
          else
          {
             s32_Retval = C_CONFIG;
          }
 
-         if (orc_XMLParser.SelectNodeChild("comment") == "comment")
+         if (orc_XmlParser.SelectNodeChild("comment") == "comment")
          {
-            c_CurDataSet.c_Comment = orc_XMLParser.GetNodeContent();
+            c_CurDataSet.c_Comment = orc_XmlParser.GetNodeContent();
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "data-set");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "data-set");
          }
          else
          {
@@ -871,11 +871,11 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
          orc_NodeDataPoolListDataSets.push_back(c_CurDataSet);
 
          //Next
-         c_CurNodeDataSet = orc_XMLParser.SelectNodeNext("data-set");
+         c_CurNodeDataSet = orc_XmlParser.SelectNodeNext("data-set");
       }
       while (c_CurNodeDataSet == "data-set");
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-sets");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-sets");
    }
    return s32_Retval;
 }
@@ -888,21 +888,21 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolListDataSets(
    post-condition: the passed XML parser has the active node set to the same "data-sets"
 
    \param[in]      orc_NodeDataPoolListDataSets    data storage
-   \param[in,out]  orc_XMLParser                   XML with list active
+   \param[in,out]  orc_XmlParser                   XML with list active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
-   const std::vector<C_OSCNodeDataPoolDataSet> & orc_NodeDataPoolListDataSets, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolListDataSets(
+   const std::vector<C_OscNodeDataPoolDataSet> & orc_NodeDataPoolListDataSets, C_OscXmlParserBase & orc_XmlParser)
 {
-   for (uint32 u32_ItDataSet = 0; u32_ItDataSet < orc_NodeDataPoolListDataSets.size(); ++u32_ItDataSet)
+   for (uint32_t u32_ItDataSet = 0; u32_ItDataSet < orc_NodeDataPoolListDataSets.size(); ++u32_ItDataSet)
    {
-      const C_OSCNodeDataPoolDataSet & rc_DataSet = orc_NodeDataPoolListDataSets[u32_ItDataSet];
+      const C_OscNodeDataPoolDataSet & rc_DataSet = orc_NodeDataPoolListDataSets[u32_ItDataSet];
 
-      orc_XMLParser.CreateAndSelectNodeChild("data-set");
-      orc_XMLParser.CreateNodeChild("name", rc_DataSet.c_Name);
-      orc_XMLParser.CreateNodeChild("comment", rc_DataSet.c_Comment);
+      orc_XmlParser.CreateAndSelectNodeChild("data-set");
+      orc_XmlParser.CreateNodeChild("name", rc_DataSet.c_Name);
+      orc_XmlParser.CreateNodeChild("comment", rc_DataSet.c_Comment);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "data-sets");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "data-sets");
    }
 }
 
@@ -915,25 +915,25 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolListDataSets(
    Stringified data pool type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::E_Type & ore_DataPool)
+C_SclString C_OscNodeDataPoolFiler::h_DataPoolToString(const C_OscNodeDataPool::E_Type & ore_DataPool)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_DataPool)
    {
-   case C_OSCNodeDataPool::eDIAG:
+   case C_OscNodeDataPool::eDIAG:
       c_Retval = "diag";
       break;
-   case C_OSCNodeDataPool::eCOM:
+   case C_OscNodeDataPool::eCOM:
       c_Retval = "com";
       break;
-   case C_OSCNodeDataPool::eNVM:
+   case C_OscNodeDataPool::eNVM:
       c_Retval = "nvm";
       break;
-   case C_OSCNodeDataPool::eHALC:
+   case C_OscNodeDataPool::eHALC:
       c_Retval = "halc";
       break;
-   case C_OSCNodeDataPool::eHALC_NVM:
+   case C_OscNodeDataPool::eHALC_NVM:
       c_Retval = "halc-nvm";
       break;
    default:
@@ -954,29 +954,29 @@ C_SCLString C_OSCNodeDataPoolFiler::h_DataPoolToString(const C_OSCNodeDataPool::
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String, C_OSCNodeDataPool::E_Type & ore_Type)
+int32_t C_OscNodeDataPoolFiler::h_StringToDataPool(const C_SclString & orc_String, C_OscNodeDataPool::E_Type & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "com")
    {
-      ore_Type = C_OSCNodeDataPool::eCOM;
+      ore_Type = C_OscNodeDataPool::eCOM;
    }
    else if (orc_String == "nvm")
    {
-      ore_Type = C_OSCNodeDataPool::eNVM;
+      ore_Type = C_OscNodeDataPool::eNVM;
    }
    else if (orc_String == "diag")
    {
-      ore_Type = C_OSCNodeDataPool::eDIAG;
+      ore_Type = C_OscNodeDataPool::eDIAG;
    }
    else if (orc_String == "halc")
    {
-      ore_Type = C_OSCNodeDataPool::eHALC;
+      ore_Type = C_OscNodeDataPool::eHALC;
    }
    else if (orc_String == "halc-nvm")
    {
-      ore_Type = C_OSCNodeDataPool::eHALC_NVM;
+      ore_Type = C_OscNodeDataPool::eHALC_NVM;
    }
    else
    {
@@ -996,33 +996,33 @@ sint32 C_OSCNodeDataPoolFiler::h_StringToDataPool(const C_SCLString & orc_String
    The function does not change the active node.
 
    \param[out]     orc_NodeDataPoolContent   data storage
-   \param[in,out]  orc_XMLParser             XML with unknown (Node to store data pool variable) active
+   \param[in,out]  orc_XmlParser             XML with unknown (Node to store data pool variable) active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                         C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolElementType(C_OscNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                          C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_CONFIG;
+   int32_t s32_Retval = C_CONFIG;
 
-   if (orc_XMLParser.SelectNodeChild("type") == "type")
+   if (orc_XmlParser.SelectNodeChild("type") == "type")
    {
-      C_OSCNodeDataPoolContent::E_Type e_Type;
-      s32_Retval = mh_StringToNodeDataPoolContent(orc_XMLParser.GetAttributeString("base-type"), e_Type);
+      C_OscNodeDataPoolContent::E_Type e_Type;
+      s32_Retval = mh_StringToNodeDataPoolContent(orc_XmlParser.GetAttributeString("base-type"), e_Type);
       if (s32_Retval == C_NO_ERR)
       {
          orc_NodeDataPoolContent.SetType(e_Type);
-         orc_NodeDataPoolContent.SetArray(orc_XMLParser.GetAttributeBool("is-array"));
+         orc_NodeDataPoolContent.SetArray(orc_XmlParser.GetAttributeBool("is-array"));
          if (orc_NodeDataPoolContent.GetArray() == true)
          {
-            orc_NodeDataPoolContent.SetArraySize(orc_XMLParser.GetAttributeUint32("array-size"));
+            orc_NodeDataPoolContent.SetArraySize(orc_XmlParser.GetAttributeUint32("array-size"));
          }
       }
       //Return
-      orc_XMLParser.SelectNodeParent();
+      orc_XmlParser.SelectNodeParent();
    }
    else
    {
@@ -1039,21 +1039,21 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(C_OSCNodeDataPoolConten
    Does not modify the active node.
 
    \param[in]      orc_NodeDataPoolContent   data storage
-   \param[in,out]  orc_XMLParser             XML parser
+   \param[in,out]  orc_XmlParser             XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OscNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                       C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild("type");
-   orc_XMLParser.SetAttributeString("base-type", mh_NodeDataPoolContentToString(orc_NodeDataPoolContent.GetType()));
-   orc_XMLParser.SetAttributeBool("is-array", orc_NodeDataPoolContent.GetArray());
+   orc_XmlParser.CreateAndSelectNodeChild("type");
+   orc_XmlParser.SetAttributeString("base-type", mh_NodeDataPoolContentToString(orc_NodeDataPoolContent.GetType()));
+   orc_XmlParser.SetAttributeBool("is-array", orc_NodeDataPoolContent.GetArray());
    if (orc_NodeDataPoolContent.GetArray() == true)
    {
-      orc_XMLParser.SetAttributeUint32("array-size", orc_NodeDataPoolContent.GetArraySize());
+      orc_XmlParser.SetAttributeUint32("array-size", orc_NodeDataPoolContent.GetArraySize());
    }
 
-   orc_XMLParser.SelectNodeParent();
+   orc_XmlParser.SelectNodeParent();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1066,7 +1066,7 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
    The function does not change the active node.
 
    \param[out]     orc_NodeDataPoolContent         data storage
-   \param[in,out]  orc_XMLParser                   XML with unknown (Node to store data pool variable) active
+   \param[in,out]  orc_XmlParser                   XML with unknown (Node to store data pool variable) active
    \param[in]      oq_CheckDataType                Check data type
    \param[in,out]  opc_CheckDataTypeErrorDetails   Check data type error details
 
@@ -1075,54 +1075,54 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(const C_OSCNodeDataPoolCo
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                          C_OSCXMLParserBase & orc_XMLParser,
-                                                          const bool oq_CheckDataType,
-                                                          stw_scl::C_SCLString * const opc_CheckDataTypeErrorDetails)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OscNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                           C_OscXmlParserBase & orc_XmlParser,
+                                                           const bool oq_CheckDataType,
+                                                           stw::scl::C_SclString * const opc_CheckDataTypeErrorDetails)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_NodeDataPoolContent.GetArray() == false)
    {
       if (oq_CheckDataType)
       {
-         s32_Retval = C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(
-            orc_NodeDataPoolContent.GetType(), orc_XMLParser, opc_CheckDataTypeErrorDetails);
+         s32_Retval = C_OscNodeDataPoolFiler::h_CheckDataPoolElementValueType(
+            orc_NodeDataPoolContent.GetType(), orc_XmlParser, opc_CheckDataTypeErrorDetails);
       }
       if (s32_Retval == C_NO_ERR)
       {
          //Single
          switch (orc_NodeDataPoolContent.GetType())
          {
-         case C_OSCNodeDataPoolContent::eUINT8:
-            orc_NodeDataPoolContent.SetValueU8(static_cast<uint8>(orc_XMLParser.GetAttributeUint32("value")));
+         case C_OscNodeDataPoolContent::eUINT8:
+            orc_NodeDataPoolContent.SetValueU8(static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32("value")));
             break;
-         case C_OSCNodeDataPoolContent::eUINT16:
-            orc_NodeDataPoolContent.SetValueU16(static_cast<uint16>(orc_XMLParser.GetAttributeUint32("value")));
+         case C_OscNodeDataPoolContent::eUINT16:
+            orc_NodeDataPoolContent.SetValueU16(static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32("value")));
             break;
-         case C_OSCNodeDataPoolContent::eUINT32:
-            orc_NodeDataPoolContent.SetValueU32(orc_XMLParser.GetAttributeUint32("value"));
+         case C_OscNodeDataPoolContent::eUINT32:
+            orc_NodeDataPoolContent.SetValueU32(orc_XmlParser.GetAttributeUint32("value"));
             break;
-         case C_OSCNodeDataPoolContent::eUINT64:
-            orc_NodeDataPoolContent.SetValueU64(orc_XMLParser.GetAttributeUint64("value"));
+         case C_OscNodeDataPoolContent::eUINT64:
+            orc_NodeDataPoolContent.SetValueU64(orc_XmlParser.GetAttributeUint64("value"));
             break;
-         case C_OSCNodeDataPoolContent::eSINT8:
-            orc_NodeDataPoolContent.SetValueS8(static_cast<sint8>(orc_XMLParser.GetAttributeSint64("value")));
+         case C_OscNodeDataPoolContent::eSINT8:
+            orc_NodeDataPoolContent.SetValueS8(static_cast<int8_t>(orc_XmlParser.GetAttributeSint64("value")));
             break;
-         case C_OSCNodeDataPoolContent::eSINT16:
-            orc_NodeDataPoolContent.SetValueS16(static_cast<sint16>(orc_XMLParser.GetAttributeSint64("value")));
+         case C_OscNodeDataPoolContent::eSINT16:
+            orc_NodeDataPoolContent.SetValueS16(static_cast<int16_t>(orc_XmlParser.GetAttributeSint64("value")));
             break;
-         case C_OSCNodeDataPoolContent::eSINT32:
-            orc_NodeDataPoolContent.SetValueS32(static_cast<sint32>(orc_XMLParser.GetAttributeSint64("value")));
+         case C_OscNodeDataPoolContent::eSINT32:
+            orc_NodeDataPoolContent.SetValueS32(static_cast<int32_t>(orc_XmlParser.GetAttributeSint64("value")));
             break;
-         case C_OSCNodeDataPoolContent::eSINT64:
-            orc_NodeDataPoolContent.SetValueS64(orc_XMLParser.GetAttributeSint64("value"));
+         case C_OscNodeDataPoolContent::eSINT64:
+            orc_NodeDataPoolContent.SetValueS64(orc_XmlParser.GetAttributeSint64("value"));
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT32:
-            orc_NodeDataPoolContent.SetValueF32(orc_XMLParser.GetAttributeFloat32("value"));
+         case C_OscNodeDataPoolContent::eFLOAT32:
+            orc_NodeDataPoolContent.SetValueF32(orc_XmlParser.GetAttributeFloat32("value"));
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT64:
-            orc_NodeDataPoolContent.SetValueF64(orc_XMLParser.GetAttributeFloat64("value"));
+         case C_OscNodeDataPoolContent::eFLOAT64:
+            orc_NodeDataPoolContent.SetValueF64(orc_XmlParser.GetAttributeFloat64("value"));
             break;
          default:
             break;
@@ -1132,10 +1132,10 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
    else
    {
       //Array
-      C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("element");
+      C_SclString c_CurNode = orc_XmlParser.SelectNodeChild("element");
       if (c_CurNode == "element")
       {
-         uint32 u32_CurIndex = 0U;
+         uint32_t u32_CurIndex = 0U;
          do
          {
             if (u32_CurIndex > orc_NodeDataPoolContent.GetArraySize())
@@ -1145,55 +1145,55 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
 
             if (oq_CheckDataType)
             {
-               s32_Retval = C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(
-                  orc_NodeDataPoolContent.GetType(), orc_XMLParser, opc_CheckDataTypeErrorDetails);
+               s32_Retval = C_OscNodeDataPoolFiler::h_CheckDataPoolElementValueType(
+                  orc_NodeDataPoolContent.GetType(), orc_XmlParser, opc_CheckDataTypeErrorDetails);
             }
             switch (orc_NodeDataPoolContent.GetType())
             {
-            case C_OSCNodeDataPoolContent::eUINT8:
-               orc_NodeDataPoolContent.SetValueAU8Element(static_cast<uint8>(orc_XMLParser.GetAttributeUint32(
-                                                                                "value")), u32_CurIndex);
+            case C_OscNodeDataPoolContent::eUINT8:
+               orc_NodeDataPoolContent.SetValueArrU8Element(static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32(
+                                                                                    "value")), u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eUINT16:
-               orc_NodeDataPoolContent.SetValueAU16Element(static_cast<uint16>(orc_XMLParser.GetAttributeUint32(
-                                                                                  "value")), u32_CurIndex);
+            case C_OscNodeDataPoolContent::eUINT16:
+               orc_NodeDataPoolContent.SetValueArrU16Element(static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32(
+                                                                                      "value")), u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eUINT32:
-               orc_NodeDataPoolContent.SetValueAU32Element(orc_XMLParser.GetAttributeUint32("value"),
-                                                           u32_CurIndex);
+            case C_OscNodeDataPoolContent::eUINT32:
+               orc_NodeDataPoolContent.SetValueArrU32Element(orc_XmlParser.GetAttributeUint32("value"),
+                                                             u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eUINT64:
-               orc_NodeDataPoolContent.SetValueAU64Element(orc_XMLParser.GetAttributeUint64("value"), u32_CurIndex);
+            case C_OscNodeDataPoolContent::eUINT64:
+               orc_NodeDataPoolContent.SetValueArrU64Element(orc_XmlParser.GetAttributeUint64("value"), u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eSINT8:
-               orc_NodeDataPoolContent.SetValueAS8Element(static_cast<sint8>(orc_XMLParser.GetAttributeSint64(
-                                                                                "value")), u32_CurIndex);
+            case C_OscNodeDataPoolContent::eSINT8:
+               orc_NodeDataPoolContent.SetValueArrS8Element(static_cast<int8_t>(orc_XmlParser.GetAttributeSint64(
+                                                                                   "value")), u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eSINT16:
-               orc_NodeDataPoolContent.SetValueAS16Element(static_cast<sint16>(orc_XMLParser.GetAttributeSint64(
-                                                                                  "value")), u32_CurIndex);
+            case C_OscNodeDataPoolContent::eSINT16:
+               orc_NodeDataPoolContent.SetValueArrS16Element(static_cast<int16_t>(orc_XmlParser.GetAttributeSint64(
+                                                                                     "value")), u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eSINT32:
-               orc_NodeDataPoolContent.SetValueAS32Element(static_cast<sint32>(orc_XMLParser.GetAttributeSint64(
-                                                                                  "value")), u32_CurIndex);
+            case C_OscNodeDataPoolContent::eSINT32:
+               orc_NodeDataPoolContent.SetValueArrS32Element(static_cast<int32_t>(orc_XmlParser.GetAttributeSint64(
+                                                                                     "value")), u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eSINT64:
-               orc_NodeDataPoolContent.SetValueAS64Element(orc_XMLParser.GetAttributeSint64("value"),
-                                                           u32_CurIndex);
+            case C_OscNodeDataPoolContent::eSINT64:
+               orc_NodeDataPoolContent.SetValueArrS64Element(orc_XmlParser.GetAttributeSint64("value"),
+                                                             u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eFLOAT32:
-               orc_NodeDataPoolContent.SetValueAF32Element(orc_XMLParser.GetAttributeFloat32("value"),
-                                                           u32_CurIndex);
+            case C_OscNodeDataPoolContent::eFLOAT32:
+               orc_NodeDataPoolContent.SetValueArrF32Element(orc_XmlParser.GetAttributeFloat32("value"),
+                                                             u32_CurIndex);
                break;
-            case C_OSCNodeDataPoolContent::eFLOAT64:
-               orc_NodeDataPoolContent.SetValueAF64Element(orc_XMLParser.GetAttributeFloat64("value"),
-                                                           u32_CurIndex);
+            case C_OscNodeDataPoolContent::eFLOAT64:
+               orc_NodeDataPoolContent.SetValueArrF64Element(orc_XmlParser.GetAttributeFloat64("value"),
+                                                             u32_CurIndex);
                break;
             default:
                break;
             }
             u32_CurIndex++; //next element
-            c_CurNode = orc_XMLParser.SelectNodeNext("element");
+            c_CurNode = orc_XmlParser.SelectNodeNext("element");
          }
          while ((c_CurNode == "element") && (s32_Retval == C_NO_ERR));
 
@@ -1205,7 +1205,7 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
          }
       }
       //Return
-      orc_XMLParser.SelectNodeParent();
+      orc_XmlParser.SelectNodeParent();
    }
 
    return s32_Retval;
@@ -1220,48 +1220,48 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(C_OSCNodeDataPoolConte
 
    \param[in]      orc_NodeName              name of node to create value in
    \param[in]      orc_NodeDataPoolContent   data storage
-   \param[in,out]  orc_XMLParser             XML parser
+   \param[in,out]  orc_XmlParser             XML parser
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLString & orc_NodeName,
-                                                        const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                        C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw::scl::C_SclString & orc_NodeName,
+                                                        const C_OscNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                        C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateAndSelectNodeChild(orc_NodeName);
+   orc_XmlParser.CreateAndSelectNodeChild(orc_NodeName);
    if (orc_NodeDataPoolContent.GetArray() == false)
    {
       //Single
       switch (orc_NodeDataPoolContent.GetType())
       {
-      case C_OSCNodeDataPoolContent::eUINT8:
-         orc_XMLParser.SetAttributeUint32("value", static_cast<uint32>(orc_NodeDataPoolContent.GetValueU8()));
+      case C_OscNodeDataPoolContent::eUINT8:
+         orc_XmlParser.SetAttributeUint32("value", static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueU8()));
          break;
-      case C_OSCNodeDataPoolContent::eUINT16:
-         orc_XMLParser.SetAttributeUint32("value", static_cast<uint32>(orc_NodeDataPoolContent.GetValueU16()));
+      case C_OscNodeDataPoolContent::eUINT16:
+         orc_XmlParser.SetAttributeUint32("value", static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueU16()));
          break;
-      case C_OSCNodeDataPoolContent::eUINT32:
-         orc_XMLParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueU32());
+      case C_OscNodeDataPoolContent::eUINT32:
+         orc_XmlParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueU32());
          break;
-      case C_OSCNodeDataPoolContent::eUINT64:
-         orc_XMLParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueU64());
+      case C_OscNodeDataPoolContent::eUINT64:
+         orc_XmlParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueU64());
          break;
-      case C_OSCNodeDataPoolContent::eSINT8:
-         orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS8()));
+      case C_OscNodeDataPoolContent::eSINT8:
+         orc_XmlParser.SetAttributeSint64("value", static_cast<int64_t>(orc_NodeDataPoolContent.GetValueS8()));
          break;
-      case C_OSCNodeDataPoolContent::eSINT16:
-         orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS16()));
+      case C_OscNodeDataPoolContent::eSINT16:
+         orc_XmlParser.SetAttributeSint64("value", static_cast<int64_t>(orc_NodeDataPoolContent.GetValueS16()));
          break;
-      case C_OSCNodeDataPoolContent::eSINT32:
-         orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS32()));
+      case C_OscNodeDataPoolContent::eSINT32:
+         orc_XmlParser.SetAttributeSint64("value", static_cast<int64_t>(orc_NodeDataPoolContent.GetValueS32()));
          break;
-      case C_OSCNodeDataPoolContent::eSINT64:
-         orc_XMLParser.SetAttributeSint64("value", orc_NodeDataPoolContent.GetValueS64());
+      case C_OscNodeDataPoolContent::eSINT64:
+         orc_XmlParser.SetAttributeSint64("value", orc_NodeDataPoolContent.GetValueS64());
          break;
-      case C_OSCNodeDataPoolContent::eFLOAT32:
-         orc_XMLParser.SetAttributeFloat32("value", orc_NodeDataPoolContent.GetValueF32());
+      case C_OscNodeDataPoolContent::eFLOAT32:
+         orc_XmlParser.SetAttributeFloat32("value", orc_NodeDataPoolContent.GetValueF32());
          break;
-      case C_OSCNodeDataPoolContent::eFLOAT64:
-         orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
+      case C_OscNodeDataPoolContent::eFLOAT64:
+         orc_XmlParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
          break;
       default:
          break;
@@ -1270,58 +1270,60 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
    else
    {
       //Array
-      for (uint32 u32_ItElem = 0; u32_ItElem < orc_NodeDataPoolContent.GetArraySize(); ++u32_ItElem)
+      for (uint32_t u32_ItElem = 0; u32_ItElem < orc_NodeDataPoolContent.GetArraySize(); ++u32_ItElem)
       {
-         orc_XMLParser.CreateAndSelectNodeChild("element");
+         orc_XmlParser.CreateAndSelectNodeChild("element");
          switch (orc_NodeDataPoolContent.GetType())
          {
-         case C_OSCNodeDataPoolContent::eUINT8:
-            orc_XMLParser.SetAttributeUint32("value",
-                                             static_cast<uint32>(orc_NodeDataPoolContent.GetValueAU8Element(u32_ItElem)));
+         case C_OscNodeDataPoolContent::eUINT8:
+            orc_XmlParser.SetAttributeUint32("value",
+                                             static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueArrU8Element(
+                                                                      u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eUINT16:
-            orc_XMLParser.SetAttributeUint32("value",
-                                             static_cast<uint32>(orc_NodeDataPoolContent.GetValueAU16Element(
-                                                                    u32_ItElem)));
+         case C_OscNodeDataPoolContent::eUINT16:
+            orc_XmlParser.SetAttributeUint32("value",
+                                             static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueArrU16Element(
+                                                                      u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eUINT32:
-            orc_XMLParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueAU32Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eUINT32:
+            orc_XmlParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueArrU32Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eUINT64:
-            orc_XMLParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueAU64Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eUINT64:
+            orc_XmlParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueArrU64Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eSINT8:
-            orc_XMLParser.SetAttributeSint64("value",
-                                             static_cast<sint64>(orc_NodeDataPoolContent.GetValueAS8Element(u32_ItElem)));
+         case C_OscNodeDataPoolContent::eSINT8:
+            orc_XmlParser.SetAttributeSint64("value",
+                                             static_cast<int64_t>(orc_NodeDataPoolContent.GetValueArrS8Element(
+                                                                     u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eSINT16:
-            orc_XMLParser.SetAttributeSint64("value",
-                                             static_cast<sint64>(orc_NodeDataPoolContent.GetValueAS16Element(
-                                                                    u32_ItElem)));
+         case C_OscNodeDataPoolContent::eSINT16:
+            orc_XmlParser.SetAttributeSint64("value",
+                                             static_cast<int64_t>(orc_NodeDataPoolContent.GetValueArrS16Element(
+                                                                     u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eSINT32:
-            orc_XMLParser.SetAttributeSint64("value",
-                                             static_cast<sint64>(orc_NodeDataPoolContent.GetValueAS32Element(
-                                                                    u32_ItElem)));
+         case C_OscNodeDataPoolContent::eSINT32:
+            orc_XmlParser.SetAttributeSint64("value",
+                                             static_cast<int64_t>(orc_NodeDataPoolContent.GetValueArrS32Element(
+                                                                     u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eSINT64:
-            orc_XMLParser.SetAttributeSint64("value", orc_NodeDataPoolContent.GetValueAS64Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eSINT64:
+            orc_XmlParser.SetAttributeSint64("value", orc_NodeDataPoolContent.GetValueArrS64Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT32:
-            orc_XMLParser.SetAttributeFloat32("value", orc_NodeDataPoolContent.GetValueAF32Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eFLOAT32:
+            orc_XmlParser.SetAttributeFloat32("value", orc_NodeDataPoolContent.GetValueArrF32Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT64:
-            orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueAF64Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eFLOAT64:
+            orc_XmlParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueArrF64Element(u32_ItElem));
             break;
          default:
             break;
          }
          //Return to parent
-         tgl_assert(orc_XMLParser.SelectNodeParent() == orc_NodeName);
+         tgl_assert(orc_XmlParser.SelectNodeParent() == orc_NodeName);
       }
    }
    //Return to parent
-   orc_XMLParser.SelectNodeParent();
+   orc_XmlParser.SelectNodeParent();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1334,48 +1336,48 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue(const stw_scl::C_SCLStri
    post-condition: the passed XML parser has the active node set to the same variable (Node to store data pool content)
 
    \param[in]      orc_NodeDataPoolContent   data storage
-   \param[in,out]  orc_XMLParser             XML with variable (Node to store data pool content) active
+   \param[in,out]  orc_XmlParser             XML with variable (Node to store data pool content) active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                     C_OSCXMLParserBase & orc_XMLParser)
+void C_OscNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OscNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                     C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.SetAttributeBool("array", orc_NodeDataPoolContent.GetArray());
-   orc_XMLParser.CreateNodeChild("type", mh_NodeDataPoolContentToString(orc_NodeDataPoolContent.GetType()));
+   orc_XmlParser.SetAttributeBool("array", orc_NodeDataPoolContent.GetArray());
+   orc_XmlParser.CreateNodeChild("type", mh_NodeDataPoolContentToString(orc_NodeDataPoolContent.GetType()));
    if (orc_NodeDataPoolContent.GetArray() == false)
    {
       //Single
       switch (orc_NodeDataPoolContent.GetType())
       {
-      case C_OSCNodeDataPoolContent::eUINT8:
-         orc_XMLParser.SetAttributeUint32("value", static_cast<uint32>(orc_NodeDataPoolContent.GetValueU8()));
+      case C_OscNodeDataPoolContent::eUINT8:
+         orc_XmlParser.SetAttributeUint32("value", static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueU8()));
          break;
-      case C_OSCNodeDataPoolContent::eUINT16:
-         orc_XMLParser.SetAttributeUint32("value", static_cast<uint32>(orc_NodeDataPoolContent.GetValueU16()));
+      case C_OscNodeDataPoolContent::eUINT16:
+         orc_XmlParser.SetAttributeUint32("value", static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueU16()));
          break;
-      case C_OSCNodeDataPoolContent::eUINT32:
-         orc_XMLParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueU32());
+      case C_OscNodeDataPoolContent::eUINT32:
+         orc_XmlParser.SetAttributeUint32("value", orc_NodeDataPoolContent.GetValueU32());
          break;
-      case C_OSCNodeDataPoolContent::eUINT64:
-         orc_XMLParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueU64());
+      case C_OscNodeDataPoolContent::eUINT64:
+         orc_XmlParser.SetAttributeUint64("value", orc_NodeDataPoolContent.GetValueU64());
          break;
-      case C_OSCNodeDataPoolContent::eSINT8:
-         orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS8()));
+      case C_OscNodeDataPoolContent::eSINT8:
+         orc_XmlParser.SetAttributeSint64("value", static_cast<int64_t>(orc_NodeDataPoolContent.GetValueS8()));
          break;
-      case C_OSCNodeDataPoolContent::eSINT16:
-         orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS16()));
+      case C_OscNodeDataPoolContent::eSINT16:
+         orc_XmlParser.SetAttributeSint64("value", static_cast<int64_t>(orc_NodeDataPoolContent.GetValueS16()));
          break;
-      case C_OSCNodeDataPoolContent::eSINT32:
-         orc_XMLParser.SetAttributeSint64("value", static_cast<sint64>(orc_NodeDataPoolContent.GetValueS32()));
+      case C_OscNodeDataPoolContent::eSINT32:
+         orc_XmlParser.SetAttributeSint64("value", static_cast<int64_t>(orc_NodeDataPoolContent.GetValueS32()));
          break;
-      case C_OSCNodeDataPoolContent::eSINT64:
-         orc_XMLParser.SetAttributeSint64("value", orc_NodeDataPoolContent.GetValueS64());
+      case C_OscNodeDataPoolContent::eSINT64:
+         orc_XmlParser.SetAttributeSint64("value", orc_NodeDataPoolContent.GetValueS64());
          break;
-      case C_OSCNodeDataPoolContent::eFLOAT32:
-         orc_XMLParser.SetAttributeFloat32("value", orc_NodeDataPoolContent.GetValueF32());
+      case C_OscNodeDataPoolContent::eFLOAT32:
+         orc_XmlParser.SetAttributeFloat32("value", orc_NodeDataPoolContent.GetValueF32());
          break;
-      case C_OSCNodeDataPoolContent::eFLOAT64:
-         orc_XMLParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
+      case C_OscNodeDataPoolContent::eFLOAT64:
+         orc_XmlParser.SetAttributeFloat64("value", orc_NodeDataPoolContent.GetValueF64());
          break;
       default:
          break;
@@ -1384,61 +1386,61 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
    else
    {
       //Array
-      orc_XMLParser.CreateAndSelectNodeChild("array");
-      for (uint32 u32_ItElem = 0; u32_ItElem < orc_NodeDataPoolContent.GetArraySize(); ++u32_ItElem)
+      orc_XmlParser.CreateAndSelectNodeChild("array");
+      for (uint32_t u32_ItElem = 0; u32_ItElem < orc_NodeDataPoolContent.GetArraySize(); ++u32_ItElem)
       {
-         orc_XMLParser.CreateAndSelectNodeChild("element");
-         orc_XMLParser.SetAttributeUint32("index", u32_ItElem);
+         orc_XmlParser.CreateAndSelectNodeChild("element");
+         orc_XmlParser.SetAttributeUint32("index", u32_ItElem);
          switch (orc_NodeDataPoolContent.GetType())
          {
-         case C_OSCNodeDataPoolContent::eUINT8:
-            orc_XMLParser.SetAttributeUint32(
+         case C_OscNodeDataPoolContent::eUINT8:
+            orc_XmlParser.SetAttributeUint32(
                "content",
-               static_cast<uint32>(orc_NodeDataPoolContent.GetValueAU8Element(u32_ItElem)));
+               static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueArrU8Element(u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eUINT16:
-            orc_XMLParser.SetAttributeUint32("content",
-                                             static_cast<uint32>(orc_NodeDataPoolContent.GetValueAU16Element(
-                                                                    u32_ItElem)));
+         case C_OscNodeDataPoolContent::eUINT16:
+            orc_XmlParser.SetAttributeUint32("content",
+                                             static_cast<uint32_t>(orc_NodeDataPoolContent.GetValueArrU16Element(
+                                                                      u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eUINT32:
-            orc_XMLParser.SetAttributeUint32("content", orc_NodeDataPoolContent.GetValueAU32Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eUINT32:
+            orc_XmlParser.SetAttributeUint32("content", orc_NodeDataPoolContent.GetValueArrU32Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eUINT64:
-            orc_XMLParser.SetAttributeUint64("content", orc_NodeDataPoolContent.GetValueAU64Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eUINT64:
+            orc_XmlParser.SetAttributeUint64("content", orc_NodeDataPoolContent.GetValueArrU64Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eSINT8:
-            orc_XMLParser.SetAttributeSint64(
+         case C_OscNodeDataPoolContent::eSINT8:
+            orc_XmlParser.SetAttributeSint64(
                "content",
-               static_cast<sint64>(orc_NodeDataPoolContent.GetValueAS8Element(u32_ItElem)));
+               static_cast<int64_t>(orc_NodeDataPoolContent.GetValueArrS8Element(u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eSINT16:
-            orc_XMLParser.SetAttributeSint64("content",
-                                             static_cast<sint64>(orc_NodeDataPoolContent.GetValueAS16Element(
-                                                                    u32_ItElem)));
+         case C_OscNodeDataPoolContent::eSINT16:
+            orc_XmlParser.SetAttributeSint64("content",
+                                             static_cast<int64_t>(orc_NodeDataPoolContent.GetValueArrS16Element(
+                                                                     u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eSINT32:
-            orc_XMLParser.SetAttributeSint64("content",
-                                             static_cast<sint64>(orc_NodeDataPoolContent.GetValueAS32Element(
-                                                                    u32_ItElem)));
+         case C_OscNodeDataPoolContent::eSINT32:
+            orc_XmlParser.SetAttributeSint64("content",
+                                             static_cast<int64_t>(orc_NodeDataPoolContent.GetValueArrS32Element(
+                                                                     u32_ItElem)));
             break;
-         case C_OSCNodeDataPoolContent::eSINT64:
-            orc_XMLParser.SetAttributeSint64("content", orc_NodeDataPoolContent.GetValueAS64Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eSINT64:
+            orc_XmlParser.SetAttributeSint64("content", orc_NodeDataPoolContent.GetValueArrS64Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT32:
-            orc_XMLParser.SetAttributeFloat32("content", orc_NodeDataPoolContent.GetValueAF32Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eFLOAT32:
+            orc_XmlParser.SetAttributeFloat32("content", orc_NodeDataPoolContent.GetValueArrF32Element(u32_ItElem));
             break;
-         case C_OSCNodeDataPoolContent::eFLOAT64:
-            orc_XMLParser.SetAttributeFloat64("content", orc_NodeDataPoolContent.GetValueAF64Element(u32_ItElem));
+         case C_OscNodeDataPoolContent::eFLOAT64:
+            orc_XmlParser.SetAttributeFloat64("content", orc_NodeDataPoolContent.GetValueArrF64Element(u32_ItElem));
             break;
          default:
             break;
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "array");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "array");
       }
       //Return
-      orc_XMLParser.SelectNodeParent();
+      orc_XmlParser.SelectNodeParent();
    }
 }
 
@@ -1451,16 +1453,16 @@ void C_OSCNodeDataPoolFiler::h_SaveDataPoolContentV1(const C_OSCNodeDataPoolCont
    Automatically generated file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_DatapoolName)
+C_SclString C_OscNodeDataPoolFiler::h_GetFileName(const C_SclString & orc_DatapoolName)
 {
-   return "dp_" + C_OSCSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
+   return "dp_" + C_OscSystemFilerUtil::h_PrepareItemNameForFileName(orc_DatapoolName) + "_core.xml";
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Check data pool element value type
 
-   \param[in]      orc_ContentType                 Content type
-   \param[in]      orc_XMLParser                   XML parser
+   \param[in]      oe_ContentType                  Content type
+   \param[in]      orc_XmlParser                   XML parser
    \param[in,out]  opc_CheckDataTypeErrorDetails   Check data type error details
 
    \return
@@ -1468,102 +1470,102 @@ C_SCLString C_OSCNodeDataPoolFiler::h_GetFileName(const C_SCLString & orc_Datapo
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDataPoolContent::E_Type & orc_ContentType,
-                                                               const C_OSCXMLParserBase & orc_XMLParser,
-                                                               stw_scl::C_SCLString * const opc_CheckDataTypeErrorDetails)
+int32_t C_OscNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OscNodeDataPoolContent::E_Type oe_ContentType,
+                                                                const C_OscXmlParserBase & orc_XmlParser,
+                                                                stw::scl::C_SclString * const opc_CheckDataTypeErrorDetails)
 {
-   sint32 s32_Retval = C_CONFIG;
+   int32_t s32_Retval = C_CONFIG;
 
    //Load value
-   const uint64 u64_Val = orc_XMLParser.GetAttributeUint64("value");
-   const sint64 s64_Val = orc_XMLParser.GetAttributeSint64("value");
-   const float64 f64_Val = orc_XMLParser.GetAttributeFloat64("value");
+   const uint64_t u64_Val = orc_XmlParser.GetAttributeUint64("value");
+   const int64_t s64_Val = orc_XmlParser.GetAttributeSint64("value");
+   const float64_t f64_Val = orc_XmlParser.GetAttributeFloat64("value");
 
-   switch (orc_ContentType)
+   switch (oe_ContentType)
    {
-   case C_OSCNodeDataPoolContent::eUINT8:
-      if ((((u64_Val <= std::numeric_limits<stw_types::uint8>::max())) &&
-           ((s64_Val >= static_cast<sint64>(std::numeric_limits<stw_types::uint8>::min())) &&
-            (s64_Val <= std::numeric_limits<stw_types::uint8>::max()))) &&
-          (((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint8>::min())) &&
-            (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint8>::max())))))
+   case C_OscNodeDataPoolContent::eUINT8:
+      if ((((u64_Val <= std::numeric_limits<uint8_t>::max())) &&
+           ((s64_Val >= static_cast<int64_t>(std::numeric_limits<uint8_t>::min())) &&
+            (s64_Val <= std::numeric_limits<uint8_t>::max()))) &&
+          (((f64_Val >= static_cast<float64_t>(std::numeric_limits<uint8_t>::min())) &&
+            (f64_Val <= static_cast<float64_t>(std::numeric_limits<uint8_t>::max())))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eUINT16:
-      if ((((u64_Val <= std::numeric_limits<stw_types::uint16>::max())) &&
-           ((s64_Val >= static_cast<sint64>(std::numeric_limits<stw_types::uint16>::min())) &&
-            (s64_Val <= std::numeric_limits<stw_types::uint16>::max()))) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint16>::min())) &&
-           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint16>::max()))))
+   case C_OscNodeDataPoolContent::eUINT16:
+      if ((((u64_Val <= std::numeric_limits<uint16_t>::max())) &&
+           ((s64_Val >= static_cast<int64_t>(std::numeric_limits<uint16_t>::min())) &&
+            (s64_Val <= std::numeric_limits<uint16_t>::max()))) &&
+          ((f64_Val >= static_cast<float64_t>(std::numeric_limits<uint16_t>::min())) &&
+           (f64_Val <= static_cast<float64_t>(std::numeric_limits<uint16_t>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eUINT32:
-      if ((((u64_Val <= std::numeric_limits<stw_types::uint32>::max())) &&
-           ((s64_Val >= static_cast<sint64>(std::numeric_limits<stw_types::uint32>::min())) &&
-            (s64_Val <= std::numeric_limits<stw_types::uint32>::max()))) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint32>::min())) &&
-           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint32>::max()))))
+   case C_OscNodeDataPoolContent::eUINT32:
+      if ((((u64_Val <= std::numeric_limits<uint32_t>::max())) &&
+           ((s64_Val >= static_cast<int64_t>(std::numeric_limits<uint32_t>::min())) &&
+            (s64_Val <= std::numeric_limits<uint32_t>::max()))) &&
+          ((f64_Val >= static_cast<float64_t>(std::numeric_limits<uint32_t>::min())) &&
+           (f64_Val <= static_cast<float64_t>(std::numeric_limits<uint32_t>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eUINT64:
+   case C_OscNodeDataPoolContent::eUINT64:
       //Sint64 check not reliable as the range of uint64 and sint64 don't completely overlap
       // and overflows might mess up the check
-      if (((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::uint64>::min())) &&
-           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::uint64>::max()))))
+      if (((f64_Val >= static_cast<float64_t>(std::numeric_limits<uint64_t>::min())) &&
+           (f64_Val <= static_cast<float64_t>(std::numeric_limits<uint64_t>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eSINT8:
+   case C_OscNodeDataPoolContent::eSINT8:
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
-      if ((((s64_Val >= std::numeric_limits<stw_types::sint8>::min()) &&
-            (s64_Val <= std::numeric_limits<stw_types::sint8>::max()))) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint8>::min())) &&
-           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint8>::max()))))
+      if ((((s64_Val >= std::numeric_limits<int8_t>::min()) &&
+            (s64_Val <= std::numeric_limits<int8_t>::max()))) &&
+          ((f64_Val >= static_cast<float64_t>(std::numeric_limits<int8_t>::min())) &&
+           (f64_Val <= static_cast<float64_t>(std::numeric_limits<int8_t>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eSINT16:
+   case C_OscNodeDataPoolContent::eSINT16:
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
-      if ((((s64_Val >= std::numeric_limits<stw_types::sint16>::min()) &&
-            (s64_Val <= std::numeric_limits<stw_types::sint16>::max()))) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint16>::min())) &&
-           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint16>::max()))))
+      if ((((s64_Val >= std::numeric_limits<int16_t>::min()) &&
+            (s64_Val <= std::numeric_limits<int16_t>::max()))) &&
+          ((f64_Val >= static_cast<float64_t>(std::numeric_limits<int16_t>::min())) &&
+           (f64_Val <= static_cast<float64_t>(std::numeric_limits<int16_t>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eSINT32:
+   case C_OscNodeDataPoolContent::eSINT32:
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
-      if ((((s64_Val >= std::numeric_limits<stw_types::sint32>::min()) &&
-            (s64_Val <= std::numeric_limits<stw_types::sint32>::max()))) &&
-          ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint32>::min())) &&
-           (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint32>::max()))))
+      if ((((s64_Val >= std::numeric_limits<int32_t>::min()) &&
+            (s64_Val <= std::numeric_limits<int32_t>::max()))) &&
+          ((f64_Val >= static_cast<float64_t>(std::numeric_limits<int32_t>::min())) &&
+           (f64_Val <= static_cast<float64_t>(std::numeric_limits<int32_t>::max()))))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eSINT64:
+   case C_OscNodeDataPoolContent::eSINT64:
       //All unsigned checks not reliable as the range of uint64 and any signed value don't completely overlap
       // and overflows might mess up the check
-      if ((f64_Val >= static_cast<float64>(std::numeric_limits<stw_types::sint64>::min())) &&
-          (f64_Val <= static_cast<float64>(std::numeric_limits<stw_types::sint64>::max())))
+      if ((f64_Val >= static_cast<float64_t>(std::numeric_limits<int64_t>::min())) &&
+          (f64_Val <= static_cast<float64_t>(std::numeric_limits<int64_t>::max())))
       {
          s32_Retval = C_NO_ERR;
       }
       break;
-   case C_OSCNodeDataPoolContent::eFLOAT32:
-   case C_OSCNodeDataPoolContent::eFLOAT64:
+   case C_OscNodeDataPoolContent::eFLOAT32:
+   case C_OscNodeDataPoolContent::eFLOAT64:
       //No range error or wrong type error possible for uint64 or sint64
       s32_Retval = C_NO_ERR;
       break;
@@ -1574,9 +1576,9 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
    {
       if (opc_CheckDataTypeErrorDetails != NULL)
       {
-         const stw_scl::C_SCLString c_Val = orc_XMLParser.GetAttributeString("value");
-         const stw_scl::C_SCLString c_DataType =
-            C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(orc_ContentType);
+         const stw::scl::C_SclString c_Val = orc_XmlParser.GetAttributeString("value");
+         const stw::scl::C_SclString c_DataType =
+            C_OscNodeDataPoolFiler::mh_NodeDataPoolContentToString(oe_ContentType);
 
          *opc_CheckDataTypeErrorDetails = "\"" + c_Val + "\" not in range of data type " + c_DataType;
       }
@@ -1592,106 +1594,105 @@ sint32 C_OSCNodeDataPoolFiler::h_CheckDataPoolElementValueType(const C_OSCNodeDa
    post-condition: the passed XML parser has the active node set to the same unknown (Node to store data pool variable)
 
    \param[out]     orc_NodeDataPoolContent   data storage
-   \param[in,out]  orc_XMLParser             XML with unknown (Node to store data pool variable) active
+   \param[in,out]  orc_XmlParser             XML with unknown (Node to store data pool variable) active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent & orc_NodeDataPoolContent,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OscNodeDataPoolContent & orc_NodeDataPoolContent,
+                                                        C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("type") == "type")
+   if (orc_XmlParser.SelectNodeChild("type") == "type")
    {
-      C_OSCNodeDataPoolContent::E_Type e_Type;
-      s32_Retval = mh_StringToNodeDataPoolContent(orc_XMLParser.GetNodeContent(), e_Type);
+      C_OscNodeDataPoolContent::E_Type e_Type;
+      s32_Retval = mh_StringToNodeDataPoolContent(orc_XmlParser.GetNodeContent(), e_Type);
       orc_NodeDataPoolContent.SetType(e_Type);
       //Return
-      orc_XMLParser.SelectNodeParent();
+      orc_XmlParser.SelectNodeParent();
    }
    else
    {
       s32_Retval = C_CONFIG;
    }
-   orc_NodeDataPoolContent.SetArray(orc_XMLParser.GetAttributeBool("array"));
+   orc_NodeDataPoolContent.SetArray(orc_XmlParser.GetAttributeBool("array"));
 
    if (orc_NodeDataPoolContent.GetArray() == false)
    {
       //same format as in newer file version:
-      h_LoadDataPoolElementValue(orc_NodeDataPoolContent, orc_XMLParser, false);
+      h_LoadDataPoolElementValue(orc_NodeDataPoolContent, orc_XmlParser, false);
    }
    else
    {
       //Array
-      if (orc_XMLParser.SelectNodeChild("array") == "array")
+      if (orc_XmlParser.SelectNodeChild("array") == "array")
       {
-         C_SCLString c_CurNode = orc_XMLParser.SelectNodeChild("element");
+         C_SclString c_CurNode = orc_XmlParser.SelectNodeChild("element");
          if (c_CurNode == "element")
          {
-            uint32 u32_CurIndex;
             do
             {
-               u32_CurIndex = orc_XMLParser.GetAttributeUint32("index");
+               const uint32_t u32_CurIndex = orc_XmlParser.GetAttributeUint32("index");
                if (u32_CurIndex >= orc_NodeDataPoolContent.GetArraySize())
                {
                   orc_NodeDataPoolContent.SetArraySize(u32_CurIndex + 1);
                }
                switch (orc_NodeDataPoolContent.GetType())
                {
-               case C_OSCNodeDataPoolContent::eUINT8:
-                  orc_NodeDataPoolContent.SetValueAU8Element(static_cast<uint8>(orc_XMLParser.GetAttributeUint32(
-                                                                                   "content")), u32_CurIndex);
+               case C_OscNodeDataPoolContent::eUINT8:
+                  orc_NodeDataPoolContent.SetValueArrU8Element(static_cast<uint8_t>(orc_XmlParser.GetAttributeUint32(
+                                                                                       "content")), u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eUINT16:
-                  orc_NodeDataPoolContent.SetValueAU16Element(static_cast<uint16>(orc_XMLParser.GetAttributeUint32(
-                                                                                     "content")), u32_CurIndex);
+               case C_OscNodeDataPoolContent::eUINT16:
+                  orc_NodeDataPoolContent.SetValueArrU16Element(static_cast<uint16_t>(orc_XmlParser.GetAttributeUint32(
+                                                                                         "content")), u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eUINT32:
-                  orc_NodeDataPoolContent.SetValueAU32Element(orc_XMLParser.GetAttributeUint32("content"),
-                                                              u32_CurIndex);
+               case C_OscNodeDataPoolContent::eUINT32:
+                  orc_NodeDataPoolContent.SetValueArrU32Element(orc_XmlParser.GetAttributeUint32("content"),
+                                                                u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eUINT64:
-                  orc_NodeDataPoolContent.SetValueAU64Element(orc_XMLParser.GetAttributeUint64(
-                                                                 "content"), u32_CurIndex);
+               case C_OscNodeDataPoolContent::eUINT64:
+                  orc_NodeDataPoolContent.SetValueArrU64Element(orc_XmlParser.GetAttributeUint64(
+                                                                   "content"), u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eSINT8:
-                  orc_NodeDataPoolContent.SetValueAS8Element(static_cast<sint8>(orc_XMLParser.GetAttributeSint64(
-                                                                                   "content")), u32_CurIndex);
+               case C_OscNodeDataPoolContent::eSINT8:
+                  orc_NodeDataPoolContent.SetValueArrS8Element(static_cast<int8_t>(orc_XmlParser.GetAttributeSint64(
+                                                                                      "content")), u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eSINT16:
-                  orc_NodeDataPoolContent.SetValueAS16Element(static_cast<sint16>(orc_XMLParser.GetAttributeSint64(
-                                                                                     "content")), u32_CurIndex);
+               case C_OscNodeDataPoolContent::eSINT16:
+                  orc_NodeDataPoolContent.SetValueArrS16Element(static_cast<int16_t>(orc_XmlParser.GetAttributeSint64(
+                                                                                        "content")), u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eSINT32:
-                  orc_NodeDataPoolContent.SetValueAS32Element(static_cast<sint32>(orc_XMLParser.GetAttributeSint64(
-                                                                                     "content")), u32_CurIndex);
+               case C_OscNodeDataPoolContent::eSINT32:
+                  orc_NodeDataPoolContent.SetValueArrS32Element(static_cast<int32_t>(orc_XmlParser.GetAttributeSint64(
+                                                                                        "content")), u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eSINT64:
-                  orc_NodeDataPoolContent.SetValueAS64Element(orc_XMLParser.GetAttributeSint64("content"),
-                                                              u32_CurIndex);
+               case C_OscNodeDataPoolContent::eSINT64:
+                  orc_NodeDataPoolContent.SetValueArrS64Element(orc_XmlParser.GetAttributeSint64("content"),
+                                                                u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eFLOAT32:
-                  orc_NodeDataPoolContent.SetValueAF32Element(orc_XMLParser.GetAttributeFloat32("content"),
-                                                              u32_CurIndex);
+               case C_OscNodeDataPoolContent::eFLOAT32:
+                  orc_NodeDataPoolContent.SetValueArrF32Element(orc_XmlParser.GetAttributeFloat32("content"),
+                                                                u32_CurIndex);
                   break;
-               case C_OSCNodeDataPoolContent::eFLOAT64:
-                  orc_NodeDataPoolContent.SetValueAF64Element(orc_XMLParser.GetAttributeFloat64("content"),
-                                                              u32_CurIndex);
+               case C_OscNodeDataPoolContent::eFLOAT64:
+                  orc_NodeDataPoolContent.SetValueArrF64Element(orc_XmlParser.GetAttributeFloat64("content"),
+                                                                u32_CurIndex);
                   break;
                default:
                   break;
                }
-               c_CurNode = orc_XMLParser.SelectNodeNext("element");
+               c_CurNode = orc_XmlParser.SelectNodeNext("element");
             }
             while (c_CurNode == "element");
             //Return
-            tgl_assert(orc_XMLParser.SelectNodeParent() == "array");
+            tgl_assert(orc_XmlParser.SelectNodeParent() == "array");
          }
          //Return
-         orc_XMLParser.SelectNodeParent();
+         orc_XmlParser.SelectNodeParent();
       }
       else
       {
@@ -1715,22 +1716,22 @@ sint32 C_OSCNodeDataPoolFiler::h_LoadDataPoolContentV1(C_OSCNodeDataPoolContent 
    C_CONFIG   file could not be created
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_NodeDataPool,
-                                                  const C_SCLString & orc_FilePath)
+int32_t C_OscNodeDataPoolFiler::h_SaveDataPoolFile(const C_OscNodeDataPool & orc_NodeDataPool,
+                                                   const C_SclString & orc_FilePath)
 {
-   C_OSCXMLParser c_XMLParser;
-   sint32 s32_Retval = C_OSCSystemFilerUtil::h_GetParserForNewFile(c_XMLParser, orc_FilePath,
-                                                                   "opensyde-dp-core-definition");
+   C_OscXmlParser c_XmlParser;
+   int32_t s32_Retval = C_OscSystemFilerUtil::h_GetParserForNewFile(c_XmlParser, orc_FilePath,
+                                                                    "opensyde-dp-core-definition");
 
    if (s32_Retval == C_NO_ERR)
    {
       //Version
-      c_XMLParser.CreateNodeChild("file-version", "1");
-      tgl_assert(c_XMLParser.CreateAndSelectNodeChild("data-pool") == "data-pool");
+      c_XmlParser.CreateNodeChild("file-version", "1");
+      tgl_assert(c_XmlParser.CreateAndSelectNodeChild("data-pool") == "data-pool");
       //node
-      C_OSCNodeDataPoolFiler::h_SaveDataPool(orc_NodeDataPool, c_XMLParser);
+      C_OscNodeDataPoolFiler::h_SaveDataPool(orc_NodeDataPool, c_XmlParser);
       //Don't forget to save!
-      if (c_XMLParser.SaveToFile(orc_FilePath) != C_NO_ERR)
+      if (c_XmlParser.SaveToFile(orc_FilePath) != C_NO_ERR)
       {
          osc_write_log_error("Saving node definition", "Could not create file for node.");
          s32_Retval = C_CONFIG;
@@ -1753,41 +1754,41 @@ sint32 C_OSCNodeDataPoolFiler::h_SaveDataPoolFile(const C_OSCNodeDataPool & orc_
    Stringified node data pool content type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
-   const C_OSCNodeDataPoolContent::E_Type & ore_NodeDataPoolContent)
+C_SclString C_OscNodeDataPoolFiler::mh_NodeDataPoolContentToString(
+   const C_OscNodeDataPoolContent::E_Type & ore_NodeDataPoolContent)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_NodeDataPoolContent)
    {
-   case C_OSCNodeDataPoolContent::eUINT8:
+   case C_OscNodeDataPoolContent::eUINT8:
       c_Retval = "uint8";
       break;
-   case C_OSCNodeDataPoolContent::eUINT16:
+   case C_OscNodeDataPoolContent::eUINT16:
       c_Retval = "uint16";
       break;
-   case C_OSCNodeDataPoolContent::eUINT32:
+   case C_OscNodeDataPoolContent::eUINT32:
       c_Retval = "uint32";
       break;
-   case C_OSCNodeDataPoolContent::eUINT64:
+   case C_OscNodeDataPoolContent::eUINT64:
       c_Retval = "uint64";
       break;
-   case C_OSCNodeDataPoolContent::eSINT8:
+   case C_OscNodeDataPoolContent::eSINT8:
       c_Retval = "sint8";
       break;
-   case C_OSCNodeDataPoolContent::eSINT16:
+   case C_OscNodeDataPoolContent::eSINT16:
       c_Retval = "sint16";
       break;
-   case C_OSCNodeDataPoolContent::eSINT32:
+   case C_OscNodeDataPoolContent::eSINT32:
       c_Retval = "sint32";
       break;
-   case C_OSCNodeDataPoolContent::eSINT64:
+   case C_OscNodeDataPoolContent::eSINT64:
       c_Retval = "sint64";
       break;
-   case C_OSCNodeDataPoolContent::eFLOAT32:
+   case C_OscNodeDataPoolContent::eFLOAT32:
       c_Retval = "float32";
       break;
-   case C_OSCNodeDataPoolContent::eFLOAT64:
+   case C_OscNodeDataPoolContent::eFLOAT64:
       c_Retval = "float64";
       break;
    default:
@@ -1808,50 +1809,50 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolContentToString(
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString & orc_String,
-                                                              C_OSCNodeDataPoolContent::E_Type & ore_Type)
+int32_t C_OscNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SclString & orc_String,
+                                                               C_OscNodeDataPoolContent::E_Type & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "uint8")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eUINT8;
+      ore_Type = C_OscNodeDataPoolContent::eUINT8;
    }
    else if (orc_String == "uint16")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eUINT16;
+      ore_Type = C_OscNodeDataPoolContent::eUINT16;
    }
    else if (orc_String == "uint32")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eUINT32;
+      ore_Type = C_OscNodeDataPoolContent::eUINT32;
    }
    else if (orc_String == "uint64")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eUINT64;
+      ore_Type = C_OscNodeDataPoolContent::eUINT64;
    }
    else if (orc_String == "sint8")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eSINT8;
+      ore_Type = C_OscNodeDataPoolContent::eSINT8;
    }
    else if (orc_String == "sint16")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eSINT16;
+      ore_Type = C_OscNodeDataPoolContent::eSINT16;
    }
    else if (orc_String == "sint32")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eSINT32;
+      ore_Type = C_OscNodeDataPoolContent::eSINT32;
    }
    else if (orc_String == "sint64")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eSINT64;
+      ore_Type = C_OscNodeDataPoolContent::eSINT64;
    }
    else if (orc_String == "float32")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eFLOAT32;
+      ore_Type = C_OscNodeDataPoolContent::eFLOAT32;
    }
    else if (orc_String == "float64")
    {
-      ore_Type = C_OSCNodeDataPoolContent::eFLOAT64;
+      ore_Type = C_OscNodeDataPoolContent::eFLOAT64;
    }
    else
    {
@@ -1871,17 +1872,17 @@ sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolContent(const C_SCLString 
    Stringified node data pool element access type
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
-   const C_OSCNodeDataPoolListElement::E_Access & ore_NodeDataPoolElementAccess)
+C_SclString C_OscNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
+   const C_OscNodeDataPoolListElement::E_Access & ore_NodeDataPoolElementAccess)
 {
-   C_SCLString c_Retval;
+   C_SclString c_Retval;
 
    switch (ore_NodeDataPoolElementAccess)
    {
-   case C_OSCNodeDataPoolListElement::eACCESS_RO:
+   case C_OscNodeDataPoolListElement::eACCESS_RO:
       c_Retval = "read-only";
       break;
-   case C_OSCNodeDataPoolListElement::eACCESS_RW:
+   case C_OscNodeDataPoolListElement::eACCESS_RW:
       c_Retval = "read-write";
       break;
    default:
@@ -1902,18 +1903,18 @@ C_SCLString C_OSCNodeDataPoolFiler::mh_NodeDataPoolElementAccessToString(
    C_RANGE    String unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCNodeDataPoolFiler::mh_StringToNodeDataPoolElementAccess(const C_SCLString & orc_String,
-                                                                    C_OSCNodeDataPoolListElement::E_Access & ore_Type)
+int32_t C_OscNodeDataPoolFiler::mh_StringToNodeDataPoolElementAccess(const C_SclString & orc_String,
+                                                                     C_OscNodeDataPoolListElement::E_Access & ore_Type)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (orc_String == "read-write")
    {
-      ore_Type = C_OSCNodeDataPoolListElement::eACCESS_RW;
+      ore_Type = C_OscNodeDataPoolListElement::eACCESS_RW;
    }
    else if (orc_String == "read-only")
    {
-      ore_Type = C_OSCNodeDataPoolListElement::eACCESS_RO;
+      ore_Type = C_OscNodeDataPoolListElement::eACCESS_RO;
    }
    else
    {

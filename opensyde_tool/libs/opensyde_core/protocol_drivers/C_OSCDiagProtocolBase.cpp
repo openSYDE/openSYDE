@@ -10,13 +10,13 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
-#include "C_OSCDiagProtocolBase.h"
+#include "C_OscDiagProtocolBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,7 +35,7 @@ using namespace stw_opensyde_core;
    Set up class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
+C_OscDiagProtocolBase::C_OscDiagProtocolBase(void) :
    mpr_OnDataPoolReadEventReceived(NULL),
    mpr_OnDataPoolReadEventErrorReceived(NULL),
    mpv_OnAsyncInstance(NULL)
@@ -48,7 +48,7 @@ C_OSCDiagProtocolBase::C_OSCDiagProtocolBase(void) :
    Tear down class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
+C_OscDiagProtocolBase::~C_OscDiagProtocolBase(void)
 {
    mpr_OnDataPoolReadEventReceived = NULL;
    mpr_OnDataPoolReadEventErrorReceived = NULL;
@@ -66,7 +66,7 @@ C_OSCDiagProtocolBase::~C_OSCDiagProtocolBase(void)
    \param[in]  opv_Instance                        instance pointer to pass back when invoking read event callback
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCDiagProtocolBase::Initialize(const PR_DataPoolReadEventReceived opr_DataPoolReadEventReceived,
+void C_OscDiagProtocolBase::Initialize(const PR_DataPoolReadEventReceived opr_DataPoolReadEventReceived,
                                        const PR_DataPoolReadEventErrorReceived opr_DataPoolReadEventErrorReceived,
                                        void * const opv_Instance)
 {

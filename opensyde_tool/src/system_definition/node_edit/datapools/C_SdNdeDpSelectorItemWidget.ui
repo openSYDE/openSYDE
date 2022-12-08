@@ -101,7 +101,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeTedElided" name="pc_TextEditDpName">
+         <widget class="stw::opensyde_gui_elements::C_OgeTedElided" name="pc_TextEditDpName">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -138,7 +138,7 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeTedElided" name="pc_TextEditDpComment">
+         <widget class="stw::opensyde_gui_elements::C_OgeTedElided" name="pc_TextEditDpComment">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -189,7 +189,7 @@
               <number>5</number>
              </property>
              <item>
-              <widget class="stw_opensyde_gui_elements::C_OgeLabStatusInformationSmall" name="pc_LabelUsage">
+              <widget class="stw::opensyde_gui_elements::C_OgeLabStatusInformationSmall" name="pc_LabelUsage">
                <property name="text">
                 <string>0%</string>
                </property>
@@ -238,14 +238,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabStatusInformationSmall</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabStatusInformationSmall</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabStatusInformationSmall.h</header>
+   <header>C_OgeLabStatusInformationSmall.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeTedElided</class>
+   <class>stw::opensyde_gui_elements::C_OgeTedElided</class>
    <extends>QTextEdit</extends>
-   <header>C_OgeTedElided.h</header>
+   <header>C_OgeTedElided.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

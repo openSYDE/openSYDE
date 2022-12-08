@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QFileInfo>
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_SyvUpPacParamSetFileAddPopUp.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SyvUpPacParamSetFileAddPopUp.hpp"
 #include "ui_C_SyvUpPacParamSetFileAddPopUp.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -51,10 +50,9 @@ using namespace stw_opensyde_gui_elements;
    \param[in]     ou32_NodeIndex  Node index for comparison
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacParamSetFileAddPopUp::C_SyvUpPacParamSetFileAddPopUp(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                               const QString & orc_Path,
-                                                               const QString & orc_StoragePath,
-                                                               const uint32 ou32_NodeIndex) :
+C_SyvUpPacParamSetFileAddPopUp::C_SyvUpPacParamSetFileAddPopUp(
+   stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent, const QString & orc_Path, const QString & orc_StoragePath,
+   const uint32_t ou32_NodeIndex) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpPacParamSetFileAddPopUp),
    mrc_ParentDialog(orc_Parent),
@@ -92,9 +90,9 @@ C_SyvUpPacParamSetFileAddPopUp::~C_SyvUpPacParamSetFileAddPopUp(void)
    C_CONFIG   file does not contain essential information
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacParamSetFileAddPopUp::ReadFile(void)
+int32_t C_SyvUpPacParamSetFileAddPopUp::ReadFile(void)
 {
-   const sint32 s32_Result = this->mc_FileInfo.ReadFile();
+   const int32_t s32_Result = this->mc_FileInfo.ReadFile();
    const QString & rc_Text = this->mc_FileInfo.GetComparisonResultsHtml();
    QString c_Html;
 
@@ -148,8 +146,8 @@ void C_SyvUpPacParamSetFileAddPopUp::keyPressEvent(QKeyEvent * const opc_KeyEven
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&

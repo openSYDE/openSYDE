@@ -12,7 +12,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <iostream>
 
@@ -21,46 +21,45 @@
 #include <QDesktopWidget>
 #include <QMimeData>
 
-#include "C_NagMainWindow.h"
+#include "C_NagMainWindow.hpp"
 #include "ui_C_NagMainWindow.h"
 
-#include "constants.h"
+#include "constants.hpp"
 
-#include "TGLUtils.h"
-#include "C_OSCUtils.h"
-#include "C_OSCLoggingHandler.h"
-#include "stwerrors.h"
-#include "C_SyvUtil.h"
-#include "C_HeHandler.h"
-#include "C_SdTopologyWidget.h"
-#include "C_SdNdeDpEditWidget.h"
-#include "C_SdHandlerWidget.h"
-#include "C_SyvHandlerWidget.h"
-#include "C_UsHandler.h"
-#include "C_OgeOverlay.h"
-#include "C_SdNdeNodeEditWidget.h"
-#include "C_PuiProject.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_GtGetText.h"
-#include "C_OSCNode.h"
-#include "C_OSCSystemBus.h"
-#include "C_PopErrorHandling.h"
-#include "C_OSCSystemDefinition.h"
-#include "C_Uti.h"
-#include "C_NagToolTip.h"
-#include "C_PopUtil.h"
-#include "C_TblTreDataElementModel.h"
+#include "TglUtils.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "stwerrors.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_HeHandler.hpp"
+#include "C_SdTopologyWidget.hpp"
+#include "C_SdNdeDpEditWidget.hpp"
+#include "C_SdHandlerWidget.hpp"
+#include "C_SyvHandlerWidget.hpp"
+#include "C_UsHandler.hpp"
+#include "C_OgeOverlay.hpp"
+#include "C_SdNdeNodeEditWidget.hpp"
+#include "C_PuiProject.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscNode.hpp"
+#include "C_OscSystemBus.hpp"
+#include "C_PopErrorHandling.hpp"
+#include "C_OscSystemDefinition.hpp"
+#include "C_Uti.hpp"
+#include "C_NagToolTip.hpp"
+#include "C_PopUtil.hpp"
+#include "C_TblTreDataElementModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::tgl;
+using namespace stw::errors;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -82,7 +81,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in]  ou16_Timer  Timer
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
+C_NagMainWindow::C_NagMainWindow(const uint16_t ou16_Timer) :
    QMainWindow(NULL),
    mpc_Ui(new Ui::C_NagMainWindow),
    mpc_ActiveWidget(NULL),
@@ -102,9 +101,9 @@ C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
 {
    // Performance measurement
    // Switch on and off because using flag from user settings would load them, hence this loading time would not count
-   C_OSCLoggingHandler::h_SetMeasurePerformanceActive(true);
-   const uint16 u16_TimerId = osc_write_log_performance_start();
-   C_OSCLoggingHandler::h_SetMeasurePerformanceActive(false);
+   C_OscLoggingHandler::h_SetMeasurePerformanceActive(true);
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
+   C_OscLoggingHandler::h_SetMeasurePerformanceActive(false);
 
    mpc_Ui->setupUi(this);
 
@@ -117,11 +116,11 @@ C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
 
    // load devices so they are known to UI
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
+   stw::opensyde_core::C_OscSystemDefinition::hc_Devices.LoadFromFile(
       C_Uti::h_GetAbsolutePathFromExe("../devices/devices.ini").toStdString().c_str(), false, NULL);
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   stw_opensyde_core::C_OSCSystemDefinition::hc_Devices.LoadFromFile(
+   stw::opensyde_core::C_OscSystemDefinition::hc_Devices.LoadFromFile(
       C_Uti::h_GetAbsolutePathFromExe("../devices/user_devices.ini").toStdString().c_str(), true, NULL);
 
    this->mpc_MainWidget = new C_NagMainWidget(this->mpc_Ui->pc_workAreaWidget);
@@ -181,7 +180,7 @@ C_NagMainWindow::C_NagMainWindow(const uint16 ou16_Timer) :
    }
 
    // Performance time measurement
-   C_OSCLoggingHandler::h_SetMeasurePerformanceActive(C_UsHandler::h_GetInstance()->GetPerformanceActive());
+   C_OscLoggingHandler::h_SetMeasurePerformanceActive(C_UsHandler::h_GetInstance()->GetPerformanceActive());
 
    //Drag & drop of *.syde files
    this->setAcceptDrops(true);
@@ -226,7 +225,7 @@ C_NagMainWindow::~C_NagMainWindow()
    delete mpc_Ui;
 
    //Clean up singleton
-   stw_opensyde_gui_logic::C_PuiProject::h_Destroy();
+   stw::opensyde_gui_logic::C_PuiProject::h_Destroy();
    C_UsHandler::h_Destroy();
    C_TblTreDataElementModel::h_CleanUp();
 }
@@ -276,7 +275,7 @@ void C_NagMainWindow::m_ShowStartView()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_SubMode, const bool oq_ChangeUseCase)
+void C_NagMainWindow::m_ChangeUseCase(const int32_t os32_Mode, const int32_t os32_SubMode, const bool oq_ChangeUseCase)
 {
    bool q_Worked;
    QString c_Name;
@@ -301,7 +300,7 @@ void C_NagMainWindow::m_ChangeUseCase(const sint32 os32_Mode, const sint32 os32_
    \param[in]  os32_SubMode   Sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_HandleSysDefRequest(const sint32 os32_Mode, const sint32 os32_SubMode)
+void C_NagMainWindow::m_HandleSysDefRequest(const int32_t os32_Mode, const int32_t os32_SubMode)
 {
    const bool q_ChangeUseCase = (this->ms32_Mode != ms32_MODE_SYSDEF);
 
@@ -309,8 +308,9 @@ void C_NagMainWindow::m_HandleSysDefRequest(const sint32 os32_Mode, const sint32
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_OpenDetail(const sint32 os32_Index, const sint32 os32_SubIndex, const sint32 os32_SubSubIndex,
-                                   const sint32 os32_SubSubSubIndex, const sint32 os32_Flag)
+void C_NagMainWindow::m_OpenDetail(const int32_t os32_Index, const int32_t os32_SubIndex,
+                                   const int32_t os32_SubSubIndex, const int32_t os32_SubSubSubIndex,
+                                   const int32_t os32_Flag)
 {
    if (this->mpc_ActiveWidget != NULL)
    {
@@ -355,7 +355,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_ToolTipHidden1 = false;
    bool q_ToolTipHidden2 = false;
 
-   if (stw_opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
+   if (stw::opensyde_gui_logic::C_HeHandler::h_CheckHelpKey(opc_KeyEvent) == true)
    {
       if (this->mq_StartView == false)
       {
@@ -377,7 +377,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       }
       else
       {
-         stw_opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
+         stw::opensyde_gui_logic::C_HeHandler::h_GetInstance().CallSpecificHelpPage(
             this->mpc_MainWidget->metaObject()->className());
       }
    }
@@ -390,7 +390,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    else
    {
       // Save on Ctrl+S
-      if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_S)) &&
+      if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_S)) &&
           (opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true))
       {
          //Check if valid save
@@ -406,7 +406,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          }
       }
       // Save as on F12
-      else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F12))
+      else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F12))
       {
          // Save as is not allowed for service projects
          if (C_PuiSvHandler::h_GetInstance()->GetServiceModeActive() == false)
@@ -416,7 +416,7 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
          }
       }
       // Open color picker
-      else if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_F8))
+      else if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_F8))
       {
          // open color picker dialog
          this->mpc_MainWidget->OpenColorPicker();
@@ -427,12 +427,12 @@ void C_NagMainWindow::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       }
    }
    //Trigger tool tip hide if necessary
-   if (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape))
+   if (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape))
    {
       q_ToolTipHidden2 = C_NagToolTip::h_HideAll();
    }
    QMainWindow::keyPressEvent(opc_KeyEvent);
-   if ((((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Escape)) && (opc_KeyEvent->isAccepted() == false)) &&
+   if ((((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Escape)) && (opc_KeyEvent->isAccepted() == false)) &&
         (q_ToolTipHidden1 == false)) && (q_ToolTipHidden2 == false))
    {
       switch (this->ms32_Mode)
@@ -609,7 +609,7 @@ void C_NagMainWindow::dropEvent(QDropEvent * const opc_Event)
              (mh_CheckMime(pc_MimeData, &c_FilePath) == true))
          {
             // Check if path is a valid path with no irregular characters
-            if (C_OSCUtils::h_CheckValidFilePath(c_FilePath.toStdString().c_str()) == false)
+            if (C_OscUtils::h_CheckValidFilePath(c_FilePath.toStdString().c_str()) == false)
             {
                C_OgeWiUtil::h_ShowPathInvalidError(this, c_FilePath);
             }
@@ -697,9 +697,9 @@ void C_NagMainWindow::m_PrepareForSpecificWidget(const bool oq_DeleteActualWidge
    \param[in]  ou32_Index           Index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_SetNewSpecificWidget(const stw_types::sint32 os32_Mode, const stw_types::sint32 os32_SubMode,
+void C_NagMainWindow::m_SetNewSpecificWidget(const int32_t os32_Mode, const int32_t os32_SubMode,
                                              const QString & orc_ItemName, const QString & orc_SubSubModeName,
-                                             const uint32 ou32_Index)
+                                             const uint32_t ou32_Index)
 {
    connect(this->mpc_ActiveWidget, &C_NagUseCaseWidget::SigChangeMode,
            this, &C_NagMainWindow::m_ChangeMode);
@@ -775,8 +775,8 @@ void C_NagMainWindow::m_RemoveUseCaseWidget(void)
    \param[in]      oq_ChangeUseCase    Flag to signal use case change
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_SubMode, uint32 & oru32_Index,
-                                       QString & orc_Name, QString & orc_SubItemName, uint32 & oru32_Flag,
+void C_NagMainWindow::m_AdaptParameter(const int32_t os32_Mode, int32_t & ors32_SubMode, uint32_t & oru32_Index,
+                                       QString & orc_Name, QString & orc_SubItemName, uint32_t & oru32_Flag,
                                        const bool oq_ChangeUseCase)
 {
    if ((this->mq_StartView == true) || (oq_ChangeUseCase == true))
@@ -817,15 +817,15 @@ void C_NagMainWindow::m_AdaptParameter(const sint32 os32_Mode, sint32 & ors32_Su
    \param[in,out]  orc_SubSubMode   Sub sub mode
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::mh_GetHeadingNames(const sint32 os32_Mode, const sint32 & ors32_SubMode, const uint32 ou32_Index,
-                                         QString & orc_SubMode, QString & orc_SubSubMode)
+void C_NagMainWindow::mh_GetHeadingNames(const int32_t os32_Mode, const int32_t & ors32_SubMode,
+                                         const uint32_t ou32_Index, QString & orc_SubMode, QString & orc_SubSubMode)
 {
    if (os32_Mode == ms32_MODE_SYSDEF)
    {
       if (ors32_SubMode == ms32_SUBMODE_SYSDEF_NODEEDIT)
       {
-         const stw_opensyde_core::C_OSCNode * const pc_Node =
-            C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_Index);
+         const stw::opensyde_core::C_OscNode * const pc_Node =
+            C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_Index);
          if (pc_Node != NULL)
          {
             orc_SubSubMode = pc_Node->c_Properties.c_Name.c_str();
@@ -838,8 +838,8 @@ void C_NagMainWindow::mh_GetHeadingNames(const sint32 os32_Mode, const sint32 & 
       }
       else if (ors32_SubMode == ms32_SUBMODE_SYSDEF_BUSEDIT)
       {
-         const stw_opensyde_core::C_OSCSystemBus * const pc_Bus =
-            C_PuiSdHandler::h_GetInstance()->GetOSCBus(ou32_Index);
+         const stw::opensyde_core::C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(ou32_Index);
          if (pc_Bus != NULL)
          {
             orc_SubSubMode = pc_Bus->c_Name.c_str();
@@ -876,8 +876,8 @@ void C_NagMainWindow::mh_GetHeadingNames(const sint32 os32_Mode, const sint32 & 
    \param[in]  ou32_Flag      Flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
-                                       const QString & orc_SubName, const uint32 ou32_Flag)
+void C_NagMainWindow::m_ShowSysDefItem(const int32_t os32_SubMode, const uint32_t ou32_Index, const QString & orc_Name,
+                                       const QString & orc_SubName, const uint32_t ou32_Flag)
 {
    C_SdHandlerWidget * pc_Handler = dynamic_cast<C_SdHandlerWidget *>(this->mpc_ActiveWidget);
 
@@ -929,8 +929,8 @@ void C_NagMainWindow::m_ShowSysDefItem(const sint32 os32_SubMode, const uint32 o
    \param[in]      ou32_Flag           Currently unused flag
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_ShowSysViewItem(sint32 & ors32_SubMode, const uint32 ou32_Index, const QString & orc_Name,
-                                        const QString & orc_SubSubModeName, const uint32 ou32_Flag)
+void C_NagMainWindow::m_ShowSysViewItem(int32_t & ors32_SubMode, const uint32_t ou32_Index, const QString & orc_Name,
+                                        const QString & orc_SubSubModeName, const uint32_t ou32_Flag)
 {
    C_SyvHandlerWidget * pc_Handler = dynamic_cast<C_SyvHandlerWidget *>(this->mpc_ActiveWidget);
 
@@ -1009,9 +1009,9 @@ bool C_NagMainWindow::mh_CheckMime(const QMimeData * const opc_Mime, QString * c
          const QList<QUrl> & rc_UrlList = opc_Mime->urls();
 
          // extract the local paths of the files
-         for (sintn sn_It = 0; sn_It < rc_UrlList.size(); ++sn_It)
+         for (int32_t s32_It = 0; s32_It < rc_UrlList.size(); ++s32_It)
          {
-            c_PathList.append(rc_UrlList.at(sn_It).toLocalFile());
+            c_PathList.append(rc_UrlList.at(s32_It).toLocalFile());
          }
          if (c_PathList.size() == 1)
          {
@@ -1275,7 +1275,7 @@ void C_NagMainWindow::m_HandleAddViewRequest(void)
    \param[in]  orc_Name    New name
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_HandleRenameView(const uint32 ou32_Index, const QString & orc_Name) const
+void C_NagMainWindow::m_HandleRenameView(const uint32_t ou32_Index, const QString & orc_Name) const
 {
    this->mc_SystemViewManager.RenameView(ou32_Index, orc_Name);
    if (this->mu32_Index == ou32_Index)
@@ -1304,7 +1304,7 @@ void C_NagMainWindow::m_UpdateTitle(void) const
    \param[in]  ou32_TargetIndex  Target index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_HandleMoveViewRequest(const uint32 ou32_StartIndex, const uint32 ou32_TargetIndex)
+void C_NagMainWindow::m_HandleMoveViewRequest(const uint32_t ou32_StartIndex, const uint32_t ou32_TargetIndex)
 {
    bool q_Continue;
 
@@ -1330,8 +1330,8 @@ void C_NagMainWindow::m_HandleMoveViewRequest(const uint32 ou32_StartIndex, cons
    \param[in]  ou32_SelectedIndex      Currently selected view index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, const sint32 os32_SelectedSubMode,
-                                                   const uint32 ou32_SelectedIndex)
+void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32_t ou32_Index, const int32_t os32_SelectedSubMode,
+                                                   const uint32_t ou32_SelectedIndex)
 {
    bool q_Continue;
 
@@ -1357,7 +1357,7 @@ void C_NagMainWindow::m_HandleDeleteSysViewRequest(const uint32 ou32_Index, cons
    \param[in]  ou32_Index  System view index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32 ou32_Index)
+void C_NagMainWindow::m_HandleDuplicateSysViewRequest(const uint32_t ou32_Index)
 {
    bool q_Continue;
 
@@ -1387,18 +1387,18 @@ void C_NagMainWindow::m_HandleServiceMode(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-bool C_NagMainWindow::m_ChangeMode(const stw_types::sint32 os32_Mode, const sint32 os32_SubMode,
-                                   const uint32 ou32_Index, const QString & orc_Name, const QString & orc_SubSubName,
-                                   const uint32 ou32_Flag, const bool oq_ChangeUseCase)
+bool C_NagMainWindow::m_ChangeMode(const int32_t os32_Mode, const int32_t os32_SubMode, const uint32_t ou32_Index,
+                                   const QString & orc_Name, const QString & orc_SubSubName, const uint32_t ou32_Flag,
+                                   const bool oq_ChangeUseCase)
 {
    bool q_Continue;
-   sint32 s32_SubMode = os32_SubMode;
-   uint32 u32_Index = ou32_Index;
+   int32_t s32_SubMode = os32_SubMode;
+   uint32_t u32_Index = ou32_Index;
    QString c_Name = orc_Name;
    QString c_SubSubName = orc_SubSubName;
-   uint32 u32_Flag = ou32_Flag;
+   uint32_t u32_Flag = ou32_Flag;
 
-   const uint16 u16_TimerId = osc_write_log_performance_start();
+   const uint16_t u16_TimerId = osc_write_log_performance_start();
 
    // Get the previous parameter for each use case, if a change from the main widget was triggered
    this->m_AdaptParameter(os32_Mode, s32_SubMode, u32_Index, c_Name, c_SubSubName, u32_Flag, oq_ChangeUseCase);

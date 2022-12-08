@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QScrollBar>
-#include "C_TblViewScroll.h"
-#include "constants.h"
+#include "C_TblViewScroll.hpp"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -65,10 +64,10 @@ C_TblViewScroll::C_TblViewScroll(QWidget * const opc_Parent) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblViewScroll::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
+void C_TblViewScroll::m_ScrollBarRangeChangedVer(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->verticalScrollBar()->hide();
    }
@@ -79,10 +78,10 @@ void C_TblViewScroll::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sint
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_TblViewScroll::m_ScrollBarRangeChangedHor(const sintn osn_Min, const sintn osn_Max) const
+void C_TblViewScroll::m_ScrollBarRangeChangedHor(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->horizontalScrollBar()->hide();
    }

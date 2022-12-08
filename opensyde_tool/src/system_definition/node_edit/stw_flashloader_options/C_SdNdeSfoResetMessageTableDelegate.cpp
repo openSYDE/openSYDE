@@ -10,21 +10,20 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLUtils.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_OgeCbxTable.h"
-#include "C_OgeSpxTable.h"
-#include "C_SdNdeSfoResetMessageTableModel.h"
-#include "C_SdNdeSfoResetMessageTableDelegate.h"
+#include "TglUtils.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeCbxTable.hpp"
+#include "C_OgeSpxTable.hpp"
+#include "C_SdNdeSfoResetMessageTableModel.hpp"
+#include "C_SdNdeSfoResetMessageTableDelegate.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -84,7 +83,7 @@ QWidget * C_SdNdeSfoResetMessageTableDelegate::createEditor(QWidget * const opc_
          pc_SpinBox->setPrefix(C_GtGetText::h_GetText("0x"));
          pc_SpinBox->setDisplayIntegerBase(16);
          pc_SpinBox->SetMinimumCustom(0);
-         if (orc_Index.data(msn_USER_ROLE_CONDITIONAL_VALUE) == 0)
+         if (orc_Index.data(ms32_USER_ROLE_CONDITIONAL_VALUE) == 0)
          {
             pc_SpinBox->SetMaximumCustom(0x7FF);
          }
@@ -161,7 +160,7 @@ void C_SdNdeSfoResetMessageTableDelegate::setEditorData(QWidget * const opc_Edit
          pc_SpinBox = dynamic_cast<QSpinBox *>(opc_Editor);
          if (pc_SpinBox != NULL)
          {
-            pc_SpinBox->setValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+            pc_SpinBox->setValue(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt());
          }
          break;
       case C_SdNdeSfoResetMessageTableModel::eEXTENDED_FORMAT:
@@ -169,7 +168,7 @@ void C_SdNdeSfoResetMessageTableDelegate::setEditorData(QWidget * const opc_Edit
          pc_ComboBox = dynamic_cast<QComboBox *>(opc_Editor);
          if (pc_ComboBox != NULL)
          {
-            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt());
          }
          break;
       default:

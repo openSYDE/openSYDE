@@ -8,27 +8,26 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "CSCLString.h"
-#include "C_GtGetText.h"
-#include "C_Uti.h"
-#include "C_SdCodeGenerationDialog.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SclString.hpp"
+#include "C_GtGetText.hpp"
+#include "C_Uti.hpp"
+#include "C_SdCodeGenerationDialog.hpp"
 #include "ui_C_SdCodeGenerationDialog.h"
 
-#include "C_PuiSdHandler.h"
-#include "C_OSCNode.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNode.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_scl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::scl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  orc_Parent    Parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdCodeGenerationDialog::C_SdCodeGenerationDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
+C_SdCodeGenerationDialog::C_SdCodeGenerationDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdCodeGenerationDialog),
    mrc_ParentDialog(orc_Parent)
@@ -97,7 +96,7 @@ void C_SdCodeGenerationDialog::InitStaticNames(void) const
    \param[in]  orc_NodesIndices  Nodes indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdCodeGenerationDialog::PrepareDialog(const std::vector<uint32> & orc_NodesIndices)
+void C_SdCodeGenerationDialog::PrepareDialog(const std::vector<uint32_t> & orc_NodesIndices)
 {
    if (!orc_NodesIndices.empty())
    {
@@ -113,8 +112,8 @@ void C_SdCodeGenerationDialog::PrepareDialog(const std::vector<uint32> & orc_Nod
    \param[out]  orc_AppIndicesPerNode   Vector of vectors of application indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdCodeGenerationDialog::GetCheckedItems(std::vector<uint32> & orc_NodeIndices,
-                                               std::vector<std::vector<uint32> > & orc_AppIndicesPerNode) const
+void C_SdCodeGenerationDialog::GetCheckedItems(std::vector<uint32_t> & orc_NodeIndices,
+                                               std::vector<std::vector<uint32_t> > & orc_AppIndicesPerNode) const
 {
    this->mpc_Ui->pc_TreeView->GetCheckedItems(&this->mc_Model, orc_NodeIndices, orc_AppIndicesPerNode);
 }
@@ -132,8 +131,8 @@ void C_SdCodeGenerationDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -173,16 +172,16 @@ void C_SdCodeGenerationDialog::m_OnCancel(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selected items
 
-   \param[in] osn_SelectionCount Number of selected items
+   \param[in] os32_SelectionCount Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdCodeGenerationDialog::m_UpdateSelection(const sintn osn_SelectionCount) const
+void C_SdCodeGenerationDialog::m_UpdateSelection(const int32_t os32_SelectionCount) const
 {
-   if (osn_SelectionCount > 0)
+   if (os32_SelectionCount > 0)
    {
       this->mpc_Ui->pc_SelectionLabel->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                        "%1 Data Block(s) selected")).
-                                               arg(osn_SelectionCount));
+                                               arg(os32_SelectionCount));
       this->mpc_Ui->pc_PushButtonOk->setDisabled(false);
    }
    else

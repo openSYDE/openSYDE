@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "C_GtGetText.h"
-#include "C_TblEditLineEditBase.h"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
+#include "C_TblEditLineEditBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -100,15 +99,15 @@ void C_TblEditLineEditBase::SetMaxFromVariant(const QVariant & orc_Value)
    C_CONFIG Operation failure: configuration invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & orc_ErrorDescription) const
+int32_t C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & orc_ErrorDescription) const
 {
    const QString c_ErrorDescriptionInt = C_GtGetText::h_GetText(
       "Only integers and hexadecimal numbers (leading \"0x\") are allowed.");
    const QString c_ErrorDescriptionFloat = C_GtGetText::h_GetText(
       "Only floating point numbers and integers are allowed.");
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    bool q_Worked = false;
-   uint32 u32_Base = 10;
+   uint32_t u32_Base = 10;
 
    // handle base (hex/dec) by hand because QString::toInt(&q_Worked, 0) and Co. also handles octal what we do not want
    if (this->text().startsWith("0x"))
@@ -154,12 +153,12 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
    {
       //Range checks
       //for range checks only the floating point conversion should be relevant
-      const float64 f64_Value = C_TblEditLineEditBase::mh_GetStringAsFloat(this->text(), q_Worked);
+      const float64_t f64_Value = C_TblEditLineEditBase::mh_GetStringAsFloat(this->text(), q_Worked);
       if (q_Worked == true)
       {
          if (this->mc_MinValue.isEmpty() == false)
          {
-            const float64 f64_MinValue = C_TblEditLineEditBase::mh_GetStringAsFloat(this->mc_MinValue, q_Worked);
+            const float64_t f64_MinValue = C_TblEditLineEditBase::mh_GetStringAsFloat(this->mc_MinValue, q_Worked);
             if (q_Worked == true)
             {
                if (f64_Value < f64_MinValue)
@@ -171,7 +170,7 @@ sint32 C_TblEditLineEditBase::GetValueAsVariant(QVariant & orc_Value, QString & 
       }
       if (this->mc_MaxValue.isEmpty() == false)
       {
-         const float64 f64_MaxValue = C_TblEditLineEditBase::mh_GetStringAsFloat(this->mc_MaxValue, q_Worked);
+         const float64_t f64_MaxValue = C_TblEditLineEditBase::mh_GetStringAsFloat(this->mc_MaxValue, q_Worked);
          if (q_Worked == true)
          {
             if (f64_MaxValue < f64_Value)
@@ -237,16 +236,16 @@ void C_TblEditLineEditBase::m_UpdateToolTip(void)
    Value as float if it worked
 */
 //----------------------------------------------------------------------------------------------------------------------
-float64 C_TblEditLineEditBase::mh_GetStringAsFloat(const QString & orc_Value, bool & orq_Worked)
+float64_t C_TblEditLineEditBase::mh_GetStringAsFloat(const QString & orc_Value, bool & orq_Worked)
 {
-   float64 f64_Retval = orc_Value.toDouble(&orq_Worked);
+   float64_t f64_Retval = orc_Value.toDouble(&orq_Worked);
 
    if (orq_Worked == false)
    {
-      f64_Retval = static_cast<float64>(orc_Value.toULongLong(&orq_Worked, 0));
+      f64_Retval = static_cast<float64_t>(orc_Value.toULongLong(&orq_Worked, 0));
       if (orq_Worked == false)
       {
-         f64_Retval = static_cast<float64>(orc_Value.toLongLong(&orq_Worked, 0));
+         f64_Retval = static_cast<float64_t>(orc_Value.toLongLong(&orq_Worked, 0));
       }
    }
    return f64_Retval;

@@ -10,24 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QDrag>
 #include <QMimeData>
 #include <QScrollBar>
-#include "constants.h"
-#include "TGLUtils.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSdHandler.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDcConnectedNodeList.h"
-#include "C_SyvDcConnectedNodeWidget.h"
+#include "constants.hpp"
+#include "TglUtils.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDcConnectedNodeList.hpp"
+#include "C_SyvDcConnectedNodeWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_SyvDcConnectedNodeList::mhc_MIME_DATA = "stw_opensyde_connected_node";
@@ -102,12 +101,12 @@ void C_SyvDcConnectedNodeList::SetData(const std::vector<C_SyvDcDeviceInformatio
    \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::EnableSerialNumber(const C_OSCProtocolSerialNumber & orc_SerialNumber) const
+void C_SyvDcConnectedNodeList::EnableSerialNumber(const C_OscProtocolSerialNumber & orc_SerialNumber) const
 {
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       C_SyvDcConnectedNodeWidget * const pc_Widget =
-         dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if ((pc_Widget != NULL) &&
           (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
       {
@@ -122,13 +121,14 @@ void C_SyvDcConnectedNodeList::EnableSerialNumber(const C_OSCProtocolSerialNumbe
    \param[in] orc_SerialNumber       Serial number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::DisableSerialNumber(const stw_opensyde_core::C_OSCProtocolSerialNumber & orc_SerialNumber)
+void C_SyvDcConnectedNodeList::DisableSerialNumber(
+   const stw::opensyde_core::C_OscProtocolSerialNumber & orc_SerialNumber)
 const
 {
-   for (sintn sn_It = 0; sn_It < this->count(); ++sn_It)
+   for (int32_t s32_It = 0; s32_It < this->count(); ++s32_It)
    {
       C_SyvDcConnectedNodeWidget * const pc_Widget =
-         dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(sn_It)));
+         dynamic_cast<C_SyvDcConnectedNodeWidget * const>(this->itemWidget(this->item(s32_It)));
       if ((pc_Widget != NULL) &&
           (pc_Widget->CompareSerialNumber(orc_SerialNumber) == true))
       {
@@ -204,22 +204,22 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
          if (pc_Widget != NULL)
          {
             QString c_StringSubNodeIdsToOldNodeIds;
-            const std::map<uint8, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds =
+            const std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_SubNodeIdsToOldNodeIds =
                pc_Widget->GetSubNodeIdsToOldNodeIds();
-            std::map<stw_types::uint8, C_SyvDcDeviceOldComConfig>::const_iterator c_ItIds;
+            std::map<uint8_t, C_SyvDcDeviceOldComConfig>::const_iterator c_ItIds;
 
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA,
                                pc_Widget->GetPlainSerialNumberString().toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_EXT_FORMAT,
-                               QString::number(static_cast<sintn>(pc_Widget->GetExtFormat())).
+                               QString::number(static_cast<int32_t>(pc_Widget->GetExtFormat())).
                                toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_MANUFACTURER_FORMAT,
-                               QString::number(static_cast<sintn>(pc_Widget->GetManufacturerFormat())).
+                               QString::number(static_cast<int32_t>(pc_Widget->GetManufacturerFormat())).
                                toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_DEVICE,
                                pc_Widget->GetDeviceName().toStdString().c_str());
             pc_Retval->setData(C_SyvDcConnectedNodeList::mhc_MIME_DATA_DEVICE_VALID,
-                               QString::number(static_cast<sintn>(pc_Widget->GetDeviceNameValid())).
+                               QString::number(static_cast<int32_t>(pc_Widget->GetDeviceNameValid())).
                                toStdString().c_str());
 
             // Build a string to set the sub node id to node id mapping
@@ -230,7 +230,7 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
                c_StringSubNodeIdsToOldNodeIds +=
                   QString::number(c_ItIds->first) + "," +
                   QString::number(c_ItIds->second.u8_OldNodeId) + "," +
-                  QString::number(static_cast<uint8>(c_ItIds->second.q_OldIpAddressValid));
+                  QString::number(static_cast<uint8_t>(c_ItIds->second.q_OldIpAddressValid));
 
                if (c_ItIds->second.q_OldIpAddressValid == true)
                {
@@ -256,10 +256,10 @@ QMimeData * C_SyvDcConnectedNodeList::mimeData(const QList<QListWidgetItem *> oc
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDcConnectedNodeList::m_Init(void)
 {
-   uint32 u32_ItData;
+   uint32_t u32_ItData;
 
    std::vector<C_SyvDcDeviceInformation> c_DataUnique;
-   std::vector<std::map<uint8, C_SyvDcDeviceOldComConfig> > c_DataUniqueSubNodeIdsToOldNodeIds;
+   std::vector<std::map<uint8_t, C_SyvDcDeviceOldComConfig> > c_DataUniqueSubNodeIdsToOldNodeIds;
 
    //Init/Reinit UI
    this->clear();
@@ -271,7 +271,7 @@ void C_SyvDcConnectedNodeList::m_Init(void)
    for (u32_ItData = 0U; u32_ItData < this->mc_Data.size(); ++u32_ItData)
    {
       const C_SyvDcDeviceInformation & rc_Data = this->mc_Data[u32_ItData];
-      uint32 u32_ItDataUnique;
+      uint32_t u32_ItDataUnique;
       bool q_MatchingSubNodeFound = false;
 
       // Check if already existing
@@ -293,7 +293,7 @@ void C_SyvDcConnectedNodeList::m_Init(void)
 
       if (q_MatchingSubNodeFound == false)
       {
-         std::map<uint8, C_SyvDcDeviceOldComConfig> c_SubNodeIdToNodeId;
+         std::map<uint8_t, C_SyvDcDeviceOldComConfig> c_SubNodeIdToNodeId;
          C_SyvDcDeviceOldComConfig c_OldComConfig;
          c_OldComConfig.SetContent(rc_Data.u8_NodeId, rc_Data.q_IpAddressValid, &rc_Data.au8_IpAddress[0]);
 
@@ -323,7 +323,7 @@ void C_SyvDcConnectedNodeList::m_Init(void)
                                           - In case of a multiple CPU, at least two sub node ids
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info, const std::map<uint8,
+void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc_Info, const std::map<uint8_t,
                                                                                                       C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds)
 {
    C_SyvDcConnectedNodeWidget * pc_Widget;
@@ -347,10 +347,10 @@ void C_SyvDcConnectedNodeList::m_AppendNode(const C_SyvDcDeviceInformation & orc
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDcConnectedNodeList::m_ScrollBarRangeChangedVer(const sintn osn_Min, const sintn osn_Max) const
+void C_SyvDcConnectedNodeList::m_ScrollBarRangeChangedVer(const int32_t os32_Min, const int32_t os32_Max) const
 {
    // manual showing and hiding of the scrollbar to stop resizing the parent widget when showing or hiding the scrollbar
-   if ((osn_Min == 0) && (osn_Max == 0))
+   if ((os32_Min == 0) && (os32_Max == 0))
    {
       this->verticalScrollBar()->hide();
    }

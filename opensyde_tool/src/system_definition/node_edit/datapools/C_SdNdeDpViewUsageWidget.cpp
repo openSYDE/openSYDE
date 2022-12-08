@@ -10,26 +10,25 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QEvent>
 #include <QHelpEvent>
 
-#include "stwtypes.h"
-#include "constants.h"
-#include "TGLUtils.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "TglUtils.hpp"
 
-#include "C_SdNdeDpViewUsageWidget.h"
+#include "C_SdNdeDpViewUsageWidget.hpp"
 
-#include "C_Uti.h"
-#include "C_GtGetText.h"
+#include "C_Uti.hpp"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -60,7 +59,7 @@ C_SdNdeDpViewUsageWidget::C_SdNdeDpViewUsageWidget(QWidget * const opc_Parent) :
 {
    // set default inactive color
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mc_ColorFree = stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 20);
+   this->mc_ColorFree = stw::opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7, 20);
 
    this->mc_Brush.setStyle(Qt::SolidPattern);
    this->mc_Pen.setColor(Qt::transparent);
@@ -86,11 +85,11 @@ C_SdNdeDpViewUsageWidget::~C_SdNdeDpViewUsageWidget(void)
    \param[out] oru32_UsedNvmSize  Calculated used memory size of the NVM
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint32 ou32_MaximumSize,
+void C_SdNdeDpViewUsageWidget::SetUsage(const uint32_t ou32_NodeIndex, const uint32_t ou32_MaximumSize,
                                         const std::vector<C_PuiSdHandler::C_PuiSdHandlerNodeLogicNvmArea> & orc_Areas,
-                                        uint32 & oru32_Percentage, uint32 & oru32_UsedNvmSize)
+                                        uint32_t & oru32_Percentage, uint32_t & oru32_UsedNvmSize)
 {
-   uint32 u32_AreaCounter;
+   uint32_t u32_AreaCounter;
 
    oru32_UsedNvmSize = 0U;
 
@@ -124,18 +123,16 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint3
    }
    else
    {
-      uint32 u32_Counter = 0;
-      uint32 u32_AreaPercentage;
-      float32 f32_AreaPercentage;
-      uint32 u32_CorrectDatapoolAreas = 0U;
-      // more than one color necessary
-      uint32 u32_DeltaColorScale = 0U;
-      uint32 u32_ActualColorScale = 100U;
-      const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
       tgl_assert(pc_Node != NULL);
       if (pc_Node != NULL)
       {
+         uint32_t u32_CorrectDatapoolAreas = 0U;
+         // more than one color necessary
+         uint32_t u32_DeltaColorScale = 0U;
+         uint32_t u32_ActualColorScale = 100U;
+
          // Calculate the percentage of the sum of all datapools
          this->mu32_TotalPercentage = (oru32_UsedNvmSize * 100U) / ou32_MaximumSize;
 
@@ -162,31 +159,32 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint3
 
             if (rc_Area.u32_Size > 0U)
             {
-               u32_AreaPercentage = (rc_Area.u32_Size * 100U) / ou32_MaximumSize;
-               f32_AreaPercentage =
-                  static_cast<float32>(((static_cast<float32>(rc_Area.u32_Size) * 100.0)) /
-                                       static_cast<float32>(ou32_MaximumSize));
+               const uint32_t u32_AreaPercentage = (rc_Area.u32_Size * 100U) / ou32_MaximumSize;
+               const float32_t f32_AreaPercentage =
+                  static_cast<float32_t>(((static_cast<float32_t>(rc_Area.u32_Size) * 100.0)) /
+                                         static_cast<float32_t>(ou32_MaximumSize));
+
                if (u32_AreaPercentage > 1U)
                {
                   c_UsageArea.u32_Percentage = u32_AreaPercentage;
-                  c_UsageArea.f32_PercentageFloat = f32_AreaPercentage;
                }
                else
                {
                   // special case zero percent because of rounding, but the Datapool has data
                   c_UsageArea.u32_Percentage = 1U;
-                  c_UsageArea.f32_PercentageFloat = f32_AreaPercentage;
                }
+               c_UsageArea.f32_PercentageFloat = f32_AreaPercentage;
+
                if (rc_Area.c_DataPoolIndexes.size() == 1)
                {
                   // Unique Datapool. Set the values of the Datapool
                   // In case of overlapped areas, the values must not be recalculated for the tooltip
                   c_UsageArea.u32_StartAddressDatapool =
-                     pc_Node->c_DataPools[rc_Area.c_DataPoolIndexes[0]].u32_NvMStartAddress;
-                  c_UsageArea.u32_SizeDatapool = pc_Node->c_DataPools[rc_Area.c_DataPoolIndexes[0]].u32_NvMSize;
+                     pc_Node->c_DataPools[rc_Area.c_DataPoolIndexes[0]].u32_NvmStartAddress;
+                  c_UsageArea.u32_SizeDatapool = pc_Node->c_DataPools[rc_Area.c_DataPoolIndexes[0]].u32_NvmSize;
                   c_UsageArea.f32_PercentageFloatDatapool =
-                     static_cast<float32>(((static_cast<float32>(c_UsageArea.u32_SizeDatapool) * 100.0)) /
-                                          static_cast<float32>(ou32_MaximumSize));
+                     static_cast<float32_t>(((static_cast<float32_t>(c_UsageArea.u32_SizeDatapool) * 100.0)) /
+                                            static_cast<float32_t>(ou32_MaximumSize));
                }
                else
                {
@@ -200,14 +198,14 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint3
 
                if (rc_Area.c_DataPoolIndexes.size() == 1)
                {
-                  uint32 u32_NextAreaCounter;
+                  uint32_t u32_NextAreaCounter;
                   bool q_AdaptColor = true;
 
                   tgl_assert(rc_Area.c_DataPoolIndexes[0] < pc_Node->c_DataPools.size());
                   c_UsageArea.c_ShowedString = pc_Node->c_DataPools[rc_Area.c_DataPoolIndexes[0]].c_Name.c_str();
                   c_UsageArea.q_Used = true;
-                  c_UsageArea.c_Color = stw_opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7,
-                                                                                    u32_ActualColorScale);
+                  c_UsageArea.c_Color = stw::opensyde_gui_logic::C_Uti::h_ScaleColor(mc_STYLE_GUIDE_COLOR_7,
+                                                                                     u32_ActualColorScale);
 
                   // for the next scaling
                   // Check if the next one is an overlap and the next after next is the same Datapool to have the
@@ -248,7 +246,7 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint3
                else
                {
                   // Overlapping NVM Datapools
-                  uint32 u32_DatapoolCounter;
+                  uint32_t u32_DatapoolCounter;
                   QString c_DatapoolNames;
 
                   for (u32_DatapoolCounter = 0U; u32_DatapoolCounter < rc_Area.c_DataPoolIndexes.size();
@@ -275,7 +273,6 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint3
 
                this->mc_VecUsageAreas.push_back(c_UsageArea);
             }
-            ++u32_Counter;
          }
       }
    }
@@ -293,7 +290,7 @@ void C_SdNdeDpViewUsageWidget::SetUsage(const uint32 ou32_NodeIndex, const uint3
    \param[in]       oq_Hovered            Flag if the Datapool is now hovered or not
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewUsageWidget::DataPoolHoverStateChanged(const uint32 ou32_DataPoolIndex, const bool oq_Hovered)
+void C_SdNdeDpViewUsageWidget::DataPoolHoverStateChanged(const uint32_t ou32_DataPoolIndex, const bool oq_Hovered)
 {
    this->mq_DataPoolHovered = oq_Hovered;
    this->mu32_HoveredDataPoolIndex = ou32_DataPoolIndex;
@@ -346,47 +343,47 @@ void C_SdNdeDpViewUsageWidget::paintEvent(QPaintEvent * const opc_Event)
    }
    else
    {
-      sintn sn_UsedWidthBegin = 0U;
-      sintn sn_UsedWidth;
-      uint32 u32_AreaCounter;
+      int32_t s32_UsedWidthBegin = 0U;
+      uint32_t u32_AreaCounter;
       // the available size without the space between the bars
-      const sintn sn_UsableWidth = this->width() - static_cast<sintn>(this->mc_VecUsageAreas.size() * 2U);
+      const int32_t s32_UsableWidth = this->width() - static_cast<int32_t>(this->mc_VecUsageAreas.size() * 2U);
 
       for (u32_AreaCounter = 0; u32_AreaCounter < this->mc_VecUsageAreas.size(); ++u32_AreaCounter)
       {
          const C_SdNdeDpViewUsageArea & rc_UsageArea = this->mc_VecUsageAreas[u32_AreaCounter];
          bool q_DrawHovered = false;
          bool q_AreaAfterHasSameDps = false;
-         sintn sn_DrawnAreaWidth;
+         int32_t s32_DrawnAreaWidth;
+         int32_t s32_UsedWidth;
 
-         sintn sn_AreaWidth;
-         sn_UsedWidth = (100 * sn_UsableWidth) /
-                        static_cast<sintn>(10000U / rc_UsageArea.u32_Percentage);
+         int32_t s32_AreaWidth;
+         s32_UsedWidth = (100 * s32_UsableWidth) /
+                         static_cast<int32_t>(10000U / rc_UsageArea.u32_Percentage);
 
          // draw the used area
          this->mc_Brush.setColor(rc_UsageArea.c_Color);
          c_Painter.setBrush(this->mc_Brush);
-         if (u32_AreaCounter < (static_cast<uint32>(this->mc_VecUsageAreas.size()) - 1U))
+         if (u32_AreaCounter < (static_cast<uint32_t>(this->mc_VecUsageAreas.size()) - 1U))
          {
-            sn_AreaWidth = sn_UsedWidth;
+            s32_AreaWidth = s32_UsedWidth;
 
             // save distances for the tooltip
-            this->mc_Distances.push_back(sn_UsedWidthBegin);
+            this->mc_Distances.push_back(s32_UsedWidthBegin);
 
-            if (u32_AreaCounter == (static_cast<uint32>(this->mc_VecUsageAreas.size()) - 1U))
+            if (u32_AreaCounter == (static_cast<uint32_t>(this->mc_VecUsageAreas.size()) - 1U))
             {
                // last used bar
-               this->mc_Distances.push_back(sn_UsedWidthBegin + sn_UsedWidth);
+               this->mc_Distances.push_back(s32_UsedWidthBegin + s32_UsedWidth);
             }
          }
          else
          {
             // special case: 100% and last bar
             // draw it to the end
-            sn_AreaWidth = this->width() - sn_UsedWidthBegin;
+            s32_AreaWidth = this->width() - s32_UsedWidthBegin;
 
             // save distances for the tooltip
-            this->mc_Distances.push_back(sn_UsedWidthBegin);
+            this->mc_Distances.push_back(s32_UsedWidthBegin);
             this->mc_Distances.push_back(this->width());
          }
 
@@ -397,9 +394,9 @@ void C_SdNdeDpViewUsageWidget::paintEvent(QPaintEvent * const opc_Event)
          }
 
          // Calculating and drawing the concrete rectangles
-         sn_DrawnAreaWidth = sn_AreaWidth;
+         s32_DrawnAreaWidth = s32_AreaWidth;
 
-         if (u32_AreaCounter < static_cast<uint32>(this->mc_VecUsageAreas.size() - 1U))
+         if (u32_AreaCounter < static_cast<uint32_t>(this->mc_VecUsageAreas.size() - 1U))
          {
             // Check the area after for overlapping Datapools
             q_AreaAfterHasSameDps = this->m_CheckForContainingDataPool(u32_AreaCounter + 1U,
@@ -407,19 +404,19 @@ void C_SdNdeDpViewUsageWidget::paintEvent(QPaintEvent * const opc_Event)
          }
 
          if ((q_AreaAfterHasSameDps == false) &&
-             (u32_AreaCounter != (static_cast<uint32>(this->mc_VecUsageAreas.size() - 1U))))
+             (u32_AreaCounter != (static_cast<uint32_t>(this->mc_VecUsageAreas.size() - 1U))))
          {
-            sn_DrawnAreaWidth -= 2;
+            s32_DrawnAreaWidth -= 2;
          }
 
          if (q_DrawHovered == false)
          {
-            c_Painter.drawRect(sn_UsedWidthBegin, 0, sn_DrawnAreaWidth, this->height());
+            c_Painter.drawRect(s32_UsedWidthBegin, 0, s32_DrawnAreaWidth, this->height());
          }
          else
          {
             // Handle a hovered Datapool
-            sintn sn_XBegin = sn_UsedWidthBegin;
+            int32_t s32_HorizontalBegin = s32_UsedWidthBegin;
             bool q_AreaBeforeWithHoveredDp = false;
             bool q_AreaAfterWithHoveredDp = false;
 
@@ -431,7 +428,7 @@ void C_SdNdeDpViewUsageWidget::paintEvent(QPaintEvent * const opc_Event)
                                                                               this->mu32_HoveredDataPoolIndex);
             }
 
-            if (u32_AreaCounter < static_cast<uint32>(this->mc_VecUsageAreas.size() - 1U))
+            if (u32_AreaCounter < static_cast<uint32_t>(this->mc_VecUsageAreas.size() - 1U))
             {
                // Check the area after
                q_AreaAfterWithHoveredDp =
@@ -441,19 +438,19 @@ void C_SdNdeDpViewUsageWidget::paintEvent(QPaintEvent * const opc_Event)
             // Adapt the bars for not having gaps
             if (q_AreaBeforeWithHoveredDp == false)
             {
-               sn_XBegin += 1;
-               sn_DrawnAreaWidth -= 1;
+               s32_HorizontalBegin += 1;
+               s32_DrawnAreaWidth -= 1;
             }
             if (q_AreaAfterWithHoveredDp == false)
             {
-               sn_DrawnAreaWidth -= 1;
+               s32_DrawnAreaWidth -= 1;
             }
 
-            c_Painter.drawRect(sn_XBegin, 1, sn_DrawnAreaWidth, (this->height() - 2));
+            c_Painter.drawRect(s32_HorizontalBegin, 1, s32_DrawnAreaWidth, (this->height() - 2));
          }
 
          // for the next bar
-         sn_UsedWidthBegin += sn_AreaWidth;
+         s32_UsedWidthBegin += s32_AreaWidth;
       }
    }
 }
@@ -530,35 +527,35 @@ void C_SdNdeDpViewUsageWidget::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    QWidget::mouseMoveEvent(opc_Event);
 
-   const sintn sn_PosX = this->mapFromGlobal(QCursor::pos()).x();
+   const int32_t s32_PosHorizontal = this->mapFromGlobal(QCursor::pos()).x();
 
    if ((this->mpc_ToolTip != NULL) &&
        (this->mpc_ToolTip->isVisible() == true))
    {
-      this->m_UpdateTooltip(sn_PosX);
+      this->m_UpdateTooltip(s32_PosHorizontal);
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Updates the index of the usage area with the specific position
 
-   \param[in]       osn_PosX     Position of mouse
+   \param[in]       os32_PosHorizontal     Position of mouse
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdNdeDpViewUsageWidget::m_GetUsageAreaIndex(const sintn osn_PosX)
+uint32_t C_SdNdeDpViewUsageWidget::m_GetUsageAreaIndex(const int32_t os32_PosHorizontal)
 {
-   uint32 u32_Index = 0U;
+   uint32_t u32_Index = 0U;
 
    if (this->mc_Distances.size() > 1)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       // multiple bars, search the correct one
       for (u32_Counter = 1; u32_Counter < this->mc_Distances.size(); ++u32_Counter)
       {
-         if (osn_PosX <= static_cast<sintn>(this->mc_Distances[u32_Counter]))
+         if (os32_PosHorizontal <= this->mc_Distances[u32_Counter])
          {
-            u32_Index = static_cast<sint32>(u32_Counter - 1U);
+            u32_Index = static_cast<int32_t>(u32_Counter - 1U);
             break;
          }
       }
@@ -576,12 +573,12 @@ uint32 C_SdNdeDpViewUsageWidget::m_GetUsageAreaIndex(const sintn osn_PosX)
    \retval   false  The Datapool is not part of the area
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpViewUsageWidget::m_CheckForContainingDataPool(const uint32 ou32_AreaIndex,
-                                                            const uint32 ou32_DataPoolIndex)
+bool C_SdNdeDpViewUsageWidget::m_CheckForContainingDataPool(const uint32_t ou32_AreaIndex,
+                                                            const uint32_t ou32_DataPoolIndex)
 {
    bool q_Return = false;
    const C_SdNdeDpViewUsageArea & rc_Area = this->mc_VecUsageAreas[ou32_AreaIndex];
-   uint32 u32_DatapoolCounter;
+   uint32_t u32_DatapoolCounter;
 
    for (u32_DatapoolCounter = 0; u32_DatapoolCounter < rc_Area.c_NvmArea.c_DataPoolIndexes.size();
         ++u32_DatapoolCounter)
@@ -604,16 +601,16 @@ bool C_SdNdeDpViewUsageWidget::m_CheckForContainingDataPool(const uint32 ou32_Ar
    \retval   false  The Datapool is not part of the area
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpViewUsageWidget::m_CheckForContainingDataPool(const uint32 ou32_AreaIndex,
-                                                            const std::vector<uint32> & orc_DataPoolIndexes)
+bool C_SdNdeDpViewUsageWidget::m_CheckForContainingDataPool(const uint32_t ou32_AreaIndex,
+                                                            const std::vector<uint32_t> & orc_DataPoolIndexes)
 {
    bool q_Return = false;
-   uint32 u32_DPIndexCounter;
+   uint32_t u32_DpIndexCounter;
 
-   for (u32_DPIndexCounter = 0; u32_DPIndexCounter < orc_DataPoolIndexes.size(); ++u32_DPIndexCounter)
+   for (u32_DpIndexCounter = 0; u32_DpIndexCounter < orc_DataPoolIndexes.size(); ++u32_DpIndexCounter)
    {
       q_Return = this->m_CheckForContainingDataPool(ou32_AreaIndex,
-                                                    orc_DataPoolIndexes[u32_DPIndexCounter]);
+                                                    orc_DataPoolIndexes[u32_DpIndexCounter]);
 
       if (q_Return == true)
       {
@@ -625,20 +622,20 @@ bool C_SdNdeDpViewUsageWidget::m_CheckForContainingDataPool(const uint32 ou32_Ar
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpViewUsageWidget::m_UpdateTooltip(const sintn osn_MouseX)
+void C_SdNdeDpViewUsageWidget::m_UpdateTooltip(const int32_t os32_MouseHorizontal)
 {
    if (this->mpc_ToolTip != NULL)
    {
       QString c_Description;
       QString c_MemoryState;
-      uint32 u32_UsedSize = 0U;
-      uint32 u32_ShowStartAddress = 0U;
-      float32 f32_ShowPercentage = 0.0F;
+      uint32_t u32_UsedSize = 0U;
+      uint32_t u32_ShowStartAddress = 0U;
+      float32_t f32_ShowPercentage = 0.0F;
       bool q_ShowFree = true;
       QString c_Percentage;
       QString c_Text;
       bool q_ErrorCase = false;
-      uint32 u32_OverlappedBytes = 0U;
+      uint32_t u32_OverlappedBytes = 0U;
 
       if (this->mc_Distances.size() == 0)
       {
@@ -656,7 +653,7 @@ void C_SdNdeDpViewUsageWidget::m_UpdateTooltip(const sintn osn_MouseX)
       }
       else
       {
-         const uint32 u32_UsageAreaIndex = m_GetUsageAreaIndex(osn_MouseX);
+         const uint32_t u32_UsageAreaIndex = m_GetUsageAreaIndex(os32_MouseHorizontal);
          // multiple bars, use the hoverd one
          // Using the concrete Datapool information in case of fragmented areas for the Datapool
          if (this->mc_VecUsageAreas[u32_UsageAreaIndex].c_NvmArea.c_DataPoolIndexes.size() == 1)

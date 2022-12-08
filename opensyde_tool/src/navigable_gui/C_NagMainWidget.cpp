@@ -10,43 +10,42 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_NagMainWidget.h"
-#include "C_HeHandler.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_NagMainWidget.hpp"
+#include "C_HeHandler.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
 #include "ui_C_NagMainWidget.h"
 
-#include "C_PuiSvHandler.h"
-#include "C_PuiSvData.h"
-#include "C_PuiUtil.h"
-#include "C_PopUtil.h"
-#include "C_UsHandler.h"
-#include "C_PuiProject.h"
-#include "C_PopErrorHandling.h"
-#include "C_OgePopUpDialog.h"
-#include "C_PopSaveAsDialogWidget.h"
-#include "C_NagAboutDialog.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OSCProjectFiler.h"
-#include "C_Uti.h"
-#include "C_GiSyColorSelectWidget.h"
-#include "C_PopCreateServiceProjDialogWidget.h"
-#include "C_PopPasswordDialogWidget.h"
+#include "C_PuiSvHandler.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_PopUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiProject.hpp"
+#include "C_PopErrorHandling.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_PopSaveAsDialogWidget.hpp"
+#include "C_NagAboutDialog.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OscProjectFiler.hpp"
+#include "C_Uti.hpp"
+#include "C_GiSyColorSelectWidget.hpp"
+#include "C_PopCreateServiceProjDialogWidget.hpp"
+#include "C_PopPasswordDialogWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -76,7 +75,7 @@ C_NagMainWidget::C_NagMainWidget(QWidget * const opc_Parent) :
 
    // Initialize buttons in disabled case
    this->m_InitIcons();
-   this->m_InitGUIElements();
+   this->m_InitGuiElements();
 
    //Initialize all visible strings on the widget
    this->InitText();
@@ -121,7 +120,7 @@ void C_NagMainWidget::paintEvent(QPaintEvent * const opc_Event)
    QPainter c_Painter(this);
 
    //draw background
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this, &c_Painter);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this, &c_Painter);
 
    // draw 1px wide line between toolbar and main widget
    c_Painter.setPen(mc_STYLE_GUIDE_COLOR_6);
@@ -140,7 +139,7 @@ void C_NagMainWidget::paintEvent(QPaintEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::keyPressEvent(QKeyEvent * const opc_Event)
 {
-   if ((opc_Event->key() == static_cast<sintn>(Qt::Key_Escape)) &&
+   if ((opc_Event->key() == static_cast<int32_t>(Qt::Key_Escape)) &&
        (this->mpc_Ui->pc_LineEditVersion->isVisible() == true))
    {
       // reset version
@@ -222,9 +221,9 @@ void C_NagMainWidget::InitText(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::LoadInitialProject(void)
 {
-   uint16 u16_Version = 0U;
+   uint16_t u16_Version = 0U;
    QString c_LoadedProject;
-   sint32 s32_Error = C_NO_ERR;
+   int32_t s32_Error = C_NO_ERR;
 
    if (C_PuiProject::h_GetInstance()->PrepareLoadInitialProject() == C_CHECKSUM)
    {
@@ -265,8 +264,8 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
 {
    if (orc_FilePath.compare("") != 0)
    {
-      uint16 u16_Version = 0U;
-      stw_types::sint32 s32_Result;
+      uint16_t u16_Version = 0U;
+      int32_t s32_Result;
 
       Q_EMIT (this->SigBeforeOtherProjectLoad());
       C_PuiProject::h_GetInstance()->SetPath(orc_FilePath);
@@ -296,12 +295,12 @@ void C_NagMainWidget::LoadProject(const QString & orc_FilePath)
 void C_NagMainWidget::UpdateRecentProjects(void)
 {
    std::vector<QString> c_Files;
-   std::vector<C_OSCProject> c_Projects;
+   std::vector<C_OscProject> c_Projects;
    const QStringList c_List = C_UsHandler::h_GetInstance()->GetRecentProjects();
    for (QStringList::const_iterator c_ItList = c_List.begin(); c_ItList != c_List.end(); ++c_ItList)
    {
-      C_OSCProject c_Tmp;
-      if (C_OSCProjectFiler::h_Load(c_Tmp, c_ItList->toStdString().c_str()) == C_NO_ERR)
+      C_OscProject c_Tmp;
+      if (C_OscProjectFiler::h_Load(c_Tmp, c_ItList->toStdString().c_str()) == C_NO_ERR)
       {
          c_Files.push_back(*c_ItList);
          c_Projects.push_back(c_Tmp);
@@ -317,7 +316,7 @@ void C_NagMainWidget::UpdateRecentProjects(void)
             // date properties are handled in model class directly
             c_Tmp.c_Author = "N/A";
             c_Tmp.c_Editor = "N/A";
-            c_Tmp.c_OpenSYDEVersion = "N/A";
+            c_Tmp.c_OpenSydeVersion = "N/A";
             c_Tmp.c_Template = "N/A";
             c_Tmp.c_Version = "N/A";
 
@@ -351,9 +350,10 @@ void C_NagMainWidget::UpdateRecentProjects(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::OnSaveProjAs(void)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       UpdateRecentProjects();
    }
@@ -372,13 +372,13 @@ void C_NagMainWidget::OnSaveProjAs(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::OnCreateServiceProj(void)
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_PopCreateServiceProjDialogWidget * const pc_Dialog = new C_PopCreateServiceProjDialogWidget(*c_New);
 
    // get views for tree visualization of the project permissions
-   std::vector<uint32> c_ViewIndices;
+   std::vector<uint32_t> c_ViewIndices;
    c_ViewIndices.reserve(C_PuiSvHandler::h_GetInstance()->GetViewCount());
-   for (uint32 u32_ItView = 0; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
+   for (uint32_t u32_ItView = 0; u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount(); ++u32_ItView)
    {
       c_ViewIndices.push_back(u32_ItView);
    }
@@ -387,14 +387,14 @@ void C_NagMainWidget::OnCreateServiceProj(void)
    pc_Dialog->PrepareDialog(c_ViewIndices);
 
    // if user confirms everything in C_PopCreateServiceProjDialogWidget::m_OkClicked
-   if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       // save inputs as user settings
       const QString c_SpPath = C_PuiUtil::h_GetAbsolutePathFromProject(pc_Dialog->GetSpPath());
       C_UsHandler::h_GetInstance()->SetLastKnownServiceProjectPath(c_SpPath);
 
       // create service project
-      const sint32 s32_Result = pc_Dialog->SaveCurrentProjectForServiceMode();
+      const int32_t s32_Result = pc_Dialog->SaveCurrentProjectForServiceMode();
       C_PopErrorHandling::h_ServiceProjectSaveErr(s32_Result, pc_Dialog);
       if (s32_Result == C_NO_ERR)
       {
@@ -408,7 +408,7 @@ void C_NagMainWidget::OnCreateServiceProj(void)
          c_FinishMessage.SetHeading(C_GtGetText::h_GetText("Create Service Project"));
          c_FinishMessage.SetDescription(C_GtGetText::h_GetText(
                                            "Service Project created successfully."));
-         c_FinishMessage.SetOKButtonText(C_GtGetText::h_GetText("OK"));
+         c_FinishMessage.SetOkButtonText(C_GtGetText::h_GetText("OK"));
          c_FinishMessage.SetDetails(c_Details);
          c_FinishMessage.SetCustomMinHeight(180, 250);
          c_FinishMessage.Execute();
@@ -427,14 +427,14 @@ void C_NagMainWidget::OnCreateServiceProj(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::OpenColorPicker(void)
 {
-   QPointer<C_OgePopUpDialog> const c_Popup = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_Popup = new C_OgePopUpDialog(this, this);
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
 
    //Resize
    c_Popup->SetSize(QSize(412, 620));
 
    // open color picker dialog
-   if (c_Popup->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       pc_ColorWidget->ChooseSelectedColor();
    }
@@ -468,12 +468,12 @@ void C_NagMainWidget::HandleServiceMode(void) const
    \param[out]  orq_Found        Found
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::h_GetFirstValidViewForServiceMode(uint32 & oru32_ViewIndex, sint32 & ors32_SubMode,
+void C_NagMainWidget::h_GetFirstValidViewForServiceMode(uint32_t & oru32_ViewIndex, int32_t & ors32_SubMode,
                                                         bool & orq_Found)
 {
    orq_Found = false;
 
-   for (uint32 u32_ItView = 0UL; (u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount()) && (!orq_Found);
+   for (uint32_t u32_ItView = 0UL; (u32_ItView < C_PuiSvHandler::h_GetInstance()->GetViewCount()) && (!orq_Found);
         ++u32_ItView)
    {
       const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(u32_ItView);
@@ -542,7 +542,7 @@ void C_NagMainWidget::m_InitIcons(void) const
 /*! \brief   Initialize GUI elements.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::m_InitGUIElements(void) const
+void C_NagMainWidget::m_InitGuiElements(void) const
 {
    // stw logo
    QPixmap c_ImgLogo;
@@ -605,7 +605,7 @@ void C_NagMainWidget::m_UpdateCurrProjInfo(void)
          arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_CreationTime).c_str()).
          arg(C_PuiProject::h_GetTimeFormatted(C_PuiProject::h_GetInstance()->c_ModificationTime).c_str()).
          arg(C_PuiProject::h_GetInstance()->c_Editor.c_str()).
-         arg(C_Uti::h_ConvertVersionToSTWStyle(C_PuiProject::h_GetInstance()->c_OpenSYDEVersion.c_str()));
+         arg(C_Uti::h_ConvertVersionToStwStyle(C_PuiProject::h_GetInstance()->c_OpenSydeVersion.c_str()));
 
       this->mpc_Ui->pc_LabelCurProjName->setText(c_FontMetrics.elidedText(c_Name, Qt::ElideRight,
                                                                           this->mpc_Ui->pc_LabelCurProjName->
@@ -647,8 +647,8 @@ void C_NagMainWidget::m_SysDefClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_SysViewClicked()
 {
-   uint32 u32_ViewIndex = 0UL;
-   sint32 s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
+   uint32_t u32_ViewIndex = 0UL;
+   int32_t s32_Mode = ms32_SUBMODE_SYSVIEW_SETUP;
    bool q_Found = false;
 
    //Check system view service mode availability
@@ -678,7 +678,8 @@ void C_NagMainWidget::m_SysViewClicked()
 //----------------------------------------------------------------------------------------------------------------------
 void C_NagMainWidget::m_AboutClicked()
 {
-   QPointer<C_OgePopUpDialog> const c_New = new C_OgePopUpDialog(this, this);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+
    new C_NagAboutDialog(*c_New, "openSYDE", ":/images/LogoOpensyde_XXL.png", 27,
                         C_GtGetText::h_GetText("QCustomPlot by Emanuel Eichhammer"));
 
@@ -798,8 +799,8 @@ void C_NagMainWidget::m_OnClear(void)
    c_MessageBox.SetDescription(C_GtGetText::h_GetText(
                                   "Do you really want to clear the table and hence "
                                   "forget all recent project user settings?"));
-   c_MessageBox.SetOKButtonText(C_GtGetText::h_GetText("Clear"));
-   c_MessageBox.SetNOButtonText(C_GtGetText::h_GetText("Keep"));
+   c_MessageBox.SetOkButtonText(C_GtGetText::h_GetText("Clear"));
+   c_MessageBox.SetNoButtonText(C_GtGetText::h_GetText("Keep"));
    c_MessageBox.SetCustomMinHeight(180, 180);
    //   c_MessageBox.SetCustomMinWidth(700);
 
@@ -852,9 +853,9 @@ void C_NagMainWidget::m_OnIndexClicked(const QModelIndex & orc_ModelIndex)
    C_WARN      User canceled the password dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_NagMainWidget::m_LoadConcreteProject(uint16 * const opu16_FileVersion)
+int32_t C_NagMainWidget::m_LoadConcreteProject(uint16_t * const opu16_FileVersion)
 {
-   sint32 s32_Result = C_NO_ERR;
+   int32_t s32_Result = C_NO_ERR;
 
    // Check if a password is necessary
    if (C_PuiProject::h_GetInstance()->IsPasswordNecessary() == true)
@@ -877,7 +878,7 @@ sint32 C_NagMainWidget::m_LoadConcreteProject(uint16 * const opu16_FileVersion)
                C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
                c_Message.SetHeading(C_GtGetText::h_GetText("Open Service Project"));
                c_Message.SetDescription(C_GtGetText::h_GetText("You entered the wrong password. Please try again."));
-               c_Message.SetOKButtonText(C_GtGetText::h_GetText("OK"));
+               c_Message.SetOkButtonText(C_GtGetText::h_GetText("OK"));
                c_Message.SetCustomMinHeight(180, 180);
                c_Message.exec();
             }
@@ -904,16 +905,16 @@ sint32 C_NagMainWidget::m_LoadConcreteProject(uint16 * const opu16_FileVersion)
    C_WARN      User canceled the dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_NagMainWidget::m_GetPassword(QString & orc_Password)
+int32_t C_NagMainWidget::m_GetPassword(QString & orc_Password)
 {
-   sint32 s32_Return = C_WARN;
+   int32_t s32_Return = C_WARN;
 
    orc_Password = "";
 
    // show password dialog
    C_PopPasswordDialogWidget * const pc_Dialog = new C_PopPasswordDialogWidget(this);
 
-   if (pc_Dialog->exec() == static_cast<sintn>(QDialog::Accepted))
+   if (pc_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       orc_Password = pc_Dialog->GetPassword();
       s32_Return = C_NO_ERR;
@@ -928,9 +929,9 @@ sint32 C_NagMainWidget::m_GetPassword(QString & orc_Password)
    \param[in]  ou16_ProjectFileVersion    Project file version
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_NagMainWidget::m_CancelPasswordDialog(uint16 ou16_ProjectFileVersion)
+void C_NagMainWidget::m_CancelPasswordDialog(uint16_t ou16_ProjectFileVersion)
 {
-   sint32 s32_Result;
+   int32_t s32_Result;
 
    // we also want those projects in the "recent projects" list, which fail to load
    C_UsHandler::h_GetInstance()->AddToRecentProjects(C_PuiProject::h_GetInstance()->GetPath());
@@ -942,7 +943,7 @@ void C_NagMainWidget::m_CancelPasswordDialog(uint16 ou16_ProjectFileVersion)
    Q_EMIT (this->SigBeforeOtherProjectLoad());
    C_PuiProject::h_GetInstance()->SetPath("");
 
-   for (sint32 s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
+   for (int32_t s32_ItRecentProject = 0; s32_ItRecentProject < c_RecentProjects.count(); ++s32_ItRecentProject)
    {
       QFileInfo c_File;
       c_File.setFile(c_RecentProjects[s32_ItRecentProject]);

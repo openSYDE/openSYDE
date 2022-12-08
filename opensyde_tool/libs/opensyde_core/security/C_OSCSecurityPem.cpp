@@ -10,27 +10,27 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <fstream>
 #include <sstream>
 
 #include <openssl/pem.h>
 
-#include "TGLFile.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "C_OSCSecurityPem.h"
+#include "TglFile.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_OscSecurityPem.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const stw_types::uint32 C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE = 2048;
+const uint32_t C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE = 2048;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -46,7 +46,7 @@ const stw_types::uint32 C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE = 2048;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSecurityPem::C_OSCSecurityPem()
+C_OscSecurityPem::C_OscSecurityPem()
 {
 }
 
@@ -54,7 +54,7 @@ C_OSCSecurityPem::C_OSCSecurityPem()
 /*! \brief  Clear
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSecurityPem::Clear()
+void C_OscSecurityPem::Clear()
 {
    this->mc_KeyInfo.Clear();
 }
@@ -66,7 +66,7 @@ void C_OSCSecurityPem::Clear()
    Key info
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_OSCSecurityPemKeyInfo & C_OSCSecurityPem::GetKeyInfo() const
+const C_OscSecurityPemKeyInfo & C_OscSecurityPem::GetKeyInfo() const
 {
    return this->mc_KeyInfo;
 }
@@ -78,7 +78,7 @@ const C_OSCSecurityPemKeyInfo & C_OSCSecurityPem::GetKeyInfo() const
    Meta infos
 */
 //----------------------------------------------------------------------------------------------------------------------
-const std::string & C_OSCSecurityPem::GetMetaInfos() const
+const std::string & C_OscSecurityPem::GetMetaInfos() const
 {
    return this->mc_MetaInfo;
 }
@@ -97,20 +97,20 @@ const std::string & C_OSCSecurityPem::GetMetaInfos() const
    \retval   C_CONFIG   Invalid file content
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPem::LoadFromFile(const std::string & orc_FileName, std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPem::LoadFromFile(const std::string & orc_FileName, std::string & orc_ErrorMessage)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    this->Clear();
 
-   if (TGL_FileExists(orc_FileName.c_str()))
+   if (TglFileExists(orc_FileName.c_str()))
    {
-      stw_scl::C_SCLString c_FileContent;
-      C_OSCUtils::h_FileToString(orc_FileName.c_str(), c_FileContent);
+      stw::scl::C_SclString c_FileContent;
+      C_OscUtils::h_FileToString(orc_FileName.c_str(), c_FileContent);
       {
          const std::string c_PemFileContent(c_FileContent.c_str());
 
-         std::vector<uint8> c_BufferFile;
+         std::vector<uint8_t> c_BufferFile;
          c_BufferFile.resize(c_PemFileContent.size());
          memcpy(&c_BufferFile[0], c_PemFileContent.data(), c_PemFileContent.size());
          s32_Retval = this->m_ReadPublicKey(c_BufferFile, orc_ErrorMessage);
@@ -149,17 +149,17 @@ sint32 C_OSCSecurityPem::LoadFromFile(const std::string & orc_FileName, std::str
    \retval   C_CHECKSUM Could not parse modulus and exponent from key
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPem::h_ExtractModulusAndExponentFromFile(const std::string & orc_FileName,
-                                                             std::vector<uint8> & orc_Modulus,
-                                                             std::vector<uint8> & orc_Exponent,
-                                                             std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPem::h_ExtractModulusAndExponentFromFile(const std::string & orc_FileName,
+                                                              std::vector<uint8_t> & orc_Modulus,
+                                                              std::vector<uint8_t> & orc_Exponent,
+                                                              std::string & orc_ErrorMessage)
 {
-   C_OSCSecurityPem c_Pem;
-   sint32 s32_Retval = c_Pem.LoadFromFile(orc_FileName, orc_ErrorMessage);
+   C_OscSecurityPem c_Pem;
+   int32_t s32_Retval = c_Pem.LoadFromFile(orc_FileName, orc_ErrorMessage);
 
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_OSCSecurityPem::h_ExtractModulusAndExponent(c_Pem.GetKeyInfo().GetPubKeyTextDecoded(),
+      s32_Retval = C_OscSecurityPem::h_ExtractModulusAndExponent(c_Pem.GetKeyInfo().GetPubKeyTextDecoded(),
                                                                  orc_Modulus, orc_Exponent, orc_ErrorMessage);
    }
    return s32_Retval;
@@ -180,34 +180,37 @@ sint32 C_OSCSecurityPem::h_ExtractModulusAndExponentFromFile(const std::string &
    \retval   C_CHECKSUM Could not parse modulus and exponent from key
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPem::h_ExtractModulusAndExponent(const std::vector<uint8> & orc_PubKeyTextDecoded,
-                                                     std::vector<uint8> & orc_Modulus,
-                                                     std::vector<uint8> & orc_Exponent, std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPem::h_ExtractModulusAndExponent(const std::vector<uint8_t> & orc_PubKeyTextDecoded,
+                                                      std::vector<uint8_t> & orc_Modulus,
+                                                      std::vector<uint8_t> & orc_Exponent,
+                                                      std::string & orc_ErrorMessage)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    X509 * pc_X509Key = X509_new();
-   const uint8 * pu8_DataPointer = &orc_PubKeyTextDecoded[0];
+   const uint8_t * pu8_DataPointer = &orc_PubKeyTextDecoded[0];
 
-   pc_X509Key = d2i_X509(&pc_X509Key, &pu8_DataPointer, orc_PubKeyTextDecoded.size());
+   const long x_DecodedSize = static_cast<long>(orc_PubKeyTextDecoded.size()); //lint !e970 !e8080 //use API type
+
+   pc_X509Key = d2i_X509(&pc_X509Key, &pu8_DataPointer, x_DecodedSize);
    if (pc_X509Key != NULL)
    {
       EVP_PKEY * const pc_PubKey = X509_get0_pubkey(pc_X509Key);
       if (pc_PubKey != NULL)
       {
-         const RSA * const pc_RSAKey = EVP_PKEY_get0_RSA(pc_PubKey);
-         if (pc_RSAKey != NULL)
+         const RSA * const pc_RsaKey = EVP_PKEY_get0_RSA(pc_PubKey);
+         if (pc_RsaKey != NULL)
          {
-            const BIGNUM * const pc_Modulus = RSA_get0_n(pc_RSAKey);
-            const BIGNUM * const pc_Exponent = RSA_get0_e(pc_RSAKey);
-            orc_Modulus.resize(C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
-            orc_Exponent.resize(C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
+            const BIGNUM * const pc_Modulus = RSA_get0_n(pc_RsaKey);
+            const BIGNUM * const pc_Exponent = RSA_get0_e(pc_RsaKey);
+            orc_Modulus.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
+            orc_Exponent.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
             {
-               const sintn sn_SizeModulus = BN_bn2bin(pc_Modulus, &orc_Modulus[0]);
-               const sintn sn_SizeExponent = BN_bn2bin(pc_Exponent, &orc_Exponent[0]);
-               if ((sn_SizeModulus > 0) && (sn_SizeExponent > 0))
+               const int32_t s32_SizeModulus = BN_bn2bin(pc_Modulus, &orc_Modulus[0]);
+               const int32_t s32_SizeExponent = BN_bn2bin(pc_Exponent, &orc_Exponent[0]);
+               if ((s32_SizeModulus > 0) && (s32_SizeExponent > 0))
                {
-                  orc_Modulus.resize(sn_SizeModulus);
-                  orc_Exponent.resize(sn_SizeExponent);
+                  orc_Modulus.resize(s32_SizeModulus);
+                  orc_Exponent.resize(s32_SizeExponent);
                }
                else
                {
@@ -250,10 +253,12 @@ sint32 C_OSCSecurityPem::h_ExtractModulusAndExponent(const std::vector<uint8> & 
    \retval   C_CONFIG   Invalid file content
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPem::m_ReadPublicKey(const std::vector<uint8> & orc_FileContent, std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPem::m_ReadPublicKey(const std::vector<uint8_t> & orc_FileContent, std::string & orc_ErrorMessage)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   BIO * const pc_PubKeyFile = BIO_new_mem_buf(&orc_FileContent[0], orc_FileContent.size());
+   int32_t s32_Retval = C_NO_ERR;
+
+   const int x_ContentSize = static_cast<int>(orc_FileContent.size()); //lint !e970 !e8080 //use type expected by API
+   BIO * const pc_PubKeyFile = BIO_new_mem_buf(&orc_FileContent[0], x_ContentSize);
 
    if (pc_PubKeyFile != NULL)
    {
@@ -261,11 +266,11 @@ sint32 C_OSCSecurityPem::m_ReadPublicKey(const std::vector<uint8> & orc_FileCont
       X509 * const pc_RsaPub = PEM_read_bio_X509(pc_PubKeyFile, NULL, NULL, NULL);
       if (pc_RsaPub != NULL)
       {
-         std::vector<uint8> c_PubKeyTextDecoded;
-         c_PubKeyTextDecoded.resize(C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
+         std::vector<uint8_t> c_PubKeyTextDecoded;
+         c_PubKeyTextDecoded.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
          {
-            uint8 * pu8_PubKeyTextDecodedPointer = &c_PubKeyTextDecoded[0];
-            const uint32 u32_PubKeyTextDecodedOpensslCount = i2d_X509(pc_RsaPub, &pu8_PubKeyTextDecodedPointer);
+            uint8_t * pu8_PubKeyTextDecodedPointer = &c_PubKeyTextDecoded[0];
+            const uint32_t u32_PubKeyTextDecodedOpensslCount = i2d_X509(pc_RsaPub, &pu8_PubKeyTextDecodedPointer);
             c_PubKeyTextDecoded.resize(u32_PubKeyTextDecodedOpensslCount);
             this->mc_KeyInfo.SetPubKeyTextDecoded(c_PubKeyTextDecoded);
             if (u32_PubKeyTextDecodedOpensslCount > 0)
@@ -274,12 +279,12 @@ sint32 C_OSCSecurityPem::m_ReadPublicKey(const std::vector<uint8> & orc_FileCont
                ASN1_INTEGER * const pc_SerialNumberOpenssl = X509_get_serialNumber(pc_RsaPub);
                if (pc_SerialNumberOpenssl != NULL)
                {
-                  std::vector<uint8> c_PubKeySerialNumber;
-                  c_PubKeySerialNumber.resize(C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
+                  std::vector<uint8_t> c_PubKeySerialNumber;
+                  c_PubKeySerialNumber.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
                   {
-                     uint8 * pu8_SerialNumberPointer = &c_PubKeySerialNumber[0];
-                     const uint32 u32_SerialNumberCount = i2d_ASN1_INTEGER(pc_SerialNumberOpenssl,
-                                                                           &pu8_SerialNumberPointer);
+                     uint8_t * pu8_SerialNumberPointer = &c_PubKeySerialNumber[0];
+                     const uint32_t u32_SerialNumberCount = i2d_ASN1_INTEGER(pc_SerialNumberOpenssl,
+                                                                             &pu8_SerialNumberPointer);
                      c_PubKeySerialNumber.resize(u32_SerialNumberCount);
                      if (u32_SerialNumberCount == 0)
                      {
@@ -362,10 +367,12 @@ sint32 C_OSCSecurityPem::m_ReadPublicKey(const std::vector<uint8> & orc_FileCont
    \retval   C_CONFIG   Invalid file content
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPem::m_ReadMetaInfos(const std::vector<uint8> & orc_FileContent, std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPem::m_ReadMetaInfos(const std::vector<uint8_t> & orc_FileContent, std::string & orc_ErrorMessage)
 {
-   sint32 s32_Retval = C_NO_ERR;
-   BIO * const pc_PubKeyFile = BIO_new_mem_buf(&orc_FileContent[0], orc_FileContent.size());
+   int32_t s32_Retval = C_NO_ERR;
+
+   const int x_ContentSize = static_cast<int>(orc_FileContent.size()); //lint !e970 !e8080 //use type expected by API
+   BIO * const pc_PubKeyFile = BIO_new_mem_buf(&orc_FileContent[0], x_ContentSize);
 
    if (pc_PubKeyFile != NULL)
    {
@@ -384,7 +391,7 @@ sint32 C_OSCSecurityPem::m_ReadMetaInfos(const std::vector<uint8> & orc_FileCont
                if (pc_MemPtr != NULL)
                {
                   this->mc_MetaInfo = "";
-                  for (uint32 u32_It = 0UL; u32_It < pc_MemPtr->length; ++u32_It)
+                  for (uint32_t u32_It = 0UL; u32_It < pc_MemPtr->length; ++u32_It)
                   {
                      this->mc_MetaInfo += pc_MemPtr->data[u32_It];
                   }
@@ -437,11 +444,12 @@ sint32 C_OSCSecurityPem::m_ReadMetaInfos(const std::vector<uint8> & orc_FileCont
    \retval   C_CONFIG   Invalid file content
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCSecurityPem::m_ReadPrivateKey(const std::vector<uint8> & orc_FileContent, std::string & orc_ErrorMessage)
+int32_t C_OscSecurityPem::m_ReadPrivateKey(const std::vector<uint8_t> & orc_FileContent, std::string & orc_ErrorMessage)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
    //Private key
-   BIO * const pc_PrivKeyFile = BIO_new_mem_buf(&orc_FileContent[0], orc_FileContent.size());
+   const int x_ContentSize = static_cast<int>(orc_FileContent.size()); //lint !e970 !e8080 //use type expected by API
+   BIO * const pc_PrivKeyFile = BIO_new_mem_buf(&orc_FileContent[0], x_ContentSize);
 
    if (pc_PrivKeyFile != NULL)
    {
@@ -449,11 +457,11 @@ sint32 C_OSCSecurityPem::m_ReadPrivateKey(const std::vector<uint8> & orc_FileCon
                                                                                 NULL);
       if (pc_RsaPriv != NULL)
       {
-         std::vector<uint8> c_PrivKeyTextDecoded;
-         c_PrivKeyTextDecoded.resize(C_OSCSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
+         std::vector<uint8_t> c_PrivKeyTextDecoded;
+         c_PrivKeyTextDecoded.resize(C_OscSecurityPem::mhu32_DEFAULT_BUFFER_SIZE);
          {
-            uint8 * pu8_PrivKeyTextPointer = &c_PrivKeyTextDecoded[0];
-            const uint32 u32_PrivKeyTextCount = i2d_PKCS8_PRIV_KEY_INFO(pc_RsaPriv, &pu8_PrivKeyTextPointer);
+            uint8_t * pu8_PrivKeyTextPointer = &c_PrivKeyTextDecoded[0];
+            const uint32_t u32_PrivKeyTextCount = i2d_PKCS8_PRIV_KEY_INFO(pc_RsaPriv, &pu8_PrivKeyTextPointer);
             c_PrivKeyTextDecoded.resize(u32_PrivKeyTextCount);
             this->mc_KeyInfo.SetPrivKeyTextDecoded(c_PrivKeyTextDecoded);
             if (u32_PrivKeyTextCount == 0)

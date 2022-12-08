@@ -1,35 +1,35 @@
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_NagViewList,
-stw_opensyde_gui--C_SyvDcConnectedNodeList,
-stw_opensyde_gui--C_SyvDcExistingNodeList,
-stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
-stw_opensyde_gui--C_SyvUpPacListWidget
+stw--opensyde_gui--C_NagViewList,
+stw--opensyde_gui--C_SyvDcConnectedNodeList,
+stw--opensyde_gui--C_SyvDcExistingNodeList,
+stw--opensyde_gui--C_SdNdeDpSelectorListWidget,
+stw--opensyde_gui--C_SyvUpPacListWidget
 {
 outline: none;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_NagViewList,
-stw_opensyde_gui--C_SyvDcConnectedNodeList,
-stw_opensyde_gui--C_SyvDcExistingNodeList,
-stw_opensyde_gui--C_SdTopologyListWidget,
-stw_opensyde_gui--C_SdTopologyListWidget::item:selected,
-stw_opensyde_gui--C_SdTopologyListWidget::item:hover,
-stw_opensyde_gui--C_SdNdeDbListWidget,
-stw_opensyde_gui--C_SdNdeDbListWidget::item:selected,
-stw_opensyde_gui--C_SdNdeDbListWidget::item:hover,
-stw_opensyde_gui--C_SdNdeDpSelectorListWidget,
-stw_opensyde_gui--C_SdNdeDpSelectorListWidget::item:selected,
-stw_opensyde_gui--C_SdNdeDpSelectorListWidget::item:hover,
-stw_opensyde_gui--C_SyvUpPacListWidget,
-stw_opensyde_gui--C_SyvUpPacListWidget::item:selected,
-stw_opensyde_gui--C_SyvUpPacListWidget::item:hover
+stw--opensyde_gui--C_NagViewList,
+stw--opensyde_gui--C_SyvDcConnectedNodeList,
+stw--opensyde_gui--C_SyvDcExistingNodeList,
+stw--opensyde_gui--C_SdTopologyListWidget,
+stw--opensyde_gui--C_SdTopologyListWidget::item:selected,
+stw--opensyde_gui--C_SdTopologyListWidget::item:hover,
+stw--opensyde_gui--C_SdNdeDbListWidget,
+stw--opensyde_gui--C_SdNdeDbListWidget::item:selected,
+stw--opensyde_gui--C_SdNdeDbListWidget::item:hover,
+stw--opensyde_gui--C_SdNdeDpSelectorListWidget,
+stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item:selected,
+stw--opensyde_gui--C_SdNdeDpSelectorListWidget::item:hover,
+stw--opensyde_gui--C_SyvUpPacListWidget,
+stw--opensyde_gui--C_SyvUpPacListWidget::item:selected,
+stw--opensyde_gui--C_SyvUpPacListWidget::item:hover
 {
 border-style: none;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget
+stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget
 {
 border-style: solid;
 border-width: 1px;
@@ -37,15 +37,15 @@ border-width: 1px;
 
 /* --------------------------------------------------------------------- */
 /* padding does not work on list widget item when the border of the item is not set to 0 explicitly */
-stw_opensyde_gui--C_SdNdeDpSelectorAddListWidget::item
+stw--opensyde_gui--C_SdNdeDpSelectorAddListWidget::item
 {
 border: 0px;
 padding-left: 5px;
 }
 
 /* --------------------------------------------------------------------- */
-stw_opensyde_gui--C_SyvDcConnectedNodeList::item,
-stw_opensyde_gui--C_SyvDcExistingNodeList::item
+stw--opensyde_gui--C_SyvDcConnectedNodeList::item,
+stw--opensyde_gui--C_SyvDcExistingNodeList::item
 {
 border-style: none;
 border-width: 0px;

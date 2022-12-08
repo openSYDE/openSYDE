@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QGraphicsScene>
-#include "gitypes.h"
-#include "C_SebUtil.h"
-#include "C_OSCUtils.h"
-#include "C_GiLiBusConnectorBase.h"
+#include "gitypes.hpp"
+#include "C_SebUtil.hpp"
+#include "C_OscUtils.hpp"
+#include "C_GiLiBusConnectorBase.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -41,18 +40,18 @@ using namespace stw_opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID       Unique ID
+   \param[in]     oru64_Id       Unique ID
    \param[in]     orc_TriggerPos Ideal position of connector
    \param[in]     opc_BusItem    End of connection at bus
    \param[in]     oq_MiddleLine  Indicator if middle line is required
    \param[in,out] opc_Parent     Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID, const QPointF & orc_TriggerPos,
+C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64_t & oru64_Id, const QPointF & orc_TriggerPos,
                                                const C_GiLiBus * const opc_BusItem, const bool oq_MiddleLine,
                                                QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(NULL, oq_MiddleLine, opc_Parent),
-   C_GiUnique(oru64_ID),
+   C_GiUnique(oru64_Id),
    ms32_ConnIndex(-1),
    ms32_KnownLineCount(-1),
    mf64_ConnProgress(0.0),
@@ -81,19 +80,19 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID, const QP
 
    Set up GUI with all elements.
 
-   \param[in]     oru64_ID              Unique ID
+   \param[in]     oru64_Id              Unique ID
    \param[in]     orc_InteractionPoints Ideal interaction point positions
    \param[in]     opc_BusItem           End of connection at bus
    \param[in]     oq_MiddleLine         Indicator if middle line is required
    \param[in,out] opc_Parent            Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID,
+C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64_t & oru64_Id,
                                                const std::vector<QPointF> & orc_InteractionPoints,
                                                const C_GiLiBus * const opc_BusItem, const bool oq_MiddleLine,
                                                QGraphicsItem * const opc_Parent) :
    C_GiLiLineGroup(NULL, oq_MiddleLine, opc_Parent),
-   C_GiUnique(oru64_ID),
+   C_GiUnique(oru64_Id),
    ms32_ConnIndex(-1),
    ms32_KnownLineCount(-1),
    mf64_ConnProgress(0.0),
@@ -110,8 +109,8 @@ C_GiLiBusConnectorBase::C_GiLiBusConnectorBase(const uint64 & oru64_ID,
    // Minimum two points are necessary. If vector has not enough points, add two points.
    if (c_SaveVec.size() < 2)
    {
-      c_SaveVec.push_back(QPointF(0.0, 0.0));
-      c_SaveVec.push_back(QPointF(0.0, 0.0));
+      c_SaveVec.emplace_back(QPointF(0.0, 0.0));
+      c_SaveVec.emplace_back(QPointF(0.0, 0.0));
    }
    this->m_Init(c_SaveVec);
 
@@ -194,7 +193,7 @@ std::vector<QPointF> C_GiLiBusConnectorBase::GetPointsScenePos(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::SetPoints(const std::vector<QPointF> & orc_ScenePos)
 {
-   sint32 s32_Index = 0;
+   int32_t s32_Index = 0;
 
    this->mpc_LastKnownGenericPositionItem = NULL;
    for (std::vector<QPointF>::const_iterator c_ItScenePos = orc_ScenePos.begin(); c_ItScenePos != orc_ScenePos.end();
@@ -236,14 +235,14 @@ const C_GiBiConnectableItem * C_GiLiBusConnectorBase::GetGenericPositionItem(voi
 /*! \brief  Change z order for bus connector
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnectorBase::RestoreZOrder(void)
+void C_GiLiBusConnectorBase::RestoreZetOrder(void)
 {
    const C_GiLiBus * const pc_Bus = this->GetBusItem();
    const QGraphicsItem * const pc_Item = dynamic_cast<const QGraphicsItem *>(this->mpc_GenericSignalItem);
 
    if ((pc_Bus != NULL) && (pc_Item != NULL))
    {
-      this->SetZValueCustom(std::min(pc_Bus->zValue(), pc_Item->zValue()) - 1.0);
+      this->SetZetValueCustom(std::min(pc_Bus->zValue(), pc_Item->zValue()) - 1.0);
    }
 }
 
@@ -255,7 +254,7 @@ void C_GiLiBusConnectorBase::RestoreZOrder(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::GetNodeInteractionScenePos(QPointF & orc_ScenePos) const
 {
-   const sint32 s32_Index = mh_GetGenericInteractionIndex();
+   const int32_t s32_Index = mh_GetGenericInteractionIndex();
 
    orc_ScenePos = this->GetPointScenePos(s32_Index);
 }
@@ -268,7 +267,7 @@ void C_GiLiBusConnectorBase::GetNodeInteractionScenePos(QPointF & orc_ScenePos) 
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiLiBusConnectorBase::GetBusInteractionScenePos(QPointF & orc_ScenePos) const
 {
-   const sint32 s32_Index = m_GetBusInteractionIndex();
+   const int32_t s32_Index = m_GetBusInteractionIndex();
 
    orc_ScenePos = this->GetPointScenePos(s32_Index);
 }
@@ -281,8 +280,8 @@ void C_GiLiBusConnectorBase::GetBusInteractionScenePos(QPointF & orc_ScenePos) c
    \param[in]     orc_ScenePos    Last known scene position of interaction point
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnectorBase::RevertBus(const stw_opensyde_gui::C_GiLiBus * const opc_StartingBus,
-                                       const stw_opensyde_gui::C_GiLiBus * const opc_LastBus,
+void C_GiLiBusConnectorBase::RevertBus(const stw::opensyde_gui::C_GiLiBus * const opc_StartingBus,
+                                       const stw::opensyde_gui::C_GiLiBus * const opc_LastBus,
                                        const QPointF & orc_ScenePos)
 {
    Q_UNUSED(opc_LastBus)
@@ -294,12 +293,12 @@ void C_GiLiBusConnectorBase::RevertBus(const stw_opensyde_gui::C_GiLiBus * const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Apply new Z value
 
-   \param[in] of64_ZValue New Z value
+   \param[in] of64_ZetValue New Z value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiLiBusConnectorBase::SetZValueCustom(const float64 of64_ZValue)
+void C_GiLiBusConnectorBase::SetZetValueCustom(const float64_t of64_ZetValue)
 {
-   C_GiLiLineGroup::SetZValueCustom(of64_ZValue);
+   C_GiLiLineGroup::SetZetValueCustom(of64_ZetValue);
    //For bus connectors no data update should happen for the z value
 }
 
@@ -316,15 +315,15 @@ void C_GiLiBusConnectorBase::mousePressEvent(QGraphicsSceneMouseEvent * const op
    {
       if (this->GetBusItem() != NULL)
       {
-         const C_OSCSystemBus::E_Type e_Type = this->GetBusItem()->GetType();
-         if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
+         const C_OscSystemBus::E_Type e_Type = this->GetBusItem()->GetType();
+         if (this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex())
          {
             Q_EMIT this->SigStartConnect(E_ConnectState::eTO_GENERIC,
                                          dynamic_cast<QGraphicsItem *>(this->mpc_GenericSignalItem),
                                          &e_Type, this);
             this->mq_InAir = true;
          }
-         else if (this->msn_ActiveItemIndex == m_GetBusInteractionIndex())
+         else if (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex())
          {
             Q_EMIT this->SigStartConnect(E_ConnectState::eTO_BUS,
                                          dynamic_cast<QGraphicsItem *>(this->mpc_GenericSignalItem),
@@ -375,16 +374,16 @@ void C_GiLiBusConnectorBase::mouseReleaseEvent(QGraphicsSceneMouseEvent * const 
 {
    if (this->me_ActiveResizeMode == C_GiLiBusConnectorBase::ePOINT)
    {
-      if ((this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
-          (this->msn_ActiveItemIndex == m_GetBusInteractionIndex()))
+      if ((this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
+          (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex()))
       {
          const QPointF c_ScenePos = opc_Event->scenePos();
          bool q_Revert = true;
-         if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
+         if (this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex())
          {
             q_Revert = m_OnGenericInteractionPointMouseRelease(c_ScenePos);
          }
-         if (this->msn_ActiveItemIndex == m_GetBusInteractionIndex())
+         if (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex())
          {
             if (this->GetBusItem() != NULL)
             {
@@ -436,8 +435,8 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
    {
       disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedGraphic,
                  this, &C_GiLiBusConnectorBase::m_UpdateExternal);
-      disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedZOrder,
-                 this, &C_GiLiBusConnectorBase::RestoreZOrder);
+      disconnect(this->GetBusItem(), &C_GiLiBus::SigChangedZeOrder,
+                 this, &C_GiLiBusConnectorBase::RestoreZetOrder);
    }
    this->m_SetBus(opc_BusItem);
    if (this->GetBusItem() != NULL)
@@ -449,8 +448,8 @@ void C_GiLiBusConnectorBase::m_UpdateBus(const QPointF & orc_Pos, const C_GiLiBu
       ms32_KnownLineCount = c_Lines.size();
       connect(this->GetBusItem(), &C_GiLiBus::SigChangedGraphic,
               this, &C_GiLiBusConnectorBase::m_UpdateExternal);
-      connect(this->GetBusItem(), &C_GiLiBus::SigChangedZOrder,
-              this, &C_GiLiBusConnectorBase::RestoreZOrder);
+      connect(this->GetBusItem(), &C_GiLiBus::SigChangedZeOrder,
+              this, &C_GiLiBusConnectorBase::RestoreZetOrder);
       m_UpdateConnection(orc_Pos);
    }
 }
@@ -530,13 +529,13 @@ void C_GiLiBusConnectorBase::m_UpdateExternal(void)
       {
          //Replace line count
          const QVector<C_GiLiLineConnection *> c_Lines = this->GetBusItem()->GetLines();
-         const sintn sn_LineCount = c_Lines.size();
-         if (sn_LineCount < ms32_KnownLineCount)
+         const int32_t s32_LineCount = c_Lines.size();
+         if (s32_LineCount < ms32_KnownLineCount)
          {
             //Deleted line
             m_UpdateConnection(this->mc_Points[m_GetBusInteractionIndex()]->scenePos());
          }
-         else if (sn_LineCount > ms32_KnownLineCount)
+         else if (s32_LineCount > ms32_KnownLineCount)
          {
             //New line
             m_UpdateConnection(this->mc_Points[m_GetBusInteractionIndex()]->scenePos());
@@ -545,7 +544,7 @@ void C_GiLiBusConnectorBase::m_UpdateExternal(void)
          {
             //Normal
          }
-         ms32_KnownLineCount = sn_LineCount;
+         ms32_KnownLineCount = s32_LineCount;
       }
 
       if (pc_Item != NULL)
@@ -563,7 +562,7 @@ void C_GiLiBusConnectorBase::m_UpdateExternal(void)
                m_UpdatePointBus();
                c_New = this->mc_Points[m_GetBusInteractionIndex()]->scenePos();
                c_Diff = c_New - c_Old;
-               for (sint32 s32_ItPoint = 0; s32_ItPoint < this->mc_Points.size(); ++s32_ItPoint)
+               for (int32_t s32_ItPoint = 0; s32_ItPoint < this->mc_Points.size(); ++s32_ItPoint)
                {
                   if (s32_ItPoint != m_GetBusInteractionIndex())
                   {
@@ -624,8 +623,8 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
    else if (this->me_ActiveResizeMode == C_GiLiBusConnectorBase::eLINE)
    {
       //Check if active line is at border
-      if ((this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
-          (this->msn_ActiveItemIndex == static_cast<sintn>(m_GetBusInteractionIndex() - 1)))
+      if ((this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
+          (this->ms32_ActiveItemIndex == static_cast<int32_t>(m_GetBusInteractionIndex() - 1)))
       {
          if (((this->mpc_GenericPositionItem != NULL) && (this->GetBusItem() != NULL)) &&
              (this->mpc_GenericSignalItem != NULL))
@@ -634,16 +633,16 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
                        this, &C_GiLiBusConnectorBase::m_UpdateInternal);
             if (this->mc_Points.size() >= 2)
             {
-               QPointF c_PNew;
-               QPointF c_POld;
+               QPointF c_PointNew;
+               QPointF c_PointOld;
                const QGraphicsItem * const pc_Item = dynamic_cast<const QGraphicsItem *>(this->mpc_GenericSignalItem);
                //find closest point in shape and set pLast to closest point in shape
                if (this->GetBusItem()->isSelected() == false)
                {
-                  c_POld = this->mc_Points[m_GetBusInteractionIndex()]->scenePos();
-                  this->GetBusItem()->FindClosestPoint(c_POld, c_PNew);
-                  this->UpdatePoint(m_GetBusInteractionIndex(), c_PNew);
-                  m_UpdateConnection(c_PNew);
+                  c_PointOld = this->mc_Points[m_GetBusInteractionIndex()]->scenePos();
+                  this->GetBusItem()->FindClosestPoint(c_PointOld, c_PointNew);
+                  this->UpdatePoint(m_GetBusInteractionIndex(), c_PointNew);
+                  m_UpdateConnection(c_PointNew);
                }
 
                //find closest point in shape and set pFirst to closest point in shape
@@ -651,9 +650,9 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
                {
                   if (pc_Item->isSelected() == false)
                   {
-                     c_POld = this->mc_Points[mh_GetGenericInteractionIndex()]->scenePos();
-                     this->mpc_GenericPositionItem->FindClosestPoint(c_POld, c_PNew);
-                     this->UpdatePoint(mh_GetGenericInteractionIndex(), c_PNew);
+                     c_PointOld = this->mc_Points[mh_GetGenericInteractionIndex()]->scenePos();
+                     this->mpc_GenericPositionItem->FindClosestPoint(c_PointOld, c_PointNew);
+                     this->UpdatePoint(mh_GetGenericInteractionIndex(), c_PointNew);
                      this->m_CalcInitialLocalPos(this->mc_Points[mh_GetGenericInteractionIndex()]->scenePos());
                   }
                }
@@ -680,9 +679,9 @@ void C_GiLiBusConnectorBase::m_UpdateInternal(void)
    Bus interaction index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiBusConnectorBase::m_GetBusInteractionIndex(void) const
+int32_t C_GiLiBusConnectorBase::m_GetBusInteractionIndex(void) const
 {
-   return (static_cast<sint32>(this->mc_Points.size()) - 1L);
+   return (static_cast<int32_t>(this->mc_Points.size()) - 1L);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -695,7 +694,7 @@ void C_GiLiBusConnectorBase::m_UpdatePointBus(void)
 
    if (pc_Conn != NULL)
    {
-      QPointF c_PNew;
+      QPointF c_PointNew;
       if (m_CheckOnlyOneBusPointMoved())
       {
          C_GiLiInteractionPoint * const pc_Point = this->mc_Points[this->m_GetBusInteractionIndex()];
@@ -703,8 +702,8 @@ void C_GiLiBusConnectorBase::m_UpdatePointBus(void)
          this->m_CalcConnProgress(pc_Conn, pc_Point->scenePos());
       }
       //find closest point in shape and set pLast to closest point in shape
-      this->m_CalcConnPos(pc_Conn, c_PNew);
-      this->UpdatePoint(m_GetBusInteractionIndex(), c_PNew);
+      this->m_CalcConnPos(pc_Conn, c_PointNew);
+      this->UpdatePoint(m_GetBusInteractionIndex(), c_PointNew);
    }
 }
 
@@ -748,7 +747,7 @@ void C_GiLiBusConnectorBase::m_UpdateGenericPoint(void)
    Generic interaction index
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_GiLiBusConnectorBase::mh_GetGenericInteractionIndex(void)
+int32_t C_GiLiBusConnectorBase::mh_GetGenericInteractionIndex(void)
 {
    return 0;
 }
@@ -785,16 +784,16 @@ void C_GiLiBusConnectorBase::m_UpdateGenericItem(C_GiBiConnectableItem * const o
    {
       disconnect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedGraphic,
                  this, &C_GiLiBusConnectorBase::m_UpdateExternal);
-      disconnect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedZOrder,
-                 this, &C_GiLiBusConnectorBase::RestoreZOrder);
+      disconnect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedZeOrder,
+                 this, &C_GiLiBusConnectorBase::RestoreZetOrder);
    }
    this->mpc_GenericSignalItem = opc_NewItem;
    if (this->mpc_GenericSignalItem != NULL)
    {
       connect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedGraphic,
               this, &C_GiLiBusConnectorBase::m_UpdateExternal);
-      connect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedZOrder,
-              this, &C_GiLiBusConnectorBase::RestoreZOrder);
+      connect(this->mpc_GenericSignalItem, &C_GiBiConnectableItem::SigChangedZeOrder,
+              this, &C_GiLiBusConnectorBase::RestoreZetOrder);
    }
 }
 
@@ -821,28 +820,28 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
    if (mq_InAir == true)
    {
       //Check if active line is at border
-      if ((this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
-          (this->msn_ActiveItemIndex == m_GetBusInteractionIndex()))
+      if ((this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex()) ||
+          (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex()))
       {
          if (this->scene() != NULL)
          {
             bool q_FoundBus = false;
             bool q_RestoreMouseCursor = true;
-            const QPointF c_CurPos = this->mc_Points[this->msn_ActiveItemIndex]->scenePos();
+            const QPointF c_CurPos = this->mc_Points[this->ms32_ActiveItemIndex]->scenePos();
             const QList<QGraphicsItem *> c_All = this->scene()->items();
             for (QList<QGraphicsItem *>::const_iterator c_ItItem = c_All.begin(); c_ItItem != c_All.end(); ++c_ItItem)
             {
                QGraphicsItem * const pc_Parent = C_SebUtil::h_GetHighestParent(c_ItItem.operator *());
                C_GiLiBus * const pc_Bus = dynamic_cast<C_GiLiBus *>(pc_Parent);
                //try node
-               if (this->msn_ActiveItemIndex == mh_GetGenericInteractionIndex())
+               if (this->ms32_ActiveItemIndex == mh_GetGenericInteractionIndex())
                {
                   m_OnIterationGenericInteractionPointMove(pc_Parent, c_CurPos, q_RestoreMouseCursor);
                   if (pc_Bus != NULL)
                   {
                      if (pc_Bus->isUnderMouse() == true)
                      {
-                        this->mc_Points[this->msn_ActiveItemIndex]->setCursor(pc_Bus->cursor());
+                        this->mc_Points[this->ms32_ActiveItemIndex]->setCursor(pc_Bus->cursor());
                         q_RestoreMouseCursor = false;
                         //Stop after connectable item found under cursor
                         break;
@@ -850,13 +849,13 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
                   }
                }
                //try bus
-               if (this->msn_ActiveItemIndex == m_GetBusInteractionIndex())
+               if (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex())
                {
                   if (pc_Bus != NULL)
                   {
                      if (pc_Bus->isUnderMouse() == true)
                      {
-                        this->mc_Points[this->msn_ActiveItemIndex]->setCursor(pc_Bus->cursor());
+                        this->mc_Points[this->ms32_ActiveItemIndex]->setCursor(pc_Bus->cursor());
                         q_RestoreMouseCursor = false;
                         if (pc_Bus->cursor().shape() == Qt::CrossCursor)
                         {
@@ -879,7 +878,7 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
                   }
                }
             }
-            if (this->msn_ActiveItemIndex == m_GetBusInteractionIndex())
+            if (this->ms32_ActiveItemIndex == m_GetBusInteractionIndex())
             {
                if (q_FoundBus == false)
                {
@@ -889,7 +888,7 @@ void C_GiLiBusConnectorBase::m_OnInteractionPointMove(void)
             if (q_RestoreMouseCursor == true)
             {
                //Restore default cursor (Not done at start as this will trigger the cursor to start flickering)
-               this->mc_Points[this->msn_ActiveItemIndex]->RestoreDefaultCursor();
+               this->mc_Points[this->ms32_ActiveItemIndex]->RestoreDefaultCursor();
             }
          }
       }
@@ -917,7 +916,7 @@ void C_GiLiBusConnectorBase::m_OnIterationBusInteractionPointMoveCleanUp(QGraphi
    {
       if (opc_HighestParentItem->isUnderMouse() == true)
       {
-         this->mc_Points[this->msn_ActiveItemIndex]->setCursor(opc_HighestParentItem->cursor());
+         this->mc_Points[this->ms32_ActiveItemIndex]->setCursor(opc_HighestParentItem->cursor());
          orq_RestoreMouseCursor = false;
       }
    }
@@ -952,9 +951,9 @@ bool C_GiLiBusConnectorBase::m_CheckAnyRelevantBusPointChanged(void) const
 
    if ((this->GetBusItem() != NULL) &&
        ((this->ms32_ConnIndex >= 0) &&
-        (this->ms32_ConnIndex < (static_cast<sint32>(this->mc_LastKnownBusScenePoints.size()) - 1))))
+        (this->ms32_ConnIndex < (static_cast<int32_t>(this->mc_LastKnownBusScenePoints.size()) - 1))))
    {
-      if (this->GetBusItem()->GetNumberPoints() != static_cast<sintn>(this->mc_LastKnownBusScenePoints.size()))
+      if (this->GetBusItem()->GetNumberPoints() != static_cast<int32_t>(this->mc_LastKnownBusScenePoints.size()))
       {
          //Bend or unbend occured
          q_Retval = true;
@@ -964,13 +963,13 @@ bool C_GiLiBusConnectorBase::m_CheckAnyRelevantBusPointChanged(void) const
          //Move or move point occured
          q_Retval = false;
 
-         for (sint32 s32_ItP = this->ms32_ConnIndex; s32_ItP <= (this->ms32_ConnIndex + 1); ++s32_ItP)
+         for (int32_t s32_ItPoint = this->ms32_ConnIndex; s32_ItPoint <= (this->ms32_ConnIndex + 1); ++s32_ItPoint)
          {
-            const QPointF c_NewBusPoint = this->GetBusItem()->GetPointScenePos(s32_ItP);
-            const QPointF c_PrevBusPoint = this->mc_LastKnownBusScenePoints[s32_ItP];
+            const QPointF c_NewBusPoint = this->GetBusItem()->GetPointScenePos(s32_ItPoint);
+            const QPointF c_PrevBusPoint = this->mc_LastKnownBusScenePoints[s32_ItPoint];
             //Check if point moved
-            if ((C_OSCUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.x(), c_NewBusPoint.x()) == false) ||
-                (C_OSCUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.y(), c_NewBusPoint.y()) == false))
+            if ((C_OscUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.x(), c_NewBusPoint.x()) == false) ||
+                (C_OscUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.y(), c_NewBusPoint.y()) == false))
             {
                q_Retval = true;
                break;
@@ -999,9 +998,9 @@ bool C_GiLiBusConnectorBase::m_CheckOnlyOneBusPointMoved(void) const
 
    if ((this->GetBusItem() != NULL) &&
        ((this->ms32_ConnIndex >= 0) &&
-        (this->ms32_ConnIndex < (static_cast<sint32>(this->mc_LastKnownBusScenePoints.size()) - 1))))
+        (this->ms32_ConnIndex < (static_cast<int32_t>(this->mc_LastKnownBusScenePoints.size()) - 1))))
    {
-      if (this->GetBusItem()->GetNumberPoints() != static_cast<sintn>(this->mc_LastKnownBusScenePoints.size()))
+      if (this->GetBusItem()->GetNumberPoints() != static_cast<int32_t>(this->mc_LastKnownBusScenePoints.size()))
       {
          //Bend or unbend occured
          q_Retval = false;
@@ -1011,13 +1010,13 @@ bool C_GiLiBusConnectorBase::m_CheckOnlyOneBusPointMoved(void) const
          //Move or move point occured
          bool q_FoundOneMovedPoint = false;
 
-         for (sint32 s32_ItP = this->ms32_ConnIndex; s32_ItP <= (this->ms32_ConnIndex + 1); ++s32_ItP)
+         for (int32_t s32_ItPoint = this->ms32_ConnIndex; s32_ItPoint <= (this->ms32_ConnIndex + 1); ++s32_ItPoint)
          {
-            const QPointF c_NewBusPoint = this->GetBusItem()->GetPointScenePos(s32_ItP);
-            const QPointF c_PrevBusPoint = this->mc_LastKnownBusScenePoints[s32_ItP];
+            const QPointF c_NewBusPoint = this->GetBusItem()->GetPointScenePos(s32_ItPoint);
+            const QPointF c_PrevBusPoint = this->mc_LastKnownBusScenePoints[s32_ItPoint];
             //Check if point moved
-            if ((C_OSCUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.x(), c_NewBusPoint.x()) == false) ||
-                (C_OSCUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.y(), c_NewBusPoint.y()) == false))
+            if ((C_OscUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.x(), c_NewBusPoint.x()) == false) ||
+                (C_OscUtils::h_IsFloat64NearlyEqual(c_PrevBusPoint.y(), c_NewBusPoint.y()) == false))
             {
                //Check if first moved point
                if (q_FoundOneMovedPoint)
@@ -1065,9 +1064,9 @@ void C_GiLiBusConnectorBase::m_UpdateLastKnownBusPoints(void)
    {
       //Get points, basically
       this->mc_LastKnownBusScenePoints.reserve(this->GetBusItem()->GetNumberPoints());
-      for (sint32 s32_ItP = 0UL; s32_ItP < this->GetBusItem()->GetNumberPoints(); ++s32_ItP)
+      for (int32_t s32_ItPoint = 0UL; s32_ItPoint < this->GetBusItem()->GetNumberPoints(); ++s32_ItPoint)
       {
-         const QPointF c_NewBusPoint = this->GetBusItem()->GetPointScenePos(s32_ItP);
+         const QPointF c_NewBusPoint = this->GetBusItem()->GetPointScenePos(s32_ItPoint);
          this->mc_LastKnownBusScenePoints.push_back(c_NewBusPoint);
       }
    }

@@ -10,19 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "TGLFile.h"
-#include "stwerrors.h"
-#include "C_OSCUtils.h"
-#include "CSCLChecksums.h"
-#include "C_OSCCanOpenEdsInfoBlock.h"
+#include "TglFile.hpp"
+#include "stwerrors.hpp"
+#include "C_OscUtils.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_OscCanOpenEdsInfoBlock.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,7 +40,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanOpenEdsInfoBlock::C_OSCCanOpenEdsInfoBlock() :
+C_OscCanOpenEdsInfoBlock::C_OscCanOpenEdsInfoBlock() :
    u32_FileHash(0)
 {
 }
@@ -53,10 +53,10 @@ C_OSCCanOpenEdsInfoBlock::C_OSCCanOpenEdsInfoBlock() :
    \param[in,out]  oru32_HashValue  Hash value with unit [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenEdsInfoBlock::CalcHash(uint32 & oru32_HashValue) const
+void C_OscCanOpenEdsInfoBlock::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->u32_FileHash, sizeof(this->u32_FileHash),
-                                      oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->u32_FileHash, sizeof(this->u32_FileHash),
+                                       oru32_HashValue);
    this->c_FileInfo.CalcHash(oru32_HashValue);
    this->c_DeviceInfo.CalcHash(oru32_HashValue);
 }
@@ -75,15 +75,15 @@ void C_OSCCanOpenEdsInfoBlock::CalcHash(uint32 & oru32_HashValue) const
    \retval   C_CONFIG   At least one value not found, for details see error message
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCCanOpenEdsInfoBlock::LoadFromFile(const stw_scl::C_SCLString & orc_FilePath,
-                                              stw_scl::C_SCLString & orc_LastError)
+int32_t C_OscCanOpenEdsInfoBlock::LoadFromFile(const stw::scl::C_SclString & orc_FilePath,
+                                               stw::scl::C_SclString & orc_LastError)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (TGL_FileExists(orc_FilePath))
+   if (TglFileExists(orc_FilePath))
    {
-      stw_scl::C_SCLIniFile c_IniFile(orc_FilePath);
-      C_OSCUtils::h_FileToString(orc_FilePath, this->c_FileContentForSave);
+      stw::scl::C_SclIniFile c_IniFile(orc_FilePath);
+      C_OscUtils::h_FileToString(orc_FilePath, this->c_FileContentForSave);
       this->m_InitHash();
       s32_Retval = this->c_FileInfo.LoadFromIni(c_IniFile, orc_LastError);
 
@@ -106,7 +106,7 @@ sint32 C_OSCCanOpenEdsInfoBlock::LoadFromFile(const stw_scl::C_SCLString & orc_F
    Granularity
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint8 C_OSCCanOpenEdsInfoBlock::GetGranularity() const
+uint8_t C_OscCanOpenEdsInfoBlock::GetGranularity() const
 {
    return this->c_DeviceInfo.GetGranularity();
 }
@@ -115,10 +115,10 @@ uint8 C_OSCCanOpenEdsInfoBlock::GetGranularity() const
 /*! \brief  Init hash
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCCanOpenEdsInfoBlock::m_InitHash()
+void C_OscCanOpenEdsInfoBlock::m_InitHash()
 {
    this->u32_FileHash = 0xFFFFFFFFU;
 
-   stw_scl::C_SCLChecksums::CalcCRC32(this->c_FileContentForSave.c_str(),
-                                      this->c_FileContentForSave.Length(), this->u32_FileHash);
+   stw::scl::C_SclChecksums::CalcCRC32(this->c_FileContentForSave.c_str(),
+                                       this->c_FileContentForSave.Length(), this->u32_FileHash);
 }

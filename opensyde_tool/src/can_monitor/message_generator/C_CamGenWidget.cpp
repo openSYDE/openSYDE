@@ -10,19 +10,19 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_CamGenWidget.h"
+#include "C_CamGenWidget.hpp"
 #include "ui_C_CamGenWidget.h"
 
-#include "C_CamOgeWiSectionHeader.h"
-#include "C_GtGetText.h"
-#include "C_UsHandler.h"
+#include "C_CamOgeWiSectionHeader.hpp"
+#include "C_GtGetText.hpp"
+#include "C_UsHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -68,8 +68,8 @@ C_CamGenWidget::C_CamGenWidget(QWidget * const opc_Parent) :
            &C_CamGenMessagesWidget::UpdateMessageData);
    connect(this->mpc_Ui->pc_WidgetSignals, &C_CamGenSigWidget::SigTriggerModelUpdateCyclicMessage,
            this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::TriggerModelUpdateCyclicMessage);
-   connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigUpdateMessageDLC,
-           this->mpc_Ui->pc_WidgetSignals, &C_CamGenSigWidget::UpdateMessageDLC);
+   connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigUpdateMessageDlc,
+           this->mpc_Ui->pc_WidgetSignals, &C_CamGenSigWidget::UpdateMessageDlc);
    connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigSendMessage,
            this, &C_CamGenWidget::SigSendMessage);
    connect(this->mpc_Ui->pc_WidgetMessages, &C_CamGenMessagesWidget::SigRegisterCyclicMessage,
@@ -97,7 +97,7 @@ void C_CamGenWidget::LoadUserSettings()
    this->mpc_Ui->pc_WidgetSignals->LoadUserSettings();
 
    // splitter between messages and signals
-   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSplitterMesSigX());
+   this->mpc_Ui->pc_Splitter->SetFirstSegment(C_UsHandler::h_GetInstance()->GetSplitterMesSigHorizontal());
 
    // splitter between trace and message generator
    this->ExpandMessageGen(C_UsHandler::h_GetInstance()->GetMessageGenIsExpanded());
@@ -112,11 +112,11 @@ void C_CamGenWidget::LoadUserSettings()
 void C_CamGenWidget::SaveUserSettings(void) const
 {
    // splitter
-   const QList<stw_types::sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+   const QList<int32_t> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
    if (c_Sizes.size() > 0)
    {
-      C_UsHandler::h_GetInstance()->SetSplitterMesSigX(c_Sizes.at(0));
+      C_UsHandler::h_GetInstance()->SetSplitterMesSigHorizontal(c_Sizes.at(0));
    }
 
    // child widgets
@@ -141,7 +141,7 @@ void C_CamGenWidget::TriggerSignalReload(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamGenWidget::RemoveMessagesForFile(const QString & orc_File,
-                                           const std::vector<stw_types::uint32> * const opc_Indices) const
+                                           const std::vector<uint32_t> * const opc_Indices) const
 {
    this->mpc_Ui->pc_WidgetMessages->RemoveMessagesForFile(orc_File, opc_Indices);
 }

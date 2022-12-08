@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_PuiSdNodeDataPoolListElement.h"
+#include "C_PuiSdNodeDataPoolListElement.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,8 +49,8 @@ C_PuiSdNodeDataPoolListElement::C_PuiSdNodeDataPoolListElement(void) :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSdNodeDataPoolListElement::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiSdNodeDataPoolListElement::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_AutoMinMaxActive, sizeof(this->q_AutoMinMaxActive), oru32_HashValue);
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->q_InterpretAsString, sizeof(this->q_InterpretAsString), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_AutoMinMaxActive, sizeof(this->q_AutoMinMaxActive), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->q_InterpretAsString, sizeof(this->q_InterpretAsString), oru32_HashValue);
 }

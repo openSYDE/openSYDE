@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SUPSuSequences.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_SYDEsup.h"
+#include "stwtypes.hpp"
+#include "C_SupSuSequences.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_SydeSup.hpp"
 #include "stwerrors.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_scl;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -38,7 +37,7 @@ using namespace stw_scl;
 /*! \brief   Default constructor.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SUPSuSequences::C_SUPSuSequences(void)
+C_SupSuSequences::C_SupSuSequences(void)
 {
    mq_Quiet = false;
 }
@@ -54,9 +53,60 @@ C_SUPSuSequences::C_SUPSuSequences(void)
    \param[in]     orq_Quiet      true: quiet, false: not quiet
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SUPSuSequences::SetQuiet(const bool & orq_Quiet)
+void C_SupSuSequences::SetQuiet(const bool & orq_Quiet)
 {
    this->mq_Quiet = orq_Quiet;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Getter to return information about active openSYDE devices
+
+   Important: Call ClearActiveOsyDeviceInformation(...) and ReadDeviceInformation(...) first.
+
+   \param[out]  orc_Indexes   absolute index of elements of returned vector in list of all devices
+
+   \return
+   list of active openSYDE devices (server side)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw::opensyde_core::C_OscSuSequences::C_OsyDeviceInformation> & C_SupSuSequences::
+GetActiveOsyDeviceInformation(std::vector<uint16_t> & orc_Indexes) const
+{
+   orc_Indexes = mc_OsyDeviceInformationIndexes;
+   return this->mc_ActiveOsyDeviceInformation;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Getter to return information about active STW Flashloader devices
+
+   Important: Call ClearActiveOsyDeviceInformation(...) and ReadDeviceInformation(...) first.
+
+   \param[out]  orc_Indexes   absolute index of elements of returned vector in list of all devices
+
+   \return
+   list of active STW Flashloader devices (server side)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+const std::vector<stw::opensyde_core::C_OscSuSequences::C_XflDeviceInformation> & C_SupSuSequences::
+GetActiveXflDeviceInformation(std::vector<uint16_t> & orc_Indexes) const
+{
+   orc_Indexes = mc_XflDeviceInformationIndexes;
+   return this->mc_ActiveXflDeviceInformation;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Empties vectors of active devices
+
+  Important: Call before ReadDeviceInformation(...)
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SupSuSequences::ClearActiveDeviceInformation()
+{
+   this->mc_OsyDeviceInformationIndexes.clear();
+   this->mc_XflDeviceInformationIndexes.clear();
+   this->mc_ActiveOsyDeviceInformation.clear();
+   this->mc_ActiveXflDeviceInformation.clear();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -84,20 +134,20 @@ void C_SUPSuSequences::SetQuiet(const bool & orq_Quiet)
    - false  continue sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
-                                        const sint32 os32_Result, const uint8 ou8_Progress,
-                                        const stw_scl::C_SCLString & orc_Information)
+bool C_SupSuSequences::m_ReportProgress(const stw::opensyde_core::C_OscSuSequences::E_ProgressStep oe_Step,
+                                        const int32_t os32_Result, const uint8_t ou8_Progress,
+                                        const stw::scl::C_SclString & orc_Information)
 {
    (void) ou8_Progress; // progress numbers not interesting for console application
    const bool q_Error = m_CheckErrorCase(oe_Step);
-   C_SCLString c_Text = "";
+   C_SclString c_Text = "";
 
    c_Text += m_GetStepName(oe_Step) + ":  ";
 
    // show result only in error case
    if (q_Error == true)
    {
-      c_Text += "Result: " + C_SCLString::IntToStr(os32_Result);
+      c_Text += "Result: " + C_SclString::IntToStr(os32_Result);
    }
 
    c_Text += " " + orc_Information;
@@ -128,16 +178,16 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
    - false  continue sequence
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequences::E_ProgressStep oe_Step,
-                                        const sint32 os32_Result, const uint8 ou8_Progress,
-                                        const stw_opensyde_core::C_OSCProtocolDriverOsyNode & orc_Server,
-                                        const stw_scl::C_SCLString & orc_Information)
+bool C_SupSuSequences::m_ReportProgress(const stw::opensyde_core::C_OscSuSequences::E_ProgressStep oe_Step,
+                                        const int32_t os32_Result, const uint8_t ou8_Progress,
+                                        const stw::opensyde_core::C_OscProtocolDriverOsyNode & orc_Server,
+                                        const stw::scl::C_SclString & orc_Information)
 {
    (void) ou8_Progress; // progress numbers not interesting for console application
    bool q_PrintLine = true;
 
    // suppress often occurring lines
-   if ((oe_Step == C_OSCSuSequences::eXFL_PROGRESS) && (os32_Result == static_cast<sint32>(stw_errors::C_NO_ERR)))
+   if ((oe_Step == C_OscSuSequences::eXFL_PROGRESS) && (os32_Result == static_cast<int32_t>(C_NO_ERR)))
    {
       if ((orc_Information == "Information: Sending FLASH request ...") ||
           (orc_Information == "Information: <<<CLRALL") ||
@@ -151,18 +201,18 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
    if (q_PrintLine == true)
    {
       const bool q_Error = m_CheckErrorCase(oe_Step);
-      C_SCLString c_Text = "";
+      C_SclString c_Text = "";
 
       c_Text += m_GetStepName(oe_Step) + ":  ";
 
       // show result only in error case
       if (q_Error == true)
       {
-         c_Text += "Result: " + C_SCLString::IntToStr(os32_Result);
+         c_Text += "Result: " + C_SclString::IntToStr(os32_Result);
       }
 
-      c_Text += " Bus Id: " + C_SCLString::IntToStr(orc_Server.u8_BusIdentifier);
-      c_Text += " Node Id: " + C_SCLString::IntToStr(orc_Server.u8_NodeIdentifier);
+      c_Text += " Bus Id: " + C_SclString::IntToStr(orc_Server.u8_BusIdentifier);
+      c_Text += " Node Id: " + C_SclString::IntToStr(orc_Server.u8_NodeIdentifier);
       c_Text += " " + orc_Information;
 
       // write to log file and console
@@ -176,7 +226,7 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
 /*! \brief   Reports information read from openSYDE server node
 
    Override method.
-   Here: Give information to logging engine.
+   Here: Write to log and remember information.
 
    Called by ReadDeviceInformation() after it has read information from an openSYDE node.
 
@@ -184,27 +234,31 @@ bool C_SUPSuSequences::m_ReportProgress(const stw_opensyde_core::C_OSCSuSequence
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SUPSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
-   const stw_opensyde_core::C_OSCSuSequences::C_OsyDeviceInformation & orc_Info, const uint32 ou32_NodeIndex)
+void C_SupSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
+   const stw::opensyde_core::C_OscSuSequences::C_OsyDeviceInformation & orc_Info, const uint32_t ou32_NodeIndex)
 {
-   C_SCLStringList c_Text;
-   C_SCLString c_Message = "openSYDE device information found for node with index " +
-                           C_SCLString::IntToStr(ou32_NodeIndex) + "\n";
+   C_SclStringList c_Text;
+   C_SclString c_Message = "openSYDE device information found for node with index " +
+                           C_SclString::IntToStr(ou32_NodeIndex) + "\n";
 
    h_OpenSydeFlashloaderInformationToText(orc_Info, c_Text);
-   for (uint32 u32_Line = 0U; u32_Line < c_Text.GetCount(); u32_Line++)
+   for (uint32_t u32_Line = 0U; u32_Line < c_Text.GetCount(); u32_Line++)
    {
       c_Message += c_Text.Strings[u32_Line] + "\n";
    }
 
    this->m_WriteLog(c_Message);
+
+   // store current device information of openSYDE node
+   this->mc_OsyDeviceInformationIndexes.push_back(ou32_NodeIndex);
+   this->mc_ActiveOsyDeviceInformation.push_back(orc_Info);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Reports information read from STW flashloader server node
 
    Override method.
-   Here: Give information to logging engine.
+   Here: Write to log and remember information.
 
    Called by ReadDeviceInformation() after it has read information from an STW flashloader node.
 
@@ -212,20 +266,24 @@ void C_SUPSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
    \param[in]     ou32_NodeIndex   Index of node within mpc_SystemDefinition
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SUPSuSequences::m_ReportStwFlashloaderInformationRead(
-   const stw_opensyde_core::C_OSCSuSequences::C_XflDeviceInformation & orc_Info, const uint32 ou32_NodeIndex)
+void C_SupSuSequences::m_ReportStwFlashloaderInformationRead(
+   const stw::opensyde_core::C_OscSuSequences::C_XflDeviceInformation & orc_Info, const uint32_t ou32_NodeIndex)
 {
-   C_SCLStringList c_Text;
-   C_SCLString c_Message = "STW Flashloader device information found for node with index " +
-                           C_SCLString::IntToStr(ou32_NodeIndex) + "\n";
+   C_SclStringList c_Text;
+   C_SclString c_Message = "STW Flashloader device information found for node with index " +
+                           C_SclString::IntToStr(ou32_NodeIndex) + "\n";
 
    h_StwFlashloaderInformationToText(orc_Info, c_Text);
-   for (uint32 u32_Line = 0U; u32_Line < c_Text.GetCount(); u32_Line++)
+   for (uint32_t u32_Line = 0U; u32_Line < c_Text.GetCount(); u32_Line++)
    {
       c_Message += c_Text.Strings[u32_Line] + "\n";
    }
 
    this->m_WriteLog(c_Message);
+
+   // store current device information of openSYDE node
+   this->mc_XflDeviceInformationIndexes.push_back(ou32_NodeIndex);
+   this->mc_ActiveXflDeviceInformation.push_back(orc_Info);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -241,131 +299,131 @@ void C_SUPSuSequences::m_ReportStwFlashloaderInformationRead(
    false: is no error (i.e. information)
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep oe_Step) const
+bool C_SupSuSequences::m_CheckErrorCase(const C_OscSuSequences::E_ProgressStep oe_Step) const
 {
    bool q_Return = false;
 
    // Decide if error or info
    switch (oe_Step)
    {
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
-   case C_OSCSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_BC_ENTER_PRE_PROGRAMMING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_BC_FLASH_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_SET_SESSION_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_WAKEUP_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_ERROR:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_SECURITY_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_WAKEUP_ERROR:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_READ_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_SIGNATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_RECONNECT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_COMM_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_MATCH_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_NOT_OK:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_NAME_NOT_READABLE:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_ERASE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_MAX_SIZE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_OPEN_FILE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_EXTRACT_KEY_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SESSION_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_SEND_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_AVAILABLE_FEATURE_ERROR:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_ERROR:
+   case C_OscSuSequences::eRESET_SYSTEM_OSY_NODE_ERROR:
+   case C_OscSuSequences::eRESET_SYSTEM_OSY_ROUTED_NODE_ERROR:
       q_Return = true;
       break;
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_ROUTING_START:
-   case C_OSCSuSequences::eACTIVATE_FLASHLOADER_FINISHED:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
-   case C_OSCSuSequences::eREAD_DEVICE_INFO_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_FINAL_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_ABORTED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_START:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:
-   case C_OSCSuSequences::eXFL_PROGRESS:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:
-   case C_OSCSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED:
-   case C_OSCSuSequences::eRESET_SYSTEM_START:
-   case C_OSCSuSequences::eRESET_SYSTEM_FINISHED:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_START:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_REQUEST_PROGRAMMING_WARNING:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_ECU_RESET_WARNING:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_XFL_ECU_RESET_WARNING:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_RECONNECT_WARNING:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_ENTER_FLASHLOADER_START:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_OSY_XFL_BC_PING_START:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_ROUTING_START:
+   case C_OscSuSequences::eACTIVATE_FLASHLOADER_FINISHED:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_SET_SESSION_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_DEVICE_NAME_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASH_BLOCKS_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_INFO_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FLASHLOADER_CHECK_SECURITY_ACTIVATION_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_OSY_FINISHED:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_READING_INFORMATION_START:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_XFL_FINISHED:
+   case C_OscSuSequences::eREAD_DEVICE_INFO_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_HEX_OPEN_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_DEVICE_NAME_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_CHECK_MEMORY_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINGERPRINT_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_TRANSFER_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_AREA_EXIT_FINAL_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_HEX_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_PREPARE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_TRANSFER_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_EXIT_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_RESULT_STRING:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FLASH_FILE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_OPEN_FILE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_WRITE_FILE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FILE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_NVM_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_PEM_FILE_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_SECURITY_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_STATE_DEBUGGER_WRITE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_OSY_NODE_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_ABORTED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_START:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_START:
+   case C_OscSuSequences::eXFL_PROGRESS:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FLASH_HEX_FINISHED:
+   case C_OscSuSequences::eUPDATE_SYSTEM_XFL_NODE_FINISHED:
+   case C_OscSuSequences::eRESET_SYSTEM_START:
+   case C_OscSuSequences::eRESET_SYSTEM_FINISHED:
    default:
       break;
    }
@@ -382,9 +440,9 @@ bool C_SUPSuSequences::m_CheckErrorCase(const C_OSCSuSequences::E_ProgressStep o
    Name of the specific step
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
+C_SclString C_SupSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
 {
-   C_SCLString c_Text;
+   C_SclString c_Text;
 
    switch (oe_Step)
    {
@@ -754,7 +812,7 @@ C_SCLString C_SUPSuSequences::m_GetStepName(const E_ProgressStep oe_Step) const
    \param[in]     orq_Error       True: log as error; false: log as information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SUPSuSequences::m_WriteLog(const C_SCLString & orc_Text, const bool & orq_IsError) const
+void C_SupSuSequences::m_WriteLog(const stw::scl::C_SclString & orc_Text, const bool & orq_IsError) const
 {
-   C_SYDEsup::h_WriteLog("Report Progress", orc_Text, orq_IsError, mq_Quiet);
+   C_SydeSup::h_WriteLog("Report Progress", orc_Text, orq_IsError, mq_Quiet);
 }

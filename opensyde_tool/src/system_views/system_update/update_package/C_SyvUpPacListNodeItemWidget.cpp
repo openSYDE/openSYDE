@@ -11,27 +11,26 @@
 
 #include <cmath>
 
-#include "C_SyvUpPacListNodeItemWidget.h"
+#include "C_SyvUpPacListNodeItemWidget.hpp"
 #include "ui_C_SyvUpPacListNodeItemWidget.h"
 
-#include "stwerrors.h"
-#include "C_GtGetText.h"
+#include "stwerrors.hpp"
+#include "C_GtGetText.hpp"
 
-#include "C_PuiProject.h"
-#include "C_PuiSvData.h"
-#include "C_PuiSvNodeUpdate.h"
-#include "C_PuiSvHandler.h"
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_PuiUtil.h"
+#include "C_PuiProject.hpp"
+#include "C_PuiSvData.hpp"
+#include "C_PuiSvNodeUpdate.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_PuiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -60,7 +59,7 @@ using namespace stw_opensyde_core;
                                        holds all items (base class must be C_SyvUpPackageSectionNodeWidget).
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacListNodeItemWidget::C_SyvUpPacListNodeItemWidget(const uint32 ou32_ViewIndex, const uint32 ou32_NodeIndex,
+C_SyvUpPacListNodeItemWidget::C_SyvUpPacListNodeItemWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                            const QString & orc_DeviceName, const bool oq_FileBased,
                                                            const bool oq_StwFlashloader, QWidget * const opc_Parent) :
    C_OgeWiOnlyBackground(opc_Parent),
@@ -164,7 +163,7 @@ void C_SyvUpPacListNodeItemWidget::SetSelected(const bool oq_Selected)
    \param[in]  ou32_State  State of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListNodeItemWidget::SetState(const uint32 ou32_State)
+void C_SyvUpPacListNodeItemWidget::SetState(const uint32_t ou32_State)
 {
    this->mu32_State = ou32_State;
 }
@@ -188,7 +187,7 @@ void C_SyvUpPacListNodeItemWidget::SetOwnerSectionName(const QString & orc_Name)
    \param[in]  ou32_Number    Application number
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListNodeItemWidget::SetAppNumber(const stw_types::uint32 ou32_Number)
+void C_SyvUpPacListNodeItemWidget::SetAppNumber(const uint32_t ou32_Number)
 {
    this->mu32_Number = ou32_Number;
 
@@ -225,7 +224,7 @@ void C_SyvUpPacListNodeItemWidget::SetAppFile(const QString & orc_File, const bo
    // Update the state of user (system view specific configuration over system definition) hint
    q_ShowUserHint = (!this->mq_DefaultFilePath) && this->mq_DefaultFilePathUsed;
    this->mpc_Ui->pc_LabelUserHint->setVisible(q_ShowUserHint);
-   this->mpc_Ui->pc_HorizontalSpacerUserHint->changeSize(((q_ShowUserHint == true) ? static_cast<sintn>(15) : 0),
+   this->mpc_Ui->pc_HorizontalSpacerUserHint->changeSize(((q_ShowUserHint == true) ? static_cast<int32_t>(15) : 0),
                                                          0, QSizePolicy::Fixed);
 
    this->m_UpdateAbsolutePath();
@@ -278,9 +277,9 @@ void C_SyvUpPacListNodeItemWidget::SetSkipOfUpdateFile(const bool oq_Skip)
    Current state of application
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacListNodeItemWidget::GetState(void) const
+uint32_t C_SyvUpPacListNodeItemWidget::GetState(void) const
 {
-   uint32 u32_State = this->mu32_State;
+   uint32_t u32_State = this->mu32_State;
 
    if (this->mq_SkipOfUpdateFile == true)
    {
@@ -298,7 +297,7 @@ uint32 C_SyvUpPacListNodeItemWidget::GetState(void) const
    Application number
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvUpPacListNodeItemWidget::GetAppNumber(void) const
+uint32_t C_SyvUpPacListNodeItemWidget::GetAppNumber(void) const
 {
    return this->mu32_Number;
 }
@@ -449,9 +448,9 @@ void C_SyvUpPacListNodeItemWidget::LoadImportConfig(const C_SyvUpPacConfigNodeAp
    C_TIMEOUT   Trigger remove of this widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SyvUpPacListNodeItemWidget::CheckPath(void)
+int32_t C_SyvUpPacListNodeItemWidget::CheckPath(void)
 {
-   sint32 s32_Return = C_NO_ERR;
+   int32_t s32_Return = C_NO_ERR;
    QFileInfo c_FileInfo;
    bool q_Changed = true;
 
@@ -598,7 +597,7 @@ bool C_SyvUpPacListNodeItemWidget::event(QEvent * const opc_Event)
       }
    }
 
-   return stw_opensyde_gui_elements::C_OgeWiOnlyBackground::event(opc_Event);
+   return stw::opensyde_gui_elements::C_OgeWiOnlyBackground::event(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -629,13 +628,13 @@ void C_SyvUpPacListNodeItemWidget::m_LoadFileInformation(bool & orq_FileExists, 
 
    if (orq_FileExists == true)
    {
-      float64 f64_SizeFloat;
+      float64_t f64_SizeFloat;
       const QDateTime c_DateTime = c_FileInfo.lastModified();
 
       // File size in kB
-      f64_SizeFloat = std::ceil(static_cast<float64>(c_FileInfo.size()) / 1024.0);
+      f64_SizeFloat = std::ceil(static_cast<float64_t>(c_FileInfo.size()) / 1024.0);
       // 64 Bit is not necessary for our hex files
-      this->mu32_FileSize = static_cast<uint32>(f64_SizeFloat);
+      this->mu32_FileSize = static_cast<uint32_t>(f64_SizeFloat);
 
       // General date format (hex files have special format and overwrite this value)
       this->mc_Date = c_DateTime.date().toString("dd.MM.yyyy");
@@ -689,37 +688,37 @@ void C_SyvUpPacListNodeItemWidget::m_UpateFilePathLabel(void) const
        (this->mc_AbsoluteFilePath != C_GtGetText::h_GetText("<Add File>")))
    {
       //Use topmost widget (in list) as reference for width
-      sintn sn_Width = this->parentWidget()->parentWidget()->width() - mhsn_PATH_OFFSET;
+      int32_t s32_Width = this->parentWidget()->parentWidget()->width() - mhs32_PATH_OFFSET;
       QString c_AdaptedString;
 
       if (this->mpc_Ui->pc_LabelUserHint->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
-         sn_Width -= this->mpc_Ui->pc_LabelUserHint->width();
+         s32_Width -= this->mpc_Ui->pc_LabelUserHint->width();
       }
 
       if (this->mpc_Ui->pc_LabelSecurity->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
-         sn_Width -= this->mpc_Ui->pc_LabelSecurity->width();
+         s32_Width -= this->mpc_Ui->pc_LabelSecurity->width();
       }
 
       if (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
-         sn_Width -= this->mpc_Ui->pc_LabelDebugger->width();
+         s32_Width -= this->mpc_Ui->pc_LabelDebugger->width();
       }
       if (((this->mpc_Ui->pc_LabelUserHint->isVisible() == true) ||
            (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)) ||
           (this->mpc_Ui->pc_LabelSecurity->isVisible() == true))
       {
          // In this case the label for the path does not have so much space to use
-         sn_Width -= this->mpc_Ui->pc_HorizontalSpacerUserHint->geometry().width();
+         s32_Width -= this->mpc_Ui->pc_HorizontalSpacerUserHint->geometry().width();
       }
 
       c_AdaptedString =
          C_Uti::h_MinimizePath(this->mc_FilePath,
-                               this->mpc_Ui->pc_LabelPath->font(), static_cast<uint32>(sn_Width), 0U);
+                               this->mpc_Ui->pc_LabelPath->font(), static_cast<uint32_t>(s32_Width), 0U);
       this->mpc_Ui->pc_LabelPath->setText(c_AdaptedString);
    }
    else

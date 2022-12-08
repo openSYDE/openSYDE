@@ -9,23 +9,22 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QString>
 #include <QApplication>
-#include "C_Uti.h"
-#include "C_UtiStyleSheets.h"
-#include "C_NagMainWindow.h"
-#include "C_PuiProject.h"
-#include "C_GtGetText.h"
-#include "C_OSCLoggingHandler.h"
-#include "C_PopErrorHandling.h"
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SdUtil.h"
+#include "C_Uti.hpp"
+#include "C_UtiStyleSheets.hpp"
+#include "C_NagMainWindow.hpp"
+#include "C_PuiProject.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OscLoggingHandler.hpp"
+#include "C_PopErrorHandling.hpp"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SdUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,7 +43,7 @@ using namespace stw_types;
 
    Set up and start application.
 
-   \param[in]   osn_Argc     Number of command line arguments
+   \param[in]   os32_Argc    Number of command line arguments
    \param[in]   opacn_Argv   Command line arguments
 
    \return
@@ -52,47 +51,49 @@ using namespace stw_types;
    else: error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn main(sintn osn_Argc, charn * opacn_Argv[])
+int32_t main(int32_t os32_Argc, char_t * opacn_Argv[])
 {
-   const stw_types::uint16 u16_Timer = osc_write_log_performance_start();
+   const uint16_t u16_Timer = osc_write_log_performance_start();
+   int32_t s32_Result;
 
    // turn on the DPI support**
    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
    QGuiApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 
-   QApplication c_Appl(osn_Argc, opacn_Argv);
+   QApplication c_Appl(os32_Argc, opacn_Argv);
    {
-      const QString c_FilePath = stw_opensyde_gui_logic::C_Uti::h_GetCompleteLogFileLocation(".syde_log");
-      const QString c_ExeHash = stw_opensyde_gui_logic::C_Uti::h_GetHashValueAsQString();
+      const QString c_FilePath = stw::opensyde_gui_logic::C_Uti::h_GetCompleteLogFileLocation(".syde_log");
+      const QString c_ExeHash = stw::opensyde_gui_logic::C_Uti::h_GetHashValueAsQtString();
 
       //Set up logging (FIRST)
-      stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToConsoleActive(false);
-      stw_opensyde_core::C_OSCLoggingHandler::h_SetWriteToFileActive(true);
-      stw_opensyde_core::C_OSCLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
+      stw::opensyde_core::C_OscLoggingHandler::h_SetWriteToConsoleActive(false);
+      stw::opensyde_core::C_OscLoggingHandler::h_SetWriteToFileActive(true);
+      stw::opensyde_core::C_OscLoggingHandler::h_SetCompleteLogFileLocation(c_FilePath.toStdString().c_str());
 
       osc_write_log_info("Startup", static_cast<QString>("Starting openSYDE Version: " +
-                                                         stw_opensyde_gui_logic::C_Uti::h_GetApplicationVersion() +
+                                                         stw::opensyde_gui_logic::C_Uti::h_GetApplicationVersion() +
                                                          ", MD5-Checksum: " +
                                                          c_ExeHash).toStdString().c_str());
    }
    {
       //Set stylesheet (SECOND)
-      c_Appl.setStyleSheet(stw_opensyde_gui_logic::C_UtiStyleSheets::h_GetStylesheet());
+      c_Appl.setStyleSheet(stw::opensyde_gui_logic::C_UtiStyleSheets::h_GetStylesheet());
    }
    {
-      const QString c_TranslationLocation = stw_opensyde_gui_logic::C_Uti::h_GetExePath() + "/Translations";
+      const QString c_TranslationLocation = stw::opensyde_gui_logic::C_Uti::h_GetExePath() + "/Translations";
       //Set language (THIRD)
-      //stw_opensyde_core::C_OSCGetText::h_SetLanguage("en_US");
-      stw_opensyde_gui_logic::C_PopErrorHandling::h_GetTextInitializeErr(
-         stw_opensyde_gui_logic::C_GtGetText::h_Initialize(c_TranslationLocation.toStdString().c_str(), "en_US"));
+      //stw::opensyde_core::C_OscGetText::h_SetLanguage("en_US");
+      stw::opensyde_gui_logic::C_PopErrorHandling::h_GetTextInitializeErr(
+         stw::opensyde_gui_logic::C_GtGetText::h_Initialize(c_TranslationLocation.toStdString().c_str(), "en_US"));
    }
    {
       //Application (FOURTH)
-      stw_opensyde_gui::C_NagMainWindow c_Window(u16_Timer);
+      stw::opensyde_gui::C_NagMainWindow c_Window(u16_Timer);
 
       c_Window.show();
 
       //lint -e{1705} Working Qt example code
-      return c_Appl.exec();
+      s32_Result = c_Appl.exec();
    }
+   return s32_Result;
 }

@@ -11,7 +11,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QMouseEvent>
@@ -19,42 +19,41 @@
 #include <QDesktopWidget>
 #include <QApplication>
 
-#include "C_OgeWiHover.h"
-#include "C_OgeWiUtil.h"
-#include "C_GtGetText.h"
+#include "C_OgeWiHover.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_GtGetText.hpp"
 #include "ui_C_OgeWiHover.h"
-#include "constants.h"
+#include "constants.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_types;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-static const sintn msn_SHADOW_WIDTH = 8;
+static const int32_t ms32_SHADOW_WIDTH = 8;
 
-static const sintn msn_MAXIMIZED_HEIGHT_MINIMUM = 300 + (2 * msn_SHADOW_WIDTH);
-static const sintn msn_MINIMIZED_HEIGHT = 31 + (2 * msn_SHADOW_WIDTH);
-static const sintn msn_SCROLL_AREA_SIZE = 9;
+static const int32_t ms32_MAXIMIZED_HEIGHT_MINIMUM = 300 + (2 * ms32_SHADOW_WIDTH);
+static const int32_t ms32_MINIMIZED_HEIGHT = 31 + (2 * ms32_SHADOW_WIDTH);
+static const int32_t ms32_SCROLL_AREA_SIZE = 9;
 
-static const sintn msn_WIDTH_MINIMUM = 323 + (2 * msn_SHADOW_WIDTH);
+static const int32_t ms32_WIDTH_MINIMUM = 323 + (2 * ms32_SHADOW_WIDTH);
 
-static const sintn msn_TOP_BORDER_AREA = 4;
+static const int32_t ms32_TOP_BORDER_AREA = 4;
 
-static const uint32 mu32_MOUSE_MODE_NO_FUNC = 0U;
-static const uint32 mu32_MOUSE_MODE_RESIZE = 1U;
-static const uint32 mu32_MOUSE_MODE_MOVE = 2U;
+static const uint32_t mu32_MOUSE_MODE_NO_FUNC = 0U;
+static const uint32_t mu32_MOUSE_MODE_RESIZE = 1U;
+static const uint32_t mu32_MOUSE_MODE_MOVE = 2U;
 
-static const uint32 mu32_RESIZE_NONE = 0U;
-static const uint32 mu32_RESIZE_HOR = 1U;
-static const uint32 mu32_RESIZE_VER = 2U;
-static const uint32 mu32_RESIZE_ALL_TOPLEFT = 3U;
-static const uint32 mu32_RESIZE_ALL_TOPRIGHT = 4U;
-static const uint32 mu32_RESIZE_ALL_BOTTOMLEFT = 5U;
-static const uint32 mu32_RESIZE_ALL_BOTTOMRIGHT = 6U;
-static const uint32 mu32_RESIZE_HOR_LEFT = 7U;
-static const uint32 mu32_RESIZE_VER_TOP = 8U;
+static const uint32_t mu32_RESIZE_NONE = 0U;
+static const uint32_t mu32_RESIZE_HOR = 1U;
+static const uint32_t mu32_RESIZE_VER = 2U;
+static const uint32_t mu32_RESIZE_ALL_TOPLEFT = 3U;
+static const uint32_t mu32_RESIZE_ALL_TOPRIGHT = 4U;
+static const uint32_t mu32_RESIZE_ALL_BOTTOMLEFT = 5U;
+static const uint32_t mu32_RESIZE_ALL_BOTTOMRIGHT = 6U;
+static const uint32_t mu32_RESIZE_HOR_LEFT = 7U;
+static const uint32_t mu32_RESIZE_VER_TOP = 8U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -90,17 +89,17 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, const QString & orc_Title, cons
    mu32_ResizeMode(mu32_RESIZE_NONE),
    mc_IconPath(orc_Icon),
    mq_SearchActive(oq_Search),
-   msn_OffsetX(0),
-   msn_OffsetY(0),
-   msn_OffsetXRight(0),
+   ms32_OffsetHorizontal(0),
+   ms32_OffsetVertical(0),
+   ms32_OffsetHorizontalRight(0),
    mq_DarkMode(false)
 {
    QImage c_Icon;
-   sintn sn_Index;
+   int32_t s32_Index;
 
    this->mpc_Ui->setupUi(this);
 
-   this->setMinimumSize(msn_WIDTH_MINIMUM, msn_MAXIMIZED_HEIGHT_MINIMUM);
+   this->setMinimumSize(ms32_WIDTH_MINIMUM, ms32_MAXIMIZED_HEIGHT_MINIMUM);
 
    // for changing the mouse cursor
    this->setMouseTracking(true);
@@ -131,15 +130,15 @@ C_OgeWiHover::C_OgeWiHover(QWidget & orc_Widget, const QString & orc_Title, cons
    // set specific widget
    this->mpc_Widget->setParent(this);
    this->mpc_Ui->pc_VerticalLayout->addWidget(this->mpc_Widget);
-   sn_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Widget);
-   this->mpc_Ui->pc_VerticalLayout->setStretch(sn_Index, 1);
+   s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(this->mpc_Widget);
+   this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
 
    //Deactivate dark mode
    this->ApplyDarkMode(false);
 
    this->setAttribute(Qt::WA_TranslucentBackground);
 
-   this->mc_TimerAnimation.setInterval(msn_TIMER_INTERVAL);
+   this->mc_TimerAnimation.setInterval(ms32_TIMER_INTERVAL);
 
    //search connect
    connect(this->mpc_Ui->pc_BtnCancelSearch, &QPushButton::clicked, this, &C_OgeWiHover::m_CancelSearch);
@@ -203,20 +202,20 @@ void C_OgeWiHover::SetMaximized(const bool oq_Maximized)
    \return     Actual maximized height
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_OgeWiHover::GetMaximizedHeight(void) const
+int32_t C_OgeWiHover::GetMaximizedHeight(void) const
 {
-   return this->msn_Height;
+   return this->ms32_Height;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the maximized height
 
-   \param[in]  osn_Height  New maximized height
+   \param[in]  os32_Height  New maximized height
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OgeWiHover::SetMaximizedHeight(const sintn osn_Height)
+void C_OgeWiHover::SetMaximizedHeight(const int32_t os32_Height)
 {
-   this->msn_Height = osn_Height;
+   this->ms32_Height = os32_Height;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -274,7 +273,7 @@ void C_OgeWiHover::ApplyDarkMode(const bool oq_Active)
 void C_OgeWiHover::m_AnimationTimerEvent()
 {
    QSize c_Size;
-   sintn sn_NewHeight;
+   int32_t s32_NewHeight;
 
    m_UpdateParentSize();
 
@@ -287,24 +286,24 @@ void C_OgeWiHover::m_AnimationTimerEvent()
       // minimize the widget
       c_Size = this->size();
 
-      if (c_Size.height() == this->msn_Height)
+      if (c_Size.height() == this->ms32_Height)
       {
          // first call
          this->mpc_Widget->setVisible(false);
       }
 
-      if (c_Size.height() > msn_MINIMIZED_HEIGHT)
+      if (c_Size.height() > ms32_MINIMIZED_HEIGHT)
       {
-         sn_NewHeight = c_Size.height() - this->msn_StepSize;
-         if (sn_NewHeight > msn_MINIMIZED_HEIGHT)
+         s32_NewHeight = c_Size.height() - this->ms32_StepSize;
+         if (s32_NewHeight > ms32_MINIMIZED_HEIGHT)
          {
-            this->setMinimumSize(msn_WIDTH_MINIMUM, sn_NewHeight);
-            this->setGeometry(this->x(), this->y(), this->width(), sn_NewHeight);
+            this->setMinimumSize(ms32_WIDTH_MINIMUM, s32_NewHeight);
+            this->setGeometry(this->x(), this->y(), this->width(), s32_NewHeight);
          }
          else
          {
-            this->setMinimumSize(msn_WIDTH_MINIMUM, msn_MINIMIZED_HEIGHT);
-            this->setGeometry(this->x(), this->y(), this->width(), msn_MINIMIZED_HEIGHT);
+            this->setMinimumSize(ms32_WIDTH_MINIMUM, ms32_MINIMIZED_HEIGHT);
+            this->setGeometry(this->x(), this->y(), this->width(), ms32_MINIMIZED_HEIGHT);
          }
       }
       else
@@ -321,36 +320,36 @@ void C_OgeWiHover::m_AnimationTimerEvent()
       // maximize the widget
       c_Size = this->size();
 
-      if (c_Size.height() < this->msn_Height)
+      if (c_Size.height() < this->ms32_Height)
       {
-         sintn sn_PosY = this->y();
-         sn_NewHeight = c_Size.height() + this->msn_StepSize;
+         int32_t s32_PosVertical = this->y();
+         s32_NewHeight = c_Size.height() + this->ms32_StepSize;
 
-         if (sn_NewHeight >= msn_MAXIMIZED_HEIGHT_MINIMUM)
+         if (s32_NewHeight >= ms32_MAXIMIZED_HEIGHT_MINIMUM)
          {
             // set the new minimum if the animation is far enough
-            this->setMinimumSize(msn_WIDTH_MINIMUM, msn_MAXIMIZED_HEIGHT_MINIMUM);
+            this->setMinimumSize(ms32_WIDTH_MINIMUM, ms32_MAXIMIZED_HEIGHT_MINIMUM);
          }
 
-         if (sn_NewHeight < this->msn_Height)
+         if (s32_NewHeight < this->ms32_Height)
          {
             // check the bottom border
-            if ((sn_PosY + sn_NewHeight) > this->mc_ParentWidgetSize.height())
+            if ((s32_PosVertical + s32_NewHeight) > this->mc_ParentWidgetSize.height())
             {
-               sn_PosY -= this->msn_StepSize;
+               s32_PosVertical -= this->ms32_StepSize;
             }
 
-            this->setGeometry(this->x(), sn_PosY, this->width(), sn_NewHeight);
+            this->setGeometry(this->x(), s32_PosVertical, this->width(), s32_NewHeight);
          }
          else
          {
             // check the bottom border
-            if ((sn_PosY + this->msn_Height) > this->mc_ParentWidgetSize.height())
+            if ((s32_PosVertical + this->ms32_Height) > this->mc_ParentWidgetSize.height())
             {
-               sn_PosY = this->mc_ParentWidgetSize.height() - this->msn_Height;
+               s32_PosVertical = this->mc_ParentWidgetSize.height() - this->ms32_Height;
             }
 
-            this->setGeometry(this->x(), sn_PosY, this->width(), this->msn_Height);
+            this->setGeometry(this->x(), s32_PosVertical, this->width(), this->ms32_Height);
          }
       }
       else
@@ -396,13 +395,13 @@ void C_OgeWiHover::m_UpdateParentSize(void)
    {
       this->mc_ParentWidgetSize = this->mpc_ContainerWidget->size();
       this->mc_ParentWidgetSize =
-         QSize(this->mc_ParentWidgetSize.width() + msn_SHADOW_WIDTH,
-               this->mc_ParentWidgetSize.height() + msn_SHADOW_WIDTH);
+         QSize(this->mc_ParentWidgetSize.width() + ms32_SHADOW_WIDTH,
+               this->mc_ParentWidgetSize.height() + ms32_SHADOW_WIDTH);
       this->mc_ParentWidgetTopLeft = QPoint(0, 0);
 
-      this->msn_OffsetX = msn_SHADOW_WIDTH;
-      this->msn_OffsetY = msn_TOP_BORDER_AREA;
-      this->msn_OffsetXRight = 0;
+      this->ms32_OffsetHorizontal = ms32_SHADOW_WIDTH;
+      this->ms32_OffsetVertical = ms32_TOP_BORDER_AREA;
+      this->ms32_OffsetHorizontalRight = 0;
    }
    else
    {
@@ -412,26 +411,26 @@ void C_OgeWiHover::m_UpdateParentSize(void)
          this->mc_ParentWidgetSize = pc_Desktop->size();
          this->mc_ParentWidgetTopLeft = pc_Desktop->geometry().topLeft();
       }
-      this->msn_OffsetX = msn_SHADOW_WIDTH;
-      this->msn_OffsetY = msn_TOP_BORDER_AREA + msn_SHADOW_WIDTH;
-      this->msn_OffsetXRight = msn_SHADOW_WIDTH;
+      this->ms32_OffsetHorizontal = ms32_SHADOW_WIDTH;
+      this->ms32_OffsetVertical = ms32_TOP_BORDER_AREA + ms32_SHADOW_WIDTH;
+      this->ms32_OffsetHorizontalRight = ms32_SHADOW_WIDTH;
    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_OgeWiHover::mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size, const bool oq_Maximized)
+uint32_t C_OgeWiHover::mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_Size, const bool oq_Maximized)
 {
-   uint32 u32_ResizeMode;
+   uint32_t u32_ResizeMode;
 
    // check the different border areas for the different resize modes
-   if (orc_Pos.x() < msn_SCROLL_AREA_SIZE)
+   if (orc_Pos.x() < ms32_SCROLL_AREA_SIZE)
    {
-      if ((orc_Pos.y() < msn_SCROLL_AREA_SIZE) &&
+      if ((orc_Pos.y() < ms32_SCROLL_AREA_SIZE) &&
           (oq_Maximized == true))
       {
          u32_ResizeMode = mu32_RESIZE_ALL_TOPLEFT;
       }
-      else if ((orc_Pos.y() > (orc_Size.height() - msn_SCROLL_AREA_SIZE)) &&
+      else if ((orc_Pos.y() > (orc_Size.height() - ms32_SCROLL_AREA_SIZE)) &&
                (oq_Maximized == true))
       {
          u32_ResizeMode = mu32_RESIZE_ALL_BOTTOMLEFT;
@@ -441,14 +440,14 @@ uint32 C_OgeWiHover::mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_
          u32_ResizeMode = mu32_RESIZE_HOR_LEFT;
       }
    }
-   else if (orc_Pos.x() > (orc_Size.width() - msn_SCROLL_AREA_SIZE))
+   else if (orc_Pos.x() > (orc_Size.width() - ms32_SCROLL_AREA_SIZE))
    {
-      if ((orc_Pos.y() < msn_SCROLL_AREA_SIZE) &&
+      if ((orc_Pos.y() < ms32_SCROLL_AREA_SIZE) &&
           (oq_Maximized == true))
       {
          u32_ResizeMode = mu32_RESIZE_ALL_TOPRIGHT;
       }
-      else if ((orc_Pos.y() > (orc_Size.height() - msn_SCROLL_AREA_SIZE)) &&
+      else if ((orc_Pos.y() > (orc_Size.height() - ms32_SCROLL_AREA_SIZE)) &&
                (oq_Maximized == true))
       {
          u32_ResizeMode = mu32_RESIZE_ALL_BOTTOMRIGHT;
@@ -458,12 +457,12 @@ uint32 C_OgeWiHover::mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_
          u32_ResizeMode = mu32_RESIZE_HOR;
       }
    }
-   else if ((orc_Pos.y() < msn_SCROLL_AREA_SIZE) &&
+   else if ((orc_Pos.y() < ms32_SCROLL_AREA_SIZE) &&
             (oq_Maximized == true))
    {
       u32_ResizeMode = mu32_RESIZE_VER_TOP;
    }
-   else if ((orc_Pos.y() > (orc_Size.height() - msn_SCROLL_AREA_SIZE)) &&
+   else if ((orc_Pos.y() > (orc_Size.height() - ms32_SCROLL_AREA_SIZE)) &&
             (oq_Maximized == true))
    {
       u32_ResizeMode = mu32_RESIZE_VER;
@@ -478,31 +477,31 @@ uint32 C_OgeWiHover::mh_GetResizeMode(const QPoint & orc_Pos, const QSize & orc_
 
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Range, const QPoint & orc_TopLeft,
-                                         const sintn osn_OffsetX, const sintn osn_OffsetY)
+                                         const int32_t os32_OffsetHorizontal, const int32_t os32_OffsetVertical)
 {
-   sintn sn_Temp = orc_TopLeft.x() - osn_OffsetX;
+   int32_t s32_Temp = orc_TopLeft.x() - os32_OffsetHorizontal;
 
-   if (orc_Pos.x() < sn_Temp)
+   if (orc_Pos.x() < s32_Temp)
    {
-      orc_Pos.setX(sn_Temp);
+      orc_Pos.setX(s32_Temp);
    }
 
-   sn_Temp = orc_TopLeft.y() - (osn_OffsetY);
-   if (orc_Pos.y() < sn_Temp)
+   s32_Temp = orc_TopLeft.y() - (os32_OffsetVertical);
+   if (orc_Pos.y() < s32_Temp)
    {
-      orc_Pos.setY(sn_Temp);
+      orc_Pos.setY(s32_Temp);
    }
 
-   sn_Temp = orc_Range.width() + orc_TopLeft.x();
-   if (orc_Pos.x() > sn_Temp)
+   s32_Temp = orc_Range.width() + orc_TopLeft.x();
+   if (orc_Pos.x() > s32_Temp)
    {
-      orc_Pos.setX(sn_Temp);
+      orc_Pos.setX(s32_Temp);
    }
 
-   sn_Temp = orc_Range.height() + orc_TopLeft.y();
-   if (orc_Pos.y() > sn_Temp)
+   s32_Temp = orc_Range.height() + orc_TopLeft.y();
+   if (orc_Pos.y() > s32_Temp)
    {
-      orc_Pos.setY(sn_Temp);
+      orc_Pos.setY(s32_Temp);
    }
 }
 
@@ -514,7 +513,7 @@ void C_OgeWiHover::mh_AdaptMouseRangePos(QPoint & orc_Pos, const QSize & orc_Ran
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeWiHover::m_HandleBasicCursorState(const QPoint & orc_Pos)
 {
-   const uint32 u32_ResizeMode = mh_GetResizeMode(orc_Pos, this->size(), this->mq_Maximized);
+   const uint32_t u32_ResizeMode = mh_GetResizeMode(orc_Pos, this->size(), this->mq_Maximized);
 
    // adapt cursor
    switch (u32_ResizeMode)
@@ -564,7 +563,7 @@ void C_OgeWiHover::mousePressEvent(QMouseEvent * const opc_Event)
    m_UpdateParentSize();
 
    C_OgeWiHover::mh_AdaptMouseRangePos(this->mc_OldPosition, this->mc_ParentWidgetSize, this->mc_ParentWidgetTopLeft,
-                                       this->msn_OffsetX, this->msn_OffsetY);
+                                       this->ms32_OffsetHorizontal, this->ms32_OffsetVertical);
 
    // check what the intention of the mouse click was
    if (opc_Event->button() == Qt::LeftButton)
@@ -574,7 +573,7 @@ void C_OgeWiHover::mousePressEvent(QMouseEvent * const opc_Event)
       if (this->mu32_ResizeMode == mu32_RESIZE_NONE)
       {
          // moving only if the top of the hover widget was clicked
-         if (opc_Event->pos().y() < msn_MINIMIZED_HEIGHT)
+         if (opc_Event->pos().y() < ms32_MINIMIZED_HEIGHT)
          {
             this->mu32_MouseMode = mu32_MOUSE_MODE_MOVE;
          }
@@ -654,45 +653,45 @@ void C_OgeWiHover::m_MoveWidget(const QMouseEvent * const opc_Event)
    QPoint c_MousePos = this->mapToParent(opc_Event->pos());
    QPoint c_Delta;
    QPoint c_NewPoint;
-   sintn sn_TempMin;
-   sintn sn_TempMax;
+   int32_t s32_TempMin;
+   int32_t s32_TempMax;
 
    m_UpdateParentSize();
 
    C_OgeWiHover::mh_AdaptMouseRangePos(c_MousePos, this->mc_ParentWidgetSize, this->mc_ParentWidgetTopLeft,
-                                       this->msn_OffsetX, this->msn_OffsetY);
+                                       this->ms32_OffsetHorizontal, this->ms32_OffsetVertical);
    c_Delta = c_MousePos - this->mc_OldPosition;
    c_NewPoint = this->pos() + c_Delta;
 
    // check the borders
-   sn_TempMin = this->mc_ParentWidgetTopLeft.x() - this->msn_OffsetX;
-   if (c_NewPoint.x() < sn_TempMin)
+   s32_TempMin = this->mc_ParentWidgetTopLeft.x() - this->ms32_OffsetHorizontal;
+   if (c_NewPoint.x() < s32_TempMin)
    {
-      c_NewPoint.setX(sn_TempMin);
+      c_NewPoint.setX(s32_TempMin);
    }
    else
    {
-      sn_TempMax =
+      s32_TempMax =
          ((this->mc_ParentWidgetTopLeft.x() + this->mc_ParentWidgetSize.width()) - this->width()) +
-         this->msn_OffsetXRight;
-      if (c_NewPoint.x() > sn_TempMax)
+         this->ms32_OffsetHorizontalRight;
+      if (c_NewPoint.x() > s32_TempMax)
       {
-         c_NewPoint.setX(sn_TempMax);
+         c_NewPoint.setX(s32_TempMax);
       }
    }
 
-   sn_TempMin = this->mc_ParentWidgetTopLeft.y() - this->msn_OffsetY;
-   if (c_NewPoint.y() < sn_TempMin)
+   s32_TempMin = this->mc_ParentWidgetTopLeft.y() - this->ms32_OffsetVertical;
+   if (c_NewPoint.y() < s32_TempMin)
    {
-      c_NewPoint.setY(sn_TempMin);
+      c_NewPoint.setY(s32_TempMin);
    }
    else
    {
-      sn_TempMax = ((this->mc_ParentWidgetTopLeft.y() + this->mc_ParentWidgetSize.height()) - this->height()) +
-                   this->msn_OffsetY;
-      if (c_NewPoint.y() > sn_TempMax)
+      s32_TempMax = ((this->mc_ParentWidgetTopLeft.y() + this->mc_ParentWidgetSize.height()) - this->height()) +
+                    this->ms32_OffsetVertical;
+      if (c_NewPoint.y() > s32_TempMax)
       {
-         c_NewPoint.setY(sn_TempMax);
+         c_NewPoint.setY(s32_TempMax);
       }
    }
 
@@ -712,12 +711,12 @@ void C_OgeWiHover::m_ResizeWidget(const QMouseEvent * const opc_Event)
    QPoint c_Delta;
    QSize c_Size = this->size();
    QPoint c_Pos = this->pos();
-   sintn sn_Temp;
+   int32_t s32_Temp;
 
    m_UpdateParentSize();
 
    C_OgeWiHover::mh_AdaptMouseRangePos(c_MousePos, this->mc_ParentWidgetSize, this->mc_ParentWidgetTopLeft,
-                                       this->msn_OffsetX, this->msn_OffsetY);
+                                       this->ms32_OffsetHorizontal, this->ms32_OffsetVertical);
    c_Delta = c_MousePos - this->mc_OldPosition;
 
    if (this->mq_Maximized == false)
@@ -780,23 +779,23 @@ void C_OgeWiHover::m_ResizeWidget(const QMouseEvent * const opc_Event)
    }
 
    // check new geometry
-   sn_Temp = this->mc_ParentWidgetTopLeft.x() - this->msn_OffsetX;
-   if (c_Pos.x() < sn_Temp)
+   s32_Temp = this->mc_ParentWidgetTopLeft.x() - this->ms32_OffsetHorizontal;
+   if (c_Pos.x() < s32_Temp)
    {
-      c_Pos.setX(sn_Temp);
+      c_Pos.setX(s32_Temp);
       c_Size.setWidth(this->width());
 
       // don't change the 'next old position'
-      c_MousePos.setX(sn_Temp);
+      c_MousePos.setX(s32_Temp);
    }
-   sn_Temp = this->mc_ParentWidgetTopLeft.y() - this->msn_OffsetY;
-   if (c_Pos.y() < sn_Temp)
+   s32_Temp = this->mc_ParentWidgetTopLeft.y() - this->ms32_OffsetVertical;
+   if (c_Pos.y() < s32_Temp)
    {
-      c_Pos.setY(sn_Temp);
+      c_Pos.setY(s32_Temp);
       c_Size.setHeight(this->height());
 
       // don't change the 'next old position'
-      c_MousePos.setY(sn_Temp);
+      c_MousePos.setY(s32_Temp);
    }
    if ((((c_Size.width() + c_Pos.x()) + this->mc_ParentWidgetTopLeft.x()) > this->mc_ParentWidgetSize.width()) ||
        (c_Size.width() <= this->minimumWidth()))

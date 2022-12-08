@@ -10,41 +10,40 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QIcon>
 #include <QImageReader>
 #include <QFileDialog>
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_GtGetText.h"
-#include "C_SdNdeCoAddDeviceDialog.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdNdeCoAddDeviceDialog.hpp"
 #include "ui_C_SdNdeCoAddDeviceDialog.h"
-#include "C_PuiSdHandler.h"
-#include "C_OSCNode.h"
-#include "C_SdUtil.h"
-#include "C_PuiUtil.h"
-#include "C_PuiProject.h"
-#include "C_OgeWiUtil.h"
-#include "C_UsHandler.h"
-#include "C_OSCCanOpenObjectDictionary.h"
-#include "C_OSCCanOpenManagerInfo.h"
-#include "C_OSCImportEdsDcf.h"
-#include "C_OgeWiCustomMessage.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_OscNode.hpp"
+#include "C_SdUtil.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_PuiProject.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_UsHandler.hpp"
+#include "C_OscCanOpenObjectDictionary.hpp"
+#include "C_OscCanOpenManagerInfo.hpp"
+#include "C_OscImportEdsDcf.hpp"
+#include "C_OgeWiCustomMessage.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::scl;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const uint16 mu16_NODE_IMG_WIDTH = 300;
-const QString C_SdNdeCoAddDeviceDialog::mhc_SUFFIX = "eds";
+const uint16_t mu16_NODE_IMG_WIDTH = 300;
+const QStringList C_SdNdeCoAddDeviceDialog::mhc_SUFFIX = {"eds", "dcf"};
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -61,13 +60,13 @@ const QString C_SdNdeCoAddDeviceDialog::mhc_SUFFIX = "eds";
 
    Set up GUI with all elements.
 
-   \param[in,out] orc_Parent  Reference to parent
-   \param[in] ou32_NodeIndex  Index of current node
-   \param[in] ou8_InterfaceId Interface id of current node
+   \param[in,out]  orc_Parent       Reference to parent
+   \param[in]      ou32_NodeIndex   Index of current node
+   \param[in]      ou8_InterfaceId  Interface id of current node
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdNdeCoAddDeviceDialog::C_SdNdeCoAddDeviceDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                   const uint32 ou32_NodeIndex, const uint8 ou8_InterfaceId) :
+C_SdNdeCoAddDeviceDialog::C_SdNdeCoAddDeviceDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                   const uint32_t ou32_NodeIndex, const uint8_t ou8_InterfaceId) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeCoAddDeviceDialog),
    mrc_ParentDialog(orc_Parent),
@@ -78,7 +77,7 @@ C_SdNdeCoAddDeviceDialog::C_SdNdeCoAddDeviceDialog(stw_opensyde_gui_elements::C_
    this->mpc_Ui->setupUi(this);
 
    //lint -e{1938}  static const is guaranteed preinitialized before main
-   this->mpc_Ui->pc_LineEditEDSPath->SetDragAndDropActiveForFile(mhc_SUFFIX);
+   this->mpc_Ui->pc_LineEditEDSPath->SetDragAndDropActiveForFile(true, &C_SdNdeCoAddDeviceDialog::mhc_SUFFIX);
 
    InitStaticNames();
 
@@ -94,8 +93,8 @@ C_SdNdeCoAddDeviceDialog::C_SdNdeCoAddDeviceDialog(stw_opensyde_gui_elements::C_
 
    this->mpc_Ui->pc_LabelFileName->setVisible(false);
 
-   const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNode(this->mu32_NodeIndex);
-   const C_OSCNodeComInterfaceSettings c_ComInterface = *(pc_Node->c_Properties.GetComInterface(C_OSCSystemBus::eCAN,
+   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNode(this->mu32_NodeIndex);
+   const C_OscNodeComInterfaceSettings c_ComInterface = *(pc_Node->c_Properties.GetComInterface(C_OscSystemBus::eCAN,
                                                                                                 this->mu8_InterfaceId));
    if (c_ComInterface.GetBusConnected() == true)
    {
@@ -111,9 +110,9 @@ C_SdNdeCoAddDeviceDialog::C_SdNdeCoAddDeviceDialog(stw_opensyde_gui_elements::C_
    connect(this->mpc_Ui->pc_PushButtonOk, &QPushButton::clicked, this, &C_SdNdeCoAddDeviceDialog::m_OkClicked);
    connect(this->mpc_Ui->pc_PushButtonCancel, &QPushButton::clicked, this, &C_SdNdeCoAddDeviceDialog::m_CancelClicked);
    connect(this->mpc_Ui->pc_PushButtonEDSPath, &QPushButton::clicked, this,
-           &C_SdNdeCoAddDeviceDialog::m_EDSPathButtonClicked);
+           &C_SdNdeCoAddDeviceDialog::m_EdsPathButtonClicked);
    connect(this->mpc_Ui->pc_LineEditEDSPath, &C_OgeLeFilePath::editingFinished,
-           this, &C_SdNdeCoAddDeviceDialog::m_OnLoadEDS);
+           this, &C_SdNdeCoAddDeviceDialog::m_OnLoadEds);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -152,16 +151,16 @@ void C_SdNdeCoAddDeviceDialog::InitStaticNames(void) const
    C_RANGE     something went wrong
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdNdeCoAddDeviceDialog::GetNodeSelection(uint32 & oru32_NodeIndex, uint32 & oru32_InterfaceIndex,
-                                                  QString & orc_EdsPath) const
+int32_t C_SdNdeCoAddDeviceDialog::GetNodeSelection(uint32_t & oru32_NodeIndex, uint32_t & oru32_InterfaceIndex,
+                                                   QString & orc_EdsPath) const
 {
-   sint32 s32_Return = C_RANGE;
-   const sint32 s32_CurrentIndex = this->mpc_Ui->pc_CbxNode->currentIndex();
+   int32_t s32_Return = C_RANGE;
+   const int32_t s32_CurrentIndex = this->mpc_Ui->pc_CbxNode->currentIndex();
 
    if ((s32_CurrentIndex >= 0) && (this->mc_InterfaceIndexes.size() == this->mc_NodeIndexes.size()) &&
        (this->mpc_Ui->pc_CbxNode->currentText().compare(C_GtGetText::h_GetText("<no Nodes available>")) != 0))
    {
-      if (s32_CurrentIndex < static_cast<sint32>(this->mc_NodeIndexes.size()))
+      if (s32_CurrentIndex < static_cast<int32_t>(this->mc_NodeIndexes.size()))
       {
          oru32_NodeIndex = this->mc_NodeIndexes[s32_CurrentIndex];
          oru32_InterfaceIndex = this->mc_InterfaceIndexes[s32_CurrentIndex];
@@ -180,9 +179,41 @@ sint32 C_SdNdeCoAddDeviceDialog::GetNodeSelection(uint32 & oru32_NodeIndex, uint
    Current EDS file path
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SCLString C_SdNdeCoAddDeviceDialog::GetEDSFile(void)
+C_SclString C_SdNdeCoAddDeviceDialog::GetEdsFile(void)
 {
    return C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditEDSPath->GetPath()).toStdString().c_str();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Ask for CANopen path
+
+   \param[in,out]  opc_BaseWidget   Base widget
+
+   \return
+   CANopen path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdNdeCoAddDeviceDialog::h_AskForCanOpenPath(QWidget * const opc_BaseWidget)
+{
+   //Load user settings value
+   QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownCanOpenEdsPath();
+   QString c_FilePath = "";
+   QFileInfo c_FileInfo;
+   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("EDS/DCF file")) + " (*.eds *.dcf)";
+
+   //Replace default path if necessary
+   if (c_Folder.compare("") == 0)
+   {
+      c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
+   }
+
+   c_FilePath =
+      C_OgeWiUtil::h_GetOpenFileName(opc_BaseWidget, C_GtGetText::h_GetText("Select EDS File"),
+                                     c_Folder, c_FilterName, C_SdNdeCoAddDeviceDialog::mhc_SUFFIX.at(0));
+
+   c_FileInfo.setFile(c_FilePath);
+   C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownCanOpenEdsPath(c_FileInfo.absoluteDir().absolutePath());
+   return c_FilePath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -190,7 +221,7 @@ C_SCLString C_SdNdeCoAddDeviceDialog::GetEDSFile(void)
 
    Here: Handle specific enter key cases
 
-   \param[in,out] opc_KeyEvent Event identification and information
+   \param[in,out]  opc_KeyEvent  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoAddDeviceDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
@@ -198,8 +229,8 @@ void C_SdNdeCoAddDeviceDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -240,30 +271,13 @@ void C_SdNdeCoAddDeviceDialog::m_CancelClicked(void)
 /*! \brief   Handle EDS path button click
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoAddDeviceDialog::m_EDSPathButtonClicked(void)
+void C_SdNdeCoAddDeviceDialog::m_EdsPathButtonClicked(void)
 {
-   //Load user settings value
-   QString c_Folder = C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownCANopenEDSPath();
-   QString c_FilePath = "";
-   QFileInfo c_FileInfo;
-   const QString c_FilterName = static_cast<QString>(C_GtGetText::h_GetText("EDS file")) + " (*." + mhc_SUFFIX + ")";
-
-   //Replace default path if necessary
-   if (c_Folder.compare("") == 0)
-   {
-      c_Folder = C_PuiProject::h_GetInstance()->GetFolderPath();
-   }
-
-   c_FilePath =
-      C_OgeWiUtil::h_GetOpenFileName(this, C_GtGetText::h_GetText("Select EDS File"),
-                                     c_Folder, c_FilterName, mhc_SUFFIX);
-
-   c_FileInfo.setFile(c_FilePath);
-   C_UsHandler::h_GetInstance()->SetProjSdTopologyLastKnownCANopenEDSPath(c_FileInfo.absoluteDir().absolutePath());
+   const QString c_FilePath = C_SdNdeCoAddDeviceDialog::h_AskForCanOpenPath(this);
 
    if (c_FilePath != "")
    {
-      this->m_SetEDSPath(c_FilePath);
+      this->m_SetEdsPath(c_FilePath);
    }
 }
 
@@ -276,10 +290,10 @@ void C_SdNdeCoAddDeviceDialog::m_EDSPathButtonClicked(void)
    \param[in] orc_New New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoAddDeviceDialog::m_SetEDSPath(const QString & orc_New)
+void C_SdNdeCoAddDeviceDialog::m_SetEdsPath(const QString & orc_New)
 {
    this->mpc_Ui->pc_LineEditEDSPath->SetPath(orc_New, C_PuiProject::h_GetInstance()->GetFolderPath());
-   this->m_OnLoadEDS();
+   this->m_OnLoadEds();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -325,41 +339,40 @@ void C_SdNdeCoAddDeviceDialog::m_LoadPicture(const QFileInfo oc_FileInfo)
    \param[in] oc_NodeName     Name of the current node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoAddDeviceDialog::m_FillUpComboBox(const uint32 ou32_BusIndex, const QString oc_NodeName)
+void C_SdNdeCoAddDeviceDialog::m_FillUpComboBox(const uint32_t ou32_BusIndex, const QString oc_NodeName)
 {
-   uint8 u8_InterfaceId;
-
    std::vector<QString> c_NotExistNames;
-   std::vector<stw_types::uint32> c_NotExistNodeIndexes;
-   std::vector<stw_types::uint32> c_NotExistInterfaceIndexes;
+   std::vector<uint32_t> c_NotExistNodeIndexes;
+   std::vector<uint32_t> c_NotExistInterfaceIndexes;
    // get node and interface names
-   C_PuiSdHandler::h_GetInstance()->GetOSCSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
+   C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(ou32_BusIndex,
                                                                                       this->mc_NodeIndexes,
                                                                                       this->mc_InterfaceIndexes);
-   const C_OSCCanOpenManagerInfo * const pc_CANopenManagerInfo =
+   const C_OscCanOpenManagerInfo * const pc_CanOpenManagerInfo =
       C_PuiSdHandler::h_GetInstance()->GetCanOpenManager(this->mu32_NodeIndex, this->mu8_InterfaceId);
-   const std::map<C_OSCCanInterfaceId,
-                  C_OSCCanOpenManagerDeviceInfo> & rc_Devices = pc_CANopenManagerInfo->c_CanOpenDevices;
+   const std::map<C_OscCanInterfaceId,
+                  C_OscCanOpenManagerDeviceInfo> & rc_Devices = pc_CanOpenManagerInfo->c_CanOpenDevices;
 
    tgl_assert(this->mc_NodeIndexes.size() == this->mc_InterfaceIndexes.size());
 
    if (this->mc_NodeIndexes.size() == this->mc_InterfaceIndexes.size())
    {
-      for (uint32 u32_Counter = 0; u32_Counter < this->mc_NodeIndexes.size(); u32_Counter++)
+      for (uint32_t u32_Counter = 0; u32_Counter < this->mc_NodeIndexes.size(); u32_Counter++)
       {
+         uint8_t u8_InterfaceId;
          tgl_assert(C_PuiSdHandler::h_GetInstance()->TranslateCanInterfaceIndexToId(this->mc_NodeIndexes[u32_Counter],
                                                                                     this->mc_InterfaceIndexes[
                                                                                        u32_Counter],
                                                                                     u8_InterfaceId) == C_NO_ERR);
-         const uint32 u32_CurrentNodeIndex = this->mc_NodeIndexes[u32_Counter];
-         const C_OSCCanInterfaceId c_CanInterfaceId(this->mc_NodeIndexes[u32_Counter], u8_InterfaceId);
-         const std::map<C_OSCCanInterfaceId,
-                        C_OSCCanOpenManagerDeviceInfo>::const_iterator c_ItDevice = rc_Devices.find(c_CanInterfaceId);
+         const uint32_t u32_CurrentNodeIndex = this->mc_NodeIndexes[u32_Counter];
+         const C_OscCanInterfaceId c_CanInterfaceId(this->mc_NodeIndexes[u32_Counter], u8_InterfaceId);
+         const std::map<C_OscCanInterfaceId,
+                        C_OscCanOpenManagerDeviceInfo>::const_iterator c_ItDevice = rc_Devices.find(c_CanInterfaceId);
          if ((c_ItDevice == rc_Devices.end()) && (u32_CurrentNodeIndex != this->mu32_NodeIndex))
          {
-            const bool q_NodeHasCANOpen = this->m_CheckIfNodeHasCANopenManager(u32_CurrentNodeIndex);
+            const bool q_NodeHasCanOpen = this->m_CheckIfNodeHasCanOpenManager(u32_CurrentNodeIndex);
 
-            if (q_NodeHasCANOpen == false)
+            if (q_NodeHasCanOpen == false)
             {
                c_NotExistNodeIndexes.push_back(this->mc_NodeIndexes[u32_Counter]);
                c_NotExistInterfaceIndexes.push_back(this->mc_InterfaceIndexes[u32_Counter]);
@@ -383,7 +396,7 @@ void C_SdNdeCoAddDeviceDialog::m_FillUpComboBox(const uint32 ou32_BusIndex, cons
    }
 
    this->mc_NodeIndexes = c_NotExistNodeIndexes;
-   tgl_assert((static_cast<sintn>(this->mc_NodeIndexes.size())) == this->mpc_Ui->pc_CbxNode->count());
+   tgl_assert((static_cast<int32_t>(this->mc_NodeIndexes.size())) == this->mpc_Ui->pc_CbxNode->count());
    this->mc_InterfaceIndexes = c_NotExistInterfaceIndexes;
 
    if (this->mpc_Ui->pc_CbxNode->count() == 0)
@@ -398,23 +411,23 @@ void C_SdNdeCoAddDeviceDialog::m_FillUpComboBox(const uint32 ou32_BusIndex, cons
    \param[in] ou32_NodeIndex     node index of device to check
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeCoAddDeviceDialog::m_CheckIfNodeHasCANopenManager(const uint32 ou32_NodeIndex)
+bool C_SdNdeCoAddDeviceDialog::m_CheckIfNodeHasCanOpenManager(const uint32_t ou32_NodeIndex)
 {
-   bool q_NodeHasCANOpen = false;
-   const C_OSCNode * const pc_CurrentNode = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(ou32_NodeIndex);
+   bool q_NodeHasCanOpen = false;
+   const C_OscNode * const pc_CurrentNode = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
 
    // check if node has already a CANopen protocol by its comm interfaces
-   std::vector<C_OSCNodeComInterfaceSettings>::const_iterator c_ComInterfacesIter;
+   std::vector<C_OscNodeComInterfaceSettings>::const_iterator c_ComInterfacesIter;
    for (c_ComInterfacesIter = pc_CurrentNode->c_Properties.c_ComInterfaces.begin();
         c_ComInterfacesIter != pc_CurrentNode->c_Properties.c_ComInterfaces.end();
         ++c_ComInterfacesIter)
    {
       // only if we have a connected bus, the device can be part of another CANopen Manager
       if ((c_ComInterfacesIter->GetBusConnected() == true) &&
-          (c_ComInterfacesIter->e_InterfaceType == C_OSCSystemBus::E_Type::eCAN))
+          (c_ComInterfacesIter->e_InterfaceType == C_OscSystemBus::E_Type::eCAN))
       {
          // let us get the CANopen Manager of found bus
-         const C_OSCNode * const pc_ManagerNodeToCheck =
+         const C_OscNode * const pc_ManagerNodeToCheck =
             C_PuiSdHandler::h_GetInstance()->GetCanOpenManagerNodeOnBus(
                c_ComInterfacesIter->u32_BusIndex);
          if (pc_ManagerNodeToCheck != NULL)
@@ -422,21 +435,21 @@ bool C_SdNdeCoAddDeviceDialog::m_CheckIfNodeHasCANopenManager(const uint32 ou32_
             // Ok, we found a manager on this bus, let's check if the manager has our current device.
             // An additional check if current device is a manager device is not needed here because of
             // u32_CurrentNodeIndex != this->mu32_NodeIndex check earlier.
-            std::map<stw_types::uint8, C_OSCCanOpenManagerInfo>::const_iterator c_CanOpenManagersIter;
+            std::map<uint8_t, C_OscCanOpenManagerInfo>::const_iterator c_CanOpenManagersIter;
             for (c_CanOpenManagersIter = pc_ManagerNodeToCheck->c_CanOpenManagers.begin();
                  (c_CanOpenManagersIter != pc_ManagerNodeToCheck->c_CanOpenManagers.end());
                  ++c_CanOpenManagersIter)
             {
-               std::map<C_OSCCanInterfaceId,
-                        C_OSCCanOpenManagerDeviceInfo>::const_iterator c_CanOpenManagerDeviceInfoIter;
+               std::map<C_OscCanInterfaceId,
+                        C_OscCanOpenManagerDeviceInfo>::const_iterator c_CanOpenManagerDeviceInfoIter;
                for (c_CanOpenManagerDeviceInfoIter = c_CanOpenManagersIter->second.c_CanOpenDevices.begin();
                     (c_CanOpenManagerDeviceInfoIter != c_CanOpenManagersIter->second.c_CanOpenDevices.end()) &&
-                    (q_NodeHasCANOpen == false);
+                    (q_NodeHasCanOpen == false);
                     ++c_CanOpenManagerDeviceInfoIter)
                {
                   if (c_CanOpenManagerDeviceInfoIter->first.u32_NodeIndex == ou32_NodeIndex)
                   {
-                     q_NodeHasCANOpen = true;
+                     q_NodeHasCanOpen = true;
                      break;
                   }
                }
@@ -445,24 +458,24 @@ bool C_SdNdeCoAddDeviceDialog::m_CheckIfNodeHasCANopenManager(const uint32 ou32_
       }
    }
 
-   return q_NodeHasCANOpen;
+   return q_NodeHasCanOpen;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle loading EDS
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeCoAddDeviceDialog::m_OnLoadEDS(void)
+void C_SdNdeCoAddDeviceDialog::m_OnLoadEds(void)
 {
    bool q_Invalid = false;
-   C_OSCCanOpenObjectDictionary c_CanOpenObjDictionary;
-   const C_SCLString c_File =
+   C_OscCanOpenObjectDictionary c_CanOpenObjDictionary;
+   const C_SclString c_File =
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditEDSPath->GetPath()).toStdString().c_str();
    const QFileInfo c_FileInfo(c_File.AsStdString()->c_str());
 
    if (c_CanOpenObjDictionary.LoadFromFile(c_File) == C_NO_ERR)
    {
-      C_SCLIniFile c_IniFile(c_File);
+      C_SclIniFile c_IniFile(c_File);
 
       if ((c_IniFile.SectionExists("FileInfo") == true) && (c_IniFile.SectionExists("DeviceInfo") == true))
       {
@@ -481,7 +494,8 @@ void C_SdNdeCoAddDeviceDialog::m_OnLoadEDS(void)
       this->mpc_Ui->pc_TedHtmlReport->setPlainText(C_GtGetText::h_GetText("<EDS file description>"));
    }
 
-   if ((QFile::exists(c_File.AsStdString()->c_str()) == true) && (c_FileInfo.suffix().compare(mhc_SUFFIX) == 0) &&
+   if ((QFile::exists(c_File.AsStdString()->c_str()) == true) &&
+       (C_SdNdeCoAddDeviceDialog::mhc_SUFFIX.contains(c_FileInfo.suffix())) &&
        (q_Invalid == false))
    {
       this->mpc_Ui->pc_LabelFileName->setVisible(true);

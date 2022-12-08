@@ -8,30 +8,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QHBoxLayout>
 
-#include "stwerrors.h"
-#include "constants.h"
-#include "C_SyvUtil.h"
-#include "C_OgeWiUtil.h"
-#include "C_PuiSvHandler.h"
-#include "C_SyvDaTearOffWidget.h"
-#include "C_SyvClipBoardHelper.h"
+#include "stwerrors.hpp"
+#include "constants.hpp"
+#include "C_SyvUtil.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_PuiSvHandler.hpp"
+#include "C_SyvDaTearOffWidget.hpp"
+#include "C_SyvClipBoardHelper.hpp"
 #include "ui_C_SyvDaTearOffWidget.h"
 
-#include "C_GtGetText.h"
-#include "C_OgeWiCustomMessage.h"
-#include "C_OgePopUpDialog.h"
-#include "C_SyvDaDashboardTabProperties.h"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiCustomMessage.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SyvDaDashboardTabProperties.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -57,7 +56,7 @@ using namespace stw_opensyde_gui_elements;
    \param[in,out]  opc_Parent       Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const stw_types::uint32 ou32_DataIndex,
+C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DataIndex,
                                            const QString & orc_Name, C_SyvDaDashboardWidget * const opc_Widget,
                                            QWidget * const opc_Parent) :
    QWidget(opc_Parent),
@@ -135,9 +134,9 @@ C_SyvDaTearOffWidget::C_SyvDaTearOffWidget(const uint32 ou32_ViewIndex, const st
    connect(this->mpc_Dashboard, &C_SyvDaDashboardWidget::SigErrorChange, this, &C_SyvDaTearOffWidget::SigErrorChange);
 
    // Connect buttons
-   connect(this->mpc_Ui->pc_PbConfirm, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
+   connect(this->mpc_Ui->pc_PbConfirm, &stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaTearOffWidget::SigConfirmClicked);
-   connect(this->mpc_Ui->pc_PbCancel, &stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
+   connect(this->mpc_Ui->pc_PbCancel, &stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit::clicked,
            this, &C_SyvDaTearOffWidget::SigCancelClicked);
    //Connect tab
    connect(this->mpc_Ui->pc_WidgetTab, &C_OgeWiDashboardTab::SigActiveChanged, this,
@@ -188,7 +187,7 @@ void C_SyvDaTearOffWidget::InitText(void) const
    Index of the dashboard
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SyvDaTearOffWidget::GetIndex(void) const
+uint32_t C_SyvDaTearOffWidget::GetIndex(void) const
 {
    return this->mpc_Dashboard->GetDashboardIndex();
 }
@@ -199,7 +198,7 @@ uint32 C_SyvDaTearOffWidget::GetIndex(void) const
    \param[in]  ou32_Value  New data index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaTearOffWidget::SetDataIndex(const uint32 ou32_Value)
+void C_SyvDaTearOffWidget::SetDataIndex(const uint32_t ou32_Value)
 {
    this->mpc_Dashboard->SetDashboardIndex(ou32_Value);
 }
@@ -314,14 +313,14 @@ void C_SyvDaTearOffWidget::Save(void) const
 /*! \brief   Handle manual user operation finished event
 
    \param[in]  os32_Result    Operation result
-   \param[in]  ou8_NRC        Negative response code, if any
+   \param[in]  ou8_Nrc        Negative response code, if any
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvDaTearOffWidget::HandleManualOperationFinished(const sint32 os32_Result, const uint8 ou8_NRC) const
+void C_SyvDaTearOffWidget::HandleManualOperationFinished(const int32_t os32_Result, const uint8_t ou8_Nrc) const
 {
    if (this->mpc_Dashboard != NULL)
    {
-      this->mpc_Dashboard->HandleManualOperationFinished(os32_Result, ou8_NRC);
+      this->mpc_Dashboard->HandleManualOperationFinished(os32_Result, ou8_Nrc);
    }
 }
 
@@ -391,7 +390,7 @@ void C_SyvDaTearOffWidget::UpdateTransmissionConfiguration(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaTearOffWidget::paintEvent(QPaintEvent * const opc_Event)
 {
-   stw_opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
+   stw::opensyde_gui_logic::C_OgeWiUtil::h_DrawBackground(this);
 
    QWidget::paintEvent(opc_Event);
 }
@@ -430,7 +429,7 @@ void C_SyvDaTearOffWidget::m_OnActiveChange(const C_OgeWiDashboardTab * const op
       Q_UNUSED(opc_Source)
       if (pc_View != NULL)
       {
-         const stw_types::uint32 u32_DataIndex = this->mpc_Dashboard->GetDashboardIndex();
+         const uint32_t u32_DataIndex = this->mpc_Dashboard->GetDashboardIndex();
          if (C_PuiSvHandler::h_GetInstance()->SetDashboardActive(this->mpc_Dashboard->GetViewIndex(), u32_DataIndex,
                                                                  oq_Active) == C_NO_ERR)
          {
@@ -461,7 +460,7 @@ void C_SyvDaTearOffWidget::m_OnCopy(const C_OgeWiDashboardTab * const opc_Source
          const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(this->mpc_Dashboard->GetDashboardIndex());
          if (pc_Dashboard != NULL)
          {
-            QMap<stw_opensyde_core::C_OSCNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
+            QMap<stw::opensyde_core::C_OscNodeDataPoolListElementId, C_PuiSvReadDataConfiguration> c_Rails;
             pc_View->GetRelevantReadRailAssigmentsForDashboard(*pc_Dashboard, c_Rails);
             C_SyvClipBoardHelper::h_StoreDashboardToClipboard(*pc_Dashboard, c_Rails, "Tab");
          }
@@ -479,16 +478,16 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
 {
    if ((this->mpc_Dashboard != NULL) && (opc_Source != NULL))
    {
-      const uint32 u32_DashboardIndex = this->mpc_Dashboard->GetDashboardIndex();
+      const uint32_t u32_DashboardIndex = this->mpc_Dashboard->GetDashboardIndex();
 
       // show popup dialog
       const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
       C_SyvDaDashboardTabProperties * const pc_Dialog =
          new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab", u32_DashboardIndex, mpc_Dashboard->GetViewIndex());
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
-         const uint32 u32_ViewIndex = this->mpc_Dashboard->GetViewIndex();
+         const uint32_t u32_ViewIndex = this->mpc_Dashboard->GetViewIndex();
 
          if ((C_PuiSvHandler::h_GetInstance()->SetDashboardName(
                  u32_ViewIndex, u32_DashboardIndex, pc_Dialog->GetDashboardTabName()) == C_NO_ERR) &&
@@ -523,22 +522,22 @@ void C_SyvDaTearOffWidget::m_CheckError(void) const
       QString c_ErrorTextTooltip;
       C_NagToolTip::E_Type e_ToolTipType;
       QString c_IconPath;
-      sintn sn_ColorID;
+      int32_t s32_ColorId;
       const bool q_ViewSetupError = C_SyvUtil::h_GetViewStatusLabelInfo(
          this->mpc_Dashboard->GetViewIndex(), ms32_SUBMODE_SYSVIEW_DASHBOARD,
          c_ErrorTextHeading, c_ErrorText, c_ErrorTextTooltip, e_ToolTipType,
-         c_IconPath, sn_ColorID);
+         c_IconPath, s32_ColorId);
 
       if (q_ViewSetupError == true)
       {
          this->mpc_Ui->pc_ErrorLabelIcon->SetSvg(c_IconPath);
          this->mpc_Ui->pc_ErrorLabelIcon->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
                                                                 c_ErrorTextTooltip, e_ToolTipType);
-         this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(sn_ColorID);
+         this->mpc_Ui->pc_ErrorLabelTitle->SetForegroundColor(s32_ColorId);
          this->mpc_Ui->pc_ErrorLabelTitle->setText(c_ErrorTextHeading);
          this->mpc_Ui->pc_ErrorLabelTitle->SetToolTipInformation(C_GtGetText::h_GetText("Invalid"),
                                                                  c_ErrorTextTooltip, e_ToolTipType);
-         this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(sn_ColorID);
+         this->mpc_Ui->pc_ErrorLabel->SetForegroundColor(s32_ColorId);
          this->mpc_Ui->pc_ErrorLabel->SetCompleteText(c_ErrorText, c_ErrorTextTooltip, e_ToolTipType);
          this->mpc_Ui->pc_GroupBoxErrorContent->setVisible(true);
       }

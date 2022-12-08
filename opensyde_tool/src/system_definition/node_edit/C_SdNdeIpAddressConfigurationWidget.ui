@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral_3">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxGeneral_3">
      <property name="title">
       <string/>
      </property>
@@ -57,7 +57,7 @@
              <number>6</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelDataElement">
+             <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelDataElement">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -105,7 +105,7 @@
              <number>1</number>
             </property>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_4">
+             <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="pc_FramSperator1_4">
               <property name="minimumSize">
                <size>
                 <width>0</width>
@@ -139,14 +139,14 @@
            <number>20</number>
           </property>
           <item row="1" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSubNetMask">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSubNetMask">
             <property name="text">
              <string>SubNetMask</string>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelIpAddress">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelIpAddress">
             <property name="text">
              <string>IpAddress</string>
             </property>
@@ -166,14 +166,14 @@
            </spacer>
           </item>
           <item row="2" column="0">
-           <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDefaultGateway">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelDefaultGateway">
             <property name="text">
              <string>GateWay</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="stw_opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetIpAddress" native="true">
+           <widget class="stw::opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetIpAddress" native="true">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -189,7 +189,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="stw_opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetSubNetMask" native="true">
+           <widget class="stw::opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetSubNetMask" native="true">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -205,7 +205,7 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="stw_opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetDefaultGateway" native="true">
+           <widget class="stw::opensyde_gui::C_SdNdeLeIpAddressWidget" name="pc_WidgetDefaultGateway" native="true">
             <property name="minimumSize">
              <size>
               <width>150</width>
@@ -272,7 +272,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
+      <widget class="stw::opensyde_gui_elements::C_OgePubCancel" name="pc_BushButtonCancel">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -313,7 +313,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_BushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -359,41 +359,41 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeLeIpAddressWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeLeIpAddressWidget</class>
    <extends>QWidget</extends>
-   <header>C_SdNdeLeIpAddressWidget.h</header>
+   <header>C_SdNdeLeIpAddressWidget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

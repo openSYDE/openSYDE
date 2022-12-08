@@ -10,29 +10,28 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <sstream>
 #include <iomanip>
 
 #include <QBitArray>
 
-#include "TGLTime.h"
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_GtGetText.h"
-#include "C_CamMetUtil.h"
-#include "cam_constants.h"
-#include "CCMONProtocol.h"
-#include "C_CamMetTreeModel.h"
+#include "TglTime.hpp"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_GtGetText.hpp"
+#include "C_CamMetUtil.hpp"
+#include "cam_constants.hpp"
+#include "C_CanMonProtocol.hpp"
+#include "C_CamMetTreeModel.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 const QString C_CamMetTreeModel::mhc_ICON_MESSAGE = ":images/IconMessageInactive.svg";
@@ -74,30 +73,30 @@ C_CamMetTreeModel::C_CamMetTreeModel(QObject * const opc_Parent) :
    mu32_GrayOutPauseTimeStamp(0U),
    mpc_RootItemContinuous(new C_TblTreSimpleItem()),
    mpc_RootItemStatic(new C_TblTreSimpleItem()),
-   msn_LastSearchedMessageRow(-1),
-   msn_LastSearchedSignalRow(-1),
-   msn_LastSearchedSignalRowMultiplexed(-1),
+   ms32_LastSearchedMessageRow(-1),
+   ms32_LastSearchedSignalRow(-1),
+   ms32_LastSearchedSignalRowMultiplexed(-1),
    mq_IsLastSearchedSignalLastOfMessage(true)
 {
-   sintn sn_Counter;
+   int32_t s32_Counter;
 
    this->m_AdaptTraceBufferSize();
 
    // Prepare the transparency colors for the gray out font
-   this->mc_FontTransparcencyColors.resize((msn_TRACE_TRANSPARENCY_START - msn_TRACE_TRANSPARENCY_END) + 1,
+   this->mc_FontTransparcencyColors.resize((ms32_TRACE_TRANSPARENCY_START - ms32_TRACE_TRANSPARENCY_END) + 1,
                                            mc_STYLE_GUIDE_COLOR_1);
 
    // Value on position 0 equals no transparency and at the end equals maximum transparency
-   for (sn_Counter = 0U; sn_Counter < static_cast<sintn>(this->mc_FontTransparcencyColors.size()); ++sn_Counter)
+   for (s32_Counter = 0U; s32_Counter < static_cast<int32_t>(this->mc_FontTransparcencyColors.size()); ++s32_Counter)
    {
-      this->mc_FontTransparcencyColors[sn_Counter].setAlpha(msn_TRACE_TRANSPARENCY_START - sn_Counter);
+      this->mc_FontTransparcencyColors[s32_Counter].setAlpha(ms32_TRACE_TRANSPARENCY_START - s32_Counter);
    }
 
    //Default
    this->mpc_InvisibleRootItem = this->mpc_RootItemContinuous;
 
    connect(&this->mc_GrayOutTimer, &QTimer::timeout, this, &C_CamMetTreeModel::m_GrayOutTimer);
-   this->mc_GrayOutTimer.start(msn_TRACE_TRANSPARENCY_REFRESH_TIME);
+   this->mc_GrayOutTimer.start(ms32_TRACE_TRANSPARENCY_REFRESH_TIME);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,34 +117,34 @@ void C_CamMetTreeModel::Continue(void)
 {
    // ms resolution is enough
    // Using US as base because we want to compare with the US value of the CAN message.
-   // The TGL_GetTickCountUS can have a difference of 1 to 2 seconds because of a different rounding
-   const uint32 u32_CurrentTime = static_cast<uint32>(TGL_GetTickCountUS() / 1000ULL);
+   // The TglGetTickCountUs can have a difference of 1 to 2 seconds because of a different rounding
+   const uint32_t u32_CurrentTime = static_cast<uint32_t>(TglGetTickCountUs() / 1000ULL);
    // Get the time interval of the entire pause
-   const stw_types::uint32 u32_GrayOutPauseOffset = u32_CurrentTime - this->mu32_GrayOutPauseTimeStamp;
+   const uint32_t u32_GrayOutPauseOffset = u32_CurrentTime - this->mu32_GrayOutPauseTimeStamp;
 
-   QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_It;
+   QMap<C_SclString, C_CamMetTreeLoggerData>::iterator c_It;
 
    // Adapt all timestamps used by the gray out engine
    for (c_It = this->mc_UniqueMessages.begin(); c_It != this->mc_UniqueMessages.end(); ++c_It)
    {
       C_CamMetTreeLoggerData & rc_Data = c_It.value();
-      sintn sn_CounterDataByte;
+      int32_t s32_CounterDataByte;
 
       // Timestamp of CAN message
       // The original timestamp of the message can be adapted, it used only for the gray out engine
       // For showing the timestamp, the prepared and already calculated timestamps will be used
-      rc_Data.c_CanMsg.u64_TimeStamp += static_cast<uint64>(u32_GrayOutPauseOffset) * 1000ULL;
+      rc_Data.c_CanMsg.u64_TimeStamp += static_cast<uint64_t>(u32_GrayOutPauseOffset) * 1000ULL;
 
       // Timestamp of all data bytes
       rc_Data.c_GreyOutInformation.u32_DataChangedTimeStamp += u32_GrayOutPauseOffset;
 
       // Timestamp of each data byte
-      for (sn_CounterDataByte = 0; sn_CounterDataByte < rc_Data.c_CanMsg.u8_DLC; ++sn_CounterDataByte)
+      for (s32_CounterDataByte = 0; s32_CounterDataByte < rc_Data.c_CanMsg.u8_DLC; ++s32_CounterDataByte)
       {
-         rc_Data.c_GreyOutInformation.c_DataBytesChangedTimeStamps[sn_CounterDataByte] += u32_GrayOutPauseOffset;
+         rc_Data.c_GreyOutInformation.c_DataBytesChangedTimeStamps[s32_CounterDataByte] += u32_GrayOutPauseOffset;
       }
       // Update all timestamps of multiplexer map
-      for (std::map<stw_types::sint32, stw_types::uint32>::iterator c_ItVal =
+      for (std::map<int32_t, uint32_t>::iterator c_ItVal =
               rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToChangedTimeStamps.begin();
            c_ItVal != rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToChangedTimeStamps.end(); ++c_ItVal)
       {
@@ -166,8 +165,8 @@ void C_CamMetTreeModel::Pause(void)
 
    // ms resolution is enough
    // Using US as base because we want to compare with the US value of the CAN message.
-   // The TGL_GetTickCountUS can have a difference of 1 to 2 seconds because of a different rounding
-   this->mu32_GrayOutPauseTimeStamp = static_cast<uint32>(TGL_GetTickCountUS() / 1000ULL);
+   // The TglGetTickCountUs can have a difference of 1 to 2 seconds because of a different rounding
+   this->mu32_GrayOutPauseTimeStamp = static_cast<uint32_t>(TglGetTickCountUs() / 1000ULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -246,9 +245,9 @@ void C_CamMetTreeModel::ActionClearData(void)
    Indices of added rows (only valid if not in unique message mode)
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLoggerData> & orc_Data)
+std::vector<int32_t> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLoggerData> & orc_Data)
 {
-   const std::vector<sint32> c_Retval = this->m_AddRowsContinuousMode(orc_Data);
+   const std::vector<int32_t> c_Retval = this->m_AddRowsContinuousMode(orc_Data);
 
    this->m_AddRowsUnique(orc_Data);
 
@@ -262,9 +261,9 @@ std::vector<sint32> C_CamMetTreeModel::AddRows(const std::list<C_CamMetTreeLogge
    \param[in]  os32_SelectedChildIndex    Current selected child index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const sint32 os32_SelectedChildIndex)
+void C_CamMetTreeModel::SetSelection(const int32_t os32_SelectedParentRow, const int32_t os32_SelectedChildIndex)
 {
-   const sint32 s32_ColIDData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
+   const int32_t s32_ColIdData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
 
    this->ms32_SelectedParentRow = os32_SelectedParentRow;
    this->mc_SelectedChildBytes.clear();
@@ -275,17 +274,17 @@ void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const 
       if (pc_CurMessage != NULL)
       {
          //Check which child/signal should be selected
-         const uint32 u32_ChildIndex = static_cast<uint32>(os32_SelectedChildIndex);
+         const uint32_t u32_ChildIndex = static_cast<uint32_t>(os32_SelectedChildIndex);
 
          //Check if the signal is valid
          if (u32_ChildIndex < pc_CurMessage->c_Signals.size())
          {
-            std::set<uint16> c_Bits;
-            const C_OSCComMessageLoggerDataSignal & rc_CurSignal = pc_CurMessage->c_Signals[u32_ChildIndex];
+            std::set<uint16_t> c_Bits;
+            const C_OscComMessageLoggerDataSignal & rc_CurSignal = pc_CurMessage->c_Signals[u32_ChildIndex];
             //Get all bit positions as intel
             rc_CurSignal.c_OscSignal.GetDataBytesBitPositionsOfSignal(c_Bits);
             //Convert bit positions into byte indices
-            for (std::set<uint16>::const_iterator c_ItBit = c_Bits.begin(); c_ItBit != c_Bits.end();
+            for (std::set<uint16_t>::const_iterator c_ItBit = c_Bits.begin(); c_ItBit != c_Bits.end();
                  ++c_ItBit)
             {
                this->mc_SelectedChildBytes.insert(*c_ItBit / 8U);
@@ -294,7 +293,7 @@ void C_CamMetTreeModel::SetSelection(const sint32 os32_SelectedParentRow, const 
       }
    }
    //Update data row
-   this->dataChanged(this->index(0, s32_ColIDData), this->index(this->rowCount() - 1, s32_ColIDData));
+   this->dataChanged(this->index(0, s32_ColIdData), this->index(this->rowCount() - 1, s32_ColIdData));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -350,15 +349,15 @@ void C_CamMetTreeModel::SetDisplayUniqueMessages(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
 {
-   const sint32 s32_ColCanID = C_CamMetTreeModel::h_EnumToColumn(eCAN_ID);
-   const sint32 s32_ColDataID = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
+   const int32_t s32_ColCanId = C_CamMetTreeModel::h_EnumToColumn(eCAN_ID);
+   const int32_t s32_ColDataId = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
 
    //Update value
    this->mq_DisplayAsHex = oq_Value;
 
    //Update UI
-   Q_EMIT this->dataChanged(this->index(0, s32_ColCanID), this->index(this->rowCount() - 1, s32_ColCanID));
-   Q_EMIT this->dataChanged(this->index(0, s32_ColDataID), this->index(this->rowCount() - 1, s32_ColDataID));
+   Q_EMIT this->dataChanged(this->index(0, s32_ColCanId), this->index(this->rowCount() - 1, s32_ColCanId));
+   Q_EMIT this->dataChanged(this->index(0, s32_ColDataId), this->index(this->rowCount() - 1, s32_ColDataId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -369,12 +368,12 @@ void C_CamMetTreeModel::SetDisplayAsHex(const bool oq_Value)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SetDisplayTimestampRelative(const bool oq_Value)
 {
-   const sint32 s32_ColID = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
+   const int32_t s32_ColId = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
 
    //Update value
    this->mq_DisplayTimestampRelative = oq_Value;
    //Update UI
-   Q_EMIT (this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID)));
+   Q_EMIT (this->dataChanged(this->index(0, s32_ColId), this->index(this->rowCount() - 1, s32_ColId)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -394,9 +393,9 @@ void C_CamMetTreeModel::SetDisplayTimestampAbsoluteTimeOfDay(const bool oq_Value
 
    if (this->mq_DisplayTimestampRelative == false)
    {
-      const sint32 s32_ColID = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
+      const int32_t s32_ColId = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
       //Update UI
-      Q_EMIT (this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID)));
+      Q_EMIT (this->dataChanged(this->index(0, s32_ColId), this->index(this->rowCount() - 1, s32_ColId)));
    }
 }
 
@@ -449,7 +448,7 @@ bool C_CamMetTreeModel::GetDisplayTimestampAbsoluteTimeOfDay(void) const
    \param[in]       ou32_Value     New size of trace buffer
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeModel::SetTraceBufferSize(const uint32 ou32_Value)
+void C_CamMetTreeModel::SetTraceBufferSize(const uint32_t ou32_Value)
 {
    this->mu32_TraceBufferSizeConfig = ou32_Value;
 }
@@ -466,16 +465,16 @@ void C_CamMetTreeModel::SetTraceBufferSize(const uint32 ou32_Value)
 std::vector<C_CamMetTreeLoggerData *> C_CamMetTreeModel::GetAllMessagesForProtocolChange(void)
 {
    std::vector<C_CamMetTreeLoggerData *> c_Retval;
-   const sintn sn_CompleteSize = static_cast<sintn>(this->mc_DataBase.size()) + this->mc_UniqueMessages.size();
+   const int32_t s32_CompleteSize = static_cast<int32_t>(this->mc_DataBase.size()) + this->mc_UniqueMessages.size();
    //Reserve
-   c_Retval.reserve(sn_CompleteSize);
+   c_Retval.reserve(s32_CompleteSize);
    //Append vector
-   for (uint32 u32_ItVec = 0; u32_ItVec < this->mc_DataBase.size(); ++u32_ItVec)
+   for (uint32_t u32_ItVec = 0; u32_ItVec < this->mc_DataBase.size(); ++u32_ItVec)
    {
       c_Retval.push_back(&this->mc_DataBase[u32_ItVec]);
    }
    //Append map
-   for (QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_It = this->mc_UniqueMessages.begin();
+   for (QMap<C_SclString, C_CamMetTreeLoggerData>::iterator c_It = this->mc_UniqueMessages.begin();
         c_It != this->mc_UniqueMessages.end(); ++c_It)
    {
       c_Retval.push_back(&c_It.value());
@@ -489,32 +488,32 @@ std::vector<C_CamMetTreeLoggerData *> C_CamMetTreeModel::GetAllMessagesForProtoc
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::SignalProtocolChange(void)
 {
-   const sint32 s32_ColID = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
+   const int32_t s32_ColId = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
 
    //Update UI
-   Q_EMIT this->dataChanged(this->index(0, s32_ColID), this->index(this->rowCount() - 1, s32_ColID));
+   Q_EMIT this->dataChanged(this->index(0, s32_ColId), this->index(this->rowCount() - 1, s32_ColId));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get header data
 
-   \param[in]  osn_Section       Section
+   \param[in]  os32_Section       Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  osn_Role          Role
+   \param[in]  os32_Role          Role
 
    \return
    Header string
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orientation oe_Orientation,
-                                       const sintn osn_Role) const
+QVariant C_CamMetTreeModel::headerData(const int32_t os32_Section, const Qt::Orientation oe_Orientation,
+                                       const int32_t os32_Role) const
 {
-   QVariant c_Retval = QAbstractItemModel::headerData(osn_Section, oe_Orientation, osn_Role);
+   QVariant c_Retval = QAbstractItemModel::headerData(os32_Section, oe_Orientation, os32_Role);
 
    if (oe_Orientation == Qt::Orientation::Horizontal)
    {
-      const E_Columns e_Col = h_ColumnToEnum(osn_Section);
-      if (osn_Role == static_cast<sintn>(Qt::DisplayRole))
+      const E_Columns e_Col = h_ColumnToEnum(os32_Section);
+      if (os32_Role == static_cast<int32_t>(Qt::DisplayRole))
 
       {
          switch (e_Col)
@@ -544,7 +543,7 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_HEADING)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_HEADING)
       {
          switch (e_Col)
          {
@@ -573,7 +572,7 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
             break;
          }
       }
-      else if (osn_Role == msn_USER_ROLE_TOOL_TIP_CONTENT)
+      else if (os32_Role == ms32_USER_ROLE_TOOL_TIP_CONTENT)
       {
          switch (e_Col)
          {
@@ -626,25 +625,26 @@ QVariant C_CamMetTreeModel::headerData(const sintn osn_Section, const Qt::Orient
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data index
 
-   \param[in]  osn_Row     Row
-   \param[in]  osn_Column  Column
+   \param[in]  os32_Row     Row
+   \param[in]  os32_Column  Column
    \param[in]  orc_Parent  Parent
 
    \return
    Data index (may be invalid = invalid parameters)
 */
 //----------------------------------------------------------------------------------------------------------------------
-QModelIndex C_CamMetTreeModel::index(const sintn osn_Row, const sintn osn_Column, const QModelIndex & orc_Parent) const
+QModelIndex C_CamMetTreeModel::index(const int32_t os32_Row, const int32_t os32_Column,
+                                     const QModelIndex & orc_Parent) const
 {
    QModelIndex c_Retval;
 
    if (this->mq_DisplayTree)
    {
-      c_Retval = C_TblTreSimpleModel::index(osn_Row, osn_Column, orc_Parent);
+      c_Retval = C_TblTreSimpleModel::index(os32_Row, os32_Column, orc_Parent);
    }
    else
    {
-      c_Retval = this->createIndex(osn_Row, osn_Column);
+      c_Retval = this->createIndex(os32_Row, os32_Column);
    }
    return c_Retval;
 }
@@ -678,29 +678,29 @@ QModelIndex C_CamMetTreeModel::parent(const QModelIndex & orc_Index) const
    Column count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
+int32_t C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (orc_Parent.isValid() == false)
    {
       //Top level
-      sn_Retval = 7;
+      s32_Retval = 7;
    }
    else if (orc_Parent.parent().isValid() == false)
    {
-      sn_Retval = 1;
+      s32_Retval = 1;
    }
    else if (orc_Parent.parent().parent().isValid() == false)
    {
-      sn_Retval = 1;
+      s32_Retval = 1;
    }
    else
    {
       // Nothing to do
    }
 
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -712,24 +712,24 @@ sintn C_CamMetTreeModel::columnCount(const QModelIndex & orc_Parent) const
    Row count
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
+int32_t C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
 {
-   sintn sn_Retval = 0;
+   int32_t s32_Retval = 0;
 
    if (this->mq_DisplayTree == true)
    {
-      sn_Retval = C_TblTreSimpleModel::rowCount(orc_Parent);
+      s32_Retval = C_TblTreSimpleModel::rowCount(orc_Parent);
    }
    else if (orc_Parent.isValid() == false)
    {
       //Top level
       if (this->mq_UniqueMessageMode == true)
       {
-         sn_Retval = this->mc_UniqueMessages.size();
+         s32_Retval = this->mc_UniqueMessages.size();
       }
       else
       {
-         sn_Retval = this->mc_DataBase.size();
+         s32_Retval = this->mc_DataBase.size();
       }
    }
    else
@@ -737,27 +737,27 @@ sintn C_CamMetTreeModel::rowCount(const QModelIndex & orc_Parent) const
       // Nothing to do
    }
 
-   return sn_Retval;
+   return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  osn_Role    Data role
+   \param[in]  os32_Role    Data role
 
    \return
    Data
 */
 //----------------------------------------------------------------------------------------------------------------------
-QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_Role) const
+QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const int32_t os32_Role) const
 {
    QVariant c_Retval;
 
-   if ((mq_DataUnlocked == true) || (osn_Role == msn_USER_ROLE_SORT))
+   if ((mq_DataUnlocked == true) || (os32_Role == ms32_USER_ROLE_SORT))
    {
-      if (((osn_Role == static_cast<sintn>(Qt::DisplayRole)) || (osn_Role == msn_USER_ROLE_MARKER_TEXT)) ||
-          (osn_Role == msn_USER_ROLE_SORT))
+      if (((os32_Role == static_cast<int32_t>(Qt::DisplayRole)) || (os32_Role == ms32_USER_ROLE_MARKER_TEXT)) ||
+          (os32_Role == ms32_USER_ROLE_SORT))
       {
          if (orc_Index.parent().isValid() == false)
          {
@@ -783,7 +783,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   }
                   break;
                case eCAN_ID:
-                  if (osn_Role == msn_USER_ROLE_SORT)
+                  if (os32_Role == ms32_USER_ROLE_SORT)
                   {
                      //For number the display style is irrelevant
                      c_Retval = pc_CurMessage->c_CanIdDec.ToInt();
@@ -827,8 +827,8 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   if (pc_CurMessage->c_ProtocolTextDec == "")
                   {
                      if ((pc_CurMessage->c_CanMsg.u8_RTR == 0U) &&
-                         ((orc_Index.data(msn_USER_ROLE_MARKER).toBitArray().isEmpty() == true) ||
-                          (osn_Role == msn_USER_ROLE_MARKER_TEXT)))
+                         ((orc_Index.data(ms32_USER_ROLE_MARKER).toBitArray().isEmpty() == true) ||
+                          (os32_Role == ms32_USER_ROLE_MARKER_TEXT)))
                      {
                         if (this->mq_DisplayAsHex == true)
                         {
@@ -853,7 +853,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   }
                   break;
                case eCAN_COUNTER:
-                  if (osn_Role == msn_USER_ROLE_SORT)
+                  if (os32_Role == ms32_USER_ROLE_SORT)
                   {
                      c_Retval = pc_CurMessage->c_Counter.ToInt64();
                   }
@@ -868,9 +868,9 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             }
          }
       }
-      else if (((osn_Role == msn_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_1) ||
-                (osn_Role == msn_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_2)) ||
-               (osn_Role == msn_USER_ROLE_STRING_PARTS))
+      else if (((os32_Role == ms32_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_1) ||
+                (os32_Role == ms32_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_2)) ||
+               (os32_Role == ms32_USER_ROLE_STRING_PARTS))
       {
          if (orc_Index.parent().isValid() == true)
          {
@@ -880,13 +880,13 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
 
             if (pc_CurMessage != NULL)
             {
-               if ((osn_Role == msn_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_1) ||
-                   (osn_Role == msn_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_2))
+               if ((os32_Role == ms32_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_1) ||
+                   (os32_Role == ms32_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_2))
                {
                   const std::vector<QStringList> c_ColWidths = mh_GetCount(*pc_CurMessage);
                   if (c_ColWidths.size() == 2)
                   {
-                     if (osn_Role == msn_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_1)
+                     if (os32_Role == ms32_USER_ROLE_TABLE_ALL_STRINGS_DYNAMIC_COL_1)
                      {
                         c_Retval = c_ColWidths[0];
                      }
@@ -900,7 +900,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                {
                   QStringList c_List;
                   //Replace row by signal index
-                  const C_OSCComMessageLoggerDataSignal & rc_CurSignal =
+                  const C_OscComMessageLoggerDataSignal & rc_CurSignal =
                      pc_CurMessage->c_Signals[this->TranslateTreeRowsToSignalIndex(orc_Index)];
                   QString c_Comment = rc_CurSignal.c_Comment.c_str();
                   QString c_Value;
@@ -927,7 +927,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::TextAlignmentRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::TextAlignmentRole))
       {
          if (orc_Index.parent().isValid() == false)
          {
@@ -942,7 +942,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_MARKER)
+      else if (os32_Role == ms32_USER_ROLE_MARKER)
       {
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          //Only allow selection in data column
@@ -961,7 +961,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                     (orc_Index.parent().isValid() == false)) && (orc_Index.row() == this->ms32_SelectedParentRow))
                {
                   //Convert byte indices into bit array
-                  for (std::set<uint16>::const_iterator c_ItByte = this->mc_SelectedChildBytes.begin();
+                  for (std::set<uint16_t>::const_iterator c_ItByte = this->mc_SelectedChildBytes.begin();
                        c_ItByte != this->mc_SelectedChildBytes.end();
                        ++c_ItByte)
                   {
@@ -980,7 +980,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_MARKER_TRANSPARENCY)
+      else if (os32_Role == ms32_USER_ROLE_MARKER_TRANSPARENCY)
       {
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          //Only allow selection in data column
@@ -995,17 +995,17 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                //Reserve
                c_Array.reserve(pc_CurMessage->c_GreyOutInformation.c_GrayOutValueDataBytes.size());
                //Copy over
-               for (std::vector<sintn>::const_iterator c_ItVal =
+               for (std::vector<int32_t>::const_iterator c_ItVal =
                        pc_CurMessage->c_GreyOutInformation.c_GrayOutValueDataBytes.begin();
                     c_ItVal != pc_CurMessage->c_GreyOutInformation.c_GrayOutValueDataBytes.end(); ++c_ItVal)
                {
-                  c_Array.push_back(static_cast<charn>(*c_ItVal));
+                  c_Array.push_back(static_cast<char_t>(*c_ItVal));
                }
                c_Retval = c_Array;
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::ForegroundRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::ForegroundRole))
       {
          if (orc_Index.parent().isValid() == false)
          {
@@ -1022,47 +1022,47 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                   }
                   else
                   {
-                     if (pc_CurMessage->c_GreyOutInformation.sn_GrayOutValueMsg <
-                         static_cast<sintn>(this->mc_FontTransparcencyColors.size()))
+                     if (pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg <
+                         static_cast<int32_t>(this->mc_FontTransparcencyColors.size()))
                      {
                         c_Retval =
-                           this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.sn_GrayOutValueMsg];
+                           this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg];
                      }
                   }
                }
                else
                {
-                  if (pc_CurMessage->c_GreyOutInformation.sn_GrayOutValueMsg <
-                      static_cast<sintn>(this->mc_FontTransparcencyColors.size()))
+                  if (pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg <
+                      static_cast<int32_t>(this->mc_FontTransparcencyColors.size()))
                   {
                      c_Retval =
-                        this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.sn_GrayOutValueMsg];
+                        this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg];
                   }
                }
             }
          }
          else
          {
-            const sint32 s32_MessageRow = static_cast<sint32>(
+            const int32_t s32_MessageRow = static_cast<int32_t>(
                orc_Index.parent().parent().isValid() ? orc_Index.parent().parent().row() : orc_Index.parent().row());
             const C_CamMetTreeLoggerData * const pc_CurMessage = GetMessageData(s32_MessageRow);
             if (pc_CurMessage != NULL)
             {
-               const uint32 u32_SignalIndex = this->TranslateTreeRowsToSignalIndex(orc_Index);
+               const uint32_t u32_SignalIndex = this->TranslateTreeRowsToSignalIndex(orc_Index);
                if (u32_SignalIndex < pc_CurMessage->c_Signals.size())
                {
-                  const C_OSCComMessageLoggerDataSignal & rc_Signal = pc_CurMessage->c_Signals[u32_SignalIndex];
-                  if (rc_Signal.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+                  const C_OscComMessageLoggerDataSignal & rc_Signal = pc_CurMessage->c_Signals[u32_SignalIndex];
+                  if (rc_Signal.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT)
                   {
                      //Use message value
                      c_Retval =
-                        this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.sn_GrayOutValueMsg];
+                        this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg];
                   }
                   else
                   {
                      //Special handling necessary
-                     sint32 s32_MuxValue = -1;
-                     if (rc_Signal.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+                     int32_t s32_MuxValue = -1;
+                     if (rc_Signal.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
                      {
                         if (rc_Signal.q_DlcError == false)
                         {
@@ -1071,17 +1071,17 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                      }
                      else
                      {
-                        const uint32 u32_MultiplexerSignalIndex = this->TranslateTreeRowsToSignalIndex(
+                        const uint32_t u32_MultiplexerSignalIndex = this->TranslateTreeRowsToSignalIndex(
                            orc_Index.parent());
-                        const C_OSCComMessageLoggerDataSignal & rc_MultiplexerSignal =
+                        const C_OscComMessageLoggerDataSignal & rc_MultiplexerSignal =
                            pc_CurMessage->c_Signals[u32_MultiplexerSignalIndex];
                         if (rc_MultiplexerSignal.q_DlcError == false)
                         {
                            s32_MuxValue = rc_MultiplexerSignal.c_RawValueDec.ToInt();
                         }
                      }
-                     const std::map<stw_types::sint32,
-                                    stw_types::sintn>::const_iterator c_It =
+                     const std::map<int32_t,
+                                    int32_t>::const_iterator c_It =
                         pc_CurMessage->c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue.find(
                            s32_MuxValue);
                      //Return gray out value for this multiplexer value (if any)
@@ -1093,14 +1093,14 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
                      {
                         //Use message value as fallback
                         c_Retval =
-                           this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.sn_GrayOutValueMsg];
+                           this->mc_FontTransparcencyColors[pc_CurMessage->c_GreyOutInformation.s32_GrayOutValueMsg];
                      }
                   }
                }
             }
          }
       }
-      else if (osn_Role == static_cast<sintn>(Qt::DecorationRole))
+      else if (os32_Role == static_cast<int32_t>(Qt::DecorationRole))
       {
          //Although you should never see this icon we still need to return something so the default drawing engine
          // reserves the space for the manually drawn icon
@@ -1119,7 +1119,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
             }
          }
       }
-      else if (osn_Role == msn_USER_ROLE_ICON)
+      else if (os32_Role == ms32_USER_ROLE_ICON)
       {
          const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
          if (e_Col == eTIME_STAMP)
@@ -1157,7 +1157,7 @@ QVariant C_CamMetTreeModel::data(const QModelIndex & orc_Index, const sintn osn_
    Enum value
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const sint32 os32_Column)
+C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const int32_t os32_Column)
 {
    C_CamMetTreeModel::E_Columns e_Retval;
    switch (os32_Column)
@@ -1199,9 +1199,9 @@ C_CamMetTreeModel::E_Columns C_CamMetTreeModel::h_ColumnToEnum(const sint32 os32
    -1 Error
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_Value)
+int32_t C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_Value)
 {
-   sint32 s32_Retval;
+   int32_t s32_Retval;
 
    switch (oe_Value)
    {
@@ -1237,30 +1237,30 @@ sint32 C_CamMetTreeModel::h_EnumToColumn(const C_CamMetTreeModel::E_Columns oe_V
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get message at row
 
-   \param[in]  osn_Row  Current row
+   \param[in]  os32_Row  Current row
 
    \return
    NULL Message not found
    Else Valid message
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn_Row) const
+const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const int32_t os32_Row) const
 {
    const C_CamMetTreeLoggerData * pc_Retval;
 
    if (this->mq_UniqueMessageMode == false)
    {
       //If not unique messages: look in "queue"/vector
-      const uint32 u32_Index = (this->mu32_OldestItemIndex + static_cast<uint32>(osn_Row)) %
-                               this->mu32_TraceBufferSizeUsed;
+      const uint32_t u32_Index = (this->mu32_OldestItemIndex + static_cast<uint32_t>(os32_Row)) %
+                                 this->mu32_TraceBufferSizeUsed;
       pc_Retval = &this->mc_DataBase[u32_Index];
    }
    else
    {
       //If unique messages: look in map
-      const QMap<C_SCLString, C_SCLString>::const_iterator c_ItOrder =
-         this->mc_UniqueMessagesOrdering.begin() + osn_Row;
-      const QMap<C_SCLString, C_CamMetTreeLoggerData>::const_iterator c_It =
+      const QMap<C_SclString, C_SclString>::const_iterator c_ItOrder =
+         this->mc_UniqueMessagesOrdering.begin() + os32_Row;
+      const QMap<C_SclString, C_CamMetTreeLoggerData>::const_iterator c_It =
          this->mc_UniqueMessages.find(c_ItOrder.value());
       pc_Retval = &c_It.value();
    }
@@ -1274,37 +1274,37 @@ const C_CamMetTreeLoggerData * C_CamMetTreeModel::GetMessageData(const sintn osn
    \param[in]       oq_Next                     Flag for search direction
                                                  true:  Search the next entry, forward
                                                  false: Search the previous entry, backward
-   \param[out]      orsn_SignalRow               < 0: No signal of the message as search result
-                                                >= 0: If orsn_MultiplexedSignalRow >= 0: Row of Multiplexer signal
-                                                      If orsn_MultiplexedSignalRow < 0: Row of checked signal
-   \param[out]      orsn_MultiplexedSignalRow   >= 0: Row of Multiplexed signal
+   \param[out]      ors32_SignalRow               < 0: No signal of the message as search result
+                                                >= 0: If ors32_MultiplexedSignalRow >= 0: Row of Multiplexer signal
+                                                      If ors32_MultiplexedSignalRow < 0: Row of checked signal
+   \param[out]      ors32_MultiplexedSignalRow   >= 0: Row of Multiplexed signal
                                                  < 0: Signal is not a multiplexed signal
 
    \retval  >= 0   Message found, row returned
    \retval  < 0    No Message found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, const bool oq_Next, sintn & orsn_SignalRow,
-                                           sintn & orsn_MultiplexedSignalRow)
+int32_t C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, const bool oq_Next,
+                                             int32_t & ors32_SignalRow, int32_t & ors32_MultiplexedSignalRow)
 {
-   sintn sn_Row = -1;
-   const uint32 u32_NumberEntries = this->rowCount();
-   uint32 u32_NumberEntriesToCheck = u32_NumberEntries;
-   const sintn sn_START_AT_LAST_SIGNAL = -2;
+   int32_t s32_Row = -1;
+   const uint32_t u32_NumberEntries = this->rowCount();
+   uint32_t u32_NumberEntriesToCheck = u32_NumberEntries;
+   const int32_t s32_START_AT_LAST_SIGNAL = -2;
 
-   orsn_SignalRow = -1;
-   orsn_MultiplexedSignalRow = -1;
+   ors32_SignalRow = -1;
+   ors32_MultiplexedSignalRow = -1;
 
    if (u32_NumberEntries > 0U)
    {
-      uint32 u32_Counter;
-      uint32 u32_StartIndex;
+      uint32_t u32_Counter;
+      uint32_t u32_StartIndex;
       // -1 means no signal was the match at the last search
-      sintn sn_CurrentSignalIndex = -1;
-      sintn sn_CurrentSignalIndexMultiplexed = -1;
+      int32_t s32_CurrentSignalIndex = -1;
+      int32_t s32_CurrentSignalIndexMultiplexed = -1;
 
       if ((this->mc_LastSearchedString == orc_SearchString) &&
-          (this->msn_LastSearchedMessageRow >= 0))
+          (this->ms32_LastSearchedMessageRow >= 0))
       {
          // In case of the same search string, continue search with next or previous index
          if (oq_Next == true)
@@ -1313,15 +1313,15 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
             if (this->mq_IsLastSearchedSignalLastOfMessage == true)
             {
                // Start with message itself again
-               u32_StartIndex = (static_cast<uint32>(this->msn_LastSearchedMessageRow) + 1) % u32_NumberEntries;
+               u32_StartIndex = (static_cast<uint32_t>(this->ms32_LastSearchedMessageRow) + 1) % u32_NumberEntries;
             }
             else
             {
                // Start search with next available signal of last message
-               u32_StartIndex = static_cast<uint32>(this->msn_LastSearchedMessageRow);
-               sn_CurrentSignalIndex = this->msn_LastSearchedSignalRow + 1;
-               sn_CurrentSignalIndexMultiplexed = this->msn_LastSearchedSignalRowMultiplexed + 1;
-               if (sn_CurrentSignalIndex >= 0)
+               u32_StartIndex = static_cast<uint32_t>(this->ms32_LastSearchedMessageRow);
+               s32_CurrentSignalIndex = this->ms32_LastSearchedSignalRow + 1;
+               s32_CurrentSignalIndexMultiplexed = this->ms32_LastSearchedSignalRowMultiplexed + 1;
+               if (s32_CurrentSignalIndex >= 0)
                {
                   // In case of a wrap around search, the signals before the start signal must be checked at the end too
                   // No further abort condition for this scenario: Assuming the start condition is the found signal
@@ -1334,29 +1334,29 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
          else
          {
             // Check last signal first
-            if (this->msn_LastSearchedSignalRow < 0)
+            if (this->ms32_LastSearchedSignalRow < 0)
             {
                // Prevent a minus value here
-               if (this->msn_LastSearchedMessageRow == 0)
+               if (this->ms32_LastSearchedMessageRow == 0)
                {
                   u32_StartIndex = u32_NumberEntries - 1U;
                }
                else
                {
-                  u32_StartIndex = (static_cast<uint32>(this->msn_LastSearchedMessageRow) - 1);
+                  u32_StartIndex = (static_cast<uint32_t>(this->ms32_LastSearchedMessageRow) - 1);
                }
 
                // special case: starting at the last signal of the message
                // but at this point the number of signals of the messages is here not available
-               sn_CurrentSignalIndex = sn_START_AT_LAST_SIGNAL;
-               sn_CurrentSignalIndexMultiplexed = sn_START_AT_LAST_SIGNAL;
+               s32_CurrentSignalIndex = s32_START_AT_LAST_SIGNAL;
+               s32_CurrentSignalIndexMultiplexed = s32_START_AT_LAST_SIGNAL;
             }
             else
             {
                // Start search with previous available signal of last message or the message itself (-1)
-               u32_StartIndex = static_cast<uint32>(this->msn_LastSearchedMessageRow);
-               sn_CurrentSignalIndex = this->msn_LastSearchedSignalRow - 1;
-               sn_CurrentSignalIndexMultiplexed = this->msn_LastSearchedSignalRowMultiplexed - 1;
+               u32_StartIndex = static_cast<uint32_t>(this->ms32_LastSearchedMessageRow);
+               s32_CurrentSignalIndex = this->ms32_LastSearchedSignalRow - 1;
+               s32_CurrentSignalIndexMultiplexed = this->ms32_LastSearchedSignalRowMultiplexed - 1;
 
                // In case of a wrap around search, the signals after the start signal must be checked at the end too
                // No further abort condition for this scenario: Assuming the start condition is the found signal
@@ -1379,7 +1379,7 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
 
       for (u32_Counter = 0U; u32_Counter < u32_NumberEntriesToCheck; ++u32_Counter)
       {
-         uint32 u32_Row;
+         uint32_t u32_Row;
          const C_CamMetTreeLoggerData * pc_Data;
 
          if (oq_Next == true)
@@ -1391,8 +1391,8 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
          {
             // Search backward
             // Count from back
-            const uint32 u32_Offset = (u32_NumberEntries - u32_StartIndex);
-            const uint32 u32_RevCounter = (u32_NumberEntries - u32_Counter);
+            const uint32_t u32_Offset = (u32_NumberEntries - u32_StartIndex);
+            const uint32_t u32_RevCounter = (u32_NumberEntries - u32_Counter);
 
             // Compensate the start index
             if (u32_RevCounter >= u32_Offset)
@@ -1408,8 +1408,8 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
             {
                // special case: starting at the last signal of the message due to backward search
                // the decision of the first message of the loop is set at the initial check of the start indexs
-               sn_CurrentSignalIndex = sn_START_AT_LAST_SIGNAL;
-               sn_CurrentSignalIndexMultiplexed = sn_START_AT_LAST_SIGNAL;
+               s32_CurrentSignalIndex = s32_START_AT_LAST_SIGNAL;
+               s32_CurrentSignalIndexMultiplexed = s32_START_AT_LAST_SIGNAL;
             }
          }
 
@@ -1419,30 +1419,30 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
          {
             bool q_SearchMessageResult;
 
-            if (sn_CurrentSignalIndex <= sn_START_AT_LAST_SIGNAL)
+            if (s32_CurrentSignalIndex <= s32_START_AT_LAST_SIGNAL)
             {
                // special case: starting at the last signal of the message due to backward search
-               sn_CurrentSignalIndex = static_cast<sintn>(pc_Data->c_Signals.size()) - 1;
-               sn_CurrentSignalIndexMultiplexed = sn_CurrentSignalIndex;
+               s32_CurrentSignalIndex = static_cast<int32_t>(pc_Data->c_Signals.size()) - 1;
+               s32_CurrentSignalIndexMultiplexed = s32_CurrentSignalIndex;
             }
 
             // Search the message and all of its signals till something was found or no signals are left to check
             q_SearchMessageResult = this->m_CheckDataForSearch(*pc_Data, orc_SearchString, oq_Next,
-                                                               sn_CurrentSignalIndex,
+                                                               s32_CurrentSignalIndex,
                                                                this->mq_IsLastSearchedSignalLastOfMessage);
 
             if (q_SearchMessageResult == true)
             {
-               sn_Row = static_cast<sintn>(u32_Row);
+               s32_Row = static_cast<int32_t>(u32_Row);
 
                // Save the match for next call
-               this->msn_LastSearchedMessageRow = sn_Row;
-               this->msn_LastSearchedSignalRow = sn_CurrentSignalIndex;
+               this->ms32_LastSearchedMessageRow = s32_Row;
+               this->ms32_LastSearchedSignalRow = s32_CurrentSignalIndex;
                // Set the multiplexed value in case of a non multiplexed message
-               this->msn_LastSearchedSignalRowMultiplexed = this->msn_LastSearchedSignalRow;
+               this->ms32_LastSearchedSignalRowMultiplexed = this->ms32_LastSearchedSignalRow;
                this->mc_LastSearchedString = orc_SearchString;
 
-               if (sn_CurrentSignalIndex >= 0)
+               if (s32_CurrentSignalIndex >= 0)
                {
                   // Check for multiplexer message
                   if (C_CamMetTreeModel::mh_IsMessageMultiplexed(*pc_Data) == true)
@@ -1454,32 +1454,32 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
 
                      // Search again
                      q_SearchMessageResult = this->m_CheckDataForSearch(c_CopyData, orc_SearchString, oq_Next,
-                                                                        sn_CurrentSignalIndexMultiplexed,
+                                                                        s32_CurrentSignalIndexMultiplexed,
                                                                         q_LastMessageDummy);
                      Q_UNUSED(q_LastMessageDummy)
 
                      if (q_SearchMessageResult == true)
                      {
                         // Should be a true again
-                        this->msn_LastSearchedSignalRowMultiplexed = sn_CurrentSignalIndexMultiplexed;
+                        this->ms32_LastSearchedSignalRowMultiplexed = s32_CurrentSignalIndexMultiplexed;
 
                         // A concrete signal of the message was found
                         // Get the correct row for the found signal
                         this->m_GetMultiplexedMsgSignalRow(c_CopyData.c_Signals,
-                                                           static_cast<uint32>(sn_CurrentSignalIndexMultiplexed),
-                                                           orsn_SignalRow, orsn_MultiplexedSignalRow);
+                                                           static_cast<uint32_t>(s32_CurrentSignalIndexMultiplexed),
+                                                           ors32_SignalRow, ors32_MultiplexedSignalRow);
                      }
                      else
                      {
                         // Should not happen
-                        orsn_SignalRow = -1;
-                        orsn_MultiplexedSignalRow = -1;
+                        ors32_SignalRow = -1;
+                        ors32_MultiplexedSignalRow = -1;
                      }
                   }
                   else
                   {
                      // No multiplexed message, order of vector equals order of tree
-                     orsn_SignalRow = sn_CurrentSignalIndex;
+                     ors32_SignalRow = s32_CurrentSignalIndex;
                   }
                }
 
@@ -1487,18 +1487,18 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
             }
             else
             {
-               sn_CurrentSignalIndexMultiplexed = -1;
+               s32_CurrentSignalIndexMultiplexed = -1;
             }
          }
       }
    }
 
-   if (sn_Row == -1)
+   if (s32_Row == -1)
    {
       this->m_ResetSearch();
    }
 
-   return sn_Row;
+   return s32_Row;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1510,9 +1510,9 @@ sintn C_CamMetTreeModel::SearchMessageData(const QString & orc_SearchString, con
    Translated signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const QModelIndex & orc_CurrentIndex) const
+uint32_t C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const QModelIndex & orc_CurrentIndex) const
 {
-   uint32 u32_Retval;
+   uint32_t u32_Retval;
 
    if (orc_CurrentIndex.parent().isValid())
    {
@@ -1546,10 +1546,11 @@ uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const QModelIndex & orc
    Translated signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const sint32 os32_MessageIndex, const sint32 os32_SignalIndex,
-                                                         const sint32 os32_SignalIndexL2) const
+uint32_t C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const int32_t os32_MessageIndex,
+                                                           const int32_t os32_SignalIndex,
+                                                           const int32_t os32_SignalIndexL2) const
 {
-   uint32 u32_Retval = 0UL;
+   uint32_t u32_Retval = 0UL;
    const C_CamMetTreeLoggerData * const pc_Message = this->GetMessageData(os32_MessageIndex);
 
    if (pc_Message != NULL)
@@ -1586,14 +1587,14 @@ void C_CamMetTreeModel::m_AdaptTraceBufferSize(void)
    Indices of added rows (only valid if not in unique message mode)
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C_CamMetTreeLoggerData> & orc_Data)
+std::vector<int32_t> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C_CamMetTreeLoggerData> & orc_Data)
 {
-   std::vector<sint32> c_Retval;
+   std::vector<int32_t> c_Retval;
    if (orc_Data.empty() == false)
    {
       //Columns which need to get updated on change of static message
-      const uint32 u32_CompleteSize = static_cast<uint32>(this->mc_DataBase.size()) +
-                                      static_cast<uint32>(orc_Data.size());
+      const uint32_t u32_CompleteSize = static_cast<uint32_t>(this->mc_DataBase.size()) +
+                                        static_cast<uint32_t>(orc_Data.size());
 
       //Check if only append case
       if (u32_CompleteSize <= this->mu32_TraceBufferSizeUsed)
@@ -1602,7 +1603,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
          if (this->mq_UniqueMessageMode == false)
          {
             this->beginInsertRows(QModelIndex(), this->rowCount(),
-                                  this->rowCount() + (static_cast<sintn>(orc_Data.size()) - 1));
+                                  this->rowCount() + (static_cast<int32_t>(orc_Data.size()) - 1));
          }
          //Appending items in reserved space
          for (std::list<C_CamMetTreeLoggerData>::const_iterator c_ItData = orc_Data.begin();
@@ -1703,7 +1704,7 @@ std::vector<sint32> C_CamMetTreeModel::m_AddRowsContinuousMode(const std::list<C
       //Every time count the actual indices
       if (this->mq_UniqueMessageMode == false)
       {
-         sint32 s32_Start = static_cast<sint32>(this->rowCount()) - (static_cast<sint32>(orc_Data.size()) - 1);
+         int32_t s32_Start = static_cast<int32_t>(this->rowCount()) - (static_cast<int32_t>(orc_Data.size()) - 1);
          c_Retval.reserve(orc_Data.size());
          for (std::list<C_CamMetTreeLoggerData>::const_iterator c_ItData = orc_Data.begin();
               c_ItData != orc_Data.end(); ++c_ItData)
@@ -1732,10 +1733,10 @@ void C_CamMetTreeModel::m_AddRowsUnique(const std::list<C_CamMetTreeLoggerData> 
       for (std::list<C_CamMetTreeLoggerData>::const_iterator c_ItData = orc_Data.begin();
            c_ItData != orc_Data.end(); ++c_ItData)
       {
-         const QMap<stw_scl::C_SCLString,
+         const QMap<stw::scl::C_SclString,
                     C_CamMetTreeLoggerData>::const_iterator c_ItMessage = this->mc_UniqueMessages.find(
             c_ItData->c_CanIdDec);
-         const sint32 s32_MuxValue = C_CamMetUtil::h_GetMultiplexerValue(c_ItData->c_Signals);
+         const int32_t s32_MuxValue = C_CamMetUtil::h_GetMultiplexerValue(c_ItData->c_Signals);
 
          //Check if there is a new row
          if (c_ItMessage != this->mc_UniqueMessages.end())
@@ -1759,18 +1760,18 @@ void C_CamMetTreeModel::m_AddRowsUnique(const std::list<C_CamMetTreeLoggerData> 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C_CamMetTreeLoggerData & orc_Message,
-                                                                         const stw_scl::C_SCLString & orc_ExistingMessageKey,
-                                                                         const sint32 os32_MultiplexerValue)
+                                                                         const stw::scl::C_SclString & orc_ExistingMessageKey,
+                                                                         const int32_t os32_MultiplexerValue)
 {
-   sint32 s32_MessageCounter = 0L;
+   int32_t s32_MessageCounter = 0L;
    bool q_UpdateDataTimeStamp;
    C_CamMetTreeLoggerData & rc_Message = this->mc_UniqueMessages[orc_Message.c_CanIdDec];
-   const uint64 u64_PreviousAbsoluteTimestampValue = rc_Message.u64_TimeStampAbsoluteStart;
-   const uint64 u64_NewAbsoluteTimestampValue = orc_Message.u64_TimeStampAbsoluteStart;
-   uint64 u64_RelativeTimestamp;
+   const uint64_t u64_PreviousAbsoluteTimestampValue = rc_Message.u64_TimeStampAbsoluteStart;
+   const uint64_t u64_NewAbsoluteTimestampValue = orc_Message.u64_TimeStampAbsoluteStart;
+   uint64_t u64_RelativeTimestamp;
 
-   const uint32 u32_PrevMsgTimeStamp = static_cast<uint32>(rc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
-   const uint32 u32_NewMsgTimeStamp = static_cast<uint32>(orc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
+   const uint32_t u32_PrevMsgTimeStamp = static_cast<uint32_t>(rc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
+   const uint32_t u32_NewMsgTimeStamp = static_cast<uint32_t>(orc_Message.c_CanMsg.u64_TimeStamp / 1000ULL);
 
    // Save previous values which are not filled by C_SyvComMessageMonitor
    const C_CamMetTreeLoggerDataGreyOutInformation c_PreviousInfo =
@@ -1794,11 +1795,11 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
    {
       u64_RelativeTimestamp = 0U;
    }
-   rc_Message.c_TimeStampRelative = C_OSCComMessageLoggerData::h_GetTimestampAsString(u64_RelativeTimestamp);
+   rc_Message.c_TimeStampRelative = C_OscComMessageLoggerData::h_GetTimestampAsString(u64_RelativeTimestamp);
 
    //Search existing item index
-   for (QMap<stw_scl::C_SCLString,
-             stw_scl::C_SCLString>::const_iterator c_ItMsg = this->mc_UniqueMessagesOrdering.begin();
+   for (QMap<stw::scl::C_SclString,
+             stw::scl::C_SclString>::const_iterator c_ItMsg = this->mc_UniqueMessagesOrdering.begin();
         c_ItMsg != this->mc_UniqueMessagesOrdering.end(); ++c_ItMsg)
    {
       if (c_ItMsg.value() == orc_ExistingMessageKey)
@@ -1811,24 +1812,24 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
       }
    }
    //Update existing tree item
-   m_UpdateTreeItemBasedOnMessage(this->mpc_RootItemStatic->c_Children[static_cast<uint32>(s32_MessageCounter)],
+   m_UpdateTreeItemBasedOnMessage(this->mpc_RootItemStatic->c_Children[static_cast<uint32_t>(s32_MessageCounter)],
                                   rc_Message, true, s32_MessageCounter);
    //Notify the model of data changes for all replaced items (current: all items)
    if (this->mq_UniqueMessageMode == true)
    {
-      const sint32 s32_ColIDName = C_CamMetTreeModel::h_EnumToColumn(eCAN_NAME);
-      const sint32 s32_ColIDDLC = C_CamMetTreeModel::h_EnumToColumn(eCAN_DLC);
-      const sint32 s32_ColIDData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
-      const sint32 s32_ColIDTime = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
-      const sint32 s32_ColIDCounter = C_CamMetTreeModel::h_EnumToColumn(eCAN_COUNTER);
+      const int32_t s32_ColIdName = C_CamMetTreeModel::h_EnumToColumn(eCAN_NAME);
+      const int32_t s32_ColIdDlc = C_CamMetTreeModel::h_EnumToColumn(eCAN_DLC);
+      const int32_t s32_ColIdData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
+      const int32_t s32_ColIdTime = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
+      const int32_t s32_ColIdCounter = C_CamMetTreeModel::h_EnumToColumn(eCAN_COUNTER);
       //Notification for possible new child
-      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDTime), this->index(s32_MessageCounter, s32_ColIDTime));
-      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDCounter),
-                        this->index(s32_MessageCounter, s32_ColIDCounter));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIdTime), this->index(s32_MessageCounter, s32_ColIdTime));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIdCounter),
+                        this->index(s32_MessageCounter, s32_ColIdCounter));
       //Possible changes
-      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDName), this->index(s32_MessageCounter, s32_ColIDName));
-      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDDLC), this->index(s32_MessageCounter, s32_ColIDDLC));
-      this->dataChanged(this->index(s32_MessageCounter, s32_ColIDData), this->index(s32_MessageCounter, s32_ColIDData));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIdName), this->index(s32_MessageCounter, s32_ColIdName));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIdDlc), this->index(s32_MessageCounter, s32_ColIdDlc));
+      this->dataChanged(this->index(s32_MessageCounter, s32_ColIdData), this->index(s32_MessageCounter, s32_ColIdData));
    }
 }
 
@@ -1840,19 +1841,19 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessageForExistingUniqueMessage(const C
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & orc_Message,
-                                                 const sint32 os32_MultiplexerValue)
+                                                 const int32_t os32_MultiplexerValue)
 {
    bool q_NewRow = false;
 
-   uint8 u8_DbCounter;
+   uint8_t u8_DbCounter;
 
-   QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_NewPos;
+   QMap<C_SclString, C_CamMetTreeLoggerData>::iterator c_NewPos;
    //Handle begin!
    C_TblTreSimpleItem * const pc_NewItem = new C_TblTreSimpleItem();
-   const sintn sn_EstimatedPosIndex = this->m_GetPosIndexForUniqueMessage(orc_Message.c_TimeStampAbsoluteStart);
+   const int32_t s32_EstimatedPosIndex = this->m_GetPosIndexForUniqueMessage(orc_Message.c_TimeStampAbsoluteStart);
    //Update tree with known index
-   m_UpdateTreeItemBasedOnMessage(pc_NewItem, orc_Message, false, sn_EstimatedPosIndex);
-   this->mpc_RootItemStatic->InsertChild(sn_EstimatedPosIndex, pc_NewItem);
+   m_UpdateTreeItemBasedOnMessage(pc_NewItem, orc_Message, false, s32_EstimatedPosIndex);
+   this->mpc_RootItemStatic->InsertChild(s32_EstimatedPosIndex, pc_NewItem);
 
    if (this->mq_UniqueMessageMode == true)
    {
@@ -1860,7 +1861,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
       q_NewRow = true;
 
       //Notify the new row count
-      this->beginInsertRows(QModelIndex(), sn_EstimatedPosIndex, sn_EstimatedPosIndex);
+      this->beginInsertRows(QModelIndex(), s32_EstimatedPosIndex, s32_EstimatedPosIndex);
    }
 
    //Insert new item
@@ -1868,7 +1869,7 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
    c_NewPos = this->mc_UniqueMessages.insert(orc_Message.c_CanIdDec, orc_Message);
    // New message, new data. Update the timestamp of the CAN message data and its bytes
    c_NewPos->c_GreyOutInformation.u32_DataChangedTimeStamp =
-      static_cast<uint32>(c_NewPos->c_CanMsg.u64_TimeStamp / 1000ULL);
+      static_cast<uint32_t>(c_NewPos->c_CanMsg.u64_TimeStamp / 1000ULL);
    for (u8_DbCounter = 0; u8_DbCounter < c_NewPos->c_CanMsg.u8_DLC; ++u8_DbCounter)
    {
       c_NewPos->c_GreyOutInformation.c_DataBytesChangedTimeStamps[u8_DbCounter] =
@@ -1897,21 +1898,21 @@ void C_CamMetTreeModel::m_HandleNewUniqueMessage(const C_CamMetTreeLoggerData & 
    Index of new message (may be estimated)
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_CamMetTreeModel::m_GetPosIndexForUniqueMessage(const C_SCLString & orc_AbsoluteTimeStamp) const
+int32_t C_CamMetTreeModel::m_GetPosIndexForUniqueMessage(const C_SclString & orc_AbsoluteTimeStamp) const
 {
-   sintn sn_EstimatedPosIndex = 0;
+   int32_t s32_EstimatedPosIndex = 0;
    //Get first valid item after the position it should be at
-   const QMap<C_SCLString, C_SCLString>::const_iterator c_EstimatedPos = this->mc_UniqueMessagesOrdering.upperBound(
+   const QMap<C_SclString, C_SclString>::const_iterator c_EstimatedPos = this->mc_UniqueMessagesOrdering.upperBound(
       orc_AbsoluteTimeStamp);
 
    //Calc estimated new position index
-   for (QMap<C_SCLString, C_SCLString>::const_iterator c_ItUniqueMessages = this->mc_UniqueMessagesOrdering.begin();
+   for (QMap<C_SclString, C_SclString>::const_iterator c_ItUniqueMessages = this->mc_UniqueMessagesOrdering.begin();
         (c_ItUniqueMessages != this->mc_UniqueMessagesOrdering.end()) && (c_ItUniqueMessages != c_EstimatedPos);
         ++c_ItUniqueMessages)
    {
-      ++sn_EstimatedPosIndex;
+      ++s32_EstimatedPosIndex;
    }
-   return sn_EstimatedPosIndex;
+   return s32_EstimatedPosIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1926,92 +1927,94 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
    {
       // ms resolution is enough
       // Using US as base because we want to compare with the US value of the CAN message.
-      // The TGL_GetTickCountUS can have a difference of 1 to 2 seconds because of a different rounding
-      const uint32 u32_CurrentTime = static_cast<uint32>(TGL_GetTickCountUS() / 1000ULL);
-      QMap<C_SCLString, C_CamMetTreeLoggerData>::iterator c_It;
-      sintn sn_RowCounter = 0;
+      // The TglGetTickCountUs can have a difference of 1 to 2 seconds because of a different rounding
+      const uint32_t u32_CurrentTime = static_cast<uint32_t>(TglGetTickCountUs() / 1000ULL);
+      QMap<C_SclString, C_CamMetTreeLoggerData>::iterator c_It;
+      int32_t s32_RowCounter = 0;
 
       for (c_It = this->mc_UniqueMessages.begin(); c_It != this->mc_UniqueMessages.end(); ++c_It)
       {
          C_CamMetTreeLoggerData & rc_Data = c_It.value();
-         const uint32 u32_DiffMsg = u32_CurrentTime - static_cast<uint32>(rc_Data.c_CanMsg.u64_TimeStamp / 1000ULL);
+         const uint32_t u32_DiffMsg = u32_CurrentTime - static_cast<uint32_t>(rc_Data.c_CanMsg.u64_TimeStamp / 1000ULL);
          // TimeStamp for data is set by AddRows when new CAN messages are added to the model
-         sintn sn_TransparencyStepMsg;
-         sintn sn_CounterDataByte;
+         int32_t s32_TransparencyStepMsg;
+         int32_t s32_CounterDataByte;
          bool q_DataByteChangedTransparency = false;
 
          // Check message gray out adaption
-         sn_TransparencyStepMsg = C_CamMetTreeModel::mh_GetTransparencyStep(u32_DiffMsg);
+         s32_TransparencyStepMsg = C_CamMetTreeModel::mh_GetTransparencyStep(u32_DiffMsg);
 
          // Use each value and check if gray out value changed
-         for (std::map<stw_types::sint32, stw_types::uint32>::const_iterator c_ItValue =
+         for (std::map<int32_t, uint32_t>::const_iterator c_ItValue =
                  rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToChangedTimeStamps.begin();
               c_ItValue != rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToChangedTimeStamps.end(); ++c_ItValue)
          {
-            const uint32 u32_DiffDataByte = u32_CurrentTime - c_ItValue->second;
-            sintn sn_TransparencyStepDataByte;
+            const uint32_t u32_DiffDataByte = u32_CurrentTime - c_ItValue->second;
+            int32_t s32_TransparencyStepDataByte;
 
-            sn_TransparencyStepDataByte = C_CamMetTreeModel::mh_GetTransparencyStep(u32_DiffDataByte);
+            s32_TransparencyStepDataByte = C_CamMetTreeModel::mh_GetTransparencyStep(u32_DiffDataByte);
 
-            if (sn_TransparencyStepDataByte !=
+            if (s32_TransparencyStepDataByte !=
                 rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue[c_ItValue->first])
             {
-               QVector<sintn> c_Roles;
-               const sint32 s32_Row = C_CamMetUtil::h_GetRowForMultiplexerValue(rc_Data.c_Signals, c_ItValue->first);
+               QVector<int32_t> c_Roles;
+               const int32_t s32_Row = C_CamMetUtil::h_GetRowForMultiplexerValue(rc_Data.c_Signals, c_ItValue->first);
                // Save the new value
                rc_Data.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue[c_ItValue->first] =
-                  sn_TransparencyStepDataByte;
+                  s32_TransparencyStepDataByte;
                //Trigger ui update
 
                // Send the change only if the value changed really and let update the foreground only
-               c_Roles.push_back(static_cast<sintn>(Qt::ForegroundRole));
-               this->dataChanged(this->index(s32_Row, 0, this->index(sn_RowCounter, 0)),
-                                 this->index(s32_Row, 0, this->index(sn_RowCounter, 0)), c_Roles);
+               c_Roles.push_back(static_cast<int32_t>(Qt::ForegroundRole));
+               this->dataChanged(this->index(s32_Row, 0, this->index(s32_RowCounter, 0)),
+                                 this->index(s32_Row, 0, this->index(s32_RowCounter, 0)), c_Roles);
             }
          }
 
          // Check data byte gray out adaption
-         for (sn_CounterDataByte = 0; sn_CounterDataByte < rc_Data.c_CanMsg.u8_DLC; ++sn_CounterDataByte)
+         for (s32_CounterDataByte = 0; s32_CounterDataByte < rc_Data.c_CanMsg.u8_DLC; ++s32_CounterDataByte)
          {
-            const uint32 u32_DiffDataByte = u32_CurrentTime -
-                                            rc_Data.c_GreyOutInformation.c_DataBytesChangedTimeStamps[sn_CounterDataByte
-                                            ];
-            sintn sn_TransparencyStepDataByte;
+            const uint32_t u32_DiffDataByte = u32_CurrentTime -
+                                              rc_Data.c_GreyOutInformation.c_DataBytesChangedTimeStamps[
+               s32_CounterDataByte
+                                              ];
+            int32_t s32_TransparencyStepDataByte;
 
-            sn_TransparencyStepDataByte = C_CamMetTreeModel::mh_GetTransparencyStep(u32_DiffDataByte);
+            s32_TransparencyStepDataByte = C_CamMetTreeModel::mh_GetTransparencyStep(u32_DiffDataByte);
 
-            if (sn_TransparencyStepDataByte != rc_Data.c_GreyOutInformation.c_GrayOutValueDataBytes[sn_CounterDataByte])
+            if (s32_TransparencyStepDataByte !=
+                rc_Data.c_GreyOutInformation.c_GrayOutValueDataBytes[s32_CounterDataByte])
             {
                // At least one data byte has a changed transparency value
                q_DataByteChangedTransparency = true;
                // Save the new value
-               rc_Data.c_GreyOutInformation.c_GrayOutValueDataBytes[sn_CounterDataByte] = sn_TransparencyStepDataByte;
+               rc_Data.c_GreyOutInformation.c_GrayOutValueDataBytes[s32_CounterDataByte] = s32_TransparencyStepDataByte;
             }
          }
 
-         if (sn_TransparencyStepMsg != rc_Data.c_GreyOutInformation.sn_GrayOutValueMsg)
+         if (s32_TransparencyStepMsg != rc_Data.c_GreyOutInformation.s32_GrayOutValueMsg)
          {
             // Update the gray out value. The gray out value for data will be adapted too
-            const sint32 s32_ColIDTime = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
-            const sint32 s32_ColIDCounter = C_CamMetTreeModel::h_EnumToColumn(eCAN_COUNTER);
-            QVector<sintn> c_Roles;
+            const int32_t s32_ColIdTime = C_CamMetTreeModel::h_EnumToColumn(eTIME_STAMP);
+            const int32_t s32_ColIdCounter = C_CamMetTreeModel::h_EnumToColumn(eCAN_COUNTER);
+            QVector<int32_t> c_Roles;
 
-            rc_Data.c_GreyOutInformation.sn_GrayOutValueMsg = sn_TransparencyStepMsg;
+            rc_Data.c_GreyOutInformation.s32_GrayOutValueMsg = s32_TransparencyStepMsg;
 
             // Send the change only if the value changed really and let update the foreground only
-            c_Roles.push_back(static_cast<sintn>(Qt::ForegroundRole));
-            this->dataChanged(this->index(sn_RowCounter, s32_ColIDTime), this->index(sn_RowCounter, s32_ColIDCounter),
+            c_Roles.push_back(static_cast<int32_t>(Qt::ForegroundRole));
+            this->dataChanged(this->index(s32_RowCounter, s32_ColIdTime), this->index(s32_RowCounter, s32_ColIdCounter),
                               c_Roles);
          }
          else if (q_DataByteChangedTransparency == true)
          {
             // Update the gray out value of CAN message data only.
-            const sint32 s32_ColData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
-            QVector<sintn> c_Roles;
+            const int32_t s32_ColData = C_CamMetTreeModel::h_EnumToColumn(eCAN_DATA);
+            QVector<int32_t> c_Roles;
 
             // Send the change only if the value changed really and let update the foreground only
-            c_Roles.push_back(static_cast<sintn>(Qt::ForegroundRole));
-            this->dataChanged(this->index(sn_RowCounter, s32_ColData), this->index(sn_RowCounter, s32_ColData),
+            c_Roles.push_back(static_cast<int32_t>(Qt::ForegroundRole));
+            this->dataChanged(this->index(s32_RowCounter, s32_ColData), this->index(s32_RowCounter, s32_ColData),
                               c_Roles);
          }
          else
@@ -2019,7 +2022,7 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
             // Nothing to do
          }
 
-         ++sn_RowCounter;
+         ++s32_RowCounter;
       }
    }
 }
@@ -2033,32 +2036,32 @@ void C_CamMetTreeModel::m_GrayOutTimer(void)
    Detected transparency step
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn C_CamMetTreeModel::mh_GetTransparencyStep(const uint32 ou32_DiffTime)
+int32_t C_CamMetTreeModel::mh_GetTransparencyStep(const uint32_t ou32_DiffTime)
 {
-   sintn sn_TransparencyStep;
+   int32_t s32_TransparencyStep;
 
    if (ou32_DiffTime > mu32_TRACE_TRANSPARENCY_TIME_START)
    {
       if (ou32_DiffTime >= mu32_TRACE_TRANSPARENCY_TIME_END)
       {
          // Maximum reached
-         sn_TransparencyStep = msn_TRACE_TRANSPARENCY_STEPS;
+         s32_TransparencyStep = ms32_TRACE_TRANSPARENCY_STEPS;
       }
       else
       {
          // Interpolation
-         const uint32 u32_DiffPart = ou32_DiffTime - mu32_TRACE_TRANSPARENCY_TIME_START;
-         sn_TransparencyStep =
-            static_cast<sintn>((u32_DiffPart * static_cast<uint32>(msn_TRACE_TRANSPARENCY_STEPS)) /
-                               mu32_TRACE_TRANSPARENCY_TIME_DIFF);
+         const uint32_t u32_DiffPart = ou32_DiffTime - mu32_TRACE_TRANSPARENCY_TIME_START;
+         s32_TransparencyStep =
+            static_cast<int32_t>((u32_DiffPart * static_cast<uint32_t>(ms32_TRACE_TRANSPARENCY_STEPS)) /
+                                 mu32_TRACE_TRANSPARENCY_TIME_DIFF);
       }
    }
    else
    {
-      sn_TransparencyStep = 0;
+      s32_TransparencyStep = 0;
    }
 
-   return sn_TransparencyStep;
+   return s32_TransparencyStep;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2080,9 +2083,9 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
    c_W1.reserve(orc_Message.c_Signals.size());
    c_W2.reserve(orc_Message.c_Signals.size());
    //Append words
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+   for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
    {
-      const C_OSCComMessageLoggerDataSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
+      const C_OscComMessageLoggerDataSignal & rc_Signal = orc_Message.c_Signals[u32_ItSig];
       c_W1.push_back(rc_Signal.c_Name.c_str());
       c_W2.push_back(rc_Signal.c_Unit.c_str());
    }
@@ -2098,9 +2101,9 @@ std::vector<QStringList> C_CamMetTreeModel::mh_GetCount(const C_CamMetTreeLogger
    \param[in]      os32_MaxLength   Maximum length the string may not exceed after calling this function
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const sint32 os32_MaxLength)
+void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const int32_t os32_MaxLength)
 {
-   orc_Str.resize(std::min(orc_Str.count(), static_cast<sintn>(os32_MaxLength)));
+   orc_Str.resize(std::min(orc_Str.count(), static_cast<int32_t>(os32_MaxLength)));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2114,9 +2117,9 @@ void C_CamMetTreeModel::mh_ResizeIfNecessary(QString & orc_Str, const sint32 os3
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * const opc_Item,
                                                        const C_CamMetTreeLoggerData & orc_Message,
-                                                       const bool oq_SignalInsert, const sint32 os32_MessageRow)
+                                                       const bool oq_SignalInsert, const int32_t os32_MessageRow)
 {
-   const std::vector<sintn> c_Order = C_CamMetUtil::h_GetMultiplexerOrder(orc_Message.c_Signals);
+   const std::vector<int32_t> c_Order = C_CamMetUtil::h_GetMultiplexerOrder(orc_Message.c_Signals);
 
    if (c_Order.size() == 0UL)
    {
@@ -2125,11 +2128,11 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
       {
          if ((oq_SignalInsert) && (os32_MessageRow >= 0))
          {
-            this->beginInsertRows(this->index(os32_MessageRow, 0), static_cast<sintn>(opc_Item->c_Children.size()),
-                                  static_cast<sintn>(opc_Item->c_Children.size() + orc_Message.c_Signals.size()));
+            this->beginInsertRows(this->index(os32_MessageRow, 0), static_cast<int32_t>(opc_Item->c_Children.size()),
+                                  static_cast<int32_t>(opc_Item->c_Children.size() + orc_Message.c_Signals.size()));
          }
          //Add
-         for (uint32 u32_ItSig = opc_Item->c_Children.size(); u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+         for (uint32_t u32_ItSig = opc_Item->c_Children.size(); u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
          {
             opc_Item->AddChild(new C_TblTreSimpleItem());
          }
@@ -2146,7 +2149,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          }
          //Remove
          opc_Item->ClearChildren();
-         for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+         for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
          {
             opc_Item->AddChild(new C_TblTreSimpleItem());
          }
@@ -2162,18 +2165,18 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
    }
    else
    {
-      std::vector<uint32> c_Expected;
-      std::vector<uint32> c_Current;
+      std::vector<uint32_t> c_Expected;
+      std::vector<uint32_t> c_Current;
       //Multiplexer
-      for (uint32 u32_ItOr = 0UL; u32_ItOr < c_Order.size(); ++u32_ItOr)
+      for (uint32_t u32_ItOr = 0UL; u32_ItOr < c_Order.size(); ++u32_ItOr)
       {
-         uint32 u32_Counter = 0UL;
-         for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+         uint32_t u32_Counter = 0UL;
+         for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
          {
-            const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
-            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            const C_OscComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
+            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
-               if (static_cast<sintn>(rc_SignalData.c_OscSignal.u16_MultiplexValue) == c_Order[u32_ItOr])
+               if (static_cast<int32_t>(rc_SignalData.c_OscSignal.u16_MultiplexValue) == c_Order[u32_ItOr])
                {
                   ++u32_Counter;
                }
@@ -2182,17 +2185,17 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
          c_Expected.push_back(u32_Counter);
       }
       //Others
-      for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
+      for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Message.c_Signals.size(); ++u32_ItSig)
       {
-         const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
-         if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+         const C_OscComMessageLoggerDataSignal & rc_SignalData = orc_Message.c_Signals[u32_ItSig];
+         if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT)
          {
             c_Expected.push_back(0UL);
          }
       }
       //Current state
       c_Current.reserve(opc_Item->c_Children.size());
-      for (uint32 u32_ItChild = 0UL; u32_ItChild < opc_Item->c_Children.size(); ++u32_ItChild)
+      for (uint32_t u32_ItChild = 0UL; u32_ItChild < opc_Item->c_Children.size(); ++u32_ItChild)
       {
          const C_TblTreSimpleItem * const pc_Child = opc_Item->c_Children[u32_ItChild];
          if (pc_Child != NULL)
@@ -2203,8 +2206,8 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
       //Compare
       if (c_Expected != c_Current)
       {
-         uint32 u32_InsertAt = 0UL;
-         uint32 u32_InsertNum = 0UL;
+         uint32_t u32_InsertAt = 0UL;
+         uint32_t u32_InsertNum = 0UL;
          const bool q_FixByInsertingNewChild = C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(c_Expected,
                                                                                                     c_Current,
                                                                                                     u32_InsertAt,
@@ -2216,7 +2219,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
                this->beginInsertRows(this->index(os32_MessageRow, 0), u32_InsertAt, u32_InsertAt);
             }
             C_TblTreSimpleItem * const pc_Parent = new C_TblTreSimpleItem();
-            for (uint32 u32_ItChild = 0UL; u32_ItChild < u32_InsertNum; ++u32_ItChild)
+            for (uint32_t u32_ItChild = 0UL; u32_ItChild < u32_InsertNum; ++u32_ItChild)
             {
                pc_Parent->AddChild(new C_TblTreSimpleItem());
             }
@@ -2235,10 +2238,10 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
             //Clear
             opc_Item->ClearChildren();
             //Rebuild as expected
-            for (uint32 u32_ItExpected = 0UL; u32_ItExpected < c_Expected.size(); ++u32_ItExpected)
+            for (uint32_t u32_ItExpected = 0UL; u32_ItExpected < c_Expected.size(); ++u32_ItExpected)
             {
                C_TblTreSimpleItem * const pc_Parent = new C_TblTreSimpleItem();
-               for (uint32 u32_ItChild = 0UL; u32_ItChild < c_Expected[u32_ItExpected]; ++u32_ItChild)
+               for (uint32_t u32_ItChild = 0UL; u32_ItChild < c_Expected[u32_ItExpected]; ++u32_ItChild)
                {
                   pc_Parent->AddChild(new C_TblTreSimpleItem());
                }
@@ -2261,7 +2264,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
    \param[in]     oq_Next               Flag for search direction of signals
                                           true:  Search the next entry, forward
                                           false: Search the previous entry, backward
-   \param[in,out] orsn_SignalIndex      Input: >= 0: signal index to start search; -1: start with message
+   \param[in,out] ors32_SignalIndex      Input: >= 0: signal index to start search; -1: start with message
                                         Output: >= 0: signal matches; -1: no signal matched or the message matches
    \param[out]    orq_LastSignalChecked true: all signals were checked of the message, not necessary to check in next
                                               round
@@ -2274,7 +2277,7 @@ void C_CamMetTreeModel::m_UpdateTreeItemBasedOnMessage(C_TblTreSimpleItem * cons
 */
 //----------------------------------------------------------------------------------------------------------------------
 bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_Data, const QString & orc_SearchString,
-                                             const bool oq_Next, stw_types::sintn & orsn_SignalIndex,
+                                             const bool oq_Next, int32_t & ors32_SignalIndex,
                                              bool & orq_LastSignalChecked) const
 {
    bool q_Return = false;
@@ -2283,14 +2286,14 @@ bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_
    {
       // Check only the string variant, which are visible
       // Strings which has no letters, no upper case necessary
-      const sintn osn_StartSignalRow = orsn_SignalIndex;
+      const int32_t os32_StartSignalRow = ors32_SignalIndex;
       bool q_SkipSignals = false;
 
       // Reset the signal row for not found as default output
-      orsn_SignalIndex = -1;
+      ors32_SignalIndex = -1;
 
       // Check message strings when no start signal is defined
-      if (osn_StartSignalRow < 0)
+      if (os32_StartSignalRow < 0)
       {
          q_Return = this->m_CheckMessageDataForSearch(orc_Data, orc_SearchString);
 
@@ -2311,13 +2314,13 @@ bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_
             if (q_Return == false)
             {
                // Check signals
-               uint32 u32_Counter = 0U;
+               uint32_t u32_Counter = 0U;
                bool q_SearchFinished = false;
 
-               if (osn_StartSignalRow > 0)
+               if (os32_StartSignalRow > 0)
                {
                   // Set start signal
-                  u32_Counter = static_cast<uint32>(osn_StartSignalRow);
+                  u32_Counter = static_cast<uint32_t>(os32_StartSignalRow);
                }
 
                do
@@ -2328,7 +2331,7 @@ bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_
                   if (q_Return == true)
                   {
                      // Found a match, search finished
-                     orsn_SignalIndex = static_cast<sintn>(u32_Counter);
+                     ors32_SignalIndex = static_cast<int32_t>(u32_Counter);
                      q_SearchFinished = true;
                   }
                   else
@@ -2360,7 +2363,7 @@ bool C_CamMetTreeModel::m_CheckDataForSearch(const C_CamMetTreeLoggerData & orc_
                while (q_SearchFinished == false);
 
                // Check if the last signal was reached. Not relevant if it matched or not
-               if (u32_Counter == (static_cast<uint32>(orc_Data.c_Signals.size()) - 1UL))
+               if (u32_Counter == (static_cast<uint32_t>(orc_Data.c_Signals.size()) - 1UL))
                {
                   orq_LastSignalChecked = true;
                }
@@ -2404,7 +2407,7 @@ bool C_CamMetTreeModel::m_CheckMessageDataForSearch(const C_CamMetTreeLoggerData
    bool q_Return = false;
 
    // Compare all in upper case to be case insensitive
-   const C_SCLString c_SearchString = orc_SearchString.toUpper().toStdString().c_str();
+   const C_SclString c_SearchString = orc_SearchString.toUpper().toStdString().c_str();
 
    if (orc_SearchString != "")
    {
@@ -2461,13 +2464,13 @@ bool C_CamMetTreeModel::m_CheckMessageDataForSearch(const C_CamMetTreeLoggerData
    \retval   false   The signal does not match to search string
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMetTreeModel::m_CheckSignalDataForSearch(const C_OSCComMessageLoggerDataSignal & orc_SignalData,
+bool C_CamMetTreeModel::m_CheckSignalDataForSearch(const C_OscComMessageLoggerDataSignal & orc_SignalData,
                                                    const QString & orc_SearchString) const
 {
    bool q_Return = false;
 
    // Compare all in upper case to be case insensitive
-   const C_SCLString c_SearchString = orc_SearchString.toUpper().toStdString().c_str();
+   const C_SclString c_SearchString = orc_SearchString.toUpper().toStdString().c_str();
 
    if (orc_SearchString != "")
    {
@@ -2508,88 +2511,88 @@ bool C_CamMetTreeModel::m_CheckSignalDataForSearch(const C_OSCComMessageLoggerDa
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Checks a signal for its multiplexer configuration and the resulting row position and tree layer position
 
-   If orsn_MultiplexedSignalRow is >= 0, the checked  signal is a multiplexed signal and the signal is on
-   the third level of the model. Then osn_SignalRow equals the row of the multiplexer signal.
+   If ors32_MultiplexedSignalRow is >= 0, the checked  signal is a multiplexed signal and the signal is on
+   the third level of the model. Then os32_SignalRow equals the row of the multiplexer signal.
 
-   If orsn_MultiplexedSignalRow is < 0, the checked signal can be a normal signal or the multiplexer signal and is on
+   If ors32_MultiplexedSignalRow is < 0, the checked signal can be a normal signal or the multiplexer signal and is on
    the second level of the model.
 
    Condition: The vector of signals must be sorted by function mh_SortMultiplexedSignals or by default
 
    \param[in]       orc_Signals                All signals to compare and check with
    \param[in]       ou32_SignalIndexToCheck    The signal to check
-   \param[out]      orsn_SignalRow              >= 0: If orsn_MultiplexedSignalRow >= 0: Row of Multiplexer signal
-                                                       If orsn_MultiplexedSignalRow < 0: Row of checked signal
+   \param[out]      ors32_SignalRow              >= 0: If ors32_MultiplexedSignalRow >= 0: Row of Multiplexer signal
+                                                       If ors32_MultiplexedSignalRow < 0: Row of checked signal
                                                  < 0: ou32_SignalIndexToCheck not valid
-   \param[out]      orsn_MultiplexedSignalRow   >= 0: Row of Multiplexed signal
+   \param[out]      ors32_MultiplexedSignalRow   >= 0: Row of Multiplexed signal
                                                  < 0: Signal is not a multiplexed signal
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeModel::m_GetMultiplexedMsgSignalRow(const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals,
-                                                     const uint32 ou32_SignalIndexToCheck, sintn & orsn_SignalRow,
-                                                     sintn & orsn_MultiplexedSignalRow) const
+void C_CamMetTreeModel::m_GetMultiplexedMsgSignalRow(const std::vector<C_OscComMessageLoggerDataSignal> & orc_Signals,
+                                                     const uint32_t ou32_SignalIndexToCheck, int32_t & ors32_SignalRow,
+                                                     int32_t & ors32_MultiplexedSignalRow) const
 {
-   orsn_SignalRow = -1;
-   orsn_MultiplexedSignalRow = -1;
+   ors32_SignalRow = -1;
+   ors32_MultiplexedSignalRow = -1;
 
    if (ou32_SignalIndexToCheck < orc_Signals.size())
    {
-      uint32 u32_Counter;
-      const C_OSCCanSignal & rc_OscSginalToCheck = orc_Signals[ou32_SignalIndexToCheck].c_OscSignal;
+      uint32_t u32_Counter;
+      const C_OscCanSignal & rc_OscSginalToCheck = orc_Signals[ou32_SignalIndexToCheck].c_OscSignal;
 
       // Multiplexer signals come first
       // Multiplexed signals has the matching multiplexer signal as parent
       // Default signals come after the multiplexer signals with its multiplexed signals
-      if (rc_OscSginalToCheck.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+      if (rc_OscSginalToCheck.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT)
       {
-         orsn_SignalRow = 0;
+         ors32_SignalRow = 0;
 
          for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
          {
-            const C_OSCCanSignal & rc_OscSginal = orc_Signals[u32_Counter].c_OscSignal;
+            const C_OscCanSignal & rc_OscSginal = orc_Signals[u32_Counter].c_OscSignal;
 
             // Count all multiplexer signals which are always at the beginning and all default signals
             // which have a lower index
             // Multiplexed signals are not on the same level
-            if ((rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) ||
-                ((rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT) &&
+            if ((rc_OscSginal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL) ||
+                ((rc_OscSginal.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT) &&
                  (u32_Counter < ou32_SignalIndexToCheck)))
             {
-               ++orsn_SignalRow;
+               ++ors32_SignalRow;
             }
          }
       }
-      else if (rc_OscSginalToCheck.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+      else if (rc_OscSginalToCheck.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
       {
-         orsn_MultiplexedSignalRow = 0;
+         ors32_MultiplexedSignalRow = 0;
 
          // The signal is on third level of the tree below the multiplexer signal
          for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
          {
-            const C_OSCComMessageLoggerDataSignal & rc_Signal = orc_Signals[u32_Counter];
-            const C_OSCCanSignal & rc_OscSginal = rc_Signal.c_OscSignal;
+            const C_OscComMessageLoggerDataSignal & rc_Signal = orc_Signals[u32_Counter];
+            const C_OscCanSignal & rc_OscSginal = rc_Signal.c_OscSignal;
 
             if ((u32_Counter < ou32_SignalIndexToCheck) &&
-                (rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                (rc_OscSginal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
                 (rc_OscSginal.u16_MultiplexValue == rc_OscSginalToCheck.u16_MultiplexValue))
             {
                // Search the multiplexed signals with the same multiplexer value with a lower index to get the row of
                // the checked signal below the multiplexer signal
-               ++orsn_MultiplexedSignalRow;
+               ++ors32_MultiplexedSignalRow;
             }
-            else if (rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+            else if (rc_OscSginal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
             {
-               const sintn sn_Value = rc_Signal.c_RawValueDec.ToIntDef(-1);
+               const int32_t s32_Value = rc_Signal.c_RawValueDec.ToIntDef(-1);
 
-               if (sn_Value >= 0)
+               if (s32_Value >= 0)
                {
-                  const uint16 u16_Value = static_cast<uint16>(sn_Value);
+                  const uint16_t u16_Value = static_cast<uint16_t>(s32_Value);
                   if (u16_Value <= rc_OscSginalToCheck.u16_MultiplexValue)
                   {
                      // In this case, this is the row of the multiplexer signal
                      // Starting with -1 all multiplexer signals whit a concrete value lower or equal to the
                      // expected value count for the row
-                     ++orsn_SignalRow;
+                     ++ors32_SignalRow;
                   }
                }
             }
@@ -2602,24 +2605,24 @@ void C_CamMetTreeModel::m_GetMultiplexedMsgSignalRow(const std::vector<C_OSCComM
       else
       {
          // Multiplexer signal
-         const sintn sn_CheckValue = orc_Signals[ou32_SignalIndexToCheck].c_RawValueDec.ToIntDef(-1);
+         const int32_t s32_CheckValue = orc_Signals[ou32_SignalIndexToCheck].c_RawValueDec.ToIntDef(-1);
 
-         if (sn_CheckValue >= 0)
+         if (s32_CheckValue >= 0)
          {
             for (u32_Counter = 0U; u32_Counter < orc_Signals.size(); ++u32_Counter)
             {
-               const C_OSCComMessageLoggerDataSignal & rc_Signal = orc_Signals[u32_Counter];
-               const C_OSCCanSignal & rc_OscSginal = rc_Signal.c_OscSignal;
-               const sintn sn_Value = rc_Signal.c_RawValueDec.ToIntDef(-1);
+               const C_OscComMessageLoggerDataSignal & rc_Signal = orc_Signals[u32_Counter];
+               const C_OscCanSignal & rc_OscSginal = rc_Signal.c_OscSignal;
+               const int32_t s32_Value = rc_Signal.c_RawValueDec.ToIntDef(-1);
 
-               if (sn_Value >= 0)
+               if (s32_Value >= 0)
                {
                   // Starting with -1 all multiplexer signals whit a concrete value lower or equal to the
                   // expected value count for the row
-                  if ((rc_OscSginal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
-                      (sn_Value <= sn_CheckValue))
+                  if ((rc_OscSginal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+                      (s32_Value <= s32_CheckValue))
                   {
-                     ++orsn_SignalRow;
+                     ++ors32_SignalRow;
                   }
                }
             }
@@ -2635,8 +2638,8 @@ void C_CamMetTreeModel::m_GetMultiplexedMsgSignalRow(const std::vector<C_OSCComM
 void C_CamMetTreeModel::m_ResetSearch(void)
 {
    this->mc_LastSearchedString = "";
-   this->msn_LastSearchedMessageRow = -1;
-   this->msn_LastSearchedSignalRow = -1;
+   this->ms32_LastSearchedMessageRow = -1;
+   this->ms32_LastSearchedSignalRow = -1;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2655,14 +2658,14 @@ void C_CamMetTreeModel::m_ResetSearch(void)
 //----------------------------------------------------------------------------------------------------------------------
 C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGreyOutInformation(
    const C_CamMetTreeLoggerData & orc_MessagePrev, const C_CamMetTreeLoggerData & orc_MessageNew,
-   const uint32 ou32_PrevMsgTimeStamp, const uint32 ou32_NewMsgTimeStamp, const sint32 os32_MultiplexerValue,
+   const uint32_t ou32_PrevMsgTimeStamp, const uint32_t ou32_NewMsgTimeStamp, const int32_t os32_MultiplexerValue,
    bool & orq_UpdateDataTimeStamp)
 {
    C_CamMetTreeLoggerDataGreyOutInformation c_Retval;
 
    orq_UpdateDataTimeStamp = false;
 
-   c_Retval.sn_GrayOutValueMsg = orc_MessagePrev.c_GreyOutInformation.sn_GrayOutValueMsg;
+   c_Retval.s32_GrayOutValueMsg = orc_MessagePrev.c_GreyOutInformation.s32_GrayOutValueMsg;
    c_Retval.c_MapMultiplexerValueToGrayOutValue =
       orc_MessagePrev.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue;
    c_Retval.c_GrayOutValueDataBytes =
@@ -2691,7 +2694,7 @@ C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGr
    if (orc_MessagePrev.c_CanMsg.u8_DLC < orc_MessageNew.c_CanMsg.u8_DLC)
    {
       //reset the gap between old and new dlc
-      for (uint8 u8_DbCounter = orc_MessagePrev.c_CanMsg.u8_DLC; u8_DbCounter < orc_MessageNew.c_CanMsg.u8_DLC;
+      for (uint8_t u8_DbCounter = orc_MessagePrev.c_CanMsg.u8_DLC; u8_DbCounter < orc_MessageNew.c_CanMsg.u8_DLC;
            ++u8_DbCounter)
       {
          // Set the current timestamp for the changed byte
@@ -2700,7 +2703,7 @@ C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGr
    }
 
    //reset the gap between old and new dlc
-   for (uint8 u8_DbCounter = 0; u8_DbCounter < orc_MessagePrev.c_CanMsg.u8_DLC; ++u8_DbCounter)
+   for (uint8_t u8_DbCounter = 0; u8_DbCounter < orc_MessagePrev.c_CanMsg.u8_DLC; ++u8_DbCounter)
    {
       //replace timestamp when databyte has changed
       if (orc_MessagePrev.c_CanMsg.au8_Data[u8_DbCounter] != orc_MessageNew.c_CanMsg.au8_Data[u8_DbCounter])
@@ -2734,7 +2737,7 @@ C_CamMetTreeLoggerDataGreyOutInformation C_CamMetTreeModel::mh_ExtractPreviousGr
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerData & orc_Message,
                                                            const C_CamMetTreeLoggerDataGreyOutInformation & orc_StoredGrayOutInformation, const bool oq_UpdateDataTimeStamp,
-                                                           const uint32 ou32_PrevMsgTimeStamp)
+                                                           const uint32_t ou32_PrevMsgTimeStamp)
 {
    if (oq_UpdateDataTimeStamp == true)
    {
@@ -2748,14 +2751,14 @@ void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerDat
    }
 
    // Reassign the data byte timestamps
-   for (uint8 u8_DbCounter = 0; u8_DbCounter < 8U; ++u8_DbCounter)
+   for (uint8_t u8_DbCounter = 0; u8_DbCounter < 8U; ++u8_DbCounter)
    {
       orc_Message.c_GreyOutInformation.c_DataBytesChangedTimeStamps[u8_DbCounter] =
          orc_StoredGrayOutInformation.c_DataBytesChangedTimeStamps[u8_DbCounter];
    }
 
    // Restore previous values after the assignment to avoid further temporary copies of the instance
-   orc_Message.c_GreyOutInformation.sn_GrayOutValueMsg = orc_StoredGrayOutInformation.sn_GrayOutValueMsg;
+   orc_Message.c_GreyOutInformation.s32_GrayOutValueMsg = orc_StoredGrayOutInformation.s32_GrayOutValueMsg;
    orc_Message.c_GreyOutInformation.c_MapMultiplexerValueToGrayOutValue =
       orc_StoredGrayOutInformation.c_MapMultiplexerValueToGrayOutValue;
    orc_Message.c_GreyOutInformation.c_MapMultiplexerValueToChangedTimeStamps =
@@ -2775,9 +2778,9 @@ void C_CamMetTreeModel::mh_ApplyPreviousGreyOutInformation(C_CamMetTreeLoggerDat
    \retval false No valid solution could be found
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint32> & orc_ExpectedVec,
-                                                          const std::vector<uint32> & orc_CurrentVec,
-                                                          uint32 & oru32_InsertAt, uint32 & oru32_InsertNum)
+bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint32_t> & orc_ExpectedVec,
+                                                          const std::vector<uint32_t> & orc_CurrentVec,
+                                                          uint32_t & oru32_InsertAt, uint32_t & oru32_InsertNum)
 {
    bool q_FixByInsertingNewChild = false;
 
@@ -2785,7 +2788,7 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
    oru32_InsertNum = 0UL;
    if (orc_ExpectedVec.size() == (orc_CurrentVec.size() + 1UL))
    {
-      uint32 u32_Counter = 0UL;
+      uint32_t u32_Counter = 0UL;
       bool q_FoundMismatch = false;
       //Assuming we hit no problem
       q_FixByInsertingNewChild = true;
@@ -2799,9 +2802,9 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
       {
          //If all valid, use last item
          oru32_InsertAt = orc_CurrentVec.size();
-         oru32_InsertNum = orc_ExpectedVec[static_cast<std::vector<uint32>::size_type>(orc_ExpectedVec.size() - 1UL)];
+         oru32_InsertNum = orc_ExpectedVec[static_cast<std::vector<uint32_t>::size_type>(orc_ExpectedVec.size() - 1UL)];
       }
-      for (uint32 u32_ItCurrent = 0; (u32_ItCurrent < orc_CurrentVec.size()) && q_FixByInsertingNewChild;
+      for (uint32_t u32_ItCurrent = 0; (u32_ItCurrent < orc_CurrentVec.size()) && q_FixByInsertingNewChild;
            ++u32_ItCurrent)
       {
          if (u32_Counter < orc_ExpectedVec.size())
@@ -2873,29 +2876,29 @@ bool C_CamMetTreeModel::mh_CheckForFixByInsertingNewChild(const std::vector<uint
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLoggerData & orc_PreviousMessage,
                                                                 const C_CamMetTreeLoggerData & orc_NewMessage,
-                                                                const sint32 os32_MuxValue)
+                                                                const int32_t os32_MuxValue)
 
 {
-   std::vector<C_OSCComMessageLoggerDataSignal> c_KeptSignals;
+   std::vector<C_OscComMessageLoggerDataSignal> c_KeptSignals;
 
    //Only if mux value valid there is a chance that some signals should be kept
    if (os32_MuxValue >= 0)
    {
       //Look for signals which might not be present in the new message
-      for (std::vector<C_OSCComMessageLoggerDataSignal>::iterator c_ItSig = orc_PreviousMessage.c_Signals.begin();
+      for (std::vector<C_OscComMessageLoggerDataSignal>::iterator c_ItSig = orc_PreviousMessage.c_Signals.begin();
            c_ItSig != orc_PreviousMessage.c_Signals.end(); ++c_ItSig)
       {
-         const C_OSCComMessageLoggerDataSignal & rc_Sig = *c_ItSig;
-         if (rc_Sig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+         const C_OscComMessageLoggerDataSignal & rc_Sig = *c_ItSig;
+         if (rc_Sig.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT)
          {
             //Guaranteed to be replaced
          }
          else
          {
-            if (rc_Sig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            if (rc_Sig.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
                //Multiplexed
-               if (rc_Sig.c_OscSignal.u16_MultiplexValue == static_cast<uint16>(os32_MuxValue))
+               if (rc_Sig.c_OscSignal.u16_MultiplexValue == static_cast<uint16_t>(os32_MuxValue))
                {
                   //Will be replaced
                }
@@ -2911,7 +2914,7 @@ void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLogg
                // In case of a DLC error the signal will be replaced in any case and avoid getting the invalid value
                // as integer
                if ((rc_Sig.q_DlcError == true) ||
-                   (rc_Sig.c_RawValueDec.ToInt() == static_cast<uint16>(os32_MuxValue)))
+                   (rc_Sig.c_RawValueDec.ToInt() == static_cast<uint16_t>(os32_MuxValue)))
                {
                   //Will be replaced
                }
@@ -2930,7 +2933,7 @@ void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLogg
    //Reserve
    orc_PreviousMessage.c_Signals.reserve(orc_PreviousMessage.c_Signals.size() + c_KeptSignals.size());
    //Append left signals to merge
-   for (std::vector<C_OSCComMessageLoggerDataSignal>::const_iterator c_ItSig = c_KeptSignals.begin();
+   for (std::vector<C_OscComMessageLoggerDataSignal>::const_iterator c_ItSig = c_KeptSignals.begin();
         c_ItSig != c_KeptSignals.end(); ++c_ItSig)
    {
       orc_PreviousMessage.c_Signals.push_back(*c_ItSig);
@@ -2948,29 +2951,29 @@ void C_CamMetTreeModel::mh_CopyMessageWhileKeepingUniqueSignals(C_CamMetTreeLogg
    Translated signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
-   const std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals, const sint32 os32_SignalIndex,
-   const sint32 os32_SignalIndexL2)
+uint32_t C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
+   const std::vector<C_OscComMessageLoggerDataSignal> & orc_Signals, const int32_t os32_SignalIndex,
+   const int32_t os32_SignalIndexL2)
 {
-   uint32 u32_Retval = 0UL;
-   const std::vector<sintn> c_Order = C_CamMetUtil::h_GetMultiplexerOrder(orc_Signals);
-   uint32 u32_Counter = 0UL;
+   uint32_t u32_Retval = 0UL;
+   const std::vector<int32_t> c_Order = C_CamMetUtil::h_GetMultiplexerOrder(orc_Signals);
+   uint32_t u32_Counter = 0UL;
 
-   if (static_cast<uint32>(os32_SignalIndex) < c_Order.size())
+   if (static_cast<uint32_t>(os32_SignalIndex) < c_Order.size())
    {
       //Part of multiplexer
-      for (uint32 u32_ItSigL1 = 0UL; u32_ItSigL1 < orc_Signals.size(); ++u32_ItSigL1)
+      for (uint32_t u32_ItSigL1 = 0UL; u32_ItSigL1 < orc_Signals.size(); ++u32_ItSigL1)
       {
-         const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSigL1];
+         const C_OscComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSigL1];
          if (os32_SignalIndexL2 >= 0)
          {
-            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL)
+            if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
             {
                //Multiplexed
-               if (static_cast<sintn>(rc_SignalData.c_OscSignal.u16_MultiplexValue) ==
-                   c_Order[static_cast<uint32>(os32_SignalIndex)])
+               if (static_cast<int32_t>(rc_SignalData.c_OscSignal.u16_MultiplexValue) ==
+                   c_Order[static_cast<uint32_t>(os32_SignalIndex)])
                {
-                  if (u32_Counter == static_cast<uint32>(os32_SignalIndexL2))
+                  if (u32_Counter == static_cast<uint32_t>(os32_SignalIndexL2))
                   {
                      u32_Retval = u32_ItSigL1;
                      break;
@@ -2986,9 +2989,9 @@ uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
          else
          {
             //Multiplexer
-            if ((rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+            if ((rc_SignalData.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
                 (rc_SignalData.q_DlcError == false) &&
-                (rc_SignalData.c_RawValueDec.ToInt() == c_Order[static_cast<uint32>(os32_SignalIndex)]))
+                (rc_SignalData.c_RawValueDec.ToInt() == c_Order[static_cast<uint32_t>(os32_SignalIndex)]))
             {
                //Just use first multiplexer
                u32_Retval = u32_ItSigL1;
@@ -3003,12 +3006,12 @@ uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
       //Skip multiplexer in counting
       u32_Counter += c_Order.size();
       //Others
-      for (uint32 u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
+      for (uint32_t u32_ItSig = 0UL; u32_ItSig < orc_Signals.size(); ++u32_ItSig)
       {
-         const C_OSCComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSig];
-         if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_DEFAULT)
+         const C_OscComMessageLoggerDataSignal & rc_SignalData = orc_Signals[u32_ItSig];
+         if (rc_SignalData.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_DEFAULT)
          {
-            if (u32_Counter == static_cast<uint32>(os32_SignalIndex))
+            if (u32_Counter == static_cast<uint32_t>(os32_SignalIndex))
             {
                u32_Retval = u32_ItSig;
                break;
@@ -3036,11 +3039,11 @@ uint32 C_CamMetTreeModel::mh_TranslateTreeRowsToSignalIndex(
 bool C_CamMetTreeModel::mh_IsMessageMultiplexed(const C_CamMetTreeLoggerData & orc_Data)
 {
    bool q_Return = false;
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    for (u32_Counter = 0U; u32_Counter < orc_Data.c_Signals.size(); ++u32_Counter)
    {
-      if (orc_Data.c_Signals[u32_Counter].c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      if (orc_Data.c_Signals[u32_Counter].c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
          q_Return = true;
          break;
@@ -3068,34 +3071,34 @@ bool C_CamMetTreeModel::mh_IsMessageMultiplexed(const C_CamMetTreeLoggerData & o
    \param[in,out]   orc_Signals   Vector with signals to sort (input sorted by start bit)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OSCComMessageLoggerDataSignal> & orc_Signals)
+void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OscComMessageLoggerDataSignal> & orc_Signals)
 {
-   uint32 u32_MultiplexerCounter = 0U;
-   uint32 u32_SignalCounter;
+   uint32_t u32_MultiplexerCounter = 0U;
+   uint32_t u32_SignalCounter;
 
    //lint -e{864} Call as expected by interface
-   std::sort(orc_Signals.begin(), orc_Signals.end(), T_LoggerDataComparatorForMultiplexer());
+   std::sort(orc_Signals.begin(), orc_Signals.end(), C_LoggerDataComparatorForMultiplexer());
 
    // Search all multiplexed signal for each the multiplexer. Iterate over the multiplexer signals
    while (u32_MultiplexerCounter < orc_Signals.size())
    {
-      const C_OSCComMessageLoggerDataSignal & rc_MultiplexerSig = orc_Signals[u32_MultiplexerCounter];
-      if (rc_MultiplexerSig.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+      const C_OscComMessageLoggerDataSignal & rc_MultiplexerSig = orc_Signals[u32_MultiplexerCounter];
+      if (rc_MultiplexerSig.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         const sintn sn_MultiplexerValue = rc_MultiplexerSig.c_RawValueDec.ToIntDef(-1);
+         const int32_t s32_MultiplexerValue = rc_MultiplexerSig.c_RawValueDec.ToIntDef(-1);
 
-         if (sn_MultiplexerValue >= 0)
+         if (s32_MultiplexerValue >= 0)
          {
             // Compare the multiplexer value of this multiplexer signal with all multiplexed signals
             for (u32_SignalCounter = u32_MultiplexerCounter + 1U; u32_SignalCounter < orc_Signals.size();
                  ++u32_SignalCounter)
             {
                if ((orc_Signals[u32_SignalCounter].c_OscSignal.e_MultiplexerType ==
-                    C_OSCCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
+                    C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL) &&
                    (orc_Signals[u32_SignalCounter].c_OscSignal.u16_MultiplexValue ==
-                    static_cast<uint16>(sn_MultiplexerValue)))
+                    static_cast<uint16_t>(s32_MultiplexerValue)))
                {
-                  const C_OSCComMessageLoggerDataSignal c_SigCopy = orc_Signals[u32_SignalCounter];
+                  const C_OscComMessageLoggerDataSignal c_SigCopy = orc_Signals[u32_SignalCounter];
 
                   // Remove the signal from the original position
                   orc_Signals.erase(orc_Signals.begin() + u32_SignalCounter);
@@ -3121,7 +3124,7 @@ void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OSCComMessageLog
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Custom operator for sorting C_OSCComMessageLoggerDataSignal
+/*! \brief   Custom operator for sorting C_OscComMessageLoggerDataSignal
 
    All multiplexer signals will be sorted to the beginning (less than) in order of the set multiplexer value
 
@@ -3132,27 +3135,27 @@ void C_CamMetTreeModel::mh_SortMultiplexedSignals(std::vector<C_OSCComMessageLog
    \retval   false   orc_Data2 is less or equal than orc_Data1
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_CamMetTreeModel::T_LoggerDataComparatorForMultiplexer::operator ()(
-   const stw_opensyde_core::C_OSCComMessageLoggerDataSignal & orc_Data1,
-   const stw_opensyde_core::C_OSCComMessageLoggerDataSignal & orc_Data2) const
+bool C_CamMetTreeModel::C_LoggerDataComparatorForMultiplexer::operator ()(
+   const stw::opensyde_core::C_OscComMessageLoggerDataSignal & orc_Data1,
+   const stw::opensyde_core::C_OscComMessageLoggerDataSignal & orc_Data2) const
 {
    bool q_Return;
 
-   if ((orc_Data1.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
-       (orc_Data2.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL))
+   if ((orc_Data1.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL) &&
+       (orc_Data2.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL))
    {
       // Both are multiplexer signals, compare the values
-      const sintn sn_Value1 = orc_Data1.c_RawValueDec.ToIntDef(-1);
-      const sintn sn_Value2 = orc_Data2.c_RawValueDec.ToIntDef(-1);
+      const int32_t s32_Value1 = orc_Data1.c_RawValueDec.ToIntDef(-1);
+      const int32_t s32_Value2 = orc_Data2.c_RawValueDec.ToIntDef(-1);
 
-      q_Return = sn_Value1 < sn_Value2;
+      q_Return = s32_Value1 < s32_Value2;
    }
-   else if (orc_Data1.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+   else if (orc_Data1.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
    {
       // orc_Data2 is not a multiplexer signal
       q_Return = true;
    }
-   else if (orc_Data2.c_OscSignal.e_MultiplexerType == C_OSCCanSignal::eMUX_MULTIPLEXER_SIGNAL)
+   else if (orc_Data2.c_OscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
    {
       // orc_Data1 is not a multiplexer signal
       q_Return = false;

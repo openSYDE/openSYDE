@@ -10,22 +10,21 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwerrors.h"
-#include "TGLUtils.h"
-#include "C_UsHandler.h"
-#include "C_PuiSdHandler.h"
-#include "C_SdBueMessageSignalEditWidget.h"
+#include "stwerrors.hpp"
+#include "TglUtils.hpp"
+#include "C_UsHandler.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdBueMessageSignalEditWidget.hpp"
 #include "ui_C_SdBueMessageSignalEditWidget.h"
-#include "C_GtGetText.h"
+#include "C_GtGetText.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::errors;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -50,7 +49,7 @@ using namespace stw_opensyde_core;
 C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const opc_Parent) :
    QWidget(opc_Parent),
    mpc_Ui(new Ui::C_SdBueMessageSignalEditWidget),
-   me_ProtocolType(C_OSCCanProtocol::eLAYER2)
+   me_ProtocolType(C_OscCanProtocol::eLAYER2)
 {
    // Init UI
    mpc_Ui->setupUi(this);
@@ -129,15 +128,15 @@ C_SdBueMessageSignalEditWidget::C_SdBueMessageSignalEditWidget(QWidget * const o
 C_SdBueMessageSignalEditWidget::~C_SdBueMessageSignalEditWidget(void)
 {
    //Store splitter position
-   const QList<sintn> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
+   const QList<int32_t> c_Sizes = this->mpc_Ui->pc_Splitter->sizes();
 
    if (c_Sizes.size() > 0)
    {
-      const sintn sn_Size = c_Sizes.at(0);
+      const int32_t s32_Size = c_Sizes.at(0);
       //Avoid saving invalid values
-      if (sn_Size > 0)
+      if (s32_Size > 0)
       {
-         C_UsHandler::h_GetInstance()->SetSdBusEditLayoutSplitterX(sn_Size);
+         C_UsHandler::h_GetInstance()->SetSdBusEditLayoutSplitterHorizontal(s32_Size);
       }
    }
    delete mpc_Ui;
@@ -150,7 +149,7 @@ C_SdBueMessageSignalEditWidget::~C_SdBueMessageSignalEditWidget(void)
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::SetMessageSyncManager(
-   stw_opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
+   stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * const opc_Value) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageSyncManager(opc_Value);
    this->mpc_Ui->pc_SigPropertiesWidget->SetMessageSyncManager(opc_Value);
@@ -163,7 +162,7 @@ void C_SdBueMessageSignalEditWidget::SetMessageSyncManager(
    \param[in]  ore_Value   New value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_OSCCanProtocol::E_Type & ore_Value)
+void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_Value)
 {
    this->me_ProtocolType = ore_Value;
    this->mpc_Ui->pc_MsgPropertiesWidget->SetComProtocol(ore_Value);
@@ -177,7 +176,7 @@ void C_SdBueMessageSignalEditWidget::SetComProtocol(const stw_opensyde_core::C_O
    \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
    this->mpc_Ui->pc_MsgPropertiesWidget->setVisible(true);
@@ -198,12 +197,12 @@ void C_SdBueMessageSignalEditWidget::SelectMessage(const C_OSCCanMessageIdentifi
    \param[in]  oru32_SignalIndex    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                  const uint32 & oru32_SignalIndex) const
+void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                  const uint32_t & oru32_SignalIndex) const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
    this->mpc_Ui->pc_MsgPropertiesWidget->setVisible(false);
-   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(false, C_OSCCanMessageIdentificationIndices());
+   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(false, C_OscCanMessageIdentificationIndices());
    this->mpc_Ui->pc_SigPropertiesWidget->setVisible(true);
    this->mpc_Ui->pc_MessageLabel->setVisible(false);
    this->mpc_Ui->pc_SignalLabel->setVisible(true);
@@ -223,8 +222,8 @@ void C_SdBueMessageSignalEditWidget::SelectSignal(const C_OSCCanMessageIdentific
    \param[in]  oru32_SignalIndex    Signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::PartialSelectSignal(const C_OSCCanMessageIdentificationIndices & orc_MessageId,
-                                                         const uint32 & oru32_SignalIndex) const
+void C_SdBueMessageSignalEditWidget::PartialSelectSignal(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                         const uint32_t & oru32_SignalIndex) const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, oru32_SignalIndex);
    this->m_HandleDisabledPdoInfo(orc_MessageId);
@@ -239,7 +238,7 @@ void C_SdBueMessageSignalEditWidget::PartialSelectSignal(const C_OSCCanMessageId
 void C_SdBueMessageSignalEditWidget::Hide(void)
 {
    this->setVisible(false);
-   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(false, C_OSCCanMessageIdentificationIndices());
+   this->mpc_Ui->pc_MsgPropertiesWidget->SetMessageId(false, C_OscCanMessageIdentificationIndices());
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -250,9 +249,8 @@ void C_SdBueMessageSignalEditWidget::Hide(void)
    \param[in]  orc_DatapoolIndexes  All Datapool indexes associated to the same protocol
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SetNodeId(const stw_types::uint32 ou32_NodeIndex,
-                                               const stw_types::uint32 ou32_InterfaceIndex,
-                                               const std::vector<stw_types::uint32> & orc_DatapoolIndexes) const
+void C_SdBueMessageSignalEditWidget::SetNodeId(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                               const std::vector<uint32_t> & orc_DatapoolIndexes) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetNodeId(ou32_NodeIndex, ou32_InterfaceIndex, orc_DatapoolIndexes);
 }
@@ -263,7 +261,7 @@ void C_SdBueMessageSignalEditWidget::SetNodeId(const stw_types::uint32 ou32_Node
    \param[in]  ou32_BusIndex  Bus index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::SetBusId(const uint32 ou32_BusIndex) const
+void C_SdBueMessageSignalEditWidget::SetBusId(const uint32_t ou32_BusIndex) const
 {
    this->mpc_Ui->pc_MsgPropertiesWidget->SetBusId(ou32_BusIndex);
 }
@@ -288,7 +286,8 @@ void C_SdBueMessageSignalEditWidget::OnConnectionChange(void) const
    \param[in]  ou32_InterfaceIndex  Interface index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::OnNodeDisconnected(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex)
+void C_SdBueMessageSignalEditWidget::OnNodeDisconnected(const uint32_t ou32_NodeIndex,
+                                                        const uint32_t ou32_InterfaceIndex)
 {
    //Only relevant if visible
    if (this->mpc_Ui->pc_MsgPropertiesWidget->isVisible() == true)
@@ -312,16 +311,16 @@ void C_SdBueMessageSignalEditWidget::OnNodeDisconnected(const uint32 ou32_NodeIn
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::OnSignalCountOfMessageChanged(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+   const C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
    //Check if relevant
    bool q_Found = false;
-   const std::vector<stw_opensyde_core::C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds =
+   const std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> c_MatchingMessageIds =
       this->mpc_Ui->pc_MsgPropertiesWidget->GetMatchingMessageIds();
 
-   for (uint32 u32_ItMessage = 0; u32_ItMessage < c_MatchingMessageIds.size(); ++u32_ItMessage)
+   for (uint32_t u32_ItMessage = 0; u32_ItMessage < c_MatchingMessageIds.size(); ++u32_ItMessage)
    {
-      const stw_opensyde_core::C_OSCCanMessageIdentificationIndices & rc_MessageId =
+      const stw::opensyde_core::C_OscCanMessageIdentificationIndices & rc_MessageId =
          c_MatchingMessageIds[u32_ItMessage];
       if (rc_MessageId == orc_MessageId)
       {
@@ -378,8 +377,8 @@ void C_SdBueMessageSignalEditWidget::RefreshSelection(void)
 {
    bool q_MessageSelected;
    bool q_SignalSelected;
-   C_OSCCanMessageIdentificationIndices c_MessageId;
-   uint32 u32_SignalIndex;
+   C_OscCanMessageIdentificationIndices c_MessageId;
+   uint32_t u32_SignalIndex;
 
    this->GetLastSelection(q_MessageSelected, NULL,
                           q_SignalSelected, NULL,
@@ -412,19 +411,19 @@ void C_SdBueMessageSignalEditWidget::RefreshSelection(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected, QString * const opc_MessageName,
                                                       bool & orq_SignalSelected, QString * const opc_SignalName,
-                                                      C_OSCCanMessageIdentificationIndices * const opc_MessageId,
-                                                      uint32 * const opu32_SignalIndex) const
+                                                      C_OscCanMessageIdentificationIndices * const opc_MessageId,
+                                                      uint32_t * const opu32_SignalIndex) const
 {
    // do not use visibility of signal/message properties widget here, because they might be already invisible
    orq_MessageSelected = false;
    orq_SignalSelected = false;
 
    // check if message is selected (matching IDs vector is empty if signal is selected)
-   const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingIds =
+   const std::vector<C_OscCanMessageIdentificationIndices> c_MatchingIds =
       this->mpc_Ui->pc_MsgPropertiesWidget->GetMatchingMessageIds();
    if (c_MatchingIds.size() > 0UL)
    {
-      const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MatchingIds[0]);
+      const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_MatchingIds[0]);
       if (pc_Message != NULL)
       {
          orq_MessageSelected = true;
@@ -443,11 +442,11 @@ void C_SdBueMessageSignalEditWidget::GetLastSelection(bool & orq_MessageSelected
    // if no message is selected, check for signal selection
    if (orq_MessageSelected == false)
    {
-      const C_OSCCanMessageIdentificationIndices c_Id = this->mpc_Ui->pc_SigPropertiesWidget->GetMessageId();
-      const uint32 u32_SignalIndex = this->mpc_Ui->pc_SigPropertiesWidget->GetSignalIndex();
-      const C_OSCCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_Id);
-      const C_OSCNodeDataPoolListElement * const pc_Signal =
-         C_PuiSdHandler::h_GetInstance()->GetOSCCanDataPoolListElement(c_Id, u32_SignalIndex);
+      const C_OscCanMessageIdentificationIndices c_Id = this->mpc_Ui->pc_SigPropertiesWidget->GetMessageId();
+      const uint32_t u32_SignalIndex = this->mpc_Ui->pc_SigPropertiesWidget->GetSignalIndex();
+      const C_OscCanMessage * const pc_Message = C_PuiSdHandler::h_GetInstance()->GetCanMessage(c_Id);
+      const C_OscNodeDataPoolListElement * const pc_Signal =
+         C_PuiSdHandler::h_GetInstance()->GetOscCanDataPoolListElement(c_Id, u32_SignalIndex);
       if ((pc_Message != NULL) && (pc_Signal != NULL))
       {
          orq_MessageSelected = false;
@@ -511,7 +510,7 @@ void C_SdBueMessageSignalEditWidget::DisconnectAllChanges(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::showEvent(QShowEvent * const opc_Event)
 {
-   const sint32 s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditLayoutSplitterX();
+   const int32_t s32_FirstSegmentWidth = C_UsHandler::h_GetInstance()->GetSdBusEditLayoutSplitterHorizontal();
 
    this->mpc_Ui->pc_Splitter->SetFirstSegment(s32_FirstSegmentWidth);
    QWidget::showEvent(opc_Event);
@@ -523,7 +522,7 @@ void C_SdBueMessageSignalEditWidget::showEvent(QShowEvent * const opc_Event)
    \param[in]  orc_MessageId  Message id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_OnMessageIdChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMessageSignalEditWidget::m_OnMessageIdChange(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
    Q_EMIT (this->SigMessageIdChanged());
@@ -544,7 +543,7 @@ void C_SdBueMessageSignalEditWidget::m_OnMessageNameChange(void)
    \param[in]  orc_MessageId  Message id
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_OnMessageDlcChange(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMessageSignalEditWidget::m_OnMessageDlcChange(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectMessage(orc_MessageId);
@@ -558,7 +557,7 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaProperties(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId, const uint32 ou32_SignalIndex) const
+   const C_OscCanMessageIdentificationIndices & orc_MessageId, const uint32_t ou32_SignalIndex) const
 {
    this->mpc_Ui->pc_MsgLayoutViewerWidget->SelectSignal(orc_MessageId, ou32_SignalIndex);
 }
@@ -569,7 +568,7 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaProperties(
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
 {
-   C_OSCCanMessageIdentificationIndices c_MessageId;
+   C_OscCanMessageIdentificationIndices c_MessageId;
 
    //If current selected
    this->mpc_Ui->pc_SigPropertiesWidget->ReloadPosition();
@@ -589,9 +588,9 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalUpdatedViaSelector(void)
    \param[in]  ou32_SignalIndex  Active signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_OnSignalActivated(const uint32 ou32_SignalIndex)
+void C_SdBueMessageSignalEditWidget::m_OnSignalActivated(const uint32_t ou32_SignalIndex)
 {
-   C_OSCCanMessageIdentificationIndices c_MessageId;
+   C_OscCanMessageIdentificationIndices c_MessageId;
 
    if (m_GetMessageId(c_MessageId) == C_NO_ERR)
    {
@@ -605,7 +604,7 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalActivated(const uint32 ou32_Signa
    \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigSignalNameChanged(orc_MessageId);
 }
@@ -617,7 +616,7 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalNameChanged(const C_OSCCanMessage
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalStartBitChanged(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+   const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT (this->SigSignalStartBitChanged(orc_MessageId));
 }
@@ -629,7 +628,7 @@ void C_SdBueMessageSignalEditWidget::m_OnSignalStartBitChanged(
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageSignalEditWidget::m_OnSignalPositionChanged(
-   const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+   const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT (this->SigSignalPositionChanged(orc_MessageId));
 }
@@ -649,7 +648,7 @@ void C_SdBueMessageSignalEditWidget::m_RecheckErrorGlobal(void)
    \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_RecheckError(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMessageSignalEditWidget::m_RecheckError(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 {
    Q_EMIT this->SigRecheckError(orc_MessageId);
 }
@@ -663,13 +662,13 @@ void C_SdBueMessageSignalEditWidget::m_RecheckError(const C_OSCCanMessageIdentif
    \retval   C_RANGE    Message ID not found
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_SdBueMessageSignalEditWidget::m_GetMessageId(C_OSCCanMessageIdentificationIndices & orc_MessageId) const
+int32_t C_SdBueMessageSignalEditWidget::m_GetMessageId(C_OscCanMessageIdentificationIndices & orc_MessageId) const
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    if (this->mpc_Ui->pc_MsgPropertiesWidget->isVisible())
    {
-      const std::vector<C_OSCCanMessageIdentificationIndices> c_MatchingMessageIds =
+      const std::vector<C_OscCanMessageIdentificationIndices> c_MatchingMessageIds =
          this->mpc_Ui->pc_MsgPropertiesWidget->GetMatchingMessageIds();
       if (c_MatchingMessageIds.size() > 0)
       {
@@ -702,15 +701,15 @@ void C_SdBueMessageSignalEditWidget::m_OnChange(void)
    \param[in]  orc_MessageId  Message identification indices
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageSignalEditWidget::m_HandleDisabledPdoInfo(const C_OSCCanMessageIdentificationIndices & orc_MessageId)
+void C_SdBueMessageSignalEditWidget::m_HandleDisabledPdoInfo(const C_OscCanMessageIdentificationIndices & orc_MessageId)
 const
 {
    bool q_ShowDisabledPdoInfo = false;
 
-   if (this->me_ProtocolType == C_OSCCanProtocol::eCAN_OPEN)
+   if (this->me_ProtocolType == C_OscCanProtocol::eCAN_OPEN)
    {
       // Special case for CANopen: Check if PDOs are disabled
-      const C_OSCCanMessage * const pc_CanMessage =
+      const C_OscCanMessage * const pc_CanMessage =
          C_PuiSdHandler::h_GetInstance()->GetCanMessage(orc_MessageId);
 
       tgl_assert(pc_CanMessage != NULL);

@@ -16,13 +16,13 @@
 #include <unistd.h>
 #include <err.h>
 #include <pwd.h>
-#include "stwtypes.h"
-#include "TGLUtils.h"
-#include "CSCLString.h"
+#include "stwtypes.hpp"
+#include "TglUtils.hpp"
+#include "C_SclString.hpp"
+
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_tgl;
-using namespace stw_scl;
+using namespace stw::tgl;
+using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,12 +46,12 @@ using namespace stw_scl;
    \param[in]     os32_Line      Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_tgl::TGL_ReportAssertion(const charn * const opcn_Module, const charn * const opcn_Func,
-                                  const sint32 os32_Line)
+void TGL_PACKAGE stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func,
+                                               const int32_t os32_Line)
 {
-   C_SCLString c_Text;
-   c_Text = static_cast<C_SCLString>("Extremely nasty error\n (assertion in module ") + opcn_Module + ", function " +
-            opcn_Func + ", line " + C_SCLString::IntToStr(os32_Line) + ") !";
+   C_SclString c_Text;
+   c_Text = static_cast<C_SclString>("Extremely nasty error\n (assertion in module ") + opcn_Module + ", function " +
+            opcn_Func + ", line " + C_SclString::IntToStr(os32_Line) + ") !";
    warnx("%s", c_Text.c_str());
 }
 
@@ -66,14 +66,15 @@ void stw_tgl::TGL_ReportAssertion(const charn * const opcn_Module, const charn *
    \param[in]     os32_Line              Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_DetailInfo, const charn * const opcn_Module,
-                                        const charn * const opcn_Func, const sint32 os32_Line)
+void TGL_PACKAGE stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo,
+                                                     const char_t * const opcn_Module, const char_t * const opcn_Func,
+                                                     const int32_t os32_Line)
 {
-   C_SCLString c_Text;
-   c_Text = static_cast<C_SCLString>(opcn_DetailInfo)
+   C_SclString c_Text;
+   c_Text = static_cast<C_SclString>(opcn_DetailInfo)
                                      + "\nfunction  " + opcn_Func
                                      + "\nassertion in module  " + opcn_Module
-                                     + ", line  " + C_SCLString::IntToStr(os32_Line)
+                                     + ", line  " + C_SclString::IntToStr(os32_Line)
                                      + "!";
    warnx("%s", c_Text.c_str());
 }
@@ -95,7 +96,7 @@ void stw_tgl::TGL_ReportAssertionDetail(const charn * const opcn_DetailInfo, con
    false     error -> oc_UserName not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool stw_tgl::TGL_GetSystemUserName(C_SCLString & orc_UserName)
+bool TGL_PACKAGE stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 {
    struct passwd *pt_passwd;
    bool q_Return = false;
@@ -120,7 +121,7 @@ bool stw_tgl::TGL_GetSystemUserName(C_SCLString & orc_UserName)
    This function can be used to proceed processing system messages while actively waiting for an event.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void stw_tgl::TGL_HandleSystemMessages(void)
+void TGL_PACKAGE stw::tgl::TglHandleSystemMessages(void)
 {
 /*
    MSG t_Msg;
@@ -147,16 +148,16 @@ void stw_tgl::TGL_HandleSystemMessages(void)
    -1  could not set variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 TGL_PACKAGE stw_tgl::TGL_SetEnvironmentVariable(const C_SCLString & orc_Name, const C_SCLString & orc_Value)
+int32_t TGL_PACKAGE stw::tgl::TglSetEnvironmentVariable(const C_SclString & orc_Name, const C_SclString & orc_Value)
 {
-   sintn sn_Return = -1;
+   int32_t s32_Return = -1;
    char acn_String[1024];
-   C_SCLString c_String = orc_Name + "=" + orc_Value;
+   C_SclString c_String = orc_Name + "=" + orc_Value;
 
    if (c_String.Length() < sizeof(acn_String))
    {
       strcpy(acn_String, c_String.c_str());
-      sn_Return = putenv(acn_String);
+      s32_Return = putenv(acn_String);
    }
-   return (sn_Return == 0) ? 0 : -1;
+   return (s32_Return == 0) ? 0 : -1;
 }

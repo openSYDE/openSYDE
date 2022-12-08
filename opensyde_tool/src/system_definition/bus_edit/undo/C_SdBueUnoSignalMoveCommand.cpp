@@ -10,16 +10,15 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SdBueUnoSignalMoveCommand.h"
+#include "stwtypes.hpp"
+#include "C_SdBueUnoSignalMoveCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,14 +45,14 @@ using namespace stw_opensyde_core;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SdBueUnoSignalMoveCommand::C_SdBueUnoSignalMoveCommand(
-   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_SourceMessageId,
-   const std::vector<uint32> & orc_SourceSignalIndex,
-   const std::vector<C_OSCCanMessageIdentificationIndices> & orc_TargetMessageId,
-   const std::vector<uint32> & orc_TargetSignalIndex, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
+   const std::vector<C_OscCanMessageIdentificationIndices> & orc_SourceMessageId,
+   const std::vector<uint32_t> & orc_SourceSignalIndex,
+   const std::vector<C_OscCanMessageIdentificationIndices> & orc_TargetMessageId,
+   const std::vector<uint32_t> & orc_TargetSignalIndex, C_PuiSdNodeCanMessageSyncManager * const opc_MessageSyncManager,
    C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget, QUndoCommand * const opc_Parent) :
-   C_SdBueUnoSignalAddDeleteBaseCommand(orc_SourceMessageId, orc_SourceSignalIndex, std::vector<uint16>(),
-                                        std::vector<C_OSCCanSignal::E_MultiplexerType>(),
-                                        std::vector<uint16>(), opc_MessageSyncManager, opc_MessageTreeWidget, "Move Signal(s)",
+   C_SdBueUnoSignalAddDeleteBaseCommand(orc_SourceMessageId, orc_SourceSignalIndex, std::vector<uint16_t>(),
+                                        std::vector<C_OscCanSignal::E_MultiplexerType>(),
+                                        std::vector<uint16_t>(), opc_MessageSyncManager, opc_MessageTreeWidget, "Move Signal(s)",
                                         opc_Parent),
    mc_SourceSignalIndex(orc_SourceSignalIndex),
    mc_TargetSignalIndex(orc_TargetSignalIndex)
@@ -62,11 +61,11 @@ C_SdBueUnoSignalMoveCommand::C_SdBueUnoSignalMoveCommand(
    {
       this->mc_SourceUniqueId.reserve(orc_SourceMessageId.size());
       this->mc_TargetUniqueId.reserve(orc_TargetMessageId.size());
-      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_SourceMessageId.size(); ++u32_ItMessage)
+      for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < orc_SourceMessageId.size(); ++u32_ItMessage)
       {
          this->mc_SourceUniqueId.push_back(opc_MessageSyncManager->GetUniqueId(orc_SourceMessageId[u32_ItMessage]));
       }
-      for (uint32 u32_ItMessage = 0UL; u32_ItMessage < orc_TargetMessageId.size(); ++u32_ItMessage)
+      for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < orc_TargetMessageId.size(); ++u32_ItMessage)
       {
          this->mc_TargetUniqueId.push_back(opc_MessageSyncManager->GetUniqueId(orc_TargetMessageId[u32_ItMessage]));
       }
@@ -90,10 +89,10 @@ void C_SdBueUnoSignalMoveCommand::redo(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueUnoSignalMoveCommand::undo(void)
 {
-   std::vector<uint64> c_SourceUniqueId = mc_SourceUniqueId;
-   std::vector<uint32> c_SourceSignalIndex = mc_SourceSignalIndex;
-   std::vector<uint64> c_TargetUniqueId = mc_TargetUniqueId;
-   std::vector<uint32> c_TargetSignalIndex = mc_TargetSignalIndex;
+   std::vector<uint64_t> c_SourceUniqueId = mc_SourceUniqueId;
+   std::vector<uint32_t> c_SourceSignalIndex = mc_SourceSignalIndex;
+   std::vector<uint64_t> c_TargetUniqueId = mc_TargetUniqueId;
+   std::vector<uint32_t> c_TargetSignalIndex = mc_TargetSignalIndex;
 
    C_SdBueUnoSignalAddDeleteBaseCommand::undo();
    //Reverse order necessary
@@ -113,19 +112,19 @@ void C_SdBueUnoSignalMoveCommand::undo(void)
    \param[in]  orc_TargetSignalIndex   Target signal index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueUnoSignalMoveCommand::m_Move(const std::vector<uint64> & orc_SourceUniqueId,
-                                         const std::vector<uint32> & orc_SourceSignalIndex,
-                                         const std::vector<uint64> & orc_TargetUniqueId,
-                                         const std::vector<uint32> & orc_TargetSignalIndex)
+void C_SdBueUnoSignalMoveCommand::m_Move(const std::vector<uint64_t> & orc_SourceUniqueId,
+                                         const std::vector<uint32_t> & orc_SourceSignalIndex,
+                                         const std::vector<uint64_t> & orc_TargetUniqueId,
+                                         const std::vector<uint32_t> & orc_TargetSignalIndex)
 {
    //Step 1: delete source (Internal save of data)
    this->mc_UniqueId = orc_SourceUniqueId;
    this->mc_SignalIndex = orc_SourceSignalIndex;
    this->m_Delete();
    //Reset color in all cases
-   for (uint32 u32_ItSig = 0UL; u32_ItSig < this->mc_UISignal.size(); ++u32_ItSig)
+   for (uint32_t u32_ItSig = 0UL; u32_ItSig < this->mc_UiSignal.size(); ++u32_ItSig)
    {
-      this->mc_UISignal[u32_ItSig].u8_ColorIndex = 0;
+      this->mc_UiSignal[u32_ItSig].u8_ColorIndex = 0;
    }
    //Step 2: add target (Use internally stored data)
    this->mc_UniqueId = orc_TargetUniqueId;

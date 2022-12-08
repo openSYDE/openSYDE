@@ -45,7 +45,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxConfig">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbx" name="pc_GroupBoxConfig">
      <property name="title">
       <string/>
      </property>
@@ -70,7 +70,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeading">
+           <widget class="stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold" name="pc_LabelHeading">
             <property name="font">
              <font>
               <family>Calibri</family>
@@ -119,7 +119,7 @@
                <number>0</number>
               </property>
               <item>
-               <widget class="stw_opensyde_gui_elements::C_OgeFraSeparator" name="frame_2">
+               <widget class="stw::opensyde_gui_elements::C_OgeFraSeparator" name="frame_2">
                 <property name="minimumSize">
                  <size>
                   <width>0</width>
@@ -143,7 +143,7 @@
              </layout>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupTypeSelection">
+             <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupTypeSelection">
               <property name="title">
                <string/>
               </property>
@@ -164,7 +164,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonStandAlone">
+                <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonStandAlone">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -186,7 +186,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonShared">
+                <widget class="stw::opensyde_gui_elements::C_OgeRabProperties" name="pc_RadioButtonShared">
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -208,7 +208,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ApplicationGroup">
+             <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ApplicationGroup">
               <property name="title">
                <string/>
               </property>
@@ -229,7 +229,7 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSharedDatapool">
+                <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSharedDatapool">
                  <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,1,0">
                   <property name="leftMargin">
                    <number>29</number>
@@ -244,7 +244,7 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSharedDatapool">
+                   <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSharedDatapool">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -276,7 +276,7 @@
                    </spacer>
                   </item>
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxSharedDatapool">
+                   <widget class="stw::opensyde_gui_elements::C_OgeCbxText" name="pc_ComboBoxSharedDatapool">
                     <property name="minimumSize">
                      <size>
                       <width>350</width>
@@ -304,7 +304,7 @@
              </widget>
             </item>
             <item>
-             <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSharedDatapoolInfo">
+             <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxSharedDatapoolInfo">
               <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,0">
                <property name="spacing">
                 <number>0</number>
@@ -353,14 +353,14 @@
                    <number>0</number>
                   </property>
                   <item>
-                   <widget class="stw_opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSharedDatapoolInfo">
+                   <widget class="stw::opensyde_gui_elements::C_OgeLabGroupItem" name="pc_LabelSharedDatapoolInfo">
                     <property name="text">
                      <string>TextLabel</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="stw_opensyde_gui::C_SdNdeDpSelectorAddListWidget" name="pc_ListWidgetSharedDatapoolInfo">
+                   <widget class="stw::opensyde_gui::C_SdNdeDpSelectorAddListWidget" name="pc_ListWidgetSharedDatapoolInfo">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                       <horstretch>0</horstretch>
@@ -428,7 +428,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubCancel" name="pc_PushButtonCancel">
+      <widget class="stw::opensyde_gui_elements::C_OgePubCancel" name="pc_PushButtonCancel">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -469,7 +469,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOk">
+      <widget class="stw::opensyde_gui_elements::C_OgePubDialog" name="pc_PushButtonOk">
        <property name="minimumSize">
         <size>
          <width>120</width>
@@ -515,57 +515,57 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabHeadingGroupBold</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabHeadingGroupBold.h</header>
+   <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraSeparator</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraSeparator.h</header>
+   <header>C_OgeFraSeparator.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubDialog</class>
+   <class>stw::opensyde_gui_elements::C_OgePubDialog</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubDialog.h</header>
+   <header>C_OgePubDialog.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbx</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbx</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbx.h</header>
+   <header>C_OgeGbx.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubCancel</class>
+   <class>stw::opensyde_gui_elements::C_OgePubCancel</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubCancel.h</header>
+   <header>C_OgePubCancel.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.h</header>
+   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeCbxText</class>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
    <extends>QComboBox</extends>
-   <header>C_OgeCbxText.h</header>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeRabProperties</class>
+   <class>stw::opensyde_gui_elements::C_OgeRabProperties</class>
    <extends>QRadioButton</extends>
-   <header>C_OgeRabProperties.h</header>
+   <header>C_OgeRabProperties.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SdNdeDpSelectorAddListWidget</class>
+   <class>stw::opensyde_gui::C_SdNdeDpSelectorAddListWidget</class>
    <extends>QListWidget</extends>
-   <header>C_SdNdeDpSelectorAddListWidget.h</header>
+   <header>C_SdNdeDpSelectorAddListWidget.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

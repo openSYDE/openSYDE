@@ -10,19 +10,18 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "C_SebUnoAddDeleteBaseCommand.h"
-#include "C_GiBiArrow.h"
-#include "C_GiBiBoundary.h"
-#include "C_GiBiTextElement.h"
-#include "C_GiBiImageGroup.h"
+#include "stwtypes.hpp"
+#include "C_SebUnoAddDeleteBaseCommand.hpp"
+#include "C_GiBiArrow.hpp"
+#include "C_GiBiBoundary.hpp"
+#include "C_GiBiTextElement.hpp"
+#include "C_GiBiImageGroup.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,15 +39,15 @@ using namespace stw_opensyde_gui_logic;
 /*! \brief  Default constructor
 
    \param[in,out] opc_Scene  Pointer to currently active scene
-   \param[in]     orc_IDs    Affected unique IDs
+   \param[in]     orc_Ids    Affected unique IDs
    \param[in]     orc_Text   Command description
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SebUnoAddDeleteBaseCommand::C_SebUnoAddDeleteBaseCommand(QGraphicsScene * const opc_Scene,
-                                                           const std::vector<uint64> & orc_IDs,
+                                                           const std::vector<uint64_t> & orc_Ids,
                                                            const QString & orc_Text, QUndoCommand * const opc_Parent) :
-   C_SebUnoBaseCommand(opc_Scene, orc_IDs, orc_Text, opc_Parent)
+   C_SebUnoBaseCommand(opc_Scene, orc_Ids, orc_Text, opc_Parent)
 {
 }
 
@@ -56,12 +55,12 @@ C_SebUnoAddDeleteBaseCommand::C_SebUnoAddDeleteBaseCommand(QGraphicsScene * cons
 /*! \brief  Store items in new structure and save indices in map
 
    \param[in,out] orc_Storage             Data structure to store data in
-   \param[in,out] orc_MapTypeAndIndexToID Map to locate new items
+   \param[in,out] orc_MapTypeAndIndexToId Map to locate new items
    \param[in]     orc_AllElements         Items to store
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, QMap<C_PuiBsTemporaryDataID,
-                                                                                     uint64> & orc_MapTypeAndIndexToID,
+void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, QMap<C_PuiBsTemporaryDataId,
+                                                                                     uint64_t> & orc_MapTypeAndIndexToId,
                                                  const C_PuiBsElements & orc_AllElements) const
 {
    std::vector<QGraphicsItem *> c_RelatedItems = this->m_GetSceneItems();
@@ -78,14 +77,14 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
       pc_Unique = dynamic_cast<C_GiUnique *>(*c_ItRelatedItem);
       if (pc_Unique != NULL)
       {
-         const uint64 u64_CurUniqueID = pc_Unique->GetID();
+         const uint64_t u64_CurUniqueId = pc_Unique->GetId();
          pc_Data = dynamic_cast<C_PuiBsDataElement *>(*c_ItRelatedItem);
          if (pc_Data != NULL)
          {
-            const sint32 s32_Index = pc_Data->GetIndex();
+            const int32_t s32_Index = pc_Data->GetIndex();
             if (s32_Index >= 0)
             {
-               const uint32 u32_Index = static_cast<uint32>(s32_Index);
+               const uint32_t u32_Index = static_cast<uint32_t>(s32_Index);
                //Save to scene data
                pc_Data->UpdateData();
 
@@ -97,11 +96,11 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                   if (u32_Index < orc_AllElements.c_LineArrows.size())
                   {
                      orc_Storage.c_LineArrows.push_back(orc_AllElements.c_LineArrows[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetLineArrowType(),
+                     orc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(this->m_GetLineArrowType(),
                                                                            orc_Storage.c_LineArrows.size()
                                                                            -
                                                                            1UL),
-                                                    u64_CurUniqueID);
+                                                    u64_CurUniqueId);
                   }
                }
                //Boundary
@@ -111,11 +110,11 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                   if (u32_Index < orc_AllElements.c_Boundaries.size())
                   {
                      orc_Storage.c_Boundaries.push_back(orc_AllElements.c_Boundaries[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetBoundaryType(),
+                     orc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(this->m_GetBoundaryType(),
                                                                            orc_Storage.c_Boundaries.size()
                                                                            -
                                                                            1UL),
-                                                    u64_CurUniqueID);
+                                                    u64_CurUniqueId);
                   }
                }
                //Image
@@ -125,10 +124,10 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                   if (u32_Index < orc_AllElements.c_Images.size())
                   {
                      orc_Storage.c_Images.push_back(orc_AllElements.c_Images[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetImageType(),
+                     orc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(this->m_GetImageType(),
                                                                            orc_Storage.c_Images.size() -
                                                                            1UL),
-                                                    u64_CurUniqueID);
+                                                    u64_CurUniqueId);
                   }
                }
                //Text element
@@ -138,10 +137,10 @@ void C_SebUnoAddDeleteBaseCommand::m_StoreCommon(C_PuiBsElements & orc_Storage, 
                   if (u32_Index < orc_AllElements.c_TextElements.size())
                   {
                      orc_Storage.c_TextElements.push_back(orc_AllElements.c_TextElements[u32_Index]);
-                     orc_MapTypeAndIndexToID.insert(C_PuiBsTemporaryDataID(this->m_GetTextElementType(),
+                     orc_MapTypeAndIndexToId.insert(C_PuiBsTemporaryDataId(this->m_GetTextElementType(),
                                                                            orc_Storage.c_TextElements.
                                                                            size() - 1UL),
-                                                    u64_CurUniqueID);
+                                                    u64_CurUniqueId);
                   }
                }
             }

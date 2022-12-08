@@ -10,17 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "constants.h"
-#include "C_PuiBsBoundary.h"
+#include "constants.hpp"
+#include "C_PuiBsBoundary.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -40,11 +39,11 @@ using namespace stw_opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiBsBoundary::C_PuiBsBoundary() :
    C_PuiBsBox(),
-   c_UIBorderColorBright(mc_STYLE_GUIDE_COLOR_7),
-   c_UIBorderColorDark(mc_STYLE_GUIDE_COLOR_2),
-   c_UIBackgroundColorBright(mc_STYLE_GUIDE_COLOR_12),
-   c_UIBackgroundColorDark(mc_STYLE_GUIDE_COLOR_36),
-   s32_UIBorderWidth(1)
+   c_UiBorderColorBright(mc_STYLE_GUIDE_COLOR_7),
+   c_UiBorderColorDark(mc_STYLE_GUIDE_COLOR_2),
+   c_UiBackgroundColorBright(mc_STYLE_GUIDE_COLOR_12),
+   c_UiBackgroundColorDark(mc_STYLE_GUIDE_COLOR_36),
+   s32_UiBorderWidth(1)
 {
 }
 
@@ -56,47 +55,47 @@ C_PuiBsBoundary::C_PuiBsBoundary() :
    \param[in,out] oru32_HashValue    Hash value with init [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiBsBoundary::CalcHash(uint32 & oru32_HashValue) const
+void C_PuiBsBoundary::CalcHash(uint32_t & oru32_HashValue) const
 {
-   sintn sn_Value;
+   int32_t s32_Value;
 
-   sn_Value = this->c_UIBorderColorBright.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBorderColorBright.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBorderColorBright.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBorderColorBright.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorBright.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorBright.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorBright.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorBright.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   sn_Value = this->c_UIBorderColorDark.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBorderColorDark.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBorderColorDark.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBorderColorDark.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorDark.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorDark.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorDark.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBorderColorDark.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   sn_Value = this->c_UIBackgroundColorBright.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBackgroundColorBright.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBackgroundColorBright.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBackgroundColorBright.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorBright.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorBright.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorBright.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorBright.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   sn_Value = this->c_UIBackgroundColorDark.red();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBackgroundColorDark.green();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBackgroundColorDark.blue();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
-   sn_Value = this->c_UIBackgroundColorDark.alpha();
-   stw_scl::C_SCLChecksums::CalcCRC32(&sn_Value, sizeof(sn_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorDark.red();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorDark.green();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorDark.blue();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
+   s32_Value = this->c_UiBackgroundColorDark.alpha();
+   stw::scl::C_SclChecksums::CalcCRC32(&s32_Value, sizeof(s32_Value), oru32_HashValue);
 
-   stw_scl::C_SCLChecksums::CalcCRC32(&this->s32_UIBorderWidth, sizeof(this->s32_UIBorderWidth), oru32_HashValue);
+   stw::scl::C_SclChecksums::CalcCRC32(&this->s32_UiBorderWidth, sizeof(this->s32_UiBorderWidth), oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);
 }

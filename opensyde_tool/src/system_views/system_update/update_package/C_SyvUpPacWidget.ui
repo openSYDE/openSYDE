@@ -41,14 +41,14 @@
       <number>21</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelTitle">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelTitle">
        <property name="text">
         <string>UPDATE PACKAGE</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelStateIcon">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_LabelStateIcon">
        <property name="minimumSize">
         <size>
          <width>20</width>
@@ -67,7 +67,7 @@
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabStateInfo" name="pc_LabelState">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabStateInfo" name="pc_LabelState">
        <property name="text">
         <string>Warnings</string>
        </property>
@@ -92,7 +92,7 @@
         <number>15</number>
        </property>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonClearAll">
+        <widget class="stw::opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonClearAll">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -130,7 +130,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonImport">
+        <widget class="stw::opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonImport">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -168,7 +168,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonExport">
+        <widget class="stw::opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonExport">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -206,7 +206,7 @@
         </widget>
        </item>
        <item>
-        <widget class="stw_opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonCreatePackage">
+        <widget class="stw::opensyde_gui_elements::C_OgePubIconText" name="pc_PushButtonCreatePackage">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -293,7 +293,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollLeft">
+         <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollLeft">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -324,10 +324,10 @@
          </widget>
         </item>
         <item>
-         <widget class="stw_opensyde_gui::C_SyvUpPacListWidget" name="pc_ListWidget"/>
+         <widget class="stw::opensyde_gui::C_SyvUpPacListWidget" name="pc_ListWidget"/>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollRight">
+         <widget class="stw::opensyde_gui_elements::C_OgePubIconOnly" name="pc_PushButtonScrollRight">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -375,7 +375,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="stw_opensyde_gui_elements::C_OgeWiBopperle" name="pc_IndexViewWidget" native="true">
+         <widget class="stw::opensyde_gui_elements::C_OgeWiBopperle" name="pc_IndexViewWidget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -406,40 +406,40 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconOnly</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconOnly.h</header>
+   <header>C_OgePubIconOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubIconText</class>
+   <class>stw::opensyde_gui_elements::C_OgePubIconText</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubIconText.h</header>
+   <header>C_OgePubIconText.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiBopperle</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiBopperle</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiBopperle.h</header>
+   <header>C_OgeWiBopperle.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabStateInfo</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabStateInfo</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabStateInfo.h</header>
+   <header>C_OgeLabStateInfo.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SyvUpPacListWidget</class>
+   <class>stw::opensyde_gui::C_SyvUpPacListWidget</class>
    <extends>QListWidget</extends>
-   <header>C_SyvUpPacListWidget.h</header>
+   <header>C_SyvUpPacListWidget.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

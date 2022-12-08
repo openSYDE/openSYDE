@@ -10,16 +10,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCSystemBus.h"
+#include "C_OscSystemBus.hpp"
 
-#include "CSCLChecksums.h"
+#include "C_SclChecksums.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_scl;
-using namespace stw_opensyde_core;
+
+using namespace stw::scl;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -37,12 +37,12 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSystemBus::C_OSCSystemBus(void) :
+C_OscSystemBus::C_OscSystemBus(void) :
    e_Type(eCAN),
    c_Name("NewBus"),
    c_Comment(""),
    u64_BitRate(125000ULL),
-   u8_BusID(0),
+   u8_BusId(0),
    u16_RxTimeoutOffsetMs(0)
 {
 }
@@ -53,7 +53,7 @@ C_OSCSystemBus::C_OSCSystemBus(void) :
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCSystemBus::~C_OSCSystemBus(void)
+C_OscSystemBus::~C_OscSystemBus(void)
 {
 }
 
@@ -66,14 +66,14 @@ C_OSCSystemBus::~C_OSCSystemBus(void)
    \param[in,out] oru32_HashValue Hash value with initial [in] value and result [out] value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
+void C_OscSystemBus::CalcHash(uint32_t & oru32_HashValue) const
 {
-   C_SCLChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(&this->u64_BitRate, sizeof(this->u64_BitRate), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(&this->u8_BusID, sizeof(this->u8_BusID), oru32_HashValue);
-   C_SCLChecksums::CalcCRC32(&this->u16_RxTimeoutOffsetMs, sizeof(this->u16_RxTimeoutOffsetMs), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->e_Type, sizeof(this->e_Type), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_Name.c_str(), this->c_Name.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(this->c_Comment.c_str(), this->c_Comment.Length(), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u64_BitRate, sizeof(this->u64_BitRate), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u8_BusId, sizeof(this->u8_BusId), oru32_HashValue);
+   C_SclChecksums::CalcCRC32(&this->u16_RxTimeoutOffsetMs, sizeof(this->u16_RxTimeoutOffsetMs), oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -91,7 +91,7 @@ void C_OSCSystemBus::CalcHash(uint32 & oru32_HashValue) const
    false: Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const C_OSCSystemBus & orc_Bus2)
+bool C_OscSystemBus::h_CompareNameGreater(const C_OscSystemBus & orc_Bus1, const C_OscSystemBus & orc_Bus2)
 {
    bool q_Retval;
 
@@ -114,7 +114,7 @@ bool C_OSCSystemBus::h_CompareNameGreater(const C_OSCSystemBus & orc_Bus1, const
    false No error
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCSystemBus::CheckErrorBusId(void) const
+bool C_OscSystemBus::CheckErrorBusId(void) const
 {
-   return (this->u8_BusID > 15);
+   return (this->u8_BusId > 15);
 }

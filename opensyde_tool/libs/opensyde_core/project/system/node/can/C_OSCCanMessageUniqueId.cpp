@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_OSCCanMessageUniqueId.h"
+#include "C_OscCanMessageUniqueId.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -33,7 +33,7 @@ using namespace stw_opensyde_core;
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanMessageUniqueId::C_OSCCanMessageUniqueId() :
+C_OscCanMessageUniqueId::C_OscCanMessageUniqueId() :
    u32_CanId(0x7FF),
    q_IsExtended(false)
 {
@@ -46,7 +46,7 @@ C_OSCCanMessageUniqueId::C_OSCCanMessageUniqueId() :
    \param[in]  oq_IsExtended  Is extended
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCCanMessageUniqueId::C_OSCCanMessageUniqueId(const stw_types::uint32 ou32_CanId, const bool oq_IsExtended) :
+C_OscCanMessageUniqueId::C_OscCanMessageUniqueId(const uint32_t ou32_CanId, const bool oq_IsExtended) :
    u32_CanId(ou32_CanId),
    q_IsExtended(oq_IsExtended)
 {
@@ -62,7 +62,7 @@ C_OSCCanMessageUniqueId::C_OSCCanMessageUniqueId(const stw_types::uint32 ou32_Ca
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessageUniqueId::operator <(const C_OSCCanMessageUniqueId & orc_Cmp) const
+bool C_OscCanMessageUniqueId::operator <(const C_OscCanMessageUniqueId & orc_Cmp) const
 {
    bool q_Return;
 
@@ -99,7 +99,7 @@ bool C_OSCCanMessageUniqueId::operator <(const C_OSCCanMessageUniqueId & orc_Cmp
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessageUniqueId::operator ==(const C_OSCCanMessageUniqueId & orc_Cmp) const
+bool C_OscCanMessageUniqueId::operator ==(const C_OscCanMessageUniqueId & orc_Cmp) const
 {
    bool q_Return = false;
 
@@ -122,9 +122,9 @@ bool C_OSCCanMessageUniqueId::operator ==(const C_OSCCanMessageUniqueId & orc_Cm
    false    Else
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_OSCCanMessageUniqueId::operator !=(const C_OSCCanMessageUniqueId & orc_Cmp) const
+bool C_OscCanMessageUniqueId::operator !=(const C_OscCanMessageUniqueId & orc_Cmp) const
 {
-   const bool q_Return = !C_OSCCanMessageUniqueId::operator ==(orc_Cmp);
+   const bool q_Return = !C_OscCanMessageUniqueId::operator ==(orc_Cmp);
 
    return q_Return;
 }

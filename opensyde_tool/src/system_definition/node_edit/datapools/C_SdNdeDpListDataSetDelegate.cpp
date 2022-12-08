@@ -10,23 +10,22 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QPainter>
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_SdNdeDpListDataSetDelegate.h"
-#include "C_OgeTedTable.h"
-#include "C_OgeLeTable.h"
-#include "C_OgeWiUtil.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_SdNdeDpListDataSetDelegate.hpp"
+#include "C_OgeTedTable.hpp"
+#include "C_OgeLeTable.hpp"
+#include "C_OgeWiUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -86,7 +85,7 @@ QWidget * C_SdNdeDpListDataSetDelegate::createEditor(QWidget * const opc_Parent,
       case C_SdNdeDpListDataSetModel::E_Rows::eNAME:
          pc_LineEdit = new C_OgeLeTable(opc_Parent);
          //Ui restriction
-         pc_LineEdit->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+         pc_LineEdit->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
          pc_Retval = pc_LineEdit;
          connect(pc_LineEdit, &C_OgeLeTable::textChanged, this, &C_SdNdeDpListDataSetDelegate::m_OnNameChange);
          break;
@@ -191,7 +190,7 @@ void C_SdNdeDpListDataSetDelegate::setModelData(QWidget * const opc_Editor, QAbs
    false No change
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpListDataSetDelegate::SetHoveredCol(const stw_types::sint32 & ors32_Value)
+bool C_SdNdeDpListDataSetDelegate::SetHoveredCol(const int32_t & ors32_Value)
 {
    bool q_Retval;
 

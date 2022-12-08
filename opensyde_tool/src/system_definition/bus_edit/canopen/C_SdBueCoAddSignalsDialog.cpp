@@ -10,18 +10,17 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_GtGetText.h"
-#include "C_SdBueCoAddSignalsDialog.h"
+#include "C_GtGetText.hpp"
+#include "C_SdBueCoAddSignalsDialog.hpp"
 #include "ui_C_SdBueCoAddSignalsDialog.h"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -44,8 +43,8 @@ using namespace stw_opensyde_gui_elements;
    \param[in]      orc_MessageId    Message id
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SdBueCoAddSignalsDialog::C_SdBueCoAddSignalsDialog(stw_opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                     const C_OSCCanMessageIdentificationIndices & orc_MessageId) :
+C_SdBueCoAddSignalsDialog::C_SdBueCoAddSignalsDialog(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
+                                                     const C_OscCanMessageIdentificationIndices & orc_MessageId) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdBueCoAddSignalsDialog),
    mpc_ContextMenu(NULL),
@@ -122,7 +121,7 @@ void C_SdBueCoAddSignalsDialog::InitStaticNames(void) const
    Current selected signals
 */
 //----------------------------------------------------------------------------------------------------------------------
-std::vector<C_OSCCanOpenManagerMappableSignal> C_SdBueCoAddSignalsDialog::GetSelectedSignals(void) const
+std::vector<C_OscCanOpenManagerMappableSignal> C_SdBueCoAddSignalsDialog::GetSelectedSignals(void) const
 {
    return this->mpc_Ui->pc_TreeView->GetSelectedSignals();
 }
@@ -153,8 +152,8 @@ void C_SdBueCoAddSignalsDialog::keyPressEvent(QKeyEvent * const opc_KeyEvent)
    bool q_CallOrg = true;
 
    //Handle all enter key cases manually
-   if ((opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Enter)) ||
-       (opc_KeyEvent->key() == static_cast<sintn>(Qt::Key_Return)))
+   if ((opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Enter)) ||
+       (opc_KeyEvent->key() == static_cast<int32_t>(Qt::Key_Return)))
    {
       if (((opc_KeyEvent->modifiers().testFlag(Qt::ControlModifier) == true) &&
            (opc_KeyEvent->modifiers().testFlag(Qt::AltModifier) == false)) &&
@@ -252,10 +251,10 @@ void C_SdBueCoAddSignalsDialog::m_OnSearch(const QString & orc_Text) const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Update number of selected items
 
-   \param[in]  osn_SelectionCount   Number of selected items
+   \param[in]  os32_SelectionCount   Number of selected items
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueCoAddSignalsDialog::m_UpdateSelection(const sintn osn_SelectionCount) const
+void C_SdBueCoAddSignalsDialog::m_UpdateSelection(const int32_t os32_SelectionCount) const
 {
    if (this->mpc_Ui->pc_TreeView->IsEmpty() == true)
    {
@@ -264,11 +263,11 @@ void C_SdBueCoAddSignalsDialog::m_UpdateSelection(const sintn osn_SelectionCount
    else
    {
       this->mpc_Ui->pc_LabelSelection->setVisible(true);
-      if (osn_SelectionCount > 0)
+      if (os32_SelectionCount > 0)
       {
          this->mpc_Ui->pc_LabelSelection->setText(static_cast<QString>(C_GtGetText::h_GetText(
                                                                           "%1 selected signal(s)")).
-                                                  arg(osn_SelectionCount));
+                                                  arg(os32_SelectionCount));
       }
       else
       {
@@ -298,7 +297,7 @@ void C_SdBueCoAddSignalsDialog::m_SetupContextMenu(void)
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select all"),
                                     this->mpc_Ui->pc_TreeView,
                                     &C_SdBueCoAddSignalsView::selectAll,
-                                    static_cast<sintn>(Qt::CTRL) + static_cast<sintn>(Qt::Key_A));
+                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
 
    this->setContextMenuPolicy(Qt::CustomContextMenu);
    connect(this, &C_SdBueCoAddSignalsDialog::customContextMenuRequested, this,

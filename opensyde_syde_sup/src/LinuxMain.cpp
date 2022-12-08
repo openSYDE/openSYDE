@@ -10,15 +10,14 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "stwtypes.h"
-#include "stwerrors.h"
-#include "C_SYDEsupLinux.h"
+#include "stwtypes.hpp"
+#include "stwerrors.hpp"
+#include "C_SydeSupLinux.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_errors;
+using namespace stw::errors;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -35,26 +34,26 @@ using namespace stw_errors;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   main
 
-   \param[in]   osn_Argc     number of command line arguments
+   \param[in]   os32_Argc    number of command line arguments
    \param[in]   oapcn_Argv   command line arguments
 
    \return
-   C_SYDEsup::e_Result::eOK                        success
-   C_SYDEsup::e_Result::eERR_PARSE_COMMAND_LINE    error occurred on parsing command line (e.g. missing parameters)
-   else                                            see C_SYDEsup::Update for precise error descriptions
+   C_SydeSup::e_Result::eOK                        success
+   C_SydeSup::e_Result::eERR_PARSE_COMMAND_LINE    error occurred on parsing command line (e.g. missing parameters)
+   else                                            see C_SydeSup::Update for precise error descriptions
 */
 //----------------------------------------------------------------------------------------------------------------------
-sintn main(const sintn osn_Argc, charn * const oppcn_Argv[])
+int32_t main(const int32_t os32_Argc, char_t * const oppcn_Argv[])
 {
-   C_SYDEsup::E_Result e_Return;
-   C_SYDEsupLinux c_SYDEServiceUpdater;
+   C_SydeSup::E_Result e_Return;
+   C_SydeSupLinux c_SydeServiceUpdater;
 
-   e_Return = c_SYDEServiceUpdater.ParseCommandLine(osn_Argc, oppcn_Argv);
+   e_Return = c_SydeServiceUpdater.ParseCommandLine(os32_Argc, oppcn_Argv);
 
-   if (e_Return == C_SYDEsup::eOK)
+   if (e_Return == C_SydeSup::eOK)
    {
-      e_Return = c_SYDEServiceUpdater.Update();
+      e_Return = c_SydeServiceUpdater.Update();
    }
 
-   return static_cast<sintn>(e_Return);
+   return static_cast<int32_t>(e_Return);
 }

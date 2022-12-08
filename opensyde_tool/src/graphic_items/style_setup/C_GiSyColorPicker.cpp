@@ -11,17 +11,16 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <QPainter>
 #include <QMouseEvent>
 
-#include "stwtypes.h"
-#include "C_GiSyColorPicker.h"
+#include "stwtypes.hpp"
+#include "C_GiSyColorPicker.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
+using namespace stw::opensyde_gui;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -46,8 +45,8 @@ using namespace stw_opensyde_gui;
 C_GiSyColorPicker::C_GiSyColorPicker(QWidget * const opc_Parent) :
    QFrame(opc_Parent),
    mq_CircleVisible(true),
-   msn_Hue(0),
-   msn_Sat(0)
+   ms32_Hue(0),
+   ms32_Sat(0)
 {
 }
 
@@ -77,26 +76,25 @@ void C_GiSyColorPicker::SetCircleVisible(const bool oq_Visible)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Set a new color to the color picker and repaint it
 
-   \param[in]   osn_Hue         new hue value
-   \param[in]   osn_Saturation   new sat value
+   \param[in]   os32_Hue         new hue value
+   \param[in]   os32_Saturation   new sat value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSyColorPicker::SetColor(sintn const osn_Hue, sintn const osn_Saturation)
+void C_GiSyColorPicker::SetColor(const int32_t os32_Hue, const int32_t os32_Saturation)
 {
-   if ((qMin(qMax(0, osn_Hue), 359) == this->msn_Hue) && (qMin(qMax(0, osn_Saturation), 255) == this->msn_Sat))
+   if ((qMin(qMax(0, os32_Hue), 359) != this->ms32_Hue) || (qMin(qMax(0, os32_Saturation), 255) != this->ms32_Sat))
    {
-      return;
+      QRect c_Rect(QPoint(((360 - this->ms32_Hue) * (contentsRect().width() - 1)) / 360,
+                          ((255 - this->ms32_Sat) * (contentsRect().height() - 1)) / 255),
+                   QSize(50, 20));
+      this->ms32_Hue = qMin(qMax(0, os32_Hue), 359);
+      this->ms32_Sat = qMin(qMax(0, os32_Saturation), 255);
+      c_Rect = c_Rect.united(QRect(QPoint(((360 - this->ms32_Hue) * (contentsRect().width() - 1)) / 360,
+                                          ((255 - this->ms32_Sat) * (contentsRect().height() - 1)) / 255),
+                                   QSize(50, 20)));
+      c_Rect.translate(contentsRect().x() - 9, contentsRect().y() - 9);
+      repaint(c_Rect);
    }
-   QRect c_Rect(QPoint(((360 - this->msn_Hue) * (contentsRect().width() - 1)) / 360,
-                       ((255 - this->msn_Sat) * (contentsRect().height() - 1)) / 255),
-                QSize(50, 20));
-   this->msn_Hue = qMin(qMax(0, osn_Hue), 359);
-   this->msn_Sat = qMin(qMax(0, osn_Saturation), 255);
-   c_Rect = c_Rect.united(QRect(QPoint(((360 - this->msn_Hue) * (contentsRect().width() - 1)) / 360,
-                                       ((255 - this->msn_Sat) * (contentsRect().height() - 1)) / 255),
-                                QSize(50, 20)));
-   c_Rect.translate(contentsRect().x() - 9, contentsRect().y() - 9);
-   repaint(c_Rect);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -132,8 +130,8 @@ void C_GiSyColorPicker::paintEvent(QPaintEvent * const opc_Event)
       c_Pen.setColor(Qt::white);
       c_Pen.setWidth(2);
       c_Painter.setPen(c_Pen);
-      c_Painter.drawEllipse(QPoint(((360 - this->msn_Hue) * (contentsRect().width() - 1)) / 360,
-                                   ((255 - this->msn_Sat) * (contentsRect().height() - 1)) / 255),
+      c_Painter.drawEllipse(QPoint(((360 - this->ms32_Hue) * (contentsRect().width() - 1)) / 360,
+                                   ((255 - this->ms32_Sat) * (contentsRect().height() - 1)) / 255),
                             6, 6);
    }
 }
@@ -148,7 +146,7 @@ void C_GiSyColorPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
    this->m_SetColorFromPosition(opc_Event->pos() - contentsRect().topLeft());
    this->repaint();
-   Q_EMIT SigNewColor(this->msn_Hue, this->msn_Sat);
+   Q_EMIT SigNewColor(this->ms32_Hue, this->ms32_Sat);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -160,7 +158,7 @@ void C_GiSyColorPicker::mouseMoveEvent(QMouseEvent * const opc_Event)
 void C_GiSyColorPicker::mousePressEvent(QMouseEvent * const opc_Event)
 {
    this->m_SetColorFromPosition(opc_Event->pos() - contentsRect().topLeft());
-   Q_EMIT SigNewColor(this->msn_Hue, this->msn_Sat);
+   Q_EMIT SigNewColor(this->ms32_Hue, this->ms32_Sat);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -187,22 +185,24 @@ void C_GiSyColorPicker::resizeEvent(QResizeEvent * const opc_Event)
 
    QImage c_Image((width() - (frameWidth() * 2)), (height() - (frameWidth() * 2)), QImage::Format_RGB32);
    //lint -e{826,927,9176}  Cast is necessary due to Qt interface. See Qt documentation for scanLine
-   sintn * psn_Pixel = reinterpret_cast<sintn *>(c_Image.scanLine(0));
-   for (sintn sn_YValue = 0; sn_YValue < (height() - (frameWidth() * 2)); sn_YValue++)
+   int32_t * ps32_Pixel = reinterpret_cast<int32_t *>(c_Image.scanLine(0));
+   for (int32_t s32_VerticalValue = 0; s32_VerticalValue < (height() - (frameWidth() * 2)); s32_VerticalValue++)
    {
       //lint -e{9016,9114}  See Qt documentation for interface
-      const sintn * const psn_End = psn_Pixel + (width() - (frameWidth() * 2));
-      sintn sn_XValue = 0;
+      const int32_t * const ps32_End = ps32_Pixel + (width() - (frameWidth() * 2));
+      int32_t s32_HorizontalValue = 0;
       //lint -e{946}  operator is necessary for painting the brightness
-      while (psn_Pixel < psn_End)
+      while (ps32_Pixel < ps32_End)
       {
          QColor c_Color;
-         c_Color.setHsv(360 - ((QPoint(sn_XValue, sn_YValue).x() * 360) / (contentsRect().width() - 1)),
-                        255 - ((QPoint(sn_XValue, sn_YValue).y() * 255) / (contentsRect().height() - 1)),
+         c_Color.setHsv(360 - ((QPoint(s32_HorizontalValue,
+                                       s32_VerticalValue).x() * 360) / (contentsRect().width() - 1)),
+                        255 -
+                        ((QPoint(s32_HorizontalValue, s32_VerticalValue).y() * 255) / (contentsRect().height() - 1)),
                         200);
-         *psn_Pixel = c_Color.rgb();
-         ++psn_Pixel;
-         ++sn_XValue;
+         *ps32_Pixel = c_Color.rgb();
+         ++ps32_Pixel;
+         ++s32_HorizontalValue;
       }
    }
    this->mc_Pixmap = QPixmap::fromImage(c_Image);

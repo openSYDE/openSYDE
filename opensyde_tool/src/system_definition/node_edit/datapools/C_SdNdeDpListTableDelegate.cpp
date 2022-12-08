@@ -10,30 +10,29 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <limits>
 #include <QPainter>
-#include "stwtypes.h"
-#include "constants.h"
-#include "C_SdNdeDpListTableDelegate.h"
-#include "C_OgeTedTable.h"
-#include "C_OgeLeTable.h"
-#include "C_OgeSpxTable.h"
-#include "C_OgeSpxTableDouble.h"
-#include "C_OgeCbxTable.h"
-#include "C_OgeSpxFactorTable.h"
-#include "C_GtGetText.h"
-#include "C_OgeWiUtil.h"
-#include "C_TblTreDelegateUtil.h"
-#include "C_SdNdeDpContentUtil.h"
+#include "stwtypes.hpp"
+#include "constants.hpp"
+#include "C_SdNdeDpListTableDelegate.hpp"
+#include "C_OgeTedTable.hpp"
+#include "C_OgeLeTable.hpp"
+#include "C_OgeSpxTable.hpp"
+#include "C_OgeSpxTableDouble.hpp"
+#include "C_OgeCbxTable.hpp"
+#include "C_OgeSpxFactorTable.hpp"
+#include "C_GtGetText.hpp"
+#include "C_OgeWiUtil.hpp"
+#include "C_TblTreDelegateUtil.hpp"
+#include "C_SdNdeDpContentUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -116,7 +115,7 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
       case C_SdNdeDpListTableModel::eNAME:
          pc_LineEdit = new C_OgeLeTable(opc_Parent);
          //Ui restriction
-         pc_LineEdit->setMaxLength(msn_C_ITEM_MAX_CHAR_COUNT);
+         pc_LineEdit->setMaxLength(ms32_C_ITEM_MAX_CHAR_COUNT);
          pc_Retval = pc_LineEdit;
          break;
       case C_SdNdeDpListTableModel::eCOMMENT:
@@ -139,7 +138,7 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
          pc_ComboBox->addItem(C_GtGetText::h_GetText("float64 - data type IEEE 64bit float"));
          pc_ComboBox->addItem(C_GtGetText::h_GetText("string - character array"));
          pc_ComboBox->ResizeViewToContents();
-         connect(pc_ComboBox, static_cast<void (C_OgeCbxTable::*)(sintn)>(&C_OgeCbxTable::currentIndexChanged), this,
+         connect(pc_ComboBox, static_cast<void (C_OgeCbxTable::*)(int32_t)>(&C_OgeCbxTable::currentIndexChanged), this,
                  &C_SdNdeDpListTableDelegate::m_OnValueTypeChange);
          pc_Retval = pc_ComboBox;
          break;
@@ -158,7 +157,7 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
 
          pc_SpinBox->SetMaximumCustom(500);
          connect(pc_SpinBox, static_cast<void (QSpinBox::*)(
-                                            sintn)>(&QSpinBox::valueChanged), this,
+                                            int32_t)>(&QSpinBox::valueChanged), this,
                  &C_SdNdeDpListTableDelegate::m_OnArraySizeChange);
          pc_Retval = pc_SpinBox;
          break;
@@ -179,8 +178,8 @@ QWidget * C_SdNdeDpListTableDelegate::createEditor(QWidget * const opc_Parent, c
          break;
       case C_SdNdeDpListTableModel::eOFFSET:
          pc_DoubleSpinBox = new C_OgeSpxTableDouble(opc_Parent);
-         pc_DoubleSpinBox->SetMinimumCustom(static_cast<float64>(std::numeric_limits<float64>::lowest()));
-         pc_DoubleSpinBox->SetMaximumCustom(static_cast<float64>(std::numeric_limits<float64>::max()));
+         pc_DoubleSpinBox->SetMinimumCustom(static_cast<float64_t>(std::numeric_limits<float64_t>::lowest()));
+         pc_DoubleSpinBox->SetMaximumCustom(static_cast<float64_t>(std::numeric_limits<float64_t>::max()));
          pc_Retval = pc_DoubleSpinBox;
          break;
       case C_SdNdeDpListTableModel::eUNIT:
@@ -267,26 +266,26 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
       case C_SdNdeDpListTableModel::eNAME:
          if (pc_LineEdit != NULL)
          {
-            pc_LineEdit->setText(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toString());
+            pc_LineEdit->setText(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toString());
             connect(pc_LineEdit, &QLineEdit::textChanged, this, &C_SdNdeDpListTableDelegate::m_OnNameChange);
          }
          break;
       case C_SdNdeDpListTableModel::eCOMMENT:
          if (pc_TextEdit != NULL)
          {
-            pc_TextEdit->setText(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toString());
+            pc_TextEdit->setText(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toString());
          }
          break;
       case C_SdNdeDpListTableModel::eVALUE_TYPE:
          if (pc_ComboBox != NULL)
          {
-            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt());
          }
          break;
       case C_SdNdeDpListTableModel::eARRAY_SIZE:
          if (pc_SpinBoxInt != NULL)
          {
-            pc_SpinBoxInt->setValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+            pc_SpinBoxInt->setValue(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt());
          }
          break;
       case C_SdNdeDpListTableModel::eAUTO_MIN_MAX:
@@ -301,19 +300,19 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
       case C_SdNdeDpListTableModel::eFACTOR:
          if (pc_SpinBoxDouble != NULL)
          {
-            pc_SpinBoxDouble->setValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toDouble());
+            pc_SpinBoxDouble->setValue(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toDouble());
          }
          break;
       case C_SdNdeDpListTableModel::eOFFSET:
          if (pc_SpinBoxDouble != NULL)
          {
-            pc_SpinBoxDouble->setValue(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toDouble());
+            pc_SpinBoxDouble->setValue(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toDouble());
          }
          break;
       case C_SdNdeDpListTableModel::eUNIT:
          if (pc_LineEdit != NULL)
          {
-            const QString c_Unit = orc_Index.data(static_cast<sintn>(Qt::EditRole)).toString();
+            const QString c_Unit = orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toString();
             if (c_Unit == "-")
             {
                pc_LineEdit->setText("");
@@ -330,7 +329,7 @@ void C_SdNdeDpListTableDelegate::setEditorData(QWidget * const opc_Editor, const
       case C_SdNdeDpListTableModel::eACCESS:
          if (pc_ComboBox != NULL)
          {
-            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<sintn>(Qt::EditRole)).toInt());
+            pc_ComboBox->setCurrentIndex(orc_Index.data(static_cast<int32_t>(Qt::EditRole)).toInt());
          }
          break;
       case C_SdNdeDpListTableModel::eDATA_SIZE:
@@ -398,25 +397,25 @@ void C_SdNdeDpListTableDelegate::setModelData(QWidget * const opc_Editor, QAbstr
       case C_SdNdeDpListTableModel::eVALUE_TYPE:
          if (pc_ComboBox != NULL)
          {
-            const sintn sn_NewValue = pc_ComboBox->currentIndex();
+            const int32_t s32_NewValue = pc_ComboBox->currentIndex();
             //Clean up undo stack
             if ((this->mq_ChangeInProgress == false) && (this->mpc_UndoStack != NULL))
             {
                this->mpc_UndoStack->setIndex(this->ms32_UndoStartIndex);
             }
-            opc_Model->setData(orc_Index, sn_NewValue);
+            opc_Model->setData(orc_Index, s32_NewValue);
          }
          break;
       case C_SdNdeDpListTableModel::eARRAY_SIZE:
          if (pc_SpinBoxInt != NULL)
          {
-            const sintn sn_NewValue = pc_SpinBoxInt->value();
+            const int32_t s32_NewValue = pc_SpinBoxInt->value();
             //Clean up undo stack
             if ((this->mq_ChangeInProgress == false) && (this->mpc_UndoStack != NULL))
             {
                this->mpc_UndoStack->setIndex(this->ms32_UndoStartIndex);
             }
-            opc_Model->setData(orc_Index, sn_NewValue);
+            opc_Model->setData(orc_Index, s32_NewValue);
          }
          break;
       case C_SdNdeDpListTableModel::eAUTO_MIN_MAX:
@@ -492,7 +491,7 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
    if (orc_Index.isValid() == true)
    {
       //Special handling for boolean to draw checked symbol instead
-      if (orc_Index.data(static_cast<sintn>(Qt::EditRole)).type() == QVariant::Type::Bool)
+      if (orc_Index.data(static_cast<int32_t>(Qt::EditRole)).type() == QVariant::Type::Bool)
       {
          bool q_Edit;
          if (this->ms32_EditCount > 0)
@@ -522,7 +521,7 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
       //Check deactivated cells
       if (this->mpc_Model != NULL)
       {
-         const sint32 s32_Column = orc_Index.column();
+         const int32_t s32_Column = orc_Index.column();
          const C_SdNdeDpListTableModel::E_Columns e_Column = this->mpc_Model->ColumnToEnum(s32_Column);
          bool q_DrawX = false;
          switch (e_Column) //lint !e788 not columns get explicit handling
@@ -532,8 +531,8 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
          case C_SdNdeDpListTableModel::eOFFSET:
          case C_SdNdeDpListTableModel::eUNIT:
             //Usually editable row
-            if ((this->mpc_Model->flags(orc_Index) & static_cast<sintn>(Qt::ItemIsEditable)) !=
-                static_cast<sintn>(Qt::ItemIsEditable))
+            if ((this->mpc_Model->flags(orc_Index) & static_cast<int32_t>(Qt::ItemIsEditable)) !=
+                static_cast<int32_t>(Qt::ItemIsEditable))
             {
                q_DrawX = true;
             }
@@ -541,14 +540,14 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
          case C_SdNdeDpListTableModel::eMIN:
          case C_SdNdeDpListTableModel::eMAX:
             //Usually editable row
-            if ((this->mpc_Model->flags(orc_Index) & static_cast<sintn>(Qt::ItemIsEditable)) !=
-                static_cast<sintn>(Qt::ItemIsEditable))
+            if ((this->mpc_Model->flags(orc_Index) & static_cast<int32_t>(Qt::ItemIsEditable)) !=
+                static_cast<int32_t>(Qt::ItemIsEditable))
             {
                //Check if special case
-               const C_PuiSdNodeDataPoolListElement * const pc_UIElement = this->mpc_Model->GetUIElement(orc_Index);
-               if (pc_UIElement != NULL)
+               const C_PuiSdNodeDataPoolListElement * const pc_UiElement = this->mpc_Model->GetUiElement(orc_Index);
+               if (pc_UiElement != NULL)
                {
-                  if (pc_UIElement->q_InterpretAsString == true)
+                  if (pc_UiElement->q_InterpretAsString == true)
                   {
                      q_DrawX = true;
                   }
@@ -643,13 +642,13 @@ QWidget * C_SdNdeDpListTableDelegate::m_CreateEditor(QWidget * const opc_Parent,
       if (this->mpc_Model != NULL)
       {
          //Core data
-         const C_OSCNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOSCElement(orc_Index);
+         const C_OscNodeDataPoolListElement * const pc_Element = this->mpc_Model->GetOscElement(orc_Index);
          if (pc_Element != NULL)
          {
             if (oe_Col == C_SdNdeDpListTableModel::eMIN)
             {
                //Adapt min
-               C_OSCNodeDataPoolContent c_NewMin = pc_Element->c_MinValue;
+               C_OscNodeDataPoolContent c_NewMin = pc_Element->c_MinValue;
                C_SdNdeDpContentUtil::h_InitMin(c_NewMin);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, c_NewMin,
                                                                 pc_Element->c_MaxValue, pc_Element->f64_Factor,
@@ -658,7 +657,7 @@ QWidget * C_SdNdeDpListTableDelegate::m_CreateEditor(QWidget * const opc_Parent,
             else if (oe_Col == C_SdNdeDpListTableModel::eMAX)
             {
                //Adapt max
-               C_OSCNodeDataPoolContent c_NewMax = pc_Element->c_MaxValue;
+               C_OscNodeDataPoolContent c_NewMax = pc_Element->c_MaxValue;
                C_SdNdeDpContentUtil::h_InitMax(c_NewMax);
                pc_Retval = C_SdNdeDpUtil::h_CreateGenericEditor(opc_Parent, orc_Index, pc_Element->c_MinValue,
                                                                 c_NewMax, pc_Element->f64_Factor,
@@ -766,15 +765,15 @@ void C_SdNdeDpListTableDelegate::m_OnSetModelData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle value type change event
 
-   \param[in] orsn_Index New value type index
+   \param[in] ors32_Index New value type index
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableDelegate::m_OnValueTypeChange(const sintn & orsn_Index)
+void C_SdNdeDpListTableDelegate::m_OnValueTypeChange(const int32_t & ors32_Index)
 {
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
    {
       this->mq_ChangeInProgress = true;
-      this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(orsn_Index));
+      this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(ors32_Index));
       this->mq_ChangeInProgress = false;
    }
 }
@@ -782,19 +781,19 @@ void C_SdNdeDpListTableDelegate::m_OnValueTypeChange(const sintn & orsn_Index)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Handle array size change event
 
-   \param[in] orsn_NewSize New size
+   \param[in] ors32_NewSize New size
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDpListTableDelegate::m_OnArraySizeChange(const sintn & orsn_NewSize)
+void C_SdNdeDpListTableDelegate::m_OnArraySizeChange(const int32_t & ors32_NewSize)
 {
    if ((this->mpc_Model != NULL) && (this->mq_ChangeInProgress == false))
    {
-      const uint32 u32_Size = this->mpc_Model->GetArraySize(this->mc_Edit.row());
-      if (((u32_Size == 1) && (orsn_NewSize != 1)) || ((u32_Size != 1) && (orsn_NewSize == 1)))
+      const uint32_t u32_Size = this->mpc_Model->GetArraySize(this->mc_Edit.row());
+      if (((u32_Size == 1) && (ors32_NewSize != 1)) || ((u32_Size != 1) && (ors32_NewSize == 1)))
       {
          //Only visible changes
          this->mq_ChangeInProgress = true;
-         this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(orsn_NewSize));
+         this->mpc_Model->setData(this->mc_Edit, static_cast<QVariant>(ors32_NewSize));
          this->mq_ChangeInProgress = false;
       }
    }

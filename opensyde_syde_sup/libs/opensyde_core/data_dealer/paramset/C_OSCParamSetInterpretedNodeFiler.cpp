@@ -10,23 +10,23 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
 #include <cstdio>
-#include "TGLFile.h"
-#include "TGLUtils.h"
-#include "stwerrors.h"
-#include "C_OSCChecksummedXML.h"
-#include "C_OSCNodeDataPoolFiler.h"
-#include "C_OSCParamSetInterpretedNodeFiler.h"
-#include "C_OSCLoggingHandler.h"
+#include "TglFile.hpp"
+#include "TglUtils.hpp"
+#include "stwerrors.hpp"
+#include "C_OscChecksummedXml.hpp"
+#include "C_OscNodeDataPoolFiler.hpp"
+#include "C_OscParamSetInterpretedNodeFiler.hpp"
+#include "C_OscLoggingHandler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_scl;
-using namespace stw_tgl;
-using namespace stw_types;
-using namespace stw_errors;
-using namespace stw_opensyde_core;
+using namespace stw::scl;
+using namespace stw::tgl;
+
+using namespace stw::errors;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -48,7 +48,7 @@ using namespace stw_opensyde_core;
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
    \param[out]     orc_Node                     data storage
-   \param[in,out]  orc_XMLParser                XML with specified node active
+   \param[in,out]  orc_XmlParser                XML with specified node active
    \param[in,out]  orq_MissingOptionalContent   Flag for indication of optional content missing
                                                 Warning: flag is never set to false if optional content is present
 
@@ -57,20 +57,21 @@ using namespace stw_opensyde_core;
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSCParamSetInterpretedNode & orc_Node,
-                                                                           C_OSCXMLParserBase & orc_XMLParser,
-                                                                           bool & orq_MissingOptionalContent)
+int32_t C_OscParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OscParamSetInterpretedNode & orc_Node,
+                                                                 C_OscXmlParserBase & orc_XmlParser,
+                                                                 bool & orq_MissingOptionalContent)
 {
-   stw_types::sint32 s32_Retval = C_OSCParamSetFilerBase::mh_LoadNodeName(orc_Node.c_Name, orc_XMLParser);
+   int32_t s32_Retval = C_OscParamSetFilerBase::mh_LoadNodeName(orc_Node.c_Name, orc_XmlParser);
+
    if (s32_Retval == C_NO_ERR)
    {
-      std::vector<C_OSCParamSetDataPoolInfo> c_DataPoolInfos;
-      s32_Retval = C_OSCParamSetFilerBase::mh_LoadDataPoolInfos(c_DataPoolInfos, orc_XMLParser,
+      std::vector<C_OscParamSetDataPoolInfo> c_DataPoolInfos;
+      s32_Retval = C_OscParamSetFilerBase::mh_LoadDataPoolInfos(c_DataPoolInfos, orc_XmlParser,
                                                                 orq_MissingOptionalContent);
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(orc_Node.c_DataPools, c_DataPoolInfos,
-                                                                          orc_XMLParser);
+         s32_Retval = C_OscParamSetInterpretedNodeFiler::mh_LoadDataPools(orc_Node.c_DataPools, c_DataPoolInfos,
+                                                                          orc_XmlParser);
       }
    }
    return s32_Retval;
@@ -84,31 +85,31 @@ stw_types::sint32 C_OSCParamSetInterpretedNodeFiler::h_LoadInterpretedNode(C_OSC
    post-condition: the passed XML parser has the active node set to the same "opensyde-parameter-sets"
 
    \param[in]      orc_Node         data storage
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OSCParamSetInterpretedNode & orc_Node,
-                                                              C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::h_SaveInterpretedNode(const C_OscParamSetInterpretedNode & orc_Node,
+                                                              C_OscXmlParserBase & orc_XmlParser)
 {
-   std::vector<C_OSCParamSetDataPoolInfo> c_Infos;
-   C_OSCParamSetFilerBase::mh_SaveNodeName(orc_Node.c_Name, orc_XMLParser);
+   std::vector<C_OscParamSetDataPoolInfo> c_Infos;
+   C_OscParamSetFilerBase::mh_SaveNodeName(orc_Node.c_Name, orc_XmlParser);
    //Extract data pool info
    c_Infos.reserve(orc_Node.c_DataPools.size());
-   for (uint32 u32_ItDataPool = 0; u32_ItDataPool < orc_Node.c_DataPools.size(); ++u32_ItDataPool)
+   for (uint32_t u32_ItDataPool = 0; u32_ItDataPool < orc_Node.c_DataPools.size(); ++u32_ItDataPool)
    {
-      const C_OSCParamSetInterpretedDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
+      const C_OscParamSetInterpretedDataPool & rc_DataPool = orc_Node.c_DataPools[u32_ItDataPool];
       c_Infos.push_back(rc_DataPool.c_DataPoolInfo);
    }
-   C_OSCParamSetFilerBase::mh_SaveDataPoolInfos(c_Infos, orc_XMLParser);
-   C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(orc_Node.c_DataPools, orc_XMLParser);
+   C_OscParamSetFilerBase::mh_SaveDataPoolInfos(c_Infos, orc_XmlParser);
+   C_OscParamSetInterpretedNodeFiler::mh_SaveDataPools(orc_Node.c_DataPools, orc_XmlParser);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void) :
-   C_OSCParamSetFilerBase()
+C_OscParamSetInterpretedNodeFiler::C_OscParamSetInterpretedNodeFiler(void) :
+   C_OscParamSetFilerBase()
 {
 }
 
@@ -121,37 +122,37 @@ C_OSCParamSetInterpretedNodeFiler::C_OSCParamSetInterpretedNodeFiler(void) :
 
    \param[out]     orc_DataPools       data storage
    \param[in]      orc_DataPoolInfos   Loaded data pool infos
-   \param[in,out]  orc_XMLParser       XML with specified node active
+   \param[in,out]  orc_XmlParser       XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
-   std::vector<C_OSCParamSetInterpretedDataPool> & orc_DataPools,
-   const std::vector<C_OSCParamSetDataPoolInfo> & orc_DataPoolInfos, C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetInterpretedNodeFiler::mh_LoadDataPools(
+   std::vector<C_OscParamSetInterpretedDataPool> & orc_DataPools,
+   const std::vector<C_OscParamSetDataPoolInfo> & orc_DataPoolInfos, C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_DataPools.clear();
-   if (orc_XMLParser.SelectNodeChild("interpreted") == "interpreted")
+   if (orc_XmlParser.SelectNodeChild("interpreted") == "interpreted")
    {
-      uint32 u32_ItDataPoolInfo = 0;
-      C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("datapool");
+      C_SclString c_SelectedNode = orc_XmlParser.SelectNodeChild("datapool");
 
       if (c_SelectedNode == "datapool")
       {
+         uint32_t u32_ItDataPoolInfo = 0;
          do
          {
             if (u32_ItDataPoolInfo < orc_DataPoolInfos.size())
             {
-               C_OSCParamSetInterpretedDataPool c_Item;
+               C_OscParamSetInterpretedDataPool c_Item;
                //Info
                c_Item.c_DataPoolInfo = orc_DataPoolInfos[u32_ItDataPoolInfo];
                ++u32_ItDataPoolInfo;
                //Content
-               s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(c_Item, orc_XMLParser);
+               s32_Retval = C_OscParamSetInterpretedNodeFiler::mh_LoadDataPool(c_Item, orc_XmlParser);
                if (s32_Retval == C_NO_ERR)
                {
                   orc_DataPools.push_back(c_Item);
@@ -164,11 +165,11 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
             }
 
             //Next
-            c_SelectedNode = orc_XMLParser.SelectNodeNext("datapool");
+            c_SelectedNode = orc_XmlParser.SelectNodeNext("datapool");
          }
          while ((c_SelectedNode == "datapool") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "interpreted");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "interpreted");
       }
       else
       {
@@ -183,7 +184,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
    }
    else
    {
@@ -201,22 +202,22 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPools(
    post-condition: the passed XML parser has the active node set to the same "node"
 
    \param[in]      orc_DataPools    Data pools
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
-   const std::vector<C_OSCParamSetInterpretedDataPool> & orc_DataPools, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::mh_SaveDataPools(
+   const std::vector<C_OscParamSetInterpretedDataPool> & orc_DataPools, C_OscXmlParserBase & orc_XmlParser)
 {
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("interpreted") == "interpreted");
-   for (uint32 u32_Index = 0U; u32_Index < orc_DataPools.size(); u32_Index++)
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("interpreted") == "interpreted");
+   for (uint32_t u32_Index = 0U; u32_Index < orc_DataPools.size(); u32_Index++)
    {
-      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("datapool") == "datapool");
-      C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(orc_DataPools[u32_Index], orc_XMLParser);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("datapool") == "datapool");
+      C_OscParamSetInterpretedNodeFiler::mh_SaveDataPool(orc_DataPools[u32_Index], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "interpreted");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "interpreted");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "node");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "node");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -227,17 +228,17 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPools(
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
    \param[in,out]  orc_DataPool     Data pool
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OSCParamSetInterpretedDataPool & orc_DataPool,
-                                                          C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OscParamSetInterpretedDataPool & orc_DataPool,
+                                                           C_OscXmlParserBase & orc_XmlParser)
 {
-   const sint32 s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(orc_DataPool.c_Lists, orc_XMLParser);
+   const int32_t s32_Retval = C_OscParamSetInterpretedNodeFiler::mh_LoadLists(orc_DataPool.c_Lists, orc_XmlParser);
 
    return s32_Retval;
 }
@@ -250,13 +251,13 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadDataPool(C_OSCParamSetInterpret
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
    \param[in]      orc_DataPool     Data pool
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInterpretedDataPool & orc_DataPool,
-                                                        C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OscParamSetInterpretedDataPool & orc_DataPool,
+                                                        C_OscXmlParserBase & orc_XmlParser)
 {
-   C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(orc_DataPool.c_Lists, orc_XMLParser);
+   C_OscParamSetInterpretedNodeFiler::mh_SaveLists(orc_DataPool.c_Lists, orc_XmlParser);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -267,40 +268,40 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveDataPool(const C_OSCParamSetInter
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
    \param[in,out]  orc_Lists        Lists
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSetInterpretedList> & orc_Lists,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OscParamSetInterpretedList> & orc_Lists,
+                                                        C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_Lists.clear();
-   if (orc_XMLParser.SelectNodeChild("lists") == "lists")
+   if (orc_XmlParser.SelectNodeChild("lists") == "lists")
    {
-      C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("list");
+      C_SclString c_SelectedNode = orc_XmlParser.SelectNodeChild("list");
 
       if (c_SelectedNode == "list")
       {
          do
          {
-            C_OSCParamSetInterpretedList c_Item;
-            s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadList(c_Item, orc_XMLParser);
+            C_OscParamSetInterpretedList c_Item;
+            s32_Retval = C_OscParamSetInterpretedNodeFiler::mh_LoadList(c_Item, orc_XmlParser);
             if (s32_Retval == C_NO_ERR)
             {
                orc_Lists.push_back(c_Item);
             }
 
             //Next
-            c_SelectedNode = orc_XMLParser.SelectNodeNext("list");
+            c_SelectedNode = orc_XmlParser.SelectNodeNext("list");
          }
          while ((c_SelectedNode == "list") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "lists");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "lists");
       }
       else
       {
@@ -309,7 +310,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "datapool");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "datapool");
    }
    else
    {
@@ -328,22 +329,22 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadLists(std::vector<C_OSCParamSet
    post-condition: the passed XML parser has the active node set to the same "datapool"
 
    \param[in]      orc_Lists        Lists
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCParamSetInterpretedList> & orc_Lists,
-                                                     C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OscParamSetInterpretedList> & orc_Lists,
+                                                     C_OscXmlParserBase & orc_XmlParser)
 {
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("lists") == "lists");
-   for (uint32 u32_Index = 0U; u32_Index < orc_Lists.size(); u32_Index++)
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("lists") == "lists");
+   for (uint32_t u32_Index = 0U; u32_Index < orc_Lists.size(); u32_Index++)
    {
-      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("list") == "list");
-      C_OSCParamSetInterpretedNodeFiler::mh_SaveList(orc_Lists[u32_Index], orc_XMLParser);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("list") == "list");
+      C_OscParamSetInterpretedNodeFiler::mh_SaveList(orc_Lists[u32_Index], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "lists");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "lists");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "datapool");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "datapool");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -354,23 +355,23 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveLists(const std::vector<C_OSCPara
    post-condition: the passed XML parser has the active node set to the same "list"
 
    \param[in,out]  orc_List         List
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedList & orc_List,
-                                                      C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetInterpretedNodeFiler::mh_LoadList(C_OscParamSetInterpretedList & orc_List,
+                                                       C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_List.c_Name = orc_XMLParser.GetNodeContent();
+      orc_List.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
    }
    else
    {
@@ -379,7 +380,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedLi
    }
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(orc_List.c_Elements, orc_XMLParser);
+      s32_Retval = C_OscParamSetInterpretedNodeFiler::mh_LoadElements(orc_List.c_Elements, orc_XmlParser);
    }
 
    return s32_Retval;
@@ -393,14 +394,14 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadList(C_OSCParamSetInterpretedLi
    post-condition: the passed XML parser has the active node set to the same "list"
 
    \param[in]      orc_List         List
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpretedList & orc_List,
-                                                    C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::mh_SaveList(const C_OscParamSetInterpretedList & orc_List,
+                                                    C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateNodeChild("name", orc_List.c_Name);
-   C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(orc_List.c_Elements, orc_XMLParser);
+   orc_XmlParser.CreateNodeChild("name", orc_List.c_Name);
+   C_OscParamSetInterpretedNodeFiler::mh_SaveElements(orc_List.c_Elements, orc_XmlParser);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -411,40 +412,40 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveList(const C_OSCParamSetInterpret
    post-condition: the passed XML parser has the active node set to the same "list"
 
    \param[in,out]  orc_Elements     Elements
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParamSetInterpretedElement> & orc_Elements,
-                                                          C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OscParamSetInterpretedElement> & orc_Elements,
+                                                           C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
    orc_Elements.clear();
-   if (orc_XMLParser.SelectNodeChild("elements") == "elements")
+   if (orc_XmlParser.SelectNodeChild("elements") == "elements")
    {
-      C_SCLString c_SelectedNode = orc_XMLParser.SelectNodeChild("element");
+      C_SclString c_SelectedNode = orc_XmlParser.SelectNodeChild("element");
 
       if (c_SelectedNode == "element")
       {
          do
          {
-            C_OSCParamSetInterpretedElement c_Item;
-            s32_Retval = C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(c_Item, orc_XMLParser);
+            C_OscParamSetInterpretedElement c_Item;
+            s32_Retval = C_OscParamSetInterpretedNodeFiler::mh_LoadElement(c_Item, orc_XmlParser);
             if (s32_Retval == C_NO_ERR)
             {
                orc_Elements.push_back(c_Item);
             }
 
             //Next
-            c_SelectedNode = orc_XMLParser.SelectNodeNext("element");
+            c_SelectedNode = orc_XmlParser.SelectNodeNext("element");
          }
          while ((c_SelectedNode == "element") && (s32_Retval == C_NO_ERR));
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "elements");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "elements");
       }
       else
       {
@@ -452,7 +453,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParam
          s32_Retval = C_CONFIG;
       }
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
    }
    else
    {
@@ -470,22 +471,22 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElements(std::vector<C_OSCParam
    post-condition: the passed XML parser has the active node set to the same "list"
 
    \param[in]      orc_Elements     Elements
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
-   const std::vector<C_OSCParamSetInterpretedElement> & orc_Elements, C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::mh_SaveElements(
+   const std::vector<C_OscParamSetInterpretedElement> & orc_Elements, C_OscXmlParserBase & orc_XmlParser)
 {
-   tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("elements") == "elements");
-   for (uint32 u32_Index = 0U; u32_Index < orc_Elements.size(); u32_Index++)
+   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("elements") == "elements");
+   for (uint32_t u32_Index = 0U; u32_Index < orc_Elements.size(); u32_Index++)
    {
-      tgl_assert(orc_XMLParser.CreateAndSelectNodeChild("element") == "element");
-      C_OSCParamSetInterpretedNodeFiler::mh_SaveElement(orc_Elements[u32_Index], orc_XMLParser);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("element") == "element");
+      C_OscParamSetInterpretedNodeFiler::mh_SaveElement(orc_Elements[u32_Index], orc_XmlParser);
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "elements");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "elements");
    }
    //Return
-   tgl_assert(orc_XMLParser.SelectNodeParent() == "list");
+   tgl_assert(orc_XmlParser.SelectNodeParent() == "list");
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -496,23 +497,23 @@ void C_OSCParamSetInterpretedNodeFiler::mh_SaveElements(
    post-condition: the passed XML parser has the active node set to the same "element"
 
    \param[out]     orc_Element      data storage
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 
    \return
    C_NO_ERR   data read
    C_CONFIG   content of file is invalid or incomplete
 */
 //----------------------------------------------------------------------------------------------------------------------
-sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterpretedElement & orc_Element,
-                                                         C_OSCXMLParserBase & orc_XMLParser)
+int32_t C_OscParamSetInterpretedNodeFiler::mh_LoadElement(C_OscParamSetInterpretedElement & orc_Element,
+                                                          C_OscXmlParserBase & orc_XmlParser)
 {
-   sint32 s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_NO_ERR;
 
-   if (orc_XMLParser.SelectNodeChild("name") == "name")
+   if (orc_XmlParser.SelectNodeChild("name") == "name")
    {
-      orc_Element.c_Name = orc_XMLParser.GetNodeContent();
+      orc_Element.c_Name = orc_XmlParser.GetNodeContent();
       //Return
-      tgl_assert(orc_XMLParser.SelectNodeParent() == "element");
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "element");
    }
    else
    {
@@ -522,11 +523,11 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
 
    if (s32_Retval == C_NO_ERR)
    {
-      s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementType(orc_Element.c_NvmValue, orc_XMLParser);
-      if ((s32_Retval == C_NO_ERR) && (orc_XMLParser.SelectNodeChild("value") == "value"))
+      s32_Retval = C_OscNodeDataPoolFiler::h_LoadDataPoolElementType(orc_Element.c_NvmValue, orc_XmlParser);
+      if ((s32_Retval == C_NO_ERR) && (orc_XmlParser.SelectNodeChild("value") == "value"))
       {
-         C_SCLString c_Error;
-         s32_Retval = C_OSCNodeDataPoolFiler::h_LoadDataPoolElementValue(orc_Element.c_NvmValue, orc_XMLParser, true,
+         C_SclString c_Error;
+         s32_Retval = C_OscNodeDataPoolFiler::h_LoadDataPoolElementValue(orc_Element.c_NvmValue, orc_XmlParser, true,
                                                                          &c_Error);
          if (s32_Retval != C_NO_ERR)
          {
@@ -535,7 +536,7 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
             s32_Retval = C_CONFIG;
          }
          //Return
-         tgl_assert(orc_XMLParser.SelectNodeParent() == "element");
+         tgl_assert(orc_XmlParser.SelectNodeParent() == "element");
       }
       else
       {
@@ -555,13 +556,13 @@ sint32 C_OSCParamSetInterpretedNodeFiler::mh_LoadElement(C_OSCParamSetInterprete
    post-condition: the passed XML parser has the active node set to the same "element"
 
    \param[in]      orc_Element      Element
-   \param[in,out]  orc_XMLParser    XML with specified node active
+   \param[in,out]  orc_XmlParser    XML with specified node active
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_OSCParamSetInterpretedNodeFiler::mh_SaveElement(const C_OSCParamSetInterpretedElement & orc_Element,
-                                                       C_OSCXMLParserBase & orc_XMLParser)
+void C_OscParamSetInterpretedNodeFiler::mh_SaveElement(const C_OscParamSetInterpretedElement & orc_Element,
+                                                       C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XMLParser.CreateNodeChild("name", orc_Element.c_Name);
-   C_OSCNodeDataPoolFiler::h_SaveDataPoolElementType(orc_Element.c_NvmValue, orc_XMLParser);
-   C_OSCNodeDataPoolFiler::h_SaveDataPoolElementValue("value", orc_Element.c_NvmValue, orc_XMLParser);
+   orc_XmlParser.CreateNodeChild("name", orc_Element.c_Name);
+   C_OscNodeDataPoolFiler::h_SaveDataPoolElementType(orc_Element.c_NvmValue, orc_XmlParser);
+   C_OscNodeDataPoolFiler::h_SaveDataPoolElementValue("value", orc_Element.c_NvmValue, orc_XmlParser);
 }

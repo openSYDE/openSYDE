@@ -11,24 +11,23 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
-#include "TGLUtils.h"
-#include "C_Uti.h"
-#include "C_SdUtil.h"
-#include "C_GtGetText.h"
-#include "C_SdBueMessageRxEntry.h"
+#include "TglUtils.hpp"
+#include "C_Uti.hpp"
+#include "C_SdUtil.hpp"
+#include "C_GtGetText.hpp"
+#include "C_SdBueMessageRxEntry.hpp"
 #include "ui_C_SdBueMessageRxEntry.h"
 
-#include "C_PuiSdHandler.h"
-#include "C_OgePopUpDialog.h"
-#include "C_OgeLabGroupItem.h"
-#include "C_SdBueMessageRxTimeoutConfig.h"
+#include "C_PuiSdHandler.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_OgeLabGroupItem.hpp"
+#include "C_SdBueMessageRxTimeoutConfig.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_types;
-using namespace stw_opensyde_gui;
-using namespace stw_opensyde_gui_elements;
-using namespace stw_opensyde_gui_logic;
-using namespace stw_opensyde_core;
+using namespace stw::opensyde_gui;
+using namespace stw::opensyde_gui_elements;
+using namespace stw::opensyde_gui_logic;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -78,7 +77,7 @@ C_SdBueMessageRxEntry::C_SdBueMessageRxEntry(QWidget * const opc_Parent) :
    this->mc_DatapoolActive = C_SdUtil::h_InitStaticIcon("://images/system_definition/IconDataPoolSmall.svg");
    this->mc_DatapoolInactive = C_SdUtil::h_InitStaticIcon("://images/system_definition/IconDataPoolSmallInactive.svg");
 
-   connect(this->mpc_Ui->pc_CheckBoxActive, &stw_opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
+   connect(this->mpc_Ui->pc_CheckBoxActive, &stw::opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
            this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
    connect(this->mpc_Ui->pc_LabelTimeoutLink, &QLabel::linkActivated,
            this, &C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked);
@@ -128,11 +127,11 @@ void C_SdBueMessageRxEntry::InitStaticNames(void) const
    \param[in]  oq_ReadOnly                Flag if elements shall be read only
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou32_NodeIndex,
-                                 const uint32 ou32_InterfaceIndex,
+void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32_t ou32_NodeIndex,
+                                 const uint32_t ou32_InterfaceIndex,
                                  const std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> & orc_ReceiveTimeoutModes,
-                                 const std::vector<uint32> & orc_ReceiveTimeoutValues,
-                                 const std::vector<uint32> & orc_DatapoolIndexes,
+                                 const std::vector<uint32_t> & orc_ReceiveTimeoutValues,
+                                 const std::vector<uint32_t> & orc_DatapoolIndexes,
                                  const std::vector<QString> & orc_DatapoolNames, const bool oq_NodeLayer,
                                  const bool oq_ReadOnly)
 {
@@ -171,7 +170,7 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou3
    }
    else
    {
-      uint32 u32_ItEntry;
+      uint32_t u32_ItEntry;
 
       // The Datapool layer can not have sub entries
       tgl_assert(this->mq_NodeLayer == true);
@@ -180,10 +179,10 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou3
       // Create for each Datapool an own sub entry
       for (u32_ItEntry = 0U; u32_ItEntry < orc_DatapoolIndexes.size(); ++u32_ItEntry)
       {
-         std::vector<uint32> c_NodeDatapoolIndexes;
+         std::vector<uint32_t> c_NodeDatapoolIndexes;
          std::vector<QString> c_NodeDatapoolNames;
          std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
-         std::vector<uint32> c_ReceiveTimeoutValues;
+         std::vector<uint32_t> c_ReceiveTimeoutValues;
          C_SdBueMessageRxEntry * const pc_Entry = new C_SdBueMessageRxEntry(this);
 
          // Special handling for node toggled signal
@@ -218,7 +217,7 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32 ou3
    \param[in]  ou32_Value  Last known cycle time value
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
+void C_SdBueMessageRxEntry::SetLastKnownCycleTimeValue(const uint32_t ou32_Value)
 {
    this->mu32_LastKnownCycleTimeValue = ou32_Value;
 
@@ -238,7 +237,7 @@ void C_SdBueMessageRxEntry::SetLastKnownCycleTimeValue(const uint32 ou32_Value)
    }
    else
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       // Inform the children
       for (u32_Counter = 0U; u32_Counter < this->mc_Entries.size(); ++u32_Counter)
@@ -281,7 +280,7 @@ void C_SdBueMessageRxEntry::SetRxTimeoutPreconditions(const bool oq_TxMethodOnEv
 
    m_HandleInactiveStates();
 
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Inform the children too
    if (this->mq_HasChildren == true)
@@ -323,7 +322,7 @@ void C_SdBueMessageRxEntry::SetRxTimeoutConfigurationReadOnly(const bool oq_Time
    \param[in]  oq_Checked           New state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::SetChecked(const uint32 ou32_DatapoolIndex, const bool oq_Checked) const
+void C_SdBueMessageRxEntry::SetChecked(const uint32_t ou32_DatapoolIndex, const bool oq_Checked) const
 {
    if (this->mq_HasChildren == false)
    {
@@ -332,7 +331,7 @@ void C_SdBueMessageRxEntry::SetChecked(const uint32 ou32_DatapoolIndex, const bo
    }
    else
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
 
       // Check for the correct entry with the correct Datapool index
       for (u32_Counter = 0U; u32_Counter < this->mc_Entries.size(); ++u32_Counter)
@@ -403,7 +402,7 @@ bool C_SdBueMessageRxEntry::HasChildren(void) const
    False No match
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdBueMessageRxEntry::DoesMatch(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex) const
+bool C_SdBueMessageRxEntry::DoesMatch(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex) const
 {
    bool q_Retval;
 
@@ -449,7 +448,7 @@ bool C_SdBueMessageRxEntry::IsChecked(void) const
    Datapool index
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32 C_SdBueMessageRxEntry::GetDatapoolIndex(void) const
+uint32_t C_SdBueMessageRxEntry::GetDatapoolIndex(void) const
 {
    return this->mu32_DatapoolIndex;
 }
@@ -459,10 +458,10 @@ uint32 C_SdBueMessageRxEntry::GetDatapoolIndex(void) const
 
    Similar to slot for toggle, but also reacts to click of partially checked checkbox.
 
-   \param[in]  osn_CheckState    check state checked/unchecked/partially checked
+   \param[in]  os32_CheckState    check state checked/unchecked/partially checked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged(const sintn osn_CheckState)
+void C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged(const int32_t os32_CheckState)
 {
    // Adapt icon (blue/grey/datapool/node)
    this->m_ToggleIcon(this->mpc_Ui->pc_CheckBoxActive->isChecked()); // use Qt function to map partial check state
@@ -478,14 +477,14 @@ void C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged(const sintn osn_CheckState)
    else
    {
       // Avoid partially checked after user click
-      if ((this->mq_NodeLayer == true) && (osn_CheckState == static_cast<sintn>(Qt::PartiallyChecked)))
+      if ((this->mq_NodeLayer == true) && (os32_CheckState == static_cast<int32_t>(Qt::PartiallyChecked)))
       {
          this->mpc_Ui->pc_CheckBoxActive->setChecked(true);
       }
       else
       {
          // check or uncheck all children
-         switch (static_cast<Qt::CheckState>(osn_CheckState))
+         switch (static_cast<Qt::CheckState>(os32_CheckState))
          {
          case Qt::Unchecked:
             this->m_ToggleSubItems(false);
@@ -513,7 +512,7 @@ void C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged(const sintn osn_CheckState)
 void C_SdBueMessageRxEntry::m_ToggleSubItems(const bool oq_Checked)
 {
    // Adapt all sub entries
-   uint32 u32_Counter;
+   uint32_t u32_Counter;
 
    // Check for the correct entry with the correct Datapool index
    for (u32_Counter = 0U; u32_Counter < this->mc_Entries.size(); ++u32_Counter)
@@ -537,8 +536,8 @@ void C_SdBueMessageRxEntry::m_ToggleSubItems(const bool oq_Checked)
    \param[in]  oq_Checked           Flag if checked
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::m_OnNodeDatapoolToggled(const uint32 ou32_NodeIndex, const uint32 ou32_InterfaceIndex,
-                                                    const uint32 ou32_DatapoolIndex, const bool oq_Checked)
+void C_SdBueMessageRxEntry::m_OnNodeDatapoolToggled(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
+                                                    const uint32_t ou32_DatapoolIndex, const bool oq_Checked)
 {
    if (this->mq_HasChildren == true)
    {
@@ -547,7 +546,7 @@ void C_SdBueMessageRxEntry::m_OnNodeDatapoolToggled(const uint32 ou32_NodeIndex,
 
       if (this->mq_ModeSingleNode == true)
       {
-         uint32 u32_Counter;
+         uint32_t u32_Counter;
          bool q_SecondCheckedEntryFound = false;
          C_SdBueMessageRxEntry * pc_LastCheckedEntry = NULL;
 
@@ -597,7 +596,7 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
 {
    if (this->mq_HasChildren == true)
    {
-      uint32 u32_Counter;
+      uint32_t u32_Counter;
       bool q_AtLeastOneActive = false;
       bool q_AtLeastOneInactive = false;
 
@@ -624,7 +623,7 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
       }
 
       // Disconnect due to avoiding informing the sub entries again
-      disconnect(this->mpc_Ui->pc_CheckBoxActive, &stw_opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
+      disconnect(this->mpc_Ui->pc_CheckBoxActive, &stw::opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
                  this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
 
       // Adapt the checkbox of the parent
@@ -653,7 +652,7 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
          this->m_ToggleIcon(false);
       }
 
-      connect(this->mpc_Ui->pc_CheckBoxActive, &stw_opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
+      connect(this->mpc_Ui->pc_CheckBoxActive, &stw::opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
               this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
    }
 }
@@ -705,7 +704,7 @@ void C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked(void)
       if (this->mq_NodeLayer == false)
       {
          // add node name if and only if Datapool case
-         const C_OSCNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOSCNodeConst(this->mu32_NodeIndex);
+         const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
          if (pc_Node != NULL)
          {
             c_NodeName = pc_Node->c_Properties.c_Name.c_str();
@@ -727,10 +726,10 @@ void C_SdBueMessageRxEntry::m_OnTimeoutConfigLinkClicked(void)
       //Resize
       c_New->SetSize(QSize(750, 380));
 
-      if (c_New->exec() == static_cast<sintn>(QDialog::Accepted))
+      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          const C_PuiSdNodeCanMessage::E_RxTimeoutMode e_NewReceiveTimeoutMode = pc_Dialog->GetReceiveTimeoutMode();
-         const uint32 u32_NewReceiveTimeoutValue = pc_Dialog->GetReceiveTimeoutValue();
+         const uint32_t u32_NewReceiveTimeoutValue = pc_Dialog->GetReceiveTimeoutValue();
 
          // Check change of receive timeout flag
          if (e_NewReceiveTimeoutMode != this->me_ReceiveTimeoutMode)

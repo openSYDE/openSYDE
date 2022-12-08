@@ -30,7 +30,7 @@
     <number>18</number>
    </property>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ErrorFrame">
+    <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_ErrorFrame">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -54,7 +54,7 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxErrorContent">
+       <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxErrorContent">
         <property name="title">
          <string/>
         </property>
@@ -72,7 +72,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_ErrorLabelIcon">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabSvgOnly" name="pc_ErrorLabelIcon">
            <property name="minimumSize">
             <size>
              <width>24</width>
@@ -91,14 +91,14 @@
           </widget>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_ErrorLabelTitle">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_ErrorLabelTitle">
            <property name="text">
             <string>Error Label Title</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeLabFrameError" name="pc_ErrorLabel">
+          <widget class="stw::opensyde_gui_elements::C_OgeLabFrameError" name="pc_ErrorLabel">
            <property name="text">
             <string>Error Label</string>
            </property>
@@ -111,7 +111,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_OgeWiEditBackground" name="pc_BackgroundWidget" native="true">
+    <widget class="stw::opensyde_gui_elements::C_OgeWiEditBackground" name="pc_BackgroundWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,1">
       <property name="spacing">
        <number>0</number>
@@ -129,7 +129,7 @@
        <number>2</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxButtons">
+       <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxButtons">
         <property name="title">
          <string>It has to be flat, so there are no borders</string>
         </property>
@@ -166,7 +166,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgeChxSystemCommisioningEdit" name="pc_CheckBoxSelectAll">
+          <widget class="stw::opensyde_gui_elements::C_OgeChxSystemCommisioningEdit" name="pc_CheckBoxSelectAll">
            <property name="text">
             <string>CheckBox</string>
            </property>
@@ -189,7 +189,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit" name="pc_PbCancel">
+          <widget class="stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit" name="pc_PbCancel">
            <property name="minimumSize">
             <size>
              <width>131</width>
@@ -208,7 +208,7 @@
           </widget>
          </item>
          <item>
-          <widget class="stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit" name="pc_PbConfirm">
+          <widget class="stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit" name="pc_PbConfirm">
            <property name="minimumSize">
             <size>
              <width>131</width>
@@ -230,7 +230,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeWiEditBackground" name="pc_WidgetWhite" native="true">
+       <widget class="stw::opensyde_gui_elements::C_OgeWiEditBackground" name="pc_WidgetWhite" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -246,7 +246,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeFraFrame" name="pc_DrawFrame">
+       <widget class="stw::opensyde_gui_elements::C_OgeFraFrame" name="pc_DrawFrame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -267,7 +267,7 @@
           <number>0</number>
          </property>
          <item row="2" column="0">
-          <widget class="stw_opensyde_gui::C_SebGraphicsView" name="pc_GraphicsView">
+          <widget class="stw::opensyde_gui::C_SebGraphicsView" name="pc_GraphicsView">
            <property name="palette">
             <palette>
              <active>
@@ -410,52 +410,52 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabSvgOnly</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabSvgOnly</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabSvgOnly.h</header>
+   <header>C_OgeLabSvgOnly.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeFraFrame</class>
+   <class>stw::opensyde_gui_elements::C_OgeFraFrame</class>
    <extends>QFrame</extends>
-   <header>C_OgeFraFrame.h</header>
+   <header>C_OgeFraFrame.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_SebGraphicsView</class>
+   <class>stw::opensyde_gui::C_SebGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>C_SebGraphicsView.h</header>
+   <header>C_SebGraphicsView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabFrameError</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabFrameError</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabFrameError.h</header>
+   <header>C_OgeLabFrameError.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeWiEditBackground</class>
+   <class>stw::opensyde_gui_elements::C_OgeWiEditBackground</class>
    <extends>QWidget</extends>
-   <header>C_OgeWiEditBackground.h</header>
+   <header>C_OgeWiEditBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgePubSystemCommissioningEdit</class>
+   <class>stw::opensyde_gui_elements::C_OgePubSystemCommissioningEdit</class>
    <extends>QPushButton</extends>
-   <header>C_OgePubSystemCommissioningEdit.h</header>
+   <header>C_OgePubSystemCommissioningEdit.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeChxSystemCommisioningEdit</class>
+   <class>stw::opensyde_gui_elements::C_OgeChxSystemCommisioningEdit</class>
    <extends>QCheckBox</extends>
-   <header>C_OgeChxSystemCommisioningEdit.h</header>
+   <header>C_OgeChxSystemCommisioningEdit.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

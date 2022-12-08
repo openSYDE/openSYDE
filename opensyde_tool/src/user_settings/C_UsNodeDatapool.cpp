@@ -10,12 +10,12 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.h"
+#include "precomp_headers.hpp"
 
-#include "C_UsNodeDatapool.h"
+#include "C_UsNodeDatapool.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-using namespace stw_opensyde_gui_logic;
+using namespace stw::opensyde_gui_logic;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -140,7 +140,7 @@ C_UsCommunication C_UsNodeDatapool::GetCommList(const QString & orc_ListName) co
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetCommMessageOverviewColumnWidth(const QString & orc_ListName,
-                                                         const std::vector<stw_types::sint32> & orc_Value)
+                                                         const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_InterfaceSettings.contains(orc_ListName) == true)
    {
@@ -163,7 +163,7 @@ void C_UsNodeDatapool::SetCommMessageOverviewColumnWidth(const QString & orc_Lis
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetCommSignalOverviewColumnWidth(const QString & orc_ListName,
-                                                        const std::vector<stw_types::sint32> & orc_Value)
+                                                        const std::vector<int32_t> & orc_Value)
 {
    if (this->mc_InterfaceSettings.contains(orc_ListName) == true)
    {
@@ -190,7 +190,7 @@ void C_UsNodeDatapool::SetCommSignalOverviewColumnWidth(const QString & orc_List
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_UsNodeDatapool::SetListSelectedMessage(const QString & orc_ListName,
-                                              const stw_opensyde_core::C_OSCCanProtocol::E_Type oe_SelectedProtocol,
+                                              const stw::opensyde_core::C_OscCanProtocol::E_Type oe_SelectedProtocol,
                                               const bool oq_MessageSelected, const QString & orc_SelectedMessageName,
                                               const bool oq_SignalSelected, const QString & orc_SelectedSignalName)
 {
@@ -244,8 +244,7 @@ C_UsNodeDatapoolList C_UsNodeDatapool::GetOtherList(const QString & orc_ListName
    \param[in]  orc_ColumnWidths  Last known column widths
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_UsNodeDatapool::SetListColumnSizes(const QString & orc_ListName,
-                                          const std::vector<stw_types::sint32> & orc_ColumnWidths)
+void C_UsNodeDatapool::SetListColumnSizes(const QString & orc_ListName, const std::vector<int32_t> & orc_ColumnWidths)
 {
    if (this->mc_ListSettings.contains(orc_ListName) == true)
    {

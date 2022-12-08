@@ -47,14 +47,14 @@
       <number>10</number>
      </property>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelHeading">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelHeading">
        <property name="text">
         <string>Signals of mess:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="stw_opensyde_gui_elements::C_OgeLabElided" name="pc_LabelHeadingDynamic">
+      <widget class="stw::opensyde_gui_elements::C_OgeLabElided" name="pc_LabelHeadingDynamic">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -75,7 +75,7 @@
     </layout>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeGbxMessageSignalsBorder" name="groupBox">
+    <widget class="stw::opensyde_gui_elements::C_CamOgeGbxMessageSignalsBorder" name="groupBox">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -94,7 +94,7 @@
     </widget>
    </item>
    <item>
-    <widget class="stw_opensyde_gui_elements::C_CamOgeGbxMessageGeneratorBackground" name="pc_GroupBoxSignals">
+    <widget class="stw::opensyde_gui_elements::C_CamOgeGbxMessageGeneratorBackground" name="pc_GroupBoxSignals">
      <property name="title">
       <string/>
      </property>
@@ -115,7 +115,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoSignals">
+       <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoSignals">
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <property name="spacing">
           <number>0</number>
@@ -149,7 +149,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoDatabase">
+       <widget class="stw::opensyde_gui_elements::C_OgeGbxTransparent" name="pc_GroupBoxNoDatabase">
         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,1">
          <property name="spacing">
           <number>0</number>
@@ -195,7 +195,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNoDatabase">
+            <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelNoDatabase">
              <property name="text">
               <string>No Database</string>
              </property>
@@ -233,7 +233,7 @@
        </widget>
       </item>
       <item>
-       <widget class="stw_opensyde_gui::C_CamGenSigTableView" name="pc_TableView"/>
+       <widget class="stw::opensyde_gui::C_CamGenSigTableView" name="pc_TableView"/>
       </item>
      </layout>
     </widget>
@@ -242,37 +242,37 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.h</header>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeGbxMessageGeneratorBackground</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeGbxMessageGeneratorBackground</class>
    <extends>QGroupBox</extends>
-   <header>C_CamOgeGbxMessageGeneratorBackground.h</header>
+   <header>C_CamOgeGbxMessageGeneratorBackground.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeGbxTransparent</class>
+   <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
-   <header>C_OgeGbxTransparent.h</header>
+   <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui::C_CamGenSigTableView</class>
+   <class>stw::opensyde_gui::C_CamGenSigTableView</class>
    <extends>QTableView</extends>
-   <header>C_CamGenSigTableView.h</header>
+   <header>C_CamGenSigTableView.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_CamOgeGbxMessageSignalsBorder</class>
+   <class>stw::opensyde_gui_elements::C_CamOgeGbxMessageSignalsBorder</class>
    <extends>QGroupBox</extends>
-   <header>C_CamOgeGbxMessageSignalsBorder.h</header>
+   <header>C_CamOgeGbxMessageSignalsBorder.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw_opensyde_gui_elements::C_OgeLabElided</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabElided</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabElided.h</header>
+   <header>C_OgeLabElided.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
