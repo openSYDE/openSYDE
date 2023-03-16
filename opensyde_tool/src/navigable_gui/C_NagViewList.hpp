@@ -33,7 +33,7 @@ class C_NagViewList :
 
 public:
    C_NagViewList(QWidget * const opc_Parent = NULL);
-   virtual ~C_NagViewList(void);
+   ~C_NagViewList(void) override;
 
    void Init(void);
    void LoadUserSettings(void) const;

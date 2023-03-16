@@ -208,7 +208,7 @@ void C_SyvDaItPaTreeModel::ClearEcuValues(void)
    QVector<int32_t> c_RolesDisplay;
    QVector<int32_t> c_RolesStyle;
    const int32_t s32_ColSet = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eSET);
-   const int32_t s32_ColECU = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eDEVICE_VALUE);
+   const int32_t s32_ColEcu = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eDEVICE_VALUE);
    const int32_t s32_ColTree = C_SyvDaItPaTreeModel::h_EnumToColumn(C_SyvDaItPaTreeModel::eTREE);
    c_RolesDisplay.append(static_cast<int32_t>(Qt::DisplayRole));
    c_RolesStyle.append(static_cast<int32_t>(Qt::FontRole));
@@ -232,7 +232,7 @@ void C_SyvDaItPaTreeModel::ClearEcuValues(void)
       rc_Ref = false;
    }
    //Trigger set value change
-   Q_EMIT this->dataChanged(this->index(0, s32_ColECU), this->index(this->rowCount() - 1, s32_ColECU), c_RolesDisplay);
+   Q_EMIT this->dataChanged(this->index(0, s32_ColEcu), this->index(this->rowCount() - 1, s32_ColEcu), c_RolesDisplay);
    //Trigger "*" update
    Q_EMIT this->dataChanged(this->index(0, s32_ColTree), this->index(this->rowCount() - 1, s32_ColTree),
                             c_RolesDisplay);
@@ -475,7 +475,7 @@ void C_SyvDaItPaTreeModel::PrepareChangedValues(const std::vector<C_OscNodeDataP
                   if ((pc_SetVal != NULL) && (this->mc_EcuValuesReadStatus[u32_ItConfig] == true))
                   {
                      //Only apply values if necessary
-                     if (this->mc_EcuValues[u32_ItConfig] == *pc_SetVal)
+                     if (this->mc_EcuValues[u32_ItConfig].CompareContentStrict(*pc_SetVal))
                      {
                         //Skip this one
                      }
@@ -870,7 +870,7 @@ const
                   const C_OscNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItElement);
                   if (pc_Value != NULL)
                   {
-                     if (this->mc_EcuValues[u32_ItElement] == *pc_Value)
+                     if (this->mc_EcuValues[u32_ItElement].CompareContentStrict(*pc_Value))
                      {
                         //No add necessary
                      }
@@ -1413,7 +1413,7 @@ int32_t C_SyvDaItPaTreeModel::columnCount(const QModelIndex & orc_Parent) const
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  os32_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    Data
@@ -1842,7 +1842,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const int32_t
                              (u32_Index < this->mc_EcuValues.size())) &&
                             (this->mc_EcuValuesReadStatus[u32_Index] == true))
                         {
-                           if (*pc_Value == this->mc_EcuValues[u32_Index])
+                           if (pc_Value->CompareContentStrict(this->mc_EcuValues[u32_Index]))
                            {
                               //Use default font
                            }
@@ -2089,7 +2089,7 @@ QVariant C_SyvDaItPaTreeModel::data(const QModelIndex & orc_Index, const int32_t
 
    \param[in]  orc_Index   Index
    \param[in]  orc_Value   New data
-   \param[in]  os32_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    true  success
@@ -2109,9 +2109,8 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
       const E_Columns e_Col = h_ColumnToEnum(orc_Index.column());
 
       const C_GiSvDaParam * const pc_ParamWidget = dynamic_cast<const C_GiSvDaParam * const>(this->mpc_DataWidget);
-      switch (e_Col) //lint !e788 not all cases handled here explicitly
+      if (e_Col == C_SyvDaItPaTreeModel::eSET)
       {
-      case C_SyvDaItPaTreeModel::eSET:
          switch (u32_ValidLayers)
          {
          case 3:
@@ -2196,10 +2195,6 @@ bool C_SyvDaItPaTreeModel::setData(const QModelIndex & orc_Index, const QVariant
             //Use default value = empty
             break;
          }
-         break;
-      default:
-         //Use default value = empty
-         break;
       }
    }
    return q_Retval;
@@ -3053,7 +3048,7 @@ void C_SyvDaItPaTreeModel::mh_InitAllNode(C_TblTreItem * const opc_TreeNode, con
       {
          opc_TreeNode->c_Name =
             static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1).arg(
-               pc_View->GetName());
+               pc_View->GetName().c_str());
       }
       //Icon
       opc_TreeNode->c_Icon = QIcon(C_SyvDaItPaTreeModel::mhc_ICON_ALL_NODE);
@@ -3506,7 +3501,7 @@ bool C_SyvDaItPaTreeModel::m_CheckElementIsChanged(const C_OscNodeDataPoolListEl
                      const C_OscNodeDataPoolContent * const pc_Value = m_GetSetValue(u32_ItElement);
                      if (pc_Value != NULL)
                      {
-                        if (this->mc_EcuValues[u32_ItElement] == *pc_Value)
+                        if (this->mc_EcuValues[u32_ItElement].CompareContentStrict(*pc_Value))
                         {
                            //No change
                         }

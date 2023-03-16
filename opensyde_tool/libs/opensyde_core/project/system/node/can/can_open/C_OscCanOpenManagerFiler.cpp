@@ -991,7 +991,7 @@ int32_t C_OscCanOpenManagerFiler::mh_LoadManagerMappedSignal(C_OscCanOpenManager
       s32_Retval = orc_XmlParser.SelectNodeChildError("com-signal");
       if (s32_Retval == C_NO_ERR)
       {
-         s32_Retval = C_OscNodeCommFiler::h_LoadNodeComSignal(orc_Config.c_SignalData, orc_XmlParser);
+         s32_Retval = C_OscNodeCommFiler::h_LoadNodeComSignal(orc_Config.c_SignalData, orc_XmlParser, true);
       }
       tgl_assert(orc_XmlParser.SelectNodeParent() == "mappable-signal");
    }
@@ -1019,10 +1019,10 @@ void C_OscCanOpenManagerFiler::mh_SaveManagerMappedSignal(const C_OscCanOpenMana
 {
    orc_XmlParser.SetAttributeBool("is-auto-min-max-used", orc_Config.q_AutoMinMaxUsed);
    orc_XmlParser.CreateAndSelectNodeChild("com-signal");
-   C_OscNodeCommFiler::h_SaveNodeComSignal(orc_Config.c_SignalData, orc_XmlParser);
+   C_OscNodeCommFiler::h_SaveNodeComSignal(orc_Config.c_SignalData, orc_XmlParser, C_OscCanProtocol::eCAN_OPEN);
    tgl_assert(orc_XmlParser.SelectNodeParent() == "mappable-signal");
    orc_XmlParser.CreateAndSelectNodeChild("data-element");
-   C_OscNodeDataPoolFiler::h_SaveDataPoolElement(orc_Config.c_DatapoolData, orc_XmlParser);
+   C_OscNodeDataPoolFiler::h_SaveDataPoolElement(orc_Config.c_DatapoolData, orc_XmlParser, C_OscNodeDataPool::eCOM);
    tgl_assert(orc_XmlParser.SelectNodeParent() == "mappable-signal");
 }
 

@@ -10,6 +10,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <QApplication>
 #include <QString>
 #include <QPainter>
 #include <QKeyEvent>
@@ -71,7 +72,9 @@ C_SebGraphicsView::C_SebGraphicsView(QWidget * const opc_Parent) :
    mc_DragMoveDistance(0.0, 0.0),
    ms32_ZoomValue(100),
    mq_SubtleSurroundGradient(false),
-   mq_DrawBackground(true)
+   mq_DrawBackground(true),
+   mq_OverrideCursorActive(false),
+   me_CurrentOverrideCursor(Qt::SizeAllCursor)
 {
    this->setAcceptDrops(true);
    this->setDragMode(QGraphicsView::NoDrag);
@@ -428,6 +431,10 @@ void C_SebGraphicsView::resizeEvent(QResizeEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
 {
+   bool q_OverrideCursorNecessary = false;
+
+   Qt::CursorShape e_Cursor = Qt::ArrowCursor;
+
    if (this->mq_ProxyWidgetInteractionActive == false)
    {
       if (this->mq_ScrollingActive == true)
@@ -435,20 +442,45 @@ void C_SebGraphicsView::mouseMoveEvent(QMouseEvent * const opc_Event)
          this->viewport()->setCursor(Qt::ClosedHandCursor);
          this->m_DragMove(opc_Event);
       }
+      else
+      {
+         C_SebScene * const pc_Scene = dynamic_cast<C_SebScene *>(this->scene());
+
+         if (pc_Scene != NULL)
+         {
+            q_OverrideCursorNecessary =
+               pc_Scene->IsOverrideCursorNecessary(this->mapToScene(opc_Event->pos()), e_Cursor);
+         }
+      }
 
       this->mc_LastMouseEvent = *opc_Event;
    }
 
-   QGraphicsView::mouseMoveEvent(opc_Event);
-
-   // remove selection (select on release, not on move)
-
-   //SSI: Deactivated for Release 7, buggy
-   /*
-   if ((this->dragMode() == QGraphicsView::RubberBandDrag) && (QApplication::mouseButtons() == Qt::LeftButton))
+   if (q_OverrideCursorNecessary != this->mq_OverrideCursorActive)
    {
-      this->scene()->setSelectionArea(QPainterPath());
-   }*/
+      if (q_OverrideCursorNecessary == true)
+      {
+         QApplication::setOverrideCursor(e_Cursor);
+         this->me_CurrentOverrideCursor = e_Cursor;
+      }
+      else
+      {
+         QApplication::restoreOverrideCursor();
+      }
+      this->mq_OverrideCursorActive = q_OverrideCursorNecessary;
+   }
+   else if ((q_OverrideCursorNecessary == true) &&
+            (e_Cursor != this->me_CurrentOverrideCursor))
+   {
+      QApplication::changeOverrideCursor(e_Cursor);
+      this->me_CurrentOverrideCursor = e_Cursor;
+   }
+   else
+   {
+      // Nothing to do
+   }
+
+   QGraphicsView::mouseMoveEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -488,6 +520,14 @@ void C_SebGraphicsView::mousePressEvent(QMouseEvent * const opc_Event)
       // using buttonS to make sure that really only one of the button is clicked
       if (opc_Event->buttons() == static_cast<int32_t>(Qt::RightButton))
       {
+         if (this->mq_OverrideCursorActive == true)
+         {
+            // In case of right click, a context menu will be opened or the scene dragged.
+            // In both cases the override cursor must be reseted before to get the correct cursor
+            this->mq_OverrideCursorActive = false;
+            QApplication::restoreOverrideCursor();
+         }
+
          // deactivate rubberband functionality
          this->setDragMode(QGraphicsView::NoDrag);
          this->mq_ScrollingActive = true;
@@ -551,6 +591,25 @@ void C_SebGraphicsView::mouseReleaseEvent(QMouseEvent * const opc_Event)
    }*/
 
    QGraphicsView::mouseReleaseEvent(opc_Event);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Overwritten mouse double click event slot
+
+   Here: Handle an active override cursor
+
+   \param[in,out]  opc_Event  Event identification and information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SebGraphicsView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
+{
+   if (this->mq_OverrideCursorActive == true)
+   {
+      // In case of double click, a dialog will be opened. The override cursor must be reseted before
+      this->mq_OverrideCursorActive = false;
+      QApplication::restoreOverrideCursor();
+   }
+   QGraphicsView::mouseDoubleClickEvent(opc_Event);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

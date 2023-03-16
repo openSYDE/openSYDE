@@ -56,7 +56,7 @@ protected:
 
 private:
    Ui::C_SdNdeDbAddNewProject * mpc_Ui;
-   int32_t ms32_TSPReadResult;
+   int32_t ms32_TspReadResult;
    const uint32_t mu32_NodeIndex;
    stw::opensyde_core::C_OscTargetSupportPackage mc_Package;
    //lint -e{1725} Only problematic if copy or assignment is allowed

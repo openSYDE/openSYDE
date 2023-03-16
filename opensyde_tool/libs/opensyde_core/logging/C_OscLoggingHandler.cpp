@@ -355,7 +355,20 @@ void C_OscLoggingHandler::mh_WriteLog(const C_SclString & orc_Type, const C_SclS
    {
       c_Function = "UNKNOWN_FUNCTION";
    }
-   c_CombinedClassAndFunction = c_Class + "::" + c_Function;
+
+   c_Class += "::";
+
+   //Special handling:
+   //Older versions of MSVC do not support the __func__ macro. They support __FUNCTION__ which expands to
+   // classname::functionname (in contrast to only functionname for __func__).
+   //To be defensive and prevent containing the class name twice: If function already contains the class name at the
+   // beginning then strip that information.
+   if (c_Function.Pos(c_Class) == 1)
+   {
+      c_Function.Delete(1, c_Class.Length());
+   }
+
+   c_CombinedClassAndFunction = c_Class + c_Function;
 
    TglGetDateTimeNow(c_DateTime);
    c_DateTimeFormatted = C_OscLoggingHandler::h_UtilConvertDateTimeToString(c_DateTime);

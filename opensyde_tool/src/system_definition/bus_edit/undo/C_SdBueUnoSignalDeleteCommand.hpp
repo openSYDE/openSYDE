@@ -34,8 +34,8 @@ public:
       stw::opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
       QUndoCommand * const opc_Parent = NULL);
 
-   virtual void redo(void);
-   virtual void undo(void);
+   void redo(void) override;
+   void undo(void) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

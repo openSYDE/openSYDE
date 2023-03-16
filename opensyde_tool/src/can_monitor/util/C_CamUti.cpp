@@ -142,7 +142,7 @@ QString C_CamUti::h_ResolvePlaceholderVariables(const QString & orc_Path)
    if (c_Return.contains("%") == true)
    {
       // replace general path variables
-      c_Return = C_Uti::h_ResolveProjIndependentPlaceholderVariables(c_Return);
+      c_Return = C_OscUtils::h_ResolveProjIndependentPlaceholderVariables(c_Return.toStdString().c_str()).c_str();
 
       // resolve CAN-monitor- and project-specific variables
       if (c_Return.contains(mc_PATH_VARIABLE_CAN_MONITOR_BIN) == true)

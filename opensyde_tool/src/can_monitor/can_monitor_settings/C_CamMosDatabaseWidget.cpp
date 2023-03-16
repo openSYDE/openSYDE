@@ -892,7 +892,7 @@ void C_CamMosDatabaseWidget::m_OnFileCheckTimeout()
    }
 
    // time till next check can be greater than time till first check
-   this->mc_Timer.setInterval(mu32_FILE_CHECK_INTERVAL);
+   this->mc_Timer.setInterval(mu32_DATABASE_CHECK_INTERVAL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -7,7 +7,7 @@
    - system timestamps
    - active delays
 
-   \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
+   \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
 #ifndef TGLTIMEHPP
@@ -15,14 +15,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
-
-#ifndef TGL_PACKAGE
-#ifdef __BORLANDC__
-#define TGL_PACKAGE __declspec(package)
-#else
-#define TGL_PACKAGE
-#endif
-#endif
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -45,11 +37,11 @@ public:
    uint16_t mu16_MilliSeconds; ///< 0 .. 999
 };
 
-void TGL_PACKAGE TglGetDateTimeNow(C_TglDateTime & orc_DateTime);
-uint64_t TGL_PACKAGE TglGetTickCountUs(void);
-uint32_t TGL_PACKAGE TglGetTickCount(void);
-void TGL_PACKAGE TglDelayUs(const uint32_t ou32_NumberUs);
-void TGL_PACKAGE TglSleep(const uint32_t ou32_NumberMs);
+void TglGetDateTimeNow(C_TglDateTime & orc_DateTime);
+void TglDelayUs(const uint32_t ou32_NumberUs);
+void TglSleep(const uint32_t ou32_NumberMs);
+uint32_t TglGetTickCount(void);
+uint64_t TglGetTickCountUs(void);
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }

@@ -8,8 +8,8 @@
    \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CXFLActionsH
-#define CXFLActionsH
+#ifndef CXFLACTIONSHPP
+#define CXFLACTIONSHPP
 
 #include "stwtypes.hpp"
 #include "CXFLProtocol.hpp"
@@ -311,7 +311,7 @@ enum E_XFLWakeupMode
 
 //----------------------------------------------------------------------------------------------------------------------
 ///Parameters for performing an ECU wakeup
-class STW_DIAGLIB_EXPORT C_XFLWakeupParameters
+class C_XFLWakeupParameters
 {
 public:
    C_XFLWakeupParameters(void);
@@ -334,7 +334,7 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 ///Higher level comfort layer on top of the flashloader protocol driver
-class STW_DIAGLIB_EXPORT C_XFLActions :
+class C_XFLActions :
    public C_XFLProtocol
 {
 private:

@@ -11,10 +11,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include "stwtypes.hpp"
 #include "C_SclChecksums.hpp"
@@ -123,18 +119,20 @@ static const uint32_t mau32_CRC_TABLE[] =
 
    \param[in]     opv_Start      data to calculate checksum over
    \param[in]     ou32_NumBytes  number of bytes to calculate the CRC for
-   \param[in,out] oru16_CRC      start checksum / resulting checksum
+   \param[in,out] oru16_Crc      start checksum / resulting checksum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SclChecksums::CalcCRC16STW(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_CRC)
+void C_SclChecksums::CalcCRC16STW(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_Crc)
 {
-   const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse byte-by-byte
+   const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse
+
+   // byte-by-byte
 
    for (uint32_t u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      const uint8_t u8_Index = static_cast<uint8_t>(oru16_CRC >> 8U);
-      oru16_CRC = static_cast<uint16_t>((static_cast<uint16_t>(oru16_CRC << 8U)) ^ mau16_CRC_TABLE[u8_Index] ^
-                                      pu8_Data[u32_Index]);
+      const uint8_t u8_Index = static_cast<uint8_t>(oru16_Crc >> 8U);
+      oru16_Crc = static_cast<uint16_t>((static_cast<uint16_t>(oru16_Crc << 8U)) ^ mau16_CRC_TABLE[u8_Index] ^
+                                        pu8_Data[u32_Index]);
    }
 }
 
@@ -148,17 +146,19 @@ void C_SclChecksums::CalcCRC16STW(const void * const opv_Start, const uint32_t o
 
    \param[in]     opv_Start      data to calculate checksum over
    \param[in]     ou32_NumBytes  number of bytes to calculate the CRC for
-   \param[in,out] oru16_CRC      start checksum / resulting checksum
+   \param[in,out] oru16_Crc      start checksum / resulting checksum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SclChecksums::CalcCRC16(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_CRC)
+void C_SclChecksums::CalcCRC16(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_Crc)
 {
-   const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse byte-by-byte
+   const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse
+
+   // byte-by-byte
 
    for (uint32_t u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      const uint8_t u8_Index = static_cast<uint8_t>(oru16_CRC >> 8U) ^ pu8_Data[u32_Index];
-      oru16_CRC = static_cast<uint16_t>((static_cast<uint16_t>(oru16_CRC << 8U)) ^ mau16_CRC_TABLE[u8_Index]);
+      const uint8_t u8_Index = static_cast<uint8_t>(oru16_Crc >> 8U) ^ pu8_Data[u32_Index];
+      oru16_Crc = static_cast<uint16_t>((static_cast<uint16_t>(oru16_Crc << 8U)) ^ mau16_CRC_TABLE[u8_Index]);
    }
 }
 
@@ -170,16 +170,18 @@ void C_SclChecksums::CalcCRC16(const void * const opv_Start, const uint32_t ou32
 
    \param[in]     opv_Start      data to calculate checksum over
    \param[in]     ou32_NumBytes  number of bytes to calculate the CRC for
-   \param[in,out] oru32_CRC      start checksum / resulting checksum
+   \param[in,out] oru32_Crc      start checksum / resulting checksum
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SclChecksums::CalcCRC32(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_CRC)
+void C_SclChecksums::CalcCRC32(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_Crc)
 {
-   const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse byte-by-byte
+   const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse
+
+   // byte-by-byte
 
    for (uint32_t u32_Index = 0U; u32_Index < ou32_NumBytes; u32_Index++)
    {
-      oru32_CRC = (mau32_CRC_TABLE[((oru32_CRC) ^ (pu8_Data[u32_Index])) & 0xFFU] ^ ((oru32_CRC) >> 8U));
+      oru32_Crc = (mau32_CRC_TABLE[((oru32_Crc) ^ (pu8_Data[u32_Index])) & 0xFFU] ^ ((oru32_Crc) >> 8U));
    }
 }
 
@@ -198,14 +200,15 @@ void C_SclChecksums::CalcCRC32(const void * const opv_Start, const uint32_t ou32
 
    \param[in]        opv_Start            pointer to data that shall be included into the checksum
    \param[in]        ou32_NumBytes        number of data bytes the checksum shall be calculated for
-   \param[in,out]    oru32_CRC            reference to the calculated checksum
+   \param[in,out]    oru32_Crc            reference to the calculated checksum
 
    \return
    0          CRC calculated
    -1         ou32_NumBytes is not a multiple of 4
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_SclChecksums::CalcCRC32TriCore(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_CRC)
+int32_t C_SclChecksums::CalcCRC32TriCore(const void * const opv_Start, const uint32_t ou32_NumBytes,
+                                         uint32_t & oru32_Crc)
 {
    int32_t s32_Return = 0;
 
@@ -222,9 +225,9 @@ int32_t C_SclChecksums::CalcCRC32TriCore(const void * const opv_Start, const uin
          uint32_t u32_Value;
          const uint32_t u32_Poly = 0xEDB88320UL;
          const uint8_t * const pu8_Data = reinterpret_cast<const uint8_t *>(opv_Start); //lint !e925 we need to parse
-                                                                                    // byte-by-byte
+         // byte-by-byte
 
-         u32_Tmp2 = oru32_CRC & u32_Poly;
+         u32_Tmp2 = oru32_Crc & u32_Poly;
 
          for (uint32_t u32_IndexBit = 0U; u32_IndexBit <= 31U; u32_IndexBit++)
          {
@@ -235,7 +238,7 @@ int32_t C_SclChecksums::CalcCRC32TriCore(const void * const opv_Start, const uin
                      ((static_cast<uint32_t>(pu8_Data[(u32_IndexWord * 4) + 1])) << 8U) +
                      ((static_cast<uint32_t>(pu8_Data[(u32_IndexWord * 4) + 2])) << 16U) +
                      ((static_cast<uint32_t>(pu8_Data[(u32_IndexWord * 4) + 3])) << 24U);
-         oru32_CRC = (u32_Value) ^ ((oru32_CRC << 1U) | u32_Tmp1);
+         oru32_Crc = (u32_Value) ^ ((oru32_Crc << 1U) | u32_Tmp1);
       }
    }
 

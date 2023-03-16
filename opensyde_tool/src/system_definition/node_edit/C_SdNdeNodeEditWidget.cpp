@@ -779,8 +779,8 @@ void C_SdNdeNodeEditWidget::m_CreateCommTab(const bool oq_AdaptCursor)
               this, &C_SdNdeNodeEditWidget::m_DataChanged);
       connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange,
               this, &C_SdNdeNodeEditWidget::SigErrorChange);
-      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigSwitchToBus,
-              this, &C_SdNdeNodeEditWidget::m_OnSwitchToBus);
+      connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigSwitchToBusProtocol,
+              this, &C_SdNdeNodeEditWidget::SigSwitchToBusProtocol);
       connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigCommDataPoolAdded, this,
               &C_SdNdeNodeEditWidget::m_ReloadDataPools);
       connect(this->mpc_ComIfDescriptionWidget, &C_SdBueComIfDescriptionWidget::SigErrorChange, this,

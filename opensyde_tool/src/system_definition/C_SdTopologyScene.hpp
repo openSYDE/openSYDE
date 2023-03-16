@@ -195,13 +195,17 @@ private:
                                  const bool & orq_ChangeInterface, const bool & orq_Reconnect,
                                  const int32_t & ors32_SpecialInterface, C_GiLiBusConnector * const opc_Connector);
    void m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * const opc_Node1, const C_GiNode * const opc_Node2);
-   std::vector<std::vector<uint8_t> > m_AssignNodeProperty(const std::vector<uint32_t> & orc_NodeIndices,
-                                                           const stw::opensyde_core::C_OscSystemBus::E_Type & ore_BusType, const uint32_t & oru32_BusIndex, const std::vector<uint8_t> & orc_InterfaceIndices, const bool oq_BusExists, const bool oq_GenerateId);
+   std::vector<std::vector<uint8_t> > m_AssignNodeProperty(const std::vector<uint32_t> & orc_NodeIndices, const stw::opensyde_core::C_OscSystemBus::E_Type
+                                                           & ore_BusType, const uint32_t & oru32_BusIndex,
+                                                           const std::vector<uint8_t> & orc_InterfaceIndices,
+                                                           const bool oq_BusExists,
+                                                           const bool oq_GenerateId);
    uint32_t m_GeneratePropertyUsingExisting(const stw::opensyde_core::C_OscNode & orc_Node,
                                             const uint32_t & oru32_BusIndex, const std::vector<
                                                uint8_t> & orc_ExistingNode1Properties,
                                             const std::vector<uint8_t> & orc_ExistingNode2Properties,
-                                            const bool oq_BusExists, const bool oq_GenerateId);
+                                            const bool oq_BusExists, const bool oq_GenerateId,
+                                            const uint8_t ou8_CurrentProperty);
    std::vector<uint8_t> m_BuildCompleteIpAddress(const uint8_t & oru8_IpLastByte);
 
    void m_ShowInterfaceChangePopUp(QGraphicsItem * const opc_Item);

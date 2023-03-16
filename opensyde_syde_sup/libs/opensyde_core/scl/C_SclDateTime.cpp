@@ -12,10 +12,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 //lint -estring(829,*ctime*)   //this module is specifically for Windows targets; no trouble with unspecified
 // behavior expected

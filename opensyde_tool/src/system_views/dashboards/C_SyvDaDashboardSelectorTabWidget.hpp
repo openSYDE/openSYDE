@@ -42,7 +42,7 @@ class C_SyvDaDashboardSelectorTabWidget :
 
 public:
    C_SyvDaDashboardSelectorTabWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaDashboardSelectorTabWidget(void);
+   ~C_SyvDaDashboardSelectorTabWidget(void) override;
 
    void TearOffWidget(const int32_t os32_Index, const QPoint & orc_Pos);
 

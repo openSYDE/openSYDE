@@ -31,9 +31,9 @@ class C_SdNdeCoPdoTableView :
 
 public:
    C_SdNdeCoPdoTableView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeCoPdoTableView(void);
+   ~C_SdNdeCoPdoTableView(void) override;
 
-   void LoadUserSettings(void); // todo remove constness
+   void LoadUserSettings(void);
    void SaveUserSettings(void) const;
    void UpdateData(void);
    void SetNodeIndexAndInterfaceId(const uint32_t ou32_ManagerNodeIndex, const uint8_t ou8_ManagerInterfaceId,

@@ -30,7 +30,7 @@ public:
    C_SyvUpFileSizeInformation(void);
 
    void Reset(void);
-   uint64_t GetEstimatedTimeS(bool * const opq_Ok) const;
+   uint64_t GetEstimatedTimeSeconds(bool * const opq_Ok) const;
    uint64_t GetOverallFilesSize(void) const;
    void ReserveSpace(const uint32_t ou32_NumNodes);
    void AppendFiles(const uint32_t ou32_NodeIndex, const std::vector<uint64_t> & orc_OtherFiles,

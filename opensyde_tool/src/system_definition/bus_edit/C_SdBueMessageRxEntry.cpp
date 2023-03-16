@@ -64,9 +64,14 @@ C_SdBueMessageRxEntry::C_SdBueMessageRxEntry(QWidget * const opc_Parent) :
    mu32_ReceiveTimeoutValue(0U),
    mq_TxMethodOnEvent(false),
    mq_DisableOptionPossible(false),
-   mq_TimeoutConfigurationReadOnly(false)
+   mq_TimeoutConfigurationReadOnly(false),
+   mq_ExclusiveMode(false)
 {
    mpc_Ui->setupUi(this);
+
+   this->mpc_Ui->pc_RadioButtonActive->SetStyleVariantReceivers();
+
+   this->mpc_Ui->pc_RadioButtonActive->setVisible(false);
 
    InitStaticNames();
    m_HandleInactiveStates();
@@ -141,6 +146,7 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32_t o
    tgl_assert(orc_DatapoolIndexes.size() == orc_DatapoolNames.size());
 
    this->mpc_Ui->pc_CheckBoxActive->setEnabled(!oq_ReadOnly);
+   this->mpc_Ui->pc_RadioButtonActive->setEnabled(!oq_ReadOnly);
 
    this->mq_NodeLayer = oq_NodeLayer;
    this->mu32_NodeIndex = ou32_NodeIndex;
@@ -150,12 +156,16 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32_t o
    {
       this->mpc_Ui->pc_CheckBoxActive->setText(orc_EntryName);
       this->mpc_Ui->pc_CheckBoxActive->setIcon(this->mc_NodeInactive);
+      this->mpc_Ui->pc_RadioButtonActive->setText(orc_EntryName);
+      this->mpc_Ui->pc_RadioButtonActive->setIcon(this->mc_NodeInactive);
    }
    else
    {
       // It is an entry specific for one Datapool on Datapool layer
       this->mpc_Ui->pc_CheckBoxActive->setText(orc_DatapoolNames[0]);
       this->mpc_Ui->pc_CheckBoxActive->setIcon(this->mc_DatapoolInactive);
+      this->mpc_Ui->pc_RadioButtonActive->setText(orc_DatapoolNames[0]);
+      this->mpc_Ui->pc_RadioButtonActive->setIcon(this->mc_DatapoolInactive);
    }
 
    if (orc_DatapoolIndexes.size() == 1)
@@ -280,13 +290,11 @@ void C_SdBueMessageRxEntry::SetRxTimeoutPreconditions(const bool oq_TxMethodOnEv
 
    m_HandleInactiveStates();
 
-   uint32_t u32_Counter;
-
    // Inform the children too
    if (this->mq_HasChildren == true)
    {
       // Inform the children
-      for (u32_Counter = 0U; u32_Counter < this->mc_Entries.size(); ++u32_Counter)
+      for (uint32_t u32_Counter = 0U; u32_Counter < this->mc_Entries.size(); ++u32_Counter)
       {
          C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_Counter];
 
@@ -318,16 +326,25 @@ void C_SdBueMessageRxEntry::SetRxTimeoutConfigurationReadOnly(const bool oq_Time
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Set checked state
 
-   \param[in]  ou32_DatapoolIndex   Datapool Index (ID)
-   \param[in]  oq_Checked           New state
+   \param[in]  oq_Checked              New state
+   \param[in]  oq_AllDatapoolIndexes   Flag if all Datapool indexes shall be checked
+   \param[in]  ou32_DatapoolIndex      Datapool Index (ID) (only if oq_AllDatapoolIndexes is false)
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdBueMessageRxEntry::SetChecked(const uint32_t ou32_DatapoolIndex, const bool oq_Checked) const
+void C_SdBueMessageRxEntry::SetChecked(const bool oq_Checked, const bool oq_AllDatapoolIndexes,
+                                       const uint32_t ou32_DatapoolIndex) const
 {
    if (this->mq_HasChildren == false)
    {
       // Entry represents only one element
-      this->mpc_Ui->pc_CheckBoxActive->setChecked(oq_Checked);
+      if (this->mq_ExclusiveMode == false)
+      {
+         this->mpc_Ui->pc_CheckBoxActive->setChecked(oq_Checked);
+      }
+      else
+      {
+         this->mpc_Ui->pc_RadioButtonActive->setChecked(oq_Checked);
+      }
    }
    else
    {
@@ -340,10 +357,18 @@ void C_SdBueMessageRxEntry::SetChecked(const uint32_t ou32_DatapoolIndex, const 
 
          if (pc_Entry != NULL)
          {
-            if (pc_Entry->GetDatapoolIndex() == ou32_DatapoolIndex)
+            if (oq_AllDatapoolIndexes == true)
             {
-               pc_Entry->SetChecked(ou32_DatapoolIndex, oq_Checked);
+               pc_Entry->SetChecked(oq_Checked, oq_AllDatapoolIndexes, 0U);
+            }
+            else if (pc_Entry->GetDatapoolIndex() == ou32_DatapoolIndex)
+            {
+               pc_Entry->SetChecked(oq_Checked, oq_AllDatapoolIndexes, ou32_DatapoolIndex);
                break;
+            }
+            else
+            {
+               // Nothing to do
             }
          }
       }
@@ -361,6 +386,7 @@ void C_SdBueMessageRxEntry::SetChecked(const uint32_t ou32_DatapoolIndex, const 
 void C_SdBueMessageRxEntry::SetEnabled(const bool oq_Enabled) const
 {
    this->mpc_Ui->pc_CheckBoxActive->setEnabled(oq_Enabled);
+   this->mpc_Ui->pc_RadioButtonActive->setEnabled(oq_Enabled);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -377,6 +403,41 @@ void C_SdBueMessageRxEntry::SetSpecificToolTip(const QString & orc_Tooltip)
          C_GtGetText::h_GetText("Timeout"),
          orc_Tooltip);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the exclusive mode for selecting maximum one receiver at time
+
+   \param[in]       oq_Active     Flag for activating or deactivating the mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageRxEntry::SetExclusiveMode(const bool oq_Active)
+{
+   disconnect(this->mpc_Ui->pc_RadioButtonActive, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled,
+              this, &C_SdBueMessageRxEntry::m_OnRadioButtonStateChanged);
+
+   this->mq_ExclusiveMode = oq_Active;
+
+   this->mpc_Ui->pc_CheckBoxActive->setVisible(!this->mq_ExclusiveMode);
+   this->mpc_Ui->pc_RadioButtonActive->setVisible(this->mq_ExclusiveMode);
+
+   if (this->mq_ExclusiveMode == true)
+   {
+      connect(this->mpc_Ui->pc_RadioButtonActive, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled,
+              this, &C_SdBueMessageRxEntry::m_OnRadioButtonStateChanged);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the radio button
+
+   \return
+   Pointer to the radio button
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QRadioButton * C_SdBueMessageRxEntry::GetRadioButton(void) const
+{
+   return this->mpc_Ui->pc_RadioButtonActive;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -504,6 +565,23 @@ void C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged(const int32_t os32_CheckSta
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Slot of radio button state change
+
+   Similar to slot for toggle, but also reacts to click of partially checked checkbox.
+
+   \param[in]  oq_Checked  Checked vs unchecked flag
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageRxEntry::m_OnRadioButtonStateChanged(const bool oq_Checked)
+{
+   if (this->mpc_Ui->pc_RadioButtonActive->isChecked() != oq_Checked)
+   {
+      this->mpc_Ui->pc_RadioButtonActive->setChecked(oq_Checked);
+   }
+   this->mpc_Ui->pc_CheckBoxActive->setChecked(oq_Checked);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Toggle all sub items
 
    \param[in]  oq_Checked  Checked vs unchecked flag
@@ -522,7 +600,7 @@ void C_SdBueMessageRxEntry::m_ToggleSubItems(const bool oq_Checked)
       if (pc_Entry != NULL)
       {
          // In case of sub entries the Datapool index is not relevant
-         pc_Entry->SetChecked(0U, oq_Checked);
+         pc_Entry->SetChecked(oq_Checked, false, 0U);
       }
    }
 }
@@ -625,6 +703,11 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
       // Disconnect due to avoiding informing the sub entries again
       disconnect(this->mpc_Ui->pc_CheckBoxActive, &stw::opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
                  this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
+      if (this->mq_ExclusiveMode == true)
+      {
+         disconnect(this->mpc_Ui->pc_RadioButtonActive, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled,
+                    this, &C_SdBueMessageRxEntry::m_OnRadioButtonStateChanged);
+      }
 
       // Adapt the checkbox of the parent
       if ((q_AtLeastOneActive == true) && (q_AtLeastOneInactive == true))
@@ -632,12 +715,15 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
          // Scenario 3
          this->mpc_Ui->pc_CheckBoxActive->setEnabled(true);
          this->mpc_Ui->pc_CheckBoxActive->setCheckState(Qt::PartiallyChecked);
+         this->mpc_Ui->pc_RadioButtonActive->setChecked(true);
+
          this->m_ToggleIcon(true);
       }
       else if ((q_AtLeastOneActive == true) && (q_AtLeastOneInactive == false))
       {
          // Scenario 2
          this->mpc_Ui->pc_CheckBoxActive->setChecked(true);
+         this->mpc_Ui->pc_RadioButtonActive->setChecked(true);
          this->m_ToggleIcon(true);
 
          // In case of a not partial checked or not checked check box and the mode single node,
@@ -649,9 +735,15 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
          // Scenario 1
          this->mpc_Ui->pc_CheckBoxActive->setEnabled(true);
          this->mpc_Ui->pc_CheckBoxActive->setChecked(false);
+         this->mpc_Ui->pc_RadioButtonActive->setChecked(false);
          this->m_ToggleIcon(false);
       }
 
+      if (this->mq_ExclusiveMode == true)
+      {
+         connect(this->mpc_Ui->pc_RadioButtonActive, &stw::opensyde_gui_elements::C_OgeRabProperties::toggled,
+                 this, &C_SdBueMessageRxEntry::m_OnRadioButtonStateChanged);
+      }
       connect(this->mpc_Ui->pc_CheckBoxActive, &stw::opensyde_gui_elements::C_OgeChxDefaultSmall::stateChanged,
               this, &C_SdBueMessageRxEntry::m_OnCheckBoxStateChanged);
    }
@@ -665,28 +757,33 @@ void C_SdBueMessageRxEntry::m_AdaptParentCheckBoxState(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageRxEntry::m_ToggleIcon(const bool oq_Checked) const
 {
+   QIcon c_Icon;
+
    if (oq_Checked == true)
    {
       if (this->mq_NodeLayer == true)
       {
-         this->mpc_Ui->pc_CheckBoxActive->setIcon(this->mc_NodeActive);
+         c_Icon = this->mc_NodeActive;
       }
       else
       {
-         this->mpc_Ui->pc_CheckBoxActive->setIcon(this->mc_DatapoolActive);
+         c_Icon = this->mc_DatapoolActive;
       }
    }
    else
    {
       if (this->mq_NodeLayer == true)
       {
-         this->mpc_Ui->pc_CheckBoxActive->setIcon(this->mc_NodeInactive);
+         c_Icon = this->mc_NodeInactive;
       }
       else
       {
-         this->mpc_Ui->pc_CheckBoxActive->setIcon(this->mc_DatapoolInactive);
+         c_Icon = this->mc_DatapoolInactive;
       }
    }
+
+   this->mpc_Ui->pc_CheckBoxActive->setIcon(c_Icon);
+   this->mpc_Ui->pc_RadioButtonActive->setIcon(c_Icon);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

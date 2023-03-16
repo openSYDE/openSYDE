@@ -305,11 +305,14 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
    {
       const QFileInfo c_File(C_CamUti::h_GetAbsPathFromProj(this->mc_Database.c_Name));
       C_OgeWiCustomMessage c_Message(this);
+      static uint8_t hu8_FileOpenFailCounter = 0;
 
       // check file existence
       if ((c_File.exists() == true) && (c_File.isFile() == true))
       {
          const QDateTime c_Timestamp = c_File.lastModified();
+         //reset fail counter
+         hu8_FileOpenFailCounter = 0;
 
          // check if new timestamp
          if (this->mc_FileTimeStamp == c_Timestamp)
@@ -347,33 +350,46 @@ void C_CamMosDatabaseItemWidget::CheckFile(void)
       }
       else
       {
-         if (this->mq_AlreadyAskedUserDelete == false)
-         {
-            QString c_Details;
-            QString c_Description = static_cast<QString>(C_GtGetText::h_GetText("Could not find file %1. "
-                                                                                "Do you want to delete this database?"))
-                                    .arg(
-               c_File.absoluteFilePath());
-            C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(
-               c_File.absoluteFilePath(), c_Description, c_Details);
-            // ask user to delete database
-            c_Message.SetType(C_OgeWiCustomMessage::eERROR);
-            c_Message.SetHeading(C_GtGetText::h_GetText("File not found"));
-            c_Message.SetDescription(c_Description);
-            c_Message.SetDetails(c_Details);
-            c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
-            c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Keep"));
-            if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
-            {
-               q_Remove = true;
-            }
-            else
-            {
-               Q_EMIT (this->SigNotifyMissingDataBase(this->mc_Database.c_Name));
-            }
+         //File not found. Inrease fail counter
+         hu8_FileOpenFailCounter++;
 
-            // reset flag
-            this->mq_AlreadyAskedUserDelete = true;
+         //From time to time there are false positive messages (e.g.: when openSYDE GUI is saving the project and
+         //at the same time openSYDE CAN Monitor is checking if database has been changed)
+         //To avoid this messages simple approach is implemented: handle "file not found" case only after second occur
+         // (= forgive one fail)
+         if (hu8_FileOpenFailCounter > 1)
+         {
+            //reset for next use
+            hu8_FileOpenFailCounter = 0;
+
+            if (this->mq_AlreadyAskedUserDelete == false)
+            {
+               QString c_Details;
+               QString c_Description = static_cast<QString>(C_GtGetText::h_GetText("Could not find file %1. "
+                                                                                   "Do you want to delete this database?"))
+                                       .arg(
+                  c_File.absoluteFilePath());
+               C_CamMosDatabaseItemWidget::h_AppendMessageWarningIfNecessary(
+                  c_File.absoluteFilePath(), c_Description, c_Details);
+               // ask user to delete database
+               c_Message.SetType(C_OgeWiCustomMessage::eERROR);
+               c_Message.SetHeading(C_GtGetText::h_GetText("File not found"));
+               c_Message.SetDescription(c_Description);
+               c_Message.SetDetails(c_Details);
+               c_Message.SetOkButtonText(C_GtGetText::h_GetText("Delete"));
+               c_Message.SetCancelButtonText(C_GtGetText::h_GetText("Keep"));
+               if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+               {
+                  q_Remove = true;
+               }
+               else
+               {
+                  Q_EMIT (this->SigNotifyMissingDataBase(this->mc_Database.c_Name));
+               }
+
+               // reset flag
+               this->mq_AlreadyAskedUserDelete = true;
+            }
          }
 
          // reset reload flag

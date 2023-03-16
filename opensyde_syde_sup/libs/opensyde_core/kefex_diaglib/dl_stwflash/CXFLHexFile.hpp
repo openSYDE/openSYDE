@@ -26,7 +26,7 @@ namespace diag_lib
 {
 //----------------------------------------------------------------------------------------------------------------------
 ///Comfort layer on top of the hex file class
-class STW_DIAGLIB_EXPORT C_XFLHexFile :
+class C_XFLHexFile :
    public stw::hex_file::C_HexFile
 {
 public:

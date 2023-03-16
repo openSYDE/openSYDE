@@ -30,6 +30,8 @@ class C_OgeRabProperties :
 
 public:
    C_OgeRabProperties(QWidget * const opc_Parent = NULL);
+
+   void SetStyleVariantReceivers(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

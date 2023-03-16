@@ -20,6 +20,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::tgl;
+using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
@@ -53,8 +54,8 @@ const int32_t C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_DEACTIVATE = 2;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvUpPacPemFileOptionsPopUp::C_SyvUpPacPemFileOptionsPopUp(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                                             const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                             const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+                                                             const opensyde_core::C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                             const opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
    :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SyvUpPacPemFileOptionsPopUp),
@@ -128,19 +129,19 @@ void C_SyvUpPacPemFileOptionsPopUp::InitStaticNames(void) const
    Combo box sec state
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvNodeUpdate::E_StateSecurity C_SyvUpPacPemFileOptionsPopUp::GetComboBoxSecState() const
+C_OscViewNodeUpdate::E_StateSecurity C_SyvUpPacPemFileOptionsPopUp::GetComboBoxSecState() const
 {
-   C_PuiSvNodeUpdate::E_StateSecurity e_Retval = C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE;
+   C_OscViewNodeUpdate::E_StateSecurity e_Retval = C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
    switch (this->mpc_Ui->pc_ComboBoxSecurity->currentIndex())
    {
    case C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_NO_CHANGE:
-      e_Retval = C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE;
+      e_Retval = C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
       break;
    case C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_ACTIVATE:
-      e_Retval = C_PuiSvNodeUpdate::eST_SEC_ACTIVATE;
+      e_Retval = C_OscViewNodeUpdate::eST_SEC_ACTIVATE;
       break;
    case C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_DEACTIVATE:
-      e_Retval = C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE;
+      e_Retval = C_OscViewNodeUpdate::eST_SEC_DEACTIVATE;
       break;
    default:
       tgl_assert(false);
@@ -156,19 +157,19 @@ C_PuiSvNodeUpdate::E_StateSecurity C_SyvUpPacPemFileOptionsPopUp::GetComboBoxSec
    Combo box deb state
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_PuiSvNodeUpdate::E_StateDebugger C_SyvUpPacPemFileOptionsPopUp::GetComboBoxDebState() const
+C_OscViewNodeUpdate::E_StateDebugger C_SyvUpPacPemFileOptionsPopUp::GetComboBoxDebState() const
 {
-   C_PuiSvNodeUpdate::E_StateDebugger e_Retval = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
+   C_OscViewNodeUpdate::E_StateDebugger e_Retval = C_OscViewNodeUpdate::eST_DEB_NO_CHANGE;
    switch (this->mpc_Ui->pc_ComboBoxDebugger->currentIndex())
    {
    case C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_NO_CHANGE:
-      e_Retval = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
+      e_Retval = C_OscViewNodeUpdate::eST_DEB_NO_CHANGE;
       break;
    case C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_ACTIVATE:
-      e_Retval = C_PuiSvNodeUpdate::eST_DEB_ACTIVATE;
+      e_Retval = C_OscViewNodeUpdate::eST_DEB_ACTIVATE;
       break;
    case C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_DEACTIVATE:
-      e_Retval = C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE;
+      e_Retval = C_OscViewNodeUpdate::eST_DEB_DEACTIVATE;
       break;
    default:
       tgl_assert(false);
@@ -234,18 +235,18 @@ void C_SyvUpPacPemFileOptionsPopUp::m_CancelClicked()
    \param[in]  oe_StateSecurity  State security
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxSec(const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity)
+void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxSec(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity)
 {
    //lint -e{9042} Warning wanted if new cases are added
    switch (oe_StateSecurity)
    {
-   case C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE:
+   case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
       this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_NO_CHANGE);
       break;
-   case C_PuiSvNodeUpdate::eST_SEC_ACTIVATE:
+   case C_OscViewNodeUpdate::eST_SEC_ACTIVATE:
       this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_ACTIVATE);
       break;
-   case C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE:
+   case C_OscViewNodeUpdate::eST_SEC_DEACTIVATE:
       this->mpc_Ui->pc_ComboBoxSecurity->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_SEC_INDEX_DEACTIVATE);
       break;
    }
@@ -257,18 +258,18 @@ void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxSec(const C_PuiSvNodeUpdate::E
    \param[in]  oe_StateDebugger  State debugger
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxDeb(const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+void C_SyvUpPacPemFileOptionsPopUp::m_InitComboBoxDeb(const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
 {
    //lint -e{9042} Warning wanted if new cases are added
    switch (oe_StateDebugger)
    {
-   case C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE:
+   case C_OscViewNodeUpdate::eST_DEB_NO_CHANGE:
       this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_NO_CHANGE);
       break;
-   case C_PuiSvNodeUpdate::eST_DEB_ACTIVATE:
+   case C_OscViewNodeUpdate::eST_DEB_ACTIVATE:
       this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_ACTIVATE);
       break;
-   case C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE:
+   case C_OscViewNodeUpdate::eST_DEB_DEACTIVATE:
       this->mpc_Ui->pc_ComboBoxDebugger->setCurrentIndex(C_SyvUpPacPemFileOptionsPopUp::mhs32_DEB_INDEX_DEACTIVATE);
       break;
    }

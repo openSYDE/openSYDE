@@ -1317,6 +1317,9 @@ C_SclString C_OscExportCommunicationStack::mh_GetProtocolNameByType(const C_OscC
    case C_OscCanProtocol::eCAN_OPEN:
       c_Name = "can open";
       break;
+   case C_OscCanProtocol::eJ1939:
+      c_Name = "j1939";
+      break;
    default:
       tgl_assert(false);
       break;

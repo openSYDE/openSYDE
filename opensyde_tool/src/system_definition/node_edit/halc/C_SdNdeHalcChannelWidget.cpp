@@ -518,7 +518,6 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
       if (pc_Channel != NULL)
       {
          bool q_IsLinked = false;
-         uint32_t u32_UseCaseCounter = 0; // for counting all channels and knowing indices of available ones
          int32_t s32_SelectedUseCaseCbxIndex = -1;
          std::vector<uint32_t> c_LinkedChannelIndices;
 
@@ -566,6 +565,8 @@ void C_SdNdeHalcChannelWidget::m_LoadChannelData(void)
          // use case only matters in channel case
          if (mq_UseChannelIndex == true)
          {
+            uint32_t u32_UseCaseCounter = 0; // for counting all channels and knowing indices of available ones
+
             for (std::vector<C_OscHalcDefChannelUseCase>::const_iterator c_ItUseCases =
                     pc_Domain->c_ChannelUseCases.begin();
                  c_ItUseCases != pc_Domain->c_ChannelUseCases.end(); ++c_ItUseCases)

@@ -560,13 +560,13 @@ void C_SdNdeDpUtil::h_DrawTableBoolean(QPainter * const opc_Painter, const QStyl
                                        const bool & orq_IsEditing)
 {
    //Adjust rectangle because there is an border in edit mode (top & bottom)
-   const int32_t s32_TopCenterX = orc_Option.rect.topLeft().x() + (orc_Option.rect.width() / 2);
+   const int32_t s32_TOP_CENTER_X = orc_Option.rect.topLeft().x() + (orc_Option.rect.width() / 2);
    const QRect c_AdaptedRect =
       orc_Option.rect.adjusted((orc_Option.rect.width() / 2) - 20, 1, -(orc_Option.rect.width() / 2) + 20, -1);
-   QPoint c_TopLeft = QPoint(s32_TopCenterX - 20, orc_Option.rect.topLeft().y());
-   QPoint c_TopRight = QPoint(s32_TopCenterX + 20, orc_Option.rect.topLeft().y());
-   QPoint c_BottomLeft = QPoint(s32_TopCenterX - 20, orc_Option.rect.bottomLeft().y());
-   QPoint c_BottomRight = QPoint(s32_TopCenterX + 20, orc_Option.rect.bottomLeft().y());
+   QPoint c_TopLeft = QPoint(s32_TOP_CENTER_X - 20, orc_Option.rect.topLeft().y());
+   QPoint c_TopRight = QPoint(s32_TOP_CENTER_X + 20, orc_Option.rect.topLeft().y());
+   QPoint c_BottomLeft = QPoint(s32_TOP_CENTER_X - 20, orc_Option.rect.bottomLeft().y());
+   QPoint c_BottomRight = QPoint(s32_TOP_CENTER_X + 20, orc_Option.rect.bottomLeft().y());
 
    if (orc_Option.state.testFlag(QStyle::State_MouseOver) == true)
    {
@@ -585,7 +585,7 @@ void C_SdNdeDpUtil::h_DrawTableBoolean(QPainter * const opc_Painter, const QStyl
             c_AdaptedRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
          //Checked symbol
-         opc_Painter->drawPixmap(s32_TopCenterX - (c_ScaledCheckBoxPixmap.width() / 2),
+         opc_Painter->drawPixmap(s32_TOP_CENTER_X - (c_ScaledCheckBoxPixmap.width() / 2),
                                  c_AdaptedRect.topLeft().y(),
                                  c_ScaledCheckBoxPixmap.width(),
                                  c_ScaledCheckBoxPixmap.height(), c_ScaledCheckBoxPixmap);
@@ -864,14 +864,14 @@ int32_t C_SdNdeDpUtil::h_GetNextDiagOrNvmDpIndex(const uint32_t ou32_NodeIndex, 
                                                  const bool oq_Forwards)
 {
    int32_t s32_Return = -1;
-   const int32_t s32_NumberNVM = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex,
+   const int32_t s32_NumberNvm = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex,
                                                                                    C_OscNodeDataPool::eNVM);
-   const int32_t s32_NumberDIAG = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex,
+   const int32_t s32_NumberDiag = C_PuiSdHandler::h_GetInstance()->GetDataPoolCount(ou32_NodeIndex,
                                                                                     C_OscNodeDataPool::eDIAG);
 
-   if ((s32_NumberNVM >= 0) && (s32_NumberDIAG >= 0))
+   if ((s32_NumberNvm >= 0) && (s32_NumberDiag >= 0))
    {
-      const int32_t s32_Max = s32_NumberNVM + s32_NumberDIAG;
+      const int32_t s32_Max = s32_NumberNvm + s32_NumberDiag;
 
       if (static_cast<int32_t>(ou32_DatapoolIndex) < s32_Max) // indirectly checks if NVM/DIAG Datapool index was passed
       {

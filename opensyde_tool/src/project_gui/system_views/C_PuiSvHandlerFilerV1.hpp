@@ -52,15 +52,17 @@ public:
 private:
    static int32_t mh_LoadNodeActiveFlags(std::vector<uint8_t> & orc_NodeActiveFlags,
                                          stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static int32_t mh_LoadNodeUpdateInformation(std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
-                                               stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static int32_t mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & orc_NodeUpdateInformation,
+   static int32_t mh_LoadNodeUpdateInformation(
+      std::vector<stw::opensyde_core::C_OscViewNodeUpdate> & orc_NodeUpdateInformation,
+      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadOneNodeUpdateInformation(stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdateInformation,
                                                   stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser,
                                                   const stw::opensyde_core::C_OscNode & orc_Node);
    static int32_t mh_LoadDashboards(std::vector<C_PuiSvDashboard> & orc_Dashboards,
                                     stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadView(C_PuiSvData & orc_View, stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static int32_t mh_LoadPc(C_PuiSvPc & orc_Pc, stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadPc(opensyde_core::C_OscViewPc & orc_OscPc, C_PuiSvPc & orc_PuiPc,
+                            stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadCharts(std::vector<C_PuiSvDbChart> & orc_Widgets,
                                 stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadLabels(std::vector<C_PuiSvDbLabel> & orc_Widgets,
@@ -112,12 +114,14 @@ private:
                                         C_PuiSvDbNodeDataPoolListElementId::E_Type & ore_Type);
    static void mh_SaveNodeActiveFlags(const std::vector<uint8_t> & orc_NodeActiveFlags,
                                       stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static void mh_SaveNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
-                                            stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveNodeUpdateInformation(
+      const std::vector<stw::opensyde_core::C_OscViewNodeUpdate> & orc_NodeUpdateInformation,
+      stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveDashboards(const std::vector<C_PuiSvDashboard> & orc_Dashboards,
                                  stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveView(const C_PuiSvData & orc_View, stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
-   static void mh_SavePc(const C_PuiSvPc & orc_Pc, stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SavePc(const stw::opensyde_core::C_OscViewPc & orc_OscPc, const C_PuiSvPc & orc_PuiPc,
+                         stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveCharts(const std::vector<C_PuiSvDbChart> & orc_Widgets,
                              stw::opensyde_core::C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveLabels(const std::vector<C_PuiSvDbLabel> & orc_Widgets,

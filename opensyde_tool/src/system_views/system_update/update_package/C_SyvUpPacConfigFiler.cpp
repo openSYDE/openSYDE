@@ -19,7 +19,7 @@
 #include "C_SclString.hpp"
 #include "C_OscXmlParserLog.hpp"
 #include "C_OscLoggingHandler.hpp"
-#include "C_PuiSvHandlerFiler.hpp"
+#include "C_OscViewFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -168,13 +168,12 @@ int32_t C_SyvUpPacConfigFiler::h_SaveConfig(const QString & orc_FilePath, const 
 
       if (q_Success == true)
       {
-         uint32_t u32_NodeCounter;
-
          // Save each update package node configuration
          q_Success = (c_XmlParser.CreateAndSelectNodeChild("nodes") == "nodes");
 
          if (q_Success == true)
          {
+            uint32_t u32_NodeCounter;
             for (u32_NodeCounter = 0U; u32_NodeCounter < orc_Config.c_NodeConfigs.size(); ++u32_NodeCounter)
             {
                q_Success = mh_SaveNode(c_XmlParser, orc_Config.c_NodeConfigs[u32_NodeCounter]);
@@ -373,10 +372,10 @@ void C_SyvUpPacConfigFiler::mh_SaveNodeUpdateInformationPem(const C_SyvUpPacConf
    orc_XmlParser.CreateAndSelectNodeChild("pem-file");
    orc_XmlParser.CreateNodeChild("path", orc_NodeConfig.c_PemFilePath.toStdString());
    orc_XmlParser.CreateAndSelectNodeChild("states");
-   orc_XmlParser.CreateNodeChild("security", C_PuiSvHandlerFiler::h_PemFileStateSecurityToString(
-                                    orc_NodeConfig.e_StateSecurity).toStdString());
-   orc_XmlParser.CreateNodeChild("debugger", C_PuiSvHandlerFiler::h_PemFileStateDebuggerToString(
-                                    orc_NodeConfig.e_StateDebugger).toStdString());
+   orc_XmlParser.CreateNodeChild("security",
+                                 C_OscViewFiler::h_PemFileStateSecurityToString(orc_NodeConfig.e_StateSecurity));
+   orc_XmlParser.CreateNodeChild("debugger",
+                                 C_OscViewFiler::h_PemFileStateDebuggerToString(orc_NodeConfig.e_StateDebugger));
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "pem-file");
    //Return
@@ -733,8 +732,8 @@ int32_t C_SyvUpPacConfigFiler::mh_LoadNodeUpdateInformationPemStates(C_SyvUpPacC
       s32_Retval = orc_XmlParser.SelectNodeChildError("security");
       if (s32_Retval == C_NO_ERR)
       {
-         C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity = C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE;
-         s32_Retval = C_PuiSvHandlerFiler::h_StringToPemFileStateSecurity(
+         C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity = C_OscViewNodeUpdate::eST_SEC_NO_CHANGE;
+         s32_Retval = C_OscViewFiler::h_StringToPemFileStateSecurity(
             orc_XmlParser.GetNodeContent().c_str(), e_StateSecurity);
          if (s32_Retval == C_NO_ERR)
          {
@@ -745,11 +744,11 @@ int32_t C_SyvUpPacConfigFiler::mh_LoadNodeUpdateInformationPemStates(C_SyvUpPacC
       }
       if (s32_Retval == C_NO_ERR)
       {
-         C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger = C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE;
+         C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger = C_OscViewNodeUpdate::eST_DEB_NO_CHANGE;
          s32_Retval = orc_XmlParser.SelectNodeChildError("debugger");
          if (s32_Retval == C_NO_ERR)
          {
-            s32_Retval = C_PuiSvHandlerFiler::h_StringToPemFileStateDebugger(
+            s32_Retval = C_OscViewFiler::h_StringToPemFileStateDebugger(
                orc_XmlParser.GetNodeContent().c_str(), e_StateDebugger);
             if (s32_Retval == C_NO_ERR)
             {

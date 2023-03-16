@@ -301,7 +301,7 @@ bool C_GiSvDaLabelBase::CallProperties(void)
          pc_Dialog->SetTheme(pc_Box->e_DisplayStyle);
 
          //Resize
-         c_New->SetSize(QSize(800, 800));
+         c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithDisplayFormatter());
 
          pc_PropertiesWidget->SetCaption(pc_Box->c_Caption);
          pc_PropertiesWidget->SetType(pc_Box->e_Type);
@@ -341,13 +341,13 @@ bool C_GiSvDaLabelBase::CallProperties(void)
             this->SetDisplayStyle(this->me_Style, this->mq_DarkMode);
             m_UpdateCaption(c_Box);
             this->UpdateTypePe(c_Box.e_Type, c_Box.q_ShowCaption, c_Box.q_ShowUnit);
-            m_UpdateStaticValue(c_Box);
             this->ClearDataPoolElements();
             if (c_Tmp.c_ElementId.GetIsValid())
             {
                this->RegisterDataPoolElement(pc_Dialog->GetDataElementId(),
                                              pc_Dialog->GetScalingInformation(), pc_Dialog->GetFormatterInformation());
             }
+            m_UpdateStaticValue(c_Box);
 
             //Signal for error change
             Q_EMIT this->SigDataElementsChanged();

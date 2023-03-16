@@ -1149,7 +1149,7 @@ QString C_SyvDaItPaWriteWidget::m_GetSuspectElementReport(void) const
            this->mc_AllAffectedValues.begin();
         c_It != this->mc_AllAffectedValues.end(); ++c_It)
    {
-      if (c_It->second.c_Actual == c_It->second.c_Expected)
+      if (c_It->second.c_Actual.CompareContentStrict(c_It->second.c_Expected))
       {
          //Skip: valid
       }

@@ -30,7 +30,6 @@
 #include "C_OscCanProtocol.hpp"
 #include "C_CieDataPoolListAdapter.hpp"
 #include "C_SdBueBusEditWidget.hpp"
-#include "ui_C_SdBueBusEditWidget.h"
 #include "stwerrors.hpp"
 #include "C_RtfExportWidget.hpp"
 #include "C_PopUtil.hpp"
@@ -959,8 +958,8 @@ void C_SdHandlerWidget::m_Export(void)
                      const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_TxIter->u32_CanId);
                      if (c_Iter == c_CanMessageIds.end())
                      {
-                        c_CanMessageIdsWithExtended.insert(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
-                                                                                   c_TxIter->q_IsExtended));
+                        c_CanMessageIdsWithExtended.emplace(C_OscCanMessageUniqueId(c_TxIter->u32_CanId,
+                                                                                    c_TxIter->q_IsExtended));
                         c_CanMessageIds.insert(c_TxIter->u32_CanId);
                         // count signals
                         u32_NumOfInputSignals += c_TxIter->c_Signals.size();
@@ -998,8 +997,8 @@ void C_SdHandlerWidget::m_Export(void)
                      const std::set<uint32_t>::const_iterator c_Iter = c_CanMessageIds.find(c_RxIter->u32_CanId);
                      if (c_Iter == c_CanMessageIds.end())
                      {
-                        c_CanMessageIdsWithExtended.insert(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
-                                                                                   c_RxIter->q_IsExtended));
+                        c_CanMessageIdsWithExtended.emplace(C_OscCanMessageUniqueId(c_RxIter->u32_CanId,
+                                                                                    c_RxIter->q_IsExtended));
                         c_CanMessageIds.insert(c_RxIter->u32_CanId);
                         // count signals
                         u32_NumOfInputSignals += c_RxIter->c_Signals.size();

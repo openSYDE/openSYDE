@@ -201,13 +201,6 @@ const QSize mc_ICON_SIZE_16 = QSize(16, 16);
 const QString mc_DLL_PATH_PEAK = "STW_dlls\\stwpeak2\\stwpeak2.dll";
 const QString mc_DLL_PATH_VECTOR = "STW_dlls\\stwvec32\\stwvec32.dll";
 
-// Path variables
-const QString mc_PATH_VARIABLE_OPENSYDE_BIN = "%{OPENSYDE_BINARY}";
-const QString mc_PATH_VARIABLE_OPENSYDE_PROJ = "%{OPENSYDE_PROJECT}";
-const QString mc_PATH_VARIABLE_DATABLOCK_PROJ = "%{PROJECT_DIR}";
-const QString mc_PATH_VARIABLE_USER_NAME = "%{USER_NAME}";
-const QString mc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
-
 // Identifier of update package subsections or items
 const uint32_t mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK = 0U;
 const uint32_t mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PARAMSET = 1U;
@@ -217,8 +210,10 @@ const uint32_t mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM = 3U;
 // Highest known generated code structure version
 const uint16_t mu16_HIGHEST_KNOWN_CODE_STRUCTURE_VERSION = 6U;
 
-// File check interval (for e.g.: Update package file check, CAN Monitor database check, ...)
+// File check interval (for  Update package file check)
 const uint32_t mu32_FILE_CHECK_INTERVAL = 500U;
+// File check interval (for  CAN Monitor database check)
+const uint32_t mu32_DATABASE_CHECK_INTERVAL = 2000U;
 
 // HTML styling
 const QString mc_REPORT_HEADLINE_HTML_TAG_START = "<h3>";

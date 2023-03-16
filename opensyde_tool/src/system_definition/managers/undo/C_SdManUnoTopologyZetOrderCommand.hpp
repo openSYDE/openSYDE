@@ -32,7 +32,7 @@ public:
    C_SdManUnoTopologyZetOrderCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
                                      const std::vector<float64_t> & orc_NewZetValues,
                                      QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SdManUnoTopologyZetOrderCommand(void);
+   ~C_SdManUnoTopologyZetOrderCommand(void) override;
 
    static void h_CheckZetOrderPriority(const QList<QGraphicsItem *> & orc_SelectedItems,
                                        const QList<QGraphicsItem *> & orc_Items, QMap<QGraphicsItem *,

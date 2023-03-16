@@ -36,7 +36,7 @@ class C_SyvSeScene :
 
 public:
    C_SyvSeScene(const uint32_t ou32_ViewIndex = 0, QObject * const opc_Parent = NULL);
-   virtual ~C_SyvSeScene(void);
+   ~C_SyvSeScene(void) override;
 
    void PrepareToClose(void);
 

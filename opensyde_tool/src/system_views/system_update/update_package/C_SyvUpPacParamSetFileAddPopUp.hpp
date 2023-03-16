@@ -39,10 +39,10 @@ public:
    explicit C_SyvUpPacParamSetFileAddPopUp(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                            const QString & orc_Path, const QString & orc_StoragePath,
                                            const uint32_t ou32_NodeIndex);
-   ~C_SyvUpPacParamSetFileAddPopUp(void) override;
+   ~C_SyvUpPacParamSetFileAddPopUp(void) noexcept override;
 
    int32_t ReadFile(void);
-   const stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & GetParamInfo(void) const;
+   const stw::opensyde_core::C_OscViewNodeUpdateParamInfo & GetParamInfo(void) const;
    void InitStaticNames(void) const;
 
 protected:

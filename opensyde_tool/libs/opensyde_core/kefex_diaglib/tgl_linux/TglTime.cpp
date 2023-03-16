@@ -39,7 +39,7 @@ using namespace stw::tgl;
    \param[out] orc_DateTime Current date and time value with milli seconds
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglGetDateTimeNow(C_TglDateTime & orc_DateTime)
+void stw::tgl::TglGetDateTimeNow(C_TglDateTime & orc_DateTime)
 {
    struct timespec t_TimeSpec;
    struct tm * pt_LocalTime;
@@ -70,20 +70,49 @@ void TGL_PACKAGE stw::tgl::TglGetDateTimeNow(C_TglDateTime & orc_DateTime)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Delays for the given number of microseconds.
+
+   \param[in]  ou32_NumberUs    Number of microseconds to wait
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void stw::tgl::TglDelayUs(const uint32_t ou32_NumberUs)
+{
+   const uint64_t u64_StopTime = TglGetTickCountUs() + ou32_NumberUs;
+
+   while (TglGetTickCountUs() < u64_StopTime)
+   {
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sleep for a number of milliseconds
+
+   Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
+   i.e.: no active, blocking waiting.
+
+   \param[in]    ou32_NumberMs    number of milliseconds to delay
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
+{
+   usleep ((useconds_t)ou32_NumberMs * 1000);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get system time in microseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
 
    Hint:
-   The staring point of CLOCK_MONOTONIC is not specified in the POSIX standard.
+   The starting point of CLOCK_MONOTONIC is not specified in the POSIX standard.
    However, for Linux the starting point is at boot time and its the same for all
    processes. Thus it can be used to get the system-up time.
 
    \return
-   System time in microseconds.
+   System time in micro-seconds.
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64_t TGL_PACKAGE stw::tgl::TglGetTickCountUs(void)
+uint64_t stw::tgl::TglGetTickCountUs(void)
 {
    int32_t s32_Error;
    uint64_t u64_Time_us = 0;
@@ -103,7 +132,7 @@ uint64_t TGL_PACKAGE stw::tgl::TglGetTickCountUs(void)
    Return elapsed time since system start in milliseconds.
 
    Hint:
-   The staring point of CLOCK_MONOTONIC is not specified in the POSIX standard.
+   The starting point of CLOCK_MONOTONIC is not specified in the POSIX standard.
    However, for Linux the starting point is at boot time and its the same for all
    processes. Thus it can be used to get the system-up time.
 
@@ -111,36 +140,8 @@ uint64_t TGL_PACKAGE stw::tgl::TglGetTickCountUs(void)
    System time in milliseconds
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint32_t TGL_PACKAGE stw::tgl::TglGetTickCount(void)
+uint32_t stw::tgl::TglGetTickCount(void)
 {
    return static_cast<uint32_t>(TglGetTickCountUs() / 1000U);
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Delays for the given number of microseconds.
-
-   \param[in]  ou32_NumberUs    Number of microseconds to wait
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglDelayUs(const uint32_t ou32_NumberUs)
-{
-   const uint64_t u64_StopTime = TglGetTickCountUs() + ou32_NumberUs;
-
-   while (TglGetTickCountUs() < u64_StopTime)
-   {
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Sleep for a number of milliseconds
-
-   Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
-   i.e.: no active, blocking waiting.
-
-   \param[in]    ou32_NumberMs    number of milliseconds to delay
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
-{
-   usleep ((useconds_t)ou32_NumberMs * 1000);
-}

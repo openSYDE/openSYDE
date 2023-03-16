@@ -1035,7 +1035,10 @@ void C_CieUtil::mh_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssign
          QString & rc_CurInfoMessage = rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerRxMessage[u32_ItMessage];
          C_OscCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OscRxMessageData[u32_ItMessage];
          C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData[u32_ItMessage];
-         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, oe_ProtocolType, &c_Infos);
+         std::vector<C_OscNodeDataPoolListElement> & rc_SignalListElements =
+            rc_CurData.c_ImportData.c_Core.c_OscRxSignalData;
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, rc_SignalListElements,
+                                                oe_ProtocolType, &c_Infos);
          //Add info
          if (rc_CurInfoMessage.isEmpty() == false)
          {
@@ -1051,7 +1054,10 @@ void C_CieUtil::mh_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssign
          QString & rc_CurInfoMessage = rc_CurData.c_ImportData.c_Core.c_WarningMessagesPerTxMessage[u32_ItMessage];
          C_OscCanMessage & rc_CurMessage = rc_CurData.c_ImportData.c_Core.c_OscTxMessageData[u32_ItMessage];
          C_PuiSdNodeCanMessage & rc_CurUiMessage = rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData[u32_ItMessage];
-         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, oe_ProtocolType, &c_Infos);
+         std::vector<C_OscNodeDataPoolListElement> & rc_SignalListElements =
+            rc_CurData.c_ImportData.c_Core.c_OscTxSignalData;
+         C_SdUtil::h_AdaptMessageToProtocolType(rc_CurMessage, &rc_CurUiMessage, rc_SignalListElements, oe_ProtocolType,
+                                                &c_Infos);
          //Add info
          if (rc_CurInfoMessage.isEmpty() == false)
          {

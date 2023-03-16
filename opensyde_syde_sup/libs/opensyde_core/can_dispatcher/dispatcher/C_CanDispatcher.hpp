@@ -27,21 +27,12 @@ namespace stw
 namespace can
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-#ifndef STWCAN_PACKAGE
-#ifdef __BORLANDC__
-//maybe we want this module to be put into a VCL package ...
-#define STWCAN_PACKAGE __declspec(package)
-#else
-#define STWCAN_PACKAGE
-#endif
-#endif
-
 const uint32_t mu32_CAN_QUEUE_DEFAULT_MAX_SIZE = 2048U;
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///We wrap up a deque in order to provide thread safety.
 //Also we limit the maximum size, to make sure we don't waste all of the heap if nobody clears the RX queue.
-class STWCAN_PACKAGE C_CanRxQueue
+class C_CanRxQueue
 {
 private:
    std::deque<T_STWCAN_Msg_RX> mc_Messages;
@@ -66,7 +57,7 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 ///Reception filter configuration
 //lint -sem(stw::can::C_CanRxFilter::PassAll,initializer)
-class STWCAN_PACKAGE C_CanRxFilter
+class C_CanRxFilter
 {
 public:
    C_CanRxFilter(void);
@@ -87,7 +78,7 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 ///Information about one registered dispatch client
-class STWCAN_PACKAGE C_CanDispatchClient
+class C_CanDispatchClient
 {
 public:
    C_CanRxQueue c_RXQueue;
@@ -97,7 +88,7 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 ///Extends C_CAN_Base by queuing and filtering mechanisms
-class STWCAN_PACKAGE C_CanDispatcher :
+class C_CanDispatcher :
    public C_CanBase
 {
 private:

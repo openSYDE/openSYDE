@@ -35,7 +35,8 @@ public:
       eLAYER2,          ///< Data pool communication protocol OSI layer 2
       eCAN_OPEN_SAFETY, ///< Data pool communication protocol CAN open safety (safety protocol)
       eECES,            ///< Data pool communication protocol ECeS (safety protocol)
-      eCAN_OPEN         ///< Data pool communication protocol CAN open manager
+      eCAN_OPEN,        ///< Data pool communication protocol CAN open manager
+      eJ1939            ///< Data pool communication protocol J1939
    };
 
    C_OscCanProtocol(void);

@@ -46,8 +46,8 @@ C_SyvUpPacConfigNode::C_SyvUpPacConfigNode() :
    c_Name(""),
    c_DeviceType(""),
    c_PemFilePath(""),
-   e_StateSecurity(C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE),
-   e_StateDebugger(C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE)
+   e_StateSecurity(stw::opensyde_core::C_OscViewNodeUpdate::eST_SEC_NO_CHANGE),
+   e_StateDebugger(stw::opensyde_core::C_OscViewNodeUpdate::eST_DEB_NO_CHANGE)
 {
 }
 

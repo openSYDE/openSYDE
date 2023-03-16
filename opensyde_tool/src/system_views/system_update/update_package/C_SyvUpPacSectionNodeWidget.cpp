@@ -96,12 +96,15 @@ C_SyvUpPacSectionNodeWidget::C_SyvUpPacSectionNodeWidget(QWidget * const opc_Par
    this->mpc_Ui->pc_LabTitle->SetFontPixel(14, true, false);
    this->mpc_Ui->pc_LabCount->SetFontPixel(14, true, false);
    this->mpc_Ui->pc_LabNoFiles->SetFontPixel(13, false, false);
+   this->mpc_Ui->pc_LabNoFilesShort->SetFontPixel(13, false, false);
    this->mpc_Ui->pc_LabTitle->SetForegroundColor(6);
    this->mpc_Ui->pc_LabCount->SetForegroundColor(6);
    this->mpc_Ui->pc_LabNoFiles->SetForegroundColor(8);
+   this->mpc_Ui->pc_LabNoFilesShort->SetForegroundColor(8);
    this->mpc_Ui->pc_ListTitleWidget->SetBackgroundColor(11);
 
    this->mpc_Ui->pc_WidgetAdd->setVisible(false);
+   this->mpc_Ui->pc_LabNoFilesShort->setVisible(false);
 
    // expanded = checked = arrow down (arrow implies actual state); collapsed = unchecked = arrow right
    this->mpc_Ui->pc_PbExpColl->setCheckable(true);
@@ -166,6 +169,8 @@ void C_SyvUpPacSectionNodeWidget::InitStaticNames(void)
 {
    this->mpc_Ui->pc_LabNoFiles->setText(C_GtGetText::h_GetText(
                                            "No files.\nAdd any via the context menu or drag and drop."));
+   this->mpc_Ui->pc_LabNoFilesShort->setText(C_GtGetText::h_GetText(
+                                                "No files.\nAdd any via the context menu or\ndrag and drop."));
 
    this->m_InitStaticNames();
 }
@@ -256,13 +261,11 @@ void C_SyvUpPacSectionNodeWidget::DiscardApplicationStatus(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::SetDisconnected(void)
 {
-   uint32_t u32_Counter;
-
    this->mq_Connected = false;
 
    if (this->mu32_FileCount > 0U)
    {
-      for (u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
+      for (uint32_t u32_Counter = 0U; u32_Counter < this->mu32_FileCount; ++u32_Counter)
       {
          this->m_SetFileState(u32_Counter, C_SyvUpPacListNodeItemWidget::hu32_STATE_DEFAULT);
          this->m_SetApplicationConnected(u32_Counter, false);
@@ -356,6 +359,7 @@ void C_SyvUpPacSectionNodeWidget::RemoveFile(C_SyvUpPacListNodeItemWidget * cons
    }
 
    this->mpc_Ui->pc_WidgetAdd->setVisible(this->mpc_Ui->pc_FileVerticalLayout->count() == 0);
+   this->m_UpdateLabelNoFiles();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -599,13 +603,12 @@ const
 
    if (this->mpc_Ui->pc_PbExpColl->isChecked() == true)
    {
-      int32_t s32_Counter;
       const QPoint c_AdaptedPos = this->mpc_Ui->pc_WidgetFileList->mapFrom(this->parentWidget(), orc_Pos);
 
       // The header widget area shall be excluded, it can cause problems if a scrollbar is in the list available
       if (c_AdaptedPos.y() > 0)
       {
-         for (s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++s32_Counter)
+         for (int32_t s32_Counter = 0; s32_Counter < this->mpc_Ui->pc_FileVerticalLayout->count(); ++s32_Counter)
          {
             QLayoutItem * const pc_Item = this->mpc_Ui->pc_FileVerticalLayout->itemAt(s32_Counter);
 
@@ -1006,6 +1009,9 @@ bool C_SyvUpPacSectionNodeWidget::IsExpanded(void) const
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::resizeEvent(QResizeEvent * const opc_Event)
 {
+   // Adapt label
+   this->m_UpdateLabelNoFiles();
+
    QWidget::resizeEvent(opc_Event);
 
    // Update the label text for adapting the elided text if necessary
@@ -1267,7 +1273,7 @@ void C_SyvUpPacSectionNodeWidget::m_SetState(const uint32_t ou32_State)
 void C_SyvUpPacSectionNodeWidget::m_AdaptParamSetFile(const QString & orc_File,
                                                       C_SyvUpPacListNodeItemWidget * const opc_App)
 {
-   C_PuiSvNodeUpdateParamInfo c_ParamFileInfo;
+   C_OscViewNodeUpdateParamInfo c_ParamFileInfo;
 
    if (this->m_GetParamsetFileInfo(orc_File, c_ParamFileInfo) == C_NO_ERR)
    {
@@ -1301,7 +1307,7 @@ void C_SyvUpPacSectionNodeWidget::m_AdaptParamSetFile(const QString & orc_File,
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_SyvUpPacSectionNodeWidget::m_GetParamsetFileInfo(const QString & orc_File,
-                                                           C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo)
+                                                           C_OscViewNodeUpdateParamInfo & orc_ParamFileInfo)
 {
    int32_t s32_Return = C_NOACT;
 
@@ -1475,6 +1481,7 @@ void C_SyvUpPacSectionNodeWidget::m_OnExpand(const bool oq_Expand)
    this->mpc_Ui->pc_WidgetAdd->setVisible(
       oq_Expand && this->mq_ShowAddButton && (this->mu32_FileCount == 0U));
    this->mpc_Ui->pc_WidgetFileList->setVisible(oq_Expand);
+   this->m_UpdateLabelNoFiles();
 
    this->updateGeometry();
 }
@@ -1502,7 +1509,7 @@ void C_SyvUpPacSectionNodeWidget::m_InitItems(void)
 
       if (pc_View != NULL)
       {
-         const C_PuiSvNodeUpdate * const pc_UpdateInfo = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
+         const C_OscViewNodeUpdate * const pc_UpdateInfo = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
 
          tgl_assert(pc_UpdateInfo != NULL);
          if (pc_UpdateInfo != NULL)
@@ -1514,6 +1521,7 @@ void C_SyvUpPacSectionNodeWidget::m_InitItems(void)
                 (this->mpc_Ui->pc_PbExpColl->isChecked() == true)) // Is expanded?
             {
                this->mpc_Ui->pc_WidgetAdd->setVisible(true);
+               this->m_UpdateLabelNoFiles();
             }
          } //lint !e429  //no memory leak because of the parent of pc_Spacer and the Qt memory management
       }
@@ -1611,6 +1619,9 @@ uint32_t C_SyvUpPacSectionNodeWidget::m_GetFirstNotFinishedApplication(void) con
          u32_ExpectedType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_PEM;
          break;
       default:
+         // Should not happen
+         tgl_assert(false);
+         u32_ExpectedType = mu32_UPDATE_PACKAGE_NODE_SECTION_TYPE_DATABLOCK;
          break;
       }
 
@@ -1693,10 +1704,30 @@ void C_SyvUpPacSectionNodeWidget::m_RestartMovie(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Update the label no files
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvUpPacSectionNodeWidget::m_UpdateLabelNoFiles(void)
+{
+   if (this->width() >= 310)
+   {
+      this->mpc_Ui->pc_WidgetAdd->setMinimumHeight(55);
+      this->mpc_Ui->pc_LabNoFiles->setVisible(true);
+      this->mpc_Ui->pc_LabNoFilesShort->setVisible(false);
+   }
+   else
+   {
+      this->mpc_Ui->pc_WidgetAdd->setMinimumHeight(68);
+      this->mpc_Ui->pc_LabNoFiles->setVisible(false);
+      this->mpc_Ui->pc_LabNoFilesShort->setVisible(true);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fills the PEM states in the DoFlash class
 
-   \param[in]       opc_App       PEM file app
-   \param[in,out]   orc_DoFlash   Detailed output parameter description
+   \param[in]   opc_App       PEM file app
+   \param[out]  orc_DoFlash   DoFlash data class
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeWidget::mh_FillDoFlashWithPemStates(const C_SyvUpPacListNodeItemWidget * const opc_App,
@@ -1708,43 +1739,10 @@ void C_SyvUpPacSectionNodeWidget::mh_FillDoFlashWithPemStates(const C_SyvUpPacLi
    tgl_assert(pc_PemApp != NULL);
    if (pc_PemApp != NULL)
    {
-      C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity;
-      C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger;
+      C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
+      C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
 
       pc_PemApp->GetPemStates(e_StateSecurity, e_StateDebugger);
-
-      switch (e_StateSecurity)
-      {
-      case C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE:
-         orc_DoFlash.q_SendSecurityEnabledState = false;
-         break;
-      case C_PuiSvNodeUpdate::eST_SEC_ACTIVATE:
-         orc_DoFlash.q_SendSecurityEnabledState = true;
-         orc_DoFlash.q_SecurityEnabled = true;
-         break;
-      case C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE:
-         orc_DoFlash.q_SendSecurityEnabledState = true;
-         orc_DoFlash.q_SecurityEnabled = false;
-         break;
-      default:
-         break;
-      }
-
-      switch (e_StateDebugger)
-      {
-      case C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE:
-         orc_DoFlash.q_SendDebuggerEnabledState = false;
-         break;
-      case C_PuiSvNodeUpdate::eST_DEB_ACTIVATE:
-         orc_DoFlash.q_SendDebuggerEnabledState = true;
-         orc_DoFlash.q_DebuggerEnabled = true;
-         break;
-      case C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE:
-         orc_DoFlash.q_SendDebuggerEnabledState = true;
-         orc_DoFlash.q_DebuggerEnabled = false;
-         break;
-      default:
-         break;
-      }
+      C_OscSuSequences::h_FillDoFlashWithPemStates(e_StateSecurity, e_StateDebugger, orc_DoFlash);
    }
 }

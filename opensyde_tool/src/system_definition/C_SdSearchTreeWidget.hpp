@@ -31,11 +31,11 @@ class C_SdSearchTreeWidget :
 
 public:
    C_SdSearchTreeWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdSearchTreeWidget();
+   ~C_SdSearchTreeWidget() override;
 
-   virtual bool Search(const QString & orc_SearchString);
-   virtual void ClearResult(void);
-   virtual void SetSearchResultFocus(void);
+   bool Search(const QString & orc_SearchString) override;
+   void ClearResult(void) override;
+   void SetSearchResultFocus(void) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

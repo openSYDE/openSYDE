@@ -606,6 +606,8 @@ void C_SyvDaItPaWidgetNew::SetEditMode(const bool oq_EditMode, const bool oq_Edi
    //Update selection
    this->m_UpdateButtons();
    m_UpdateButtonToolTips();
+
+   this->mpc_Ui->pc_TreeView->SetCursorHandlingActive((oq_EditMode == false) || (oq_EditContentMode == true));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -969,7 +971,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OscNodeDataPoolLis
 
          //User settings restore
          c_Folder = C_Uti::h_CheckAndReplaceWithExePathIfNecessary(C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                                                                      pc_View->GetName()).c_ParamImportPath);
+                                                                      pc_View->GetName().c_str()).c_ParamImportPath);
 
          c_File = C_OgeWiUtil::h_GetOpenFileName(pc_ParamWidget->GetPopUpParent(),
                                                  C_GtGetText::h_GetText("Load Parameter Set File"),
@@ -981,7 +983,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OscNodeDataPoolLis
             int32_t s32_Result;
 
             //User settings store
-            C_UsHandler::h_GetInstance()->SetProjSvParamImport(pc_View->GetName(), c_File);
+            C_UsHandler::h_GetInstance()->SetProjSvParamImport(pc_View->GetName().c_str(), c_File);
 
             s32_Result = c_ParamSetHandler.ReadFile(c_File.toStdString().c_str(), true, true);
 
@@ -1099,7 +1101,6 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OscNodeDataPoolLis
                                           const uint32_t ou32_ValidLayers) const
 {
    int32_t s32_Result = C_NO_ERR;
-   uint32_t u32_ListCounter;
    C_OscParamSetHandler c_ParamSetFileHandler;
 
    std::vector<C_OscParamSetInterpretedNode> c_IntNodes;
@@ -1110,6 +1111,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OscNodeDataPoolLis
 
    if (orc_ListIds.size() != 0)
    {
+      uint32_t u32_ListCounter;
       //General info
       c_ParamSetFileHandler.AddInterpretedFileData(c_FileInfo);
 
@@ -1262,8 +1264,8 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OscNodeDataPoolLis
                   // Save the file
                   QString c_Folder;
                   QString c_FileName;
-                  const C_UsSystemView c_View = C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-                     pc_View->GetName());
+                  const C_UsSystemView c_View =
+                     C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
 
                   //User settings restore
                   c_Folder = C_Uti::h_CheckAndReplaceWithExePathIfNecessary(c_View.c_ParamExportPath);
@@ -1294,7 +1296,7 @@ void C_SyvDaItPaWidgetNew::m_SaveElements(const std::vector<C_OscNodeDataPoolLis
                      bool q_Continue = true;
 
                      //User settings store
-                     C_UsHandler::h_GetInstance()->SetProjSvParamExport(pc_View->GetName(), c_FileName);
+                     C_UsHandler::h_GetInstance()->SetProjSvParamExport(pc_View->GetName().c_str(), c_FileName);
 
                      // Remove old file
                      c_File.setFileName(c_FileName);
@@ -1390,9 +1392,8 @@ void C_SyvDaItPaWidgetNew::m_RecordElements(const std::vector<C_OscNodeDataPoolL
       {
          const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(
             pc_ParamWidget->GetPopUpParent(), pc_ParamWidget->GetPopUpParent());
-         C_SyvDaItPaImageRecordWidget * const pc_Dialog = new C_SyvDaItPaImageRecordWidget(*c_New, *this->mpc_ComDriver,
-                                                                                           orc_ListIds,
-                                                                                           pc_View->GetName());
+         C_SyvDaItPaImageRecordWidget * const pc_Dialog =
+            new C_SyvDaItPaImageRecordWidget(*c_New, *this->mpc_ComDriver, orc_ListIds, pc_View->GetName().c_str());
 
          Q_UNUSED(pc_Dialog)
 
@@ -1590,9 +1591,9 @@ QString C_SyvDaItPaWidgetNew::mh_GetDefaultFileName(const uint32_t ou32_ViewInde
 
    if (pc_View != NULL)
    {
-      const QString c_ViewPart1 = static_cast<QString>(C_GtGetText::h_GetText("View_%1_")).arg(ou32_ViewIndex + 1UL);
+      const QString c_ViewPart1 = static_cast<QString>(C_GtGetText::h_GetText("View_%1_")).arg(ou32_ViewIndex + 1);
       const QString c_ViewPart1File = C_OscUtils::h_NiceifyStringForFileName(c_ViewPart1.toStdString().c_str()).c_str();
-      const QString c_ViewPart2 = C_PuiSdHandler::h_AutomaticCeStringAdaptation(pc_View->GetName());
+      const QString c_ViewPart2 = C_PuiSdHandler::h_AutomaticCeStringAdaptation(pc_View->GetName().c_str());
       const QString c_DataElementFileName = mh_GetFile(orc_Id, ou32_ValidLayers);
       const QString c_ViewFileName = static_cast<QString>("%1%2").arg(c_ViewPart1File).arg(c_ViewPart2);
       if (c_DataElementFileName.isEmpty() == false)

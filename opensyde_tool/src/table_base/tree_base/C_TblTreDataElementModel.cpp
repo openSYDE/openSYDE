@@ -664,22 +664,22 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
 
-   if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
+   if ((pc_View != NULL) && (pc_View->GetOscPcData().GetConnected() == true))
    {
       //Init sync managers
       //Busses
       if (C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(ou32_ViewIndex,
-                                                            pc_View->GetPcData().GetBusIndex()) == false)
+                                                            pc_View->GetOscPcData().GetBusIndex()) == false)
       {
          C_TblTreItem * const pc_BusItem = new C_TblTreItem();
-         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
-            pc_View->GetPcData().GetBusIndex());
+         const C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
          bool q_BusValid = false;
          //Node
          if (pc_Bus != NULL)
          {
             //Init current node
-            pc_BusItem->u32_Index = pc_View->GetPcData().GetBusIndex();
+            pc_BusItem->u32_Index = pc_View->GetOscPcData().GetBusIndex();
             pc_BusItem->c_Name = pc_Bus->c_Name.c_str();
             pc_BusItem->q_Selectable = false;
             pc_BusItem->c_ToolTipHeading = pc_Bus->c_Name.c_str();
@@ -722,6 +722,9 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
                case 3U:
                   e_Type = C_OscCanProtocol::eCAN_OPEN;
                   break;
+               case 4U:
+                  e_Type = C_OscCanProtocol::eJ1939;
+                  break;
                default:
                   e_Type = C_OscCanProtocol::eLAYER2;
                   tgl_assert(false);
@@ -729,7 +732,7 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
                }
                pc_ProtocolItem->c_Name = C_PuiSdUtil::h_ConvertProtocolTypeToString(e_Type);
                pc_ProtocolItem->c_ToolTipHeading = pc_ProtocolItem->c_Name;
-               pc_SyncManager->Init(pc_View->GetPcData().GetBusIndex(), e_Type);
+               pc_SyncManager->Init(pc_View->GetOscPcData().GetBusIndex(), e_Type);
                c_UniqueMessages = pc_SyncManager->GetUniqueMessages();
                //Flag
                q_ProtocolValid = false;
@@ -2261,10 +2264,10 @@ const
                //3: Invisible item
                //2: Node item
                //1: Data pool type item
-               c_Retval.push_back(C_PuiSvDbNodeDataPoolListElementId(pc_SecondParent->u32_Index,
-                                                                     pc_TreeItem->u32_Index, 0UL, 0UL,
-                                                                     C_PuiSvDbNodeDataPoolListElementId::
-                                                                     eDATAPOOL_ELEMENT, false, 0UL));
+               c_Retval.emplace_back(C_PuiSvDbNodeDataPoolListElementId(pc_SecondParent->u32_Index,
+                                                                        pc_TreeItem->u32_Index, 0UL, 0UL,
+                                                                        C_PuiSvDbNodeDataPoolListElementId::
+                                                                        eDATAPOOL_ELEMENT, false, 0UL));
             }
          }
          else
@@ -2372,12 +2375,12 @@ const
                   {
                      for (uint32_t u32_ItElement = 0; u32_ItElement < pc_OscList->c_Elements.size(); ++u32_ItElement)
                      {
-                        c_Retval.push_back(C_PuiSvDbNodeDataPoolListElementId(u32_NodeIndex,
-                                                                              u32_DataPoolIndex,
-                                                                              u32_ListIndex,
-                                                                              u32_ItElement,
-                                                                              C_PuiSvDbNodeDataPoolListElementId::
-                                                                              eDATAPOOL_ELEMENT, false, 0UL));
+                        c_Retval.emplace_back(C_PuiSvDbNodeDataPoolListElementId(u32_NodeIndex,
+                                                                                 u32_DataPoolIndex,
+                                                                                 u32_ListIndex,
+                                                                                 u32_ItElement,
+                                                                                 C_PuiSvDbNodeDataPoolListElementId::
+                                                                                 eDATAPOOL_ELEMENT, false, 0UL));
                      }
                   }
                   else
@@ -2494,8 +2497,8 @@ std::vector<uint32_t> C_TblTreDataElementModel::mh_GetViewSdHash(const uint32_t 
          stw::scl::C_SclChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Hash);
       }
       //Relevant PC data
-      q_Data = pc_View->GetPcData().GetConnected();
-      u32_Data = pc_View->GetPcData().GetBusIndex();
+      q_Data = pc_View->GetOscPcData().GetConnected();
+      u32_Data = pc_View->GetOscPcData().GetBusIndex();
       stw::scl::C_SclChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Hash);
       stw::scl::C_SclChecksums::CalcCRC32(&u32_Data, sizeof(u32_Data), u32_Hash);
 

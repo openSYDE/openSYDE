@@ -69,17 +69,6 @@ C_GiSvNodeSyvSetup::C_GiSvNodeSyvSetup(const uint32_t ou32_ViewIndex, const int3
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   default destructor
-
-   Clean up.
-*/
-//----------------------------------------------------------------------------------------------------------------------
-//lint -e{1540}  no memory leak because of the parent of mpc_CheckBox and the Qt memory management
-C_GiSvNodeSyvSetup::~C_GiSvNodeSyvSetup()
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node connected state
 
    \param[in]     oq_Connected   Flag if connected or not

@@ -41,7 +41,7 @@ class C_SyvDaChaWidget :
 public:
    explicit C_SyvDaChaWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
                              QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaChaWidget(void);
+   ~C_SyvDaChaWidget(void) override;
 
    // Functions of C_SyvDaDashboardContentBaseWidget
    void SetDashboardIndex(const uint32_t ou32_Value) override;

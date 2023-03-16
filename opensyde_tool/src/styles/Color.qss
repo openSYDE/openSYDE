@@ -190,7 +190,8 @@ stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_BRIGHT"][B
 stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][BackgroundChecked="false"],
 stw--opensyde_gui--C_SdNdeCoAddDeviceDialog,
 stw--opensyde_gui--C_SdBueCoAddSignalsDialog,
-stw--opensyde_gui--C_SdNdeCoDeviceUpdateEdsDialog
+stw--opensyde_gui--C_SdNdeCoDeviceUpdateEdsDialog,
+stw--opensyde_gui--C_SdBueJ1939PgPropertiesDialog
 {
 background-color: transparent;
 }
@@ -672,7 +673,8 @@ stw--opensyde_gui_elements--C_OgeLabDashboardChart[Style="OPENSYDE_BRIGHT"][Sele
 stw--opensyde_gui_elements--C_OgePubHalcPanel,
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView::item:selected,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
-stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
+stw--opensyde_gui_elements--C_OgeRabProperties[CheckedColor="4"]:checked
 {
 color: rgb(57, 57, 109);
 }
@@ -811,6 +813,7 @@ stw--opensyde_gui_elements--C_OgeLabReadSub,
 stw--opensyde_gui_elements--C_OgeLabReadMain,
 stw--opensyde_gui_elements--C_OgeLabBusType,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="7"],
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Foreground="7"],
 stw--opensyde_gui_elements--C_OgeMuSections QLabel
 {
 color: rgb(87, 87, 170);
@@ -1147,7 +1150,8 @@ stw--opensyde_gui_elements--C_OgePubHalcPanel:disabled,
 stw--opensyde_gui_elements--C_OgeFraGeneric[Border="10"],
 stw--opensyde_gui_elements--C_OgeChxTiny::indicator:enabled:!checked,
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement:disabled[Style="OPENSYDE_BRIGHT"],
-stw--opensyde_gui_elements--C_OgePubAddChartDataElement[Style="OPENSYDE_DARK"]
+stw--opensyde_gui_elements--C_OgePubAddChartDataElement[Style="OPENSYDE_DARK"],
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Border="10"]
 {
 border-color: rgb(206, 206, 217);
 }
@@ -1288,7 +1292,8 @@ stw--opensyde_gui_elements--C_OgeSpxEditProperties:enabled,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:disabled,
-stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:!checked
+stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:!checked,
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Hovered="11"]:hover
 {
 background-color: rgb(237, 237, 242);
 }
@@ -1406,6 +1411,7 @@ stw--opensyde_gui_elements--C_OgeGbxMouseMove,
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView,
 stw--opensyde_gui--C_SdNdeCoConfigTreeView,
 stw--opensyde_gui_elements--C_OgeFraGeneric[Background="12"],
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Background="12"],
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement[Style="OPENSYDE_BRIGHT"]
 {
 background-color: rgb(250, 250, 250);
@@ -1952,7 +1958,8 @@ stw--opensyde_gui_elements--C_OgeGbxToolTip[Type="DEFAULT"],
 stw--opensyde_gui_elements--C_OgeTedToolTipContent[Type="DEFAULT"],
 stw--opensyde_gui_elements--C_OgeLabHeadingToolTip[Type="DEFAULT"],
 stw--opensyde_gui--C_SyvDaItDashboardLabelWidget[Style="FLAT_BRIGHT"][Type="DEFAULT"],
-stw--opensyde_gui_elements--C_OgePubHalcPanel:hover
+stw--opensyde_gui_elements--C_OgePubHalcPanel:hover,
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Clicked="38"]:enabled:hover:pressed
 {
 background-color: rgb(217, 217, 226);
 }

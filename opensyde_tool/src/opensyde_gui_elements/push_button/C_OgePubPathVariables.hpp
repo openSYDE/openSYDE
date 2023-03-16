@@ -28,7 +28,7 @@ class C_OgePubPathVariables :
 
 public:
    explicit C_OgePubPathVariables(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgePubPathVariables(void);
+   ~C_OgePubPathVariables(void) override;
 
    void AddDatablockSection(void);
 

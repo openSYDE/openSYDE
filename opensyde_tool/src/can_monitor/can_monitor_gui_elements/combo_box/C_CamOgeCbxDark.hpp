@@ -32,6 +32,7 @@ public:
    explicit C_CamOgeCbxDark(QWidget * const opc_Parent = NULL);
    ~C_CamOgeCbxDark(void) override;
 
+private:
    //Avoid call
    C_CamOgeCbxDark(const C_CamOgeCbxDark &);                //not implemented -> prevent copying
    C_CamOgeCbxDark & operator =(const C_CamOgeCbxDark &) &; //not implemented -> prevent assignment

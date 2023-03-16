@@ -500,8 +500,8 @@ void C_SyvUtil::h_GetViewDisplayName(const uint32_t ou32_ViewIndex, const int32_
          orc_SubSubMode = "";
          break;
       }
-      orc_SubMode = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2")).arg(ou32_ViewIndex + 1UL).arg(
-         pc_View->GetName());
+      orc_SubMode = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2"))
+                    .arg(ou32_ViewIndex + 1).arg(pc_View->GetName().c_str());
    }
 }
 

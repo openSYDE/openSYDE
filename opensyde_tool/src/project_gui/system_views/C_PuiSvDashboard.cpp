@@ -3080,7 +3080,7 @@ void C_PuiSvDashboard::HandleCompatibilityChart(std::vector<C_PuiSvDashboard> & 
    for (const C_PuiSvDbChart & rc_Chart : this->GetCharts())
    {
       C_PuiSvDashboard c_NewDashboard;
-      const QString c_NewTabName = static_cast<QString>("%1_Chart_%2").arg(this->GetName()).arg(u32_Counter + 1UL);
+      const QString c_NewTabName = static_cast<QString>("%1_Chart_%2").arg(this->GetName()).arg(u32_Counter + 1);
       C_PuiSvDbTabChart c_NewChart;
       C_PuiBsTextElement c_NewTextElement;
       uint8_t u8_ColorCounter;

@@ -34,6 +34,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
+using namespace stw::scl;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
@@ -120,7 +121,7 @@ C_SyvUpPacNodeWidget::C_SyvUpPacNodeWidget(const uint32_t ou32_ViewIndex, const 
    if (pc_View != NULL)
    {
       int32_t s32_ExpectedSections;
-      QVector<bool> c_Flags = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName()).
+      QVector<bool> c_Flags = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str()).
                               GetSvNode(orc_NodeName).GetSectionsExpanded();
 
       s32_ExpectedSections = this->mc_DatablockWidgets.size();
@@ -180,7 +181,7 @@ C_SyvUpPacNodeWidget::~C_SyvUpPacNodeWidget()
          c_Flags.push_back(this->mpc_FilesWidget->IsExpanded());
       }
 
-      C_UsHandler::h_GetInstance()->SetProjSvUpdateSectionsExpandedFlags(pc_View->GetName(), this->mc_NodeName,
+      C_UsHandler::h_GetInstance()->SetProjSvUpdateSectionsExpandedFlags(pc_View->GetName().c_str(), this->mc_NodeName,
                                                                          c_Flags);
    }
 
@@ -546,14 +547,14 @@ void C_SyvUpPacNodeWidget::RemoveAllFiles(void) const
 
    tgl_assert(C_PuiSvHandler::h_GetInstance()->ClearNodeUpdateInformationAsAppropriate(this->mu32_ViewIndex,
                                                                                        this->mu32_NodeIndex,
-                                                                                       C_PuiSvNodeUpdate::
+                                                                                       C_OscViewNodeUpdate::
                                                                                        eFTP_DATA_BLOCK) == C_NO_ERR);
 
    if (this->mq_FileBased == true)
    {
       tgl_assert(C_PuiSvHandler::h_GetInstance()->ClearNodeUpdateInformationAsAppropriate(this->mu32_ViewIndex,
                                                                                           this->mu32_NodeIndex,
-                                                                                          C_PuiSvNodeUpdate::
+                                                                                          C_OscViewNodeUpdate::
                                                                                           eFTP_FILE_BASED) == C_NO_ERR);
    }
 
@@ -1245,11 +1246,11 @@ void C_SyvUpPacNodeWidget::m_Init(void)
 {
    const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
    QSpacerItem * const pc_Spacer = new QSpacerItem(0, 3, QSizePolicy::Minimum, QSizePolicy::Expanding);
-   uint32_t u32_DatablockParamSetFiles = 0U;
 
    tgl_assert(pc_Node != NULL);
    if (pc_Node != NULL)
    {
+      uint32_t u32_DatablockParamSetFiles = 0U;
       uint32_t u32_DatablockCounter;
       uint32_t u32_ViewDataBlockPathNumber = 0;
 
@@ -1523,15 +1524,15 @@ bool C_SyvUpPacNodeWidget::m_CheckFileAlreadyContained(const QString & orc_File)
        (pc_View != NULL))
    {
       const QString c_AbsoluteFile = C_PuiUtil::h_GetResolvedAbsPathFromProject(orc_File);
-      std::vector<QString> c_Paths;
+      std::vector<C_SclString> c_Paths;
 
       // compare with existing data block files
-      c_Paths = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
-      for (std::vector<QString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
+      c_Paths = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
+      for (std::vector<C_SclString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
       {
-         if ((c_AbsoluteFile == C_PuiUtil::h_GetResolvedAbsPathFromProject(*c_It)) ||
+         if ((c_AbsoluteFile == C_PuiUtil::h_GetResolvedAbsPathFromProject((*c_It).c_str())) ||
              (static_cast<QFileInfo>(c_AbsoluteFile).fileName() ==
-              static_cast<QFileInfo>(C_PuiUtil::h_GetResolvedAbsPathFromProject(*c_It)).fileName()))
+              static_cast<QFileInfo>(C_PuiUtil::h_GetResolvedAbsPathFromProject((*c_It).c_str())).fileName()))
          {
             q_Retval = true;
             break;
@@ -1542,13 +1543,13 @@ bool C_SyvUpPacNodeWidget::m_CheckFileAlreadyContained(const QString & orc_File)
       if (q_Retval == false)
       {
          c_Paths =
-            pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
-         for (std::vector<QString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
+            pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex)->GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED);
+         for (std::vector<C_SclString>::const_iterator c_It = c_Paths.begin(); c_It != c_Paths.end(); ++c_It)
          {
             // variables resolve not necessary
-            if ((c_AbsoluteFile == C_PuiUtil::h_GetAbsolutePathFromProject(*c_It)) ||
+            if ((c_AbsoluteFile == C_PuiUtil::h_GetAbsolutePathFromProject((*c_It).c_str())) ||
                 (static_cast<QFileInfo>(c_AbsoluteFile).fileName() ==
-                 static_cast<QFileInfo>(C_PuiUtil::h_GetAbsolutePathFromProject(*c_It)).fileName()))
+                 static_cast<QFileInfo>(C_PuiUtil::h_GetAbsolutePathFromProject((*c_It).c_str())).fileName()))
             {
                q_Retval = true;
                break;

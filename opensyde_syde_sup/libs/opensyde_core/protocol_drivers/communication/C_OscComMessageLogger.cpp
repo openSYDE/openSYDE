@@ -95,7 +95,7 @@ bool C_OscComMessageLoggerFilter::operator ==(const C_OscComMessageLoggerFilter 
 C_OscComMessageLogger::C_OscComMessageLogger(void) :
    mpc_OsySysDefMessage(NULL),
    mpc_OsySysDefDataPoolList(NULL),
-   me_Protocol(stw::cmon_protocol::CMONL7ProtocolNone),
+   me_Protocol(stw::cmon_protocol::eCMON_L7_PROTOCOL_NONE),
    mq_Paused(false),
    mu64_FirstTimeStampStart(0U),
    mu64_FirstTimeStampDayOfTime(0U),
@@ -860,7 +860,7 @@ C_SclString C_OscComMessageLogger::m_GetProtocolStringHex(const T_STWCAN_Msg_RX 
 {
    C_SclString c_Result = "";
 
-   if (this->me_Protocol != stw::cmon_protocol::CMONL7ProtocolNone)
+   if (this->me_Protocol != stw::cmon_protocol::eCMON_L7_PROTOCOL_NONE)
    {
       c_Result = this->mc_ProtocolHex.MessageToStringProtocolOnly(orc_Msg);
    }
@@ -882,7 +882,7 @@ C_SclString C_OscComMessageLogger::m_GetProtocolStringDec(const T_STWCAN_Msg_RX 
 {
    C_SclString c_Result = "";
 
-   if (this->me_Protocol != stw::cmon_protocol::CMONL7ProtocolNone)
+   if (this->me_Protocol != stw::cmon_protocol::eCMON_L7_PROTOCOL_NONE)
    {
       c_Result = this->mc_ProtocolDec.MessageToStringProtocolOnly(orc_Msg);
    }

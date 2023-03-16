@@ -35,7 +35,7 @@ class C_OgeWiNavigationTab :
 
 public:
    explicit C_OgeWiNavigationTab(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeWiNavigationTab(void);
+   ~C_OgeWiNavigationTab(void) override;
 
    void SetEnabled(const bool oq_Enabled);
    void SetIncludeLeftBorder(const bool oq_Include);

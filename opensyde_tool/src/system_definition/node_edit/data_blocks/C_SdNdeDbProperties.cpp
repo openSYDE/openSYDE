@@ -710,7 +710,7 @@ QString C_SdNdeDbProperties::m_CheckId(void) const
    if (pc_Node != NULL)
    {
       //Check ID
-      bool q_ProcessIDError = false;
+      bool q_ProcessIdError = false;
       std::vector<uint32_t> c_UsedProcessIds;
       for (uint32_t u32_ItApplication = 0UL; u32_ItApplication < pc_Node->c_Applications.size(); ++u32_ItApplication)
       {
@@ -733,13 +733,13 @@ QString C_SdNdeDbProperties::m_CheckId(void) const
                   c_UsedProcessIds.push_back(rc_Application.u8_ProcessId);
                   if (static_cast<uint8_t>(this->mpc_Ui->pc_SpinBoxProcessID->value()) == rc_Application.u8_ProcessId)
                   {
-                     q_ProcessIDError = true;
+                     q_ProcessIdError = true;
                   }
                }
             }
          }
       }
-      if (q_ProcessIDError == true)
+      if (q_ProcessIdError == true)
       {
          if (c_UsedProcessIds.size() > 0)
          {

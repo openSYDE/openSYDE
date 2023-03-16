@@ -208,7 +208,7 @@ void C_GiBiRectBaseGroup::m_InitActionPoints()
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiBiRectBaseGroup::m_UpdateActionPoints(void)
 {
-   // adapt the shown bounding rect coordinatesESX-3CM
+   // adapt the shown bounding rect coordinates
    this->mc_ShowBoundingRect = this->m_GetBiggestSubItemBoundingRect();
    this->mc_ShowBoundingRect.setX(this->mc_ShowBoundingRect.x() - mf64_ActionPointOffset);
    this->mc_ShowBoundingRect.setY(this->mc_ShowBoundingRect.y() - mf64_ActionPointOffset);
@@ -620,6 +620,85 @@ void C_GiBiRectBaseGroup::UpdateTransform(const QTransform & orc_Transform)
          pc_ActionPoint->UpdateTransform(orc_Transform);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the necessary cursor type when hovered dependent of the cursor position
+
+   \param[in]       orc_ScenePos     Scene position of cursor
+   \param[out]      ore_Cursor       Detected necessary cursor
+
+   \retval   true   Override cursor is necessary
+   \retval   false  Override cursor is not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiBiRectBaseGroup::IsResizeCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const
+{
+   bool q_Return = false;
+
+   if (this->isSelected() == true)
+   {
+      // Depending of the count of elements
+      if (this->mc_ActionPoints.size() >= ms32_INDEX_ELEMENT_KEEP_RATIO_MAX)
+      {
+         if (this->mc_ActionPoints[ms32_INDEX_BOTTOM_RIGHT]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeFDiagCursor;
+            q_Return = true;
+         }
+         else if (this->mc_ActionPoints[ms32_INDEX_BOTTOM_LEFT]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeBDiagCursor;
+            q_Return = true;
+         }
+         else if (this->mc_ActionPoints[ms32_INDEX_TOP_LEFT]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeFDiagCursor;
+            q_Return = true;
+         }
+         else if (this->mc_ActionPoints[ms32_INDEX_TOP_RIGHT]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeBDiagCursor;
+            q_Return = true;
+         }
+         else
+         {
+            // Nothing to do
+         }
+      }
+
+      // Depending of the count of elements
+      if ((q_Return == false) &&
+          (this->mc_ActionPoints.size() == ms32_INDEX_ELEMENT_MAX))
+      {
+         if (this->mc_ActionPoints[ms32_INDEX_TOP]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeVerCursor;
+            q_Return = true;
+         }
+         else if (this->mc_ActionPoints[ms32_INDEX_BOTTOM]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeVerCursor;
+            q_Return = true;
+         }
+         else if (this->mc_ActionPoints[ms32_INDEX_LEFT]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeHorCursor;
+            q_Return = true;
+         }
+         else if (this->mc_ActionPoints[ms32_INDEX_RIGHT]->IsPointInside(orc_ScenePos) == true)
+         {
+            ore_Cursor = Qt::SizeHorCursor;
+            q_Return = true;
+         }
+         else
+         {
+            // Nothing to do
+         }
+      }
+   }
+
+   return q_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

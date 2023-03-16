@@ -411,25 +411,25 @@ stw::cmon_protocol::e_CanMonL7Protocols C_CamMetControlBarWidget::mh_GetProtocol
    switch (os32_Protocol)
    {
    case 1:
-      e_Retval = stw::cmon_protocol::CMONL7ProtocolOpenSYDE;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_OPEN_SYDE;
       break;
    case 2:
-      e_Retval = stw::cmon_protocol::CMONL7ProtocolCANopen;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_CAN_OPEN;
       break;
    case 3:
-      e_Retval = stw::cmon_protocol::CMONL7ProtocolKEFEX;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_KEFEX;
       break;
    case 4:
-      e_Retval = stw::cmon_protocol::CMONL7ProtocolXFL;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_XFL;
       break;
    case 5:
-      e_Retval = stw::cmon_protocol::CMONL7Protocol_SHIP_IP_IVA;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_SHIP_IP_IVA;
       break;
    case 6:
-      e_Retval = stw::cmon_protocol::CMONL7ProtocolJ1939;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_J1939;
       break;
    default:
-      e_Retval = stw::cmon_protocol::CMONL7ProtocolNone;
+      e_Retval = stw::cmon_protocol::eCMON_L7_PROTOCOL_NONE;
       break;
    }
    return e_Retval;

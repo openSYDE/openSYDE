@@ -2465,11 +2465,11 @@ void C_SyvDaChaPlotHandlerWidget::m_Zoom(const bool oq_ZoomIn)
 
       if (oq_ZoomIn == true)
       {
-         f64_Factor = 0.95;
+         f64_Factor = 0.85;
       }
       else
       {
-         f64_Factor = 1.05;
+         f64_Factor = 1.176;
       }
 
       if ((this->mc_Data.e_SettingZoomMode == C_PuiSvDbTabChart::eSETTING_ZM_XY) ||

@@ -80,7 +80,7 @@ C_SyvDcConnectedNodeWidget::C_SyvDcConnectedNodeWidget(QListWidgetItem * const o
 */
 //----------------------------------------------------------------------------------------------------------------------
 //lint -e{1540} Never took ownership of mpc_ListWidgetItem
-C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void)
+C_SyvDcConnectedNodeWidget::~C_SyvDcConnectedNodeWidget(void) noexcept
 {
    delete mpc_Ui;
 }

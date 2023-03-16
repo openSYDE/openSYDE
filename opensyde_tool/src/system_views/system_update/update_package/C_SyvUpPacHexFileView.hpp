@@ -55,7 +55,7 @@ private:
    void m_LoadInfo(void) const;
    void m_OkClicked(void);
    static void mh_AddFileSection(const QString & orc_Path, QString & orc_Content);
-   static QString mh_GetMD5Hex(const QString & orc_Path);
+   static QString mh_GetMd5Hex(const QString & orc_Path);
    static void mh_AddDataInformation(stw::opensyde_core::C_OsyHexFile & orc_HexFile, QString & orc_Content);
    static void mh_AddApplicationInformation(stw::opensyde_core::C_OsyHexFile & orc_HexFile, QString & orc_Content);
 

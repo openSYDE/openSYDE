@@ -151,6 +151,7 @@ public:
    C_SclString & Insert(const C_SclString & orc_Source, const uint32_t ou32_Index);
    C_SclString & Delete(const uint32_t ou32_Index, const uint32_t ou32_Count);
    C_SclString & SetLength(const uint32_t ou32_NewLength);
+   C_SclString & ReplaceAll(const C_SclString & orc_Search, const C_SclString & orc_Replacement);
 
    uint32_t Pos(const C_SclString & orc_SubString) const;
    uint32_t LastPos(const C_SclString & orc_SubString) const; //last position of string

@@ -13,6 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
+#include <QButtonGroup>
 #include "stwtypes.hpp"
 #include "C_SdBueMessageRxEntry.hpp"
 #include "C_PuiSdNodeCanMessage.hpp"
@@ -53,6 +54,8 @@ public:
                           const uint32_t ou32_DatapoolIndex, const bool oq_Checked) const;
    void SetModeSingleNode(const bool oq_ModeSingleNode);
 
+   void SetExclusiveMode(const bool oq_Active);
+
    void Clear(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -71,11 +74,13 @@ Q_SIGNALS:
 private:
    Ui::C_SdBueMessageRxList * mpc_Ui;
    std::vector<C_SdBueMessageRxEntry *> mc_Entries;
+   QButtonGroup mc_RadioGroup;
    uint32_t mu32_LastKnownCycleTimeValue;
    bool mq_TxMethodOnEvent;
    bool mq_DisableOptionPossible;
    bool mq_TimeoutConfigurationReadOnly;
    bool mq_ModeSingleNode;
+   bool mq_ExclusiveMode;
 
    //Avoid call
    C_SdBueMessageRxList(const C_SdBueMessageRxList &);

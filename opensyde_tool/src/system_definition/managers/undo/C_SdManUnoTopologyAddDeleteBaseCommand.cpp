@@ -408,7 +408,7 @@ void C_SdManUnoTopologyAddDeleteBaseCommand::m_SaveToData(void)
             {
                const C_GiLiBus * pc_BusConst;
                const uint32_t u32_BackupBusConnectionIndex = this->mc_DataBackup.c_BusConnections.size();
-               this->mc_DataBackup.c_BusConnections.push_back(C_PuiSdCompleteBusConnectionData());
+               this->mc_DataBackup.c_BusConnections.emplace_back(C_PuiSdCompleteBusConnectionData());
                {
                   C_PuiSdCompleteBusConnectionData & rc_CurBusConnectionBackupData =
                      this->mc_DataBackup.c_BusConnections[u32_BackupBusConnectionIndex];

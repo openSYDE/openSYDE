@@ -144,8 +144,6 @@ void C_SdBueNodeSelectorWidget::SetBusId(const uint32_t ou32_BusIndex)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueNodeSelectorWidget::SetProtocol(const C_OscCanProtocol::E_Type oe_Protocol)
 {
-   uint32_t u32_NodeCounter;
-
    std::vector<uint32_t> c_NodeIndexes;
    std::vector<uint32_t> c_InterfaceIndexes;
    std::vector<uint32_t> c_NodeIndexesWithInterfaceDuplicates;
@@ -166,7 +164,7 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OscCanProtocol::E_Type oe_Pr
    if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
    {
       // get all the nodes using the protocol
-      for (u32_NodeCounter = 0U; u32_NodeCounter < c_NodeIndexes.size(); ++u32_NodeCounter)
+      for (uint32_t u32_NodeCounter = 0U; u32_NodeCounter < c_NodeIndexes.size(); ++u32_NodeCounter)
       {
          const C_OscNode * const pc_Node =
             C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(c_NodeIndexes[u32_NodeCounter]);
@@ -175,9 +173,8 @@ void C_SdBueNodeSelectorWidget::SetProtocol(const C_OscCanProtocol::E_Type oe_Pr
          {
             // get the protocols
             std::vector<const C_OscCanProtocol *> c_Protocols = pc_Node->GetCanProtocolsConst(oe_Protocol);
-            uint32_t u32_Counter;
 
-            for (u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
+            for (uint32_t u32_Counter = 0U; u32_Counter < c_Protocols.size(); ++u32_Counter)
             {
                const C_OscCanProtocol * const pc_Protcol = c_Protocols[u32_Counter];
                if (c_InterfaceIndexes[u32_NodeCounter] < pc_Protcol->c_ComMessages.size())

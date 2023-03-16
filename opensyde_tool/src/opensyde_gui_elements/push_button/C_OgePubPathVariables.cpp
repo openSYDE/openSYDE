@@ -14,6 +14,7 @@
 #include "precomp_headers.hpp"
 
 #include "constants.hpp"
+#include "C_OscUtils.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OgePubPathVariables.hpp"
 #include "C_OgeLabGenericNoPaddingNoMargins.hpp"
@@ -22,6 +23,7 @@
 using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -96,7 +98,7 @@ void C_OgePubPathVariables::AddDatablockSection(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubPathVariables::m_OpenSydeExeTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_OPENSYDE_BIN));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_OPENSYDE_BIN.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -107,7 +109,7 @@ void C_OgePubPathVariables::m_OpenSydeExeTriggered(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubPathVariables::m_OpenSydeProjTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_OPENSYDE_PROJ));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_OPENSYDE_PROJ.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -118,7 +120,7 @@ void C_OgePubPathVariables::m_OpenSydeProjTriggered(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubPathVariables::m_DataBlockProjTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_DATABLOCK_PROJ));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_DATABLOCK_PROJ.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -129,7 +131,7 @@ void C_OgePubPathVariables::m_DataBlockProjTriggered(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubPathVariables::m_UserNameTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_USER_NAME));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_USER_NAME.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -140,5 +142,5 @@ void C_OgePubPathVariables::m_UserNameTriggered(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePubPathVariables::m_ComputerNameTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_COMPUTER_NAME));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_COMPUTER_NAME.c_str()));
 }

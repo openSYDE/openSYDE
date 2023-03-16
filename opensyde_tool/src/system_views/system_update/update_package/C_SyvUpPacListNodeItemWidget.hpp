@@ -41,7 +41,7 @@ public:
    explicit C_SyvUpPacListNodeItemWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                          const QString & orc_DeviceName, const bool oq_FileBased,
                                          const bool oq_StwFlashloader, QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvUpPacListNodeItemWidget();
+   ~C_SyvUpPacListNodeItemWidget() override;
 
    QWidget * GetListParent(void);
 

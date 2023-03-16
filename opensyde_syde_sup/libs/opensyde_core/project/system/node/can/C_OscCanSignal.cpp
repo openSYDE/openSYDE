@@ -43,7 +43,8 @@ C_OscCanSignal::C_OscCanSignal(void) :
    e_MultiplexerType(eMUX_DEFAULT),
    u16_MultiplexValue(0),
    u16_CanOpenManagerObjectDictionaryIndex(0),
-   u8_CanOpenManagerObjectDictionarySubIndex(0)
+   u8_CanOpenManagerObjectDictionarySubIndex(0),
+   u32_J1939SuspectParameterNumber(0U)
 {
 }
 
@@ -139,6 +140,8 @@ void C_OscCanSignal::CalcHash(uint32_t & oru32_HashValue, const bool oq_R20Compa
                                           sizeof(this->u16_CanOpenManagerObjectDictionaryIndex), oru32_HashValue);
       stw::scl::C_SclChecksums::CalcCRC32(&this->u8_CanOpenManagerObjectDictionarySubIndex,
                                           sizeof(this->u8_CanOpenManagerObjectDictionarySubIndex), oru32_HashValue);
+      stw::scl::C_SclChecksums::CalcCRC32(&this->u32_J1939SuspectParameterNumber,
+                                          sizeof(this->u32_J1939SuspectParameterNumber), oru32_HashValue);
    }
 }
 

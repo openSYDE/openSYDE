@@ -1113,15 +1113,13 @@ void C_SdNdeNodePropertiesWidget::m_SupportedProtocolChange(void)
    // Update the com interface routing settings in the table
    if (pc_Node != NULL)
    {
-      uint16_t u16_ComIfCnt;
       const C_OscDeviceDefinition * const pc_DevDef = pc_Node->pc_DeviceDefinition;
-
       const C_OscNodeProperties c_NodeProp = pc_Node->c_Properties;
 
       tgl_assert(pc_DevDef != NULL);
       if (pc_DevDef != NULL)
       {
-         for (u16_ComIfCnt = 0U;
+         for (uint16_t u16_ComIfCnt = 0U;
               u16_ComIfCnt <
               (static_cast<uint16_t>(pc_DevDef->u8_NumCanBusses) +
                static_cast<uint16_t>(pc_DevDef->u8_NumEthernetBusses));

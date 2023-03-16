@@ -23,6 +23,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
+using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui_elements;
@@ -60,8 +61,8 @@ C_SyvUpPacListNodeItemPemFileWidget::C_SyvUpPacListNodeItemPemFileWidget(const u
                                                                          QWidget * const opc_Parent) :
    C_SyvUpPacListNodeItemWidget(ou32_ViewIndex, ou32_NodeIndex, orc_DeviceName, oq_FileBased,
                                 oq_StwFlashloader, opc_Parent),
-   me_StateSecurity(C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE),
-   me_StateDebugger(C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE)
+   me_StateSecurity(C_OscViewNodeUpdate::eST_SEC_NO_CHANGE),
+   me_StateDebugger(C_OscViewNodeUpdate::eST_DEB_NO_CHANGE)
 {
    this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security UNKNOWN"));
    this->mpc_Ui->pc_LabelSecurity->SetFontPixel(10);
@@ -142,8 +143,8 @@ bool C_SyvUpPacListNodeItemPemFileWidget::IsViewFileInfoPossible(void) const
    \param[in]  oe_StateDebugger  Debugger state of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListNodeItemPemFileWidget::SetPemStates(const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                       const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+void C_SyvUpPacListNodeItemPemFileWidget::SetPemStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                       const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
 {
    this->me_StateDebugger = oe_StateDebugger;
    this->me_StateSecurity = oe_StateSecurity;
@@ -151,13 +152,13 @@ void C_SyvUpPacListNodeItemPemFileWidget::SetPemStates(const C_PuiSvNodeUpdate::
    //lint -e{9042} Warning wanted if new cases are added
    switch (this->me_StateSecurity)
    {
-   case C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE:
+   case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
       this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security UNKNOWN"));
       break;
-   case C_PuiSvNodeUpdate::eST_SEC_ACTIVATE:
+   case C_OscViewNodeUpdate::eST_SEC_ACTIVATE:
       this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security ON"));
       break;
-   case C_PuiSvNodeUpdate::eST_SEC_DEACTIVATE:
+   case C_OscViewNodeUpdate::eST_SEC_DEACTIVATE:
       this->mpc_Ui->pc_LabelSecurity->setText(C_GtGetText::h_GetText("Security OFF"));
       break;
    }
@@ -165,19 +166,19 @@ void C_SyvUpPacListNodeItemPemFileWidget::SetPemStates(const C_PuiSvNodeUpdate::
    //lint -e{9042} Warning wanted if new cases are added
    switch (this->me_StateDebugger)
    {
-   case C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE:
+   case C_OscViewNodeUpdate::eST_DEB_NO_CHANGE:
       this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger UNKNOWN"));
       break;
-   case C_PuiSvNodeUpdate::eST_DEB_ACTIVATE:
+   case C_OscViewNodeUpdate::eST_DEB_ACTIVATE:
       this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger ON"));
       break;
-   case C_PuiSvNodeUpdate::eST_DEB_DEACTIVATE:
+   case C_OscViewNodeUpdate::eST_DEB_DEACTIVATE:
       this->mpc_Ui->pc_LabelDebugger->setText(C_GtGetText::h_GetText("Debugger OFF"));
       break;
    }
 
-   this->mpc_Ui->pc_LabelSecurity->setVisible(this->me_StateSecurity != C_PuiSvNodeUpdate::eST_SEC_NO_CHANGE);
-   this->mpc_Ui->pc_LabelDebugger->setVisible(this->me_StateDebugger != C_PuiSvNodeUpdate::eST_DEB_NO_CHANGE);
+   this->mpc_Ui->pc_LabelSecurity->setVisible(this->me_StateSecurity != C_OscViewNodeUpdate::eST_SEC_NO_CHANGE);
+   this->mpc_Ui->pc_LabelDebugger->setVisible(this->me_StateDebugger != C_OscViewNodeUpdate::eST_DEB_NO_CHANGE);
 
    //Adapt file path label to changes in layout
    this->m_UpateFilePathLabel();
@@ -190,8 +191,8 @@ void C_SyvUpPacListNodeItemPemFileWidget::SetPemStates(const C_PuiSvNodeUpdate::
    \param[out]      ore_StateDebugger   Debugger state of node
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SyvUpPacListNodeItemPemFileWidget::GetPemStates(C_PuiSvNodeUpdate::E_StateSecurity & ore_StateSecurity,
-                                                       C_PuiSvNodeUpdate::E_StateDebugger & ore_StateDebugger) const
+void C_SyvUpPacListNodeItemPemFileWidget::GetPemStates(C_OscViewNodeUpdate::E_StateSecurity & ore_StateSecurity,
+                                                       C_OscViewNodeUpdate::E_StateDebugger & ore_StateDebugger) const
 {
    ore_StateDebugger = this->me_StateDebugger;
    ore_StateSecurity = this->me_StateSecurity;

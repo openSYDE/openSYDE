@@ -27,7 +27,7 @@ class C_OgeCbxTableHalc :
 
 public:
    explicit C_OgeCbxTableHalc(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeCbxTableHalc(void);
+   ~C_OgeCbxTableHalc(void) override;
 
 private:
    //Avoid call

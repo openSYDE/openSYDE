@@ -138,7 +138,24 @@ void C_SdBueMessageTableView::LoadUserSettings(const std::vector<int32_t> & orc_
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::SaveUserSettings(std::vector<int32_t> & orc_Values) const
 {
+   const std::map<C_SdBueMessageTableModel::E_Columns,
+                  uint32_t> c_DefaultColumnWidths = C_SdBueMessageTableView::mh_GetDefaultColumnWidths();
+
    orc_Values = this->m_GetColumnWidths();
+   for (uint32_t u32_It = 0UL; u32_It < orc_Values.size(); ++u32_It)
+   {
+      if (orc_Values[u32_It] == 0L)
+      {
+         const std::map<C_SdBueMessageTableModel::E_Columns,
+                        uint32_t>::const_iterator c_It = c_DefaultColumnWidths.find(C_SdBueMessageTableModel::h_ColumnToEnum(
+                                                                                       u32_It));
+         if (c_It != c_DefaultColumnWidths.cend())
+         {
+            //Column hidden, use default instead
+            orc_Values[u32_It] = static_cast<int32_t>(c_It->second);
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -252,22 +269,51 @@ void C_SdBueMessageTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Even
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessageTableView::m_InitColumns(void)
 {
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eINDEX), 40);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eICON), 26);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eENABLED), 54);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eNAME), 206);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCOMMENT), 206);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_OPEN_INDEX), 54);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eEXTENDED), 71);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_ID), 72);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCOB_ID), 228);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eDLC), 44);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eTX_METHOD), 90);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCYCLE_TIME), 105);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eNOT_EARLIER_THAN), 135);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eNOT_LATER_THAN), 145);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eTRANSMITTER), 90);
-   this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eRECEIVER), 106);
+   const
+   std::map<C_SdBueMessageTableModel::E_Columns,
+            uint32_t> c_ColumnWidths = C_SdBueMessageTableView::mh_GetDefaultColumnWidths();
+
+   for (std::map<C_SdBueMessageTableModel::E_Columns,
+                 uint32_t>::const_iterator c_ItEntry = c_ColumnWidths.cbegin(); c_ItEntry != c_ColumnWidths.cend();
+        ++c_ItEntry)
+   {
+      this->setColumnWidth(C_SdBueMessageTableModel::h_EnumToColumn(c_ItEntry->first), c_ItEntry->second);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default column widths
+
+   \return
+   Default column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<C_SdBueMessageTableModel::E_Columns, uint32_t> C_SdBueMessageTableView::mh_GetDefaultColumnWidths()
+{
+   std::map<C_SdBueMessageTableModel::E_Columns, uint32_t> c_ColumnWidths;
+   c_ColumnWidths[C_SdBueMessageTableModel::eINDEX] = 40;
+   c_ColumnWidths[C_SdBueMessageTableModel::eICON] = 26;
+   c_ColumnWidths[C_SdBueMessageTableModel::eENABLED] = 54;
+   c_ColumnWidths[C_SdBueMessageTableModel::eNAME] = 206;
+   c_ColumnWidths[C_SdBueMessageTableModel::eCOMMENT] = 206;
+   c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_PGN] = 56;
+   c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_PRIORITY] = 50;
+   c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_SOURCE_ADDRESS] = 94;
+   c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_DESTINATION_ADDRESS] = 118;
+   c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_FORMAT] = 50;
+   c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_EDP_AND_DP] = 55;
+   c_ColumnWidths[C_SdBueMessageTableModel::eCAN_OPEN_INDEX] = 54;
+   c_ColumnWidths[C_SdBueMessageTableModel::eEXTENDED] = 71;
+   c_ColumnWidths[C_SdBueMessageTableModel::eCAN_ID] = 72;
+   c_ColumnWidths[C_SdBueMessageTableModel::eCOB_ID] = 228;
+   c_ColumnWidths[C_SdBueMessageTableModel::eDLC] = 44;
+   c_ColumnWidths[C_SdBueMessageTableModel::eTX_METHOD] = 90;
+   c_ColumnWidths[C_SdBueMessageTableModel::eCYCLE_TIME] = 105;
+   c_ColumnWidths[C_SdBueMessageTableModel::eNOT_EARLIER_THAN] = 135;
+   c_ColumnWidths[C_SdBueMessageTableModel::eNOT_LATER_THAN] = 145;
+   c_ColumnWidths[C_SdBueMessageTableModel::eTRANSMITTER] = 90;
+   c_ColumnWidths[C_SdBueMessageTableModel::eRECEIVER] = 106;
+   return c_ColumnWidths;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -278,23 +324,58 @@ void C_SdBueMessageTableView::m_HandleColumnVisibility(void)
 {
    if (this->mpc_SyncManager != NULL)
    {
+      bool q_ShowEnabled;
+      bool q_ShowCanOpenIndex;
+      bool q_ShowCanId;
+      bool q_ShowCobId;
+      bool q_ShowJ1939;
+      bool q_ShowCycleTime;
       if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
       {
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eENABLED), false);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
-                                  C_SdBueMessageTableModel::eCAN_OPEN_INDEX), false);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_ID), true);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCOB_ID), false);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCYCLE_TIME), true);
+         q_ShowEnabled = true;
+         q_ShowCanOpenIndex = true;
+         q_ShowCanId = false;
+         q_ShowCobId = true;
+         q_ShowCycleTime = false;
+         q_ShowJ1939 = false;
+      }
+      else if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eJ1939)
+      {
+         q_ShowEnabled = false;
+         q_ShowCanOpenIndex = false;
+         q_ShowCanId = true;
+         q_ShowCobId = false;
+         q_ShowCycleTime = true;
+         q_ShowJ1939 = true;
       }
       else
       {
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eENABLED), true);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_OPEN_INDEX),
-                               true);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_ID), false);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCOB_ID), true);
-         this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCYCLE_TIME), false);
+         q_ShowEnabled = false;
+         q_ShowCanOpenIndex = false;
+         q_ShowCanId = true;
+         q_ShowCobId = false;
+         q_ShowCycleTime = true;
+         q_ShowJ1939 = false;
       }
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eENABLED),
+                            !q_ShowEnabled);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_OPEN_INDEX),
+                            !q_ShowCanOpenIndex);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCAN_ID), !q_ShowCanId);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(C_SdBueMessageTableModel::eCOB_ID), !q_ShowCobId);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eCYCLE_TIME), !q_ShowCycleTime);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eJ1939_PGN), !q_ShowJ1939);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eJ1939_PRIORITY), !q_ShowJ1939);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eJ1939_SOURCE_ADDRESS), !q_ShowJ1939);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eJ1939_DESTINATION_ADDRESS), !q_ShowJ1939);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eJ1939_FORMAT), !q_ShowJ1939);
+      this->setColumnHidden(C_SdBueMessageTableModel::h_EnumToColumn(
+                               C_SdBueMessageTableModel::eJ1939_EDP_AND_DP), !q_ShowJ1939);
    }
 }

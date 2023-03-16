@@ -41,7 +41,7 @@ C_OscComLoggerProtocols::C_OscComLoggerProtocols(void) :
    C_CanMonProtocols()
 {
    // Reassign the openSYDE protocol with the derived variant with system definition interpretation
-   this->mapc_Protocols[CMONL7ProtocolOpenSYDE] = &mc_ProtocolOpenSydeExtended;
+   this->mapc_Protocols[eCMON_L7_PROTOCOL_OPEN_SYDE] = &mc_ProtocolOpenSydeExtended;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

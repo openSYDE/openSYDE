@@ -11,10 +11,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <cstring>
 
@@ -1332,7 +1328,7 @@ int32_t C_XFLProtocol::ReadFlash(const uint8_t ou8_NumBytes, const uint32_t ou32
       }
    }
    while ((TglGetTickCount() - u32_StartTime) < TIMEOUT_FLASH_MS); //"TIMEOUT_FLASH" used for compatibility reasons
-                                                                    // with previous client implementations
+                                                                   // with previous client implementations
    if (s32_Return != C_NO_ERR)
    {
       return s32_Return;
@@ -1373,7 +1369,7 @@ int32_t C_XFLProtocol::ReadFlash(const uint8_t ou8_NumBytes, const uint32_t ou32
          }
       }
       while ((TglGetTickCount() - u32_StartTime) < TIMEOUT_FLASH_MS); //"TIMEOUT_FLASH" used for compatibility reasons
-                                                                       // with previous client implementations
+                                                                      // with previous client implementations
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;

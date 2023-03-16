@@ -179,7 +179,7 @@ void C_SdClipBoardHelper::h_StoreDataPoolLists(const std::vector<C_OscNodeDataPo
    c_StringXml.CreateAndSelectNodeChild("core");
    c_StringXml.CreateAndSelectNodeChild("lists");
 
-   C_OscNodeDataPoolFiler::h_SaveDataPoolLists(orc_OscContent, c_StringXml);
+   C_OscNodeDataPoolFiler::h_SaveDataPoolLists(orc_OscContent, c_StringXml, ore_Type);
 
    c_StringXml.SaveToString(c_XmlContent);
    mh_SetClipBoard(c_XmlContent.c_str());
@@ -272,15 +272,16 @@ int32_t C_SdClipBoardHelper::h_LoadToDataPoolLists(std::vector<C_OscNodeDataPool
 
    \param[in]  orc_OscContent    OSC content
    \param[in]  orc_UiContent     UI content
+   \param[in]  oe_DatapoolType   Datapool type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(
    const std::vector<C_OscNodeDataPoolListElement> & orc_OscContent,
-   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent)
+   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent, const C_OscNodeDataPool::E_Type oe_DatapoolType)
 {
    QString c_Tmp;
 
-   h_StoreDataPoolListElementsToString(orc_OscContent, orc_UiContent, c_Tmp);
+   h_StoreDataPoolListElementsToString(orc_OscContent, orc_UiContent, oe_DatapoolType, c_Tmp);
    mh_SetClipBoard(c_Tmp);
 }
 
@@ -307,12 +308,14 @@ int32_t C_SdClipBoardHelper::h_LoadToDataPoolListElementsFromClipBoard(
 
    \param[in]   orc_OscContent   OSC content
    \param[in]   orc_UiContent    UI content
+   \param[in]   oe_DatapoolType  Datapool type
    \param[out]  orc_Output       String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
    const std::vector<C_OscNodeDataPoolListElement> & orc_OscContent,
-   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent, QString & orc_Output)
+   const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent, const C_OscNodeDataPool::E_Type oe_DatapoolType,
+   QString & orc_Output)
 {
    stw::scl::C_SclString c_XmlContent;
    C_OscXmlParser c_StringXml;
@@ -330,7 +333,7 @@ void C_SdClipBoardHelper::h_StoreDataPoolListElementsToString(
    c_StringXml.CreateAndSelectNodeChild("core");
    c_StringXml.CreateAndSelectNodeChild("data-elements");
 
-   C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(orc_OscContent, c_StringXml);
+   C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(orc_OscContent, c_StringXml, oe_DatapoolType);
 
    c_StringXml.SaveToString(c_XmlContent);
    orc_Output = c_XmlContent.c_str();
@@ -672,11 +675,12 @@ int32_t C_SdClipBoardHelper::h_LoadToDataPoolListDataSetsFromString(
    \param[in]  orc_OwnerNodeInterfaceIndex   Owner node interface index
    \param[in]  orc_OwnerNodeDatapoolIndex    Owner node Datapool index
    \param[in]  orc_OwnerIsTxFlag             Owner has message as Tx flags
+   \param[in]  oe_ProtocolType               Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OscCanMessage> & orc_Messages,
-                                          const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,
-                                          const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag)
+                                          const std::vector<std::vector<C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, const std::vector<std::vector<C_PuiSdNodeDataPoolListElement> > & orc_UiSignalCommons, const std::vector<std::vector<C_PuiSdNodeCanSignal> > & orc_UiSignals, const std::vector<std::vector<QString> > & orc_OwnerNodeName, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex, const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex, const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag,
+                                          const opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType)
 {
    QString c_String;
 
@@ -686,14 +690,15 @@ void C_SdClipBoardHelper::h_StoreMessages(const std::vector<C_OscCanMessage> & o
    c_StringXml.CreateAndSelectNodeChild("clip-board");
    c_StringXml.CreateAndSelectNodeChild("core");
    c_StringXml.CreateAndSelectNodeChild("message");
-   C_OscNodeCommFiler::h_SaveNodeComMessages(orc_Messages, c_StringXml);
+   C_OscNodeCommFiler::h_SaveNodeComMessages(orc_Messages, c_StringXml, oe_ProtocolType);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "core");
    c_StringXml.CreateAndSelectNodeChild("message-common");
    for (uint32_t u32_ItMessage = 0; u32_ItMessage < orc_OscSignalCommons.size(); ++u32_ItMessage)
    {
       c_StringXml.CreateAndSelectNodeChild("data-elements");
-      C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(orc_OscSignalCommons[u32_ItMessage], c_StringXml);
+      C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(orc_OscSignalCommons[u32_ItMessage], c_StringXml,
+                                                         C_OscNodeDataPool::eCOM);
       //Return
       tgl_assert(c_StringXml.SelectNodeParent() == "message-common");
    }
@@ -964,15 +969,17 @@ int32_t C_SdClipBoardHelper::h_LoadMessages(std::vector<C_OscCanMessage> & orc_M
    \param[in]  orc_OscSignalCommons    Signal common osc data
    \param[in]  orc_UiSignalCommons     Signal common ui data
    \param[in]  orc_UiSignals           Signal ui data
+   \param[in]  oe_ProtocolType         Protocol type
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::h_StoreSignalsToClipboard(const std::vector<C_OscCanSignal> & orc_Signals,
-                                                    const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
-                                                    const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals)
+                                                    const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
+                                                    const opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType)
 {
    QString c_String;
 
-   mh_StoreSignalsToString(orc_Signals, orc_OscSignalCommons, orc_UiSignalCommons, orc_UiSignals, c_String);
+   mh_StoreSignalsToString(orc_Signals, orc_OscSignalCommons, orc_UiSignalCommons, orc_UiSignals, oe_ProtocolType,
+                           c_String);
    C_SdClipBoardHelper::mh_SetClipBoard(c_String);
 }
 
@@ -1322,11 +1329,12 @@ C_SdClipBoardHelper::C_SdClipBoardHelper(void) :
    \param[in]   orc_OscSignalCommons   Signal common osc data
    \param[in]   orc_UiSignalCommons    Signal common ui data
    \param[in]   orc_UiSignals          Signal ui data
+   \param[in]   oe_ProtocolType        Protocol type
    \param[out]  orc_Output             String output
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OscCanSignal> & orc_Signals,
-                                                  const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
+                                                  const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals, const opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType,
                                                   QString & orc_Output)
 {
    stw::scl::C_SclString c_XmlContent;
@@ -1335,11 +1343,11 @@ void C_SdClipBoardHelper::mh_StoreSignalsToString(const std::vector<C_OscCanSign
    c_StringXml.CreateAndSelectNodeChild("clip-board");
    c_StringXml.CreateAndSelectNodeChild("core");
    c_StringXml.CreateAndSelectNodeChild("com-signals");
-   C_OscNodeCommFiler::h_SaveNodeComSignals(orc_Signals, c_StringXml);
+   C_OscNodeCommFiler::h_SaveNodeComSignals(orc_Signals, c_StringXml, oe_ProtocolType);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "core");
    c_StringXml.CreateAndSelectNodeChild("data-elements");
-   C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(orc_OscSignalCommons, c_StringXml);
+   C_OscNodeDataPoolFiler::h_SaveDataPoolListElements(orc_OscSignalCommons, c_StringXml, C_OscNodeDataPool::eCOM);
    //Return
    tgl_assert(c_StringXml.SelectNodeParent() == "core");
    //Return

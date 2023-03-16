@@ -266,13 +266,13 @@ std::vector<QString> C_PuiSvDbDataElementDisplayFormatterConfig::GetValuesConten
          for (u32_ArrayCounter = 0U; u32_ArrayCounter < orc_Value.GetArraySize(); ++u32_ArrayCounter)
          {
             // For each array element an error return string
-            c_Return.push_back(C_GtGetText::h_GetText("Invalid Formatter"));
+            c_Return.emplace_back(C_GtGetText::h_GetText("Invalid Formatter"));
          }
       }
       else
       {
          // Special case string: Only one string as return value
-         c_Return.push_back(C_GtGetText::h_GetText("Invalid Formatter"));
+         c_Return.emplace_back(C_GtGetText::h_GetText("Invalid Formatter"));
       }
    }
 

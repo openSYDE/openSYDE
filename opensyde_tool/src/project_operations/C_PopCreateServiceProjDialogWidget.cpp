@@ -532,7 +532,7 @@ void C_PopCreateServiceProjDialogWidget::m_SavePermissionsToUserSettings(std::ve
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(u32_ItView);
          if (pc_View != NULL)
          {
-            const QString c_Name = pc_View->GetName();
+            const QString c_Name = pc_View->GetName().c_str();
             C_UsHandler::h_GetInstance()->SetViewPermission(c_Name, orc_ViewConfigs[u32_ItView]);
          }
       }

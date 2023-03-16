@@ -250,7 +250,7 @@ void C_SupSuSequences::m_ReportOpenSydeFlashloaderInformationRead(
    this->m_WriteLog(c_Message);
 
    // store current device information of openSYDE node
-   this->mc_OsyDeviceInformationIndexes.push_back(ou32_NodeIndex);
+   this->mc_OsyDeviceInformationIndexes.push_back(static_cast<uint16_t>(ou32_NodeIndex));
    this->mc_ActiveOsyDeviceInformation.push_back(orc_Info);
 }
 
@@ -282,7 +282,7 @@ void C_SupSuSequences::m_ReportStwFlashloaderInformationRead(
    this->m_WriteLog(c_Message);
 
    // store current device information of openSYDE node
-   this->mc_XflDeviceInformationIndexes.push_back(ou32_NodeIndex);
+   this->mc_XflDeviceInformationIndexes.push_back(static_cast<uint16_t>(ou32_NodeIndex));
    this->mc_ActiveXflDeviceInformation.push_back(orc_Info);
 }
 

@@ -280,6 +280,26 @@ bool C_SebScene::IsSelectionRelevantForProxyWidgetInteraction(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the necessary cursor type when hovered dependent of the cursor position
+
+   Default implementation does nothing. Override when necessary
+
+   \param[in]       orc_ScenePos     Scene position of cursor
+   \param[out]      ore_Cursor       Detected necessary cursor
+
+   \retval   true   Override cursor is necessary
+   \retval   false  Override cursor is not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SebScene::IsOverrideCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const
+{
+   Q_UNUSED(orc_ScenePos)
+   Q_UNUSED(ore_Cursor)
+
+   return false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Signal for update of current scaling
 
    \param[in]  orc_Transform  Current scaling

@@ -13,7 +13,7 @@
 #include "C_OsyHexFile.hpp"
 #include "C_SyvUtil.hpp"
 #include "C_SyvUpDeviceInfo.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 #include "C_OscSuSequencesNodeStates.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -91,9 +91,9 @@ private:
    void m_CheckThirdParty(void);
 
    void m_InitPackageData(const stw::opensyde_core::C_OscNode & orc_Node,
-                          const stw::opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInformation);
+                          const stw::opensyde_core::C_OscViewNodeUpdate & orc_UpdateInformation);
    void m_InitPackageDataForApplicationsFromFiles(const std::vector<QString> & orc_FinalFilePaths);
-   void m_InitPackageDataForOtherFiles(const stw::opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInformation);
+   void m_InitPackageDataForOtherFiles(const stw::opensyde_core::C_OscViewNodeUpdate & orc_UpdateInformation);
    void m_InitStatusFromPackage(const stw::opensyde_gui_logic::C_SyvUpDeviceInfo & orc_DeviceApplicationInfos,
                                 const stw::opensyde_core::C_OscNode & orc_Node);
 

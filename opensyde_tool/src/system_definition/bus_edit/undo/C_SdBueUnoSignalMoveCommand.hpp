@@ -36,8 +36,8 @@ public:
       stw::opensyde_gui::C_SdBueMessageSelectorTreeWidget * const opc_MessageTreeWidget,
       QUndoCommand * const opc_Parent = NULL);
 
-   virtual void redo(void);
-   virtual void undo(void);
+   void redo(void) override;
+   void undo(void) override;
 
 private:
    void m_Move(const std::vector<uint64_t> & orc_SourceUniqueId, const std::vector<uint32_t> & orc_SourceSignalIndex,

@@ -24,6 +24,7 @@
 #include "C_PuiSdHandler.hpp"
 #include "C_PuiSdUtil.hpp"
 #include "C_SdUtil.hpp"
+#include "C_OscCanUtil.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -85,9 +86,9 @@ void C_SdBueMessageTableModel::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  os32_Section       Section
+   \param[in]  os32_Section      Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  os32_Role          Role
+   \param[in]  os32_Role         Role
 
    \return
    Header string
@@ -120,6 +121,24 @@ QVariant C_SdBueMessageTableModel::headerData(const int32_t os32_Section, const 
          case eCOMMENT:
             c_Retval = C_GtGetText::h_GetText("Comment");
             break;
+         case eJ1939_PGN:
+            c_Retval = C_GtGetText::h_GetText("PGN");
+            break;
+         case eJ1939_PRIORITY:
+            c_Retval = C_GtGetText::h_GetText("Priority");
+            break;
+         case eJ1939_SOURCE_ADDRESS:
+            c_Retval = C_GtGetText::h_GetText("Source Address");
+            break;
+         case eJ1939_DESTINATION_ADDRESS:
+            c_Retval = C_GtGetText::h_GetText("Destination Address");
+            break;
+         case eJ1939_FORMAT:
+            c_Retval = C_GtGetText::h_GetText("Format");
+            break;
+         case eJ1939_EDP_AND_DP:
+            c_Retval = C_GtGetText::h_GetText("EDP/DP");
+            break;
          case eCAN_OPEN_INDEX:
             c_Retval = C_GtGetText::h_GetText("Index");
             break;
@@ -139,7 +158,7 @@ QVariant C_SdBueMessageTableModel::headerData(const int32_t os32_Section, const 
             c_Retval = C_GtGetText::h_GetText("Tx method");
             break;
          case eCYCLE_TIME:
-            c_Retval = C_GtGetText::h_GetText("Cycle time [ms]");
+            c_Retval = this->m_GetCycleTimeHeaderName();
             break;
          case eNOT_EARLIER_THAN:
             c_Retval = this->m_GetNotEarlierThanHeaderName();
@@ -205,7 +224,7 @@ int32_t C_SdBueMessageTableModel::columnCount(const QModelIndex & orc_Parent) co
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      s32_Retval = 16;
+      s32_Retval = 22;
    }
    return s32_Retval;
 }
@@ -214,7 +233,7 @@ int32_t C_SdBueMessageTableModel::columnCount(const QModelIndex & orc_Parent) co
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  os32_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    Data
@@ -245,6 +264,24 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int
                break;
             case eCOMMENT:
                c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_Comment;
+               break;
+            case eJ1939_PGN:
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_J1939Pgn;
+               break;
+            case eJ1939_PRIORITY:
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_J1939Priority;
+               break;
+            case eJ1939_SOURCE_ADDRESS:
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_J1939SourceAddress;
+               break;
+            case eJ1939_DESTINATION_ADDRESS:
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_J1939DestinationAddress;
+               break;
+            case eJ1939_FORMAT:
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_J1939Format;
+               break;
+            case eJ1939_EDP_AND_DP:
+               c_Retval = this->mc_MsgInfoAll[s32_Index].c_MessageData.c_J1939EdpAndDp;
                break;
             case eCAN_OPEN_INDEX:
                if (os32_Role == static_cast<int32_t>(Qt::EditRole))
@@ -352,6 +389,12 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int
          case eRECEIVER:
          case eENABLED:
          case eCOB_ID:
+         case eJ1939_PGN:
+         case eJ1939_PRIORITY:
+         case eJ1939_SOURCE_ADDRESS:
+         case eJ1939_DESTINATION_ADDRESS:
+         case eJ1939_FORMAT:
+         case eJ1939_EDP_AND_DP:
          case eCAN_OPEN_INDEX:
          default:
             //No decoration
@@ -381,6 +424,12 @@ QVariant C_SdBueMessageTableModel::data(const QModelIndex & orc_Index, const int
          case eRECEIVER:
          case eENABLED:
          case eCOB_ID:
+         case eJ1939_PGN:
+         case eJ1939_PRIORITY:
+         case eJ1939_SOURCE_ADDRESS:
+         case eJ1939_DESTINATION_ADDRESS:
+         case eJ1939_FORMAT:
+         case eJ1939_EDP_AND_DP:
          case eCAN_OPEN_INDEX:
          default:
             c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
@@ -481,27 +530,45 @@ C_SdBueMessageTableModel::E_Columns C_SdBueMessageTableModel::h_ColumnToEnum(con
       e_Retval = eCAN_ID;
       break;
    case 8:
-      e_Retval = eCOB_ID;
+      e_Retval = eJ1939_PGN;
       break;
    case 9:
-      e_Retval = eDLC;
+      e_Retval = eJ1939_PRIORITY;
       break;
    case 10:
-      e_Retval = eTX_METHOD;
+      e_Retval = eJ1939_SOURCE_ADDRESS;
       break;
    case 11:
-      e_Retval = eCYCLE_TIME;
+      e_Retval = eJ1939_DESTINATION_ADDRESS;
       break;
    case 12:
-      e_Retval = eNOT_EARLIER_THAN;
+      e_Retval = eJ1939_FORMAT;
       break;
    case 13:
-      e_Retval = eNOT_LATER_THAN;
+      e_Retval = eJ1939_EDP_AND_DP;
       break;
    case 14:
-      e_Retval = eTRANSMITTER;
+      e_Retval = eCOB_ID;
       break;
    case 15:
+      e_Retval = eDLC;
+      break;
+   case 16:
+      e_Retval = eTX_METHOD;
+      break;
+   case 17:
+      e_Retval = eCYCLE_TIME;
+      break;
+   case 18:
+      e_Retval = eNOT_EARLIER_THAN;
+      break;
+   case 19:
+      e_Retval = eNOT_LATER_THAN;
+      break;
+   case 20:
+      e_Retval = eTRANSMITTER;
+      break;
+   case 21:
       e_Retval = eRECEIVER;
       break;
    default:
@@ -552,29 +619,47 @@ int32_t C_SdBueMessageTableModel::h_EnumToColumn(const C_SdBueMessageTableModel:
    case eCAN_ID:
       s32_Retval = 7;
       break;
-   case eCOB_ID:
+   case eJ1939_PGN:
       s32_Retval = 8;
       break;
-   case eDLC:
+   case eJ1939_PRIORITY:
       s32_Retval = 9;
       break;
-   case eTX_METHOD:
+   case eJ1939_SOURCE_ADDRESS:
       s32_Retval = 10;
       break;
-   case eCYCLE_TIME:
+   case eJ1939_DESTINATION_ADDRESS:
       s32_Retval = 11;
       break;
-   case eNOT_EARLIER_THAN:
+   case eJ1939_FORMAT:
       s32_Retval = 12;
       break;
-   case eNOT_LATER_THAN:
+   case eJ1939_EDP_AND_DP:
       s32_Retval = 13;
       break;
-   case eTRANSMITTER:
+   case eCOB_ID:
       s32_Retval = 14;
       break;
-   case eRECEIVER:
+   case eDLC:
       s32_Retval = 15;
+      break;
+   case eTX_METHOD:
+      s32_Retval = 16;
+      break;
+   case eCYCLE_TIME:
+      s32_Retval = 17;
+      break;
+   case eNOT_EARLIER_THAN:
+      s32_Retval = 18;
+      break;
+   case eNOT_LATER_THAN:
+      s32_Retval = 19;
+      break;
+   case eTRANSMITTER:
+      s32_Retval = 20;
+      break;
+   case eRECEIVER:
+      s32_Retval = 21;
       break;
    default:
       s32_Retval = -1;
@@ -1117,6 +1202,59 @@ void C_SdBueMessageTableModel::m_FillMsgInfo(void)
          rc_Data.c_Transmitter = this->m_GetTransmitter(rc_Id, *pc_Message);
          rc_Data.c_Receiver = this->m_GetReceiver(rc_Id, *pc_Message);
          rc_Data.c_Icon = this->m_GetMessageIcon(rc_Id);
+
+         this->m_FillJ1939MsgInfo(rc_Data, *pc_Message);
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fill j1939 message info
+
+   \param[in,out]  orc_MessageTableData   Message table data
+   \param[in]      orc_MessageData        Message data
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageTableModel::m_FillJ1939MsgInfo(C_SdBueMessageTableModel::C_MsgTableData & orc_MessageTableData,
+                                                  const C_OscCanMessage & orc_MessageData)
+{
+   C_OscCanUtilJ1939PgInfo c_PgInfo;
+
+   C_OscCanUtil::h_GetJ1939PgInfoFromCanId(orc_MessageData.u32_CanId, c_PgInfo);
+
+   orc_MessageTableData.c_J1939Pgn = C_OscCanUtil::h_GetVisiblePgn(c_PgInfo.u32_Pgn);
+   orc_MessageTableData.c_J1939Priority = static_cast<uint32_t>(c_PgInfo.u8_Priority);
+   orc_MessageTableData.c_J1939SourceAddress = static_cast<uint32_t>(c_PgInfo.u8_SourceAddress);
+   if (c_PgInfo.q_HasDestinationAddress)
+   {
+      orc_MessageTableData.c_J1939DestinationAddress = QString::number(c_PgInfo.u8_PduSpecific);
+      orc_MessageTableData.c_J1939Format = C_GtGetText::h_GetText("PDU 1");
+   }
+   else
+   {
+      orc_MessageTableData.c_J1939DestinationAddress = C_GtGetText::h_GetText("All");
+      orc_MessageTableData.c_J1939Format = C_GtGetText::h_GetText("PDU 2");
+   }
+   orc_MessageTableData.c_J1939EdpAndDp = QString::number(c_PgInfo.u8_Edp) + QString::number(c_PgInfo.u8_Dp);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get "Cycle Time" header name
+
+   \retval
+    "Cycle Time" header name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_SdBueMessageTableModel::m_GetCycleTimeHeaderName(void) const
+{
+   QString c_Retval = C_GtGetText::h_GetText("Cycle Time [ms]");
+
+   if (this->mpc_SyncManager != NULL)
+   {
+      if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN_SAFETY)
+      {
+         c_Retval = C_GtGetText::h_GetText("Safety Cycle-Time [ms]");
+      }
+   }
+   return c_Retval;
 }

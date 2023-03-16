@@ -11,15 +11,10 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include "stwtypes.hpp"
 #include "C_SclResourceStrings.hpp"
-
 
 using namespace stw::scl;
 
@@ -102,6 +97,7 @@ void C_SCLResourceStrings::SortByIndex(void)
    int32_t s32_Index;    //needs to be signed !
    int32_t s32_Position; //needs to be signed !
    C_SclResourceString t_Key;
+
    for (s32_Index = 1; s32_Index < static_cast<int32_t>(mac_Strings.GetLength()); s32_Index++)
    {
       t_Key = mac_Strings[s32_Index];
@@ -121,6 +117,7 @@ void C_SCLResourceStrings::SortByIndex(void)
 void C_SCLResourceStrings::SetStringTable(const C_SclResourceString * const opc_Strings, const uint16_t ou16_NumStrings)
 {
    uint16_t u16_Index;
+
    try
    {
       mac_Strings.SetLength(ou16_NumStrings);

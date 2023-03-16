@@ -227,7 +227,7 @@ int32_t C_OscDeviceManager::ChangeDevices(std::vector<C_OscDeviceDefinition> & o
          c_Ini.EraseSection(orc_DeviceGroup);
 
          // Write device count in the list in order
-         c_Ini.WriteInteger(orc_DeviceGroup, "DeviceCount", orc_Devices.size());
+         c_Ini.WriteInteger(orc_DeviceGroup, "DeviceCount", static_cast<int32_t>(orc_Devices.size()));
 
          for (uint32_t u32_ItDevice = 0; u32_ItDevice < orc_Devices.size(); ++u32_ItDevice)
          {

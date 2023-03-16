@@ -87,9 +87,9 @@ void C_SyvTopologyBaseScene::Load(void)
    m_AddAnyItemToScene(pc_PC);
    if (pc_View != NULL)
    {
-      if (pc_View->GetPcData().GetConnected() == true)
+      if (pc_View->GetOscPcData().GetConnected() == true)
       {
-         const uint32_t u32_BusIndex = pc_View->GetPcData().GetBusIndex();
+         const uint32_t u32_BusIndex = pc_View->GetOscPcData().GetBusIndex();
          QList<QGraphicsItem *> c_Items = this->items();
          C_GiLiBus * pc_Bus = NULL;
 
@@ -112,7 +112,7 @@ void C_SyvTopologyBaseScene::Load(void)
          }
          if (pc_Bus != NULL)
          {
-            m_AddPcBusConnector(pc_Bus, pc_PC, pc_View->GetPcData().GetConnectionData());
+            m_AddPcBusConnector(pc_Bus, pc_PC, pc_View->GetPuiPcData().GetConnectionData());
          }
          else
          {
@@ -121,7 +121,7 @@ void C_SyvTopologyBaseScene::Load(void)
       }
       else
       {
-         q_Change = pc_View->GetPcData().CheckIndirectDisconnection();
+         q_Change = pc_View->GetOscPcData().CheckIndirectDisconnection();
       }
    }
    //Set bus state
@@ -659,7 +659,7 @@ bool C_SyvTopologyBaseScene::m_HandlePcReconnectIfNecessary(QString & orc_BusNam
             C_GiLiBus * const pc_Item = dynamic_cast<C_GiLiBus *>(*c_ItItem);
             if (pc_Item != NULL)
             {
-               if (static_cast<uint32_t>(pc_Item->GetIndex()) == pc_PcData->GetPcData().GetBusIndex())
+               if (static_cast<uint32_t>(pc_Item->GetIndex()) == pc_PcData->GetOscPcData().GetBusIndex())
                {
                   //Check if valid
                   const bool q_Disabled = C_PuiSvHandler::h_GetInstance()->CheckBusDisabled(this->mu32_ViewIndex,

@@ -6,20 +6,12 @@
    \copyright   Copyright 2003 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolL2H
-#define CCMONProtocolL2H
+#ifndef CCMONPROTOCOLL2HPP
+#define CCMONPROTOCOLL2HPP
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
 #include "C_SclString.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -30,7 +22,7 @@ namespace cmon_protocol
 //----------------------------------------------------------------------------------------------------------------------
 
 ///Interpretation as layer two protocol (no L7 interpretation)
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolL2 :
+class C_CanMonProtocolL2 :
    public C_CanMonProtocolBase
 {
 public:

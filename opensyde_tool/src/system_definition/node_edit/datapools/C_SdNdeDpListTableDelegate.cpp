@@ -523,7 +523,7 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
       {
          const int32_t s32_Column = orc_Index.column();
          const C_SdNdeDpListTableModel::E_Columns e_Column = this->mpc_Model->ColumnToEnum(s32_Column);
-         bool q_DrawX = false;
+         bool q_Draw = false;
          switch (e_Column) //lint !e788 not columns get explicit handling
          {
          case C_SdNdeDpListTableModel::eAUTO_MIN_MAX:
@@ -534,7 +534,7 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
             if ((this->mpc_Model->flags(orc_Index) & static_cast<int32_t>(Qt::ItemIsEditable)) !=
                 static_cast<int32_t>(Qt::ItemIsEditable))
             {
-               q_DrawX = true;
+               q_Draw = true;
             }
             break;
          case C_SdNdeDpListTableModel::eMIN:
@@ -544,21 +544,14 @@ void C_SdNdeDpListTableDelegate::paint(QPainter * const opc_Painter, const QStyl
                 static_cast<int32_t>(Qt::ItemIsEditable))
             {
                //Check if special case
-               const C_PuiSdNodeDataPoolListElement * const pc_UiElement = this->mpc_Model->GetUiElement(orc_Index);
-               if (pc_UiElement != NULL)
-               {
-                  if (pc_UiElement->q_InterpretAsString == true)
-                  {
-                     q_DrawX = true;
-                  }
-               }
+               q_Draw = this->mpc_Model->IsElementInterpretedAsString(orc_Index);
             }
             break;
          default:
             //no handling
             break;
          }
-         if (q_DrawX == true)
+         if (q_Draw == true)
          {
             QPixmap c_ScaledDisabledPixmap;
             //Draw manually

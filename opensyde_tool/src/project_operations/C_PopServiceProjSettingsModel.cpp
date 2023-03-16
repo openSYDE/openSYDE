@@ -85,7 +85,7 @@ int32_t C_PopServiceProjSettingsModel::Init(const std::vector<uint32_t> & orc_El
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(u32_ViewCnt);
       if (pc_View != NULL)
       {
-         pc_TreeNode->c_Name = "VIEW #" + QString::number(u32_ViewCnt + 1UL) + " - " + pc_View->GetName();
+         pc_TreeNode->c_Name = "VIEW #" + QString::number(u32_ViewCnt + 1) + " - " + pc_View->GetName().c_str();
          pc_TreeNode->q_Enabled = true;
          pc_TreeNode->q_CheckBoxVisible = true;
          pc_TreeNode->q_Selectable = true;
@@ -252,7 +252,7 @@ void C_PopServiceProjSettingsModel::m_CheckInitItems(C_TblTreeModelCheckableItem
          }
          else
          {
-            c_ViewConfig = C_UsHandler::h_GetInstance()->GetViewPermissions(pc_View->GetName());
+            c_ViewConfig = C_UsHandler::h_GetInstance()->GetViewPermissions(pc_View->GetName().c_str());
          }
 
          for (uint32_t u32_ItNodeIndices = 0; u32_ItNodeIndices < orc_ViewIndices.size(); u32_ItNodeIndices++)

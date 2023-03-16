@@ -31,7 +31,7 @@ class C_SdNdeHalcChannelTreeView :
 
 public:
    C_SdNdeHalcChannelTreeView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeHalcChannelTreeView(void);
+   ~C_SdNdeHalcChannelTreeView(void) override;
 
    void SetNode(const uint32_t ou32_NodeIndex);
    void UpdateChannelText(const uint32_t ou32_DomainIndex, const uint32_t ou32_ChannelIndex,

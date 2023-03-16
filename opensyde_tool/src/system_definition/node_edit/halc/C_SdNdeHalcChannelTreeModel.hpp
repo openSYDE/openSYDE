@@ -59,7 +59,7 @@ private:
    std::vector<QIcon> mc_Icons;
 
    static void mh_SetChannelText(C_TblTreItem * const opc_Item, const QString & orc_ChannelName,
-                                 const QString & orc_ChannelID, const QString & orc_Comment);
+                                 const QString & orc_ChannelId, const QString & orc_Comment);
    static QIcon mh_InitIcon(const stw::opensyde_core::C_OscHalcDefDomain::E_Category oe_Category, const bool oq_Large,
                             const bool oq_Error, const bool oq_Linked);
    QIcon m_GetIcon(const stw::opensyde_core::C_OscHalcDefDomain::E_Category oe_Category, const bool oq_Large,

@@ -172,8 +172,8 @@ void C_NagViewItem::LoadUserSettings(void)
       {
          if ((!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive()) || (pc_View->GetServiceModeActive()))
          {
-            const C_UsSystemView c_ViewUserSettings = C_UsHandler::h_GetInstance()->GetProjSvSetupView(
-               pc_View->GetName());
+            const C_UsSystemView c_ViewUserSettings =
+               C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
             q_NewVal = c_ViewUserSettings.GetNavigationExpandedStatus();
          }
          else
@@ -201,7 +201,7 @@ void C_NagViewItem::SaveUserSettings(void) const
 
    if (pc_View != NULL)
    {
-      C_UsHandler::h_GetInstance()->SetProjSvNavigationExpandedStatus(pc_View->GetName(), this->m_IsExpanded());
+      C_UsHandler::h_GetInstance()->SetProjSvNavigationExpandedStatus(pc_View->GetName().c_str(), this->m_IsExpanded());
    }
 }
 
@@ -218,9 +218,8 @@ void C_NagViewItem::UpdateName(void) const
       const QString c_ServiceModeInfo =
          ((!C_PuiSvHandler::h_GetInstance()->GetServiceModeActive()) ||
           (pc_View->GetServiceModeActive())) ? "" : C_GtGetText::h_GetText(" (no access)");
-      const QString c_Name = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2%3")).arg(
-         this->mu32_ViewIndex + 1UL).arg(
-         pc_View->GetName()).arg(c_ServiceModeInfo);
+      const QString c_Name = static_cast<QString>(C_GtGetText::h_GetText("VIEW #%1 - %2%3"))
+                             .arg(this->mu32_ViewIndex + 1).arg(pc_View->GetName().c_str()).arg(c_ServiceModeInfo);
       this->mpc_Ui->pc_LabelHeading->setText(c_Name);
    }
 }
@@ -552,7 +551,7 @@ void C_NagViewItem::m_OnNameEditFinished(void)
          const C_PuiSvData * const pc_ViewData = C_PuiSvHandler::h_GetInstance()->GetView(u32_ItView);
          if (pc_ViewData != NULL)
          {
-            if (pc_ViewData->GetName().compare(this->mpc_Ui->pc_LineEditHeading->text()) == 0)
+            if (pc_ViewData->GetName().AnsiCompare(this->mpc_Ui->pc_LineEditHeading->text().toStdString().c_str()) == 0)
             {
                q_Found = true;
             }
@@ -762,7 +761,7 @@ void C_NagViewItem::m_OnEditButton(void) const
       this->mpc_Ui->pc_LabelHeading->setVisible(false);
       this->mpc_Ui->pc_LineEditHeading->setVisible(true);
       //Configure text edit
-      this->mpc_Ui->pc_LineEditHeading->setText(pc_View->GetName());
+      this->mpc_Ui->pc_LineEditHeading->setText(pc_View->GetName().c_str());
       this->mpc_Ui->pc_LineEditHeading->setFocus();
       this->mpc_Ui->pc_LineEditHeading->selectAll();
    }

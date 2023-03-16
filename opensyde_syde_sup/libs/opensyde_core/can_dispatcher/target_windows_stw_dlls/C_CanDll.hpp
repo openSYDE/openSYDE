@@ -9,8 +9,8 @@
    \copyright   Copyright 2008 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCANDLLH
-#define CCANDLLH
+#ifndef CCANDLLHPP
+#define CCANDLLHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <windows.h>
@@ -22,14 +22,6 @@ namespace stw
 namespace can
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-#ifndef STWCAN_PACKAGE
-#ifdef __BORLANDC__
-//maybe we want this module to be put into a VCL package ...
-#define STWCAN_PACKAGE __declspec(package)
-#else
-#define STWCAN_PACKAGE
-#endif
-#endif
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 //function pointer types:
@@ -47,7 +39,7 @@ typedef int32_t (WINAPI * PR_CAN_SEND_EXTMSG)(const STW_CAN_EXTMSG * const opt_M
 typedef int32_t (WINAPI * PR_CAN_READ_EXTMSG)(STW_CAN_EXTMSG * const opt_Msg);
 typedef int32_t (WINAPI * PR_CAN_SEND_EXTRTR)(const STW_CAN_EXTMSG * const opt_Msg);
 typedef int32_t (WINAPI * PR_CAN_INIT_ONE_ID)(const int32_t os32_Bitrate,
-                                              const uint32_t ou32_ID);
+                                              const uint32_t ou32_Id);
 
 //functions only available for stream based communication interfaces:
 typedef int32_t (WINAPI * PR_SER_GET_TX_BUF_COUNT)(uint32_t * const opu32_NumBytes,
@@ -78,7 +70,7 @@ typedef int32_t (WINAPI * PR_CANext_Status)(const uint8_t ou8_Channel,
                                             T_STWCAN_Status * const opt_Status);
 typedef int32_t (WINAPI * PR_CANext_Init_One_ID)(const uint8_t ou8_Channel,
                                                  const int32_t os32_Bitrate,
-                                                 const uint32_t ou32_ID);
+                                                 const uint32_t ou32_Id);
 typedef int32_t (WINAPI * PR_CANext_DLL_Info)(const uint8_t ou8_Channel,
                                               T_STWCAN_DLLInfo * const opt_Info);
 typedef int32_t (WINAPI * PR_CANext_Get_Num_Channels)(void);
@@ -106,7 +98,7 @@ typedef int32_t (WINAPI * PR_CANtcp_Get_Device_Name)(const uint8_t ou8_Channel,
 //lint -sem(stw::can::C_CAN_DLL::m_Init,initializer)
 //lint -sem(stw::can::C_CAN_DLL::m_Exit,cleanup)
 ///Interface class to use STW CAN DLL functions
-class STWCAN_PACKAGE C_CanDll
+class C_CanDll
 {
 private:
    CRITICAL_SECTION mt_Lock;
@@ -151,7 +143,7 @@ private:
    PR_CANtcp_Read_Device_List_From_Server mpr_CANtcp_Read_Device_List_From_Server;
    PR_CANtcp_Get_Device_Name mpr_CANtcp_Get_Device_Name;
 
-   int32_t m_Init(const char_t * const opcn_DLLPath);
+   int32_t m_Init(const char_t * const opcn_DllPath);
    void m_Exit(void);
    void m_ClearFunctionPointers(void);
 
@@ -159,7 +151,7 @@ public:
    C_CanDll(const C_CanDll & orc_Souce);               //not implemented -> prevent copying
    C_CanDll & operator = (const C_CanDll & orc_Souce); //not implemented -> prevent assignment
 
-   C_CanDll(const char_t * const opcn_DLLPath);
+   C_CanDll(const char_t * const opcn_DllPath);
    ~C_CanDll();
 
    int32_t CAN_Init(void);

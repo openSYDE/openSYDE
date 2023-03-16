@@ -923,7 +923,7 @@ void C_SyvDaChaWidget::m_CallProperties(void)
          pc_Dialog->SetTheme(rc_Box.e_DisplayStyle);
 
          //Resize
-         c_New->SetSize(QSize(800, 500));
+         c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithoutDesignAndPreview());
 
          if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
          {

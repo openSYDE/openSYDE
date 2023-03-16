@@ -5,7 +5,8 @@
 
    This is the base class and contains most functionality of SYDEsup.
    SYDEsup is a console application for updating your system with a Service
-   Update Package created with openSYDE.
+   Update Package created with openSYDE. It also can create this package
+   from an openSYDE project.
 
    \copyright   Copyright 2018 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
@@ -28,6 +29,9 @@
 #include "C_SupSuSequences.hpp"
 #include "C_OscBinaryHash.hpp"
 #include "C_OsyHexFile.hpp"
+#include "C_OscSystemDefinitionFiler.hpp"
+#include "C_OscSystemFilerUtil.hpp"
+#include "C_OscViewFiler.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -57,6 +61,8 @@ C_SydeSup::C_SydeSup(void) :
    mpc_EthDispatcher(NULL),
    mq_Quiet(false),
    mq_OnlyNecessaryFiles(false),
+   me_OperationMode(eMODE_UPDATE),
+   mc_OperationMode(""),
    mc_SupFilePath(""),
    mc_CanDriver(""),
    mc_LogPath(""),
@@ -86,14 +92,18 @@ C_SydeSup::~C_SydeSup(void)
    * -h for help
    * -v for version
    * -m for manual page
+   * -o for operation mode (one of: update, createpackage)
    * -n for only transfer files if necessary
    * -q for quiet
    * -p for package file path
    * -i for CAN interface information (optional but needed if active bus in package is of type CAN, not Ethernet)
    * -z for path to unzip directory (optional)
    * -l for path to log file (optional)
+   * -s for openSYDE project file path
+   * -d for device definition file path
+   * -w for view name
 
-   \param[in]  osn_Argc    number of command line arguments
+   \param[in]  os32_Argc   number of command line arguments
    \param[in]  oppcn_Argv  command line arguments
 
    \return
@@ -133,6 +143,9 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          "necessaryfiles",    no_argument,         NULL,    'n'
       },
       {
+         "operationmode",     required_argument,   NULL,    'o'
+      },
+      {
          "packagefile",       required_argument,   NULL,    'p'
       },
       {
@@ -148,14 +161,23 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          "certificatesdir",   required_argument,   NULL,    'c'
       },
       {
-         NULL,           0,                   NULL,    0
+         "opensydeproject",   required_argument,   NULL,    's'
+      },
+      {
+         "devicedefinition",  required_argument,   NULL,    'd'
+      },
+      {
+         "systemview",        required_argument,   NULL,    'w'
+      },
+      {
+         NULL,                0,                   NULL,    0
       }
    };
 
    do
    {
       int32_t s32_Index;
-      s32_Result = getopt_long(os32_Argc, oppcn_Argv, "hmvqnp:i:z:l:c:", &ac_Options[0], &s32_Index);
+      s32_Result = getopt_long(os32_Argc, oppcn_Argv, "hmvqnp:o:i:z:l:c:s:w:d:", &ac_Options[0], &s32_Index);
       if (s32_Result != -1)
       {
          switch (s32_Result)
@@ -176,6 +198,9 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          case 'n':
             mq_OnlyNecessaryFiles = true;
             break;
+         case 'o':
+            mc_OperationMode = optarg;
+            break;
          case 'p':
             mc_SupFilePath = optarg;
             break;
@@ -190,6 +215,15 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
             break;
          case 'c':
             mc_CertFolderPath = optarg;
+            break;
+         case 's':
+            mc_OsyProjectPath = optarg;
+            break;
+         case 'd':
+            mc_DeviceDefPath = optarg;
+            break;
+         case 'w':
+            mc_ViewName = optarg;
             break;
          case '?': //parser reports error (missing parameter option)
             q_ParseError = true;
@@ -244,21 +278,56 @@ C_SydeSup::E_Result C_SydeSup::ParseCommandLine(const int32_t os32_Argc, char_t 
          const stw::scl::C_SclString c_Time = __TIME__;
 
          // Initialize optional parameters and setup logging
-         e_Return = this->m_InitOptionalParameters(); // only error here is not-existing unzip directory
+         e_Return = this->m_InitOptionalParameters();
 
          // log extended version information
          h_WriteLog("SYDEsup Version", "SYDEsup Version: " + c_Version + ", MD5-Checksum: " + c_BinaryHash);
          h_WriteLog("SYDEsup Version", "   Binary: " + TglGetExePath(), false, mq_Quiet);
          h_WriteLog("SYDEsup Version", "   Build date: " + c_Date + " " + c_Time, false, mq_Quiet);
 
-         if (e_Return != eOK)
+         // After initialization of optional parameters: now we know the operation mode.
+         // So let's check further parameters are provided for create-package-mode.
+         if ((e_Return == eOK) && (me_OperationMode == eMODE_CREATEPACKAGE))
          {
-            h_WriteLog("Initialize Parameters",  this->mc_UnzipPath + " is no existing directory.", true);
+            if ((mc_OsyProjectPath == "") || (mc_DeviceDefPath == "") || (mc_ViewName == ""))
+            {
+               e_Return = eERR_PARSE_COMMAND_LINE;
+               h_WriteLog("Initialize Parameters",
+                          "Missing command line parameter for creating a Service Update Package, try -h. ", true);
+            }
          }
       }
    }
 
    return e_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Select operation mode and start the requested action (update system or create service update package).
+
+   We support two different modes. Either use SYDEsup for updating your system with an existing service update package
+   or use SYDEsup for creating a service update package.
+
+   This method is the entrance point for SYDEsup and triggers the actual requested action.
+
+   \return
+   see C_SydeSup::Update and C_SydeSup::CreatePackage for return values
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SydeSup::E_Result C_SydeSup::SelectModeAndStart(void)
+{
+   E_Result e_Result;
+
+   if (me_OperationMode == eMODE_CREATEPACKAGE)
+   {
+      e_Result = this->CreatePackage();
+   }
+   else
+   {
+      e_Result = this->Update();
+   }
+
+   return e_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -598,6 +667,148 @@ C_SydeSup::E_Result C_SydeSup::Update(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Create service update package from given project
+
+   Previous call to ParseCommandLineParameters required.
+
+   \return
+   eERR_CREATE_PROJ_LOAD_FAILED     Could not load project (system definition and/or system views)
+   eERR_CREATE_VIEW_NOT_FOUND       Could not find a view with the name provided by user
+   eERR_CREATE_ZIP_RD_RW            File writing problems occured on output file creation or deletion
+   eERR_CREATE_ZIP_CONFIG           Configuration problems occured on update package creation
+                                     (see C_OscSuServiceUpdatePackage::h_CreatePackage for further details)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SydeSup::E_Result C_SydeSup::CreatePackage(void)
+{
+   E_Result e_Result = eOK;
+   int32_t s32_Return;
+   C_SclString c_SysDefPath;
+   C_SclString c_SysViewPath;
+   C_OscSystemDefinition c_SystemDefinition;
+   C_OscViewData c_View;
+
+   std::vector<C_OscViewData> c_SysViews;
+
+   // Check if project file exists
+   if (TglFileExists(mc_OsyProjectPath) == false)
+   {
+      e_Result = eERR_CREATE_PROJ_LOAD_FAILED;
+   }
+
+   // Load system definition and views
+   if (e_Result == eOK)
+   {
+      C_OscSystemFilerUtil::h_AdaptProjectPathToSystemDefinition(mc_OsyProjectPath, c_SysDefPath);
+      C_OscSystemFilerUtil::h_AdaptProjectPathToSystemViews(mc_OsyProjectPath, c_SysViewPath);
+      s32_Return = C_OscSystemDefinitionFiler::h_LoadSystemDefinitionFile(c_SystemDefinition, c_SysDefPath,
+                                                                          mc_DeviceDefPath);
+      if (s32_Return == C_NO_ERR)
+      {
+         s32_Return = C_OscViewFiler::h_LoadSystemViewsFile(c_SysViews, c_SysViewPath, c_SystemDefinition.c_Nodes);
+      }
+      if (s32_Return != C_NO_ERR)
+      {
+         e_Result = eERR_CREATE_PROJ_LOAD_FAILED;
+      }
+   }
+
+   // Get selected view
+   if (e_Result == eOK)
+   {
+      e_Result = m_FindView(c_SysViews, c_View);
+   }
+
+   // If service update package already exists: remove it
+   if (e_Result == eOK)
+   {
+      if (TglFileExists(mc_SupFilePath) == true)
+      {
+         if (remove(mc_SupFilePath.c_str()) != 0)
+         {
+            e_Result = eERR_CREATE_ZIP_RD_RW;
+         }
+      }
+   }
+
+   // Collect information and create zip package
+   if (e_Result == eOK)
+   {
+      C_SclStringList c_Warnings;
+      C_SclString c_Error;
+      std::vector<uint8_t> c_NodeActiveFlags = c_View.GetNodeActiveFlags();
+      std::vector<C_OscSuSequences::C_DoFlash> c_ApplicationsToWrite;
+      std::vector<uint32_t> c_NodesUpdateOrder;
+
+      // First: fill applications to write
+      this->m_GetUpdatePackage(c_View, c_SystemDefinition, c_ApplicationsToWrite);
+
+      // Second: adapt node active flags (no files -> treat node as inactive)
+      tgl_assert(c_NodeActiveFlags.size() == c_ApplicationsToWrite.size());
+      for (uint32_t u32_NodeCounter = 0; u32_NodeCounter < c_ApplicationsToWrite.size(); ++u32_NodeCounter)
+      {
+         if ((c_ApplicationsToWrite[u32_NodeCounter].c_FilesToFlash.size() == 0) &&
+             (c_ApplicationsToWrite[u32_NodeCounter].c_FilesToWriteToNvm.size() == 0) &&
+             (c_ApplicationsToWrite[u32_NodeCounter].c_PemFile == ""))
+         {
+            c_NodeActiveFlags[u32_NodeCounter] = 0U;
+         }
+      }
+
+      // Last: determine node update order
+      for (uint32_t u32_UpdatePos = 0; u32_UpdatePos < c_View.GetAllNodeUpdateInformation().size(); ++u32_UpdatePos)
+      {
+         // search current update position
+         for (uint32_t u32_NodeCount = 0; u32_NodeCount < c_View.GetAllNodeUpdateInformation().size(); ++u32_NodeCount)
+         {
+            if ((c_NodeActiveFlags[u32_NodeCount] == 1U) &&
+                (u32_UpdatePos == c_View.GetAllNodeUpdateInformation()[u32_NodeCount].u32_NodeUpdatePosition))
+            {
+               c_NodesUpdateOrder.push_back(u32_NodeCount);
+            }
+         }
+      }
+
+      // Now we have all data collected and can create the package
+      s32_Return = C_OscSuServiceUpdatePackage::h_CreatePackage(mc_SupFilePath, c_SystemDefinition,
+                                                                c_View.GetOscPcData().GetBusIndex(),
+                                                                c_NodeActiveFlags,
+                                                                c_NodesUpdateOrder,
+                                                                c_ApplicationsToWrite,
+                                                                c_Warnings,
+                                                                c_Error, false, true);
+
+      // File writing issues
+      if ((s32_Return == C_RD_WR) || (s32_Return == C_RANGE) || (s32_Return == C_BUSY))
+      {
+         e_Result = eERR_CREATE_ZIP_RD_RW;
+      }
+      // Configuration issues
+      else if (s32_Return != C_NO_ERR)
+      {
+         e_Result = eERR_CREATE_ZIP_CONFIG;
+      }
+      else
+      {
+         // no error, no problem
+      }
+   }
+
+   // inform if successful
+   if (e_Result == eOK)
+   {
+      std::cout << "\n";
+      h_WriteLog("Create Update Package", "Successfully created update package \"" + mc_SupFilePath + "\".");
+      std::cout << &std::endl;
+   }
+
+   // inform user about errors
+   this->m_PrintStringFromError(e_Result);
+
+   return e_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Write to log file and print to console.
 
    Write detailed information with logging engine to log file but
@@ -636,12 +847,32 @@ void C_SydeSup::h_WriteLog(const stw::scl::C_SclString & orc_Activity, const stw
 
    \return
    eOK                        initialization worked
-   eERR_PARSE_COMMAND_LINE    unzip directory is provided but does not exist
+   eERR_PARSE_COMMAND_LINE    unzip directory is provided but does not exist and/or
+                              operation mode is provided but unknown
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SydeSup::E_Result C_SydeSup::m_InitOptionalParameters(void)
 {
    E_Result e_Return = eOK;
+
+   // first setup logging
+   this->m_InitLogging();
+
+   // operation mode
+   if ((mc_OperationMode == "") || (mc_OperationMode == "update"))
+   {
+      me_OperationMode = eMODE_UPDATE;
+   }
+   else if (mc_OperationMode == "createpackage")
+   {
+      me_OperationMode = eMODE_CREATEPACKAGE;
+   }
+   else
+   {
+      // User provided unknown mode, which is an invalid command line parameter
+      e_Return = eERR_PARSE_COMMAND_LINE;
+      h_WriteLog("Initialize Parameters", "\"" +  this->mc_OperationMode + "\" is no known operation mode.", true);
+   }
 
    // unzip path:
    if (mc_UnzipPath == "")
@@ -658,25 +889,9 @@ C_SydeSup::E_Result C_SydeSup::m_InitOptionalParameters(void)
    else
    {
       // User provided not-existing directory, which is an invalid command line parameter
-      e_Return = C_SydeSup::eERR_PARSE_COMMAND_LINE;
+      e_Return = eERR_PARSE_COMMAND_LINE;
+      h_WriteLog("Initialize Parameters", "\"" + this->mc_UnzipPath + "\" is no existing directory.", true);
    }
-
-   // log path (gets created, so just check for non empty):
-   if (mc_LogPath == "")
-   {
-      // default location
-      mc_LogPath = this->m_GetDefaultLogLocation();
-   }
-
-   // add trailing path delimiter in case there is none
-   mc_LogPath = TglFileIncludeTrailingDelimiter(mc_LogPath);
-
-   // log to file
-   mc_LogFile = this->m_GetLogFileLocation();
-   C_OscLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFile);
-   std::cout << "The following output also is logged to the file: " << mc_LogFile.c_str() << &std::endl;
-   C_OscLoggingHandler::h_SetWriteToConsoleActive(false);
-   C_OscLoggingHandler::h_SetWriteToFileActive(true);
 
    return e_Return;
 }
@@ -719,9 +934,11 @@ void C_SydeSup::m_PrintInformation(const bool oq_Detailed) const
    {
       std::cout <<
          "\nThis tool \"SYDEsup\" is part of the openSYDE tool chain by STW (Sensor-Technik Wiedemann GmbH).\n"
-         "It allows to update a openSYDE compatible system of multiple nodes in a single step.\n"
-         "The update data must be provided in the openSYDE Service Update Package"
-         "format (*.syde_sup), which can be created with the openSYDE PC tool.\n\n"
+         "It allows to update an openSYDE compatible system of multiple nodes in a single step.\n"
+         "The update data must be provided in the openSYDE Service Update Package "
+         "format (*.syde_sup), which can be created with the openSYDE PC tool.\n"
+         "SYDEsup furthermore provides the possibility to create an openSYDE Service Update Package from an openSYDE "
+         "project.\n\n"
          "For further information take a look at openSYDE user manual." << &std::endl;
    }
 
@@ -733,8 +950,10 @@ void C_SydeSup::m_PrintInformation(const bool oq_Detailed) const
       "-m     --manpage           Print manual page                                               -m\n"
       "-v     --version           Print version                                                   -v\n"
       "-q     --quiet             Print less console output                                       -q\n"
+      "-o     --operationmode     Set mode: \"update\" or \"createpackage\"           update          -o createpackage\n"
       "-n     --necessaryfiles    Only transfer files if necessary.                               -n\n"
-      "                           Files already on address based target will be skipped.            \n"
+      "                           Files already on address based target will \n"
+      "                           be skipped.            \n"
       "-p     --packagefile       Path to Service Update Package file             <none>          -p ." <<
       c_PathDelimiter.c_str() << "MyPackage.syde_sup\n"
       "-i     --caninterface      CAN interface                                   <none>          " <<
@@ -745,9 +964,42 @@ void C_SydeSup::m_PrintInformation(const bool oq_Detailed) const
       this->m_GetDefaultLogLocation().c_str() <<      "          -l ." << c_PathDelimiter.c_str() << "MyLogDir\n"
       "-c     --certificatesdir   Directory for certificates (PEM-files)          <none>          -c ." <<
       c_PathDelimiter.c_str() << "MyCertificatesDir\n"
+      "-s     --opensydeproject   Path to openSYDE project file (SYDE file)       <none>          -s ." <<
+      c_PathDelimiter.c_str() << "MyProject.syde\n"
+      "-d     --devicedefinition  Path to device definitions file                 <none>          -d ." <<
+      c_PathDelimiter.c_str() << "openSYDE" << c_PathDelimiter.c_str() << "devices" << c_PathDelimiter.c_str() <<
+      "devices.ini\n"
+      "-w     --systemview        Name of view in openSYDE project                <none>          -w ViewCAN1\n"
       "The package file parameter \"-p\" is mandatory, all others are optional.\n"
-      "If the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided." <<
+      "If in update mode the active bus in the given Service Update Package is of CAN type, a CAN interface must be provided.\n"
+      "In createpackage mode the parameters opensydeproject, systemview and devicedefinition are mandatory." <<
       &std::endl;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Initialize logging engine.
+
+   Log file location is an optional parameter, so this is a part of initialization of optional parameters!
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SydeSup::m_InitLogging(void)
+{
+   // log path (gets created, so just check for non empty):
+   if (mc_LogPath == "")
+   {
+      // default location
+      mc_LogPath = this->m_GetDefaultLogLocation();
+   }
+
+   // add trailing path delimiter in case there is none
+   mc_LogPath = TglFileIncludeTrailingDelimiter(mc_LogPath);
+
+   // log to file
+   mc_LogFile = this->m_GetLogFileLocation();
+   C_OscLoggingHandler::h_SetCompleteLogFileLocation(mc_LogFile);
+   std::cout << "The following output also is logged to the file: " << mc_LogFile.c_str() << &std::endl;
+   C_OscLoggingHandler::h_SetWriteToConsoleActive(false);
+   C_OscLoggingHandler::h_SetWriteToFileActive(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -970,6 +1222,28 @@ void C_SydeSup::m_PrintStringFromError(const E_Result & ore_Result) const
       c_Error = "Could not initialize thread for update task.";
       break;
 
+   // results regarding creation of service update package
+   case eERR_CREATE_PROJ_LOAD_FAILED:
+      c_Activity = "Create Update Package";
+      c_Error = "Could not load openSYDE project files from \"" + this->mc_OsyProjectPath +
+                "\" with device definition \"" + this->mc_DeviceDefPath + "\".";
+      break;
+   case eERR_CREATE_VIEW_NOT_FOUND:
+      c_Activity = "Create Update Package";
+      c_Error = "Could not find view \"" + this->mc_ViewName + "\" in given openSYDE project.";
+      break;
+   case eERR_CREATE_ZIP_RD_RW:
+      c_Activity = "Create Update Package";
+      c_Error = "File reading or writing problem occured. E.g. could not delete existing Service Update Package file "
+                "or could not create temporary folder or flash files are missing or could not write zip file.";
+      break;
+   case eERR_CREATE_ZIP_CONFIG:
+      c_Activity = "Create Update Package";
+      c_Error = "Could not create zip package because configuration is invalid. "
+                "Possible issues: node update position misconfigured, active nodes and/or application mismatch, "
+                "bus index not found, ...";
+      break;
+
    // general results
    case eOK: //C_NO_ERR
       // no error, everything worked fine (and user already got informed about success)
@@ -992,8 +1266,16 @@ void C_SydeSup::m_PrintStringFromError(const E_Result & ore_Result) const
    {
       h_WriteLog(c_Activity, c_Error, true);
       std::cout << "\n";
-      h_WriteLog("System Update", "Could not update system! Tool result code: " +
-                 C_SclString::IntToStr(static_cast<int32_t>(ore_Result)), true);
+      if (me_OperationMode == eMODE_CREATEPACKAGE)
+      {
+         h_WriteLog("Create Update Package", "Could not create Service Update Package! Tool result code: " +
+                    C_SclString::IntToStr(static_cast<int32_t>(ore_Result)), true);
+      }
+      else
+      {
+         h_WriteLog("System Update", "Could not update system! Tool result code: " +
+                    C_SclString::IntToStr(static_cast<int32_t>(ore_Result)), true);
+      }
       std::cout << "See openSYDE user manual or log file for information: " << mc_LogFile.c_str()  << "\n" <<
          &std::endl;
    }
@@ -1030,17 +1312,19 @@ void C_SydeSup::m_Conclude(C_SupSuSequences & orc_Sequence, const bool & orq_Res
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Update function of SYDEsup with optional X-Check feature to update only necessary files of
+
             address based targets
 
    Precondition for X-Check feature is that the orc_ApplicationsToWrite and the ReadDeviceInformation sequence order
    of nodes is the same. This was verified by various tests.
 
-   \param[in,out]   orc_Sequence             SYDEsup sequence used for main update functionality
-   \param[in]       orc_SystemDefinition     openSYDE system definition to get info of address/file based targets
-   \param[in]       orc_NodesUpdateOrder     nodes update order for main update functionality
-   \param[in]       orc_ActiveNodes          active nodes (0 .. node is inactive, 1 .. node is active)
-   \param[in,out]   orc_ApplicationsToWrite  in case of used X-Check feature only necessary files are updated of
+   \param[in,out]  orc_Sequence              SYDEsup sequence used for main update functionality
+   \param[in]      orc_SystemDefinition      openSYDE system definition to get info of address/file based targets
+   \param[in]      orc_NodesUpdateOrder      nodes update order for main update functionality
+   \param[in]      orc_ActiveNodes           active nodes (0 .. node is inactive, 1 .. node is active)
+   \param[in,out]  orc_ApplicationsToWrite   in case of used X-Check feature only necessary files are updated of
                                              address based targets
+
    \return
    C_NO_ERR    successful execution of update
    else        see error codes of UpdateSystem and SYDEsup log
@@ -1269,10 +1553,10 @@ int32_t C_SydeSup::m_UpdateSystem(C_SupSuSequences & orc_Sequence, const C_OscSy
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Helper function return types of active nodes
 
-   \param[in]       orc_SystemDefinition   openSYDE system definition to get info of address/file based targets
-   \param[in]       orc_ActiveNodes        complete list of nodes with active and inactive information
-                                           (0 .. node is inactive
-                                            1 .. node is active  )
+   \param[in]  orc_SystemDefinition    openSYDE system definition to get info of address/file based targets
+   \param[in]  orc_ActiveNodes         complete list of nodes with active and inactive information
+                                       (0 .. node is inactive
+                                       1 .. node is active  )
 
    \return
    for each element of vector
@@ -1326,4 +1610,269 @@ std::vector<uint8_t> C_SydeSup::m_GetActiveNodeTypes(const C_OscSystemDefinition
    }
 
    return c_ActiveNodeTypes;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Find view in project that maches given view name
+
+   \param[in]   orc_Views  List of system views
+   \param[out]  orc_View   System view that matches given view name
+
+   \retval   eOK                          View found and returend in orc_View
+   \retval   eERR_CREATE_VIEW_NOT_FOUND   View not found
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SydeSup::E_Result C_SydeSup::m_FindView(const std::vector<C_OscViewData> & orc_Views, C_OscViewData & orc_View)
+{
+   E_Result e_Result = eOK;
+   bool q_ViewFound = false;
+
+   for (std::vector<C_OscViewData>::const_iterator c_ItViews = orc_Views.begin(); c_ItViews < orc_Views.end();
+        ++c_ItViews)
+   {
+      if (c_ItViews->GetName() == mc_ViewName)
+      {
+         orc_View = *c_ItViews;
+         q_ViewFound = true;
+      }
+   }
+
+   if (q_ViewFound == false)
+   {
+      e_Result = eERR_CREATE_VIEW_NOT_FOUND;
+   }
+
+   return e_Result;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get update package containing information for the system update
+
+   \param[in]      orc_View                  System view for which the update package should get created
+   \param[in]      orc_SystemDefinition      System definition
+   \param[in,out]  orc_ApplicationsToWrite   Node update configuration
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SydeSup::m_GetUpdatePackage(const C_OscViewData & orc_View, const C_OscSystemDefinition & orc_SystemDefinition,
+                                   std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite) const
+{
+   const std::vector<C_OscViewNodeUpdate> & rc_AllNodesUpdateInfo = orc_View.GetAllNodeUpdateInformation();
+
+   // Check precondition
+   tgl_assert(orc_SystemDefinition.c_Nodes.size() == rc_AllNodesUpdateInfo.size());
+
+   // Resize to insert data into vectors with [] operator.
+   // Flash data vector must have same size like node count (not only active nodes!) so in fact we fill with dummies
+   orc_ApplicationsToWrite.resize(rc_AllNodesUpdateInfo.size(), C_OscSuSequences::C_DoFlash());
+
+   // Collect node update data
+   for (uint32_t u32_NodeCounter = 0; u32_NodeCounter < rc_AllNodesUpdateInfo.size(); ++u32_NodeCounter)
+   {
+      if (orc_View.GetNodeActive(u32_NodeCounter) == true)
+      {
+         const C_OscViewNodeUpdate & rc_NodeUpdateInfo = rc_AllNodesUpdateInfo[u32_NodeCounter];
+         C_OscSuSequences::C_DoFlash & rc_AppsToWrite = orc_ApplicationsToWrite[u32_NodeCounter];
+         const C_OscNode & rc_Node = orc_SystemDefinition.c_Nodes[u32_NodeCounter];
+
+         // Fill other known device names
+         if (rc_Node.pc_DeviceDefinition != NULL)
+         {
+            if (rc_Node.u32_SubDeviceIndex < rc_Node.pc_DeviceDefinition->c_SubDevices.size())
+            {
+               rc_AppsToWrite.c_OtherAcceptedDeviceNames =
+                  rc_Node.pc_DeviceDefinition->c_SubDevices[rc_Node.u32_SubDeviceIndex].c_OtherAcceptedNames;
+            }
+         }
+
+         // Applications: Data Blocks, file based, parameter sets (PSI), PEM
+         // Data Blocks
+         m_GetDataBlocksToWrite(rc_NodeUpdateInfo, rc_Node, rc_AppsToWrite);
+
+         // File based
+         m_GetFileBasedFilesToWrite(rc_NodeUpdateInfo, rc_Node, rc_AppsToWrite);
+
+         // Parameter sets
+         m_GetParamSetsToWrite(rc_NodeUpdateInfo, rc_Node, rc_AppsToWrite);
+
+         // PEM File
+         if (rc_NodeUpdateInfo.GetPemFilePath() != "")
+         {
+            if (rc_NodeUpdateInfo.GetSkipUpdateOfPemFile() == false)
+            {
+               C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
+               C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
+
+               const C_SclString c_AbsolutePath =
+                  TglExpandFileName(rc_NodeUpdateInfo.GetPemFilePath(), TglExtractFilePath(mc_OsyProjectPath));
+               rc_AppsToWrite.c_PemFile = c_AbsolutePath;
+               // Fill PEM states
+               rc_NodeUpdateInfo.GetStates(e_StateSecurity, e_StateDebugger);
+               C_OscSuSequences::h_FillDoFlashWithPemStates(e_StateSecurity, e_StateDebugger, rc_AppsToWrite);
+               osc_write_log_info("Create Update Package",
+                                  "For node \"" + rc_Node.c_Properties.c_Name + "\" use PEM file: " + c_AbsolutePath);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add Data Block files to write to flash data structure
+
+   Handle dependency to Data Block data (default output path, relativeness to Data Block project, placeholder variables)
+
+   \param[in]   orc_NodeUpdate            Node update data
+   \param[in]   orc_Node                  System definition node data
+   \param[out]  orc_ApplicationToWrite    Application to write
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SydeSup::m_GetDataBlocksToWrite(const C_OscViewNodeUpdate & orc_NodeUpdate, const C_OscNode & orc_Node,
+                                       C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const
+{
+   const std::vector<C_SclString> c_Paths = orc_NodeUpdate.GetPaths(C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
+   const std::vector<bool> c_SkipUpdate =
+      orc_NodeUpdate.GetSkipUpdateOfPathsFlags(C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
+
+   // use TglExpandFileName to get an absolute path for openSYDE project
+   //(else we get issues below with resolving paths from Data Blocks)
+   const C_SclString c_OsyProjDir = TglExtractFilePath(TglExpandFileName(mc_OsyProjectPath, "./"));
+
+   tgl_assert(c_Paths.size() == c_SkipUpdate.size());
+   if (c_Paths.size() == c_SkipUpdate.size())
+   {
+      uint32_t u32_FileCounter = 0;
+      for (uint32_t u32_DataBlockCounter = 0; u32_DataBlockCounter < orc_Node.c_Applications.size();
+           ++u32_DataBlockCounter)
+      {
+         // Resolve placeholder variables and make path absolute
+         const C_OscNodeApplication & rc_DataBlock = orc_Node.c_Applications[u32_DataBlockCounter];
+
+         // HALC PSI Data Block output files are handled in PSI file section
+         if (rc_DataBlock.e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
+         {
+            const C_SclString c_DbProjPath = rc_DataBlock.c_ProjectPath;
+            C_SclString c_RealPath;
+
+            for (uint32_t u32_DatablockFileCounter = 0; u32_DatablockFileCounter < rc_DataBlock.c_ResultPaths.size();
+                 ++u32_DatablockFileCounter)
+            {
+               tgl_assert(u32_FileCounter < c_Paths.size());
+               if (u32_FileCounter < c_Paths.size())
+               {
+                  if (c_SkipUpdate[u32_FileCounter] == false)
+                  {
+                     if (c_Paths[u32_FileCounter] == "")
+                     {
+                        // Use path from system definition
+                        // (which might be relative to Data Block project -> resolve this)
+                        c_RealPath = rc_DataBlock.c_ResultPaths[u32_DatablockFileCounter];
+                        c_RealPath =
+                           C_OscUtils::h_MakeIndependentOfDbProjectPath(c_DbProjPath, c_OsyProjDir, c_RealPath);
+                     }
+                     else
+                     {
+                        // Use path from nodes update information
+                        c_RealPath = c_Paths[u32_FileCounter];
+                     }
+
+                     // resolve placeholder variables
+                     c_RealPath = C_OscUtils::h_ResolvePlaceholderVariables(c_RealPath, c_OsyProjDir, c_DbProjPath);
+                     // make path absolute (if relative it is relative to openSYDE project)
+                     c_RealPath = TglExpandFileName(c_RealPath, c_OsyProjDir);
+                     orc_ApplicationToWrite.c_FilesToFlash.push_back(c_RealPath);
+                     osc_write_log_info("Create Update Package",
+                                        "For node \"" + orc_Node.c_Properties.c_Name + "\" and application \"" +
+                                        rc_DataBlock.c_Name + "\" use file: " + c_RealPath);
+                  }
+                  // Increment update file counter
+                  ++u32_FileCounter;
+               }
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Add file based files to write to flash data structure
+
+   \param[in]   orc_NodeUpdate            Node update data
+   \param[in]   orc_Node                  System definition node data
+   \param[out]  orc_ApplicationToWrite    Application to write
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SydeSup::m_GetFileBasedFilesToWrite(const C_OscViewNodeUpdate & orc_NodeUpdate, const C_OscNode & orc_Node,
+                                           C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const
+{
+   const std::vector<C_SclString> c_Paths = orc_NodeUpdate.GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED);
+   const std::vector<bool> c_SkipUpdate =
+      orc_NodeUpdate.GetSkipUpdateOfPathsFlags(C_OscViewNodeUpdate::eFTP_FILE_BASED);
+   const C_SclString c_OsyProjDir = TglExtractFilePath(mc_OsyProjectPath);
+
+   tgl_assert(c_Paths.size() == c_SkipUpdate.size());
+   if (c_Paths.size() == c_SkipUpdate.size())
+   {
+      for (uint32_t u32_FileCounter = 0; u32_FileCounter < c_Paths.size(); ++u32_FileCounter)
+      {
+         if (c_SkipUpdate[u32_FileCounter] == false)
+         {
+            // Make path absolute (no placeholder in file based case)
+            const C_SclString c_AbsolutePath = TglExpandFileName(c_Paths[u32_FileCounter], c_OsyProjDir);
+            orc_ApplicationToWrite.c_FilesToFlash.push_back(c_AbsolutePath);
+
+            osc_write_log_info("Create Update Package",
+                               "For node \"" + orc_Node.c_Properties.c_Name + "\" use file: " + c_AbsolutePath);
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Ad parameter (PSI files) sets to write to flash data structure
+
+   \param[in]   orc_NodeUpdate            Node update data
+   \param[in]   orc_Node                  System definition node data
+   \param[out]  orc_ApplicationToWrite    Application to write
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SydeSup::m_GetParamSetsToWrite(const C_OscViewNodeUpdate & orc_NodeUpdate, const C_OscNode & orc_Node,
+                                      C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const
+{
+   const std::vector<bool> c_SkipParamUpdate = orc_NodeUpdate.GetSkipUpdateOfParamInfosFlags();
+   const std::vector<C_OscViewNodeUpdateParamInfo> c_ParamInfos = orc_NodeUpdate.GetParamInfos();
+
+   tgl_assert(c_ParamInfos.size() == c_SkipParamUpdate.size());
+   if (c_ParamInfos.size() == c_SkipParamUpdate.size())
+   {
+      uint32_t u32_DbFileCounter = 0;
+      for (uint32_t u32_ParamInfoCounter = 0; u32_ParamInfoCounter < c_ParamInfos.size(); ++u32_ParamInfoCounter)
+      {
+         if (c_SkipParamUpdate[u32_ParamInfoCounter] == false)
+         {
+            C_SclString c_RealPath = c_ParamInfos[u32_ParamInfoCounter].GetPath();
+            if (c_RealPath == "")
+            {
+               // Find corresponding Data Block of type HALC Parameter set. Must be unique.
+               for (std::vector<C_OscNodeApplication>::const_iterator c_It = orc_Node.c_Applications.begin();
+                    c_It < orc_Node.c_Applications.end(); ++c_It)
+               {
+                  if (c_It->e_Type == C_OscNodeApplication::ePARAMETER_SET_HALC)
+                  {
+                     c_RealPath = C_OscUtils::h_MakeIndependentOfDbProjectPath(
+                        c_It->c_ProjectPath, mc_OsyProjectPath, c_It->c_ResultPaths[u32_DbFileCounter]);
+                     u32_DbFileCounter++;
+                     break;
+                  }
+               }
+            }
+            // make path absolute and add it to NVM update files
+            c_RealPath = TglExpandFileName(c_RealPath, TglExtractFilePath(mc_OsyProjectPath));
+            orc_ApplicationToWrite.c_FilesToWriteToNvm.push_back(c_RealPath);
+
+            osc_write_log_info("Create Update Package",
+                               "For node \"" + orc_Node.c_Properties.c_Name + "\" use parameter set image file: " +
+                               c_RealPath);
+         }
+      }
+   }
 }

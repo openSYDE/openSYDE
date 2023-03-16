@@ -81,6 +81,9 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    // init static names
    this->InitStaticNames();
 
+   // TODO BAY: Activate again when J1939 will be enabled
+   this->mpc_Ui->pc_ProtocolTabWidget->setTabVisible(4, false);
+
    //Set undo manager
    this->mpc_Ui->pc_MessageSelectorWidget->SetUndoManager(&this->mc_UndoManager);
 
@@ -235,10 +238,17 @@ void C_SdBueComIfDescriptionWidget::InitStaticNames(void) const
       3, c_Protocol, static_cast<QString>(C_GtGetText::h_GetText("Edit PDO Messages and Signals of protocol type %1 "
                                                                  )).arg(c_Protocol));
 
+   // tooltip J1939
+   c_Protocol = C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::eJ1939);
+   this->mpc_Ui->pc_ProtocolTabWidget->SetToolTipInformation(
+      4, c_Protocol,
+      static_cast<QString>(C_GtGetText::h_GetText("Edit PG Messages and SP Signals of protocol type %1 ")).arg(
+         c_Protocol));
+
    this->mpc_Ui->pc_InterfaceSelectorTitleLabel->setText(C_GtGetText::h_GetText("Node Interface"));
 
    this->mpc_Ui->pc_HintToBusLabel->setText(C_GtGetText::h_GetText("Node Interface is already used on a bus.\n"
-                                                                   "Edit the COMM Mesages here:"));
+                                                                   "Edit the COMM Messages here:"));
    this->mpc_Ui->pc_HintNoUsageLabel->setText(
       C_GtGetText::h_GetText("Node Interface has no CANopen Manager or\n"
                              "is not assigned to a CANopen Manager.\n"
@@ -1075,6 +1085,12 @@ void C_SdBueComIfDescriptionWidget::m_FillNodeDatapoolIndexes(const C_OscNode * 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the active protocol type depending on which tab the user is navigating.
+
+   \return
+   protocol as member of enum
+*/
+//----------------------------------------------------------------------------------------------------------------------
 C_OscCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) const
 {
    C_OscCanProtocol::E_Type e_Protocol;
@@ -1089,6 +1105,9 @@ C_OscCanProtocol::E_Type C_SdBueComIfDescriptionWidget::GetActProtocol(void) con
       break;
    case 3:
       e_Protocol = C_OscCanProtocol::eCAN_OPEN;
+      break;
+   case 4:
+      e_Protocol = C_OscCanProtocol::eJ1939;
       break;
    case 0: // default case: layer 2
    default:
@@ -1416,6 +1435,9 @@ int32_t C_SdBueComIfDescriptionWidget::mh_GetIndexOfProtocol(const C_OscCanProto
       break;
    case C_OscCanProtocol::eCAN_OPEN:
       s32_Index = 3;
+      break;
+   case C_OscCanProtocol::eJ1939:
+      s32_Index = 4;
       break;
    default:
       tgl_assert(false);
@@ -1749,7 +1771,8 @@ void C_SdBueComIfDescriptionWidget::m_OnLinkSwitchToBus(const QString & orc_Link
 
       if (rc_ComInterface.GetBusConnected() == true)
       {
-         Q_EMIT (this->SigSwitchToBus(rc_ComInterface.u32_BusIndex, orc_Link));
+         const C_OscCanProtocol::E_Type e_Protocol = GetActProtocol();
+         Q_EMIT (this->SigSwitchToBusProtocol(rc_ComInterface.u32_BusIndex, orc_Link, e_Protocol));
       }
    }
 }
@@ -1878,6 +1901,7 @@ void C_SdBueComIfDescriptionWidget::m_UpdateTabText(void) const
    this->m_UpdateTabText(C_OscCanProtocol::eECES);
    this->m_UpdateTabText(C_OscCanProtocol::eCAN_OPEN_SAFETY);
    this->m_UpdateTabText(C_OscCanProtocol::eCAN_OPEN);
+   this->m_UpdateTabText(C_OscCanProtocol::eJ1939);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

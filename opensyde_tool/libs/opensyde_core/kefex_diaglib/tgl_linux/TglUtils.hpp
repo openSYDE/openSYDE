@@ -15,14 +15,6 @@
 #include "stwtypes.hpp"
 #include "C_SclString.hpp"
 
-#ifndef TGL_PACKAGE
-#ifdef __BORLANDC__
-#define TGL_PACKAGE __declspec(package)
-#else
-#define TGL_PACKAGE
-#endif
-#endif
-
 #if __cplusplus >= 201103L //C++11 ?
 #define TGL_UTIL_FUNC_ID __func__
 #else
@@ -51,15 +43,14 @@ namespace tgl
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-void TGL_PACKAGE TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func,
-                                    const int32_t os32_Line);
-void TGL_PACKAGE TglReportAssertionDetail(const char_t * const opcn_DetailInfo, const char_t * const opcn_Module,
-                                          const char_t * const opcn_Func, const int32_t os32_Line);
-bool TGL_PACKAGE TglGetSystemUserName(stw::scl::C_SclString & orc_UserName);
-void TGL_PACKAGE TglHandleSystemMessages(void);
+void TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func, const int32_t os32_Line);
+void TglReportAssertionDetail(const char_t * const opcn_DetailInfo, const char_t * const opcn_Module,
+                              const char_t * const opcn_Func, const int32_t os32_Line);
+bool TglGetSystemUserName(stw::scl::C_SclString & orc_UserName);
+bool TglGetSystemMachineName(stw::scl::C_SclString & orc_MachineName);
+void TglHandleSystemMessages(void);
 
-int32_t TGL_PACKAGE TglSetEnvironmentVariable(const stw::scl::C_SclString & orc_Name,
-                                              const stw::scl::C_SclString & orc_Value);
+int32_t TglSetEnvironmentVariable(const stw::scl::C_SclString & orc_Name, const stw::scl::C_SclString & orc_Value);
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }

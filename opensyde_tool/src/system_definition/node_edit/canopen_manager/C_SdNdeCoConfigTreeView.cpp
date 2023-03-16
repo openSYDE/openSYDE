@@ -184,7 +184,6 @@ void C_SdNdeCoConfigTreeView::ResetDelegate(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoConfigTreeView::LoadUserSettings(void)
 {
-   uint8_t u8_InterfaceNumber;
    C_OscCanInterfaceId c_NodeId;
 
    const uint32_t u32_NodeIndex = this->mc_Model.GetNodeIndex();
@@ -192,6 +191,7 @@ void C_SdNdeCoConfigTreeView::LoadUserSettings(void)
 
    if (pc_Node != NULL)
    {
+      uint8_t u8_InterfaceNumber;
       const C_UsNode c_UsNode =
          C_UsHandler::h_GetInstance()->GetProjSdNode(pc_Node->c_Properties.c_Name.c_str());
       const std::map<uint8_t, C_OscCanOpenManagerInfo> c_CanOpenManagers = pc_Node->c_CanOpenManagers;
@@ -311,7 +311,6 @@ void C_SdNdeCoConfigTreeView::LoadUserSettings(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeCoConfigTreeView::SaveUserSettings(void) const
 {
-   uint8_t u8_InterfaceNumber;
    C_OscCanInterfaceId c_NodeId;
    const uint32_t u32_NodeIndex = this->mc_Model.GetNodeIndex();
 
@@ -372,6 +371,7 @@ void C_SdNdeCoConfigTreeView::SaveUserSettings(void) const
 
       if (this->currentIndex().isValid() == true)
       {
+         uint8_t u8_InterfaceNumber;
          bool q_Reset = true;
 
          if ((this->mc_Model.GetInterfaceIdForModelIndex(this->currentIndex(), u8_InterfaceNumber) == C_NO_ERR))

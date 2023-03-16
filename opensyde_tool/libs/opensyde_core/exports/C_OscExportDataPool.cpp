@@ -151,7 +151,7 @@ int32_t C_OscExportDataPool::h_CreateSourceCode(const C_SclString & orc_Path, co
                           "\" because code format version does not support public Datapools.");
    }
 
-   // defensive checks agains data that we cannot handle:
+   // defensive checks against data that we cannot handle:
    // number of data sets must by <= 255:
    if (s32_Retval == C_NO_ERR)
    {

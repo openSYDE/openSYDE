@@ -29,7 +29,7 @@ class C_SdTopologyListWidget :
 
 public:
    explicit C_SdTopologyListWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdTopologyListWidget();
+   ~C_SdTopologyListWidget() override;
 
    void SetMaximumHeightAdaption(const bool oq_Active);
    void ApplyDarkMode(const bool oq_Active) const;

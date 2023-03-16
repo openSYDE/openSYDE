@@ -17,6 +17,7 @@
 #include "C_SyvDaItPaTreeDelegate.hpp"
 #include "C_OgeTreeViewToolTipBase.hpp"
 #include "C_PuiSvDbDataElementHandler.hpp"
+#include "C_SyvDaItTableHeaderView.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -34,7 +35,7 @@ class C_SyvDaItPaTreeView :
 
 public:
    C_SyvDaItPaTreeView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaItPaTreeView(void);
+   ~C_SyvDaItPaTreeView(void) override;
 
    bool IsEmpty(void) const;
    void ClearEcuValues(void);
@@ -47,6 +48,7 @@ public:
    const;
    void SetDark(const bool oq_Value);
    void SetEditMode(const bool oq_EditMode);
+   void SetCursorHandlingActive(const bool oq_Active);
    void SetConnected(const bool oq_Connected);
    void SetLoadSaveActive(const bool oq_Active);
    void SetActionActive(const bool oq_Active);
@@ -99,9 +101,11 @@ protected:
 private:
    stw::opensyde_gui_logic::C_SyvDaItPaTreeDelegate mc_Delegate;
    stw::opensyde_gui_logic::C_SyvDaItPaTreeModel mc_Model;
+   C_SyvDaItTableHeaderView * mpc_TableHeaderView;
    stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * mpc_DataWidget;
    bool mq_IgnoreChanges;
 
+   void m_OnVerticalScrollBarChange(const int32_t os32_NewScrollBarValue);
    void m_HandleChange(void);
    bool m_ColumnsSortedAsExpected(const std::vector<int32_t> & orc_NewColPositionIndices) const;
    void m_HandleLinkClicked(const QModelIndex & orc_Index);

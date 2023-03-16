@@ -889,7 +889,9 @@ QString C_Uti::h_ConvertVersionToStwStyle(const QString & orc_Version)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Utility function to convert relative path to absolute path if necessary
 
-   Warning: assuming orc_AbsoluteBaseDir is not an empty string and no file.
+   Warning: assuming orc_BaseDir is not an empty string and no file.
+
+   Consolidation (cleaning of redundant "." and "..") will be performed unless the path contains a "%" sign.
 
    \param[in]  orc_BaseDir                   Base path if relative and could itself be relative
    \param[in]  orc_RelativeOrAbsolutePath    Path which might be relative or absolute (and could be empty)
@@ -900,35 +902,18 @@ QString C_Uti::h_ConvertVersionToStwStyle(const QString & orc_Version)
 //----------------------------------------------------------------------------------------------------------------------
 QString C_Uti::h_ConcatPathIfNecessary(const QString & orc_BaseDir, const QString & orc_RelativeOrAbsolutePath)
 {
-   QString c_Retval;
+   QString c_Result = C_OscUtils::h_ConcatPathIfNecessary(orc_BaseDir.toStdString().c_str(),
+                                                          orc_RelativeOrAbsolutePath.toStdString().c_str()).c_str();
 
-   if ((orc_BaseDir.isEmpty() == false) &&
-       (QDir::isAbsolutePath(orc_RelativeOrAbsolutePath) == false) &&
-       (static_cast<QFileInfo>(orc_BaseDir).isFile() == false))
+   // do some path beautifying
+   if (c_Result.contains("%") == false)
    {
-      c_Retval = orc_BaseDir + "/" + orc_RelativeOrAbsolutePath;
-
-      // do some path beautifying
-      if (c_Retval.contains("%") == false)
-      {
-         // clean path only if there are no path variables
-         // (else %{BLUB}/../folder would be cleaned to folder which is wrong)
-         c_Retval = QDir::cleanPath(c_Retval);
-      }
-   }
-   else
-   {
-      c_Retval = orc_RelativeOrAbsolutePath;
+      // clean path only if there are no path variables
+      // (else %{BLUB}/../folder would be cleaned to folder which is wrong)
+      c_Result = QDir::cleanPath(c_Result);
    }
 
-   // remove all double slashes but the first (network paths)
-   if (c_Retval.startsWith("//"))
-   {
-      c_Retval = '/' + c_Retval;
-   }
-   c_Retval.replace("//", "/");
-
-   return c_Retval;
+   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1208,57 +1193,6 @@ bool C_Uti::h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & or
    }
 
    return oq_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Check if path contains project independent variables (e.g. %{OPENSYDE_BINARY}) and resolve them.
-
-   Do not call this function for replacing every path variable!
-   This functionality can be found in a utility class that knows project stuff.
-
-   \param[in]  orc_Path    path that probably contains variables
-
-   \return
-   Resolved path
-*/
-//----------------------------------------------------------------------------------------------------------------------
-QString C_Uti::h_ResolveProjIndependentPlaceholderVariables(const QString & orc_Path)
-{
-   QString c_Return = orc_Path;
-   C_SclString c_Help;
-
-   if (c_Return.contains(mc_PATH_VARIABLE_OPENSYDE_BIN) == true)
-   {
-      c_Return.replace(mc_PATH_VARIABLE_OPENSYDE_BIN, C_Uti::h_GetExePath() + '/');
-   }
-
-   if (c_Return.contains(mc_PATH_VARIABLE_USER_NAME) == true)
-   {
-      tgl_assert(TglGetSystemUserName(c_Help));
-      c_Return.replace(mc_PATH_VARIABLE_USER_NAME, c_Help.c_str());
-   }
-
-   if (c_Return.contains(mc_PATH_VARIABLE_COMPUTER_NAME) == true)
-   {
-      // find out computer name is analogue to find out user name, but TGLUtils do not offer this
-      QString c_UserName;
-      char_t acn_WinUserName[255];
-      //lint -e{8080} //using type expected by the library for compatibility
-      DWORD x_Size = sizeof(acn_WinUserName);
-      const bool q_Return = (GetComputerNameA(acn_WinUserName, &x_Size) == 0) ? false : true;
-      if (q_Return == true)
-      {
-         c_UserName = acn_WinUserName;
-      }
-      else
-      {
-         c_UserName = "?\?\?\?\?";
-      }
-
-      c_Return.replace(mc_PATH_VARIABLE_COMPUTER_NAME, c_UserName);
-   }
-
-   return c_Return;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

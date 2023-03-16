@@ -81,6 +81,7 @@ protected:
    void mouseMoveEvent(QMouseEvent * const opc_Event) override;
    void mousePressEvent(QMouseEvent * const opc_Event) override;
    void mouseReleaseEvent(QMouseEvent * const opc_Event) override;
+   void mouseDoubleClickEvent(QMouseEvent * const opc_Event) override;
    void keyPressEvent(QKeyEvent * const opc_Event) override;
    void wheelEvent(QWheelEvent * const opc_Event) override;
    void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
@@ -130,6 +131,10 @@ private:
 
    // tool tip
    C_NagToolTip mc_ToolTip;
+
+   // cursor handling
+   bool mq_OverrideCursorActive;
+   Qt::CursorShape me_CurrentOverrideCursor;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

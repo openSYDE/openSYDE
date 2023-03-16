@@ -30,10 +30,10 @@ class C_SyvSeContextMenuManager :
 
 public:
    C_SyvSeContextMenuManager();
-   virtual ~C_SyvSeContextMenuManager();
+   ~C_SyvSeContextMenuManager() override;
 
-   virtual void HandleContextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event,
-                                       const QList<QGraphicsItem *> & orc_SelectedItems, const bool & orq_ShowPaste);
+   void HandleContextMenuEvent(QGraphicsSceneContextMenuEvent * const opc_Event,
+                               const QList<QGraphicsItem *> & orc_SelectedItems, const bool & orq_ShowPaste) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

@@ -42,8 +42,8 @@ public:
                        const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignal,
                        const std::vector<stw::opensyde_core::C_OscCanProtocol::E_Type> & orc_ProtocolType);
 
-   virtual void redo(void);
-   virtual void undo(void);
+   void redo(void) override;
+   void undo(void) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

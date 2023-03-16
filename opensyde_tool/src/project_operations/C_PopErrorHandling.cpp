@@ -130,8 +130,8 @@ void C_PopErrorHandling::h_ProjectLoadErr(const int32_t & ors32_Err, const QStri
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Save with error handling
 
-   \param[in]   ors32_Err     Save error
-   \param[in]   opc_Parent    parent widget
+   \param[in]  ors32_Err   Save error
+   \param[in]  opc_Parent  parent widget
 */
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -144,22 +144,37 @@ void C_PopErrorHandling::h_ProjectSaveErr(const int32_t & ors32_Err, QWidget * c
       switch (ors32_Err)
       {
       case C_RD_WR:
-         c_Message.SetDescription(C_GtGetText::h_GetText("Problems accessing file system."));
-         break;
+         {
+            const QString c_LogLink = C_GtGetText::h_GetText("For details see ") +
+                                      C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."), mc_STYLE_GUIDE_COLOR_LINK,
+                                                       C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str());
+            QString c_Details = C_GtGetText::h_GetText(
+               "Possible reasons:<br/>- The chosen path is too long. The project might have been partially written, "
+               "but will most likely be corrupt and cannot be used.<br/>- Missing write permissions on chosen directory.<br/>");
+            c_Details += c_LogLink;
+            c_Message.SetDescription(C_GtGetText::h_GetText("Problems accessing file system."));
+            c_Message.SetDetails(c_Details);
+            break;
+         }
       case C_RANGE:
          c_Message.SetDescription(C_GtGetText::h_GetText("Path is empty."));
          break;
       case C_NOACT:
          c_Message.SetDescription(C_GtGetText::h_GetText("Could not create project directory."));
          break;
-      case C_COM:
-         c_Message.SetDescription(C_GtGetText::h_GetText("Message sorting failed."));
-         break;
       default:
          c_Message.SetDescription(C_GtGetText::h_GetText("Unknown cause."));
          break;
       }
-      c_Message.SetCustomMinHeight(180, 180);
+
+      if (ors32_Err == C_RD_WR)
+      {
+         c_Message.SetCustomMinHeight(180, 300);
+      }
+      else
+      {
+         c_Message.SetCustomMinHeight(180, 180);
+      }
       c_Message.Execute();
    }
 }

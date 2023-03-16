@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QIcon>
 #include <QWidget>
+#include <QRadioButton>
 #include "stwtypes.hpp"
 
 #include "C_PuiSdNodeCanMessage.hpp"
@@ -46,9 +47,12 @@ public:
    void SetLastKnownCycleTimeValue(const uint32_t ou32_Value);
    void SetRxTimeoutPreconditions(const bool oq_TxMethodOnEvent, const bool oq_DisableOptionPossible);
    void SetRxTimeoutConfigurationReadOnly(const bool oq_TimeoutConfigurationReadOnly);
-   void SetChecked(const uint32_t ou32_DatapoolIndex, const bool oq_Checked) const;
+   void SetChecked(const bool oq_Checked, const bool oq_AllDatapoolIndexes, const uint32_t ou32_DatapoolIndex) const;
    void SetEnabled(const bool oq_Enabled) const;
    void SetSpecificToolTip(const QString & orc_Tooltip);
+   void SetExclusiveMode(const bool oq_Active);
+
+   QRadioButton * GetRadioButton(void) const;
 
    bool HasChildren(void) const;
 
@@ -103,8 +107,10 @@ private:
    bool mq_TxMethodOnEvent;
    bool mq_DisableOptionPossible;
    bool mq_TimeoutConfigurationReadOnly;
+   bool mq_ExclusiveMode;
 
    void m_OnCheckBoxStateChanged(const int32_t os32_CheckState);
+   void m_OnRadioButtonStateChanged(const bool oq_Checked);
    void m_ToggleSubItems(const bool oq_Checked);
    void m_OnNodeDatapoolToggled(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex,
                                 const uint32_t ou32_DatapoolIndex, const bool oq_Checked);

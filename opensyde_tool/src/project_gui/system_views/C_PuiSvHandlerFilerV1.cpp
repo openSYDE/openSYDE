@@ -459,8 +459,8 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadNodeActiveFlags(std::vector<uint8_t> & orc
    C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvHandlerFilerV1::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation,
-                                                            C_OscXmlParserBase & orc_XmlParser)
+int32_t C_PuiSvHandlerFilerV1::mh_LoadNodeUpdateInformation(
+   std::vector<C_OscViewNodeUpdate> & orc_NodeUpdateInformation, C_OscXmlParserBase & orc_XmlParser)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -480,7 +480,7 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvN
 
             if (pc_Node != NULL)
             {
-               C_PuiSvNodeUpdate c_UpdateInfo;
+               C_OscViewNodeUpdate c_UpdateInfo;
 
                s32_Retval = mh_LoadOneNodeUpdateInformation(c_UpdateInfo, orc_XmlParser, *pc_Node);
                orc_NodeUpdateInformation.push_back(c_UpdateInfo);
@@ -519,7 +519,7 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvN
 
                if (pc_Node != NULL)
                {
-                  C_PuiSvNodeUpdate c_UpdateInfo;
+                  C_OscViewNodeUpdate c_UpdateInfo;
                   s32_Retval = mh_LoadOneNodeUpdateInformation(c_UpdateInfo, orc_XmlParser, *pc_Node);
                   orc_NodeUpdateInformation.push_back(c_UpdateInfo);
                   //Next
@@ -564,7 +564,7 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadNodeUpdateInformation(std::vector<C_PuiSvN
    C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate & orc_NodeUpdateInformation,
+int32_t C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_OscViewNodeUpdate & orc_NodeUpdateInformation,
                                                                C_OscXmlParserBase & orc_XmlParser,
                                                                const C_OscNode & orc_Node)
 {
@@ -584,11 +584,11 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate
       C_SclString c_CurrentNodeUpdateInformationNode = orc_XmlParser.SelectNodeChild("path");
       if (c_CurrentNodeUpdateInformationNode == "path")
       {
-         std::vector<QString> c_Paths;
+         std::vector<C_SclString> c_Paths;
          std::vector<bool> c_PathsSkipFlags;
          do
          {
-            c_Paths.push_back(orc_XmlParser.GetNodeContent().c_str());
+            c_Paths.push_back(orc_XmlParser.GetNodeContent());
             //Next
             c_CurrentNodeUpdateInformationNode = orc_XmlParser.SelectNodeNext("path");
          }
@@ -600,16 +600,16 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadOneNodeUpdateInformation(C_PuiSvNodeUpdate
          if (orc_Node.c_Applications.size() == c_Paths.size())
          {
             //matching size
-            orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
-            orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathsSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            orc_NodeUpdateInformation.SetPaths(c_Paths, C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
+            orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathsSkipFlags, C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
          }
          else
          {
             //invalid size
             c_Paths.clear();
             c_Paths.resize(orc_Node.c_Applications.size(), "");
-            orc_NodeUpdateInformation.SetPaths(c_Paths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
-            orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathsSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            orc_NodeUpdateInformation.SetPaths(c_Paths, C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
+            orc_NodeUpdateInformation.SetSkipUpdateOfPathsFlags(c_PathsSkipFlags, C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
          }
          //Return
          tgl_assert(orc_XmlParser.SelectNodeParent() == "paths");
@@ -746,18 +746,20 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadView(C_PuiSvData & orc_View, C_OscXmlParse
       orc_View.SetNodeActiveFlags(c_NodeActiveFlags);
       if (s32_Retval == C_NO_ERR)
       {
-         std::vector<C_PuiSvNodeUpdate> c_NodeUpdateInformation;
+         std::vector<C_OscViewNodeUpdate> c_NodeUpdateInformation;
          //If you have an async project this might help
-         //c_NodeUpdateInformation.resize(c_NodeActiveFlags.size(),C_PuiSvNodeUpdate());
+         //c_NodeUpdateInformation.resize(c_NodeActiveFlags.size(),C_OscViewNodeUpdate());
          s32_Retval = mh_LoadNodeUpdateInformation(c_NodeUpdateInformation, orc_XmlParser);
          orc_View.SetNodeUpdateInformation(c_NodeUpdateInformation);
          if (s32_Retval == C_NO_ERR)
          {
             if (orc_XmlParser.SelectNodeChild("pc") == "pc")
             {
-               C_PuiSvPc c_PcData;
-               s32_Retval = mh_LoadPc(c_PcData, orc_XmlParser);
-               orc_View.SetPcData(c_PcData);
+               C_OscViewPc c_OscPcData;
+               C_PuiSvPc c_PuiPcData;
+               s32_Retval = mh_LoadPc(c_OscPcData, c_PuiPcData, orc_XmlParser);
+               orc_View.SetOscPcData(c_OscPcData);
+               orc_View.SetPuiPcData(c_PuiPcData);
                //Return
                tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-view");
             }
@@ -801,7 +803,8 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadView(C_PuiSvData & orc_View, C_OscXmlParse
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Load PC element
 
-   \param[in,out] orc_Pc        PC element
+   \param[in,out]  orc_OscPc    PC element (core part)
+   \param[in,out]  orc_PuiPc    PC element (GUI part)
    \param[in,out] orc_XmlParser XML parser with the "current" element set to the "pc" element
 
    \return
@@ -809,38 +812,39 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadView(C_PuiSvData & orc_View, C_OscXmlParse
    C_CONFIG    error loading information
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvHandlerFilerV1::mh_LoadPc(C_PuiSvPc & orc_Pc, C_OscXmlParserBase & orc_XmlParser)
+int32_t C_PuiSvHandlerFilerV1::mh_LoadPc(C_OscViewPc & orc_OscPc, C_PuiSvPc & orc_PuiPc,
+                                         C_OscXmlParserBase & orc_XmlParser)
 {
    int32_t s32_Retval = C_NO_ERR;
 
-   orc_Pc.SetConnected(orc_XmlParser.GetAttributeBool("connected"), orc_XmlParser.GetAttributeUint32("bus-index"),
-                       true);
+   orc_OscPc.SetConnected(orc_XmlParser.GetAttributeBool("connected"), orc_XmlParser.GetAttributeUint32("bus-index"),
+                          true);
    if (orc_XmlParser.SelectNodeChild("dll-path") == "dll-path")
    {
       QString c_Path = orc_XmlParser.GetNodeContent().c_str();
       if (orc_XmlParser.AttributeExists("type"))
       {
-         orc_Pc.SetCanDllType(static_cast<C_PuiSvPc::E_CanDllType>(orc_XmlParser.GetAttributeSint32("type")));
+         orc_PuiPc.SetCanDllType(static_cast<C_PuiSvPc::E_CanDllType>(orc_XmlParser.GetAttributeSint32("type")));
       }
       else
       {
          // translate from path to type+path for compatibility reasons (type was not present in old openSYDE versions)
          if ((c_Path == stw::opensyde_gui::mc_DLL_PATH_PEAK) || (c_Path.isEmpty() == true))
          {
-            orc_Pc.SetCanDllType(C_PuiSvPc::E_CanDllType::ePEAK);
+            orc_PuiPc.SetCanDllType(C_PuiSvPc::E_CanDllType::ePEAK);
             c_Path = "";
          }
          else if (c_Path == stw::opensyde_gui::mc_DLL_PATH_VECTOR)
          {
-            orc_Pc.SetCanDllType(C_PuiSvPc::E_CanDllType::eVECTOR);
+            orc_PuiPc.SetCanDllType(C_PuiSvPc::E_CanDllType::eVECTOR);
             c_Path = "";
          }
          else
          {
-            orc_Pc.SetCanDllType(C_PuiSvPc::E_CanDllType::eOTHER);
+            orc_PuiPc.SetCanDllType(C_PuiSvPc::E_CanDllType::eOTHER);
          }
       }
-      orc_Pc.SetCustomCanDllPath(c_Path);
+      orc_PuiPc.SetCustomCanDllPath(c_Path);
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "pc");
    }
@@ -850,7 +854,7 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadPc(C_PuiSvPc & orc_Pc, C_OscXmlParserBase 
    }
    if ((orc_XmlParser.SelectNodeChild("box") == "box") && (s32_Retval == C_NO_ERR))
    {
-      s32_Retval = C_PuiBsElementsFiler::h_LoadBoxBase(orc_Pc, orc_XmlParser);
+      s32_Retval = C_PuiBsElementsFiler::h_LoadBoxBase(orc_PuiPc, orc_XmlParser);
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "pc");
    }
@@ -864,7 +868,7 @@ int32_t C_PuiSvHandlerFilerV1::mh_LoadPc(C_PuiSvPc & orc_Pc, C_OscXmlParserBase 
       {
          C_PuiBsLineBase c_Connection;
          s32_Retval = C_PuiBsElementsFiler::h_LoadLineBase(c_Connection, orc_XmlParser);
-         orc_Pc.SetConnectionData(c_Connection);
+         orc_PuiPc.SetConnectionData(c_Connection);
          //Return
          tgl_assert(orc_XmlParser.SelectNodeParent() == "connection");
       }
@@ -2375,23 +2379,22 @@ void C_PuiSvHandlerFilerV1::mh_SaveNodeActiveFlags(const std::vector<uint8_t> & 
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvHandlerFilerV1::mh_SaveNodeUpdateInformation(
-   const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation, C_OscXmlParserBase & orc_XmlParser)
+   const std::vector<C_OscViewNodeUpdate> & orc_NodeUpdateInformation, C_OscXmlParserBase & orc_XmlParser)
 {
    orc_XmlParser.CreateAndSelectNodeChild("node-update-information");
    for (uint32_t u32_ItNodeActiveFlag = 0; u32_ItNodeActiveFlag < orc_NodeUpdateInformation.size();
         ++u32_ItNodeActiveFlag)
    {
-      const C_PuiSvNodeUpdate & rc_NodeUpdateInformation = orc_NodeUpdateInformation[u32_ItNodeActiveFlag];
-      const std::vector<QString> & rc_ApplicationPaths = rc_NodeUpdateInformation.GetPaths(
-         C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+      const C_OscViewNodeUpdate & rc_NodeUpdateInformation = orc_NodeUpdateInformation[u32_ItNodeActiveFlag];
+      const std::vector<C_SclString> & rc_ApplicationPaths = rc_NodeUpdateInformation.GetPaths(
+         C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
       orc_XmlParser.CreateAndSelectNodeChild("node-specific-update-information");
       orc_XmlParser.SetAttributeUint32("position", rc_NodeUpdateInformation.u32_NodeUpdatePosition);
       orc_XmlParser.CreateAndSelectNodeChild("paths");
       for (uint32_t u32_ItApplicationPath = 0; u32_ItApplicationPath < rc_ApplicationPaths.size();
            ++u32_ItApplicationPath)
       {
-         const QString & rc_Path = rc_ApplicationPaths[u32_ItApplicationPath];
-         orc_XmlParser.CreateNodeChild("path", rc_Path.toStdString().c_str());
+         orc_XmlParser.CreateNodeChild("path", rc_ApplicationPaths[u32_ItApplicationPath]);
       }
       //Return
       tgl_assert(orc_XmlParser.SelectNodeParent() == "node-specific-update-information");
@@ -2436,7 +2439,7 @@ void C_PuiSvHandlerFilerV1::mh_SaveView(const C_PuiSvData & orc_View, C_OscXmlPa
    orc_XmlParser.SetAttributeBool("darkmode", orc_View.GetDarkModeActive());
    orc_XmlParser.SetAttributeUint32("device-config-selected-bit-rate", orc_View.GetDeviceConfigSelectedBitRate());
    orc_XmlParser.CreateAndSelectNodeChild("name");
-   orc_XmlParser.SetNodeContent(orc_View.GetName().toStdString().c_str());
+   orc_XmlParser.SetNodeContent(orc_View.GetName());
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-view");
    orc_XmlParser.CreateNodeChild("device-config-mode", mh_DeviceConfigModeToString(
@@ -2450,7 +2453,7 @@ void C_PuiSvHandlerFilerV1::mh_SaveView(const C_PuiSvData & orc_View, C_OscXmlPa
    mh_SaveNodeActiveFlags(orc_View.GetNodeActiveFlags(), orc_XmlParser);
    mh_SaveNodeUpdateInformation(orc_View.GetAllNodeUpdateInformation(), orc_XmlParser);
    orc_XmlParser.CreateAndSelectNodeChild("pc");
-   mh_SavePc(orc_View.GetPcData(), orc_XmlParser);
+   mh_SavePc(orc_View.GetOscPcData(), orc_View.GetPuiPcData(), orc_XmlParser);
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-system-view");
    mh_SaveDashboards(orc_View.GetDashboards(), orc_XmlParser);
@@ -2469,23 +2472,24 @@ void C_PuiSvHandlerFilerV1::mh_SaveView(const C_PuiSvData & orc_View, C_OscXmlPa
    \param[in,out] orc_XmlParser XML parser with the "current" element set to the "pc" element
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvHandlerFilerV1::mh_SavePc(const C_PuiSvPc & orc_Pc, C_OscXmlParserBase & orc_XmlParser)
+void C_PuiSvHandlerFilerV1::mh_SavePc(const C_OscViewPc & orc_OscPc, const C_PuiSvPc & orc_PuiPc,
+                                      C_OscXmlParserBase & orc_XmlParser)
 {
-   orc_XmlParser.SetAttributeBool("connected", orc_Pc.GetConnected());
-   orc_XmlParser.SetAttributeUint32("bus-index", orc_Pc.GetBusIndex());
+   orc_XmlParser.SetAttributeBool("connected", orc_OscPc.GetConnected());
+   orc_XmlParser.SetAttributeUint32("bus-index", orc_OscPc.GetBusIndex());
 
    orc_XmlParser.CreateAndSelectNodeChild("dll-path");
-   orc_XmlParser.SetAttributeSint32("type", static_cast<int32_t>(orc_Pc.GetCanDllType()));
-   orc_XmlParser.SetNodeContent(orc_Pc.GetCustomCanDllPath().toStdString().c_str());
+   orc_XmlParser.SetAttributeSint32("type", static_cast<int32_t>(orc_PuiPc.GetCanDllType()));
+   orc_XmlParser.SetNodeContent(orc_PuiPc.GetCustomCanDllPath().toStdString().c_str());
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "pc");
    orc_XmlParser.CreateAndSelectNodeChild("box");
-   C_PuiBsElementsFiler::h_SaveBoxBase(orc_Pc, orc_XmlParser);
+   C_PuiBsElementsFiler::h_SaveBoxBase(orc_PuiPc, orc_XmlParser);
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "pc");
    orc_XmlParser.CreateAndSelectNodeChild("connection");
    orc_XmlParser.CreateAndSelectNodeChild("line");
-   C_PuiBsElementsFiler::h_SaveLineBase(orc_Pc.GetConnectionData(), orc_XmlParser);
+   C_PuiBsElementsFiler::h_SaveLineBase(orc_PuiPc.GetConnectionData(), orc_XmlParser);
    //Return
    tgl_assert(orc_XmlParser.SelectNodeParent() == "connection");
    //Return

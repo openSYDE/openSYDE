@@ -44,6 +44,7 @@ public:
    void paint(QPainter * const opc_Painter, const QStyleOptionViewItem & orc_Option,
               const QModelIndex & orc_Index) const override;
    void destroyEditor(QWidget * const opc_Editor, const QModelIndex & orc_Index) const override;
+   static int32_t h_GetTableItemHeight();
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

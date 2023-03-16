@@ -1,5 +1,5 @@
-#ifndef CKFXCOMMCONFIGURATIONH
-#define CKFXCOMMCONFIGURATIONH
+#ifndef CKFXCOMMCONFIGURATIONHPP
+#define CKFXCOMMCONFIGURATIONHPP
 //---------------------------------------------------------------------------
 
 #include "stwtypes.hpp"
@@ -34,7 +34,7 @@ public:
 //---------------------------------------------------------------------------
 
 ///engine for handling communication protocol specific parameters
-class STW_DIAGLIB_EXPORT C_KFXCommConfigurationBase
+class C_KFXCommConfigurationBase
 {
 public:
    C_KFXCommConfigurationBase(void);
@@ -59,7 +59,7 @@ public:
 
 //---------------------------------------------------------------------------
 ///higher-level class (more comfortable functions for KEFEX protocol)
-class STW_DIAGLIB_EXPORT C_KFXCommConfiguration :
+class C_KFXCommConfiguration :
    public C_KFXCommConfigurationBase
 {
 private:

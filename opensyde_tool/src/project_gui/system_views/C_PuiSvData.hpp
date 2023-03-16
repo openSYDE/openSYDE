@@ -16,9 +16,10 @@
 #include <set>
 #include <QMap>
 #include <QString>
+#include "C_OscViewData.hpp"
 #include "C_PuiSvPc.hpp"
 #include "C_PuiSvDashboard.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 #include "C_PuiSvReadDataConfiguration.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -30,7 +31,8 @@ namespace opensyde_gui_logic
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
-class C_PuiSvData
+class C_PuiSvData :
+   public stw::opensyde_core::C_OscViewData
 {
 public:
    enum E_DeviceConfigurationMode
@@ -40,10 +42,8 @@ public:
    };
 
    C_PuiSvData(void);
-   virtual ~C_PuiSvData(void);
 
-   virtual void CalcHash(uint32_t & oru32_HashValue) const;
-   uint32_t CalcUpdateHash(void) const;
+   void CalcHash(uint32_t & oru32_HashValue) const override;
 
    bool GetServiceModeActive(void) const;
    bool GetServiceModeSetupActive(void) const;
@@ -54,38 +54,9 @@ public:
    void SetServiceModeUpdateActive(const bool oq_NewValue);
    void SetServiceModeDashboardActive(const bool oq_NewValue);
 
-   const C_PuiSvPc & GetPcData(void) const;
-   void SetPcData(const C_PuiSvPc & orc_Value);
-   bool GetNodeActive(const uint32_t ou32_NodeIndex) const;
+   const C_PuiSvPc & GetPuiPcData(void) const;
+   void SetPuiPcData(const C_PuiSvPc & orc_Value);
    bool GetNodeStatusDisplayedAsActive(const uint32_t ou32_NodeIndex) const;
-   const std::vector<uint8_t> & GetNodeActiveFlags(void) const;
-   void SetNodeActiveFlags(const std::vector<uint8_t> & orc_Value);
-   const std::vector<C_PuiSvNodeUpdate> & GetAllNodeUpdateInformation(void) const;
-   void SetNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation);
-   const C_PuiSvNodeUpdate * GetNodeUpdateInformation(const uint32_t ou32_NodeIndex) const;
-   int32_t SetNodeUpdateInformation(const uint32_t ou32_NodeIndex, const C_PuiSvNodeUpdate & orc_NodeUpdateInformation);
-   int32_t SetNodeUpdateInformationPath(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                        const QString & orc_Value, const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
-   int32_t SetNodeUpdateInformationParamInfo(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                             const C_PuiSvNodeUpdateParamInfo & orc_Value);
-   int32_t SetNodeUpdateInformationPemFilePath(const uint32_t ou32_NodeIndex, const QString & orc_Value);
-   int32_t SetNodeUpdateInformationSkipUpdateOfPath(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                    const bool oq_SkipFile,
-                                                    const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
-   int32_t SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                         const bool oq_SkipFile);
-   int32_t SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_t ou32_NodeIndex, const bool oq_SkipFile);
-   int32_t SetNodeUpdateInformationStates(const uint32_t ou32_NodeIndex,
-                                          const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                          const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger);
-   int32_t SetNodeUpdateInformationParamInfoContent(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                    const QString & orc_FilePath, const uint32_t ou32_LastKnownCrc);
-   int32_t AddNodeUpdateInformationPath(const uint32_t ou32_NodeIndex, const QString & orc_Value,
-                                        const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
-   int32_t AddNodeUpdateInformationParamInfo(const uint32_t ou32_NodeIndex,
-                                             const C_PuiSvNodeUpdateParamInfo & orc_Value);
-   const QString & GetName(void) const;
-   void SetName(const QString & orc_Value);
    const std::vector<C_PuiSvDashboard> & GetDashboards(void) const;
    const C_PuiSvDashboard * GetDashboard(const uint32_t ou32_Index) const;
    void SetDashboards(const std::vector<C_PuiSvDashboard> & orc_Value);
@@ -139,8 +110,6 @@ public:
    void OnSyncNodeHalc(const uint32_t ou32_Index, const std::map<C_PuiSvDbNodeDataPoolListElementId,
                                                                  C_PuiSvDbNodeDataPoolListElementId> & orc_MapCurToNew);
    void OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index);
-   void OnSyncBusAdded(const uint32_t ou32_Index);
-   void OnSyncBusDeleted(const uint32_t ou32_Index);
    void OnSyncNodeDataPoolAdded(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex);
    void OnSyncNodeDataPoolMoved(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolSourceIndex,
                                 const uint32_t ou32_DataPoolTargetIndex);
@@ -187,7 +156,6 @@ public:
    void SetNodeCheckedState(const uint32_t ou32_NodeIndex, const uint8_t ou8_Checked);
    void SetPcBox(const C_PuiBsBox & orc_Box);
    void SetPcConnection(const C_PuiBsLineBase & orc_Line);
-   void SetPcConnected(const bool oq_Connected, const uint32_t ou32_BusIndex);
    void SetPcCanDllType(const C_PuiSvPc::E_CanDllType oe_DllType);
    void SetPcCanDllPath(const QString & orc_DllPath);
 
@@ -222,13 +190,6 @@ public:
 
    //Delete
    int32_t RemoveReadRailItem(const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id);
-   int32_t RemoveNodeUpdateInformationPath(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                           const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
-   int32_t RemoveNodeUpdateInformationParamInfo(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index);
-   int32_t RemoveNodeUpdateInformationPemFilePath(const uint32_t ou32_NodeIndex);
-   int32_t ClearNodeUpdateInformationAsAppropriate(const uint32_t ou32_NodeIndex,
-                                                   const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
-   int32_t ClearNodeUpdateInformationParamPaths(const uint32_t ou32_NodeIndex);
    int32_t DeleteDashboard(const uint32_t ou32_DashboardIndex);
    int32_t DeleteDashboardWidget(const uint32_t ou32_DashboardIndex, const uint32_t ou32_WidgetIndex,
                                  const C_PuiSvDbDataElement::E_Type oe_Type);
@@ -255,17 +216,11 @@ public:
 
 protected:
    //Protected access for tests
-   std::vector<uint8_t> mc_NodeActiveFlags; ///< Vector of usage flags.
-   ///< Equal to system definition nodes count.
-   ///< True: Node used in system view
-   ///< False: Node not used in system view
    std::vector<C_PuiSvDashboard> mc_Dashboards; ///< Dashboard data
 
 private:
-   QString mc_Name;                                         ///< System view name
-   C_PuiSvPc mc_PcData;                                     ///< Data for PC element
-   std::vector<C_PuiSvNodeUpdate> mc_NodeUpdateInformation; ///< Vector of node update information.
-   ///< Equal to system definition nodes count.
+   C_PuiSvPc mc_PuiPcData; ///< Data for PC element
+
    uint16_t mu16_UpdateRateFast;
    uint16_t mu16_UpdateRateMedium;
    uint16_t mu16_UpdateRateSlow;

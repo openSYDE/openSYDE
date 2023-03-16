@@ -1344,7 +1344,7 @@ C_SdBueMlvSignalManager::C_SignalItemColors C_SdBueMlvGraphicsScene::m_GetConcre
 {
    uint32_t u32_ColorCounter;
 
-   C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig;
+   C_SdBueMlvSignalManager::C_SignalItemColors c_ColorConfig = {0U, QColor(), QColor(), QColor()};
 
    // search the color to set the flag
    for (u32_ColorCounter = 0U; u32_ColorCounter < mhu8_MAX_NUM_BITS; ++u32_ColorCounter)

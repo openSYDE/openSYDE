@@ -34,7 +34,7 @@ public:
                                           const QPointF & orc_ConnectionPos, const int32_t & ors32_Interface,
                                           const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                                           const QString & orc_Description, QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SdManUnoTopologyReconnectBaseCommand(void);
+   ~C_SdManUnoTopologyReconnectBaseCommand(void) override;
    void undo(void) override;
    void redo(void) override;
 

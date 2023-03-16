@@ -37,6 +37,8 @@ using namespace stw::opensyde_gui_logic;
    \param[in,out] opc_Parent Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
+//PC-Lint suppressions: No problem with having the mutex stored as member instead of a static member
+//lint -save -e2751
 C_CamMetTreeGuiBuffer::C_CamMetTreeGuiBuffer(QObject * const opc_Parent) :
    QObject(opc_Parent),
    mq_Connected(false)
@@ -91,3 +93,4 @@ void C_CamMetTreeGuiBuffer::m_HandleUpdateUi(void)
       Q_EMIT this->SigUpdateUi(c_BufferCopy);
    }
 }
+//lint -restore

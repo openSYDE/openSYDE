@@ -69,6 +69,8 @@ public:
    void ApplySizeChange(const QPointF & orc_NewPos, const QSizeF & orc_NewSize);
    virtual void CopyStyle(const QGraphicsItem * const opc_GuidelineItem);
    virtual void UpdateTransform(const QTransform & orc_Transform);
+
+   bool IsResizeCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const;
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

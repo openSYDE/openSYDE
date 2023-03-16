@@ -63,6 +63,7 @@ private:
    const stw::opensyde_gui_logic::C_PuiSdNodeCanMessageSyncManager * mpc_SyncManager;
 
    void m_InitColumns(void);
+   static std::map<opensyde_gui_logic::C_SdBueSignalTableModel::E_Columns, uint32_t> mh_GetDefaultColumnWidths(void);
    void m_HandleColumnVisibility(void);
 
    QSortFilterProxyModel mc_SortProxyModel;

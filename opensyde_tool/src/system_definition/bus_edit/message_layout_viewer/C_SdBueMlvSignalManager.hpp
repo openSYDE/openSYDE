@@ -67,7 +67,7 @@ public:
                            const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                            const uint16_t ou16_MaximumCountBits, const float64_t of64_Space,
                            QObject * const opc_Parent = NULL);
-   virtual ~C_SdBueMlvSignalManager();
+   ~C_SdBueMlvSignalManager() override;
 
    void LoadSignal(const uint32_t ou32_SignalIndex, const C_SignalItemColors & orc_ColorConfiguration,
                    const bool oq_Resizeable);

@@ -74,10 +74,11 @@ C_SyvUpPacListNodeItemParamSetWidget::C_SyvUpPacListNodeItemParamSetWidget(const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacListNodeItemParamSetWidget::SetParamInfo(
-   const stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamInfo)
+   const stw::opensyde_core::C_OscViewNodeUpdateParamInfo & orc_ParamInfo)
 {
    this->mc_ParamsetInfo = orc_ParamInfo;
-   this->SetAppFile(this->mc_ParamsetInfo.GetPath(), (orc_ParamInfo.GetPath() == this->GetDefaultFilePath()));
+   this->SetAppFile(this->mc_ParamsetInfo.GetPath().c_str(),
+                    (orc_ParamInfo.GetPath().c_str() == this->GetDefaultFilePath()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ void C_SyvUpPacListNodeItemParamSetWidget::SetParamInfo(
    Paramterset information
 */
 //----------------------------------------------------------------------------------------------------------------------
-stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo C_SyvUpPacListNodeItemParamSetWidget::GetParamInfo(void) const
+stw::opensyde_core::C_OscViewNodeUpdateParamInfo C_SyvUpPacListNodeItemParamSetWidget::GetParamInfo(void) const
 {
    return mc_ParamsetInfo;
 }
@@ -184,7 +185,7 @@ void C_SyvUpPacListNodeItemParamSetWidget::m_LoadFileInformation(bool & orq_File
       const int32_t s32_ReadResult = pc_InfoDialog->ReadFile();
       if (s32_ReadResult == C_NO_ERR)
       {
-         const C_PuiSvNodeUpdateParamInfo & rc_ParamSetInfo = pc_InfoDialog->GetParamInfo();
+         const stw::opensyde_core::C_OscViewNodeUpdateParamInfo & rc_ParamSetInfo = pc_InfoDialog->GetParamInfo();
          if (rc_ParamSetInfo.GetLastKnownCrc() != this->mc_ParamsetInfo.GetLastKnownCrc())
          {
             //New file has changes

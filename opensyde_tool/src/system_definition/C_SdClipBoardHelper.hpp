@@ -53,13 +53,15 @@ public:
                                         stw::opensyde_core::C_OscNodeDataPool::E_Type & ore_Type);
    static void h_StoreDataPoolListElementsToClipBoard(
       const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscContent,
-      const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent);
+      const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent,
+      const stw::opensyde_core::C_OscNodeDataPool::E_Type oe_DatapoolType);
    static int32_t h_LoadToDataPoolListElementsFromClipBoard(
       std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscContent,
       std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent);
    static void h_StoreDataPoolListElementsToString(
       const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscContent,
-      const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent, QString & orc_Output);
+      const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent,
+      const stw::opensyde_core::C_OscNodeDataPool::E_Type oe_DatapoolType, QString & orc_Output);
    static int32_t h_LoadToDataPoolListElementsFromString(
       std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscContent,
       std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiContent, const QString & orc_Input);
@@ -87,7 +89,8 @@ public:
                                const std::vector<std::vector<QString> > & orc_OwnerNodeName,
                                const std::vector<std::vector<uint32_t> > & orc_OwnerNodeInterfaceIndex,
                                const std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,
-                               const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag);
+                               const std::vector<std::vector<bool> > & orc_OwnerIsTxFlag,
+                               const opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
    static int32_t h_LoadMessages(std::vector<stw::opensyde_core::C_OscCanMessage> & orc_Messages, std::
                                  vector<std::vector<stw::opensyde_core::
                                                     C_OscNodeDataPoolListElement> > & orc_OscSignalCommons, std::
@@ -99,7 +102,7 @@ public:
                                  std::vector<std::vector<uint32_t> > & orc_OwnerNodeDatapoolIndex,
                                  std::vector<std::vector<bool> > & orc_OwnerIsTxFlag);
    static void h_StoreSignalsToClipboard(const std::vector<stw::opensyde_core::C_OscCanSignal> & orc_Signals,
-                                         const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals);
+                                         const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals, const opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
    static int32_t h_LoadSignalsFromClipboard(std::vector<stw::opensyde_core::C_OscCanSignal> & orc_Signals,
                                              std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons, std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals);
    static void h_StoreMessageIndexToString(
@@ -117,7 +120,7 @@ private:
    C_SdClipBoardHelper(void);
 
    static void mh_StoreSignalsToString(const std::vector<stw::opensyde_core::C_OscCanSignal> & orc_Signals,
-                                       const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals, QString & orc_Output);
+                                       const std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons, const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, const std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals, const opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType, QString & orc_Output);
    static int32_t mh_LoadSignalsFromString(const QString & orc_Input,
                                            std::vector<stw::opensyde_core::C_OscCanSignal> & orc_Signals,
                                            std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons, std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons, std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals);

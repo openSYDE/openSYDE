@@ -62,7 +62,7 @@ void C_SyvUpFileSizeInformation::Reset(void)
    Estimated wait time in seconds (only valid if opq_Ok was set to true)
 */
 //----------------------------------------------------------------------------------------------------------------------
-uint64_t C_SyvUpFileSizeInformation::GetEstimatedTimeS(bool * const opq_Ok) const
+uint64_t C_SyvUpFileSizeInformation::GetEstimatedTimeSeconds(bool * const opq_Ok) const
 {
    uint64_t u64_Retval = 0ULL;
 
@@ -328,7 +328,7 @@ void C_SyvUpFileSizeInformation::LoadUserSettings(const uint32_t ou32_ViewIndex)
    if ((pc_View != NULL) &&
        (s32_Retval == C_NO_ERR))
    {
-      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
       for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
       {
          QString c_Name;
@@ -372,7 +372,7 @@ void C_SyvUpFileSizeInformation::SaveUserSettings(const uint32_t ou32_ViewIndex)
    {
       for (uint32_t u32_ItNode = 0UL; u32_ItNode < c_NodeActiveFlags.size(); ++u32_ItNode)
       {
-         if (c_NodeActiveFlags[u32_ItNode] == true)
+         if (c_NodeActiveFlags[u32_ItNode] == 1)
          {
             const QMap<uint32_t, float64_t>::const_iterator c_It = this->mc_BytesPerMsMapPerNode.find(
                u32_ItNode);
@@ -385,8 +385,8 @@ void C_SyvUpFileSizeInformation::SaveUserSettings(const uint32_t ou32_ViewIndex)
                   if (C_PuiSvHandler::h_GetInstance()->CalcViewRoutingCrcIndex(ou32_ViewIndex, u32_ItNode,
                                                                                u32_Crc) == C_NO_ERR)
                   {
-                     C_UsHandler::h_GetInstance()->AddProjSvNodeUpdateDataRate(pc_View->GetName(), c_Name, u32_Crc,
-                                                                               c_It.value());
+                     C_UsHandler::h_GetInstance()->AddProjSvNodeUpdateDataRate(pc_View->GetName().c_str(), c_Name,
+                                                                               u32_Crc, c_It.value());
                   }
                }
             }

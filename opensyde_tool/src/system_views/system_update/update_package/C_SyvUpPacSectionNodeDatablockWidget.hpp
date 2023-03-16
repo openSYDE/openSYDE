@@ -10,7 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvUpPacSectionNodeWidget.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 #include "C_SyvUpDeviceInfo.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -47,7 +47,7 @@ public:
 
 protected:
    void m_InitSpecificItem(const stw::opensyde_core::C_OscNode & orc_Node,
-                           const stw::opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInfo) override;
+                           const stw::opensyde_core::C_OscViewNodeUpdate & orc_UpdateInfo) override;
    void m_InitStaticNames(void) override;
    void m_UpdateTitle(void) override;
 

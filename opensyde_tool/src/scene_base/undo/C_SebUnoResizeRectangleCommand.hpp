@@ -33,7 +33,7 @@ public:
    C_SebUnoResizeRectangleCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
                                   const QPointF & orc_OldPos, const QSizeF & orc_OldSize, const QPointF & orc_NewPos,
                                   const QSizeF & orc_NewSize, QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SebUnoResizeRectangleCommand();
+   ~C_SebUnoResizeRectangleCommand() override;
    void undo(void) override;
    void redo(void) override;
 

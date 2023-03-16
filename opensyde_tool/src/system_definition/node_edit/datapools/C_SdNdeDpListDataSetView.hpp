@@ -40,7 +40,7 @@ class C_SdNdeDpListDataSetView :
 
 public:
    C_SdNdeDpListDataSetView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeDpListDataSetView(void);
+   ~C_SdNdeDpListDataSetView(void) override;
    void SetList(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
                 const uint32_t & oru32_ListIndex);
    bool Equals(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,

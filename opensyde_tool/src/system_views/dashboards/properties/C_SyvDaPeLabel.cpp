@@ -125,14 +125,13 @@ void C_SyvDaPeLabel::InitStaticNames(void) const
 C_PuiSvDbLabel::E_Type C_SyvDaPeLabel::GetType(void) const
 {
    C_PuiSvDbLabel::E_Type e_Retval;
-   switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
+   if (this->mpc_Ui->pc_ComboBoxType->currentIndex() == C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_TRANSPARENT)
    {
-   case C_SyvDaPeLabel::mhs32_INDEX_STYLE_TYPE_TRANSPARENT:
       e_Retval = C_PuiSvDbLabel::eTRANSPARENT;
-      break;
-   default:
+   }
+   else
+   {
       e_Retval = C_PuiSvDbLabel::eDEFAULT;
-      break;
    }
 
    return e_Retval;

@@ -137,7 +137,24 @@ void C_SdBueSignalTableView::LoadUserSettings(const std::vector<int32_t> & orc_V
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableView::SaveUserSettings(std::vector<int32_t> & orc_Values) const
 {
+   const std::map<C_SdBueSignalTableModel::E_Columns,
+                  uint32_t> c_DefaultColumnWidths = C_SdBueSignalTableView::mh_GetDefaultColumnWidths();
+
    orc_Values = this->m_GetColumnWidths();
+   for (uint32_t u32_It = 0UL; u32_It < orc_Values.size(); ++u32_It)
+   {
+      if (orc_Values[u32_It] == 0L)
+      {
+         const std::map<C_SdBueSignalTableModel::E_Columns,
+                        uint32_t>::const_iterator c_It = c_DefaultColumnWidths.find(C_SdBueSignalTableModel::h_ColumnToEnum(
+                                                                                       u32_It));
+         if (c_It != c_DefaultColumnWidths.cend())
+         {
+            //Column hidden, use default instead
+            orc_Values[u32_It] = static_cast<int32_t>(c_It->second);
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -252,23 +269,47 @@ void C_SdBueSignalTableView::mouseDoubleClickEvent(QMouseEvent * const opc_Event
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueSignalTableView::m_InitColumns(void)
 {
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eINDEX), 40);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eICON), 26);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eMESSAGE), 138);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eNAME), 148);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCOMMENT), 206);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX), 81);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eSTART_BIT), 70);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eLENGTH), 81);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eBYTE_ORDER), 73);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eVALUE_TYPE), 74);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eINITIAL_VALUE), 88);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eFACTOR), 53);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eOFFSET), 59);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eAUTO_MIN_MAX), 103);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eMINIMUM_VALUE), 75);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eMAXIMUM_VALUE), 72);
-   this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eUNIT), 55);
+   const
+   std::map<C_SdBueSignalTableModel::E_Columns,
+            uint32_t> c_ColumnWidths = C_SdBueSignalTableView::mh_GetDefaultColumnWidths();
+
+   for (std::map<C_SdBueSignalTableModel::E_Columns,
+                 uint32_t>::const_iterator c_ItEntry = c_ColumnWidths.cbegin(); c_ItEntry != c_ColumnWidths.cend();
+        ++c_ItEntry)
+   {
+      this->setColumnWidth(C_SdBueSignalTableModel::h_EnumToColumn(c_ItEntry->first), c_ItEntry->second);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default column widths
+
+   \return
+   Default column widths
+*/
+//----------------------------------------------------------------------------------------------------------------------
+std::map<C_SdBueSignalTableModel::E_Columns, uint32_t> C_SdBueSignalTableView::mh_GetDefaultColumnWidths()
+{
+   std::map<C_SdBueSignalTableModel::E_Columns, uint32_t> c_ColumnWidths;
+   c_ColumnWidths[C_SdBueSignalTableModel::eINDEX] = 40;
+   c_ColumnWidths[C_SdBueSignalTableModel::eICON] = 26;
+   c_ColumnWidths[C_SdBueSignalTableModel::eMESSAGE] = 138;
+   c_ColumnWidths[C_SdBueSignalTableModel::eNAME] = 148;
+   c_ColumnWidths[C_SdBueSignalTableModel::eCOMMENT] = 206;
+   c_ColumnWidths[C_SdBueSignalTableModel::eJ1939_SPN] = 56;
+   c_ColumnWidths[C_SdBueSignalTableModel::eCAN_OPEN_INDEX] = 81;
+   c_ColumnWidths[C_SdBueSignalTableModel::eSTART_BIT] = 70;
+   c_ColumnWidths[C_SdBueSignalTableModel::eLENGTH] = 81;
+   c_ColumnWidths[C_SdBueSignalTableModel::eBYTE_ORDER] = 73;
+   c_ColumnWidths[C_SdBueSignalTableModel::eVALUE_TYPE] = 74;
+   c_ColumnWidths[C_SdBueSignalTableModel::eINITIAL_VALUE] = 88;
+   c_ColumnWidths[C_SdBueSignalTableModel::eFACTOR] = 53;
+   c_ColumnWidths[C_SdBueSignalTableModel::eOFFSET] = 59;
+   c_ColumnWidths[C_SdBueSignalTableModel::eAUTO_MIN_MAX] = 103;
+   c_ColumnWidths[C_SdBueSignalTableModel::eMINIMUM_VALUE] = 75;
+   c_ColumnWidths[C_SdBueSignalTableModel::eMAXIMUM_VALUE] = 72;
+   c_ColumnWidths[C_SdBueSignalTableModel::eUNIT] = 55;
+   return c_ColumnWidths;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -279,14 +320,26 @@ void C_SdBueSignalTableView::m_HandleColumnVisibility()
 {
    if (this->mpc_SyncManager != NULL)
    {
+      bool q_ShowCanOpen;
+      bool q_ShowJ1939;
       if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN)
       {
-         this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX),
-                               false);
+         q_ShowCanOpen = true;
+         q_ShowJ1939 = false;
+      }
+      else if (this->mpc_SyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eJ1939)
+      {
+         q_ShowCanOpen = false;
+         q_ShowJ1939 = true;
       }
       else
       {
-         this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX), true);
+         q_ShowCanOpen = false;
+         q_ShowJ1939 = false;
       }
+      this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eCAN_OPEN_INDEX),
+                            !q_ShowCanOpen);
+      this->setColumnHidden(C_SdBueSignalTableModel::h_EnumToColumn(C_SdBueSignalTableModel::eJ1939_SPN),
+                            !q_ShowJ1939);
    }
 }

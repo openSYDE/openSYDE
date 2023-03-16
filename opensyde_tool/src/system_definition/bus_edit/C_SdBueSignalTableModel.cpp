@@ -84,9 +84,9 @@ void C_SdBueSignalTableModel::UpdateData(void)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get header data
 
-   \param[in]  os32_Section       Section
+   \param[in]  os32_Section      Section
    \param[in]  oe_Orientation    Orientation
-   \param[in]  os32_Role          Role
+   \param[in]  os32_Role         Role
 
    \return
    Header string
@@ -118,6 +118,9 @@ QVariant C_SdBueSignalTableModel::headerData(const int32_t os32_Section, const Q
             break;
          case eCOMMENT:
             c_Retval = C_GtGetText::h_GetText("Comment");
+            break;
+         case eJ1939_SPN:
+            c_Retval = C_GtGetText::h_GetText("SPN");
             break;
          case eCAN_OPEN_INDEX:
             c_Retval = C_GtGetText::h_GetText("Index");
@@ -211,7 +214,7 @@ int32_t C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) con
    if (!orc_Parent.isValid())
    {
       //For table parent should always be invalid
-      s32_Retval = 18;
+      s32_Retval = 19;
    }
    return s32_Retval;
 }
@@ -220,7 +223,7 @@ int32_t C_SdBueSignalTableModel::columnCount(const QModelIndex & orc_Parent) con
 /*! \brief   Get data at index
 
    \param[in]  orc_Index   Index
-   \param[in]  os32_Role    Data role
+   \param[in]  os32_Role   Data role
 
    \return
    Data
@@ -277,6 +280,7 @@ QVariant C_SdBueSignalTableModel::data(const QModelIndex & orc_Index, const int3
          case eUNIT:
          case eINDEX:
          case eSTART_BIT:
+         case eJ1939_SPN:
          case eCAN_OPEN_INDEX:
             //No decoration
             break;
@@ -368,45 +372,48 @@ C_SdBueSignalTableModel::E_Columns C_SdBueSignalTableModel::h_ColumnToEnum(const
       e_Retval = eCOMMENT;
       break;
    case 4:
-      e_Retval = eCAN_OPEN_INDEX;
+      e_Retval = eJ1939_SPN;
       break;
    case 5:
-      e_Retval = eMESSAGE;
+      e_Retval = eCAN_OPEN_INDEX;
       break;
    case 6:
-      e_Retval = eMULTIPLEXING;
+      e_Retval = eMESSAGE;
       break;
    case 7:
-      e_Retval = eSTART_BIT;
+      e_Retval = eMULTIPLEXING;
       break;
    case 8:
-      e_Retval = eLENGTH;
+      e_Retval = eSTART_BIT;
       break;
    case 9:
-      e_Retval = eBYTE_ORDER;
+      e_Retval = eLENGTH;
       break;
    case 10:
-      e_Retval = eVALUE_TYPE;
+      e_Retval = eBYTE_ORDER;
       break;
    case 11:
-      e_Retval = eINITIAL_VALUE;
+      e_Retval = eVALUE_TYPE;
       break;
    case 12:
-      e_Retval = eFACTOR;
+      e_Retval = eINITIAL_VALUE;
       break;
    case 13:
-      e_Retval = eOFFSET;
+      e_Retval = eFACTOR;
       break;
    case 14:
-      e_Retval = eAUTO_MIN_MAX;
+      e_Retval = eOFFSET;
       break;
    case 15:
-      e_Retval = eMINIMUM_VALUE;
+      e_Retval = eAUTO_MIN_MAX;
       break;
    case 16:
-      e_Retval = eMAXIMUM_VALUE;
+      e_Retval = eMINIMUM_VALUE;
       break;
    case 17:
+      e_Retval = eMAXIMUM_VALUE;
+      break;
+   case 18:
       e_Retval = eUNIT;
       break;
    default:
@@ -445,47 +452,50 @@ int32_t C_SdBueSignalTableModel::h_EnumToColumn(const C_SdBueSignalTableModel::E
    case eCOMMENT:
       s32_Retval = 3;
       break;
-   case eCAN_OPEN_INDEX:
+   case eJ1939_SPN:
       s32_Retval = 4;
       break;
-   case eMESSAGE:
+   case eCAN_OPEN_INDEX:
       s32_Retval = 5;
       break;
-   case eMULTIPLEXING:
+   case eMESSAGE:
       s32_Retval = 6;
       break;
-   case eSTART_BIT:
+   case eMULTIPLEXING:
       s32_Retval = 7;
       break;
-   case eLENGTH:
+   case eSTART_BIT:
       s32_Retval = 8;
       break;
-   case eBYTE_ORDER:
+   case eLENGTH:
       s32_Retval = 9;
       break;
-   case eVALUE_TYPE:
+   case eBYTE_ORDER:
       s32_Retval = 10;
       break;
-   case eINITIAL_VALUE:
+   case eVALUE_TYPE:
       s32_Retval = 11;
       break;
-   case eFACTOR:
+   case eINITIAL_VALUE:
       s32_Retval = 12;
       break;
-   case eOFFSET:
+   case eFACTOR:
       s32_Retval = 13;
       break;
-   case eAUTO_MIN_MAX:
+   case eOFFSET:
       s32_Retval = 14;
       break;
-   case eMINIMUM_VALUE:
+   case eAUTO_MIN_MAX:
       s32_Retval = 15;
       break;
-   case eMAXIMUM_VALUE:
+   case eMINIMUM_VALUE:
       s32_Retval = 16;
       break;
-   case eUNIT:
+   case eMAXIMUM_VALUE:
       s32_Retval = 17;
+      break;
+   case eUNIT:
+      s32_Retval = 18;
       break;
    default:
       s32_Retval = -1;
@@ -614,6 +624,9 @@ QVariant C_SdBueSignalTableModel::m_GetDisplayAndEditValue(const QModelIndex & o
       case eMESSAGE:
          c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_MsgName;
          break;
+      case eJ1939_SPN:
+         c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.u32_J1939Spn;
+         break;
       case eCAN_OPEN_INDEX:
          c_Retval = this->mc_SigInfoAll[s32_Index].c_SignalData.c_CoIndex;
          break;
@@ -701,6 +714,7 @@ QFont C_SdBueSignalTableModel::m_GetFontValue(const C_SdBueSignalTableModel::E_C
    case eAUTO_MIN_MAX:
    case eMINIMUM_VALUE:
    case eMAXIMUM_VALUE:
+   case eJ1939_SPN:
    case eCAN_OPEN_INDEX:
    case eUNIT:
       c_Font = mc_STYLE_GUIDE_FONT_REGULAR_14;
@@ -773,6 +787,7 @@ void C_SdBueSignalTableModel::m_FillSigInfo(void)
                c_SigData.c_MsgName = static_cast<QString>("%1 (0x%2)").arg(pc_Message->c_Name.c_str(),
                                                                            QString::number(pc_Message->u32_CanId,
                                                                                            16).toUpper());
+               c_SigData.u32_J1939Spn = pc_OscSignal->u32_J1939SuspectParameterNumber;
                c_SigData.c_CoIndex = C_SdUtil::h_GetCanOpenSignalObjectIndex(
                   pc_OscSignal->u16_CanOpenManagerObjectDictionaryIndex,
                   pc_OscSignal->u8_CanOpenManagerObjectDictionarySubIndex);

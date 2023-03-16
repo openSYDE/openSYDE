@@ -139,8 +139,10 @@ void C_SdBueMlvWidget::SetComProtocol(const stw::opensyde_core::C_OscCanProtocol
 {
    this->me_Protocol = ore_Value;
 
-   // Multiplexer is only relevant and used by layer 2 protocol
-   this->mpc_Ui->pc_GroupBoxMultiplexer->setVisible(this->me_Protocol == C_OscCanProtocol::eLAYER2);
+   // Multiplexer is only relevant and used by layer 2 and J1939 protocol
+   this->mpc_Ui->pc_GroupBoxMultiplexer->setVisible(
+      (this->me_Protocol == C_OscCanProtocol::eLAYER2) ||
+      (this->me_Protocol == C_OscCanProtocol::eJ1939));
 
    if (this->mpc_Scene != NULL)
    {
@@ -239,7 +241,8 @@ void C_SdBueMlvWidget::m_SelectMessage(const C_OscCanMessageIdentificationIndice
       bool q_MultiplexedMsg = false;
       uint16_t u16_MultiplexerValue = 0;
 
-      if ((this->me_Protocol == C_OscCanProtocol::eLAYER2) &&
+      if (((this->me_Protocol == C_OscCanProtocol::eLAYER2) ||
+           (this->me_Protocol == C_OscCanProtocol::eJ1939)) &&
           (this->mpc_Ui->pc_ComboBoxMultiplexer->isEnabled() == true))
       {
          q_MultiplexedMsg = true;
@@ -275,7 +278,7 @@ void C_SdBueMlvWidget::m_OnMessageUpdated(void)
 void C_SdBueMlvWidget::m_OnMultiplexerValueChanged(void)
 {
    if ((this->mpc_Scene != NULL) &&
-       (this->me_Protocol == C_OscCanProtocol::eLAYER2) &&
+       ((this->me_Protocol == C_OscCanProtocol::eLAYER2) || (this->me_Protocol == C_OscCanProtocol::eJ1939)) &&
        (this->mpc_Ui->pc_ComboBoxMultiplexer->isEnabled() == true))
    {
       this->mpc_Scene->SetMultiplexValue(this->m_GetSelectedMultiplexerValues());
@@ -315,8 +318,9 @@ void C_SdBueMlvWidget::m_UpdateMultiplexerValues(const C_OscCanMessageIdentifica
                                                                    int32_t)>(&C_OgeCbxText::currentIndexChanged), this,
               &C_SdBueMlvWidget::m_OnMultiplexerValueChanged);
 
-   // Only relevant and used by layer 2 protocol
-   if (this->me_Protocol == C_OscCanProtocol::eLAYER2)
+   // Only relevant and used by layer 2 and J1939 protocols
+   if ((this->me_Protocol == C_OscCanProtocol::eLAYER2) ||
+       (this->me_Protocol == C_OscCanProtocol::eJ1939))
    {
       bool q_TryToSetPreviousValue = false;
       uint16_t u16_PreviousValue = 0;

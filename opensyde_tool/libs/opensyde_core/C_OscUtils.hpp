@@ -56,6 +56,24 @@ public:
                              stw::scl::C_SclString * const opc_ErrorPath = NULL,
                              stw::scl::C_SclString * const opc_ErrorMessage = NULL);
 
+   //Utilities for path place holder parsing
+   static stw::scl::C_SclString h_MakeIndependentOfDbProjectPath(const stw::scl::C_SclString & orc_DbProjectPath,
+                                                                 const stw::scl::C_SclString & orc_OsydeProjectPath,
+                                                                 const stw::scl::C_SclString & orc_Path);
+   static stw::scl::C_SclString h_ResolvePlaceholderVariables(const stw::scl::C_SclString & orc_Path,
+                                                              const stw::scl::C_SclString & orc_OsydeProjectPath,
+                                                              const stw::scl::C_SclString & orc_DbProjectPath = "");
+   static stw::scl::C_SclString h_ResolveProjIndependentPlaceholderVariables(const stw::scl::C_SclString & orc_Path);
+   static stw::scl::C_SclString h_ConcatPathIfNecessary(const stw::scl::C_SclString & orc_BaseDir,
+                                                        const stw::scl::C_SclString & orc_RelativeOrAbsolutePath);
+
+   // Path variables
+   static const stw::scl::C_SclString hc_PATH_VARIABLE_OPENSYDE_BIN;
+   static const stw::scl::C_SclString hc_PATH_VARIABLE_OPENSYDE_PROJ;
+   static const stw::scl::C_SclString hc_PATH_VARIABLE_DATABLOCK_PROJ;
+   static const stw::scl::C_SclString hc_PATH_VARIABLE_USER_NAME;
+   static const stw::scl::C_SclString hc_PATH_VARIABLE_COMPUTER_NAME;
+
 private:
    static const float64_t mhf64_EPSILON;
    static stw::scl::C_SCLResourceStrings mhc_ResourceStrings;

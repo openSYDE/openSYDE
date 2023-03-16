@@ -12,6 +12,7 @@
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
+#include "C_SclString.hpp"
 #include "TglUtils.hpp"
 #include "C_OscLoggingHandler.hpp"
 #include "C_PuiSdHandler.hpp"
@@ -21,6 +22,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
+using namespace stw::scl;
 using namespace stw::opensyde_core;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_logic;
@@ -117,6 +119,7 @@ void C_GiSvSubNodeData::SetConnected(const bool oq_Active)
 
       this->mq_ConnectStatesSet = false;
       this->mq_UpdateStatesSet = false;
+      this->mq_UpdateFailed = false;
    }
 
    //Always reset known status information flag
@@ -284,7 +287,7 @@ void C_GiSvSubNodeData::UpdateInitialPackageStatus(const C_SyvUpDeviceInfo & orc
       {
          const C_OscNode * const pc_Node =
             C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
-         const C_PuiSvNodeUpdate * const pc_UpdateInformation =
+         const C_OscViewNodeUpdate * const pc_UpdateInformation =
             pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
          if ((pc_UpdateInformation != NULL) && (pc_Node != NULL))
 
@@ -337,12 +340,12 @@ bool C_GiSvSubNodeData::CheckUpdateDisabledState(void) const
                   const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
                   if (pc_View != NULL)
                   {
-                     const C_PuiSvNodeUpdate * const pc_UpdateInfo =
+                     const C_OscViewNodeUpdate * const pc_UpdateInfo =
                         pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
                      if (pc_UpdateInfo != NULL)
                      {
                         if ((pc_UpdateInfo->GetParamInfos().size() == 0UL) &&
-                            (pc_UpdateInfo->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED).size() == 0UL))
+                            (pc_UpdateInfo->GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED).size() == 0UL))
                         {
                            //No file associated
                            q_Retval = true;
@@ -415,9 +418,9 @@ bool C_GiSvSubNodeData::CheckAlwaysUpdate(void) const
        (pc_Node->pc_DeviceDefinition != NULL) &&
        (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
    {
-      const C_PuiSvNodeUpdate * const pc_UpdateInformation = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
+      const C_OscViewNodeUpdate * const pc_UpdateInformation = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
       if (((pc_UpdateInformation->GetParamInfos().size() == 0UL) &&
-           (pc_UpdateInformation->GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED).size() == 0UL)) &&
+           (pc_UpdateInformation->GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED).size() == 0UL)) &&
           (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased ==
            false))
       {
@@ -576,6 +579,7 @@ void C_GiSvSubNodeData::DiscardInfo()
    {
       this->me_InitialStatus = C_SyvUtil::eI_TO_BE_UPDATED;
       this->me_UpdateStatus = C_SyvUtil::eU_WAITING;
+      this->mq_UpdateFailed = false;
       this->mq_Discarded = true;
    }
 }
@@ -900,10 +904,10 @@ void C_GiSvSubNodeData::m_CheckThirdParty(void)
    \param[in]  orc_UpdateInformation   Update information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvSubNodeData::m_InitPackageData(const C_OscNode & orc_Node, const C_PuiSvNodeUpdate & orc_UpdateInformation)
+void C_GiSvSubNodeData::m_InitPackageData(const C_OscNode & orc_Node, const C_OscViewNodeUpdate & orc_UpdateInformation)
 {
    if (orc_Node.c_Applications.size() ==
-       orc_UpdateInformation.GetPaths(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK).size())
+       orc_UpdateInformation.GetPaths(C_OscViewNodeUpdate::eFTP_DATA_BLOCK).size())
    {
       if (orc_Node.c_Applications.size() > 0UL)
       {
@@ -918,8 +922,8 @@ void C_GiSvSubNodeData::m_InitPackageData(const C_OscNode & orc_Node, const C_Pu
          uint32_t u32_ItApplication;
          uint32_t u32_ItApplicationPath = 0U;
          std::vector<QString> c_FinalApplicationPaths;
-         const std::vector<QString> & rc_ApplicationPaths = orc_UpdateInformation.GetPaths(
-            C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+         const std::vector<C_SclString> & rc_ApplicationPaths = orc_UpdateInformation.GetPaths(
+            C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
          c_FinalApplicationPaths.reserve(orc_Node.c_Applications.size());
 
          for (u32_ItApplication = 0U; u32_ItApplication < orc_Node.c_Applications.size();
@@ -930,7 +934,7 @@ void C_GiSvSubNodeData::m_InitPackageData(const C_OscNode & orc_Node, const C_Pu
             // The HALC NVM param files files will be handled with the other param files
             if (rc_Application.e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
             {
-               const QString & rc_ViewApplicationPath = rc_ApplicationPaths[u32_ItApplicationPath];
+               const QString & rc_ViewApplicationPath = rc_ApplicationPaths[u32_ItApplicationPath].c_str();
                if (rc_ViewApplicationPath.compare("") == 0)
                {
                   // In not NVM HALC case, only 1 path for each datablock exists
@@ -1001,29 +1005,29 @@ void C_GiSvSubNodeData::m_InitPackageDataForApplicationsFromFiles(const std::vec
    \param[in]  orc_UpdateInformation   Update information
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_GiSvSubNodeData::m_InitPackageDataForOtherFiles(const C_PuiSvNodeUpdate & orc_UpdateInformation)
+void C_GiSvSubNodeData::m_InitPackageDataForOtherFiles(const C_OscViewNodeUpdate & orc_UpdateInformation)
 {
-   const std::vector<C_PuiSvNodeUpdateParamInfo> & rc_ParamInfo = orc_UpdateInformation.GetParamInfos();
-   const std::vector<QString> & rc_Files =
-      orc_UpdateInformation.GetPaths(C_PuiSvNodeUpdate::eFTP_FILE_BASED);
+   const std::vector<C_OscViewNodeUpdateParamInfo> & rc_ParamInfo = orc_UpdateInformation.GetParamInfos();
+   const std::vector<C_SclString> & rc_Files =
+      orc_UpdateInformation.GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED);
 
    //Handle param files
    this->mc_ParamFileInfos.reserve(rc_ParamInfo.size());
    for (uint32_t u32_ItParamFile = 0; u32_ItParamFile < rc_ParamInfo.size(); ++u32_ItParamFile)
    {
-      const C_PuiSvNodeUpdateParamInfo & rc_CurParamInfo = rc_ParamInfo[u32_ItParamFile];
-      this->mc_ParamFileInfos.push_back(rc_CurParamInfo.GetPath());
+      const C_OscViewNodeUpdateParamInfo & rc_CurParamInfo = rc_ParamInfo[u32_ItParamFile];
+      this->mc_ParamFileInfos.emplace_back(rc_CurParamInfo.GetPath().c_str());
    }
 
    //Handle files
    this->mc_FileInfos.reserve(rc_Files.size());
    for (uint32_t u32_ItFile = 0; u32_ItFile < rc_Files.size(); ++u32_ItFile)
    {
-      this->mc_FileInfos.push_back(rc_Files[u32_ItFile]);
+      this->mc_FileInfos.emplace_back(rc_Files[u32_ItFile].c_str());
    }
 
    // Handle PEM file
-   this->mc_PemFileInfo = orc_UpdateInformation.GetPemFilePath();
+   this->mc_PemFileInfo = orc_UpdateInformation.GetPemFilePath().c_str();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1066,11 +1070,11 @@ void C_GiSvSubNodeData::m_InitStatusFromPackage(
                   const C_OscProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
                      orc_DeviceApplicationInfos.pc_OpenSydeDevice->c_Applications[u32_ItApplication];
                   //Search for match
-                  if (((rc_OsyDeviceInfo.c_ApplicationName == rc_FileInfo.acn_ProjectName) &&
-                       (rc_OsyDeviceInfo.c_ApplicationVersion == rc_FileInfo.acn_ProjectVersion)) &&
-                      ((rc_OsyDeviceInfo.c_BuildDate + rc_OsyDeviceInfo.c_BuildTime) ==
-                       (static_cast<QString>(rc_FileInfo.acn_Date) +
-                        rc_FileInfo.acn_Time).toStdString().c_str()))
+                  if ((rc_OsyDeviceInfo.c_ApplicationName.Trim() == rc_FileInfo.GetProjectName().Trim()) &&
+                      (rc_OsyDeviceInfo.c_ApplicationVersion.Trim() == rc_FileInfo.GetProjectVersion().Trim()) &&
+                      (rc_OsyDeviceInfo.c_BuildDate.Trim() == rc_FileInfo.GetDate().Trim()) &&
+                      (rc_OsyDeviceInfo.c_BuildTime.Trim() == rc_FileInfo.GetTime().Trim()))
+
                   {
                      if (rc_OsyDeviceInfo.u8_SignatureValid == 0U) //0 == valid
                      {
@@ -1117,20 +1121,12 @@ void C_GiSvSubNodeData::m_InitStatusFromPackage(
                  ++s32_ItDeviceInfoBlock)
             {
                const stw::diag_lib::C_XFLECUInformation & rc_StwDeviceInfo =
-                  orc_DeviceApplicationInfos.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks[
-                     s32_ItDeviceInfoBlock];
+                  orc_DeviceApplicationInfos.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks[s32_ItDeviceInfoBlock];
                //Search for match
-               if (((static_cast<QString>(rc_StwDeviceInfo.acn_ProjectName).compare(rc_FileInfo.acn_ProjectName)
-                     ==
-                     0) &&
-                    (static_cast<QString>(rc_StwDeviceInfo.acn_ProjectVersion).compare(rc_FileInfo.
-                                                                                       acn_ProjectVersion) ==
-                     0)) &&
-                   (static_cast<QString>((static_cast<QString>(rc_StwDeviceInfo.acn_Date) +
-                                          rc_StwDeviceInfo.acn_Time)).compare((static_cast<QString>(rc_FileInfo
-                                                                                                    .acn_Date)
-                                                                               +
-                                                                               rc_FileInfo.acn_Time)) == 0))
+               if ((rc_StwDeviceInfo.GetProjectName().Trim() == rc_FileInfo.GetProjectName().Trim()) &&
+                   (rc_StwDeviceInfo.GetProjectVersion().Trim() == rc_FileInfo.GetProjectVersion().Trim()) &&
+                   (rc_StwDeviceInfo.GetDate().Trim() == rc_FileInfo.GetDate().Trim()) &&
+                   (rc_StwDeviceInfo.GetTime().Trim() == rc_FileInfo.GetTime().Trim()))
                {
                   q_Found = true;
                   break;

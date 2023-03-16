@@ -186,7 +186,9 @@ public:
    int32_t MapBusNameToIndex(const QString & orc_BusName, uint32_t & oru32_BusIndex) const;
    int32_t MapBusIndexToName(const uint32_t ou32_BusIndex, QString & orc_BusName) const;
    QString GetCanSignalDisplayName(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
-                                   const uint32_t & oru32_SignalIndex) const;
+                                   const uint32_t & oru32_SignalIndex, const bool oq_ToolTip) const;
+   QString GetCanMessageDisplayName(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                    const bool oq_ToolTip) const;
 
 protected:
    C_PuiSdHandlerBusLogic(QObject * const opc_Parent = NULL);

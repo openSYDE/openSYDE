@@ -32,8 +32,6 @@ TinyXML-2             zlib license              opensyde_tool\libs\opensyde_core
 MinGW Runtime         MIT Style                 <no sources provided>                                    http://www.mingw.org/license
 Miniz                 MIT                       opensyde_tool\libs\opensyde_core\miniz                   https://github.com/richgel999/miniz
 AES                   MIT                       opensyde_tool\libs\opensyde_core\aes                     https://github.com/SergeyBel/AES
-libtomcrypt           Unlicense                 opensyde_tool\libs\opensyde_core\libtomcrypt             https://github.com/libtom/libtomcrypt
-libtommath            Unlicense                 opensyde_tool\libs\opensyde_core\libtomcrypt\libtommath  https://github.com/libtom/libtommath
 
 
 (*) Copies of the (unmodified) Qt library sources have not been placed in the openSYDE GitHub repository.

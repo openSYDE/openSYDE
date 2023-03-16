@@ -33,7 +33,7 @@ public:
                                         const std::vector<uint64_t> & orc_Ids, const QPointF & orc_NewPos,
                                         const float64_t of64_HighestUsedZetValue,
                                         QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SdManUnoTopologyAddSnapshotCommand(void);
+   ~C_SdManUnoTopologyAddSnapshotCommand(void) override;
 
 protected:
    void m_AddNew(void) override;

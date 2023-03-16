@@ -35,7 +35,7 @@ class C_OgeTreeViewToolTipBaseCheckable :
 
 public:
    C_OgeTreeViewToolTipBaseCheckable(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTreeViewToolTipBaseCheckable(void);
+   ~C_OgeTreeViewToolTipBaseCheckable(void) override;
 
    void Init(stw::opensyde_gui_logic::C_TblTreeModelCheckable * const opc_Model,
              const std::vector<uint32_t> & orc_ElementIndices);

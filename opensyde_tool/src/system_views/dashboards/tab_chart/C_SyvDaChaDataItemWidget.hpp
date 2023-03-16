@@ -45,7 +45,7 @@ public:
    };
 
    explicit C_SyvDaChaDataItemWidget(const uint32_t ou32_ViewIndex, QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaChaDataItemWidget();
+   ~C_SyvDaChaDataItemWidget() override;
 
    void InitWidget(const uint32_t ou32_DataPoolElementConfigIndex,
                    const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_DataPoolElementId,
@@ -106,9 +106,9 @@ private:
    QPixmap mc_IconSignalInactive;
    QPixmap mc_IconVariableInactive;
    QPixmap mc_IconParameterInactive;
-   QPixmap mc_IconHALInputInactive;
-   QPixmap mc_IconHALOutputInactive;
-   QPixmap mc_IconHALOtherInactive;
+   QPixmap mc_IconHalInputInactive;
+   QPixmap mc_IconHalOutputInactive;
+   QPixmap mc_IconHalOtherInactive;
    QPixmap mc_IconSignalWarning;
    QPixmap mc_IconVariableWarning;
    QPixmap mc_IconParameterWarning;

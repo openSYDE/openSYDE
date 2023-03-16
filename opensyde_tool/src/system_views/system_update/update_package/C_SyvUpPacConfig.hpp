@@ -15,7 +15,7 @@
 #include <QString>
 #include <vector>
 
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 #include "C_OscNodeApplication.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
@@ -51,8 +51,8 @@ public:
 
    QString c_PemFilePath;
 
-   C_PuiSvNodeUpdate::E_StateSecurity e_StateSecurity;
-   C_PuiSvNodeUpdate::E_StateDebugger e_StateDebugger;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity e_StateSecurity;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger e_StateDebugger;
 };
 
 class C_SyvUpPacConfig

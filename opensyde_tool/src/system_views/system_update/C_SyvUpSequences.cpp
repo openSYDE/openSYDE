@@ -175,8 +175,8 @@ int32_t C_SyvUpSequences::ReinitDispatcher(void)
 
       if (pc_View != NULL)
       {
-         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
-            pc_View->GetPcData().GetBusIndex());
+         const C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
 
          if (pc_Bus != NULL)
          {

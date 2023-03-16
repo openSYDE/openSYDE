@@ -152,6 +152,7 @@ public:
    bool operator ==(const C_OscNodeDataPoolContent & orc_Cmp) const;
    bool operator !=(const C_OscNodeDataPoolContent & orc_Cmp) const;
 
+   bool CompareContentStrict(const C_OscNodeDataPoolContent & orc_Cmp) const;
    bool CompareArrayGreaterOrEqual(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
    bool CompareArrayGreater(const C_OscNodeDataPoolContent & orc_Cmp, const uint32_t ou32_Index) const;
 

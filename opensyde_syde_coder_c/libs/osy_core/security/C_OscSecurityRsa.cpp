@@ -12,7 +12,9 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
-#include <tomcrypt.h>
+#include <cstring>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
 
 #include "stwerrors.hpp"
 #include "C_OscSecurityRsa.hpp"
@@ -30,11 +32,8 @@ const uint32_t C_OscSecurityRsa::mhu32_DEFAULT_BUFFER_SIZE = 1024;
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
-bool C_OscSecurityRsa::mhq_IsInitialized = false;
 
 /* -- Module Global Function Prototypes ----------------------------------------------------------------------------- */
-//lint -e{526, 2701,8010,8047} //Required by libtomcrypt
-extern const ltc_math_descriptor ltm_desc;
 
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
@@ -47,29 +46,17 @@ C_OscSecurityRsa::C_OscSecurityRsa()
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Initialize RSA library
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_OscSecurityRsa::h_Init()
-{
-   //Set math lib for libtomcrypt
-   ltc_mp = ltm_desc;
-   C_OscSecurityRsa::mhq_IsInitialized = true;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Sign signature
 
-   \param[in]      orc_PrivateKey         Private key
-   \param[in,out]  orc_Message            Message
-   \param[in,out]  orc_EncryptedMessage   Encrypted message
+   \param[in]      orc_PrivateKey         Private key in PKCS#8 format
+   \param[in]      orc_Message            Message
+   \param[out]     orc_EncryptedMessage   Encrypted message
 
    \return
    STW error codes
 
    \retval   C_NO_ERR   Message encrypted
    \retval   C_RANGE    Invalid key
-   \retval   C_CONFIG   Class uninitialized
    \retval   C_NOACT    Could not encrypt message
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,69 +64,62 @@ int32_t C_OscSecurityRsa::h_SignSignature(const std::vector<uint8_t> & orc_Priva
                                           const std::vector<uint8_t> & orc_Message,
                                           std::vector<uint8_t> & orc_EncryptedMessage)
 {
-   int32_t s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_RANGE;
+   const uint8_t * pu8_Data = &orc_PrivateKey[0];
 
-   if (C_OscSecurityRsa::mhq_IsInitialized)
+   orc_EncryptedMessage.resize(C_OscSecurityRsa::mhu32_DEFAULT_BUFFER_SIZE);
+
+   //Get private key information from PKCS#8 dump:
+   PKCS8_PRIV_KEY_INFO * const pc_Key = d2i_PKCS8_PRIV_KEY_INFO(NULL, &pu8_Data, orc_PrivateKey.size());
+   if (pc_Key != NULL)
    {
-      rsa_key c_PrivKeyRsa;
+      //Convert PKCS#8 key to EVP_PKEY:
+      EVP_PKEY * const pc_EvpKey = EVP_PKCS82PKEY(pc_Key);
+      PKCS8_PRIV_KEY_INFO_free(pc_Key);
 
-      try
+      if (pc_EvpKey != NULL)
       {
-         //using library type for API compatibility:
-         const unsigned long x_KeySize = static_cast<unsigned long>(orc_PrivateKey.size()); //lint !e8080 !e970
+         //Get RSA context from EVP_PKEY:
+         RSA * const pc_Rsa = EVP_PKEY_get1_RSA(pc_EvpKey);
+         EVP_PKEY_free(pc_EvpKey);
+         s32_Retval = C_NOACT;
 
-         if (rsa_import_pkcs8(&orc_PrivateKey[0], x_KeySize, NULL, 0, &c_PrivKeyRsa) == CRYPT_OK)
+         if (pc_Rsa != NULL)
          {
-            //ENCRYPTION
-            orc_EncryptedMessage.resize(C_OscSecurityRsa::mhu32_DEFAULT_BUFFER_SIZE);
-            //lint -save -e970 -e8080 //using types to match library interface
-            unsigned long x_EncryptedMessageCount = static_cast<unsigned long>(orc_EncryptedMessage.size());
-            const unsigned long x_MessageSize = static_cast<unsigned long>(orc_Message.size());
+            //Perform the actual encryption:
+            const int x_ResultEncrypt = RSA_private_encrypt( //lint !e970 !e8080 //using type to match library interface
+               orc_Message.size(), &orc_Message[0], &orc_EncryptedMessage[0], pc_Rsa,
+               RSA_PKCS1_PADDING);
+            RSA_free(pc_Rsa);
 
-            if (rsa_sign_hash_ex(&orc_Message[0], x_MessageSize, &orc_EncryptedMessage[0],
-                                 &x_EncryptedMessageCount,
-                                 static_cast<int>(LTC_PKCS_1_V1_5_NA1),
-                                 NULL, 0, 0, 0, &c_PrivKeyRsa) == CRYPT_OK)
-            //lint -restore
+            orc_EncryptedMessage.resize(x_ResultEncrypt);
+            if (x_ResultEncrypt != 0)
             {
-               orc_EncryptedMessage.resize(x_EncryptedMessageCount);
-            }
-            else
-            {
-               s32_Retval = C_NOACT;
+               s32_Retval = C_NO_ERR;
             }
          }
-         else
-         {
-            s32_Retval = C_RANGE;
-         }
-      }
-      catch (...)
-      {
-         s32_Retval = C_UNKNOWN_ERR;
       }
    }
-   else
-   {
-      s32_Retval = C_CONFIG;
-   }
+
    return s32_Retval;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Verify signature
 
-   \param[in]   orc_PublicKey          Public key
-   \param[in]   orc_Message            Message
+   Checks whether an encrypted messages, decrypted with a public key matches an expected message.
+
+   \param[in]   orc_PublicKey          Public key in X509 format
+   \param[in]   orc_Message            Expected message
    \param[in]   orc_EncryptedMessage   Encrypted message
-   \param[out]  orq_Valid              Valid
+   \param[out]  orq_Valid              true: signature valid
+                                       false: signature not valid
 
    \return
    STW error codes
 
    \retval   C_NO_ERR   Message decrypted
    \retval   C_RANGE    Invalid key
-   \retval   C_CONFIG   Class uninitialized
    \retval   C_NOACT    Could not decrypt message
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -147,56 +127,58 @@ int32_t C_OscSecurityRsa::h_VerifySignature(const std::vector<uint8_t> & orc_Pub
                                             const std::vector<uint8_t> & orc_Message,
                                             const std::vector<uint8_t> & orc_EncryptedMessage, bool & orq_Valid)
 {
-   int32_t s32_Retval = C_NO_ERR;
+   int32_t s32_Retval = C_RANGE;
 
-   if (C_OscSecurityRsa::mhq_IsInitialized)
+   //get RSA structure from binary key:
+   const uint8_t * pu8_Data = &orc_PublicKey[0];
+
+   orq_Valid = false;
+
+   //Extract X509 data from binary key data:
+   X509 * const pc_X509Data = d2i_X509(NULL, &pu8_Data, orc_PublicKey.size());
+   if (pc_X509Data != NULL)
    {
-      rsa_key c_PubKeyRsa;
+      //Get key in EVP_PKEY format:
+      EVP_PKEY * const pc_EvpKey = X509_get_pubkey(pc_X509Data);
+      X509_free(pc_X509Data);
 
-      try
+      if (pc_EvpKey != NULL)
       {
-         //using type to match library interface
-         const unsigned long x_KexSize = static_cast<unsigned long>(orc_PublicKey.size()); //lint !e8080 !e970
-         if (rsa_import_x509(&orc_PublicKey[0], x_KexSize, &c_PubKeyRsa) == CRYPT_OK)
+         //Get RSA context from EVP_PKEY:
+         RSA * const pc_Rsa = EVP_PKEY_get1_RSA(pc_EvpKey);
+         EVP_PKEY_free(pc_EvpKey);
+         s32_Retval = C_NOACT;
+
+         if (pc_Rsa != NULL)
          {
-            //lint -save -e970 -e8080 //using types to match library interface
-            int x_IsValid;
-            const unsigned long x_Message1Size = static_cast<unsigned long>(orc_EncryptedMessage.size());
-            const unsigned long x_Message2Size = static_cast<unsigned long>(orc_Message.size());
-            if (rsa_verify_hash_ex(&orc_EncryptedMessage[0], x_Message1Size, &orc_Message[0],
-                                   x_Message2Size,
-                                   static_cast<int>(LTC_PKCS_1_V1_5_NA1),
-                                   0, 0,
-                                   &x_IsValid, &c_PubKeyRsa) == CRYPT_OK)
-            //lint -restore
+            std::vector<uint8_t> c_DecryptedMessage;
+            c_DecryptedMessage.resize(C_OscSecurityRsa::mhu32_DEFAULT_BUFFER_SIZE);
+
+            //Perform the actual decryption:
+            const int x_DecryptResult = RSA_public_decrypt( //lint !e970 !e8080  //using type to match library interface
+               orc_EncryptedMessage.size(), &orc_EncryptedMessage[0], &c_DecryptedMessage[0], pc_Rsa,
+               RSA_PKCS1_PADDING);
+            RSA_free(pc_Rsa);
+
+            if (x_DecryptResult != 0)
             {
-               if (x_IsValid == 1)
+               s32_Retval = C_NO_ERR;
+               c_DecryptedMessage.resize(x_DecryptResult);
+
+               //compare decrypted messages with expected message:
+               if (c_DecryptedMessage.size() == orc_Message.size())
                {
-                  orq_Valid = true;
-               }
-               else
-               {
-                  orq_Valid = false;
+                  const int x_DiffResult = //lint !e970 !e8080 //using type to match library interface
+                                           std::memcmp(&c_DecryptedMessage[0], &orc_Message[0], orc_Message.size());
+                  if (x_DiffResult == 0)
+                  {
+                     orq_Valid = true; //we have a winner
+                  }
                }
             }
-            else
-            {
-               s32_Retval = C_NOACT;
-            }
-         }
-         else
-         {
-            s32_Retval = C_RANGE;
          }
       }
-      catch (...)
-      {
-         s32_Retval = C_UNKNOWN_ERR;
-      }
    }
-   else
-   {
-      s32_Retval = C_CONFIG;
-   }
+
    return s32_Retval;
 }

@@ -8,8 +8,8 @@
    \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CXFLECUINFORMATIONH
-#define CXFLECUINFORMATIONH
+#ifndef CXFLECUINFORMATIONHPP
+#define CXFLECUINFORMATIONHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"

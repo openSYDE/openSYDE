@@ -1516,7 +1516,7 @@ int32_t C_PuiSdHandlerHalc::CheckHalcDomainChannelLinked(const uint32_t ou32_Nod
          for (std::vector<stw::scl::C_SclString>::const_iterator c_ItNames = c_LinkedChannelNames.begin();
               c_ItNames != c_LinkedChannelNames.end(); ++c_ItNames)
          {
-            opc_LinkedChannelNames->push_back((*c_ItNames).c_str());
+            opc_LinkedChannelNames->emplace_back((*c_ItNames).c_str());
          }
       }
    }

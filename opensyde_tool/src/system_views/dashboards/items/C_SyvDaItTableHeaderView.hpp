@@ -25,7 +25,9 @@ class C_SyvDaItTableHeaderView :
 {
 public:
    C_SyvDaItTableHeaderView(const Qt::Orientation & ore_Orientation, QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaItTableHeaderView(void);
+   ~C_SyvDaItTableHeaderView(void) override;
+
+   void SetCursorHandlingActive(const bool oq_Active);
 
 protected:
    bool event(QEvent * const opc_Event) override;
@@ -35,6 +37,7 @@ private:
    C_SyvDaItTableHeaderView(const C_SyvDaItTableHeaderView &);
    C_SyvDaItTableHeaderView & operator =(const C_SyvDaItTableHeaderView &) &; //lint !e1511 //we want to hide the base
 
+   bool mq_CursorHandlingActive;
    bool mq_CursorChanged;
 };
 

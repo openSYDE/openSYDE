@@ -216,7 +216,8 @@ void C_SyvDaDashboardSelectorTabWidget::SetViewIndex(const uint32_t ou32_Value)
    {
       const std::vector<C_PuiSvDashboard> & rc_Dashboards = pc_View->GetDashboards();
       std::vector<uint32_t> c_LeftToAdd;
-      const C_UsSystemView c_ViewUserSettings = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+      const C_UsSystemView c_ViewUserSettings =
+         C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
       c_LeftToAdd.reserve(rc_Dashboards.size());
       //Initially add all indices
       for (uint32_t u32_It = 0; u32_It < rc_Dashboards.size(); ++u32_It)
@@ -1501,7 +1502,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
             const C_PuiSvDashboard * const pc_Dashboard = pc_View->GetDashboard(pc_Widget->GetIndex());
             if (pc_Dashboard != NULL)
             {
-               C_UsHandler::h_GetInstance()->SetProjSvDashboardTearOffPosition(pc_View->GetName(),
+               C_UsHandler::h_GetInstance()->SetProjSvDashboardTearOffPosition(pc_View->GetName().c_str(),
                                                                                pc_Dashboard->GetName(),
                                                                                pc_Widget->geometry().topLeft(),
                                                                                pc_Widget->geometry().size(),
@@ -1524,7 +1525,7 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
             if (pc_Dashboard != NULL)
             {
                //User settings
-               C_UsHandler::h_GetInstance()->SetProjSvDashboardMainTab(pc_View->GetName(),
+               C_UsHandler::h_GetInstance()->SetProjSvDashboardMainTab(pc_View->GetName().c_str(),
                                                                        pc_Dashboard->GetName());
                //Data
                C_PuiSvHandler::h_GetInstance()->SetDashboardTabIndex(this->mu32_ViewIndex,
@@ -1533,7 +1534,8 @@ void C_SyvDaDashboardSelectorTabWidget::m_StoreUserSettings(void)
          }
       }
       //Selection
-      C_UsHandler::h_GetInstance()->SetProjSvDashboardSelectedTabIndex(pc_View->GetName(), this->currentIndex());
+      C_UsHandler::h_GetInstance()->SetProjSvDashboardSelectedTabIndex(pc_View->GetName().c_str(),
+                                                                       this->currentIndex());
    }
 }
 

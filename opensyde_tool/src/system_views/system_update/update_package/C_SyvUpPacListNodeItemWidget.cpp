@@ -19,7 +19,7 @@
 
 #include "C_PuiProject.hpp"
 #include "C_PuiSvData.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 #include "C_PuiSvHandler.hpp"
 #include "TglUtils.hpp"
 #include "C_Uti.hpp"
@@ -435,7 +435,7 @@ void C_SyvUpPacListNodeItemWidget::LoadImportConfig(const C_SyvUpPacConfigNodeAp
                  this->mu32_ViewIndex,
                  this->mu32_NodeIndex,
                  this->mu32_Number, c_Path,
-                 C_PuiSvNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
+                 C_OscViewNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -523,16 +523,14 @@ bool C_SyvUpPacListNodeItemWidget::IsFileIdentical(const QString & orc_AppName, 
                                                    const QString & orc_AppBuildTime,
                                                    const QString & orc_AppBuildDate) const
 {
-   Q_UNUSED(orc_AppName)
-
    bool q_Return = false;
 
    if ((orc_AppName != "") &&
        (orc_AppVersion != "") &&
        (orc_AppBuildTime != "") &&
        (orc_AppBuildDate != "") &&
-       (orc_AppBuildTime == this->mc_Time) &&
-       (orc_AppBuildDate == this->mc_Date))
+       (orc_AppBuildTime.trimmed() == this->mc_Time.trimmed()) &&
+       (orc_AppBuildDate.trimmed() == this->mc_Date.trimmed()))
    {
       q_Return = true;
    }
@@ -688,32 +686,52 @@ void C_SyvUpPacListNodeItemWidget::m_UpateFilePathLabel(void) const
        (this->mc_AbsoluteFilePath != C_GtGetText::h_GetText("<Add File>")))
    {
       //Use topmost widget (in list) as reference for width
+      const int32_t s32_SPACING = 6U;
       int32_t s32_Width = this->parentWidget()->parentWidget()->width() - mhs32_PATH_OFFSET;
       QString c_AdaptedString;
 
       if (this->mpc_Ui->pc_LabelUserHint->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
-         s32_Width -= this->mpc_Ui->pc_LabelUserHint->width();
+         s32_Width -= (this->mpc_Ui->pc_LabelUserHint->width() + s32_SPACING);
+      }
+
+      if (this->mpc_Ui->pc_LabelSkip->isVisible() == true)
+      {
+         // In this case the label for the path does not have so much space to use
+         s32_Width -= (this->mpc_Ui->pc_LabelSkip->width() + s32_SPACING);
       }
 
       if (this->mpc_Ui->pc_LabelSecurity->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
-         s32_Width -= this->mpc_Ui->pc_LabelSecurity->width();
+         s32_Width -= (this->mpc_Ui->pc_LabelSecurity->width() + s32_SPACING);
       }
 
       if (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)
       {
          // In this case the label for the path does not have so much space to use
-         s32_Width -= this->mpc_Ui->pc_LabelDebugger->width();
+         s32_Width -= (this->mpc_Ui->pc_LabelDebugger->width() + s32_SPACING);
       }
+
+      if (this->mpc_Ui->pc_LabelVersion->isVisible() == true)
+      {
+         // In this case the label for the path does not have so much space to use
+         s32_Width -= (this->mpc_Ui->pc_LabelVersion->width() + s32_SPACING);
+      }
+
       if (((this->mpc_Ui->pc_LabelUserHint->isVisible() == true) ||
            (this->mpc_Ui->pc_LabelDebugger->isVisible() == true)) ||
-          (this->mpc_Ui->pc_LabelSecurity->isVisible() == true))
+          (this->mpc_Ui->pc_LabelSecurity->isVisible() == true) ||
+          (this->mpc_Ui->pc_LabelSkip->isVisible() == true))
       {
          // In this case the label for the path does not have so much space to use
          s32_Width -= this->mpc_Ui->pc_HorizontalSpacerUserHint->geometry().width();
+      }
+
+      if (this->layout() != NULL)
+      {
+         s32_Width -= this->layout()->contentsMargins().right();
       }
 
       c_AdaptedString =

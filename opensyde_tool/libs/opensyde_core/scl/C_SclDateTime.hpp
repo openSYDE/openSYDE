@@ -24,20 +24,11 @@ namespace stw
 {
 namespace scl
 {
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
-
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Handling of date and time information
-class SCL_PACKAGE C_SclDateTime
+class C_SclDateTime
 {
 private:
 public:

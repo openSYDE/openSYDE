@@ -31,6 +31,7 @@
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
+using namespace stw::scl;
 using namespace stw::opensyde_gui;
 using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_gui_logic;
@@ -81,7 +82,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::AdaptFile(const QString & orc_File,
       if (this->me_Type == C_OscNodeApplication::ePARAMETER_SET_HALC)
       {
          // Special case: Datablock has psi files
-         const C_PuiSvNodeUpdateParamInfo c_ParamFileInfo;
+         const C_OscViewNodeUpdateParamInfo c_ParamFileInfo;
          C_SyvUpPacListNodeItemParamSetWidget * const pc_ParamSetWidget =
             dynamic_cast<C_SyvUpPacListNodeItemParamSetWidget *>(opc_App);
 
@@ -227,7 +228,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::AdaptFile(const QString & orc_File,
                                                                                this->mu32_NodeIndex,
                                                                                this->mu32_DataBlockPathNumber,
                                                                                orc_File,
-                                                                               C_PuiSvNodeUpdate::
+                                                                               C_OscViewNodeUpdate::
                                                                                eFTP_DATA_BLOCK) == C_NO_ERR);
    }
 }
@@ -253,7 +254,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::SetSkipOfUpdateFile(const bool oq_Ski
                        this->mu32_ViewIndex,
                        this->mu32_NodeIndex,
                        this->mu32_DataBlockPathNumber, oq_Skip,
-                       C_PuiSvNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
+                       C_OscViewNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
       }
       else
       {
@@ -299,11 +300,11 @@ void C_SyvUpPacSectionNodeDatablockWidget::RevertFile(C_SyvUpPacListNodeItemWidg
                   tgl_assert(C_PuiSvHandler::h_GetInstance()->
                              SetNodeUpdateInformationPath(this->mu32_ViewIndex, this->mu32_NodeIndex,
                                                           this->mu32_DataBlockPathNumber, "",
-                                                          C_PuiSvNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
+                                                          C_OscViewNodeUpdate::eFTP_DATA_BLOCK) == C_NO_ERR);
                }
                else
                {
-                  const C_PuiSvNodeUpdateParamInfo c_ParamInfo;
+                  const C_OscViewNodeUpdateParamInfo c_ParamInfo;
                   // Remove the view specific path
                   tgl_assert(C_PuiSvHandler::h_GetInstance()->
                              SetNodeUpdateInformationParamInfo(this->mu32_ViewIndex, this->mu32_NodeIndex,
@@ -548,10 +549,10 @@ void C_SyvUpPacSectionNodeDatablockWidget::UpdateDeviceInformation(const C_SyvUp
                   //STW flashloader device
                   const stw::diag_lib::C_XFLECUInformation & rc_DeviceInfoBlock =
                      orc_DeviceInformation.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks[u32_AppCounter];
-                  c_AppName = rc_DeviceInfoBlock.acn_ProjectName;
-                  c_AppVersion = rc_DeviceInfoBlock.acn_ProjectVersion;
-                  c_AppBuildTime = rc_DeviceInfoBlock.acn_Time;
-                  c_AppBuildDate = rc_DeviceInfoBlock.acn_Date;
+                  c_AppName = rc_DeviceInfoBlock.GetProjectName().c_str();
+                  c_AppVersion = rc_DeviceInfoBlock.GetProjectVersion().c_str();
+                  c_AppBuildTime = rc_DeviceInfoBlock.GetTime().c_str();
+                  c_AppBuildDate = rc_DeviceInfoBlock.GetDate().c_str();
 
                   // No application valid flag
                   q_Valid = true;
@@ -675,7 +676,7 @@ uint32_t C_SyvUpPacSectionNodeDatablockWidget::Type(void) const
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyde_core::C_OscNode & orc_Node,
-                                                              const stw::opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInfo)
+                                                              const stw::opensyde_core::C_OscViewNodeUpdate & orc_UpdateInfo)
 {
    // mu32_SectionNumber equals in case of datablock widget the index of the datablock
    tgl_assert(this->mu32_SectionNumber < orc_Node.c_Applications.size());
@@ -686,9 +687,9 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
 
       if (rc_Datablock.e_Type != C_OscNodeApplication::ePARAMETER_SET_HALC)
       {
-         std::vector<QString> c_ViewDatablockPaths = orc_UpdateInfo.GetPaths(C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+         std::vector<C_SclString> c_ViewDatablockPaths = orc_UpdateInfo.GetPaths(C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
          std::vector<bool> c_ViewDatablockSkipFlags = orc_UpdateInfo.GetSkipUpdateOfPathsFlags(
-            C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
          C_SyvUpPacListNodeItemDatablockWidget * const pc_FileWidget =
             new C_SyvUpPacListNodeItemDatablockWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
                                                       this->mc_DeviceType,
@@ -714,7 +715,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
          // Check if a specific path is available
          if (c_ViewDatablockPaths[this->mu32_DataBlockPathNumber] != "")
          {
-            pc_FileWidget->SetAppFile(c_ViewDatablockPaths[this->mu32_DataBlockPathNumber], false);
+            pc_FileWidget->SetAppFile(c_ViewDatablockPaths[this->mu32_DataBlockPathNumber].c_str(), false);
          }
          else
          {
@@ -735,14 +736,14 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
       else
       {
          // Special case: Datablock for NVM HALC parameter set image files
-         const std::vector<C_PuiSvNodeUpdateParamInfo> c_ViewParamsetPaths = orc_UpdateInfo.GetParamInfos();
+         const std::vector<C_OscViewNodeUpdateParamInfo> c_ViewParamsetPaths = orc_UpdateInfo.GetParamInfos();
          std::vector<bool> c_ViewParamSetSkipFlags = orc_UpdateInfo.GetSkipUpdateOfParamInfosFlags();
          uint32_t u32_ParamSetFileCounter;
 
          for (u32_ParamSetFileCounter = 0U; u32_ParamSetFileCounter < rc_Datablock.c_ResultPaths.size();
               ++u32_ParamSetFileCounter)
          {
-            C_PuiSvNodeUpdateParamInfo c_ParamInfo;
+            C_OscViewNodeUpdateParamInfo c_ParamInfo;
             C_SyvUpPacListNodeItemParamSetWidget * const pc_ParamWidget =
                new C_SyvUpPacListNodeItemParamSetWidget(this->mu32_ViewIndex, this->mu32_NodeIndex,
                                                         this->mc_DeviceType,
@@ -750,7 +751,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
             const QString c_DefaultPath = C_PuiUtil::h_MakeIndependentOfDbProjectPath(
                rc_Datablock.c_ProjectPath.c_str(),
                rc_Datablock.c_ResultPaths[u32_ParamSetFileCounter].c_str());
-            C_PuiSvNodeUpdateParamInfo c_FileInfo;
+            C_OscViewNodeUpdateParamInfo c_FileInfo;
 
             this->mc_SectionName = rc_Datablock.c_Name.c_str();
             this->me_Type = rc_Datablock.e_Type;
@@ -774,7 +775,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
             if (c_FileInfo.GetPath() != "")
             {
                // System view specific path
-               pc_ParamWidget->SetAppFile(c_FileInfo.GetPath(), false);
+               pc_ParamWidget->SetAppFile(c_FileInfo.GetPath().c_str(), false);
                //Set initial param set info
                c_ParamInfo.SetContent(c_FileInfo.GetPath(), c_FileInfo.GetLastKnownCrc());
             }
@@ -783,7 +784,7 @@ void C_SyvUpPacSectionNodeDatablockWidget::m_InitSpecificItem(const stw::opensyd
                // System definition default path
                pc_ParamWidget->SetAppFile(c_DefaultPath, true);
                //Set initial param set info
-               c_ParamInfo.SetContent(c_DefaultPath, c_FileInfo.GetLastKnownCrc());
+               c_ParamInfo.SetContent(c_DefaultPath.toStdString().c_str(), c_FileInfo.GetLastKnownCrc());
             }
             pc_ParamWidget->SetSkipOfUpdateFile(c_ViewParamSetSkipFlags[u32_ParamSetFileCounter]);
 

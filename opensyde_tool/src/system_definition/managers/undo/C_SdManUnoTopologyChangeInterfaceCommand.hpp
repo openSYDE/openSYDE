@@ -34,7 +34,7 @@ public:
                                             const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_PreviousProperties,
                                             const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_NewProperties,
                                             QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SdManUnoTopologyChangeInterfaceCommand(void);
+   ~C_SdManUnoTopologyChangeInterfaceCommand(void) override;
    void undo(void) override;
    void redo(void) override;
 

@@ -39,7 +39,7 @@ class C_SdNdeUnoDataPoolManager :
 
 public:
    C_SdNdeUnoDataPoolManager(QObject * const opc_Parent = NULL);
-   virtual ~C_SdNdeUnoDataPoolManager(void);
+   ~C_SdNdeUnoDataPoolManager(void) override;
 
    void DoMoveList(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
                    stw::opensyde_gui::C_SdNdeDpListsTreeWidget * const opc_DataPoolListsTreeWidget,
@@ -66,7 +66,7 @@ Q_SIGNALS:
    void SigChanged(void);
 
 protected:
-   virtual void m_CleanupAction(void);
+   void m_CleanupAction(void) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

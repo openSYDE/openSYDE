@@ -33,7 +33,7 @@ class C_SdBueMlvBaseItem :
 public:
    C_SdBueMlvBaseItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor, const QFont & orc_Font,
                       const QString & orc_Text, const bool oq_DrawText, QGraphicsItem * const opc_Parent = NULL);
-   virtual ~C_SdBueMlvBaseItem();
+   ~C_SdBueMlvBaseItem() override;
 
    void SetText(const QString & orc_Text);
    void SetSize(const QSizeF & orc_Size);
@@ -41,7 +41,7 @@ public:
 
    void paint(QPainter * const opc_Painter, const QStyleOptionGraphicsItem * const opc_Option,
               QWidget * const opc_Widget) override;
-   virtual QRectF boundingRect() const;
+   QRectF boundingRect() const override;
 
 protected:
    QColor mc_BackgroundColorDefault;

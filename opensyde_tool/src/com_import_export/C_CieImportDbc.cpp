@@ -154,17 +154,19 @@ int32_t C_CieImportDbc::h_ImportNetwork(const C_SclString & orc_File,
          {
             if (oq_AddUnmappedMessages == true)
             {
-               for (const auto c_DbcMessage : c_DbcNetwork.messages)
+               const auto c_DbcMessage = find_if(
+                  c_DbcNetwork.messages.begin(), c_DbcNetwork.messages.end(), [c_Iter] (auto & orc_Message)
                {
-                  if (c_DbcMessage.second.name.compare(*c_Iter) == 0)
+                  return orc_Message.second.name.compare(*c_Iter) == 0;
+               }
+                  );
+
+               if (c_DbcMessage != c_DbcNetwork.messages.end())
+               {
+                  //Add found valid message to unmapped messages
+                  if (mh_ConvertAndAddMessage(c_DbcMessage->second, orc_Definition.c_UnmappedMessages) != C_NO_ERR)
                   {
-                     //Add found valid message to unmapped messages
-                     if (mh_ConvertAndAddMessage(c_DbcMessage.second, orc_Definition.c_UnmappedMessages) != C_NO_ERR)
-                     {
-                        s32_Return = C_WARN;
-                     }
-                     //Stop searching after finding the message
-                     break;
+                     s32_Return = C_WARN;
                   }
                }
             }
@@ -1125,22 +1127,21 @@ int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSi
 int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork)
 {
    int32_t s32_Return = C_NO_ERR;
-   bool q_ValueFound;
 
    // search Send Type
-   q_ValueFound = false;
-   for (const auto c_DbcAttributeDefinition : orc_DbcNetwork.attributeDefinitions)
+   const auto c_DbcAttributeDefinition = find_if(
+      orc_DbcNetwork.attributeDefinitions.begin(), orc_DbcNetwork.attributeDefinitions.end(), [] (auto & orc_Definition)
    {
-      // global enum message send type, exists only one time
-      if (mhc_SEND_TYPE.AnsiCompare(c_DbcAttributeDefinition.first.c_str()) == 0)
-      {
-         mhc_AttributeSendType = c_DbcAttributeDefinition.second;
-         q_ValueFound = true;
-         break;
-      }
+      return mhc_SEND_TYPE.AnsiCompare(orc_Definition.first.c_str()) == 0;
    }
+      );
+
    // attribute found?
-   if (q_ValueFound == false)
+   if (c_DbcAttributeDefinition != orc_DbcNetwork.attributeDefinitions.end())
+   {
+      mhc_AttributeSendType = c_DbcAttributeDefinition->second;
+   }
+   else
    {
       s32_Return = C_WARN;
       mhc_WarningMessages.Append("Missing attribute definition for send type \"" + mhc_SEND_TYPE + "\".");
@@ -1148,19 +1149,19 @@ int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & 
    }
 
    // search default send type
-   q_ValueFound = false;
-   for (const auto c_DbcAttributeDefaults : orc_DbcNetwork.attributeDefaults)
+   const auto c_DbcAttributeDefaults = find_if(
+      orc_DbcNetwork.attributeDefaults.begin(), orc_DbcNetwork.attributeDefaults.end(), [] (auto & orc_Default)
    {
-      // global enum message send type, exists only one time
-      if (mhc_SEND_TYPE.AnsiCompare(c_DbcAttributeDefaults.first.c_str()) == 0)
-      {
-         mhc_DefaultSendTypeValue = (c_DbcAttributeDefaults.second).stringValue.c_str();
-         q_ValueFound = true;
-         break;
-      }
+      return mhc_SEND_TYPE.AnsiCompare(orc_Default.first.c_str()) == 0;
    }
-   // default attribute found?
-   if (q_ValueFound == false)
+      );
+
+   // attribute found?
+   if (c_DbcAttributeDefaults != orc_DbcNetwork.attributeDefaults.end())
+   {
+      mhc_DefaultSendTypeValue = (c_DbcAttributeDefaults->second).stringValue.c_str();
+   }
+   else
    {
       s32_Return = C_WARN;
       mhc_DefaultSendTypeValue = "OnEvent";
@@ -1171,39 +1172,42 @@ int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & 
    }
 
    // search default initial value
-   mhq_DefaultValueDefined = false;
-   for (const auto c_DbcAttributeDefaults : orc_DbcNetwork.attributeDefaults)
+   const auto c_DbcAttributeDefaultsInit = find_if(
+      orc_DbcNetwork.attributeDefaults.begin(), orc_DbcNetwork.attributeDefaults.end(), [] (auto & orc_Default)
    {
-      // global enum message send type, exists only one time
-      if (mhc_INITIAL_VALUE.AnsiCompare(c_DbcAttributeDefaults.first.c_str()) == 0)
+      return mhc_INITIAL_VALUE.AnsiCompare(orc_Default.first.c_str()) == 0;
+   }
+      );
+
+   // attribute found?
+   mhq_DefaultValueDefined = false;
+   if (c_DbcAttributeDefaultsInit != orc_DbcNetwork.attributeDefaults.end())
+   {
+      const C_SclString c_DefaultInitialValue = (c_DbcAttributeDefaultsInit->second).stringValue.c_str();
+      // try to convert to DBC standard raw float value
+      try
       {
-         const C_SclString c_DefaultInitialValue = (c_DbcAttributeDefaults.second).stringValue.c_str();
-         // try to convert to DBC standard raw float value
-         try
+         mhf32_DefaultInitialValue = static_cast<float32_t>(c_DefaultInitialValue.ToDouble());
+         mhq_DefaultValueDefined = true;
+      }
+      catch (...)
+      {
+         // could be of type enum
+         if ((c_DbcAttributeDefaultsInit->second).valueType == Vector::DBC::AttributeValueType::Enum)
          {
-            mhf32_DefaultInitialValue = static_cast<float32_t>(c_DefaultInitialValue.ToDouble());
+            mhf32_DefaultInitialValue = static_cast<float32_t>((c_DbcAttributeDefaultsInit->second).enumValue);
             mhq_DefaultValueDefined = true;
          }
-         catch (...)
+         else
          {
-            // could be of type enum
-            if ((c_DbcAttributeDefaults.second).valueType == Vector::DBC::AttributeValueType::Enum)
-            {
-               mhf32_DefaultInitialValue = static_cast<float32_t>((c_DbcAttributeDefaults.second).enumValue);
-               mhq_DefaultValueDefined = true;
-            }
-            else
-            {
-               // strange, print a warning to user
-               s32_Return = C_WARN;
-               mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
-                                          "\" could not be interpreted. Default value set to \"0\".");
-               osc_write_log_warning("DBC file import",
-                                     "Default initial value for signals \"" + c_DefaultInitialValue +
-                                     "\" could not be interpreted. Default value set to \"0\".");
-            }
+            // strange, print a warning to user
+            s32_Return = C_WARN;
+            mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
+                                       "\" could not be interpreted. Default value set to \"0\".");
+            osc_write_log_warning("DBC file import",
+                                  "Default initial value for signals \"" + c_DefaultInitialValue +
+                                  "\" could not be interpreted. Default value set to \"0\".");
          }
-         break;
       }
    }
    // default attribute found?

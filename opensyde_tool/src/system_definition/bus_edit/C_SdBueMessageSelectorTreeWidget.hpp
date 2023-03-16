@@ -20,6 +20,7 @@
 #include "C_PuiSdNodeCanMessageSyncManager.hpp"
 #include "C_OscCanMessageIdentificationIndices.hpp"
 #include "C_SdBusMessageSelectorTreeWidgetItem.hpp"
+#include "C_SdBueMessageSelectorTreeDelegate.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -37,7 +38,7 @@ class C_SdBueMessageSelectorTreeWidget :
 
 public:
    explicit C_SdBueMessageSelectorTreeWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdBueMessageSelectorTreeWidget(void);
+   ~C_SdBueMessageSelectorTreeWidget(void) override;
 
    QSize sizeHint(void) const override;
 
@@ -177,6 +178,7 @@ private:
    std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> mc_SelectedMessageIds;
    std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> mc_ExpandedMessageIds;
    std::vector<std::vector<uint32_t> > mc_SelectedSignals;
+   stw::opensyde_gui_logic::C_SdBueMessageSelectorTreeDelegate mc_Delegate;
    bool mq_StopSigSelectionChanged;
    bool mq_ModeSingleNode;
    uint32_t mu32_NodeIndex;                  // Used by node mode

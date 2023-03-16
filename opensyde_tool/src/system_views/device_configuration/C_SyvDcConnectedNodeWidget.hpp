@@ -42,7 +42,7 @@ public:
                                        const std::map<uint8_t,
                                                       stw::opensyde_gui_logic::C_SyvDcDeviceOldComConfig> & orc_SubNodeIdsToOldNodeIds,
                                        QWidget * const opc_Parent = NULL);
-   ~C_SyvDcConnectedNodeWidget(void) override;
+   ~C_SyvDcConnectedNodeWidget(void) noexcept override;
 
    QString GetPlainSerialNumberString(void) const;
    bool GetExtFormat(void) const;

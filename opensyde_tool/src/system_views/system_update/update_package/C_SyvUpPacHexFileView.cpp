@@ -203,7 +203,7 @@ void C_SyvUpPacHexFileView::mh_AddFileSection(const QString & orc_Path, QString 
    orc_Content += C_GtGetText::h_GetText("MD5 checksum:");
    orc_Content += "</td>";
    orc_Content += C_SyvUpPacHexFileView::mhc_CONTINUE_TD;
-   orc_Content += mh_GetMD5Hex(orc_Path);
+   orc_Content += mh_GetMd5Hex(orc_Path);
    orc_Content += "</td>";
    orc_Content += "</tr>";
    orc_Content += "</table>";
@@ -218,7 +218,7 @@ void C_SyvUpPacHexFileView::mh_AddFileSection(const QString & orc_Path, QString 
    MD5 checksum for file encoded in hex
 */
 //----------------------------------------------------------------------------------------------------------------------
-QString C_SyvUpPacHexFileView::mh_GetMD5Hex(const QString & orc_Path)
+QString C_SyvUpPacHexFileView::mh_GetMd5Hex(const QString & orc_Path)
 {
    QString c_Retval;
    QFile c_File(orc_Path);
@@ -245,9 +245,9 @@ QString C_SyvUpPacHexFileView::mh_GetMD5Hex(const QString & orc_Path)
 void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QString & orc_Content)
 {
    const uint32_t u32_Bytes = orc_HexFile.ByteCount();
-   uint32_t u32_CRC;
+   uint32_t u32_Crc;
 
-   orc_HexFile.CalcFileChecksum(u32_CRC);
+   orc_HexFile.CalcFileChecksum(u32_Crc);
 
    orc_Content += "<h3>" + static_cast<QString>(C_GtGetText::h_GetText("Data Information")) + "</h3>";
    orc_Content += "<table>";
@@ -264,7 +264,7 @@ void C_SyvUpPacHexFileView::mh_AddDataInformation(C_OsyHexFile & orc_HexFile, QS
    orc_Content += C_GtGetText::h_GetText("32bit CRC:");
    orc_Content += "</td>";
    orc_Content += C_SyvUpPacHexFileView::mhc_CONTINUE_TD;
-   orc_Content += static_cast<QString>("0x%1").arg(u32_CRC, 0, 16);
+   orc_Content += static_cast<QString>("0x%1").arg(u32_Crc, 0, 16);
    orc_Content += "</td>";
    orc_Content += "</tr>";
    orc_Content += "</table>";
@@ -296,8 +296,8 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexF
    {
       const stw::diag_lib::C_XFLECUInformation & rc_CurInfo = c_InfoBlocks[s32_ItAppl];
       orc_Content += "<h3>" +
-                     static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1L, 2, 10,
-                                                                                  QChar('0')) + "</h3>";
+                     static_cast<QString>(C_GtGetText::h_GetText("Block %1")).arg(s32_ItAppl + 1, 2, 10, QChar('0')) +
+                     "</h3>";
       orc_Content += "<table>";
       orc_Content += "<tr>";
       orc_Content += C_SyvUpPacHexFileView::mhc_START_TD;
@@ -337,7 +337,7 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexF
       orc_Content += C_SyvUpPacHexFileView::mhc_CONTINUE_TD;
       if (rc_CurInfo.ContainsDateAndTime() == true)
       {
-         orc_Content += rc_CurInfo.acn_Date;
+         orc_Content += rc_CurInfo.GetDate().c_str();
       }
       else
       {
@@ -352,7 +352,7 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexF
       orc_Content += C_SyvUpPacHexFileView::mhc_CONTINUE_TD;
       if (rc_CurInfo.ContainsDateAndTime() == true)
       {
-         orc_Content += rc_CurInfo.acn_Time;
+         orc_Content += rc_CurInfo.GetTime().c_str();
       }
       else
       {
@@ -367,7 +367,7 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexF
       orc_Content += C_SyvUpPacHexFileView::mhc_CONTINUE_TD;
       if (rc_CurInfo.ContainsProjectName() == true)
       {
-         orc_Content += rc_CurInfo.acn_ProjectName;
+         orc_Content += rc_CurInfo.GetProjectName().c_str();
       }
       else
       {
@@ -382,7 +382,7 @@ void C_SyvUpPacHexFileView::mh_AddApplicationInformation(C_OsyHexFile & orc_HexF
       orc_Content += C_SyvUpPacHexFileView::mhc_CONTINUE_TD;
       if (rc_CurInfo.ContainsProjectVersion() == true)
       {
-         orc_Content += rc_CurInfo.acn_ProjectVersion;
+         orc_Content += rc_CurInfo.GetProjectVersion().c_str();
       }
       else
       {

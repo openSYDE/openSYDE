@@ -12,10 +12,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <cstring>
 #include "stwtypes.hpp"
@@ -48,7 +44,7 @@ using namespace stw::scl;
    \param[in]      opu8_Buffer     input buffer
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_Md5Checksum::mh_MD5Compress(C_HashState * const opc_HashState, const uint8_t * const opu8_Buffer)
+void C_Md5Checksum::mh_Md5Compress(C_HashState * const opc_HashState, const uint8_t * const opu8_Buffer)
 {
 #define LOAD32L(x, y)                            \
    (x) = (static_cast<uint32_t>((y)[3] & 255U) << 24U) | \
@@ -172,7 +168,7 @@ void C_Md5Checksum::mh_MD5Compress(C_HashState * const opc_HashState, const uint
    \param[in,out]  opc_HashState   hash engine state
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_Md5Checksum::mh_MD5Init(C_HashState * const opc_HashState)
+void C_Md5Checksum::mh_Md5Init(C_HashState * const opc_HashState)
 {
    opc_HashState->au32_State[0] = 0x67452301UL;
    opc_HashState->au32_State[1] = 0xefcdab89UL;
@@ -194,7 +190,7 @@ void C_Md5Checksum::mh_MD5Init(C_HashState * const opc_HashState)
    C_CONFIG  inconsistent hash engine status
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_Md5Checksum::mh_MD5Process(C_HashState * const opc_HashState, const uint8_t * opu8_Input,
+int32_t C_Md5Checksum::mh_Md5Process(C_HashState * const opc_HashState, const uint8_t * opu8_Input,
                                      uint32_t ou32_InputLength)
 {
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -211,7 +207,7 @@ int32_t C_Md5Checksum::mh_MD5Process(C_HashState * const opc_HashState, const ui
    {
       if ((opc_HashState->u32_CurLen == 0) && (ou32_InputLength >= 64))
       {
-         mh_MD5Compress(opc_HashState, opu8_Input);
+         mh_Md5Compress(opc_HashState, opu8_Input);
          opc_HashState->u64_Length += (64 * 8);
          opu8_Input             += 64;
          ou32_InputLength       -= 64;
@@ -227,7 +223,7 @@ int32_t C_Md5Checksum::mh_MD5Process(C_HashState * const opc_HashState, const ui
          ou32_InputLength       -= u32_CurrentSize;
          if (opc_HashState->u32_CurLen == 64)
          {
-            mh_MD5Compress(opc_HashState, &opc_HashState->au8_Buffer[0]);
+            mh_Md5Compress(opc_HashState, &opc_HashState->au8_Buffer[0]);
             opc_HashState->u64_Length += (8 * 64);
             opc_HashState->u32_CurLen = 0;
          }
@@ -247,7 +243,7 @@ int32_t C_Md5Checksum::mh_MD5Process(C_HashState * const opc_HashState, const ui
    C_CONFIG  inconsistent hash engine status
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_Md5Checksum::mh_MD5Done(C_HashState * const opc_HashState, uint8_t * const opu8_Output)
+int32_t C_Md5Checksum::mh_Md5Done(C_HashState * const opc_HashState, uint8_t * const opu8_Output)
 {
 #define STORE32L(x, y)                                                                     \
    (y)[3] = static_cast<uint8_t>(((x) >> 24U) & 255U); (y)[2] = static_cast<uint8_t>(((x) >> 16U) & 255U);   \
@@ -282,7 +278,7 @@ int32_t C_Md5Checksum::mh_MD5Done(C_HashState * const opc_HashState, uint8_t * c
          opc_HashState->au8_Buffer[opc_HashState->u32_CurLen] = 0;
          opc_HashState->u32_CurLen++;
       }
-      mh_MD5Compress(opc_HashState, opc_HashState->au8_Buffer);
+      mh_Md5Compress(opc_HashState, opc_HashState->au8_Buffer);
       opc_HashState->u32_CurLen = 0;
    }
 
@@ -295,7 +291,7 @@ int32_t C_Md5Checksum::mh_MD5Done(C_HashState * const opc_HashState, uint8_t * c
 
    /* store length */
    STORE64L(opc_HashState->u64_Length, &opc_HashState->au8_Buffer[56]);
-   mh_MD5Compress(opc_HashState, opc_HashState->au8_Buffer);
+   mh_Md5Compress(opc_HashState, opc_HashState->au8_Buffer);
 
    /* copy output */
    for (uint8_t u8_Word = 0; u8_Word < 4; u8_Word++)
@@ -341,43 +337,43 @@ C_SclString C_Md5Checksum::GetMD5(const C_SclString & orc_FilePath)
    Calculated MD5 (empty string if there are problems)
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_Md5Checksum::GetMD5(std::FILE * const opt_File)
+C_SclString C_Md5Checksum::GetMD5(std::FILE * const opc_File)
 {
    const uint32_t u32_BufferSize = 4096; //checksum the file in blocks of 4096 bytes
    uint8_t au8_Data[u32_BufferSize];     //buffer for data read from the file
-   C_SclString c_StrMD5;
+   C_SclString c_StrMd5;
    C_HashState c_Hash;
    uint8_t au8_Result[16];
 
-   if (opt_File == NULL)
+   if (opc_File == NULL)
    {
       return "";
    }
 
-   mh_MD5Init(&c_Hash);
+   mh_Md5Init(&c_Hash);
 
    //checksum the file in individual blocks
    while (true)
    {
-      const int32_t s32_BlockSize = fread(&au8_Data[0], 1, u32_BufferSize, opt_File);
+      const int32_t s32_BlockSize = fread(&au8_Data[0], 1, u32_BufferSize, opc_File);
       if (s32_BlockSize <= 0)
       {
          break;
       }
       //we have data: process it
-      mh_MD5Process(&c_Hash, &au8_Data[0], s32_BlockSize);
+      mh_Md5Process(&c_Hash, &au8_Data[0], s32_BlockSize);
    }
 
-   mh_MD5Done(&c_Hash, au8_Result);
+   mh_Md5Done(&c_Hash, au8_Result);
 
    //Convert the hexadecimal checksum to a C_SclString
    for (uint8_t u8_Byte = 0U; u8_Byte < 16U; u8_Byte++)
    {
       C_SclString c_Str;
       c_Str.PrintFormatted("%02x", au8_Result[u8_Byte]);
-      c_StrMD5 += c_Str;
+      c_StrMd5 += c_Str;
    }
-   return c_StrMD5;
+   return c_StrMd5;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -393,20 +389,20 @@ C_SclString C_Md5Checksum::GetMD5(std::FILE * const opt_File)
 C_SclString C_Md5Checksum::GetMD5(const uint8_t * const opu8_Data, const uint32_t ou32_Length)
 {
    //calculate and return the checksum
-   C_SclString c_StrMD5;
+   C_SclString c_StrMd5;
    C_HashState c_Hash;
    uint8_t au8_Result[16];
 
-   mh_MD5Init(&c_Hash);
-   mh_MD5Process(&c_Hash, opu8_Data, ou32_Length);
-   mh_MD5Done(&c_Hash, au8_Result);
+   mh_Md5Init(&c_Hash);
+   mh_Md5Process(&c_Hash, opu8_Data, ou32_Length);
+   mh_Md5Done(&c_Hash, au8_Result);
 
    //Convert the hexadecimal checksum to a C_SclString
    for (uint8_t u8_Byte = 0U; u8_Byte < 16U; u8_Byte++)
    {
       C_SclString c_Str;
       c_Str.PrintFormatted("%02x", au8_Result[u8_Byte]);
-      c_StrMD5 += c_Str;
+      c_StrMd5 += c_Str;
    }
-   return c_StrMD5;
+   return c_StrMd5;
 }

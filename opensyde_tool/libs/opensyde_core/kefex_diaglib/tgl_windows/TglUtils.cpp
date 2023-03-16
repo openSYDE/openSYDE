@@ -11,10 +11,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <windows.h>
 #include <Lmcons.h> //for UNLEN
@@ -48,8 +44,8 @@ using namespace stw::scl;
    \param[in]   os32_Line    Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func,
-                                               const int32_t os32_Line)
+void stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func,
+                                  const int32_t os32_Line)
 {
    C_SclString c_Text;
 
@@ -70,9 +66,8 @@ void TGL_PACKAGE stw::tgl::TglReportAssertion(const char_t * const opcn_Module, 
    \param[in]     os32_Line              Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo,
-                                                     const char_t * const opcn_Module, const char_t * const opcn_Func,
-                                                     const int32_t os32_Line)
+void stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo, const char_t * const opcn_Module,
+                                        const char_t * const opcn_Func, const int32_t os32_Line)
 {
    C_SclString c_Text;
 
@@ -90,11 +85,11 @@ void TGL_PACKAGE stw::tgl::TglReportAssertionDetail(const char_t * const opcn_De
    \param[out]    orc_UserName     name of logged in user
 
    \return
-   true      user name detected and places in oc_UserName  \n
-   false     error -> oc_UserName not valid
+   true      user name detected and placed in orc_UserName  \n
+   false     error -> orc_UserName not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool TGL_PACKAGE stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
+bool stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 {
    char_t acn_WinUserName[UNLEN + 1];
    DWORD u32_Size = sizeof(acn_WinUserName);
@@ -113,13 +108,42 @@ bool TGL_PACKAGE stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   get system machine name
+
+   Reports the name of the system
+
+   \param[out]    orc_MachineName     name of system
+
+   \return
+   true      system name detected and placed in orc_MachineName  \n
+   false     error -> orc_MachineName not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool stw::tgl::TglGetSystemMachineName(C_SclString & orc_MachineName)
+{
+   char_t acn_WinSystemName[MAX_COMPUTERNAME_LENGTH + 1];
+   DWORD u32_Size = sizeof(acn_WinSystemName);
+   const bool q_Return = (GetComputerNameA(acn_WinSystemName, &u32_Size) == 0) ? false : true;
+
+   if (q_Return == true)
+   {
+      orc_MachineName = acn_WinSystemName;
+   }
+   else
+   {
+      orc_MachineName = "?\?\?\?\?";
+   }
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Poll system message queue
 
    Polls the system's message queue and posts detected messages for handling.
    This function can be used to proceed processing system messages while actively waiting for an event.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglHandleSystemMessages(void)
+void stw::tgl::TglHandleSystemMessages(void)
 {
    MSG t_Msg;
    bool q_Return;
@@ -145,7 +169,7 @@ void TGL_PACKAGE stw::tgl::TglHandleSystemMessages(void)
    -1  could not set variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t TGL_PACKAGE stw::tgl::TglSetEnvironmentVariable(const C_SclString & orc_Name, const C_SclString & orc_Value)
+int32_t stw::tgl::TglSetEnvironmentVariable(const C_SclString & orc_Name, const C_SclString & orc_Value)
 {
    int x_Return;
 

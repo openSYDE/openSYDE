@@ -100,7 +100,7 @@ C_SclString::C_SclString(void) :
 /*! \brief    Constructor
 
    Initialize string data to ou8_Value (interpreted as a number)
-   We cannot use the template constructor as by default streams interpret uint8 as a character.
+   We cannot use the template constructor as by default streams interpret uint8_t as a character.
 
    \param[in]  ou8_InitValue   initial value
 
@@ -766,6 +766,36 @@ C_SclString & C_SclString::SetLength(const uint32_t ou32_NewLength)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief    Replace all occurrences of one string by another string
+
+   Replaces all occurrences of orc_Search by orc_Replace within the string instance.
+
+   \param[in]  orc_Search        string to search for
+   \param[in]  orc_Replacement   string to replace by
+
+   \return
+   Resulting string
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString & C_SclString::ReplaceAll(const C_SclString & orc_Search, const C_SclString & orc_Replacement)
+{
+   std::string * const pc_TheString = this->AsStdString();
+   const std::string * const pc_TheSearched = orc_Search.AsStdString();
+   const std::string * const pc_TheReplacement = orc_Replacement.AsStdString();
+   size_t un_Pos = pc_TheString->find(*pc_TheSearched);
+
+   while (un_Pos != std::string::npos)
+   {
+      //found one ...
+      pc_TheString->replace(un_Pos, pc_TheSearched->size(), *pc_TheReplacement);
+      //one more ?
+      un_Pos = pc_TheString->find(*pc_TheSearched, un_Pos + pc_TheReplacement->size());
+   }
+
+   return (*this);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get first position of specified string in existing string
 
    Return first position of specified string in existing string data
@@ -1173,9 +1203,9 @@ int64_t C_SclString::mh_StrTos64(const char_t * const opcn_String, const bool oq
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert string to sint64 number
+/*! \brief    Convert string to int64_t number
 
-   Convert string to sint64 values.
+   Convert string to int64_t values.
    Will throw exception if string is not a number.
    Accepted formats:
    - decimal positive value
@@ -1391,7 +1421,7 @@ C_SclString C_SclString::IntToStr(const char_t ocn_Value)
    C_SclString c_Text;
 
    std::stringstream c_Stream;
-   //a "sint32" should be enough for a charn on all platforms
+   //a "int32_t" should be enough for a charn on all platforms
    c_Stream << static_cast<int32_t>(ocn_Value);
    c_Text.c_String = c_Stream.str();
 
@@ -1399,12 +1429,12 @@ C_SclString C_SclString::IntToStr(const char_t ocn_Value)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief    Convert uint8 number to hexadecimal string
+/*! \brief    Convert uint8_t number to hexadecimal string
 
-   Compose string from uint8 value data.
+   Compose string from uint8_t value data.
    Does not insert a "0x" prefix before the data.
 
-   Can not be done with the template function as uint8 is interpreted as character by streams.
+   Can not be done with the template function as uint8_t is interpreted as character by streams.
 
    Example:
    "IntToHex(0x023, 4)" will return 0023.

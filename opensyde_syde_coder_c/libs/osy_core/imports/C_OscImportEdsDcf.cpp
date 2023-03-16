@@ -1262,7 +1262,7 @@ int32_t C_OscImportEdsDcf::mh_ParseSignals(const uint32_t ou32_CoMessageId, cons
                         if (s32_Retval == C_NO_ERR)
                         {
                            //Handle index
-                           c_CurSignal.u32_ComDataElementIndex = orc_OscSignalData.size();
+                           c_CurSignal.u32_ComDataElementIndex = static_cast<uint32_t>(orc_OscSignalData.size());
                            //Add
                            orc_OscMessageData.c_Signals.push_back(c_CurSignal);
                            orc_OscSignalData.push_back(c_CurDataPoolSignal);

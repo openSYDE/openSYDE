@@ -49,7 +49,7 @@ class C_SdNdeCoConfigTreeView :
 
 public:
    explicit C_SdNdeCoConfigTreeView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeCoConfigTreeView(void);
+   ~C_SdNdeCoConfigTreeView(void) override;
 
    void SetNodeId(const uint32_t ou32_NodeIndex);
 

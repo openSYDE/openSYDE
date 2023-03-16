@@ -10,14 +10,9 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
-
-#include "C_CanMonProtocolTarget.hpp"
 
 #include <cctype>
+#include "C_CanMonProtocolTarget.hpp"
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "C_CanMonProtocolXfl.hpp"
@@ -35,7 +30,7 @@ using namespace stw::can;
 //have the protocol constants here as copies, so we can put this class into a library of its own
 // without having to add all the protocol header files
 
-//STW Flashloader protocol contants
+//STW Flashloader protocol constants
 //command groups
 static const uint8_t mu8_XFL_CMD_GRP_EE_COMMAND          = 0x10U;
 static const uint8_t mu8_XFL_CMD_GRP_EE_WRITE_CMD        = 0x11U;
@@ -157,22 +152,22 @@ static const uint8_t mu8_XFL_ERR_WRONG_REC_TYPE   = 0xFFU;
 
 C_CanMonProtocolXfl::C_CanMonProtocolXfl(void) :
    C_CanMonProtocolBase(),
-   mu32_XFLSendID(0x51U)
+   mu32_XFLSendId(0x51U)
 {
 }
 
 //---------------------------------------------------------------------------
 
-uint32_t C_CanMonProtocolXfl::GetSendID(void) const
+uint32_t C_CanMonProtocolXfl::GetSendId(void) const
 {
-   return mu32_XFLSendID;
+   return mu32_XFLSendId;
 }
 
 //---------------------------------------------------------------------------
 
-void C_CanMonProtocolXfl::SetSendID(const uint32_t ou32_Send)
+void C_CanMonProtocolXfl::SetSendId(const uint32_t ou32_SendId)
 {
-   mu32_XFLSendID = ou32_Send;
+   mu32_XFLSendId = ou32_SendId;
 }
 
 //-----------------------------------------------------------------------------
@@ -195,7 +190,7 @@ int32_t C_CanMonProtocolXfl::SaveParamsToIni(C_SclIniFile & orc_IniFile, const C
 
    try
    {
-      orc_IniFile.WriteInteger(orc_Section, "PP_XFL_SEND_ID", static_cast<int32_t>(this->mu32_XFLSendID));
+      orc_IniFile.WriteInteger(orc_Section, "PP_XFL_SEND_ID", static_cast<int32_t>(this->mu32_XFLSendId));
    }
    catch (...)
    {
@@ -220,8 +215,8 @@ int32_t C_CanMonProtocolXfl::SaveParamsToIni(C_SclIniFile & orc_IniFile, const C
 //-----------------------------------------------------------------------------
 int32_t C_CanMonProtocolXfl::LoadParamsFromIni(C_SclIniFile & orc_IniFile, const C_SclString & orc_Section)
 {
-   this->mu32_XFLSendID = static_cast<uint32_t>(orc_IniFile.ReadInteger(orc_Section, "PP_XFL_SEND_ID",
-                                                                        static_cast<int32_t>(this->mu32_XFLSendID)));
+   this->mu32_XFLSendId = static_cast<uint32_t>(orc_IniFile.ReadInteger(orc_Section, "PP_XFL_SEND_ID",
+                                                                        static_cast<int32_t>(this->mu32_XFLSendId)));
    return C_NO_ERR;
 }
 
@@ -245,7 +240,7 @@ C_SclString C_CanMonProtocolXfl::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
    int32_t s32_Return;
    char_t acn_CIDBuffer[6];
 
-   if (orc_Msg.u32_ID == mu32_XFLSendID)
+   if (orc_Msg.u32_ID == mu32_XFLSendId)
    {
       if ((orc_Msg.u8_DLC == 5U) &&
           (orc_Msg.au8_Data[0] == 0x46U) &&
@@ -987,7 +982,7 @@ C_SclString C_CanMonProtocolXfl::MessageToString(const T_STWCAN_Msg_RX & orc_Msg
          c_Text = "";
       }
    }
-   else if (orc_Msg.u32_ID == (mu32_XFLSendID + 1U))
+   else if (orc_Msg.u32_ID == (mu32_XFLSendId + 1U))
    {
       //response from ECU
       c_Text = "RES Node ";

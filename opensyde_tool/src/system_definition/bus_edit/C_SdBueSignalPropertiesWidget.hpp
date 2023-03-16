@@ -78,7 +78,8 @@ private:
       eCHA_LENGTH,
       eCHA_START_BIT,
       eCHA_MUX_TYPE,
-      eCHA_MUX_VALUE
+      eCHA_MUX_VALUE,
+      eCHA_J1939_SPN
    };
 
    enum E_Type
@@ -123,6 +124,7 @@ private:
    void m_HandleStartBitChange(void);
    void m_HandleMuxTypeChange(void);
    void m_HandleMuxValueChange(void);
+   void m_HandleJ1939SpnChange(void);
    static void mh_AdaptValueToSignalLength(const uint16_t ou16_BitLength,
                                            stw::opensyde_core::C_OscNodeDataPoolContent & orc_Content);
    int32_t m_LoadGeneric(stw::opensyde_gui_elements::C_OgeWiSpinBoxGroup * const opc_Widget,

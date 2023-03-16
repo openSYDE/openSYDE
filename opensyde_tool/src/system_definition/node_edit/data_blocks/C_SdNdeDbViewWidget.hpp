@@ -46,7 +46,7 @@ public:
    void AddApp(void);
    void UpdateApplications(void) const;
    void AddFromTsp(void);
-   void AddHalcDefFromTSP(stw::opensyde_gui::C_SdNdeDbAddNewProject * const opc_Dialog);
+   void AddHalcDefFromTsp(stw::opensyde_gui::C_SdNdeDbAddNewProject * const opc_Dialog);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

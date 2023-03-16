@@ -37,7 +37,7 @@ class C_SdNdeDbDataPoolEntry :
 public:
    explicit C_SdNdeDbDataPoolEntry(const uint32_t ou32_NodeIndex, const uint32_t ou32_DataPoolIndex,
                                    QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeDbDataPoolEntry(void);
+   ~C_SdNdeDbDataPoolEntry(void) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736

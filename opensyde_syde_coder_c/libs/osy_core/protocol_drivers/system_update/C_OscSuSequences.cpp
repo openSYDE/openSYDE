@@ -1068,7 +1068,8 @@ int32_t C_OscSuSequences::m_FlashOneFileOpenSydeFile(const C_SclString & orc_Fil
             }
 
             //lint -e{668}  //file cannot be NULL if we get here
-            s32_FileApiReturn = std::fread(&c_Data[0], 1U, static_cast<size_t>(c_Data.size()), pc_File);
+            s32_FileApiReturn =
+               static_cast<int32_t>(std::fread(&c_Data[0], 1U, static_cast<size_t>(c_Data.size()), pc_File));
             if (s32_FileApiReturn != static_cast<int32_t>(c_Data.size()))
             {
                //it's not ideal that we have to abort in the middle of the procedure

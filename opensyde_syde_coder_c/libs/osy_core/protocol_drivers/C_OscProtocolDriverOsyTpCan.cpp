@@ -172,7 +172,7 @@ int32_t C_OscProtocolDriverOsyTpCan::m_HandleIncomingOsySpecificSingleFrame(cons
 
       if ((u8_Size > 0) && (u8_Size <= 8U))
       {
-         (void)std::memcpy(&c_Service.c_Data[1], &orc_CanMessage.au8_Data[1], static_cast<uint32_t>(u8_Size) - 1);
+         (void)std::memcpy(&c_Service.c_Data[1], &orc_CanMessage.au8_Data[1], static_cast<size_t>(u8_Size) - 1);
       }
 
       //add to queue:
@@ -1986,8 +1986,8 @@ int32_t C_OscProtocolDriverOsyTpCan::BroadcastSetNodeIdBySerialNumberExtended(
             if (u8_BytesToCopy < 3U)
             {
                // Set the not needed bytes to 0
-               memset(&c_Service.c_Data[static_cast<uint32_t>(u8_BytesToCopy) + 4U], 0U,
-                      3U - static_cast<uint32_t>(u8_BytesToCopy));
+               memset(&c_Service.c_Data[static_cast<size_t>(u8_BytesToCopy) + 4U], 0U,
+                      3U - static_cast<size_t>(u8_BytesToCopy));
             }
 
             memcpy(&c_Service.c_Data[4], &c_RawSerialNumber[u8_SerialNumberBytesSent], u8_BytesToCopy);

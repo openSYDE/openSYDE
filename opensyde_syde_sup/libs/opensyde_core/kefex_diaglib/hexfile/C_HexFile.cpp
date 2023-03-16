@@ -1,7 +1,7 @@
 //************************************************************************
 // .MODULE      load, sort and store Intel HEX files
 //------------------------------------------------------------------------
-// .FILE        hexfile.cpp
+// .FILE        C_HexFile.cpp
 // .PROGRAM
 // .GROUP
 //------------------------------------------------------------------------
@@ -25,10 +25,6 @@
 //                          and binary data size in byte
 //************************************************************************
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <cstring>
 #include <cctype>
@@ -139,18 +135,18 @@ uint32_t C_HexFile::LoadFromFile(const char_t * const opcn_FileName)
    uint32_t u32_Error;
    int32_t s32_FileType;
 
-   std::FILE * pt_File;
+   std::FILE * pc_File;
 
    this->Clear();
-   pt_File = std::fopen(opcn_FileName, "rt");
+   pc_File = std::fopen(opcn_FileName, "rt");
 
-   if (pt_File == NULL)
+   if (pc_File == NULL)
    {
       u32_Error = ERR_CANT_OPEN_FILE;
    }
    else
    {
-      u32_Error = this->m_GetFileType(pt_File, s32_FileType); // get hex file type
+      u32_Error = this->m_GetFileType(pc_File, s32_FileType); // get hex file type
       // intel-hex, s-record, ...
       if (u32_Error == NO_ERR)
       {
@@ -161,17 +157,17 @@ uint32_t C_HexFile::LoadFromFile(const char_t * const opcn_FileName)
             switch (s32_FileType)
             {
             case ms32_HEXFILE_IHEX:
-               u32_Error = m_LoadIntelHex(pt_File);
+               u32_Error = m_LoadIntelHex(pc_File);
                break;
             case ms32_HEXFILE_SREC:
-               u32_Error = m_LoadSRecord(pt_File);
+               u32_Error = m_LoadSRecord(pc_File);
                break;
             default:
                u32_Error = ERR_HEXLINE_SYNTAX;
                break;
             }
 
-            (void)fclose(pt_File);
+            (void)fclose(pc_File);
 
             if ((u32_Error & ERR_HEXLINE_SYNTAX) == 0U) // no error?
             {
@@ -181,13 +177,13 @@ uint32_t C_HexFile::LoadFromFile(const char_t * const opcn_FileName)
          else
          {
             //Release created file pointer
-            (void)fclose(pt_File);
+            (void)fclose(pc_File);
          }
       }
       else
       {
          //Release created file pointer
-         (void)fclose(pt_File);
+         (void)fclose(pc_File);
       }
    }
 
@@ -606,13 +602,13 @@ uint32_t C_HexFile::SaveToFile(const char_t * const opcn_FileName)
    uint32_t u32_Error = NO_ERR;
    const uint8_t  * pu8_HexLine;
 
-   std::FILE * pt_File;
+   std::FILE * pc_File;
 
    if (LineInit() != NULL) // HEX Data loaded?
    {
-      pt_File = std::fopen(opcn_FileName, "wt"); // yes, now open acFileName
+      pc_File = std::fopen(opcn_FileName, "wt"); // yes, now open acFileName
 
-      if (pt_File == NULL)
+      if (pc_File == NULL)
       {
          u32_Error = ERR_CANT_OPEN_FILE; // something is wrong with acFileName!
       }
@@ -621,11 +617,11 @@ uint32_t C_HexFile::SaveToFile(const char_t * const opcn_FileName)
          // are there any lines left?
          while ((pu8_HexLine = NextLine()) != NULL)
          {
-            fputs(mh_HexLineString(pu8_HexLine), pt_File); // write string into file
-            fputs("\n", pt_File);
+            fputs(mh_HexLineString(pu8_HexLine), pc_File); // write string into file
+            fputs("\n", pc_File);
          }
 
-         (void)fclose(pt_File);
+         (void)fclose(pc_File);
       }
    }
 

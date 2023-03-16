@@ -39,7 +39,7 @@ class C_SdNdeDpListHeaderUsageWidget :
 
 public:
    C_SdNdeDpListHeaderUsageWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeDpListHeaderUsageWidget(void);
+   ~C_SdNdeDpListHeaderUsageWidget(void) override;
 
    uint32_t SetUsage(const uint32_t ou32_Size, const uint32_t ou32_Used);
 

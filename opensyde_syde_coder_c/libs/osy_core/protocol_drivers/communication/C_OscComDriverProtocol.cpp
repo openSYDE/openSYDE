@@ -166,12 +166,6 @@ int32_t C_OscComDriverProtocol::Init(const C_OscSystemDefinition & orc_SystemDef
       this->mpc_IpDispatcher = opc_IpDispatcher;
       this->mpc_SecurityPemDb = opc_SecurityPemDb;
 
-      if (this->mpc_SecurityPemDb != NULL)
-      {
-         // Initialization of RSA library
-         C_OscSecurityRsa::h_Init();
-      }
-
       //No check for connected because error check passed
       s32_Retval = m_InitRoutesAndActiveNodes();
       if (s32_Retval == C_NO_ERR)

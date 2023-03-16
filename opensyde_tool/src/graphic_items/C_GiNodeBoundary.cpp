@@ -38,10 +38,11 @@ using namespace stw::opensyde_gui;
 
    Set up GUI with all elements.
 
-   \param[in]     orc_Text     Text of node
-   \param[in]     of64_Width   Width of node
-   \param[in]     of64_Height  Height of node
-   \param[in,out] opc_Parent   Optional pointer to parent
+   \param[in]      orc_Text            Text of node
+   \param[in]      of64_Width          Width of node
+   \param[in]      of64_Height         Height of node
+   \param[in]      ou32_SubNodesCount  Number of sub nodes
+   \param[in,out]  opc_Parent          Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_GiNodeBoundary::C_GiNodeBoundary(const QString & orc_Text, const float64_t of64_Width, const float64_t of64_Height,

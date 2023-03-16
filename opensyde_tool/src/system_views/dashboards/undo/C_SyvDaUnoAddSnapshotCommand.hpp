@@ -35,7 +35,7 @@ public:
                                            C_PuiSvReadDataConfiguration> & orc_RestoredRails,
                                 const QPointF & orc_NewPos, const float64_t of64_HighestUsedZetValue,
                                 QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SyvDaUnoAddSnapshotCommand(void);
+   ~C_SyvDaUnoAddSnapshotCommand(void) override;
 
 protected:
    void m_AddNew(void) override;

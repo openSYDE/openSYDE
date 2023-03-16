@@ -1,8 +1,4 @@
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <cstring>
 #include "C_CanMonProtocolTarget.hpp"
@@ -119,7 +115,7 @@ C_SclString C_CanMonProtocols::MessageToStringLog(const T_STWCAN_Msg_RX & orc_Ms
       c_Text += ";";
    }
 
-   if (me_ActiveProtocol != CMONL7ProtocolNone)
+   if (me_ActiveProtocol != eCMON_L7_PROTOCOL_NONE)
    {
       if (c_Text.Length() < u16_MAX_CHARS_RAW_DATA)
       {
@@ -144,7 +140,7 @@ C_SclString C_CanMonProtocols::MessageToString(const T_STWCAN_Msg_RX & orc_Msg) 
    if (c_Text == "")
    {
       //get L2 representation
-      c_Text = mapc_Protocols[CMONL7ProtocolNone]->MessageToString(orc_Msg);
+      c_Text = mapc_Protocols[eCMON_L7_PROTOCOL_NONE]->MessageToString(orc_Msg);
    }
    return c_Text;
 }
@@ -166,18 +162,18 @@ C_SclString C_CanMonProtocols::MessageToString(const T_STWCAN_Msg_RX & orc_Messa
 
 C_CanMonProtocols::C_CanMonProtocols() :
    mq_Decimal(false),
-   me_ActiveProtocol(CMONL7ProtocolNone)
+   me_ActiveProtocol(eCMON_L7_PROTOCOL_NONE)
 {
    //set shortcut pointers to be able to iterate:
-   mapc_Protocols[CMONL7ProtocolNone]         = &mc_ProtocolL2;
-   mapc_Protocols[CMONL7ProtocolCANopen]      = &mc_ProtocolCANopen;
-   mapc_Protocols[CMONL7ProtocolKEFEX]        = &mc_ProtocolKEFEX;
-   mapc_Protocols[CMONL7ProtocolXFL]          = &mc_ProtocolXFL;
-   mapc_Protocols[CMONL7ProtocolSTWFF]        = &mc_ProtocolSTWFF;
-   mapc_Protocols[CMONL7ProtocolGD]           = &mc_ProtocolGD;
-   mapc_Protocols[CMONL7Protocol_SHIP_IP_IVA] = &mc_ProtocolSHIP_IP_IVA;
-   mapc_Protocols[CMONL7ProtocolJ1939]        = &mc_ProtocolJ1939;
-   mapc_Protocols[CMONL7ProtocolOpenSYDE]     = &mc_ProtocolOpenSYDE;
+   mapc_Protocols[eCMON_L7_PROTOCOL_NONE]         = &mc_ProtocolL2;
+   mapc_Protocols[eCMON_L7_PROTOCOL_CAN_OPEN]      = &mc_ProtocolCanOpen;
+   mapc_Protocols[eCMON_L7_PROTOCOL_KEFEX]        = &mc_ProtocolKefex;
+   mapc_Protocols[eCMON_L7_PROTOCOL_XFL]          = &mc_ProtocolXfl;
+   mapc_Protocols[eCMON_L7_PROTOCOL_STW_FF]        = &mc_ProtocolStwFf;
+   mapc_Protocols[eCMON_L7_PROTOCOL_GD]           = &mc_ProtocolGd;
+   mapc_Protocols[eCMON_L7_PROTOCOL_SHIP_IP_IVA] = &mc_ProtocolShipIpIva;
+   mapc_Protocols[eCMON_L7_PROTOCOL_J1939]        = &mc_ProtocolJ1939;
+   mapc_Protocols[eCMON_L7_PROTOCOL_OPEN_SYDE]     = &mc_ProtocolOpenSyde;
 }
 
 //---------------------------------------------------------------------------
@@ -253,7 +249,7 @@ int32_t C_CanMonProtocols::SetDecimalMode(const bool oq_Decimal)
    C_RD_WR   -> could not write
 */
 //-----------------------------------------------------------------------------
-int32_t C_CanMonProtocols::SaveProtocolParametersToINI(const C_SclString & orc_FileName,
+int32_t C_CanMonProtocols::SaveProtocolParametersToIni(const C_SclString & orc_FileName,
                                                        const C_SclString & orc_Section)
 const
 {
@@ -296,7 +292,7 @@ const
    C_RD_WR   -> could not read (file does not exist)
 */
 //-----------------------------------------------------------------------------
-int32_t C_CanMonProtocols::LoadProtocolParametersFromINI(const C_SclString & orc_FileName,
+int32_t C_CanMonProtocols::LoadProtocolParametersFromIni(const C_SclString & orc_FileName,
                                                          const C_SclString & orc_Section)
 const
 {
@@ -368,31 +364,31 @@ bool C_CanMonProtocols::GetProtocolHasParameters(const e_CanMonL7Protocols oe_L7
 
    switch (oe_L7Protocol)
    {
-   case CMONL7ProtocolNone:
+   case eCMON_L7_PROTOCOL_NONE:
       q_HasParams = false;
       break;
-   case CMONL7ProtocolCANopen:
+   case eCMON_L7_PROTOCOL_CAN_OPEN:
       q_HasParams = false;
       break;
-   case CMONL7ProtocolKEFEX:
+   case eCMON_L7_PROTOCOL_KEFEX:
       q_HasParams = true;
       break;
-   case CMONL7ProtocolXFL:
+   case eCMON_L7_PROTOCOL_XFL:
       q_HasParams = true;
       break;
-   case CMONL7ProtocolSTWFF:
+   case eCMON_L7_PROTOCOL_STW_FF:
       q_HasParams = false;
       break;
-   case CMONL7ProtocolGD:
+   case eCMON_L7_PROTOCOL_GD:
       q_HasParams = false;
       break;
-   case CMONL7Protocol_SHIP_IP_IVA:
+   case eCMON_L7_PROTOCOL_SHIP_IP_IVA:
       q_HasParams = false;
       break;
-   case CMONL7ProtocolJ1939:
+   case eCMON_L7_PROTOCOL_J1939:
       q_HasParams = false;
       break;
-   case CMONL7ProtocolOpenSYDE:
+   case eCMON_L7_PROTOCOL_OPEN_SYDE:
       q_HasParams = false;
       break;
    default:
@@ -404,30 +400,30 @@ bool C_CanMonProtocols::GetProtocolHasParameters(const e_CanMonL7Protocols oe_L7
 
 //---------------------------------------------------------------------------
 
-uint16_t C_CanMonProtocols::KFXGetBaseID(void) const
+uint16_t C_CanMonProtocols::KfxGetBaseId(void) const
 {
-   return mc_ProtocolKEFEX.GetBaseID();
+   return mc_ProtocolKefex.GetBaseId();
 }
 
 //---------------------------------------------------------------------------
 
-void C_CanMonProtocols::KFXSetBaseID(const uint16_t ou16_BaseID)
+void C_CanMonProtocols::KdxSetBaseId(const uint16_t ou16_BaseId)
 {
-   mc_ProtocolKEFEX.SetBaseID(ou16_BaseID);
+   mc_ProtocolKefex.SetBaseId(ou16_BaseId);
 }
 
 //---------------------------------------------------------------------------
 
-uint32_t C_CanMonProtocols::XFLGetSendID(void) const
+uint32_t C_CanMonProtocols::XflGetSendId(void) const
 {
-   return mc_ProtocolXFL.GetSendID();
+   return mc_ProtocolXfl.GetSendId();
 }
 
 //---------------------------------------------------------------------------
 
-void C_CanMonProtocols::XFLSetSendID(const uint32_t ou32_SendID)
+void C_CanMonProtocols::XflSetSendId(const uint32_t ou32_SendId)
 {
-   mc_ProtocolXFL.SetSendID(ou32_SendID);
+   mc_ProtocolXfl.SetSendId(ou32_SendId);
 }
 
 //---------------------------------------------------------------------------

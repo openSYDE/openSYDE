@@ -31,7 +31,7 @@ class C_OgeTawToolBox :
 
 public:
    C_OgeTawToolBox(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTawToolBox(void);
+   ~C_OgeTawToolBox(void) override;
 
 private:
    //Avoid call

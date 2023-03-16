@@ -498,9 +498,9 @@ void C_SdNdeHalcWidget::m_OnSelectClicked(void)
          const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
          if (pc_Node != NULL)
          {
-            for (uint32_t u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
+            for (uint32_t u32_ItDp = 0UL; u32_ItDp < pc_Node->c_DataPools.size(); ++u32_ItDp)
             {
-               const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
+               const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDp];
                if (rc_Dp.e_Type != C_OscNodeDataPool::eHALC)
                {
                   ++u32_NotHalcDpCount;

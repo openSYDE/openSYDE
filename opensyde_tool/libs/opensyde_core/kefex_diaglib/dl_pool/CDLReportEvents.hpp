@@ -8,8 +8,8 @@
    \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CDLREPORTEVENTSH
-#define CDLREPORTEVENTSH
+#ifndef CDLREPORTEVENTSHPP
+#define CDLREPORTEVENTSHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -31,7 +31,7 @@ const uint8_t gu8_DL_REPORT_STATUS_TYPE_ERROR       = 2U; ///< error -> will res
 
 /* -- Function Prototypes ------------------------------------------------------------------------------------------- */
 ///Abstract base class providing an interface for implementation of reported functions
-class STW_DIAGLIB_EXPORT C_DLReportEvents
+class C_DLReportEvents
 {
 public:
 protected:
@@ -39,8 +39,8 @@ protected:
    virtual ~C_DLReportEvents(void);
 
    //Report progress (during a lengthy process)
-   //This is just for informational purposes and not neccessarily exactly linear to the actual progress.
-   //The return value can be used to abort an ongoing procdure (if supported by the caller).
+   //This is just for informational purposes and not necessarily exactly linear to the actual progress.
+   //The return value can be used to abort an ongoing procedure (if supported by the caller).
    virtual int32_t TRG_ReportProgress(const uint16_t ou16_Progress1_1000,
                                       const stw::scl::C_SclString & orc_AdditionalText) = 0;
    //report error or warning text (e.g. log or messagebox)

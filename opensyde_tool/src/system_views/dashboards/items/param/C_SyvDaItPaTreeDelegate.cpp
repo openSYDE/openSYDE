@@ -284,8 +284,8 @@ void C_SyvDaItPaTreeDelegate::setModelData(QWidget * const opc_Editor, QAbstract
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Size hint of each index
 
-   \param[in] orc_Option Style options
-   \param[in] orc_Index  Index
+   \param[in]  orc_Option  Style options
+   \param[in]  orc_Index   Index
 
    \return
    Item size
@@ -297,7 +297,7 @@ QSize C_SyvDaItPaTreeDelegate::sizeHint(const QStyleOptionViewItem & orc_Option,
 
    if (orc_Index.isValid() == true)
    {
-      c_Retval.setHeight(20);
+      c_Retval.setHeight(C_SyvDaItPaTreeDelegate::h_GetTableItemHeight());
    }
    return c_Retval;
 }
@@ -332,6 +332,18 @@ void C_SyvDaItPaTreeDelegate::destroyEditor(QWidget * const opc_Editor, const QM
 {
    QStyledItemDelegate::destroyEditor(opc_Editor, orc_Index);
    Q_EMIT this->SigNewEditor(NULL);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get table item height
+
+   \return
+   Table item height
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_SyvDaItPaTreeDelegate::h_GetTableItemHeight()
+{
+   return 20;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

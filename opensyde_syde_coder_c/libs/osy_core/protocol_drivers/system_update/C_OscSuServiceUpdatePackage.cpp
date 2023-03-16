@@ -513,6 +513,9 @@ int32_t C_OscSuServiceUpdatePackage::h_ProcessPackage(const C_SclString & orc_Pa
       //no zip -> we have a plain directory. Does it even exist?
       if (TglDirectoryExists(orc_PackagePath) == true)
       {
+         //We need the base path for handling relative paths of files to transfer:
+         c_TargetUnzipPath = TglFileIncludeTrailingDelimiter(orc_PackagePath);
+
          //check if necessary files are present
          s32_Return = C_OscSuServiceUpdatePackage::mh_CheckSupFiles(orc_PackagePath);
          if (s32_Return != C_NO_ERR)

@@ -8,20 +8,12 @@
    \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolJ1939H
-#define CCMONProtocolJ1939H
+#ifndef CCMONPROTOCOLJ1939HPP
+#define CCMONPROTOCOLJ1939HPP
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
 #include "C_SclString.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +23,7 @@ namespace cmon_protocol
 {
 //----------------------------------------------------------------------------------------------------------------------
 ///Interpretation of SAE J1939 protocol
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolJ1939 :
+class C_CanMonProtocolJ1939 :
    public C_CanMonProtocolBase
 {
 public:

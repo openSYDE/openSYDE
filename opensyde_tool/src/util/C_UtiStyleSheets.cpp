@@ -495,7 +495,6 @@ void C_UtiStyleSheets::mh_SetStyleSheetColor(const QString & orc_ColorType, QStr
                                              const QColor & orc_Color)
 {
    const int32_t s32_Pos = orc_Style.indexOf(orc_ColorType + ":");
-   int32_t s32_PosSemicolon;
    QString c_StyleColor;
 
    c_StyleColor = orc_ColorType + ": " + orc_Color.name(QColor::HexArgb);
@@ -503,7 +502,7 @@ void C_UtiStyleSheets::mh_SetStyleSheetColor(const QString & orc_ColorType, QStr
    if (s32_Pos >= 0)
    {
       // search the semicolon of this part of the stylesheet
-      s32_PosSemicolon = orc_Style.indexOf(";", s32_Pos);
+      const int32_t s32_PosSemicolon = orc_Style.indexOf(";", s32_Pos);
       orc_Style.remove(s32_Pos, s32_PosSemicolon - s32_Pos);
       orc_Style.insert(s32_Pos, c_StyleColor);
    }

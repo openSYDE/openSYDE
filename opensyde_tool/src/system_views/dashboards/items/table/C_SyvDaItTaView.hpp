@@ -17,6 +17,7 @@
 #include "C_PuiSvDbWidgetBase.hpp"
 #include "C_SyvDaItTaDelegate.hpp"
 #include "C_PuiSvDbDataElementHandler.hpp"
+#include "C_SyvDaItTableHeaderView.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -53,6 +54,7 @@ public:
 
    void SetSelectionAvailable(const bool oq_Active, const bool oq_SelectFirst);
    void SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode);
+   void SetCursorHandlingActive(const bool oq_Active);
    void HideToolTip(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
@@ -73,6 +75,7 @@ protected:
 private:
    stw::opensyde_gui_logic::C_SyvDaItTaModel mc_Model;
    C_SyvDaItTaDelegate mc_Delegate;
+   C_SyvDaItTableHeaderView * mpc_TableHeaderView;
 
    //Avoid call
    C_SyvDaItTaView(const C_SyvDaItTaView &);

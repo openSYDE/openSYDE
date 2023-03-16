@@ -95,3 +95,29 @@ void C_OgePubGenericTextWithBackground::SetFontPixel(const int32_t os32_Value, c
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "SemiBold", oq_SemiBold);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Bold", oq_Bold);
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set border color (stylesheet color index) and activates the border
+
+   \param[in] os32_Value New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubGenericTextWithBackground::SetBorderColor(const int32_t os32_Value)
+{
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Border", os32_Value);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "BorderActive", true);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set clicked colors (stylesheet color index) and activates the border
+
+   \param[in] os32_ValueClicked New value for clicked
+   \param[in] os32_ValueHovered New value for hovered before clicking
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgePubGenericTextWithBackground::SetClickedColor(const int32_t os32_ValueClicked,
+                                                        const int32_t os32_ValueHovered)
+{
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Hovered", os32_ValueHovered);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this, "Clicked", os32_ValueClicked);
+}

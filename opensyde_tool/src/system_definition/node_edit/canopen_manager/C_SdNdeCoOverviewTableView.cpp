@@ -234,7 +234,6 @@ void C_SdNdeCoOverviewTableView::mouseDoubleClickEvent(QMouseEvent * const opc_E
       {
          uint8_t u8_InterfaceNumber;
          stw::opensyde_core::C_OscCanInterfaceId c_CanInterfaceId;
-         uint32_t u32_UseCaseIndex;
          C_SdNdeCoOverviewTableModel::E_NodeType e_NodeType;
 
          const int32_t s32_Error = this->mc_Model.MapRowToNodeConfig(
@@ -248,8 +247,8 @@ void C_SdNdeCoOverviewTableView::mouseDoubleClickEvent(QMouseEvent * const opc_E
             }
             else
             {
-               u32_UseCaseIndex = 0U; // for the config page
-               Q_EMIT (this->SigDeviceSelected(u8_InterfaceNumber, c_CanInterfaceId, u32_UseCaseIndex));
+               const uint32_t u32_USE_CASE_INDEX = 0U; // for the config page
+               Q_EMIT (this->SigDeviceSelected(u8_InterfaceNumber, c_CanInterfaceId, u32_USE_CASE_INDEX));
             }
          }
          else

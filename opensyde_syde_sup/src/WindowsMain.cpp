@@ -34,13 +34,13 @@ using namespace stw::errors;
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   main
 
-   \param[in]   osn_Argc     number of command line arguments
+   \param[in]   os32_Argc    number of command line arguments
    \param[in]   oapcn_Argv   command line arguments
 
    \return
    C_SydeSup::e_Result::eOK                        success
    C_SydeSup::e_Result::eERR_PARSE_COMMAND_LINE    error occurred on parsing command line (e.g. missing parameters)
-   else                                            see C_SydeSup::Update for precise error descriptions
+   else                                            see C_SydeSup::SelectModeAndStart for precise error descriptions
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t main(const int32_t os32_Argc, char_t * const oppcn_Argv[])
@@ -52,7 +52,7 @@ int32_t main(const int32_t os32_Argc, char_t * const oppcn_Argv[])
 
    if (e_Return == C_SydeSup::eOK)
    {
-      e_Return = c_SydeServiceUpdater.Update();
+      e_Return = c_SydeServiceUpdater.SelectModeAndStart();
    }
 
    return static_cast<int32_t>(e_Return);

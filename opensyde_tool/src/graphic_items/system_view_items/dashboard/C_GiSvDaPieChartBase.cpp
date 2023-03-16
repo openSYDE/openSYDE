@@ -286,7 +286,7 @@ bool C_GiSvDaPieChartBase::CallProperties(void)
             pc_Dialog->SetTheme(pc_Box->e_DisplayStyle);
 
             //Resize
-            c_New->SetSize(QSize(800, 800));
+            c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithDisplayFormatter());
 
             pc_PropertiesWidget->SetShowUnit(pc_Box->q_ShowUnit);
             pc_PropertiesWidget->SetShowValue(pc_Box->q_ShowValue);

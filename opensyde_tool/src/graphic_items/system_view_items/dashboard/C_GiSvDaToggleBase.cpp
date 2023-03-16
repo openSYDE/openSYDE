@@ -272,7 +272,7 @@ bool C_GiSvDaToggleBase::CallProperties(void)
             pc_Dialog->SetTheme(pc_Box->e_DisplayStyle);
 
             //Resize
-            c_New->SetSize(QSize(800, 800));
+            c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter());
 
             pc_PropertiesWidget->SetType(pc_Box->e_Type);
             pc_Dialog->SetWriteMode(pc_Box->e_ElementWriteMode);

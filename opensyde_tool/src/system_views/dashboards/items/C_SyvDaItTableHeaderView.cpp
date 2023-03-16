@@ -41,6 +41,7 @@ using namespace stw::opensyde_gui;
 C_SyvDaItTableHeaderView::C_SyvDaItTableHeaderView(const Qt::Orientation & ore_Orientation,
                                                    QWidget * const opc_Parent) :
    C_SdNdeDpListTableHeaderView(ore_Orientation, opc_Parent),
+   mq_CursorHandlingActive(true),
    mq_CursorChanged(false)
 {
 }
@@ -53,6 +54,20 @@ C_SyvDaItTableHeaderView::C_SyvDaItTableHeaderView(const Qt::Orientation & ore_O
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItTableHeaderView::~C_SyvDaItTableHeaderView(void)
 {
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the cursor handling active
+
+   If the cursor handling is active the SplitHCursor cursor will be set when necessary by setOverrideCursor
+   and restored when not
+
+   \param[in]       oq_Active     Flag if cursor handling is active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTableHeaderView::SetCursorHandlingActive(const bool oq_Active)
+{
+   this->mq_CursorHandlingActive = oq_Active;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -77,27 +92,30 @@ C_SyvDaItTableHeaderView::~C_SyvDaItTableHeaderView(void)
 //----------------------------------------------------------------------------------------------------------------------
 bool C_SyvDaItTableHeaderView::event(QEvent * const opc_Event)
 {
-   if (opc_Event->type() == QEvent::CursorChange)
+   if (this->mq_CursorHandlingActive == true)
    {
-      if (this->mq_CursorChanged == false)
+      if (opc_Event->type() == QEvent::CursorChange)
       {
-         this->mq_CursorChanged = true;
-         QApplication::setOverrideCursor(Qt::SplitHCursor);
+         if (this->mq_CursorChanged == false)
+         {
+            this->mq_CursorChanged = true;
+            QApplication::setOverrideCursor(Qt::SplitHCursor);
+         }
+         else
+         {
+            this->mq_CursorChanged = false;
+            QApplication::restoreOverrideCursor();
+         }
       }
-      else
+      else if (opc_Event->type() == QEvent::HoverLeave)
       {
          this->mq_CursorChanged = false;
          QApplication::restoreOverrideCursor();
       }
-   }
-   else if (opc_Event->type() == QEvent::HoverLeave)
-   {
-      this->mq_CursorChanged = false;
-      QApplication::restoreOverrideCursor();
-   }
-   else
-   {
-      // Nothing to do
+      else
+      {
+         // Nothing to do
+      }
    }
 
    return C_SdNdeDpListTableHeaderView::event(opc_Event);

@@ -12,8 +12,8 @@
    \copyright   Copyright 2015 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CSCLCHECKSUMSH
-#define CSCLCHECKSUMSH
+#ifndef CSCLCHECKSUMSHPP
+#define CSCLCHECKSUMSHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -23,26 +23,17 @@ namespace stw
 {
 namespace scl
 {
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
-
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
-class SCL_PACKAGE C_SclChecksums
+class C_SclChecksums
 {
 public:
    //"h_" prefix for static not used here for consistency with other SCL classes
-   static void CalcCRC16(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_CRC);
-   static void CalcCRC32(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_CRC);
-   static int32_t CalcCRC32TriCore(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_CRC);
-   static void CalcCRC16STW(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_CRC);
+   static void CalcCRC16(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_Crc);
+   static void CalcCRC32(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_Crc);
+   static int32_t CalcCRC32TriCore(const void * const opv_Start, const uint32_t ou32_NumBytes, uint32_t & oru32_Crc);
+   static void CalcCRC16STW(const void * const opv_Start, const uint32_t ou32_NumBytes, uint16_t & oru16_Crc);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

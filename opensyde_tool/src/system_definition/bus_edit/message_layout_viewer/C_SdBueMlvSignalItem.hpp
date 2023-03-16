@@ -38,7 +38,7 @@ public:
    C_SdBueMlvSignalItem(const QColor & orc_BackgroundColor, const QColor & orc_FontColor,
                         const QColor & orc_ResizeItemColor, const QString & orc_Name, const float64_t of64_Space,
                         QGraphicsItem * const opc_Parent = NULL);
-   virtual ~C_SdBueMlvSignalItem();
+   ~C_SdBueMlvSignalItem() override;
 
    void Update(const float64_t of64_SingleItemWidth, const float64_t of64_SingleItemHeight);
    void SetBitPosition(const uint16_t ou16_ByteRow, const uint16_t ou16_StartBit, const uint16_t ou16_LastBit);

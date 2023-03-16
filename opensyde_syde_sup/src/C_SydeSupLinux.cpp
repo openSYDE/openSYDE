@@ -359,4 +359,3 @@ C_SclString C_SydeSupLinux::m_GetCanInterfaceUsageExample(void) const
 {
    return "-i can0";
 }
-

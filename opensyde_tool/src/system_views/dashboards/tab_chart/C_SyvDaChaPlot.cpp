@@ -617,7 +617,7 @@ void C_SyvDaChaPlot::mousePressEvent(QMouseEvent * const opc_Event)
 
    Here moving of an line item as measurement cursor
 
-   \param[in,out] opc_Event Event identification and information
+   \param[in,out]  opc_Event  Event identification and information
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
@@ -630,10 +630,10 @@ void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
       // Calculate the difference in pixels
       const float64_t f64_NewHorizontal = f64_CurrPosHorizontal + c_Delta.x();
       // Convert to x axis coordinate
-      const float64_t f64_NewAxisX = this->xAxis->pixelToCoord(f64_NewHorizontal);
+      const float64_t f64_NewAxisVertical = this->xAxis->pixelToCoord(f64_NewHorizontal);
 
       // Adapt the x position of the cursor
-      this->mpc_ClickedCursor->UpdatePosition(f64_NewAxisX);
+      this->mpc_ClickedCursor->UpdatePosition(f64_NewAxisVertical);
 
       // Store the event
       this->mc_LastItemLineEvent = *opc_Event;
@@ -642,7 +642,7 @@ void C_SyvDaChaPlot::mouseMoveEvent(QMouseEvent * const opc_Event)
       this->replot();
 
       // Inform about the new position
-      Q_EMIT (this->SigCursorItemMovedOnHorizontalAxis(this->mpc_ClickedCursor, f64_NewAxisX));
+      Q_EMIT (this->SigCursorItemMovedOnHorizontalAxis(this->mpc_ClickedCursor, f64_NewAxisVertical));
 
       opc_Event->accept();
    }
@@ -698,6 +698,18 @@ void C_SyvDaChaPlot::wheelEvent(QWheelEvent * const opc_Event)
 
    Qt::Orientations c_Orientations = Qt::Horizontal | Qt::Vertical;
    bool q_ConfigChanged = false;
+
+   if (opc_Event->modifiers().testFlag(Qt::ShiftModifier) == false)
+   {
+      // Default value of chart configuration
+      const float64_t f64_ORIGINAL_FACTOR = 0.85;
+      pc_AxisRect->setRangeZoomFactor(f64_ORIGINAL_FACTOR);
+   }
+   else
+   {
+      const float64_t f64_MODIFIED_FACTOR = 0.99;
+      pc_AxisRect->setRangeZoomFactor(f64_MODIFIED_FACTOR);
+   }
 
    if (pc_AxisRect != NULL)
    {

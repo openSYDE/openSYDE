@@ -8,20 +8,12 @@
    \copyright   Copyright 2007 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolGDH
-#define CCMONProtocolGDH
+#ifndef CCMONPROTOCOLGDHPP
+#define CCMONPROTOCOLGDHPP
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
 #include "C_SclString.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +24,7 @@ namespace cmon_protocol
 //----------------------------------------------------------------------------------------------------------------------
 
 ///Interpretation of Generic Driver protocol
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolGd :
+class C_CanMonProtocolGd :
    public C_CanMonProtocolBase
 {
 public:

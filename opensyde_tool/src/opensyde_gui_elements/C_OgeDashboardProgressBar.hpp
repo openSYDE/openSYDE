@@ -35,7 +35,7 @@ public:
    void SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style, const bool oq_DarkMode);
 
 protected:
-   virtual void paintEvent(QPaintEvent * const opc_Event);
+   void paintEvent(QPaintEvent * const opc_Event) override;
    void resizeEvent(QResizeEvent * const opc_Event) override;
 
 private:

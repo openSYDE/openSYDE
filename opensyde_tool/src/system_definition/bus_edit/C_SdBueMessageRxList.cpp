@@ -47,7 +47,8 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
    mq_TxMethodOnEvent(false),
    mq_DisableOptionPossible(false),
    mq_TimeoutConfigurationReadOnly(false),
-   mq_ModeSingleNode(false)
+   mq_ModeSingleNode(false),
+   mq_ExclusiveMode(false)
 {
    mpc_Ui->setupUi(this);
 
@@ -150,8 +151,10 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
             pc_Entry->SetRxTimeoutPreconditions(this->mq_TxMethodOnEvent, this->mq_DisableOptionPossible);
             pc_Entry->SetRxTimeoutConfigurationReadOnly(this->mq_TimeoutConfigurationReadOnly);
             pc_Entry->SetSpecificToolTip(orc_SpecificTooltip);
+            pc_Entry->SetExclusiveMode(this->mq_ExclusiveMode);
             this->mpc_Ui->pc_VerticalLayout->insertWidget(this->mpc_Ui->pc_VerticalLayout->count() - 1, pc_Entry);
             this->mc_Entries.push_back(pc_Entry);
+            this->mc_RadioGroup.addButton(pc_Entry->GetRadioButton());
 
             // Node with specific interface and all associated Datapools finished.
             c_NodeDatapoolIndexes.clear();
@@ -283,7 +286,7 @@ void C_SdBueMessageRxList::CheckSpecificNode(const uint32_t ou32_NodeIndex, cons
       C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
       if ((pc_Entry != NULL) && (pc_Entry->DoesMatch(ou32_NodeIndex, ou32_InterfaceIndex) == true))
       {
-         pc_Entry->SetChecked(ou32_DatapoolIndex, oq_Checked);
+         pc_Entry->SetChecked(oq_Checked, false, ou32_DatapoolIndex);
       }
    }
 }
@@ -320,6 +323,53 @@ void C_SdBueMessageRxList::SetModeSingleNode(const bool oq_ModeSingleNode)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the exclusive mode for selecting maximum one receiver at time
+
+   \param[in]       oq_Active     Flag for activating or deactivating the mode
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageRxList::SetExclusiveMode(const bool oq_Active)
+{
+   uint32_t u32_ItEntry;
+
+   // In case of activating the exclusive mode, set the radio button of the first entry with an already
+   // checked checkbox to adapt the exclusive configuration
+   // Must be done before the exclusive mode was set to all entries to not have the slot for reacting on the radio
+   // button
+   // connected
+   if (oq_Active == true)
+   {
+      bool q_OneEntryChecked = false;
+      for (u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+      {
+         C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
+
+         if (pc_Entry->IsChecked() == true)
+         {
+            if (q_OneEntryChecked == false)
+            {
+               q_OneEntryChecked = true;
+               pc_Entry->GetRadioButton()->setChecked(true);
+            }
+            else
+            {
+               // In case of an already set checked radio button, the other checkboxes must be unchecked manually
+               pc_Entry->SetChecked(false, true, 0);
+            }
+         }
+      }
+   }
+
+   this->mq_ExclusiveMode = oq_Active;
+
+   for (u32_ItEntry = 0; u32_ItEntry < this->mc_Entries.size(); ++u32_ItEntry)
+   {
+      C_SdBueMessageRxEntry * const pc_Entry = this->mc_Entries[u32_ItEntry];
+      pc_Entry->SetExclusiveMode(oq_Active);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Clean up
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -334,6 +384,7 @@ void C_SdBueMessageRxList::Clear(void)
       disconnect(pc_Entry, &C_SdBueMessageRxEntry::SigNodeReceiveTimeoutMode, this,
                  &C_SdBueMessageRxList::SigNodeReceiveTimeoutMode);
       this->mpc_Ui->pc_VerticalLayout->removeWidget(pc_Entry);
+      this->mc_RadioGroup.removeButton(pc_Entry->GetRadioButton());
       pc_Entry->deleteLater();
    }
    this->mc_Entries.clear();

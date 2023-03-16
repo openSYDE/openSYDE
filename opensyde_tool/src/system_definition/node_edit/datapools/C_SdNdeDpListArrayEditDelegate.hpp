@@ -31,8 +31,8 @@ class C_SdNdeDpListArrayEditDelegate :
 public:
    C_SdNdeDpListArrayEditDelegate(QObject * const opc_Parent = NULL);
 
-   virtual QWidget * createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
-                                  const QModelIndex & orc_Index) const;
+   QWidget * createEditor(QWidget * const opc_Parent, const QStyleOptionViewItem & orc_Option,
+                          const QModelIndex & orc_Index) const override;
    void setEditorData(QWidget * const opc_Editor, const QModelIndex & orc_Index) const override;
    void setModelData(QWidget * const opc_Editor, QAbstractItemModel * const opc_Model,
                      const QModelIndex & orc_Index) const override;

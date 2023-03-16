@@ -8,20 +8,12 @@
    \copyright   Copyright 2005 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolSTWFFH
-#define CCMONProtocolSTWFFH
+#ifndef CCMONPROTOCOLSTWFFHPP
+#define CCMONPROTOCOLSTWFFHPP
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
 #include "C_SclString.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +24,7 @@ namespace cmon_protocol
 //----------------------------------------------------------------------------------------------------------------------
 
 ///Interpretation of STWFF protocol
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolStwFf :
+class C_CanMonProtocolStwFf :
    public C_CanMonProtocolBase
 {
 public:

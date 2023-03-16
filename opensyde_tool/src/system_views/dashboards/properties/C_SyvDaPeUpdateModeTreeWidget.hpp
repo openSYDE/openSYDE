@@ -32,7 +32,7 @@ class C_SyvDaPeUpdateModeTreeWidget :
 
 public:
    C_SyvDaPeUpdateModeTreeWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaPeUpdateModeTreeWidget(void);
+   ~C_SyvDaPeUpdateModeTreeWidget(void) override;
 
    void Init(const uint32_t ou32_ViewIndex);
    void Select(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id);

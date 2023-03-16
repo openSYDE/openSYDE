@@ -10,11 +10,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include "CDLReportEvents.hpp"
 
@@ -40,4 +36,3 @@ C_DLReportEvents::C_DLReportEvents(void)
 C_DLReportEvents::~C_DLReportEvents(void)
 {
 }
-

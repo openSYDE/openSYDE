@@ -499,8 +499,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.hpp \
               $${PWD}/protocol_drivers/system_update/C_OsyHexFile.hpp \
               $${PWD}/protocol_drivers/DiagLib_config.hpp
-
-   include(./libtomcrypt/libtomcrypt.pri)
 }
 
 # optional: protocol logging

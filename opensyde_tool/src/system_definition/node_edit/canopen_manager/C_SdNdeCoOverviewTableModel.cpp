@@ -526,8 +526,7 @@ const
             c_PdoCnt.u16_RxActive++;
          }
       }
-      opc_PdoDeviceMap->insert({ou32_NodeId, c_PdoCnt}
-                               );
+      opc_PdoDeviceMap->emplace(ou32_NodeId, c_PdoCnt);
    }
 }
 
@@ -546,7 +545,6 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
    if (pc_Node->c_CanOpenManagers.empty() == false)
    {
       // we have a CANopen Manager node
-      uint8_t u8_InterfaceIndex;
       std::map<uint8_t, C_OscCanOpenManagerInfo>::const_iterator c_IterManagers;
       for (c_IterManagers = pc_Node->c_CanOpenManagers.begin();
            c_IterManagers != pc_Node->c_CanOpenManagers.end();
@@ -554,6 +552,7 @@ void C_SdNdeCoOverviewTableModel::m_FillCoInfo()
       {
          // current device is a CANopen Manager
          C_CoInfo c_CoInfoManager;
+         uint8_t u8_InterfaceIndex;
 
          c_CoInfoManager.c_CoNodeConfig.e_NodeType = E_NodeType::eMANAGER;
          u8_InterfaceIndex = c_IterManagers->first;

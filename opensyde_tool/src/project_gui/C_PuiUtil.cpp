@@ -19,10 +19,12 @@
 #include "C_Uti.hpp"
 #include "C_PuiUtil.hpp"
 #include "C_PuiProject.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -69,7 +71,7 @@ QString C_PuiUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get rid of Data Block project path.
 
-   If the path contains mc_PATH_VARIABLE_DATABLOCK_PROJ we replace this with the project path,
+   If the path contains C_OscUtils::hc_PATH_VARIABLE_DATABLOCK_PROJ we replace this with the project path,
    but do not resolve any other placeholder variable.
    If the path is relative it is meant as relative to the Data Block project path,
    so we concatenate these paths.
@@ -85,30 +87,22 @@ QString C_PuiUtil::h_GetAbsolutePathFromProject(const QString & orc_Path)
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiUtil::h_MakeIndependentOfDbProjectPath(const QString & orc_DbProjectPath, const QString & orc_Path)
+
 {
-   QString c_Return = orc_Path;
+   QString c_Result = C_OscUtils::h_MakeIndependentOfDbProjectPath(
+      orc_DbProjectPath.toStdString().c_str(),
+      C_PuiProject::h_GetInstance()->GetFolderPath().toStdString().c_str(),
+      orc_Path.toStdString().c_str()).c_str();
 
-   if (c_Return.contains(mc_PATH_VARIABLE_DATABLOCK_PROJ) == true)
+   // do some path beautifying
+   if (c_Result.contains("%") == false)
    {
-      c_Return.replace(mc_PATH_VARIABLE_DATABLOCK_PROJ, orc_DbProjectPath);
-
-      // remove all double slashes but the first (network paths)
-      if (c_Return.startsWith("//"))
-      {
-         c_Return = '/' + c_Return;
-      }
-      c_Return.replace("//", "/");
-   }
-   else
-   {
-      // concatenate if placeholder-resolved path would be relative
-      if (QDir::isRelativePath(C_PuiUtil::h_ResolvePlaceholderVariables(orc_Path)) == true)
-      {
-         c_Return = C_Uti::h_ConcatPathIfNecessary(orc_DbProjectPath, c_Return);
-      }
+      // clean path only if there are no path variables
+      // (else %{BLUB}/../folder would be cleaned to folder which is wrong)
+      c_Result = QDir::cleanPath(c_Result);
    }
 
-   return c_Return;
+   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -123,30 +117,22 @@ QString C_PuiUtil::h_MakeIndependentOfDbProjectPath(const QString & orc_DbProjec
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiUtil::h_ResolvePlaceholderVariables(const QString & orc_Path, const QString & orc_DbProjectPath)
+
 {
-   QString c_Return = orc_Path;
+   QString c_Result = C_OscUtils::h_ResolvePlaceholderVariables(
+      orc_Path.toStdString().c_str(),
+      C_PuiProject::h_GetInstance()->GetFolderPath().toStdString().c_str(),
+      orc_DbProjectPath.toStdString().c_str()).c_str();
 
-   // first check for indicator %
-   if (c_Return.contains("%") == true)
+   // do some path beautifying
+   if (c_Result.contains("%") == false)
    {
-      // replace general path variables
-      c_Return = C_Uti::h_ResolveProjIndependentPlaceholderVariables(c_Return);
-
-      // resolve project-specific variables
-      if (c_Return.contains(mc_PATH_VARIABLE_OPENSYDE_PROJ) == true)
-      {
-         c_Return.replace(mc_PATH_VARIABLE_OPENSYDE_PROJ, C_PuiProject::h_GetInstance()->GetFolderPath());
-      }
-
-      if (c_Return.contains(mc_PATH_VARIABLE_DATABLOCK_PROJ) == true)
-      {
-         c_Return.replace(mc_PATH_VARIABLE_DATABLOCK_PROJ,
-                          C_PuiUtil::h_ResolvePlaceholderVariables(orc_DbProjectPath, ""));
-         // occurrences of orc_DbProjectPath in itself get replaced with ""
-      }
+      // clean path only if there are no path variables
+      // (else %{BLUB}/../folder would be cleaned to folder which is wrong)
+      c_Result = QDir::cleanPath(c_Result);
    }
 
-   return c_Return;
+   return c_Result;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -210,7 +196,7 @@ QString C_PuiUtil::h_GetResolvedAbsPathFromExe(const QString & orc_Path, const Q
 
    For example: C:/.../openSYDE_Project/DataBlockProject/GeneratedCode
 
-   \param[in]  orc_DbProjectPath    path of Data Block project (for replacing mc_PATH_VARIABLE_DATABLOCK_PROJ
+   \param[in]  orc_DbProjectPath    path of Data Block project (for replacing hc_PATH_VARIABLE_DATABLOCK_PROJ
                                     and concatenation!)
    \param[in]  orc_Path             path that probably contains path variables and if relative is relative to
                                     Data Block project

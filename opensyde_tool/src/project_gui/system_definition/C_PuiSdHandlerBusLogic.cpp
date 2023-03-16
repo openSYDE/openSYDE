@@ -15,6 +15,7 @@
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "TglUtils.hpp"
+#include "C_OscCanUtil.hpp"
 #include "C_Uti.hpp"
 #include "C_PuiSdUtil.hpp"
 #include "C_PuiSdHandlerBusLogic.hpp"
@@ -2652,13 +2653,14 @@ int32_t C_PuiSdHandlerBusLogic::MapBusIndexToName(const uint32_t ou32_BusIndex, 
 
    \param[in]  orc_MessageId        Message identification indices
    \param[in]  oru32_SignalIndex    Signal index
+   \param[in]  oq_ToolTip           True: display name for tool tip (short), false: general display name
 
    \return
    Signal display name
 */
 //----------------------------------------------------------------------------------------------------------------------
 QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OscCanMessageIdentificationIndices & orc_MessageId,
-                                                        const uint32_t & oru32_SignalIndex) const
+                                                        const uint32_t & oru32_SignalIndex, const bool oq_ToolTip) const
 {
    QString c_Retval;
    const C_OscCanSignal * const pc_Signal = this->GetCanSignal(orc_MessageId, oru32_SignalIndex);
@@ -2667,15 +2669,65 @@ QString C_PuiSdHandlerBusLogic::GetCanSignalDisplayName(const C_OscCanMessageIde
 
    if ((pc_Signal != NULL) && (pc_SignalData != NULL))
    {
+      c_Retval = pc_SignalData->c_Name.c_str();
+
+      // append multiplexer information for multiplexer signals
       if (pc_Signal->e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL)
       {
-         c_Retval = static_cast<QString>("%1 (Multiplexer)").arg(pc_SignalData->c_Name.c_str());
+         c_Retval = static_cast<QString>("%1 (Multiplexer)").arg(c_Retval);
       }
-      else
+
+      // add SPN for J1939 signals (not for tooltip)
+      if (orc_MessageId.e_ComProtocol == C_OscCanProtocol::eJ1939)
       {
-         c_Retval = pc_SignalData->c_Name.c_str();
+         if (oq_ToolTip == false)
+         {
+            c_Retval =
+               static_cast<QString>("SPN %1  %2").arg(pc_Signal->u32_J1939SuspectParameterNumber).arg(c_Retval);
+         }
+         else
+         {
+            c_Retval =
+               static_cast<QString>("%1 (SPN %2)").arg(c_Retval).arg(pc_Signal->u32_J1939SuspectParameterNumber);
+         }
       }
    }
+   return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get can message display name
+
+   \param[in]  orc_MessageId  Message identification indices
+   \param[in]  oq_ToolTip     True: display name for tool tip (short), false: general display name
+
+   \return
+   Can message display name
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_PuiSdHandlerBusLogic::GetCanMessageDisplayName(const C_OscCanMessageIdentificationIndices & orc_MessageId,
+                                                         const bool oq_ToolTip) const
+{
+   QString c_Retval;
+   const C_OscCanMessage * const pc_MessageData = this->GetCanMessage(orc_MessageId);
+
+   if (pc_MessageData != NULL)
+   {
+      c_Retval = static_cast<QString>("%1 (0x%2)").
+                 arg(pc_MessageData->c_Name.c_str()).
+                 arg(QString::number(pc_MessageData->u32_CanId, 16).toUpper());
+
+      // Add PGN for J1939 signals (not for tooltip)
+      if ((oq_ToolTip == false) && (orc_MessageId.e_ComProtocol  == C_OscCanProtocol::eJ1939))
+      {
+         C_OscCanUtilJ1939PgInfo c_PgInfo;
+         C_OscCanUtil::h_GetJ1939PgInfoFromCanId(pc_MessageData->u32_CanId, c_PgInfo);
+
+         const uint32_t u32_VisiblePgn = C_OscCanUtil::h_GetVisiblePgn(c_PgInfo.u32_Pgn);
+         c_Retval = static_cast<QString>("PGN %1  %2").arg(u32_VisiblePgn).arg(c_Retval);
+      }
+   }
+
    return c_Retval;
 }
 
@@ -2753,6 +2805,8 @@ const
                                      c_ExistingNames);
    m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eECES, oru32_InterfaceIndex, c_ExistingNames);
    m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eCAN_OPEN, oru32_InterfaceIndex,
+                                     c_ExistingNames);
+   m_GetExistingMessageNamesProtocol(oru32_NodeIndex, C_OscCanProtocol::eJ1939, oru32_InterfaceIndex,
                                      c_ExistingNames);
 
    return c_ExistingNames;

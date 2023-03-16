@@ -382,6 +382,12 @@
                 </property>
                 <item row="0" column="0">
                  <widget class="stw::opensyde_gui_elements::C_OgeFraFrame" name="pc_PreviewFrame">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>170</height>
+                   </size>
+                  </property>
                   <property name="autoFillBackground">
                    <bool>false</bool>
                   </property>

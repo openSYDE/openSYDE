@@ -65,6 +65,10 @@ public:
    stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style GetTheme(void) const;
    QString GetDisplayName(void) const;
 
+   static QSize h_GetPopupSizeWithDisplayFormatter(void);
+   static QSize h_GetPopupSizeWithoutDisplayFormatter(void);
+   static QSize h_GetPopupSizeWithoutDesignAndPreview(void);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 
@@ -109,6 +113,7 @@ private:
    QString m_GetDefaultDisplayName(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id) const;
    void m_OnUseDefaultScalingChange(void) const;
    void m_OnFormatterActiveChange(void) const;
+   void m_CheckFormatterString(void) const;
 
    void m_InitNoDataElement(void) const;
    void m_InitDataElement(const stw::opensyde_gui_logic::C_PuiSvDbNodeDataPoolListElementId & orc_Id,

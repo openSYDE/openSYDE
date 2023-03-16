@@ -12,10 +12,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <cctype>
 #include "stwtypes.hpp"
@@ -23,7 +19,6 @@
 #include "C_CanMonProtocolOpenSyde.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
-
 
 using namespace stw::errors;
 using namespace stw::cmon_protocol;
@@ -244,8 +239,8 @@ C_SclString C_CanMonProtocolOpenSyde::m_AddressInformationToText(
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_CanMonProtocolOpenSyde::m_DataPoolIdentifierToText(const uint32_t ou32_DataPoolIdentifier,
-                                                               const bool oq_IsResponse,
-                                                               const T_CanAddressInformation & orc_CanAddressInformation)
+                                                                 const bool oq_IsResponse,
+                                                                 const T_CanAddressInformation & orc_CanAddressInformation)
 const
 {
    const bool q_ReservedBitSet = ((ou32_DataPoolIdentifier & 0x00800000U) != 0U) ? true : false;
@@ -282,7 +277,7 @@ const
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_CanMonProtocolOpenSyde::mh_DisassembleCanId(const uint32_t ou32_CanId,
-                                                   T_CanAddressInformation & or_CanAddressInformation)
+                                                      T_CanAddressInformation & or_CanAddressInformation)
 {
    int32_t s32_Return = C_NO_ERR;
 
@@ -368,7 +363,7 @@ C_CanMonProtocolOpenSyde::C_CanMonProtocolOpenSyde(void) :
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_CanMonProtocolOpenSyde::m_ServiceIdToText(const uint8_t ou8_ServiceData,
-                                                      const bool oq_IsNegativeResponse) const
+                                                        const bool oq_IsNegativeResponse) const
 {
    const bool q_IsResponse = ((ou8_ServiceData & 0x40U) == 0x40U) ? true : false;
    const uint8_t u8_Service = (ou8_ServiceData & 0xBFU);
@@ -502,9 +497,9 @@ C_SclString C_CanMonProtocolOpenSyde::m_SessionIdToText(const uint8_t ou8_Sessio
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const opu8_ServiceData,
-                                                        const uint8_t ou8_ServiceSize,
-                                                        const T_CanAddressInformation & orc_CanAddressInformation,
-                                                        const bool oq_IsSingleFrame) const
+                                                          const uint8_t ou8_ServiceSize,
+                                                          const T_CanAddressInformation & orc_CanAddressInformation,
+                                                          const bool oq_IsSingleFrame) const
 {
    const bool q_IsResponse = ((opu8_ServiceData[0] & 0x40U) == 0x40U) ? true : false;
    const uint8_t u8_Service = (opu8_ServiceData[0] & 0xBFU);
@@ -536,8 +531,8 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
       else
       {
          const uint32_t u32_DpIndex = (static_cast<uint32_t>(opu8_ServiceData[1]) << 16U) +
-                                    (static_cast<uint32_t>(opu8_ServiceData[2]) << 8U) +
-                                    opu8_ServiceData[3];
+                                      (static_cast<uint32_t>(opu8_ServiceData[2]) << 8U) +
+                                      opu8_ServiceData[3];
          c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, orc_CanAddressInformation);
       }
       u8_FirstRawByte = 4U;
@@ -594,8 +589,8 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
                else
                {
                   const uint32_t u32_DpIndex = (static_cast<uint32_t>(opu8_ServiceData[2]) << 16U) +
-                                             (static_cast<uint32_t>(opu8_ServiceData[3]) << 8U) +
-                                             opu8_ServiceData[4];
+                                               (static_cast<uint32_t>(opu8_ServiceData[3]) << 8U) +
+                                               opu8_ServiceData[4];
                   c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, orc_CanAddressInformation);
                   if (q_IsChange == true)
                   {
@@ -624,8 +619,8 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
          if (ou8_ServiceSize >= 4U)
          {
             const uint32_t u32_DpIndex = (static_cast<uint32_t>(opu8_ServiceData[1]) << 16U) +
-                                       (static_cast<uint32_t>(opu8_ServiceData[2]) << 8U) +
-                                       opu8_ServiceData[3];
+                                         (static_cast<uint32_t>(opu8_ServiceData[2]) << 8U) +
+                                         opu8_ServiceData[3];
             c_Text += m_DataPoolIdentifierToText(u32_DpIndex, q_IsResponse, orc_CanAddressInformation);
             u8_FirstRawByte = 4U; //display data in raw format
          }
@@ -729,8 +724,8 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
             const uint8_t u8_BlockNumber = opu8_ServiceData[1] & 0x0FU;
             const uint8_t u8_SubNodeId = static_cast<uint8_t>((opu8_ServiceData[1] & 0xF0U) >> 4U);
             const uint32_t u32_UniqueId = (static_cast<uint32_t>(opu8_ServiceData[2]) << 16U) +
-                                        (static_cast<uint32_t>(opu8_ServiceData[3]) << 8U) +
-                                        static_cast<uint32_t>(opu8_ServiceData[4]);
+                                          (static_cast<uint32_t>(opu8_ServiceData[3]) << 8U) +
+                                          static_cast<uint32_t>(opu8_ServiceData[4]);
 
             // Interpret as standard format with POS
             c_Snr = this->mh_SerialNumberToString(&opu8_ServiceData[1]);
@@ -914,9 +909,9 @@ C_SclString C_CanMonProtocolOpenSyde::m_ServiceDataToText(const uint8_t * const 
                else
                {
                   const uint32_t u32_Value = (static_cast<uint32_t>(opu8_ServiceData[2]) << 24U) +
-                                           (static_cast<uint32_t>(opu8_ServiceData[3]) << 16U) +
-                                           (static_cast<uint32_t>(opu8_ServiceData[4]) << 8U) +
-                                           opu8_ServiceData[5];
+                                             (static_cast<uint32_t>(opu8_ServiceData[3]) << 16U) +
+                                             (static_cast<uint32_t>(opu8_ServiceData[4]) << 8U) +
+                                             opu8_ServiceData[5];
                   c_Text += "  VALUE:" + m_GetValueDecHex(u32_Value);
                }
             }
@@ -1065,7 +1060,8 @@ C_SclString C_CanMonProtocolOpenSyde::m_NegativeResponseCodeToText(const uint8_t
    Text interpretation of data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_CanMonProtocolOpenSyde::m_GetSupposedlyAsciiText(const uint8_t ou8_NumBytes, const uint8_t * const opu8_Data)
+C_SclString C_CanMonProtocolOpenSyde::m_GetSupposedlyAsciiText(const uint8_t ou8_NumBytes,
+                                                               const uint8_t * const opu8_Data)
 const
 {
    C_SclString c_Text = "\"";
@@ -1122,9 +1118,10 @@ C_SclString C_CanMonProtocolOpenSyde::mh_ThreeByteVersionToString(const uint8_t 
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_CanMonProtocolOpenSyde::m_DataIdentifierAndDataToText(const bool oq_IsWrite,
-                                                                  const uint16_t ou16_DataIdentifier,
-                                                                  const bool oq_IsResponse, const uint8_t ou8_PayloadSize,
-                                                                  const uint8_t * const opu8_Payload) const
+                                                                    const uint16_t ou16_DataIdentifier,
+                                                                    const bool oq_IsResponse,
+                                                                    const uint8_t ou8_PayloadSize,
+                                                                    const uint8_t * const opu8_Payload) const
 {
    C_SclString c_Text;
    uint8_t u8_FirstRawByte = 0U;
@@ -1505,8 +1502,9 @@ C_SclString C_CanMonProtocolOpenSyde::m_DataIdentifierAndDataToText(const bool o
    Text interpretation of routine data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_CanMonProtocolOpenSyde::m_RoutineDataToText(const uint16_t ou16_RoutineIdentifier, const bool oq_IsResponse,
-                                                        const uint8_t ou8_DataSize, const uint8_t * const opu8_Data) const
+C_SclString C_CanMonProtocolOpenSyde::m_RoutineDataToText(const uint16_t ou16_RoutineIdentifier,
+                                                          const bool oq_IsResponse, const uint8_t ou8_DataSize,
+                                                          const uint8_t * const opu8_Data) const
 {
    C_SclString c_Text;
    uint8_t u8_FirstRawByte = 0U;
@@ -1824,8 +1822,8 @@ C_SclString C_CanMonProtocolOpenSyde::MessageToString(const T_STWCAN_Msg_RX & or
                   {
                      //special negative response for this service
                      const uint32_t u32_DpIndex = (static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 16U) +
-                                                (static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 8U) +
-                                                orc_Msg.au8_Data[6];
+                                                  (static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 8U) +
+                                                  orc_Msg.au8_Data[6];
                      c_Text += m_ServiceIdToText(orc_Msg.au8_Data[2], true) + " NRC:" +
                                m_NegativeResponseCodeToText(orc_Msg.au8_Data[3]) + " " +
                                m_DataPoolIdentifierToText(u32_DpIndex, true, t_Address);
@@ -1918,8 +1916,8 @@ C_SclString C_CanMonProtocolOpenSyde::MessageToString(const T_STWCAN_Msg_RX & or
                   {
                      //we should have data:
                      const uint32_t u32_DpIndex = (static_cast<uint32_t>(orc_Msg.au8_Data[1]) << 16U) +
-                                                (static_cast<uint32_t>(orc_Msg.au8_Data[2]) << 8U) +
-                                                orc_Msg.au8_Data[3];
+                                                  (static_cast<uint32_t>(orc_Msg.au8_Data[2]) << 8U) +
+                                                  orc_Msg.au8_Data[3];
                      c_Text += m_DataPoolIdentifierToText(u32_DpIndex, true, t_Address);
                      //display data in raw format
                      if ((orc_Msg.u8_DLC - 4U) > 0U) //do we have data byte(s) left to display in raw format ...
@@ -2064,7 +2062,8 @@ C_SclString C_CanMonProtocolOpenSyde::MessageToString(const T_STWCAN_Msg_RX & or
    Text representation of raw data
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString C_CanMonProtocolOpenSyde::m_RawDataToString(const uint8_t ou8_NumBytes, const uint8_t * const opu8_Data) const
+C_SclString C_CanMonProtocolOpenSyde::m_RawDataToString(const uint8_t ou8_NumBytes,
+                                                        const uint8_t * const opu8_Data) const
 {
    uint8_t u8_Index;
    C_SclString c_Text = "  DATA[";

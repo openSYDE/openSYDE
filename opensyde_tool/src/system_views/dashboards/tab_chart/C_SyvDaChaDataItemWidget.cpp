@@ -86,9 +86,9 @@ C_SyvDaChaDataItemWidget::C_SyvDaChaDataItemWidget(const uint32_t ou32_ViewIndex
    this->mc_IconParameterInactive.load(":/images/system_definition/IconParameterInactive.svg");
    this->mc_IconSignalInactive.load(":/images/system_definition/IconSignalInactive.svg");
    this->mc_IconVariableInactive.load(":/images/system_definition/IconVariableInactive.svg");
-   this->mc_IconHALInputInactive.load(":/images/system_definition/NodeEdit/halc/InputSmallInactive.svg");
-   this->mc_IconHALOutputInactive.load(":/images/system_definition/NodeEdit/halc/OutputSmallInactive.svg");
-   this->mc_IconHALOtherInactive.load(":/images/system_definition/NodeEdit/halc/OtherSmallInactive.svg");
+   this->mc_IconHalInputInactive.load(":/images/system_definition/NodeEdit/halc/InputSmallInactive.svg");
+   this->mc_IconHalOutputInactive.load(":/images/system_definition/NodeEdit/halc/OutputSmallInactive.svg");
+   this->mc_IconHalOtherInactive.load(":/images/system_definition/NodeEdit/halc/OtherSmallInactive.svg");
    // Waring icon
    this->mc_IconParameterWarning.load(":/images/system_definition/IconParameterWarning.svg");
    this->mc_IconSignalWarning.load(":/images/system_definition/IconSignalWarning.svg");
@@ -675,7 +675,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
       case C_OscHalcDefDomain::eCA_INPUT:
          if (q_Inacitve == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALInputInactive);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalInputInactive);
          }
          else if (this->mq_Error == true)
          {
@@ -693,7 +693,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
       case C_OscHalcDefDomain::eCA_OUTPUT:
          if (q_Inacitve == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOutputInactive);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOutputInactive);
          }
          else if (this->mq_Error == true)
          {
@@ -711,7 +711,7 @@ void C_SyvDaChaDataItemWidget::m_UpdateIcon(void) const
       case C_OscHalcDefDomain::eCA_OTHER:
          if (q_Inacitve == true)
          {
-            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHALOtherInactive);
+            this->mpc_Ui->pc_LabelIcon->setPixmap(this->mc_IconHalOtherInactive);
          }
          else if (this->mq_Error == true)
          {

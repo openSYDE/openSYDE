@@ -30,7 +30,6 @@ class C_GiCheckBox :
 {
 public:
    C_GiCheckBox(const QRectF & orc_Rect, QGraphicsItem * const opc_Parent = NULL);
-   virtual ~C_GiCheckBox();
 
    void SetChecked(const bool oq_Checked);
    bool IsChecked(void) const;

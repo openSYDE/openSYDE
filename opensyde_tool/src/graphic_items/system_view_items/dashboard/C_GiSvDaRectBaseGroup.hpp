@@ -50,6 +50,7 @@ public:
    ~C_GiSvDaRectBaseGroup(void) override;
 
    bool IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos) const;
+   bool IsOverrideCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const;
 
    virtual void SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbWidgetBase::E_Style oe_Style,
                                 const bool oq_DarkMode);

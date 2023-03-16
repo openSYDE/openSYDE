@@ -89,12 +89,12 @@ int32_t C_SyvComDriverUtil::h_GetOscComDriverParamFromView(const uint32_t ou32_V
 
       if (pc_View != NULL)
       {
-         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
-            pc_View->GetPcData().GetBusIndex());
+         const C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
          if (pc_Bus != NULL)
          {
             //No check for connected because error check passed
-            oru32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
+            oru32_ActiveBusIndex = pc_View->GetOscPcData().GetBusIndex();
             orc_ActiveNodes.clear();
 
             if (C_PuiSvHandler::h_GetInstance()->GetNodeActiveFlagsWithSquadAdaptions(
@@ -108,7 +108,7 @@ int32_t C_SyvComDriverUtil::h_GetOscComDriverParamFromView(const uint32_t ou32_V
                   //No ethernet
                   *oppc_IpDispatcher = NULL;
 
-                  c_FilePath = pc_View->GetPcData().GetCanDllAbsolute();
+                  c_FilePath = pc_View->GetPuiPcData().GetCanDllAbsolute();
 
                   c_File.setFileName(c_FilePath);
 

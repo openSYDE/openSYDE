@@ -110,7 +110,7 @@ C_SyvDcWidget::C_SyvDcWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_
    if (pc_View != NULL)
    {
       //No check for connected because error check passed
-      this->mu32_BusIndex = pc_View->GetPcData().GetBusIndex();
+      this->mu32_BusIndex = pc_View->GetOscPcData().GetBusIndex();
       const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(this->mu32_BusIndex);
 
       if (pc_Bus != NULL)
@@ -2952,10 +2952,10 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
       //Stop timer (don't continue process)
       this->mc_Timer.stop();
 
-      if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
+      if ((pc_View != NULL) && (pc_View->GetOscPcData().GetConnected() == true))
       {
          const C_OscSystemBus * const pc_Bus =
-            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetPcData().GetBusIndex());
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
          if ((this->mpc_DcSequences != NULL) &&
              (pc_Bus != NULL))
          {
@@ -2983,7 +2983,7 @@ void C_SyvDcWidget::m_DoCompleteDisconnect(void)
 
             //Check which nodes
             C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(
-               pc_View->GetPcData().GetBusIndex(), c_NodeIndexes, c_InterfaceIndexes);
+               pc_View->GetOscPcData().GetBusIndex(), c_NodeIndexes, c_InterfaceIndexes);
             for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
             {
                //Check if node active

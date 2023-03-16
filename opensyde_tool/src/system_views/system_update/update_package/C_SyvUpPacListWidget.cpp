@@ -107,7 +107,7 @@ C_SyvUpPacListWidget::~C_SyvUpPacListWidget()
    if (pc_View != NULL)
    {
       // save visibility of empty optional widgets
-      C_UsHandler::h_GetInstance()->SetProjSvUpdateEmptyOptionalSectionsVisible(pc_View->GetName(),
+      C_UsHandler::h_GetInstance()->SetProjSvUpdateEmptyOptionalSectionsVisible(pc_View->GetName().c_str(),
                                                                                 this->mq_EmptyOptionalSectionsVisible);
    }
 }
@@ -132,7 +132,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32_t ou32_ViewIndex)
    if ((pc_View != NULL) &&
        (s32_Retval == C_NO_ERR))
    {
-      const std::vector<C_PuiSvNodeUpdate> & rc_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
+      const std::vector<C_OscViewNodeUpdate> & rc_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
       uint32_t u32_CurrentPosition = 0U;
       uint32_t u32_FoundNodes = 0U;
       uint32_t u32_NodeUpdateCounter;
@@ -150,7 +150,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32_t ou32_ViewIndex)
             // same position after the previous one too
             if (rc_NodeUpdate[u32_NodeUpdateCounter].u32_NodeUpdatePosition == u32_CurrentPosition)
             {
-               if (c_NodeActiveFlags[u32_NodeUpdateCounter] == true)
+               if (c_NodeActiveFlags[u32_NodeUpdateCounter] == 1)
                {
                   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(
                      u32_NodeUpdateCounter);
@@ -202,7 +202,7 @@ void C_SyvUpPacListWidget::SetViewIndex(const uint32_t ou32_ViewIndex)
       }
 
       // load view specific user settings
-      const C_UsSystemView c_View = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+      const C_UsSystemView c_View = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
       // hide show optional sections toggles visibility -> set flag to negotiated value:
       this->mq_EmptyOptionalSectionsVisible = !c_View.GetUpdatePackEmptyOptionalSectionsVisible();
       this->m_HideShowOptionalSections();
@@ -608,7 +608,6 @@ void C_SyvUpPacListWidget::ImportConfig(void)
 
    if (c_FileName != "")
    {
-      int32_t s32_Result;
       C_SyvUpPacConfig c_Config;
       C_OgeWiCustomMessage::E_Outputs e_ReturnMessageBox;
       C_OgeWiCustomMessage c_MessageBox(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
@@ -626,7 +625,7 @@ void C_SyvUpPacListWidget::ImportConfig(void)
       if (e_ReturnMessageBox == C_OgeWiCustomMessage::eYES)
       {
          // Load configuration
-         s32_Result = C_SyvUpPacConfigFiler::h_LoadConfig(c_FileName, c_Config);
+         const int32_t s32_Result = C_SyvUpPacConfigFiler::h_LoadConfig(c_FileName, c_Config);
 
          if (s32_Result == C_NO_ERR)
          {
@@ -699,7 +698,7 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
    QString c_DefaultFilename;
    if (pc_ViewData != NULL)
    {
-      c_DefaultFilename = pc_ViewData->GetName();
+      c_DefaultFilename = pc_ViewData->GetName().c_str();
    }
 
    if (oq_SaveAsFile)
@@ -757,7 +756,7 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
          // active bus index
          const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
          //No check for connected because error check passed
-         const uint32_t u32_ActiveBusIndex = pc_View->GetPcData().GetBusIndex();
+         const uint32_t u32_ActiveBusIndex = pc_View->GetOscPcData().GetBusIndex();
 
          // active nodes
          std::vector<uint8_t> c_NodeActiveFlags;
@@ -778,7 +777,7 @@ void C_SyvUpPacListWidget::CreateServiceUpdatePackage(const bool oq_SaveAsFile)
          C_SclString c_Error;
          if (s32_Return == C_NO_ERR)
          {
-            // In case of skipped files, check if some nodes does not need to be active for the package anymore
+            // In case of skipped files, check if some nodes do not need to be active for the package anymore
             uint32_t u32_NodeCounter;
 
             tgl_assert(c_NodeActiveFlags.size() == c_ApplicationsToWrite.size());
@@ -1142,7 +1141,7 @@ void C_SyvUpPacListWidget::m_MoveItem(const int32_t os32_SourceIndex, const int3
    // The numbers in the widgets must be updated before
    if (pc_View != NULL)
    {
-      std::vector<C_PuiSvNodeUpdate> c_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
+      std::vector<C_OscViewNodeUpdate> c_NodeUpdate = pc_View->GetAllNodeUpdateInformation();
       int32_t s32_Counter;
 
       for (s32_Counter = 0; s32_Counter < this->count(); ++s32_Counter)

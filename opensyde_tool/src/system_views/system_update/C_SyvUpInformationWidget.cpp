@@ -747,7 +747,7 @@ void C_SyvUpInformationWidget::m_UpdateEstimatedWaitTime(const bool oq_IncludesC
       if (this->mc_FileSizeInformation.GetOverallFilesSize() > 0ULL)
       {
          bool q_Worked;
-         const uint64_t u64_WaitingTimeSeconds = this->mc_FileSizeInformation.GetEstimatedTimeS(&q_Worked);
+         const uint64_t u64_WaitingTimeSeconds = this->mc_FileSizeInformation.GetEstimatedTimeSeconds(&q_Worked);
          //After all estimations were attempted check if any succeeded
          if (q_Worked == true)
          {
@@ -908,7 +908,7 @@ void C_SyvUpInformationWidget::m_LoadUserSettings()
    // restore configuration of the view
    if (pc_View != NULL)
    {
-      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
 
       //splitter
       int32_t s32_LastSegmentWidth  = c_UserView.GetUpdateSplitterHorizontal();
@@ -948,11 +948,11 @@ void C_SyvUpInformationWidget::m_SaveUserSettings() const
       const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterVert->sizes();
       if (c_Sizes.count() > 1)
       {
-         C_UsHandler::h_GetInstance()->SetProjSvUpdateSplitterHorizontal(pc_View->GetName(), c_Sizes.at(1));
+         C_UsHandler::h_GetInstance()->SetProjSvUpdateSplitterHorizontal(pc_View->GetName().c_str(), c_Sizes.at(1));
       }
 
       // summary widget style type
-      C_UsHandler::h_GetInstance()->SetProjSvUpdateSummaryBig(pc_View->GetName(),
+      C_UsHandler::h_GetInstance()->SetProjSvUpdateSummaryBig(pc_View->GetName().c_str(),
                                                               this->mpc_Ui->pc_SplitterVert->isVisibleTo(this));
    }
 }

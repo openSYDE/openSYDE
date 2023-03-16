@@ -30,10 +30,6 @@ class C_OscSystemFilerUtil
 public:
    static stw::scl::C_SclString h_BusTypeEnumToString(const C_OscSystemBus::E_Type oe_Type);
    static int32_t h_BusTypeStringToEnum(const stw::scl::C_SclString & orc_Type, C_OscSystemBus::E_Type & ore_Type);
-   static stw::scl::C_SclString h_CodeExportScalingTypeToString(const C_OscNodeCodeExportSettings::E_Scaling &
-                                                                ore_Scaling);
-   static int32_t h_StringToCodeExportScalingType(const stw::scl::C_SclString & orc_String,
-                                                  C_OscNodeCodeExportSettings::E_Scaling & ore_Scaling);
    static int32_t h_GetParserForExistingFile(C_OscXmlParser & orc_FileXmlParser, const stw::scl::C_SclString & orc_Path,
                                              const stw::scl::C_SclString & orc_RootNode);
    static int32_t h_GetParserForNewFile(C_OscXmlParser & orc_FileXmlParser, const stw::scl::C_SclString & orc_Path,
@@ -45,6 +41,14 @@ public:
    static int32_t h_SaveStringToFile(const stw::scl::C_SclString & orc_CompleteFileAsString,
                                      const stw::scl::C_SclString & orc_CompleteFilePath,
                                      const stw::scl::C_SclString & orc_LogHeading);
+   static void h_AdaptProjectPathToSystemDefinition(const stw::scl::C_SclString & orc_ProjectPath,
+                                                    stw::scl::C_SclString & orc_SystemDefintionPath);
+   static void h_AdaptProjectPathToSystemViews(const stw::scl::C_SclString & orc_ProjectPath,
+                                               stw::scl::C_SclString & orc_SystemViewsPath);
+   static stw::scl::C_SclString h_CodeExportScalingTypeToString(const C_OscNodeCodeExportSettings::E_Scaling &
+                                                                ore_Scaling);
+   static int32_t h_StringToCodeExportScalingType(const stw::scl::C_SclString & orc_String,
+                                                  C_OscNodeCodeExportSettings::E_Scaling & ore_Scaling);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

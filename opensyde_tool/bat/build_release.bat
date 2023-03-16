@@ -8,17 +8,15 @@ SET PATH=C:\Qt\Qt5.15.2\5.15.2\mingw81_32\bin\;%PATH%
 
 rem run qmake
 qmake.exe ../pjt/openSYDE.pro -r -spec win32-g++ "CONFIG+=release"
-if ERRORLEVEL 1 goto done
+if errorlevel 1 exit /b %errorlevel%
 
 mingw32-make.exe clean
-if ERRORLEVEL 1 goto done
+if errorlevel 1 exit /b %errorlevel%
 
 rem perform actual build
 rem output results to text file:
 mingw32-make.exe -j4 2> mingw32diagnostics.txt
-if ERRORLEVEL 1 goto done
+if errorlevel 1 exit /b %errorlevel%
 
 cd ..\bat
 time /t
-
-:done

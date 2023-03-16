@@ -8,19 +8,11 @@
    \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolSHIPIPIVAH
-#define CCMONProtocolSHIPIPIVAH
+#ifndef CCMONPROTOCOLSHIPIPIVAHPP
+#define CCMONPROTOCOLSHIPIPIVAHPP
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +23,7 @@ namespace cmon_protocol
 //----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
-class C_CMONProtocolSIPPayload
+class C_CanMonProtocolSipPayload
 {
 public:
    stw::scl::C_SclString c_Name; ///< payload description (should include unit)
@@ -48,14 +40,14 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
-class C_CMONProtocolSIPASPDescription
+class C_CanMonProtocolSipAspDescription
 {
 public:
    //index is implicit as they start from zero !
    stw::scl::C_SclString c_ShortName;
    uint16_t u16_Length; ///< total size of service in bytes
 
-   stw::scl::C_SclDynamicArray<C_CMONProtocolSIPPayload> c_Payload;
+   stw::scl::C_SclDynamicArray<C_CanMonProtocolSipPayload> c_Payload;
 
    void Set(const stw::scl::C_SclString & orc_ShortName, const uint16_t ou16_Length);
 };
@@ -63,66 +55,65 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
-class C_CMONProtocolSIPASNDescription
+class C_CanMonProtocolSipAsnDescription
 {
 public:
    //index is implicit as they start from zero !
    stw::scl::C_SclString c_ShortName;
-   stw::scl::C_SclString c_ASPPrefix;                               ///< if c_ASPs.GetLength() == 0: meaning of ASP
-                                                                    // (e.g. "CH" or "IDX")
-   uint16_t u16_Length;                                             ///< if c_ASPs.GetLength() == 0: expected size of
-                                                                    // APAY
-   stw::scl::C_SclDynamicArray<C_CMONProtocolSIPPayload> c_Payload; //if c_ASPs.GetLength() == 0
+   stw::scl::C_SclString c_AspPrefix;                                 ///< if c_ASPs.GetLength() == 0: meaning of ASP
+                                                                      // (e.g. "CH" or "IDX")
+   uint16_t u16_Length;                                               ///< if c_ASPs.GetLength() == 0: expected size of
+                                                                      // APAY
+   stw::scl::C_SclDynamicArray<C_CanMonProtocolSipPayload> c_Payload; ///< if c_ASPs.GetLength() == 0
+   stw::scl::C_SclDynamicArray<C_CanMonProtocolSipAspDescription> c_Asps;
 
-   stw::scl::C_SclDynamicArray<C_CMONProtocolSIPASPDescription> c_ASPs;
-
-   void Set(const stw::scl::C_SclString & orc_ShortName, const uint8_t ou8_NumASPs,
-            const stw::scl::C_SclString & orc_ASPPrefix = "", const uint16_t ou16_Length = 0);
+   void Set(const stw::scl::C_SclString & orc_ShortName, const uint8_t ou8_NumAsps,
+            const stw::scl::C_SclString & orc_AspPrefix = "", const uint16_t ou16_Length = 0);
 };
 
 //----------------------------------------------------------------------------------------------------------------------
 
 ///class for descriptions of SHIP-IP! services, only used internally
-class C_CMONProtocolSIPASADescription
+class C_CanMonProtocolSipAsaDescription
 {
 public:
    //index is implicit as they start from zero !
    stw::scl::C_SclString c_ShortName;
-   stw::scl::C_SclDynamicArray<C_CMONProtocolSIPASNDescription> c_ASNs;
+   stw::scl::C_SclDynamicArray<C_CanMonProtocolSipAsnDescription> c_Asns;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
 
 ///Interpretation of SHIP-IP!/IVA protocol:
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolShipIpIva :
-   public C_CMONProtocolKEFEX_IVA
+class C_CanMonProtocolShipIpIva :
+   public C_CanMonProtocolKefexIva
 {
 private:
    static bool hmq_ServiceTableInitialized;
    static void hm_InitServiceTable(void);
-   static stw::scl::C_SclDynamicArray<C_CMONProtocolSIPASADescription> hmc_Services;
+   static stw::scl::C_SclDynamicArray<C_CanMonProtocolSipAsaDescription> hmc_Services;
 
-   stw::scl::C_SclString m_SIPDecodeData(const stw::scl::C_SclDynamicArray<C_CMONProtocolSIPPayload> & orc_Payload,
+   stw::scl::C_SclString m_SipDecodeData(const stw::scl::C_SclDynamicArray<C_CanMonProtocolSipPayload> & orc_Payload,
                                          const uint8_t ou8_NumBytesInPayload, const uint8_t * const opu8_Payload) const;
 
    stw::scl::C_SclString m_MessageToString11Bit(const stw::can::T_STWCAN_Msg_RX & orc_Msg) const;
-   stw::scl::C_SclString m_IVAGetErrorFromCode(const uint16_t ou16_ErrorCode) const;
-   stw::scl::C_SclString m_IVAServiceIndexToString(const uint16_t ou16_ServiceIndex) const;
+   stw::scl::C_SclString m_IvaGetErrorFromCode(const uint16_t ou16_ErrorCode) const;
+   stw::scl::C_SclString m_IvaServiceIndexToString(const uint16_t ou16_ServiceIndex) const;
 
-   stw::scl::C_SclString m_SIPMessageToString(const stw::can::T_STWCAN_Msg_RX & orc_Msg) const;
-   stw::scl::C_SclString m_SIP11MessageToString(const stw::can::T_STWCAN_Msg_RX & orc_Msg) const;
-   stw::scl::C_SclString m_SIPDecodeSFFFReadWriteHeader(const uint8_t ou8_ASA, const uint8_t ou8_ASN,
-                                                        const uint8_t ou8_ASP,
-                                                        stw::scl::C_SclDynamicArray<C_CMONProtocolSIPPayload> ** const oppc_Payload)
+   stw::scl::C_SclString m_SipMessageToString(const stw::can::T_STWCAN_Msg_RX & orc_Msg) const;
+   stw::scl::C_SclString m_Sip11MessageToString(const stw::can::T_STWCAN_Msg_RX & orc_Msg) const;
+   stw::scl::C_SclString m_SipDecodeSfFfReadWriteHeader(const uint8_t ou8_Asa, const uint8_t ou8_Asn,
+                                                        const uint8_t ou8_Asp,
+                                                        stw::scl::C_SclDynamicArray<C_CanMonProtocolSipPayload> ** const oppc_Payload)
    const;
-   stw::scl::C_SclString m_SIPGetTPErrorFromCode(const uint8_t ou8_ErrorCode) const;
-   stw::scl::C_SclString m_SIPGetAppErrorFromCode(const uint8_t ou8_ErrorCode) const;
-   stw::scl::C_SclString m_SIPGetAccessType(const uint8_t ou8_AccessType) const;
-   stw::scl::C_SclString m_SIPGetApplData(const uint8_t ou8_Byte1, const uint8_t ou8_Byte2,
+   stw::scl::C_SclString m_SipGetTpErrorFromCode(const uint8_t ou8_ErrorCode) const;
+   stw::scl::C_SclString m_SipGetAppErrorFromCode(const uint8_t ou8_ErrorCode) const;
+   stw::scl::C_SclString m_SipGetAccessType(const uint8_t ou8_AccessType) const;
+   stw::scl::C_SclString m_SipGetApplData(const uint8_t ou8_Byte1, const uint8_t ou8_Byte2,
                                           const uint8_t * const opu8_FollowingBytes,
                                           const uint8_t ou8_NumBytesInThisFrame, const bool oq_IsRequest) const;
-   stw::scl::C_SclString m_SIPGetMemoryRWTypeAndIndex(const uint8_t ou8_MemType, const uint8_t ou8_MemIndex) const;
-   stw::scl::C_SclString m_SIPGetODRWTypeAndIndex(const uint8_t ou8_ODType, const uint16_t ou16_VariableIndex) const;
+   stw::scl::C_SclString m_SipGetMemoryRwTypeAndIndex(const uint8_t ou8_MemType, const uint8_t ou8_MemIndex) const;
+   stw::scl::C_SclString m_SipGetOdRwTypeAndIndex(const uint8_t ou8_OdType, const uint16_t ou16_VariableIndex) const;
 
 public:
    virtual stw::scl::C_SclString MessageToString(const stw::can::T_STWCAN_Msg_RX & orc_Msg) const;

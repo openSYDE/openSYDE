@@ -22,19 +22,11 @@ namespace stw
 namespace can
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-#ifndef STWCAN_PACKAGE
-#ifdef __BORLANDC__
-//maybe we want this module to be put into a VCL package ...
-#define STWCAN_PACKAGE __declspec(package)
-#else
-#define STWCAN_PACKAGE
-#endif
-#endif
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Abstract base class defining fundamental interface for all CAN drivers
 //lint -sem(stw::can::C_CAN_Base::m_InitClassBase,initializer)
-class STWCAN_PACKAGE C_CanBase
+class C_CanBase
 {
 private:
    void m_InitClassBase(void);

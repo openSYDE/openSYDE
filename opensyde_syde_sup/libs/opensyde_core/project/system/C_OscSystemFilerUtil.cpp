@@ -266,43 +266,73 @@ int32_t C_OscSystemFilerUtil::h_SaveStringToFile(const C_SclString & orc_Complet
 {
    int32_t s32_Retval = C_NO_ERR;
 
-   if (TglFileExists(orc_CompleteFilePath) == true)
+   const C_SclString c_Folder = TglExtractFilePath(orc_CompleteFilePath);
+
+   if (TglDirectoryExists(c_Folder) == false)
    {
-      //erase it:
-      int x_Return; //lint !e970 !e8080  //using type to match library interface
-      x_Return = std::remove(orc_CompleteFilePath.c_str());
-      if (x_Return != 0)
+      if (TglCreateDirectory(c_Folder) != 0)
       {
-         osc_write_log_error(orc_LogHeading,
-                             "Could not erase pre-existing file \"" + orc_CompleteFilePath + "\".");
+         osc_write_log_error(orc_LogHeading, "Could not create folder \"" + c_Folder + "\".");
          s32_Retval = C_RD_WR;
       }
    }
+
    if (s32_Retval == C_NO_ERR)
    {
-      const C_SclString c_Folder = TglExtractFilePath(orc_CompleteFilePath);
-      if (TglDirectoryExists(c_Folder) == false)
+      //Write (erase if file exists)
+      std::ofstream c_File;
+
+      c_File.open(orc_CompleteFilePath.c_str(), std::ofstream::trunc);
+      if (c_File.is_open() == true)
       {
-         if (TglCreateDirectory(c_Folder) != 0)
+         bool q_HasFailed;
+
+         c_File.write(orc_CompleteFileAsString.c_str(), orc_CompleteFileAsString.Length());
+         q_HasFailed = c_File.fail();
+         c_File.close();
+         if (q_HasFailed == true)
          {
-            osc_write_log_error(orc_LogHeading, "Could not create folder \"" + c_Folder + "\".");
+            osc_write_log_error(orc_LogHeading,
+                                "Could not create or overwrite file \"" + orc_CompleteFilePath + "\".");
             s32_Retval = C_RD_WR;
          }
       }
-   }
-   if (s32_Retval == C_NO_ERR)
-   {
-      //Write
-      std::ofstream c_File;
-
-      c_File.open(orc_CompleteFilePath.c_str(), std::ofstream::out);
-      if (c_File.is_open())
+      else
       {
-         c_File.write(orc_CompleteFileAsString.c_str(), orc_CompleteFileAsString.Length());
-         c_File.close();
+         osc_write_log_error(orc_LogHeading,
+                             "Could not write to file \"" + orc_CompleteFilePath + "\".");
+         s32_Retval = C_RD_WR;
       }
    }
    return s32_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt project path to system definition file path (*.syde_sysdef)
+
+   \param[in]   orc_ProjectPath           Project path
+   \param[out]  orc_SystemDefintionPath   System defintion path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemFilerUtil::h_AdaptProjectPathToSystemDefinition(const C_SclString & orc_ProjectPath,
+                                                                C_SclString & orc_SystemDefintionPath)
+{
+   orc_SystemDefintionPath = TglExtractFilePath(orc_ProjectPath) + "system_definition/" +
+                             TglChangeFileExtension(TglExtractFileName(orc_ProjectPath), ".syde_sysdef");
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adapt project path to system views file path (*.syde_sysviews)
+
+   \param[in]   orc_ProjectPath        Project path
+   \param[out]  orc_SystemViewsPath    System views path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSystemFilerUtil::h_AdaptProjectPathToSystemViews(const C_SclString & orc_ProjectPath,
+                                                           C_SclString & orc_SystemViewsPath)
+{
+   orc_SystemViewsPath = TglExtractFilePath(orc_ProjectPath) + "system_views/" +
+                         TglChangeFileExtension(TglExtractFileName(orc_ProjectPath), ".syde_sysviews");
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@
 #include "C_OgePopUpDialog.hpp"
 #include "C_SyvUpDeviceInfo.hpp"
 #include "C_GiSvNodeData.hpp"
-#include "C_PuiSvNodeUpdateParamInfo.hpp"
+#include "C_OscViewNodeUpdateParamInfo.hpp"
 
 namespace Ui
 {

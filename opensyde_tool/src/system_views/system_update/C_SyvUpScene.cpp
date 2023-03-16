@@ -766,7 +766,7 @@ bool C_SyvUpScene::m_IsLastBusConnectorInProgressAnimationToNode(const C_PuiSdNo
       else
       {
          //Search for PC bus if no routing necessary
-         u32_BusIndexToSearchFor = orc_View.GetPcData().GetBusIndex();
+         u32_BusIndexToSearchFor = orc_View.GetOscPcData().GetBusIndex();
       }
       //Search for first viable interface
       if ((orc_BusItem.GetIndex() >= 0) &&
@@ -818,7 +818,7 @@ int32_t C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculati
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
    if (((pc_UiNode != NULL) && (pc_OscNode != NULL)) &&
-       (((pc_Route != NULL) && (pc_View != NULL)) && (pc_View->GetPcData().GetConnected() == true)))
+       (((pc_Route != NULL) && (pc_View != NULL)) && (pc_View->GetOscPcData().GetConnected() == true)))
    {
       //Internal knowledge: Index of connector interaction point on bus is: LAST index
       //Special cases
@@ -830,14 +830,14 @@ int32_t C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculati
       //Segments of buses (always double the bus count)
       std::vector<QPointF> c_BusSegments;
       //Other
-      const std::vector<QPointF> & rc_PCConnectionPoints =
-         pc_View->GetPcData().GetConnectionData().c_UiInteractionPoints;
+      const std::vector<QPointF> & rc_PcConnectionPoints =
+         pc_View->GetPuiPcData().GetConnectionData().c_UiInteractionPoints;
       //Reserve
       c_Busses.reserve(static_cast<std::vector<uint32_t>::size_type>(pc_Route->c_VecRoutePoints.size() + 1UL));
       c_BusSegments.reserve(static_cast<std::vector<QPointF>::size_type>((pc_Route->c_VecRoutePoints.size() + 1UL) *
                                                                          2UL));
       //Add PC bus
-      c_Busses.push_back(pc_View->GetPcData().GetBusIndex());
+      c_Busses.push_back(pc_View->GetOscPcData().GetBusIndex());
       //Add route end points
       for (uint32_t u32_ItRoute = 0; u32_ItRoute < pc_Route->c_VecRoutePoints.size(); ++u32_ItRoute)
       {
@@ -845,10 +845,10 @@ int32_t C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculati
          c_Busses.push_back(rc_Point.u32_OutBusIndex);
       }
       //Handle first point
-      if (rc_PCConnectionPoints.size() > 0UL)
+      if (rc_PcConnectionPoints.size() > 0UL)
       {
-         c_BusSegments.push_back(rc_PCConnectionPoints[static_cast<std::vector< QPointF>::size_type >
-                                                       (rc_PCConnectionPoints.size() - 1UL)]);
+         c_BusSegments.push_back(rc_PcConnectionPoints[static_cast<std::vector< QPointF>::size_type >
+                                                       (rc_PcConnectionPoints.size() - 1UL)]);
          //Handle intermediate points
          for (uint32_t u32_ItRoute = 0; u32_ItRoute < pc_Route->c_VecRoutePoints.size(); ++u32_ItRoute)
          {

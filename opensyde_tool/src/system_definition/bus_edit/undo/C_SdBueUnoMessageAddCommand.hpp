@@ -38,8 +38,8 @@ public:
 
    std::vector<stw::opensyde_core::C_OscCanMessageIdentificationIndices> GetLastMessageIds(void) const;
 
-   virtual void redo(void);
-   virtual void undo(void);
+   void redo(void) override;
+   void undo(void) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

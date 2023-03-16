@@ -32,7 +32,7 @@ class C_NagServiceModeInfo :
 
 public:
    explicit C_NagServiceModeInfo(QWidget * const opc_Parent = NULL);
-   virtual ~C_NagServiceModeInfo(void);
+   ~C_NagServiceModeInfo(void) override;
 
    void InitStaticNames(void);
 

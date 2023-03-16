@@ -244,6 +244,11 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeStwFlashloaderSettings.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeCommFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdateParamInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenObjectDictionary.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsInfoBlock.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsDeviceInfoBlock.cpp
@@ -328,6 +333,11 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdateParamInfo.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenObjectDictionary.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsInfoBlock.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsDeviceInfoBlock.hpp
@@ -348,6 +358,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view
    )
 endif()
 
@@ -492,8 +503,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/ip_dispatcher/dispatcher
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer
       ${CMAKE_CURRENT_SOURCE_DIR}/security
-      ${CMAKE_CURRENT_SOURCE_DIR}/libtomcrypt/src/headers
-      ${CMAKE_CURRENT_SOURCE_DIR}/libtomcrypt/libtommath
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
@@ -505,8 +514,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_stwflash
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/cmonprotocol
    )
-
-   add_subdirectory(libtomcrypt)
 endif()
 
 # windows target drivers: CAN and Ethernet dispatchers

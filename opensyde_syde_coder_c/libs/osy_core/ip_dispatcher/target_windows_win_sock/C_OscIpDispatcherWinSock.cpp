@@ -1206,10 +1206,7 @@ int32_t C_OscIpDispatcherWinSock::ReadUdp(std::vector<uint8_t> & orc_Data, uint8
             if ((x_Return != SOCKET_ERROR) && (x_SizeInBuffer >= 1U))
             {
                sockaddr_in c_Sender;
-               const int x_NumToReceive = static_cast<int>(orc_Data.size()); //lint !e8080 !e970 //using type to match
-                                                                             // library interface
-               int x_AddressSize = sizeof(c_Sender);                         //lint !e8080 !e970 //using type to match
-                                                                             // library interface
+               int x_AddressSize = sizeof(c_Sender); //lint !e8080 !e970 //using type to match library interface
 
                //enough bytes: read
                orc_Data.resize(x_SizeInBuffer);
@@ -1217,7 +1214,8 @@ int32_t C_OscIpDispatcherWinSock::ReadUdp(std::vector<uint8_t> & orc_Data, uint8
                //lint -e{926,929}  //Side-effect of the "char"-based API. No problems as long as we are on Windows.
                //lint -e{740,9176} //Side-effect of the POSIX-style API. Match is guaranteed by the API.
                x_Return = recvfrom(mc_SocketsUdpServer[u32_Interface], reinterpret_cast<char_t *>(&orc_Data[0]),
-                                   x_NumToReceive, 0, reinterpret_cast<sockaddr *>(&c_Sender),
+                                   static_cast<int>(orc_Data.size()), //lint !e970 //using expected API type
+                                   0, reinterpret_cast<sockaddr *>(&c_Sender),
                                    &x_AddressSize);
 
                //there might be more than one package in the buffer; recvfrom only reads one

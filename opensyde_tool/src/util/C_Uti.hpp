@@ -82,7 +82,6 @@ public:
    static QString h_GetAbsolutePathFromExe(const QString & orc_Path);
    static bool h_IsPathRelativeToDir(const QString & orc_PathIn, const QString & orc_AbsoluteReferenceDir,
                                      QString & orc_PathAbsolute, QString & orc_PathRelative);
-   static QString h_ResolveProjIndependentPlaceholderVariables(const QString & orc_Path);
    static QString h_GetHashValueAsQtString(void);
    static QString h_GetValueAsHex(const uint64_t ou64_Value, const uint8_t ou8_FieldWidth = 0);
    static QString h_GetValueAsHex(const uint32_t ou32_Value, const uint8_t ou8_FieldWidth = 0);

@@ -140,14 +140,13 @@ C_PuiSvDbSpinBox::E_Type C_SyvDaPeSpinBox::GetType(void) const
 {
    C_PuiSvDbSpinBox::E_Type e_Retval;
 
-   switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
+   if (this->mpc_Ui->pc_ComboBoxType->currentIndex() == C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE2)
    {
-   case C_SyvDaPeSpinBox::mhs32_INDEX_STYLE_TYPE2:
       e_Retval = C_PuiSvDbSpinBox::eTYPE2;
-      break;
-   default:
+   }
+   else
+   {
       e_Retval = C_PuiSvDbSpinBox::eTYPE1;
-      break;
    }
 
    return e_Retval;

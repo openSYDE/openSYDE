@@ -211,7 +211,7 @@ void C_SyvSeScene::ReloadViewData(void)
          q_ConnectionFound = true;
          if (pc_View != NULL)
          {
-            if (pc_View->GetPcData().GetConnected() == true)
+            if (pc_View->GetOscPcData().GetConnected() == true)
             {
                C_GiLiBus * pc_FoundBus = NULL;
                //Last bus
@@ -222,7 +222,7 @@ void C_SyvSeScene::ReloadViewData(void)
                   if (pc_PcBus != NULL)
                   {
                      if ((pc_PcBus->GetIndex() >= 0) &&
-                         (static_cast<uint32_t>(pc_PcBus->GetIndex()) == pc_View->GetPcData().GetBusIndex()))
+                         (static_cast<uint32_t>(pc_PcBus->GetIndex()) == pc_View->GetOscPcData().GetBusIndex()))
                      {
                         pc_FoundBus = pc_PcBus;
                      }
@@ -230,8 +230,8 @@ void C_SyvSeScene::ReloadViewData(void)
                }
                //Reset bus (might be different)
                pc_PcBusConnection->RevertBus(pc_FoundBus, NULL,
-                                             pc_View->GetPcData().GetConnectionData().c_UiInteractionPoints[0]);
-               pc_PcBusConnection->SetPoints(pc_View->GetPcData().GetConnectionData().c_UiInteractionPoints);
+                                             pc_View->GetPuiPcData().GetConnectionData().c_UiInteractionPoints[0]);
+               pc_PcBusConnection->SetPoints(pc_View->GetPuiPcData().GetConnectionData().c_UiInteractionPoints);
             }
             else
             {
@@ -245,7 +245,7 @@ void C_SyvSeScene::ReloadViewData(void)
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       if (pc_View != NULL)
       {
-         if (pc_View->GetPcData().GetConnected() == true)
+         if (pc_View->GetOscPcData().GetConnected() == true)
          {
             C_GiLiBus * pc_FoundBus = NULL;
             C_GiSvPc * pc_FoundPc = NULL;
@@ -263,7 +263,7 @@ void C_SyvSeScene::ReloadViewData(void)
                if (pc_PcBus != NULL)
                {
                   if ((pc_PcBus->GetIndex() >= 0) &&
-                      (static_cast<uint32_t>(pc_PcBus->GetIndex()) == pc_View->GetPcData().GetBusIndex()))
+                      (static_cast<uint32_t>(pc_PcBus->GetIndex()) == pc_View->GetOscPcData().GetBusIndex()))
                   {
                      pc_FoundBus = pc_PcBus;
                   }
@@ -272,7 +272,7 @@ void C_SyvSeScene::ReloadViewData(void)
             if ((pc_FoundPc != NULL) && (pc_FoundBus != NULL))
             {
                //Create connection
-               m_AddPcBusConnector(pc_FoundBus, pc_FoundPc, pc_View->GetPcData().GetConnectionData());
+               m_AddPcBusConnector(pc_FoundBus, pc_FoundPc, pc_View->GetPuiPcData().GetConnectionData());
             }
          }
       }

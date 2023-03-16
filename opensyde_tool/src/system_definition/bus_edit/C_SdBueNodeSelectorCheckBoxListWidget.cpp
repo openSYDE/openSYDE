@@ -84,13 +84,11 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
                                                      const std::vector<uint32_t> & orc_Indexes,
                                                      const std::vector<uint32_t> & orc_SubIndexes)
 {
-   uint32_t u32_Counter;
-   int32_t s32_Counter;
    QSpacerItem * const pc_Spacer = new QSpacerItem(0, 3, QSizePolicy::Minimum, QSizePolicy::Expanding);
    const int32_t s32_ItemCount = this->mpc_Ui->pc_CbxVerticalLayout->count();
 
    // clear all previous nodes
-   for (s32_Counter = (s32_ItemCount - 1); s32_Counter >= 0; --s32_Counter)
+   for (int32_t s32_Counter = (s32_ItemCount - 1); s32_Counter >= 0; --s32_Counter)
    {
       QLayoutItem * const pc_Item = this->mpc_Ui->pc_CbxVerticalLayout->itemAt(s32_Counter);
 
@@ -116,7 +114,7 @@ void C_SdBueNodeSelectorCheckBoxListWidget::AddNodes(const std::vector<QString> 
        (orc_Names.size() == orc_SubIndexes.size()))
    {
       // add new nodes
-      for (u32_Counter = 0U; u32_Counter < orc_Names.size(); ++u32_Counter)
+      for (uint32_t u32_Counter = 0U; u32_Counter < orc_Names.size(); ++u32_Counter)
       {
          this->m_AddNode(orc_Names[u32_Counter], orc_Indexes[u32_Counter], orc_SubIndexes[u32_Counter]);
       }

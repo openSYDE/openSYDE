@@ -124,7 +124,7 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32_t ou32_ViewIndex, QWidget * 
    //Update all items with initial zoom & pos value
    if (pc_View != NULL)
    {
-      c_Name = pc_View->GetName();
+      c_Name = pc_View->GetName().c_str();
    }
    else
    {
@@ -142,7 +142,7 @@ C_SyvSeSetupWidget::C_SyvSeSetupWidget(const uint32_t ou32_ViewIndex, QWidget * 
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvSeSetupWidget::~C_SyvSeSetupWidget(void)
+C_SyvSeSetupWidget::~C_SyvSeSetupWidget(void) noexcept
 {
    delete mpc_Ui;
    delete mpc_Scene;
@@ -169,9 +169,9 @@ void C_SyvSeSetupWidget::Save(void) const
    // store configuration of the view
    if (pc_View != NULL)
    {
-      C_UsHandler::h_GetInstance()->SetProjSvSetupViewZoom(
-         pc_View->GetName(), this->mpc_Ui->pc_GraphicsView->GetZoomValue());
-      C_UsHandler::h_GetInstance()->SetProjSvSetupViewPos(pc_View->GetName(),
+      C_UsHandler::h_GetInstance()->SetProjSvSetupViewZoom(pc_View->GetName().c_str(),
+                                                           this->mpc_Ui->pc_GraphicsView->GetZoomValue());
+      C_UsHandler::h_GetInstance()->SetProjSvSetupViewPos(pc_View->GetName().c_str(),
                                                           this->mpc_Ui->pc_GraphicsView->GetViewPos());
    }
    if (this->mpc_Scene != NULL)

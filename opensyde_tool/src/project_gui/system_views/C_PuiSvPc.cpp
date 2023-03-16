@@ -12,15 +12,11 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
-#include <limits>
-#include <QFileInfo>
-
-#include "C_Uti.hpp"
-#include "C_PuiUtil.hpp"
 #include "stwtypes.hpp"
-#include "C_PuiSvPc.hpp"
-#include "C_SclChecksums.hpp"
 #include "constants.hpp"
+#include "C_SclChecksums.hpp"
+#include "C_PuiUtil.hpp"
+#include "C_PuiSvPc.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_logic;
@@ -43,8 +39,6 @@ using namespace stw::opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvPc::C_PuiSvPc(void) :
    C_PuiBsBox(),
-   mq_Connected(false),
-   mu32_BusIndex(std::numeric_limits<uint32_t>::max()),
    me_CanDllType(ePEAK),
    mc_CustomCanDllPath("")
 {
@@ -63,36 +57,9 @@ void C_PuiSvPc::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->me_CanDllType, sizeof(this->me_CanDllType), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(this->mc_CustomCanDllPath.toStdString().c_str(),
                                        this->mc_CustomCanDllPath.length(), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->mq_Connected, sizeof(this->mq_Connected), oru32_HashValue);
-   stw::scl::C_SclChecksums::CalcCRC32(&this->mu32_BusIndex, sizeof(this->mu32_BusIndex), oru32_HashValue);
-
    this->mc_ConnectionData.CalcHash(oru32_HashValue);
 
    C_PuiBsBox::CalcHash(oru32_HashValue);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get connected flag
-
-   \return
-   Current connected flag
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvPc::GetConnected(void) const
-{
-   return this->mq_Connected;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get bus index
-
-   \return
-   Current bus index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32_t C_PuiSvPc::GetBusIndex(void) const
-{
-   return this->mu32_BusIndex;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,23 +83,6 @@ const C_PuiBsLineBase & C_PuiSvPc::GetConnectionData(void) const
 void C_PuiSvPc::SetConnectionData(const C_PuiBsLineBase & orc_Value)
 {
    this->mc_ConnectionData = orc_Value;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set connected state of pc in view
-
-   \param[in]  oq_Connected         Flag if pc is connected
-   \param[in]  ou32_BusIndex        Bus index PC is connected to
-   \param[in]  orq_ForceSimpleSet   Optional flag to indicate if this function is used as a simple set or a logic operation
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::SetConnected(const bool oq_Connected, const uint32_t ou32_BusIndex, const bool & orq_ForceSimpleSet)
-{
-   this->mq_Connected = oq_Connected;
-   if ((orq_ForceSimpleSet == true) || (this->mq_Connected == true))
-   {
-      this->mu32_BusIndex = ou32_BusIndex;
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -240,78 +190,4 @@ void C_PuiSvPc::SetBox(const C_PuiBsBox & orc_Box)
    this->f64_Height = orc_Box.f64_Height;
    this->f64_Width = orc_Box.f64_Width;
    this->f64_ZetOrder = orc_Box.f64_ZetOrder;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sync view bus index to added bus index
-
-   \param[in]  ou32_Index  Added bus index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::OnSyncBusAdded(const uint32_t ou32_Index)
-{
-   if (ou32_Index < this->mu32_BusIndex)
-   {
-      ++this->mu32_BusIndex;
-   }
-   else if (ou32_Index == this->mu32_BusIndex)
-   {
-      if (this->mq_Connected == false)
-      {
-         this->mq_Connected = true;
-      }
-      else
-      {
-         ++this->mu32_BusIndex;
-      }
-   }
-   else
-   {
-      //No handling necessary
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sync view bus index to deleted bus index
-
-   \param[in]  ou32_Index  Deleted bus index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvPc::OnSyncBusDeleted(const uint32_t ou32_Index)
-{
-   if (ou32_Index < this->mu32_BusIndex)
-   {
-      --this->mu32_BusIndex;
-   }
-   else if (ou32_Index == this->mu32_BusIndex)
-   {
-      this->mq_Connected = false;
-   }
-   else
-   {
-      //No handling necessary
-   }
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Utility function to check if disconnect was only triggered indirectly
-
-   \return
-   False All valid state
-   True  Disconnect was not triggered properly
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvPc::CheckIndirectDisconnection(void) const
-{
-   bool q_Retval;
-
-   if ((this->mq_Connected == false) && (this->mu32_BusIndex != std::numeric_limits<uint32_t>::max()))
-   {
-      q_Retval = true;
-   }
-   else
-   {
-      q_Retval = false;
-   }
-   return q_Retval;
 }

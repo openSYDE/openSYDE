@@ -14,7 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QString>
 #include "stwtypes.hpp"
-#include "C_PuiSvNodeUpdateParamInfo.hpp"
+#include "C_OscViewNodeUpdateParamInfo.hpp"
 #include "C_OscParamSetInterpretedData.hpp"
 #include "C_SyvUpPacParamSetFileInfoComparisonDescription.hpp"
 
@@ -34,7 +34,7 @@ public:
 
    int32_t ReadFile(void);
 
-   const stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & GetParamInfo(void) const;
+   const stw::opensyde_core::C_OscViewNodeUpdateParamInfo & GetParamInfo(void) const;
    const QString & GetPath(void) const;
    const QString & GetComparisonResultsHtml(void) const;
 
@@ -43,7 +43,7 @@ private:
    const QString mc_StoragePath;
    const uint32_t mu32_NodeIndex;
    stw::opensyde_core::C_OscParamSetInterpretedData mc_InterpretedFileInfo;
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo mc_ParamInfo;
+   stw::opensyde_core::C_OscViewNodeUpdateParamInfo mc_ParamInfo;
    QString mc_ComparisonHtml;
    std::vector<C_SyvUpPacParamSetFileInfoComparisonDescription> mc_ComparisonResults;
    static const QString mhc_START_HEADING_TD;

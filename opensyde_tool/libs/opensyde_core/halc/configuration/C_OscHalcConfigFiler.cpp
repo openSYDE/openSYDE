@@ -472,6 +472,10 @@ int32_t C_OscHalcConfigFiler::mh_SaveIoDataBase(const C_OscHalcDefBase & orc_IoD
    {
       //To string
       s32_Retval = C_OscHalcDefFiler::h_SaveData(orc_IoData, orc_XmlParser);
+      //Remember file name
+      orc_XmlParser.SetAttributeString("original_file_name", orc_IoData.c_OriginalFileName);
+      //Remember file content
+      orc_XmlParser.SetAttributeString("original_file_content", orc_IoData.c_FileString);
    }
    else
    {
@@ -827,6 +831,12 @@ int32_t C_OscHalcConfigFiler::mh_LoadIoDataBase(C_OscHalcDefBase & orc_IoData, C
       {
          //From string
          s32_Retval = C_OscHalcDefFiler::h_LoadData(orc_IoData, orc_XmlParser);
+         //Retrieve file name
+         tgl_assert(orc_XmlParser.GetAttributeStringError("original_file_name",
+                                                          orc_IoData.c_OriginalFileName) == C_NO_ERR);
+         //Remember file content
+         tgl_assert(orc_XmlParser.GetAttributeStringError("original_file_content",
+                                                          orc_IoData.c_FileString) == C_NO_ERR);
       }
       else
       {
@@ -913,7 +923,7 @@ int32_t C_OscHalcConfigFiler::mh_LoadIoDomains(C_OscHalcConfig & orc_IoData, C_O
       if (s32_Retval == C_NO_ERR)
       {
          //Return
-         tgl_assert(orc_XmlParser.SelectNodeParent() == "opensyde-node-io-config");
+         orc_XmlParser.SelectNodeParent();
       }
    }
    return s32_Retval;

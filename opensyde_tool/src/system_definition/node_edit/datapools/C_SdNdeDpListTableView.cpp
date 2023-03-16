@@ -224,30 +224,36 @@ bool C_SdNdeDpListTableView::Equals(const uint32_t & oru32_NodeIndex, const uint
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDpListTableView::Copy(void) const
 {
-   std::vector<C_OscNodeDataPoolListElement> c_OscContentVec;
-   std::vector<C_PuiSdNodeDataPoolListElement> c_UiContentVec;
-   C_OscNodeDataPoolListElement c_OscContent;
-   C_PuiSdNodeDataPoolListElement c_UiContent;
+   const C_OscNodeDataPool * const pc_Datapool = C_PuiSdHandler::h_GetInstance()->GetOscDataPool(this->mu32_NodeIndex,
+                                                                                                 this->mu32_DataPoolIndex);
 
-   std::vector<uint32_t> c_SelectedIndices = m_GetSelectedIndices();
-   c_OscContentVec.reserve(c_SelectedIndices.size());
-   c_UiContentVec.reserve(c_SelectedIndices.size());
-
-   //Sort to have "correct" copy order
-   C_SdUtil::h_SortIndicesAscending(c_SelectedIndices);
-   for (uint32_t u32_ItIndex = 0; u32_ItIndex < c_SelectedIndices.size(); ++u32_ItIndex)
+   if (pc_Datapool != NULL)
    {
-      if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
-                                                                  this->mu32_ListIndex,
-                                                                  c_SelectedIndices[u32_ItIndex],
-                                                                  c_OscContent,
-                                                                  c_UiContent) == C_NO_ERR)
+      std::vector<C_OscNodeDataPoolListElement> c_OscContentVec;
+      std::vector<C_PuiSdNodeDataPoolListElement> c_UiContentVec;
+      C_OscNodeDataPoolListElement c_OscContent;
+      C_PuiSdNodeDataPoolListElement c_UiContent;
+
+      std::vector<uint32_t> c_SelectedIndices = m_GetSelectedIndices();
+      c_OscContentVec.reserve(c_SelectedIndices.size());
+      c_UiContentVec.reserve(c_SelectedIndices.size());
+
+      //Sort to have "correct" copy order
+      C_SdUtil::h_SortIndicesAscending(c_SelectedIndices);
+      for (uint32_t u32_ItIndex = 0; u32_ItIndex < c_SelectedIndices.size(); ++u32_ItIndex)
       {
-         c_OscContentVec.push_back(c_OscContent);
-         c_UiContentVec.push_back(c_UiContent);
+         if (C_PuiSdHandler::h_GetInstance()->GetDataPoolListElement(this->mu32_NodeIndex, this->mu32_DataPoolIndex,
+                                                                     this->mu32_ListIndex,
+                                                                     c_SelectedIndices[u32_ItIndex],
+                                                                     c_OscContent,
+                                                                     c_UiContent) == C_NO_ERR)
+         {
+            c_OscContentVec.push_back(c_OscContent);
+            c_UiContentVec.push_back(c_UiContent);
+         }
       }
+      C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(c_OscContentVec, c_UiContentVec, pc_Datapool->e_Type);
    }
-   C_SdClipBoardHelper::h_StoreDataPoolListElementsToClipBoard(c_OscContentVec, c_UiContentVec);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -871,7 +877,7 @@ std::vector<QString> C_SdNdeDpListTableView::GetSelectedVariableNames(void) cons
          if (u32_VarIndex < pc_List->c_Elements.size())
          {
             const C_OscNodeDataPoolListElement & rc_Element = pc_List->c_Elements[u32_VarIndex];
-            c_Retval.push_back(rc_Element.c_Name.c_str());
+            c_Retval.emplace_back(rc_Element.c_Name.c_str());
          }
       }
    }

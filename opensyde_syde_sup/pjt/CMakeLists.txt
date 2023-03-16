@@ -101,8 +101,6 @@ set(SYDESUP_LINK_LIBRARIES_WINDOWS
    ws2_32   #WinSock
    Iphlpapi #IP helper API
    crypto
-   libtomcrypt
-   libtommath
 )
 
 set(SYDESUP_LINK_LIBRARIES_LINUX
@@ -110,8 +108,6 @@ set(SYDESUP_LINK_LIBRARIES_LINUX
    rt
    opensyde_core
    OpenSSL::Crypto
-   libtomcrypt
-   libtommath
 )
 
 # COMPILER SWITCHES

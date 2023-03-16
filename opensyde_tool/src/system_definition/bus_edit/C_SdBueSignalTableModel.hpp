@@ -37,6 +37,7 @@ public:
       eMESSAGE,
       eNAME,
       eCOMMENT,
+      eJ1939_SPN,
       eCAN_OPEN_INDEX,
       eMULTIPLEXING,
       eSTART_BIT,
@@ -76,6 +77,7 @@ private:
    public:
       QString c_MsgName;
       QString c_CoIndex;
+      uint32_t u32_J1939Spn;
       QString c_MultiplexingValue;
       QString c_SigName;
       QString c_Comment;

@@ -11,7 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include "C_OgePopUpDialog.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace Ui
@@ -34,13 +34,13 @@ class C_SyvUpPacPemFileOptionsPopUp :
 
 public:
    explicit C_SyvUpPacPemFileOptionsPopUp(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
-                                          const stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                          const stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger);
+                                          const stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                          const stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger);
    ~C_SyvUpPacPemFileOptionsPopUp(void) override;
 
    void InitStaticNames(void) const;
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateSecurity GetComboBoxSecState(void) const;
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateDebugger GetComboBoxDebState(void) const;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity GetComboBoxSecState(void) const;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger GetComboBoxDebState(void) const;
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -60,8 +60,8 @@ private:
    void m_OkClicked(void);
    void m_CancelClicked(void);
 
-   void m_InitComboBoxSec(const stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity);
-   void m_InitComboBoxDeb(const stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger);
+   void m_InitComboBoxSec(const stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity);
+   void m_InitComboBoxDeb(const stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger);
 
    //Avoid call
    C_SyvUpPacPemFileOptionsPopUp(const C_SyvUpPacPemFileOptionsPopUp &);

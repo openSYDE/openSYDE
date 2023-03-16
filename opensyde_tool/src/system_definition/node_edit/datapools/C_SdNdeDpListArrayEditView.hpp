@@ -41,7 +41,7 @@ class C_SdNdeDpListArrayEditView :
 
 public:
    C_SdNdeDpListArrayEditView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeDpListArrayEditView(void);
+   ~C_SdNdeDpListArrayEditView(void) override;
    void SetElement(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
                    const uint32_t & oru32_ListIndex, const uint32_t & oru32_ElementIndex,
                    const stw::opensyde_gui_logic::C_SdNdeDpUtil::E_ArrayEditType & ore_ArrayEditType,

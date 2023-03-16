@@ -11,7 +11,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvUpPacListNodeItemWidget.hpp"
 
-#include "C_PuiSvNodeUpdateParamInfo.hpp"
+#include "C_OscViewNodeUpdateParamInfo.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -30,9 +30,9 @@ public:
                                         const QString & orc_DeviceName, const bool oq_FileBased,
                                         const bool oq_StwFlashloader, QWidget * const opc_Parent = NULL);
 
-   void SetParamInfo(const stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamInfo);
+   void SetParamInfo(const opensyde_core::C_OscViewNodeUpdateParamInfo & orc_ParamInfo);
 
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo GetParamInfo(void) const;
+   stw::opensyde_core::C_OscViewNodeUpdateParamInfo GetParamInfo(void) const;
 
    uint32_t GetType(void) const override;
    void ViewFileInfo(void) override;
@@ -43,7 +43,7 @@ protected:
    QString m_CreateToolTipTitle(void) const override;
 
 private:
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo mc_ParamsetInfo;
+   stw::opensyde_core::C_OscViewNodeUpdateParamInfo mc_ParamsetInfo;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

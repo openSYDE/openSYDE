@@ -34,6 +34,8 @@ public:
    void SetBackgroundColor(const int32_t os32_Value);
    void SetCheckedBackgroundColor(const int32_t os32_Value);
    void SetFontPixel(const int32_t os32_Value, const bool oq_SemiBold = false, const bool oq_Bold = false);
+   void SetBorderColor(const int32_t os32_Value);
+   void SetClickedColor(const int32_t os32_ValueClicked, const int32_t os32_ValueHovered);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

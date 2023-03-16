@@ -24,6 +24,7 @@
 #include "C_SdBueMessagePropertiesWidget.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OscUtils.hpp"
+#include "C_OscCanUtil.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "TglUtils.hpp"
 #include "ui_C_SdBueMessagePropertiesWidget.h"
@@ -31,6 +32,8 @@
 #include "C_OgeWiUtil.hpp"
 #include "C_SdUtil.hpp"
 #include "C_OgeWiCustomMessage.hpp"
+#include "C_OgePopUpDialog.hpp"
+#include "C_SdBueJ1939PgPropertiesDialog.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 
@@ -98,6 +101,47 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    this->mpc_Ui->pc_LabelCoDlcAuto->SetFontPixel(13, false, false);
    this->mpc_Ui->pc_LabelCoDlcAuto->SetForegroundColor(36);
 
+   this->mpc_Ui->pc_FrameJ1939PgInfo->SetBackgroundColor(12);
+   this->mpc_Ui->pc_FrameJ1939PgInfo->SetBorderColor(10);
+
+   this->mpc_Ui->pc_LabelJ1939Pgn->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939Pgn->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939Pgn->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939Priority->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939Priority->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939Priority->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939SourceAddr->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939SourceAddr->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939SourceAddr->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939DestAddr->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939DestAddr->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939DestAddr->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939Format->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939Format->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939Format->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939EdpDp->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939EdpDp->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939EdpDp->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939PgnValue->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939PgnValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939PgnValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939PriorityValue->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939PriorityValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939PriorityValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939SourceAddrValue->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939SourceAddrValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939SourceAddrValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939DestAddrValue->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939DestAddrValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939DestAddrValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939FormatValue->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939FormatValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939FormatValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   this->mpc_Ui->pc_LabelJ1939EdpDpValue->SetFontPixel(13);
+   this->mpc_Ui->pc_LabelJ1939EdpDpValue->SetForegroundColor(6);
+   this->mpc_Ui->pc_LabelJ1939EdpDpValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
+   C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonJ1939OpenDialog, "WithLeftBorder", true);
+
    InitStaticNames();
 
    //Ui restriction
@@ -149,6 +193,9 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    connect(this->mpc_Ui->pc_SpinBoxCycleTime, static_cast<void (QSpinBox::*)(
                                                              int32_t)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdBueMessagePropertiesWidget::m_SyncLaterToCycle);
+
+   connect(this->mpc_Ui->pc_PushButtonJ1939OpenDialog, &QPushButton::clicked,
+           this, &C_SdBueMessagePropertiesWidget::m_OnEditJ1939PgPropertiesClicked);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -191,6 +238,13 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelTransmitterDatapoolOnly->setText(C_GtGetText::h_GetText("Datapool"));
    this->mpc_Ui->pc_LabelCoPdoSyncNumber->setText(C_GtGetText::h_GetText("SYNC Number"));
 
+   this->mpc_Ui->pc_LabelJ1939Pgn->setText(C_GtGetText::h_GetText("PGN:"));
+   this->mpc_Ui->pc_LabelJ1939Priority->setText(C_GtGetText::h_GetText("Priority:"));
+   this->mpc_Ui->pc_LabelJ1939SourceAddr->setText(C_GtGetText::h_GetText("Source Address:"));
+   this->mpc_Ui->pc_LabelJ1939DestAddr->setText(C_GtGetText::h_GetText("Destination Address:"));
+   this->mpc_Ui->pc_LabelJ1939Format->setText(C_GtGetText::h_GetText("Format:"));
+   this->mpc_Ui->pc_LabelJ1939EdpDp->setText(C_GtGetText::h_GetText("EDP and DP:"));
+
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
    pc_LineEdit = new C_OgeLeComboBox(this->mpc_Ui->pc_ComboBoxTransmitterNode);
    pc_LineEdit->setPlaceholderText(C_GtGetText::h_GetText("Choose a transmitter"));
@@ -223,6 +277,7 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_SpinBoxLater->setSuffix(C_GtGetText::h_GetText(" ms"));
    this->mpc_Ui->pc_SpinBoxId->setPrefix(C_GtGetText::h_GetText("0x"));
    this->mpc_Ui->pc_SpinBoxCobId->setPrefix(C_GtGetText::h_GetText("0x"));
+   this->mpc_Ui->pc_PushButtonJ1939OpenDialog->setText(C_GtGetText::h_GetText(""));
 
    //Tool tips
    this->mpc_Ui->pc_LabelName->SetToolTipInformation(C_GtGetText::h_GetText("Name"),
@@ -239,6 +294,10 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelID->SetToolTipInformation(C_GtGetText::h_GetText("CAN ID"),
                                                    C_GtGetText::h_GetText("CAN Identifier (Hex).\n"
                                                                           "Unique within a bus."));
+   this->mpc_Ui->pc_PushButtonJ1939OpenDialog->SetToolTipInformation(
+      C_GtGetText::h_GetText("Edit CAN ID"),
+      C_GtGetText::h_GetText("Edit J1939 PG properties like PGN, priority, source and destination address "
+                             "and calculate the CAN ID from those."));
    this->mpc_Ui->pc_LabelCobId->SetToolTipInformation(C_GtGetText::h_GetText("COB-ID"),
                                                       C_GtGetText::h_GetText("Communication Object Identifier (Hex).\n"
                                                                              "Unique within a bus."));
@@ -257,12 +316,7 @@ void C_SdBueMessagePropertiesWidget::InitStaticNames(void) const
                                                           C_GtGetText::h_GetText(
                                                              "Cyclic method property. Message is transmitted every time"
                                                              " after this time is expired."));
-   this->mpc_Ui->pc_LabelTxMethod->SetToolTipInformation(
-      C_GtGetText::h_GetText("Tx Method"),
-      C_GtGetText::h_GetText("Message transmission method. "
-                             "\nCyclic: Message is transmitted cyclically."
-                             "\nOn Change: Message is transmitted if any signal value is changed."
-                             "\nOn Event: Message transmission is handled by application (spontaneous)."));
+
    this->mpc_Ui->pc_LabelTxMethodCo->SetToolTipInformation(
       C_GtGetText::h_GetText("Tx Method"),
       C_GtGetText::h_GetText(
@@ -344,7 +398,20 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
          this->mpc_Ui->pc_TextEditComment->setText(pc_Message->c_Comment.c_str());
 
          //Extended
-         this->mpc_Ui->pc_CheckBoxExtendedType->setChecked(pc_Message->q_IsExtended);
+         if (this->me_ComProtocol == C_OscCanProtocol::eJ1939)
+         {
+            // Always 29 Bit
+            this->mpc_Ui->pc_CheckBoxExtendedType->setChecked(true);
+         }
+         else if (this->me_ComProtocol == C_OscCanProtocol::eCAN_OPEN_SAFETY)
+         {
+            // Always 11 Bit
+            this->mpc_Ui->pc_CheckBoxExtendedType->setChecked(false);
+         }
+         else
+         {
+            this->mpc_Ui->pc_CheckBoxExtendedType->setChecked(pc_Message->q_IsExtended);
+         }
 
          //Id
          this->mpc_Ui->pc_SpinBoxId->setValue(pc_Message->u32_CanId);
@@ -361,6 +428,8 @@ void C_SdBueMessagePropertiesWidget::m_LoadFromData(void)
             this->mpc_Ui->pc_CheckBoxCobIdWithNodeId->setChecked(pc_Message->q_CanOpenManagerCobIdIncludesNodeId);
             this->m_UpdateCobIdText(*pc_Message, u8_CoDeviceNodeId);
          }
+
+         this->m_UpdateJ1939PgInfo();
 
          //Dlc
          this->mpc_Ui->pc_SpinBoxDlc->setValue(pc_Message->u16_Dlc);
@@ -574,8 +643,12 @@ void C_SdBueMessagePropertiesWidget::m_CoLoadEdsRestricitions(const C_OscCanMess
       else
       {
          // This item is relevant for the other protocols, but is only en-/disabled here. Activate it again
-         this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(true);
          this->mpc_Ui->pc_SpinBoxEarly->setEnabled(true);
+
+         // Protocol dependent
+         this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(
+            (this->me_ComProtocol != C_OscCanProtocol::eCAN_OPEN_SAFETY) &&
+            (this->me_ComProtocol != C_OscCanProtocol::eJ1939));
       }
    }
 }
@@ -785,6 +858,7 @@ void C_SdBueMessagePropertiesWidget::m_OnNameChanged(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdBueMessagePropertiesWidget::m_OnIdChanged(void)
 {
+   this->m_UpdateJ1939PgInfo();
    m_OnPropertiesChanged();
    m_CheckMessageId();
    Q_EMIT this->SigMessageNameChanged();
@@ -1910,7 +1984,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
 
       // is one node selected as Tx?
       // and is no CANopen device transmitter. In this case the device has no Datapools and data assigned
-      // for a valid comparison and has no datapool or message in its data model
+      // for a valid comparison and has no Datapool or message in its data model
       if ((s32_CurrentNodeIndex >= 0) &&
           (q_CanOpenActive == false))
       {
@@ -1924,7 +1998,7 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
          std::vector<uint32_t> c_RxReceiveTimeoutValues;
          std::vector<uint32_t> * pc_MappedDatapools;
          uint32_t u32_EntryCounter = 0U;
-         uint32_t u32_RemoveCounter;
+         int32_t s32_RemoveCounter;
 
          // remove this node from the vector
          tgl_assert(this->mc_BusNodeIndexes.size() == this->mc_BusInterfaceIndexes.size());
@@ -1972,10 +2046,12 @@ void C_SdBueMessagePropertiesWidget::m_UpdateRxAfterTxSelection(
             ++u32_EntryCounter;
          }
 
-         for (u32_RemoveCounter = 0U; u32_RemoveCounter < c_NamesToDelete.size(); ++u32_RemoveCounter)
+         // Removing from the back to have still intact iterators
+         for (s32_RemoveCounter = (static_cast<int32_t>(c_NamesToDelete.size()) - 1); s32_RemoveCounter >= 0;
+              --s32_RemoveCounter)
          {
             // Remove the marked entries
-            c_NodeNames.erase(c_NamesToDelete[u32_RemoveCounter]);
+            c_NodeNames.erase(c_NamesToDelete[s32_RemoveCounter]);
          }
 
          this->mpc_Ui->pc_WidgetReceiver->AddNodes(c_NodeNames, c_RxDatapoolNames, c_RxNodeIndexes,
@@ -2535,6 +2611,88 @@ uint32_t C_SdBueMessagePropertiesWidget::m_GetCoPdoSyncTxMethodCycleEquivalent(v
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Open the J1939 PG properties dialog
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::m_OnEditJ1939PgPropertiesClicked(void)
+{
+   const QPointer<C_OgePopUpDialog> c_PopUp = new C_OgePopUpDialog(this, this);
+   C_SdBueJ1939PgPropertiesDialog * const pc_AddDialog = new C_SdBueJ1939PgPropertiesDialog(
+      this->mpc_Ui->pc_SpinBoxId->value(), *c_PopUp, this->mpc_Ui->pc_LineEditName->text());
+
+   //Resize
+   c_PopUp->SetSize(QSize(600, 430));
+
+   Q_UNUSED(pc_AddDialog)
+
+   if (c_PopUp->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      // Get the changed CAN ID
+      this->mpc_Ui->pc_SpinBoxId->setValue(pc_AddDialog->GetNewCanId());
+      this->mpc_Ui->pc_SpinBoxId->textFromValue(this->mpc_Ui->pc_SpinBoxId->value());
+      this->m_UpdateJ1939PgInfo();
+   }
+
+   if (c_PopUp != NULL)
+   {
+      c_PopUp->HideOverlay();
+      c_PopUp->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Updates the PG information extracted from the CAN ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessagePropertiesWidget::m_UpdateJ1939PgInfo(void)
+{
+   if (this->me_ComProtocol == C_OscCanProtocol::eJ1939)
+   {
+      const uint32_t u32_Id = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxId->value());
+      C_OscCanUtilJ1939PgInfo c_PgInfo;
+
+      C_OscCanUtil::h_GetJ1939PgInfoFromCanId(u32_Id, c_PgInfo);
+
+      const uint32_t u32_VisiblePgn = C_OscCanUtil::h_GetVisiblePgn(c_PgInfo.u32_Pgn);
+
+      this->mpc_Ui->pc_LabelJ1939PgnValue->setText(QString::number(u32_VisiblePgn) + " (0x" +
+                                                   QString::number(u32_VisiblePgn, 16).toUpper() + ")");
+      this->mpc_Ui->pc_LabelJ1939PriorityValue->setText(QString::number(c_PgInfo.u8_Priority));
+      this->mpc_Ui->pc_LabelJ1939SourceAddrValue->setText(QString::number(c_PgInfo.u8_SourceAddress));
+      if (c_PgInfo.q_HasDestinationAddress == true)
+      {
+         this->mpc_Ui->pc_LabelJ1939DestAddrValue->setText(QString::number(c_PgInfo.u8_PduSpecific));
+         this->mpc_Ui->pc_LabelJ1939FormatValue->setText(C_GtGetText::h_GetText("PDU 1 (Point-to-Point)"));
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelJ1939DestAddrValue->setText(C_GtGetText::h_GetText("All"));
+         this->mpc_Ui->pc_LabelJ1939FormatValue->setText(C_GtGetText::h_GetText("PDU 2 (Broadcast)"));
+      }
+
+      // Special case: The addressing mode changes the receivers list for an exclusive selection
+      this->mpc_Ui->pc_WidgetReceiver->SetExclusiveMode(c_PgInfo.q_HasDestinationAddress);
+
+      if ((c_PgInfo.u8_Edp == 0U) && (c_PgInfo.u8_Dp == 0U))
+      {
+         this->mpc_Ui->pc_LabelJ1939EdpDpValue->setText(C_GtGetText::h_GetText("00 (SAE J1939)"));
+      }
+      else if ((c_PgInfo.u8_Edp == 0U) && (c_PgInfo.u8_Dp == 1U))
+      {
+         this->mpc_Ui->pc_LabelJ1939EdpDpValue->setText(C_GtGetText::h_GetText("01 (NMEAJ1939)"));
+      }
+      else if ((c_PgInfo.u8_Edp == 1U) && (c_PgInfo.u8_Dp == 0U))
+      {
+         this->mpc_Ui->pc_LabelJ1939EdpDpValue->setText(C_GtGetText::h_GetText("10 (SAE J1939 reserved)"));
+      }
+      else
+      {
+         this->mpc_Ui->pc_LabelJ1939EdpDpValue->setText(C_GtGetText::h_GetText("11 (ISO 11992-4)"));
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the node 'mode' of the widget with all necessary indexes
 
    \param[in]  ou32_NodeIndex       Node index
@@ -2616,6 +2774,7 @@ void C_SdBueMessagePropertiesWidget::OnConnectionChange(void)
 void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Type & ore_Value)
 {
    const bool q_CanOpenActive = (ore_Value == C_OscCanProtocol::eCAN_OPEN);
+   const bool q_J1939Active = (ore_Value == C_OscCanProtocol::eJ1939);
 
    DisconnectAllChanges();
 
@@ -2649,6 +2808,37 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Ty
    this->mpc_Ui->pc_ComboBoxTxMethod->SetItemVisible(ms32_TX_TYPE_INDEX_CAN_OPEN_TYPE_1_TO_240, q_CanOpenActive);
    this->mpc_Ui->pc_ComboBoxTxMethod->SetItemVisible(ms32_TX_TYPE_INDEX_CAN_OPEN_TYPE_254, q_CanOpenActive);
    this->mpc_Ui->pc_ComboBoxTxMethod->SetItemVisible(ms32_TX_TYPE_INDEX_CAN_OPEN_TYPE_255, q_CanOpenActive);
+
+   this->mpc_Ui->pc_PushButtonJ1939OpenDialog->setVisible(q_J1939Active);
+   this->mpc_Ui->pc_FrameJ1939PgInfo->setVisible(q_J1939Active);
+   // Resetting the mode in case of a protocol change in any case
+   this->mpc_Ui->pc_WidgetReceiver->SetExclusiveMode(false);
+
+   // Cycle Time
+   this->mpc_Ui->pc_LabelCycleTime->setText(C_GtGetText::h_GetText("Cycle Time"));
+   this->mpc_Ui->pc_LabelCycleTime->SetToolTipInformation(C_GtGetText::h_GetText("Cycle Time"),
+                                                          C_GtGetText::h_GetText(
+                                                             "Cyclic method property. Message is transmitted every time"
+                                                             " after this time is expired."));
+
+   if (q_J1939Active == false)
+   {
+      this->mpc_Ui->pc_LabelTxMethod->SetToolTipInformation(
+         C_GtGetText::h_GetText("Tx Method"),
+         C_GtGetText::h_GetText("Message transmission method. "
+                                "\nCyclic: Message is transmitted cyclically."
+                                "\nOn Change: Message is transmitted if any signal value is changed."
+                                "\nOn Event: Message transmission is handled by application (spontaneous)."));
+   }
+   else
+   {
+      this->mpc_Ui->pc_LabelTxMethod->SetToolTipInformation(
+         C_GtGetText::h_GetText("Tx Method"),
+         C_GtGetText::h_GetText("Message transmission method. "
+                                "\nCyclic: Message is transmitted cyclically."
+                                "\nOn Event: Message transmission is handled by application (spontaneous) or"
+                                " is triggered by an other J1939 node."));
+   }
 
    // No need of removing the widget from the previous layout manually.
    // addWidget does the job
@@ -2746,6 +2936,14 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Ty
       //Tx method
       this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(false);
       this->mpc_Ui->pc_ComboBoxTxMethod->setCurrentIndex(ms32_TX_TYPE_INDEX_CYCLIC);
+
+      // Cycle Time is "Safety Cycle-Time" in CANopen Safety
+      this->mpc_Ui->pc_LabelCycleTime->setText(C_GtGetText::h_GetText("Safety Cycle-Time"));
+      this->mpc_Ui->pc_LabelCycleTime->SetToolTipInformation(C_GtGetText::h_GetText("Safety Cycle-Time (SCT)"),
+                                                             C_GtGetText::h_GetText(
+                                                                "Safety Cycle-Time (SCT) is the cycle time of an SRDO transmission."
+                                                                "\nIn openSYDE there is no separate setting of the SR Validation Time"
+                                                                "\n(SRVT)(SRVT = SCT)."));
    }
    else if (ore_Value == C_OscCanProtocol::eCAN_OPEN)
    {
@@ -2759,6 +2957,19 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Ty
       //Tx method
       this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(true);
       this->mpc_Ui->pc_ComboBoxTxMethod->setCurrentIndex(ms32_TX_TYPE_INDEX_CAN_OPEN_TYPE_254);
+   }
+   else if (ore_Value == C_OscCanProtocol::eJ1939)
+   {
+      //Can id
+      this->mpc_Ui->pc_CheckBoxExtendedType->setEnabled(false);
+      this->mpc_Ui->pc_CheckBoxExtendedType->setChecked(true);
+
+      //Dlc
+      this->mpc_Ui->pc_SpinBoxDlc->setEnabled(false);
+      this->mpc_Ui->pc_SpinBoxDlc->setValue(8);
+
+      //Tx method
+      this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(true);
    }
    else
    {
@@ -2774,8 +2985,8 @@ void C_SdBueMessagePropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Ty
       //Tx method
       this->mpc_Ui->pc_ComboBoxTxMethod->setEnabled(true);
    }
-   //Min max handling (initially extended type is always set to false)
-   m_OnExtendedChangeWithoutDataAccess(false);
+   //Min max handling
+   m_OnExtendedChangeWithoutDataAccess(this->mpc_Ui->pc_CheckBoxExtendedType->isChecked());
 
    ConnectAllChanges();
 }

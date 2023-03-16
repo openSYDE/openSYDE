@@ -20,6 +20,7 @@
 #include "C_OscSystemDefinition.hpp"
 #include "C_OscComSequencesBase.hpp"
 #include "C_OscSuSequencesNodeStates.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -251,6 +252,9 @@ public:
    virtual int32_t GetUpdateStates(std::vector<C_OscSuSequencesNodeUpdateStates> & orc_UpdateStatesNodes)
    const;
 
+   static void h_FillDoFlashWithPemStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                          const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
+                                          C_OscSuSequences::C_DoFlash & orc_DoFlash);
    static void h_OpenSydeFlashloaderInformationToText(const C_OsyDeviceInformation & orc_Info,
                                                       stw::scl::C_SclStringList & orc_Text);
    static void h_StwFlashloaderInformationToText(const C_XflDeviceInformation & orc_Info,

@@ -42,23 +42,28 @@ public:
                                                  C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveNodeComMessageContainers(
       const std::vector<C_OscCanMessageContainer> & orc_NodeComMessageContainers,
-      C_OscXmlParserBase & orc_XmlParser);
+      C_OscXmlParserBase & orc_XmlParser, const C_OscCanProtocol::E_Type oe_ProtocolType);
    static int32_t h_LoadNodeComMessageContainer(C_OscCanMessageContainer & orc_NodeComMessageContainer,
                                                 C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveNodeComMessageContainer(const C_OscCanMessageContainer & orc_NodeComMessageContainer,
-                                             C_OscXmlParserBase & orc_XmlParser);
+                                             C_OscXmlParserBase & orc_XmlParser,
+                                             const C_OscCanProtocol::E_Type oe_ProtocolType);
    static int32_t h_LoadNodeComMessages(std::vector<C_OscCanMessage> & orc_NodeComMessages,
                                         C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveNodeComMessages(const std::vector<C_OscCanMessage> & orc_NodeComMessages,
-                                     C_OscXmlParserBase & orc_XmlParser);
+                                     C_OscXmlParserBase & orc_XmlParser,
+                                     const C_OscCanProtocol::E_Type oe_ProtocolType);
    static int32_t h_LoadNodeComMessage(C_OscCanMessage & orc_NodeComMessage, C_OscXmlParserBase & orc_XmlParser);
-   static void h_SaveNodeComMessage(const C_OscCanMessage & orc_NodeComMessage, C_OscXmlParserBase & orc_XmlParser);
+   static void h_SaveNodeComMessage(const C_OscCanMessage & orc_NodeComMessage, C_OscXmlParserBase & orc_XmlParser,
+                                    const C_OscCanProtocol::E_Type oe_ProtocolType);
    static int32_t h_LoadNodeComSignals(std::vector<C_OscCanSignal> & orc_NodeComSignals,
                                        C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveNodeComSignals(const std::vector<C_OscCanSignal> & orc_NodeComSignals,
-                                    C_OscXmlParserBase & orc_XmlParser);
-   static int32_t h_LoadNodeComSignal(C_OscCanSignal & orc_NodeComSignal, C_OscXmlParserBase & orc_XmlParser);
-   static void h_SaveNodeComSignal(const C_OscCanSignal & orc_NodeComSignal, C_OscXmlParserBase & orc_XmlParser);
+                                    C_OscXmlParserBase & orc_XmlParser, const C_OscCanProtocol::E_Type oe_ProtocolType);
+   static int32_t h_LoadNodeComSignal(C_OscCanSignal & orc_NodeComSignal, C_OscXmlParserBase & orc_XmlParser,
+                                      const bool oq_CanOpenOnly = false);
+   static void h_SaveNodeComSignal(const C_OscCanSignal & orc_NodeComSignal, C_OscXmlParserBase & orc_XmlParser,
+                                   const C_OscCanProtocol::E_Type oe_ProtocolType);
    static stw::scl::C_SclString h_CommunicationProtocolToString(
       const C_OscCanProtocol::E_Type & ore_CommunicationProtocol);
    static int32_t h_StringToCommunicationProtocol(const stw::scl::C_SclString & orc_String,
@@ -77,6 +82,8 @@ private:
    static int32_t mh_LoadNodeOwnerIndices(C_OscCanInterfaceId & orc_OwnerNodeIndex, C_OscXmlParserBase & orc_XmlParser);
    static void mh_SaveSignalCanOpenPart(const C_OscCanSignal & orc_NodeCommSignal, C_OscXmlParserBase & orc_XmlParser);
    static int32_t mh_LoadSignalCanOpenPart(C_OscCanSignal & orc_NodeCommSignal, C_OscXmlParserBase & orc_XmlParser);
+   static void mh_SaveSignalJ1939Part(const C_OscCanSignal & orc_NodeCommSignal, C_OscXmlParserBase & orc_XmlParser);
+   static int32_t mh_LoadSignalJ1939Part(C_OscCanSignal & orc_NodeCommSignal, C_OscXmlParserBase & orc_XmlParser);
    static stw::scl::C_SclString mh_CommunicationByteOrderToString(
       const C_OscCanSignal::E_ByteOrderType & ore_CommunicationByteOrder);
    static int32_t mh_StringToCommunicationByteOrder(const stw::scl::C_SclString & orc_String,

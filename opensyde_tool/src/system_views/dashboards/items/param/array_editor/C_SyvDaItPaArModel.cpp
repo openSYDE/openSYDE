@@ -54,7 +54,7 @@ using namespace stw::opensyde_gui_logic;
 //----------------------------------------------------------------------------------------------------------------------
 C_SyvDaItPaArModel::C_SyvDaItPaArModel(QObject * const opc_Parent) :
    QAbstractTableModel(opc_Parent),
-   mq_ECUValues(false),
+   mq_EcuValues(false),
    mu32_ElementIndex(0),
    mpc_DataWidget(NULL)
 {
@@ -72,7 +72,7 @@ void C_SyvDaItPaArModel::SetElement(const uint32_t ou32_ElementIndex,
                                     C_PuiSvDbDataElementHandler * const opc_DataWidget, const bool oq_EcuValues)
 {
    beginResetModel();
-   this->mq_ECUValues = oq_EcuValues;
+   this->mq_EcuValues = oq_EcuValues;
    this->mu32_ElementIndex = ou32_ElementIndex;
    this->mpc_DataWidget = opc_DataWidget;
    endResetModel();
@@ -196,7 +196,7 @@ QVariant C_SyvDaItPaArModel::data(const QModelIndex & orc_Index, const int32_t o
             const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscElement();
             if (pc_Element != NULL)
             {
-               if (this->mq_ECUValues == true)
+               if (this->mq_EcuValues == true)
                {
                   c_Retval = C_SdNdeDpContentUtil::h_ConvertScaledContentToGeneric(pc_Element->c_NvmValue,
                                                                                    pc_Element->f64_Factor,
@@ -321,7 +321,7 @@ Qt::ItemFlags C_SyvDaItPaArModel::flags(const QModelIndex & orc_Index) const
    {
       //Each item
       c_Retval = QAbstractTableModel::flags(orc_Index) | Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-      if ((this->mq_ECUValues == false) && (this->m_GetDataSetIndex() < 0))
+      if ((this->mq_EcuValues == false) && (this->m_GetDataSetIndex() < 0))
       {
          c_Retval = c_Retval | Qt::ItemIsEditable;
       }
@@ -506,7 +506,7 @@ bool C_SyvDaItPaArModel::m_CheckError(const QModelIndex & orc_Index) const
    const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscElement();
    const C_OscNodeDataPoolContent * const pc_Data = this->GetElementData();
 
-   if (this->mq_ECUValues == false)
+   if (this->mq_EcuValues == false)
    {
       if ((pc_Element != NULL) && (pc_Data != NULL))
       {

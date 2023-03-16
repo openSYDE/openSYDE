@@ -894,17 +894,20 @@ std::vector<std::vector<uint8_t> > C_SdUtil::h_GetAllUsedIpAddressesForBus(const
 
    \param[in,out]  orc_Message            Message to adapt
    \param[in,out]  opc_UiMessage          Optional Ui Message to adapt
+   \param[in,out]  orc_SignalListElements Datapool list elements for signals
    \param[in]      oe_Type                Protocol type
    \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_PuiSdNodeCanMessage * const opc_UiMessage,
+                                            std::vector<C_OscNodeDataPoolListElement> & orc_SignalListElements,
                                             const C_OscCanProtocol::E_Type oe_Type,
                                             QStringList * const opc_AdaptationInfos)
 {
    QStringList c_Info;
 
-   if ((oe_Type == C_OscCanProtocol::eECES) || (oe_Type == C_OscCanProtocol::eCAN_OPEN_SAFETY))
+   if ((oe_Type == C_OscCanProtocol::eECES) ||
+       (oe_Type == C_OscCanProtocol::eCAN_OPEN_SAFETY))
    {
       // general changes for safety protocols
 
@@ -912,10 +915,12 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
       if (orc_Message.e_TxMethod != C_OscCanMessage::eTX_METHOD_CYCLIC)
       {
          c_Info.push_back(
-            static_cast<QString>(C_GtGetText::h_GetText("Message transmission type changed from \"%1\" to \"%2\" due "
-                                                        "to ECeS/ECoS protocol restrictions.")).
+            static_cast<QString>(C_GtGetText::h_GetText(
+                                    "Message transmission type changed from \"%1\" to \"%2\" due "
+                                    "to ECeS/ECoS protocol restrictions.")).
             arg(C_SdUtil::h_ConvertTxMethodToName(orc_Message.e_TxMethod)).
             arg(C_SdUtil::h_ConvertTxMethodToName(C_OscCanMessage::eTX_METHOD_CYCLIC)));
+
          orc_Message.e_TxMethod = C_OscCanMessage::eTX_METHOD_CYCLIC;
 
          // Adapt the necessary cyclic information
@@ -931,7 +936,12 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
             }
          }
       }
+   }
 
+   if ((oe_Type == C_OscCanProtocol::eECES) ||
+       (oe_Type == C_OscCanProtocol::eCAN_OPEN_SAFETY) ||
+       (oe_Type == C_OscCanProtocol::eJ1939))
+   {
       // specific changes
       switch (oe_Type)
       {
@@ -966,6 +976,23 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
             orc_Message.u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
          }
          break;
+      case C_OscCanProtocol::eJ1939:
+         //DLC fix 8
+         if (orc_Message.u16_Dlc != 8U)
+         {
+            c_Info.push_back(
+               static_cast<QString>(C_GtGetText::h_GetText("Message DLC changed from %1 to 8 due to J1939 "
+                                                           "protocol restrictions.")).arg(orc_Message.u16_Dlc));
+            orc_Message.u16_Dlc = 8U;
+         }
+         //Extended type
+         if (orc_Message.q_IsExtended == false)
+         {
+            c_Info.push_back(C_GtGetText::h_GetText("Message extended flag changed from \"standard\" to \"extended\" "
+                                                    "due to J1939 protocol restrictions."));
+            orc_Message.q_IsExtended = true;
+         }
+         break;
       case C_OscCanProtocol::eCAN_OPEN:
       case C_OscCanProtocol::eLAYER2:
       default:
@@ -977,7 +1004,13 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
       for (std::vector<C_OscCanSignal>::iterator c_SignalIt = orc_Message.c_Signals.begin();
            c_SignalIt != orc_Message.c_Signals.end(); ++c_SignalIt)
       {
-         h_AdaptSignalToProtocolType(*c_SignalIt, oe_Type, &c_Info);
+         tgl_assert(c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size());
+         if (c_SignalIt->u32_ComDataElementIndex < orc_SignalListElements.size())
+         {
+            h_AdaptSignalToProtocolType(*c_SignalIt,
+                                        orc_SignalListElements[c_SignalIt->u32_ComDataElementIndex],
+                                        oe_Type, &c_Info);
+         }
       }
       c_Info.removeDuplicates();
    }
@@ -992,11 +1025,14 @@ void C_SdUtil::h_AdaptMessageToProtocolType(C_OscCanMessage & orc_Message, C_Pui
 /*! \brief   Adapt signal to protocol restrictions
 
    \param[in,out]  orc_Signal             Signal to adapt
+   \param[in,out]  orc_SignalListElement  Signal list element to adapt
    \param[in]      oe_Type                Protocol type
    \param[in,out]  opc_AdaptationInfos    Optional report about adaptations
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal, const C_OscCanProtocol::E_Type oe_Type,
+void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal,
+                                           C_OscNodeDataPoolListElement & orc_SignalListElement,
+                                           const C_OscCanProtocol::E_Type oe_Type,
                                            QStringList * const opc_AdaptationInfos)
 {
    QStringList c_Info;
@@ -1022,6 +1058,38 @@ void C_SdUtil::h_AdaptSignalToProtocolType(C_OscCanSignal & orc_Signal, const C_
                           arg(orc_Signal.u16_ComBitStart));
             orc_Signal.u16_ComBitStart = 0;
          }
+      }
+   }
+
+   if (oe_Type == C_OscCanProtocol::eJ1939)
+   {
+      // J1939 supports only Intel byte order
+      orc_Signal.e_ComByteOrder = C_OscCanSignal::eBYTE_ORDER_INTEL;
+
+      // Only unsigned allowed
+      // But keep the size of the element
+      switch (orc_SignalListElement.GetType())
+      {
+      case C_OscNodeDataPoolContent::eSINT8:
+         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT8);
+         break;
+      case C_OscNodeDataPoolContent::eSINT16:
+         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT16);
+         break;
+      case C_OscNodeDataPoolContent::eSINT32:
+      case C_OscNodeDataPoolContent::eFLOAT32:
+         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT32);
+         break;
+      case C_OscNodeDataPoolContent::eSINT64:
+      case C_OscNodeDataPoolContent::eFLOAT64:
+         orc_SignalListElement.SetType(C_OscNodeDataPoolContent::eUINT64);
+         break;
+      case C_OscNodeDataPoolContent::eUINT8:  // Nothing to do for unsigned
+      case C_OscNodeDataPoolContent::eUINT16: // Nothing to do for unsigned
+      case C_OscNodeDataPoolContent::eUINT32: // Nothing to do for unsigned
+      case C_OscNodeDataPoolContent::eUINT64: // Nothing to do for unsigned
+      default:
+         break;
       }
    }
 

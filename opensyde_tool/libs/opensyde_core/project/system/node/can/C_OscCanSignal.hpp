@@ -69,6 +69,7 @@ public:
    ///< dictionary index
    uint8_t u8_CanOpenManagerObjectDictionarySubIndex; ///< CANopen manager specific information about object
    ///< dictionary sub index
+   uint32_t u32_J1939SuspectParameterNumber; ///< J1939 specific information about the SPN number
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

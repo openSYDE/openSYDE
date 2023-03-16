@@ -33,7 +33,7 @@ public:
                                          const QPointF & orc_ConnectionPos, const int32_t & ors32_Interface,
                                          const std::vector<C_PuiSdNodeInterfaceAutomaticProperties> & orc_Properties,
                                          QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SdManUnoTopologyReconnectBusCommand(void);
+   ~C_SdManUnoTopologyReconnectBusCommand(void) override;
 
 protected:
    void m_Reconnect(const uint64_t & oru64_StartingId, const uint64_t & oru64_LastId, const int32_t & ors32_Interface,

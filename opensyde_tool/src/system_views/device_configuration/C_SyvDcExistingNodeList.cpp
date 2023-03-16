@@ -264,13 +264,13 @@ int32_t C_SyvDcExistingNodeList::m_Init(void)
    this->mu32_CommunicatingNodeCount = 0U;
 
    //No point if PC not connected
-   if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
+   if ((pc_View != NULL) && (pc_View->GetOscPcData().GetConnected() == true))
    {
       const std::vector<uint8_t> & rc_NodeActiveFlags = pc_View->GetNodeActiveFlags();
       for (uint32_t u32_ItNode = 0; u32_ItNode < rc_NodeActiveFlags.size(); ++u32_ItNode)
       {
          //Active
-         if (rc_NodeActiveFlags[u32_ItNode] == true)
+         if (rc_NodeActiveFlags[u32_ItNode] == 1)
          {
             uint32_t u32_SquadIndex;
             const C_OscNodeSquad * pc_Squad = NULL;
@@ -315,7 +315,7 @@ int32_t C_SyvDcExistingNodeList::m_Init(void)
                         pc_Node->c_Properties.c_ComInterfaces[u32_ItInterface];
                      //Connected to current bus
                      if (((rc_Interface.GetBusConnected() == true) &&
-                          (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())) &&
+                          (rc_Interface.u32_BusIndex == pc_View->GetOscPcData().GetBusIndex())) &&
                          (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].IsUpdateAvailable(
                              rc_Interface.e_InterfaceType) == true))
                      {

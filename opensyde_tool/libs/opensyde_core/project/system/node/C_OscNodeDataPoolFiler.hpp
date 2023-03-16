@@ -55,14 +55,15 @@ public:
                                      const stw::scl::C_SclString & orc_FilePath);
    static void h_SaveDataPool(const C_OscNodeDataPool & orc_NodeDataPool, C_OscXmlParserBase & orc_XmlParser);
    static void h_SaveDataPoolList(const C_OscNodeDataPoolList & orc_NodeDataPoolList,
-                                  C_OscXmlParserBase & orc_XmlParser);
+                                  C_OscXmlParserBase & orc_XmlParser, const C_OscNodeDataPool::E_Type oe_DatapoolType);
    static void h_SaveDataPoolElement(const C_OscNodeDataPoolListElement & orc_NodeDataPoolListElement,
-                                     C_OscXmlParserBase & orc_XmlParser);
+                                     C_OscXmlParserBase & orc_XmlParser,
+                                     const C_OscNodeDataPool::E_Type oe_DatapoolType);
    static void h_SaveDataPoolLists(const std::vector<C_OscNodeDataPoolList> & orc_NodeDataPoolLists,
-                                   C_OscXmlParserBase & orc_XmlParser);
+                                   C_OscXmlParserBase & orc_XmlParser, const C_OscNodeDataPool::E_Type oe_DatapoolType);
    static void h_SaveDataPoolListElements(
       const std::vector<C_OscNodeDataPoolListElement> & orc_NodeDataPoolListElements,
-      C_OscXmlParserBase & orc_XmlParser);
+      C_OscXmlParserBase & orc_XmlParser, const C_OscNodeDataPool::E_Type oe_DatapoolType);
    static void h_SaveDataPoolListElementDataSetValues(
       const std::vector<C_OscNodeDataPoolContent> & orc_NodeDataPoolListElementDataSetValues,
       C_OscXmlParserBase & orc_XmlParser);

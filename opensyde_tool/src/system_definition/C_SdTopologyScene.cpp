@@ -3219,7 +3219,8 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
    \param[in]  orc_NodeIndices         Indices of nodes participating in the new connection.
    \param[in]  ore_BusType             Type of bus which will be created.
    \param[in]  oru32_BusIndex          Index of new bus.
-   \param[in]  orc_InterfaceIndices    Selected interfaces.
+   \param[in]  orc_InterfaceIndices    Selected interfaces (indices represent combobox indices from dialog.
+                                       For ETH interfaces calculation is needed to get real interface index.)
    \param[in]  oq_BusExists            Bus exists
    \param[in]  oq_GenerateId           True:  function generates Id
                                        False: function generates Ip address
@@ -3234,9 +3235,6 @@ std::vector<std::vector<uint8_t> > C_SdTopologyScene::m_AssignNodeProperty(
    const uint32_t & oru32_BusIndex, const std::vector<uint8_t> & orc_InterfaceIndices, const bool oq_BusExists,
    const bool oq_GenerateId)
 {
-   uint32_t u32_NewNodeProperty;
-   uint32_t u32_NodeSquadIndex;
-
    std::vector<std::vector<uint8_t> > c_Container;
    //these 2 vectors hold whether ID(s) or IP's last byte(s) depending on oq_GenerateId
    const std::vector<uint8_t> c_Node1Property;
@@ -3248,7 +3246,17 @@ std::vector<std::vector<uint8_t> > C_SdTopologyScene::m_AssignNodeProperty(
    // do stuff for both nodes (for better understanding: At this point "node" means the ones you see on topology)
    for (uint32_t u32_NodeIt = 0; u32_NodeIt < orc_NodeIndices.size(); ++u32_NodeIt)
    {
-      u32_NodeSquadIndex = 0;
+      uint32_t u32_NodeSquadIndex = 0;
+      uint32_t u32_NewNodeProperty;
+      uint8_t u8_Interface;         //represent interface index from dialog combobox (not necessarily the real index)
+      uint8_t u8_EthInterfaceIndex; //the real index of an ETH interface (based on total number of interfaces)
+
+      //if user has assigned an id/ip before node was connected to bus, we want to check if the id/ip is valid
+      //and can be used instead of auto-generate a new one
+      uint8_t u8_CurrentProperty;
+
+      u8_Interface = orc_InterfaceIndices[u32_NodeIt];
+
       // check if current node squad
       if (C_PuiSdHandler::h_GetInstance()->GetNodeSquadIndexWithNodeIndex(orc_NodeIndices[u32_NodeIt],
                                                                           u32_NodeSquadIndex) == C_NO_ERR)
@@ -3279,18 +3287,28 @@ std::vector<std::vector<uint8_t> > C_SdTopologyScene::m_AssignNodeProperty(
                   {
                      if ((oq_GenerateId == false) && (ore_BusType == C_OscSystemBus::eETHERNET))
                      {
-                        // generate ip address for current sub node
+                        //to get correct ETH index we need a little calculation (see docu header)
+                        u8_EthInterfaceIndex = u8_Interface + pc_SubNode->pc_DeviceDefinition->u8_NumCanBusses;
+                        //get current last byte of IP address
+                        u8_CurrentProperty =
+                           pc_SubNode->c_Properties.c_ComInterfaces[u8_EthInterfaceIndex].c_Ip.au8_IpAddress[3];
+
+                        // generate IP address for current sub node
                         u32_NewNodeProperty = m_GeneratePropertyUsingExisting(*pc_SubNode, oru32_BusIndex,
                                                                               c_Container[0],
-                                                                              c_Container[1], oq_BusExists, false);
+                                                                              c_Container[1], oq_BusExists, false,
+                                                                              u8_CurrentProperty);
                      }
                      else
                      {
-                        // generate ids/ips for current sub node.
+                        //get current node id
+                        u8_CurrentProperty  = pc_SubNode->c_Properties.c_ComInterfaces[u8_Interface].u8_NodeId;
+
+                        // generate id for current sub node.
                         u32_NewNodeProperty = m_GeneratePropertyUsingExisting(*pc_SubNode, oru32_BusIndex,
                                                                               c_Container[0],
                                                                               c_Container[1],
-                                                                              oq_BusExists, true);
+                                                                              oq_BusExists, true, u8_CurrentProperty);
                      }
                      c_Container[u32_NodeIt].push_back(static_cast<uint8_t>(u32_NewNodeProperty));
                   }
@@ -3308,16 +3326,24 @@ std::vector<std::vector<uint8_t> > C_SdTopologyScene::m_AssignNodeProperty(
          {
             if ((oq_GenerateId == false) && (ore_BusType == C_OscSystemBus::eETHERNET))
             {
-               // generate ip address
+               //to get correct ETH index we need a little calculation (see docu header)
+               u8_EthInterfaceIndex = u8_Interface + pc_Node->pc_DeviceDefinition->u8_NumCanBusses;
+               //get current last byte of IP address
+               u8_CurrentProperty =
+                  pc_Node->c_Properties.c_ComInterfaces[u8_EthInterfaceIndex].c_Ip.au8_IpAddress[3];
+               //generate ip address
                u32_NewNodeProperty = m_GeneratePropertyUsingExisting(*pc_Node, oru32_BusIndex, c_Container[0],
-                                                                     c_Container[1], oq_BusExists, false);
+                                                                     c_Container[1], oq_BusExists, false,
+                                                                     u8_CurrentProperty);
             }
             else
             {
-               // generate node id
+               //get current node id
+               u8_CurrentProperty = pc_Node->c_Properties.c_ComInterfaces[u8_Interface].u8_NodeId;
+               //generate node id
                u32_NewNodeProperty = m_GeneratePropertyUsingExisting(*pc_Node, oru32_BusIndex, c_Container[0],
                                                                      c_Container[1],
-                                                                     oq_BusExists, true);
+                                                                     oq_BusExists, true, u8_CurrentProperty);
             }
             c_Container[u32_NodeIt].push_back(static_cast<uint8_t>(u32_NewNodeProperty));
          }
@@ -3337,6 +3363,9 @@ std::vector<std::vector<uint8_t> > C_SdTopologyScene::m_AssignNodeProperty(
    \param[in]  oq_BusExists                   Bus exists
    \param[in]  oq_GenerateId                  True: generate node ID
                                               False: generate last byte for IP address
+   \param[in]  ou8_CurrentProperty            current node id/last byte of IP, if user assigned id/ip before
+                                              connecting to bus. Check if already in use, otherwise use as
+                                              new generated property.
 
    \return
    new node ID/last byte of IP
@@ -3345,18 +3374,22 @@ std::vector<std::vector<uint8_t> > C_SdTopologyScene::m_AssignNodeProperty(
 uint32_t C_SdTopologyScene::m_GeneratePropertyUsingExisting(const C_OscNode & orc_Node, const uint32_t & oru32_BusIndex,
                                                             const std::vector<uint8_t> & orc_ExistingNode1Properties,
                                                             const std::vector<uint8_t> & orc_ExistingNode2Properties,
-                                                            const bool oq_BusExists, const bool oq_GenerateId)
+                                                            const bool oq_BusExists, const bool oq_GenerateId,
+                                                            const uint8_t ou8_CurrentProperty)
 {
    uint32_t u32_Retval;
 
    std::vector<uint32_t> c_UsedProperties;
+   bool q_CurrentPropInUse = false;
 
    if (oq_BusExists)
    {
+      //we need a node ID
       if (oq_GenerateId == true)
       {
          c_UsedProperties = C_SdUtil::h_GetUsedNodeIdsForBusUniqueAndSortedAscending(oru32_BusIndex, -1, -1);
       }
+      //we need an IP address
       else
       {
          c_UsedProperties = C_SdUtil::h_GetUsedIpAddressesForBusUniqueAndSortedAscending(oru32_BusIndex, -1, -1);
@@ -3372,14 +3405,35 @@ uint32_t C_SdTopologyScene::m_GeneratePropertyUsingExisting(const C_OscNode & or
       }
    }
 
+   //put together all used/existing properties
    c_UsedProperties.insert(c_UsedProperties.end(), orc_ExistingNode1Properties.begin(),
                            orc_ExistingNode1Properties.end());
    c_UsedProperties.insert(c_UsedProperties.end(), orc_ExistingNode2Properties.begin(),
                            orc_ExistingNode2Properties.end());
    c_UsedProperties = C_Uti::h_UniquifyAndSortAscending(c_UsedProperties);
 
-   u32_Retval =
-      C_SdUtil::h_GetNextFreeNodeProperty(orc_Node.c_Properties.c_ComInterfaces, c_UsedProperties, -1, oq_GenerateId);
+   //search for ou8_CurrentProperty in c_UsedProperties. If it's not used yet, we can use it
+   //as u32_Retval (see last 'else')
+   for (uint32_t u32_PropIt = 0; u32_PropIt < c_UsedProperties.size(); ++u32_PropIt)
+   {
+      if (ou8_CurrentProperty == static_cast<uint8_t>(c_UsedProperties[u32_PropIt]))
+      {
+         q_CurrentPropInUse = true;
+         break;
+      }
+   }
+
+   if (q_CurrentPropInUse == true)
+   {
+      //we cannot use ou8_CurrentProperty -> Generate new one
+      u32_Retval =
+         C_SdUtil::h_GetNextFreeNodeProperty(orc_Node.c_Properties.c_ComInterfaces, c_UsedProperties, -1,
+                                             oq_GenerateId);
+   }
+   else
+   {
+      u32_Retval = static_cast<uint32_t>(ou8_CurrentProperty);
+   }
 
    return u32_Retval;
 }

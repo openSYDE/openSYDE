@@ -110,7 +110,8 @@ bool C_SyvUpPacListNodeItemDatablockWidget::IsFileIdentical(const QString & orc_
 
    if (q_Return == true)
    {
-      q_Return = (orc_AppName == this->mc_ProjectName) && (orc_AppVersion == this->mc_Version);
+      q_Return = (orc_AppName.trimmed() == this->mc_ProjectName.trimmed()) &&
+                 (orc_AppVersion.trimmed() == this->mc_Version.trimmed());
    }
 
    return q_Return;
@@ -216,8 +217,8 @@ void C_SyvUpPacListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_Fil
                else
                {
                   // Use information from hex file
-                  this->mc_ProjectName = c_FileApplicationInfo.acn_ProjectName;
-                  this->mc_Version = c_FileApplicationInfo.acn_ProjectVersion;
+                  this->mc_ProjectName = c_FileApplicationInfo.GetProjectName().c_str();
+                  this->mc_Version = c_FileApplicationInfo.GetProjectVersion().c_str();
                   if (this->mc_Version != "")
                   {
                      this->mpc_Ui->pc_LabelVersion->setText(this->mc_Version);
@@ -227,10 +228,10 @@ void C_SyvUpPacListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_Fil
                      this->mc_Version = C_GtGetText::h_GetText("NA");
                      this->mpc_Ui->pc_LabelVersion->setText(C_GtGetText::h_GetText("?"));
                   }
-                  this->mc_Date = c_FileApplicationInfo.acn_Date;
+                  this->mc_Date = c_FileApplicationInfo.GetDate().c_str();
                   // This is in format Mar 14 2015 whereas openSYDE date format is usually 14.03.2015, but we do not
                   // convert, because we want to show the "real" information like it would look like in other tools
-                  this->mc_Time = c_FileApplicationInfo.acn_Time;
+                  this->mc_Time = c_FileApplicationInfo.GetTime().c_str();
                }
 
                // No check with Alias necessary due to check with real device type defined with target integration
@@ -345,7 +346,7 @@ void C_SyvUpPacListNodeItemDatablockWidget::m_LoadFileInformation(bool & orq_Fil
                                                                                   this->mu32_NodeIndex,
                                                                                   this->mu32_Number,
                                                                                   this->mc_FilePath,
-                                                                                  C_PuiSvNodeUpdate::
+                                                                                  C_OscViewNodeUpdate::
                                                                                   eFTP_DATA_BLOCK) == C_NO_ERR);
       }
    }

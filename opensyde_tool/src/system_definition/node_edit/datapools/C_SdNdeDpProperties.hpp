@@ -68,7 +68,7 @@ private:
    stw::opensyde_core::C_OscCanProtocol::E_Type * const mpe_ComProtocolType;
    const uint32_t mu32_NodeIndex;
    const int32_t ms32_DataPoolIndex;
-   bool mq_DatapoolAutoNvMStartAddress;
+   bool mq_DatapoolAutoNvmStartAddress;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);

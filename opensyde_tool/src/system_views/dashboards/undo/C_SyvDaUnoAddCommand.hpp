@@ -33,7 +33,7 @@ public:
                         const float64_t of64_ZetValue, const QString & orc_AdditionalInformation = "",
                         QUndoCommand * const opc_Parent = NULL, const bool & orq_ForceUseAdditionalInformation = false,
                         const bool & orq_DarkModeDefault = false);
-   virtual ~C_SyvDaUnoAddCommand(void);
+   ~C_SyvDaUnoAddCommand(void) override;
 
 protected:
    void m_AddNew(void) override;

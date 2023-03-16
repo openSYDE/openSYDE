@@ -91,26 +91,26 @@ public:
                                      const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id,
                                      const C_PuiSvReadDataConfiguration & orc_Config);
    int32_t SetNodeUpdateInformation(const uint32_t ou32_ViewIndex,
-                                    const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation);
+                                    const std::vector<stw::opensyde_core::C_OscViewNodeUpdate> & orc_NodeUpdateInformation);
    int32_t SetNodeUpdateInformation(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                    const C_PuiSvNodeUpdate & orc_NodeUpdateInformation);
+                                    const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdateInformation);
    int32_t SetNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                         const uint32_t ou32_Index, const QString & orc_Value,
-                                        const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+                                        const stw::opensyde_core::C_OscViewNodeUpdate::E_GenericFileType oe_Type);
    int32_t SetNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                             const uint32_t ou32_Index, const C_PuiSvNodeUpdateParamInfo & orc_Value);
+                                             const uint32_t ou32_Index,
+                                             const stw::opensyde_core::C_OscViewNodeUpdateParamInfo & orc_Value);
    int32_t SetNodeUpdateInformationPemFilePath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                const QString & orc_Value);
    int32_t SetNodeUpdateInformationSkipUpdateOfPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                     const uint32_t ou32_Index, const bool oq_SkipFile,
-                                                    const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+                                                    const stw::opensyde_core::C_OscViewNodeUpdate::E_GenericFileType oe_Type);
    int32_t SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                          const uint32_t ou32_Index, const bool oq_SkipFile);
    int32_t SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                        const bool oq_SkipFile);
    int32_t SetNodeUpdateInformationStates(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                          const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                          const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger);
+                                          const stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity, const stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger);
    int32_t SetNodeUpdateInformationParamInfoContent(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                     const uint32_t ou32_Index, const QString & orc_FilePath,
                                                     const uint32_t ou32_LastKnownCrc);
@@ -124,9 +124,10 @@ public:
                                const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id,
                                const C_PuiSvReadDataConfiguration & orc_Config);
    int32_t AddNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                        const QString & orc_Value, const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+                                        const QString & orc_Value,
+                                        const stw::opensyde_core::C_OscViewNodeUpdate::E_GenericFileType oe_Type);
    int32_t AddNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                             const C_PuiSvNodeUpdateParamInfo & orc_Value);
+                                             const stw::opensyde_core::C_OscViewNodeUpdateParamInfo & orc_Value);
    int32_t AddDashboard(const uint32_t ou32_ViewIndex, const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt);
    int32_t InsertDashboard(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
                            const C_PuiSvDashboard & orc_Dashboard, const bool oq_AutoAdapt,
@@ -160,12 +161,12 @@ public:
                                   const stw::opensyde_core::C_OscNodeDataPoolListElementId & orc_Id);
    int32_t RemoveNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                            const uint32_t ou32_Index,
-                                           const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+                                           const stw::opensyde_core::C_OscViewNodeUpdate::E_GenericFileType oe_Type);
    int32_t RemoveNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                 const uint32_t ou32_Index);
    int32_t RemoveNodeUpdateInformationPemFilePath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex);
    int32_t ClearNodeUpdateInformationAsAppropriate(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                                   const C_PuiSvNodeUpdate::E_GenericFileType oe_Type);
+                                                   const stw::opensyde_core::C_OscViewNodeUpdate::E_GenericFileType oe_Type);
    int32_t ClearNodeUpdateInformationParamPaths(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex);
    int32_t DeleteDashboard(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex);
    int32_t DeleteDashboardWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,

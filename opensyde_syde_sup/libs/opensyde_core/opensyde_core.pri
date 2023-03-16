@@ -163,7 +163,8 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
                   $${PWD}/project/system/FileLoadersV2 \
                   $${PWD}/project/system/node \
                   $${PWD}/project/system/node/can \
-                  $${PWD}/project/system/node/can/can_open
+                  $${PWD}/project/system/node/can/can_open \
+                  $${PWD}/project/view
 
    SOURCES += \
        $${PWD}/halc/configuration/C_OscHalcConfig.cpp \
@@ -245,6 +246,11 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.cpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.cpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.cpp \
+       $${PWD}/project/view/C_OscViewPc.cpp \
+       $${PWD}/project/view/C_OscViewData.cpp \
+       $${PWD}/project/view/C_OscViewNodeUpdate.cpp \
+       $${PWD}/project/view/C_OscViewNodeUpdateParamInfo.cpp \
+       $${PWD}/project/view/C_OscViewFiler.cpp \
        $${PWD}/imports/C_OscCanOpenObjectDictionary.cpp \
        $${PWD}/imports/C_OscCanOpenEdsInfoBlock.cpp \
        $${PWD}/imports/C_OscCanOpenEdsDeviceInfoBlock.cpp \
@@ -330,6 +336,11 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_project_handling) {
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.hpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.hpp \
        $${PWD}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.hpp \
+       $${PWD}/project/view/C_OscViewData.hpp \
+       $${PWD}/project/view/C_OscViewPc.hpp \
+       $${PWD}/project/view/C_OscViewNodeUpdate.hpp \
+       $${PWD}/project/view/C_OscViewNodeUpdateParamInfo.hpp \
+       $${PWD}/project/view/C_OscViewFiler.hpp \
        $${PWD}/imports/C_OscCanOpenObjectDictionary.hpp \
        $${PWD}/imports/C_OscCanOpenEdsInfoBlock.hpp \
        $${PWD}/imports/C_OscCanOpenEdsDeviceInfoBlock.hpp \
@@ -499,8 +510,6 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.hpp \
               $${PWD}/protocol_drivers/system_update/C_OsyHexFile.hpp \
               $${PWD}/protocol_drivers/DiagLib_config.hpp
-
-   include(./libtomcrypt/libtomcrypt.pri)
 }
 
 # optional: protocol logging

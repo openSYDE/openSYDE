@@ -68,7 +68,7 @@ C_SyvComDataDealer::C_SyvComDataDealer(C_OscNode * const opc_Node, const uint32_
 /*! \brief   Clean up class
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvComDataDealer::~C_SyvComDataDealer(void)
+C_SyvComDataDealer::~C_SyvComDataDealer(void) noexcept
 {
    //nothing to do ...
 }

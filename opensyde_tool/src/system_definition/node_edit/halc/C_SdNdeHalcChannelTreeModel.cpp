@@ -497,17 +497,17 @@ QModelIndex C_SdNdeHalcChannelTreeModel::GetModelIndexFromIndexes(const uint32_t
 
    \param[in,out]  opc_Item         Item
    \param[in]      orc_ChannelName  Channel name
-   \param[in]      orc_ChannelID    Channel ID
+   \param[in]      orc_ChannelId    Channel ID
    \param[in]      orc_Comment      Comment
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeHalcChannelTreeModel::mh_SetChannelText(C_TblTreItem * const opc_Item, const QString & orc_ChannelName,
-                                                    const QString & orc_ChannelID, const QString & orc_Comment)
+                                                    const QString & orc_ChannelId, const QString & orc_Comment)
 {
    if (opc_Item != NULL)
    {
-      opc_Item->c_Name = static_cast<QString>("%1  %2").arg(orc_ChannelID, orc_ChannelName);
-      opc_Item->c_ToolTipHeading = static_cast<QString>("%1 (%2)").arg(orc_ChannelName, orc_ChannelID);
+      opc_Item->c_Name = static_cast<QString>("%1  %2").arg(orc_ChannelId, orc_ChannelName);
+      opc_Item->c_ToolTipHeading = static_cast<QString>("%1 (%2)").arg(orc_ChannelName, orc_ChannelId);
       opc_Item->c_ToolTipContent = orc_Comment;
    }
 } //lint !e429  //no memory leak because of correct tree clean up

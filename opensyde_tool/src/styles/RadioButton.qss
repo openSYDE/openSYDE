@@ -7,6 +7,16 @@ border-style: solid;
 margin-right: 6px;
 }
 
+stw--opensyde_gui_elements--C_OgeRabProperties[IndicatorMargin="4"]::indicator
+{
+margin-right: 4px;
+}
+
+stw--opensyde_gui_elements--C_OgeRabProperties[Margin="3"]
+{
+margin-bottom:3px;
+}
+
 stw--opensyde_gui_elements--C_OgeRabCheckBox::indicator
 {
 width: 30px;

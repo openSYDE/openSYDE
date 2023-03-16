@@ -99,7 +99,7 @@ public:
    QMimeData * mimeData(const QModelIndexList & orc_Indices) const override;
 
    const stw::opensyde_core::C_OscNodeDataPoolListElement * GetOscElement(const QModelIndex & orc_Index) const;
-   const C_PuiSdNodeDataPoolListElement * GetUiElement(const QModelIndex & orc_Index) const;
+   bool IsElementInterpretedAsString(const QModelIndex & orc_Index) const;
    void HandleDataChange(const uint32_t ou32_Row, const C_SdNdeDpUtil::E_ElementDataChangeType & ore_ChangeType,
                          const int32_t os32_DataSetIndex);
    void DoInsertDataSet(const uint32_t ou32_DataSetIndex);
@@ -124,12 +124,79 @@ Q_SIGNALS:
                       const uint32_t & oru32_ArrayIndex, const int32_t & ors32_DataSetIndex);
 
 private:
+   class C_DpListTableDataSetData
+   {
+   public:
+      QVariant c_DataSet;
+      QVariant c_DataSetEdit;
+      QString c_DataSetToolTipContent;
+      QColor c_DataSetForeground;
+   };
+
+   class C_DpListTableData
+   {
+   public:
+      QVariant c_Name;
+      QColor c_NameForeground;
+      QVariant c_Comment;
+
+      QString c_ValueType;
+      QVariant c_ValueTypeEdit;
+
+      uint32_t u32_ArraySize;
+      QVariant c_ArraySize;
+      QVariant c_ArraySizeEdit;
+
+      QVariant c_Min;
+      QVariant c_MinEdit;
+      QString c_MinToolTipContent;
+      QVariant c_Max;
+      QVariant c_MaxEdit;
+      QString c_MaxToolTipContent;
+      QFont c_MinMaxFont;        // Same font configuration for min and max col
+      QColor c_MinMaxForeground; // Same color configuration for min and max col
+
+      QVariant c_Factor;
+      QVariant c_Offset;
+      QVariant c_Unit;
+
+      QFont c_DataSetFont; // For all data sets
+      std::vector<C_DpListTableDataSetData> c_DataSetData;
+
+      QVariant c_Access;
+      QVariant c_AccessEdit;
+      QString c_DataSize;
+      QString c_Address;
+
+      QVariant c_InvalidToolTipContent;
+      QVariant c_InvalidToolTipHeading;
+      QStringList c_InvalidIconRole;
+
+      bool q_AutoMinMaxActive;
+      int32_t s32_AutoMinMaxCheckState;
+      int32_t s32_EventCallCheckState;
+
+      QStringList c_IconIconRole;
+      bool q_InterpretAsString;
+   };
+
    uint32_t mu32_NodeIndex;
    uint32_t mu32_DataPoolIndex;
    uint32_t mu32_ListIndex;
+   std::vector<C_DpListTableData> mc_DpListInfoAll;
+   bool mq_DpIsSafety;
    C_SdNdeDpListTableErrorManager mc_ErrorManager;
 
-   bool m_CheckLink(const QModelIndex & orc_Index) const;
+   void m_FillDpListInfo(void);
+   void m_FillDpListElementInfo(const uint32_t ou32_ElementIndex);
+
+   void m_DataChange(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                     const uint32_t & oru32_DataPoolListIndex, const uint32_t & oru32_DataPoolListElementIndex,
+                     const QVariant & orc_NewData, const C_SdNdeDpUtil::E_ElementDataChangeType & ore_DataChangeType,
+                     const uint32_t & oru32_ArrayIndex, const int32_t & ors32_DataSetIndex);
+
+   bool m_CheckLink(const C_PuiSdNodeDataPoolListElement * const opc_UiElement,
+                    const opensyde_core::C_OscNodeDataPoolListElement * const opc_OscElement) const;
    void m_OnErrorChange(void);
    void m_MoveItems(const std::vector<uint32_t> & orc_ContiguousIndices, const uint32_t ou32_TargetIndex) const;
    void m_MoveItem(const uint32_t ou32_SourceIndex, const uint32_t ou32_TargetIndex) const;

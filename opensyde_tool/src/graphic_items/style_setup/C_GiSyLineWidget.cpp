@@ -424,8 +424,8 @@ void C_GiSyLineWidget::m_UpdatePreview(void)
          f64_HorizontalOffset = static_cast<float64_t>(this->mpc_Ui->pc_SpinBoxWidth->value()) * 2.0;
       }
 
-      c_Points.push_back(QPointF(f64_PLACEMENT_OFFSET + f64_HorizontalOffset,
-                                 static_cast<float64_t>(c_ViewSize.height()) / 2.0));
+      c_Points.emplace_back(QPointF(f64_PLACEMENT_OFFSET + f64_HorizontalOffset,
+                                    static_cast<float64_t>(c_ViewSize.height()) / 2.0));
       e_ArrowHeadType = this->GetEndArrow();
       if (C_GiBiArrow::h_HasOffsetInteractionPoint(e_ArrowHeadType) == true)
       {

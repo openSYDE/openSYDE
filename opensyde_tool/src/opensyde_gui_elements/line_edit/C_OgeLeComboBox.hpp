@@ -30,7 +30,7 @@ public:
    C_OgeLeComboBox(QWidget * const opc_Parent = NULL);
 
 protected:
-   virtual void mousePressEvent(QMouseEvent * const opc_Event);
+   void mousePressEvent(QMouseEvent * const opc_Event) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

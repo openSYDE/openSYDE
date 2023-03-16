@@ -34,6 +34,7 @@
 #include "C_SdBueSortHelper.hpp"
 #include "C_SdClipBoardHelper.hpp"
 #include "C_OscLoggingHandler.hpp"
+#include "C_OscCanUtil.hpp"
 #include "C_OgeWiCustomMessage.hpp"
 #include "C_SdBueMessageSelectorTreeWidget.hpp"
 #include "C_OgePopUpDialog.hpp"
@@ -78,6 +79,7 @@ C_SdBueMessageSelectorTreeWidget::C_SdBueMessageSelectorTreeWidget(QWidget * con
    mq_NoSelectionUpdate(false)
 {
    this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+   this->setItemDelegate(&this->mc_Delegate);
 
    // configure the scrollbar to stop resizing the widget when showing or hiding the scrollbar
    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -667,7 +669,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
                      tgl_assert(pc_Node != NULL);
                      if (pc_Node != NULL)
                      {
-                        c_OwnerNodeNamePerMessage.push_back(pc_Node->c_Properties.c_Name.c_str());
+                        c_OwnerNodeNamePerMessage.emplace_back(pc_Node->c_Properties.c_Name.c_str());
                      }
                      c_OwnerNodeInterfaceIndexPerMessage.push_back(rc_CurMessageId.u32_InterfaceIndex);
                      c_OwnerNodeDatapoolIndexPerMessage.push_back(rc_CurMessageId.u32_DatapoolIndex);
@@ -683,7 +685,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
          }
          C_SdClipBoardHelper::h_StoreMessages(c_Messages, c_OscSignalCommons, c_UiSignalCommons, c_UiSignals,
                                               c_OwnerNodeName, c_OwnerNodeInterfaceIndex, c_OwnerNodeDatapoolIndex,
-                                              c_OwnerIsTxFlag);
+                                              c_OwnerIsTxFlag, this->me_ProtocolType);
       }
       if (q_SignalsOnly == true)
       {
@@ -731,7 +733,8 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
             }
             ++u32_ItVec;
          }
-         C_SdClipBoardHelper::h_StoreSignalsToClipboard(c_Signals, c_OscSignalCommons, c_UiSignalCommons, c_UiSignals);
+         C_SdClipBoardHelper::h_StoreSignalsToClipboard(c_Signals, c_OscSignalCommons, c_UiSignalCommons, c_UiSignals,
+                                                        this->me_ProtocolType);
       }
    }
    osc_write_log_performance_stop(u16_TimerId, "Bus-Messages-Copy");
@@ -768,7 +771,8 @@ void C_SdBueMessageSelectorTreeWidget::CopySignal(const C_OscCanMessageIdentific
                                                                     c_UiSignals[u32_IT_VEC]) ==
               C_NO_ERR);
 
-   C_SdClipBoardHelper::h_StoreSignalsToClipboard(c_Signals, c_OscSignalCommons, c_UiSignalCommons, c_UiSignals);
+   C_SdClipBoardHelper::h_StoreSignalsToClipboard(c_Signals, c_OscSignalCommons, c_UiSignalCommons, c_UiSignals,
+                                                  this->me_ProtocolType);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -878,7 +882,13 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
                      //Auto fix signal restrictions of safety protocols
                      for (uint32_t u32_ItSignal = 0; u32_ItSignal < c_Signals.size(); ++u32_ItSignal)
                      {
-                        C_SdUtil::h_AdaptSignalToProtocolType(c_Signals[u32_ItSignal], this->me_ProtocolType, NULL);
+                        if (c_Signals[u32_ItSignal].u32_ComDataElementIndex < c_OscSignalCommons.size())
+                        {
+                           C_SdUtil::h_AdaptSignalToProtocolType(
+                              c_Signals[u32_ItSignal],
+                              c_OscSignalCommons[c_Signals[u32_ItSignal].u32_ComDataElementIndex],
+                              this->me_ProtocolType, NULL);
+                        }
                      }
 
                      this->mpc_UndoManager->DoPasteSignals(this->mc_UniqueMessageIds[u32_InternalMessageIndex],
@@ -928,7 +938,13 @@ void C_SdBueMessageSelectorTreeWidget::Paste(void)
             //Auto fix messages
             for (uint32_t u32_ItMessage = 0; u32_ItMessage < c_Messages.size(); ++u32_ItMessage)
             {
-               C_SdUtil::h_AdaptMessageToProtocolType(c_Messages[u32_ItMessage], NULL, this->me_ProtocolType, NULL);
+               if (u32_ItMessage < c_OscMsgSignalCommons.size())
+               {
+                  C_SdUtil::h_AdaptMessageToProtocolType(c_Messages[u32_ItMessage],
+                                                         NULL,
+                                                         c_OscMsgSignalCommons[u32_ItMessage],
+                                                         this->me_ProtocolType, NULL);
+               }
             }
             //Valid messages
             if (m_GetMessageIdForAdd(c_MessageId) == C_NO_ERR)
@@ -1148,7 +1164,8 @@ void C_SdBueMessageSelectorTreeWidget::InternalAddSignal(const C_OscCanMessageId
       {
          //Ui
          m_InsertSignal(this->topLevelItem(u32_InternalMessageIndex), u32_SignalIndex,
-                        C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(orc_MessageId, oru32_SignalIndex));
+                        C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(orc_MessageId, oru32_SignalIndex,
+                                                                                 false));
          //Ui update trigger
          this->updateGeometry();
 
@@ -1281,12 +1298,9 @@ void C_SdBueMessageSelectorTreeWidget::OnSignalNameChange(const C_OscCanMessageI
             {
                if (pc_ChildItem != NULL)
                {
-                  pc_ChildItem->setText(0,
-                                        C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(this->
-                                                                                                 mc_UniqueMessageIds[
-                                                                                                    u32_InternalMessageIndex
-                                                                                                 ],
-                                                                                                 u32_SignalIndex));
+                  pc_ChildItem->setText(0, C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName
+                                           (this->mc_UniqueMessageIds[u32_InternalMessageIndex], u32_SignalIndex,
+                                           false));
                }
             }
          }
@@ -1695,11 +1709,11 @@ bool C_SdBueMessageSelectorTreeWidget::IsSelectedMessageContentReadOnly(void) co
    // If empty, this information is not available and can not be checked
    if (this->mc_CoUniqueMessagesPdoMappingRo.empty() == false)
    {
-      uint32_t u32_MessageIndex;
       const QModelIndexList c_IndexList = this->selectedIndexes();
 
       if (c_IndexList.isEmpty() == false)
       {
+         uint32_t u32_MessageIndex;
          bool q_MsgIndexValid = false;
          // Only one relevant to check for signal.
          const QModelIndexList::const_iterator c_ItIndex = c_IndexList.begin();
@@ -2040,15 +2054,18 @@ void C_SdBueMessageSelectorTreeWidget::m_LastMinuteToolTipUpdate(void)
    for (uint32_t u32_ItMessage = 0UL; u32_ItMessage < this->mc_UniqueMessageIds.size(); ++u32_ItMessage)
    {
       uint32_t u32_InternalIndex;
-      if (m_MapMessageIdToInternalMessageIndex(this->mc_UniqueMessageIds[u32_ItMessage], u32_InternalIndex) == C_NO_ERR)
+      const C_OscCanMessageIdentificationIndices & rc_MessageId = this->mc_UniqueMessageIds[u32_ItMessage];
+
+      if (m_MapMessageIdToInternalMessageIndex(rc_MessageId, u32_InternalIndex) == C_NO_ERR)
       {
          QTreeWidgetItem * const pc_TopLevelItem = this->topLevelItem(u32_InternalIndex);
          if (pc_TopLevelItem != NULL)
          {
             //Message
-            pc_TopLevelItem->setData(0, ms32_USER_ROLE_TOOL_TIP_HEADING, pc_TopLevelItem->text(0));
+            pc_TopLevelItem->setData(0, ms32_USER_ROLE_TOOL_TIP_HEADING,
+                                     C_PuiSdHandler::h_GetInstance()->GetCanMessageDisplayName(rc_MessageId, true));
             pc_TopLevelItem->setData(0, ms32_USER_ROLE_TOOL_TIP_CONTENT,
-                                     C_SdUtil::h_GetToolTipContentMessage(this->mc_UniqueMessageIds[u32_ItMessage]));
+                                     C_SdUtil::h_GetToolTipContentMessage(rc_MessageId));
             //Signals
             for (int32_t s32_ItSignalInternal = 0; s32_ItSignalInternal < pc_TopLevelItem->childCount();
                  ++s32_ItSignalInternal)
@@ -2059,10 +2076,11 @@ void C_SdBueMessageSelectorTreeWidget::m_LastMinuteToolTipUpdate(void)
                                                              u32_SignalDataIndex) == C_NO_ERR)
                {
                   //Signal
-                  pc_SignalItem->setData(0, ms32_USER_ROLE_TOOL_TIP_HEADING, pc_SignalItem->text(0));
+                  pc_SignalItem->setData(0, ms32_USER_ROLE_TOOL_TIP_HEADING,
+                                         C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(
+                                            rc_MessageId, u32_SignalDataIndex, true));
                   pc_SignalItem->setData(0, ms32_USER_ROLE_TOOL_TIP_CONTENT,
-                                         C_SdUtil::h_GetToolTipContentSignal(this->mc_UniqueMessageIds[u32_ItMessage],
-                                                                             u32_SignalDataIndex));
+                                         C_SdUtil::h_GetToolTipContentSignal(rc_MessageId, u32_SignalDataIndex));
                }
             }
          }
@@ -2247,8 +2265,6 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32_t & oru32_Me
 
          uint32_t u32_Counter;
          uint32_t u32_SignalDataIndex;
-         const QString c_Text = static_cast<QString>("%1 (0x%2)").arg(pc_MessageData->c_Name.c_str()).arg(
-            QString::number(pc_MessageData->u32_CanId, 16).toUpper());
 
          if ((this->mpc_MessageSyncManager != NULL) &&
              (this->mpc_MessageSyncManager->GetCurrentComProtocol() == C_OscCanProtocol::eCAN_OPEN))
@@ -2290,7 +2306,7 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32_t & oru32_Me
 
          this->insertTopLevelItem(oru32_MessageIdIndex, pc_Message);
 
-         pc_Message->setText(0, c_Text);
+         pc_Message->setText(0, C_PuiSdHandler::h_GetInstance()->GetCanMessageDisplayName(rc_MessageId, false));
          pc_Message->setForeground(0, mc_STYLE_GUIDE_COLOR_8);
 
          // Signals
@@ -2299,8 +2315,8 @@ void C_SdBueMessageSelectorTreeWidget::m_InsertMessage(const uint32_t & oru32_Me
             if (m_MapSignalInternalIndexToDataIndex(oru32_MessageIdIndex, u32_Counter, u32_SignalDataIndex) == C_NO_ERR)
             {
                this->m_InsertSignal(pc_Message, u32_Counter,
-                                    C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(rc_MessageId,
-                                                                                             u32_SignalDataIndex));
+                                    C_PuiSdHandler::h_GetInstance()->GetCanSignalDisplayName(
+                                       rc_MessageId, u32_SignalDataIndex, false));
             }
          }
          //lint -e593 Qt parent handling will take care of it

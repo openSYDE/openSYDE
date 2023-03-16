@@ -121,7 +121,7 @@ C_SyvUpUpdateWidget::C_SyvUpUpdateWidget(const uint32_t ou32_ViewIndex, QWidget 
    //Update all items with initial zoom & pos value
    if (pc_View != NULL)
    {
-      c_Name = pc_View->GetName();
+      c_Name = pc_View->GetName().c_str();
    }
    else
    {
@@ -193,14 +193,15 @@ C_SyvUpUpdateWidget::~C_SyvUpUpdateWidget()
       const QList<int32_t> c_Sizes = this->mpc_Ui->pc_SplitterHori->sizes();
       if (c_Sizes.count() > 1)
       {
-         C_UsHandler::h_GetInstance()->SetProjSvUpdateHorizontalSplitterVertical(pc_View->GetName(), c_Sizes.at(1));
+         C_UsHandler::h_GetInstance()->SetProjSvUpdateHorizontalSplitterVertical(pc_View->GetName().c_str(),
+                                                                                 c_Sizes.at(1));
       }
 
       //Scene
       C_UsHandler::h_GetInstance()->SetProjSvUpdateViewZoom(
-         pc_View->GetName(), this->mpc_Ui->pc_GraphicsView->GetZoomValue());
+         pc_View->GetName().c_str(), this->mpc_Ui->pc_GraphicsView->GetZoomValue());
       C_UsHandler::h_GetInstance()->SetProjSvUpdateViewPos(
-         pc_View->GetName(), this->mpc_Ui->pc_GraphicsView->GetViewPos());
+         pc_View->GetName().c_str(), this->mpc_Ui->pc_GraphicsView->GetViewPos());
    }
    m_CleanUpProgressLog();
 
@@ -372,7 +373,7 @@ void C_SyvUpUpdateWidget::showEvent(QShowEvent * const opc_Event)
    // store configuration of the view
    if (pc_View != NULL)
    {
-      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName());
+      const C_UsSystemView c_UserView = C_UsHandler::h_GetInstance()->GetProjSvSetupView(pc_View->GetName().c_str());
       int32_t s32_LastSegmentWidth = c_UserView.GetUpdateHorizontalSplitterVertical();
 
       //Revert to default if necessary
@@ -529,10 +530,10 @@ int32_t C_SyvUpUpdateWidget::m_InitSequence(void)
 
    if (pc_View != NULL)
    {
-      if (pc_View->GetPcData().GetConnected())
+      if (pc_View->GetOscPcData().GetConnected())
       {
-         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
-            pc_View->GetPcData().GetBusIndex());
+         const C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
          if (pc_Bus != NULL)
          {
             if (pc_Bus->e_Type == C_OscSystemBus::eETHERNET)
@@ -961,10 +962,8 @@ void C_SyvUpUpdateWidget::m_ReportOpenSydeFlashloaderInformationRead(void)
                   QString::number(rc_Info.c_Applications[u8_Application].u32_BlockEndAddress, 16).rightJustified(
                      8, '0')));
             this->m_UpdateReportText(
-               static_cast<QString>(C_GtGetText::h_GetText(" Signature valid: %1")).arg((rc_Info.c_Applications[
-                                                                                            u8_Application].
-                                                                                         u8_SignatureValid ==
-                                                                                         0) ? "yes" : "no"));
+               static_cast<QString>(C_GtGetText::h_GetText(" Signature valid: %1")).
+               arg((rc_Info.c_Applications[u8_Application].u8_SignatureValid == 0) ? "yes" : "no"));
             this->m_UpdateReportText(static_cast<QString>(C_GtGetText::h_GetText(" Additional information: %1")).arg(
                                         rc_Info.c_Applications[u8_Application].c_AdditionalInformation.c_str()));
          }
@@ -1365,16 +1364,16 @@ void C_SyvUpUpdateWidget::m_Connect(void)
          }
       }
 
+      // Copy the application paths
+      // Saving both, the original and temporary, paths will help to map changed relevant applications
+      // between connect and update by discarding application information blocks
+      this->mc_NodesWithAllApplicationsAndTempPath = this->mc_NodesWithAllApplications;
+
       if (s32_Return == C_NO_ERR)
       {
          QString c_ErrorPath;
          const C_SclString c_ExePath = C_Uti::h_GetExePath().toStdString().c_str();
          const C_SclString c_TemporaryPath = c_ExePath + "/" + mhc_TEMP_FOLDER.toStdString().c_str() + "/";
-
-         // Copy the application paths
-         // Saving both, the original and temporary, paths will help to map changed relevant applications
-         // between connect and update by discarding application information blocks
-         this->mc_NodesWithAllApplicationsAndTempPath = this->mc_NodesWithAllApplications;
 
          // Copy all files to a temporary folder to have them "safe"
          s32_Return = this->mpc_UpSequences->SyvUpCreateTemporaryFolder(c_TemporaryPath,
@@ -2050,12 +2049,12 @@ void C_SyvUpUpdateWidget::m_Timer(void)
          {
             uint32_t u32_ErrorNodeIndex;
             uint32_t u32_ErrorFileIndex;
-            uint32_t u32_Position;
 
             // Adapt the update configuration. Remove all applications which are updated successfully
             // in case of a retry without new connect
             if (this->mpc_UpSequences->GetLastUpdatePosition(u32_ErrorNodeIndex, u32_ErrorFileIndex) == C_NO_ERR)
             {
+               uint32_t u32_Position;
                // Remove all applications of the finished nodes
                for (u32_Position = 0U; u32_Position < this->mc_NodesOrder.size(); u32_Position++)
                {
@@ -2401,7 +2400,7 @@ void C_SyvUpUpdateWidget::m_InitProgressLog(void)
 
    if (pc_View != NULL)
    {
-      c_ViewName = pc_View->GetName();
+      c_ViewName = pc_View->GetName().c_str();
    }
    c_ViewSettings = C_UsHandler::h_GetInstance()->GetProjSvSetupView(c_ViewName);
 
@@ -2480,7 +2479,7 @@ void C_SyvUpUpdateWidget::m_CleanUpProgressLog(void)
          // save position, size and state of toolbox
          c_Size.setWidth(this->mpc_ProgressLog->width());
          c_Size.setHeight(this->mpc_ProgressLog->GetMaximizedHeight());
-         C_UsHandler::h_GetInstance()->SetProjSvUpdateProgressLog(pc_View->GetName(),
+         C_UsHandler::h_GetInstance()->SetProjSvUpdateProgressLog(pc_View->GetName().c_str(),
                                                                   this->mpc_ProgressLog->pos(), c_Size,
                                                                   this->mpc_ProgressLog->GetMaximized());
       }

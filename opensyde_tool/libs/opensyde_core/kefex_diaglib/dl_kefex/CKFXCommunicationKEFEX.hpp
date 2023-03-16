@@ -1,5 +1,5 @@
-#ifndef CKFXCommunicationKEFEXH
-#define CKFXCommunicationKEFEXH
+#ifndef CKFXCOMMUNICATIONKEFEXHPP
+#define CKFXCOMMUNICATIONKEFEXHPP
 
 #include "stwtypes.hpp"
 #include "CKFXComm.hpp"
@@ -18,7 +18,7 @@ namespace diag_lib
 const uint16_t KFX_NUM_LOCKS = 10U;
 
 ///KEFEX protocol communication driver
-class STW_DIAGLIB_EXPORT C_KFXCommunicationKEFEX :
+class C_KFXCommunicationKEFEX :
    public C_KFXCommunicationBase
 {
 private:

@@ -48,6 +48,7 @@ public:
 
    bool IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos) override;
    bool IsSelectionRelevantForProxyWidgetInteraction(void) const override;
+   bool IsOverrideCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const override;
 
    void SetEditMode(const bool oq_Active);
    void SetDrawingActive(const bool oq_Active) const;

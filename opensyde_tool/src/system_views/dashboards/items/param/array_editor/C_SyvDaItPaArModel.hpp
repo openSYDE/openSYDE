@@ -55,7 +55,7 @@ public:
    void Reset(void);
 
 private:
-   bool mq_ECUValues;
+   bool mq_EcuValues;
    uint32_t mu32_ElementIndex;
    stw::opensyde_gui_logic::C_PuiSvDbDataElementHandler * mpc_DataWidget;
 

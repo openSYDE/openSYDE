@@ -168,6 +168,37 @@ bool C_GiSvDaRectBaseGroup::IsMousePosRelevantForProxyWidgetInteraction(const QP
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the necessary cursor type when hovered dependent of the cursor position
+
+   Dependent of the resize action points
+
+   \param[in]       orc_ScenePos     Scene position of cursor
+   \param[out]      ore_Cursor       Detected necessary cursor
+
+   \retval   true   Override cursor is necessary
+   \retval   false  Override cursor is not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_GiSvDaRectBaseGroup::IsOverrideCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const
+{
+   bool q_Return = false;
+
+   if ((this->mq_EditModeActive == true) &&
+       (this->mq_EditContentModeEnabled == false))
+   {
+      q_Return = this->IsResizeCursorNecessary(orc_ScenePos, ore_Cursor);
+
+      if (q_Return == false)
+      {
+         q_Return = true;
+         ore_Cursor = Qt::SizeAllCursor;
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Apply style
 
    \param[in] oe_Style    New style type
@@ -345,15 +376,14 @@ void C_GiSvDaRectBaseGroup::RegisterDataPoolElementCyclicError(
       //Clean up any left over items in buffer
       this->UpdateShowValue();
 
-      switch (ou8_ErrorCode)
+      if (ou8_ErrorCode == 0x22)
       {
-      case 0x22:
          c_AdditionalInfo = C_GtGetText::h_GetText("Access to element value failed (e.g. blocked by application)");
-         break;
-      default:
+      }
+      else
+      {
          c_AdditionalInfo =
             static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_ErrorCode, 16));
-         break;
       }
       c_Info =
          static_cast<QString>(C_GtGetText::h_GetText("Cyclic service failed with error: %1")).arg(c_AdditionalInfo);
@@ -1400,12 +1430,6 @@ void C_GiSvDaRectBaseGroup::wheelEvent(QGraphicsSceneWheelEvent * const opc_Even
 //----------------------------------------------------------------------------------------------------------------------
 void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
-   if ((this->mq_EditModeActive == true) &&
-       (this->mq_EditContentModeEnabled == false))
-   {
-      QApplication::setOverrideCursor(Qt::SizeAllCursor);
-   }
-
    this->mpc_ProxyWidget->TriggerHoverEnterEvent(opc_Event);
    C_GiBiRectBaseGroup::hoverEnterEvent(opc_Event);
 }
@@ -1419,6 +1443,7 @@ void C_GiSvDaRectBaseGroup::hoverEnterEvent(QGraphicsSceneHoverEvent * const opc
 void C_GiSvDaRectBaseGroup::hoverMoveEvent(QGraphicsSceneHoverEvent * const opc_Event)
 {
    this->mpc_ProxyWidget->TriggerHoverMoveEvent(opc_Event);
+
    C_GiBiRectBaseGroup::hoverMoveEvent(opc_Event);
 
    //Handle tool tips
@@ -1624,12 +1649,6 @@ void C_GiSvDaRectBaseGroup::hoverLeaveEvent(QGraphicsSceneHoverEvent * const opc
    C_GiBiRectBaseGroup::hoverLeaveEvent(opc_Event);
 
    Q_EMIT (this->SigHideToolTip());
-
-   if ((this->mq_EditModeActive == true) &&
-       (this->mq_EditContentModeEnabled == false))
-   {
-      QApplication::restoreOverrideCursor();
-   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

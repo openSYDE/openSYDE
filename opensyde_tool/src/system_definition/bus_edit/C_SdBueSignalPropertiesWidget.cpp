@@ -133,6 +133,8 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    this->mpc_Ui->pc_LabelMuxValue->setText(C_GtGetText::h_GetText("Multiplexer Value"));
    this->mpc_Ui->pc_CheckBoxAutoMinMax->setText(C_GtGetText::h_GetText("Auto min/max"));
    this->mpc_Ui->pc_LabelObjectDictTitle->setText(C_GtGetText::h_GetText("Object Dictionary"));
+   this->mpc_Ui->pc_LabelJ1939->setText(C_GtGetText::h_GetText("J1939 Specific"));
+   this->mpc_Ui->pc_LabelJ1939Spn->setText(C_GtGetText::h_GetText("SPN"));
 
    this->mpc_Ui->pc_TextEditComment->setPlaceholderText(C_GtGetText::h_GetText("Add your comment here ..."));
 
@@ -262,6 +264,14 @@ void C_SdBueSignalPropertiesWidget::InitStaticNames(void) const
    c_InfoText =  C_GtGetText::h_GetText(
       "With which multiplexer signal value should this multiplexed signal be transmitted.");
    this->mpc_Ui->pc_LabelMuxValue->SetToolTipInformation(C_GtGetText::h_GetText("Multiplexer Value"), c_InfoText);
+
+   c_InfoText =  C_GtGetText::h_GetText(
+      "J1939 specific number to identify a specific Suspect Parameter.");
+   this->mpc_Ui->pc_LabelJ1939Spn->SetToolTipInformation(C_GtGetText::h_GetText("Suspect Parameter Number"),
+                                                         c_InfoText);
+
+   this->mpc_Ui->pc_SpinBoxJ1939Spn->SetMinimumCustom(0);
+   this->mpc_Ui->pc_SpinBoxJ1939Spn->SetMaximumCustom(524287);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -304,12 +314,24 @@ void C_SdBueSignalPropertiesWidget::SetSignalId(const C_OscCanMessageIdentificat
 void C_SdBueSignalPropertiesWidget::SetComProtocol(const C_OscCanProtocol::E_Type oe_Value)
 {
    const bool q_CanOpenActive = (oe_Value == C_OscCanProtocol::eCAN_OPEN);
+   const bool q_J1993Active = (oe_Value == C_OscCanProtocol::eJ1939);
 
    this->me_ComProtocol = oe_Value;
 
    this->mpc_Ui->pc_WidgetObjectDict->setVisible(q_CanOpenActive);
+   this->mpc_Ui->pc_WidgetJ1939->setVisible(q_J1993Active);
+   if (q_J1993Active == false)
+   {
+      this->mpc_Ui->pc_SpacerJ1939Spacer->changeSize(1, 0);
+   }
+   else
+   {
+      this->mpc_Ui->pc_SpacerJ1939Spacer->changeSize(1, 4);
+   }
+   this->mpc_Ui->pc_LabelJ1939Spn->setVisible(q_J1993Active);
+   this->mpc_Ui->pc_SpinBoxJ1939Spn->setVisible(q_J1993Active);
 
-   this->mpc_Ui->pc_ComboBoxByteOrder->setEnabled(!q_CanOpenActive);
+   this->mpc_Ui->pc_ComboBoxByteOrder->setEnabled((q_CanOpenActive  == false) && (q_J1993Active == false));
 
    // All other elements will be en-/disabled in the m_LoadFromData function calls
 }
@@ -474,6 +496,7 @@ void C_SdBueSignalPropertiesWidget::m_LoadFromData(void)
          m_UpdateUiForChange(eCHA_START_BIT);
          m_UpdateUiForChange(eCHA_MUX_TYPE);
          m_UpdateUiForChange(eCHA_MUX_VALUE);
+         m_UpdateUiForChange(eCHA_J1939_SPN);
 
          this->m_CoLoadEdsRestricitions();
       }
@@ -631,6 +654,15 @@ void C_SdBueSignalPropertiesWidget::m_HandleMuxTypeChange(void)
 void C_SdBueSignalPropertiesWidget::m_HandleMuxValueChange(void)
 {
    this->m_HandleAnyChange(eCHA_MUX_VALUE);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Handle SPN value change
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueSignalPropertiesWidget::m_HandleJ1939SpnChange(void)
+{
+   this->m_HandleAnyChange(eCHA_J1939_SPN);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1391,6 +1423,13 @@ void C_SdBueSignalPropertiesWidget::m_ApplyNewValueFromUi(const C_SdBueSignalPro
          this->mc_DataOscSignal.u16_ComBitLength = pc_Signal->u16_ComBitLength;
       }
       break;
+   case eCHA_J1939_SPN:
+      if (this->me_ComProtocol == C_OscCanProtocol::eJ1939)
+      {
+         this->mc_DataOscSignal.u32_J1939SuspectParameterNumber =
+            static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxJ1939Spn->value());
+      }
+      break;
    default:
       break;
    }
@@ -1437,6 +1476,7 @@ void C_SdBueSignalPropertiesWidget::m_AdaptOtherValues(const C_SdBueSignalProper
    case eCHA_INIT:
    case eCHA_UNIT:
    case eCHA_COMMENT:
+   case eCHA_J1939_SPN:
       //No other elements affected
       break;
    case eCHA_START_BIT:
@@ -1777,6 +1817,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
    case eCHA_AUTO_MIN_MAX:
    case eCHA_FACTOR:
    case eCHA_OFFSET:
+   case eCHA_J1939_SPN:
       //No change necessary
       break;
    default:
@@ -1795,6 +1836,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateOtherSignalsForChange(
 void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change)
 {
    const bool q_CanOpenActive = (this->me_ComProtocol == C_OscCanProtocol::eCAN_OPEN);
+   const bool q_J1939Active = (this->me_ComProtocol == C_OscCanProtocol::eJ1939);
 
    //Don't trigger any new changes as all data is pulled from the internal data
    m_DisconnectAll();
@@ -1808,7 +1850,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change
       break;
    case eCHA_MUX_TYPE:
       //Restrictions
-      if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eLAYER2)
+      if ((this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eLAYER2) ||
+          (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eJ1939))
       {
          this->mpc_Ui->pc_ComboBoxMuxType->setVisible(true);
          this->mpc_Ui->pc_LabelMuxType->setVisible(true);
@@ -1842,7 +1885,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change
       }
       else
       {
-         this->mpc_Ui->pc_ComboBoxType->setEnabled(!q_CanOpenActive);
+         this->mpc_Ui->pc_ComboBoxType->setEnabled((q_CanOpenActive == false) && (q_J1939Active == false));
       }
       //Value
       this->mpc_Ui->pc_ComboBoxType->setCurrentIndex(static_cast<int32_t>(this->me_DataType));
@@ -1927,7 +1970,8 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change
       break;
    case eCHA_MUX_VALUE:
       //Restrictions
-      if (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eLAYER2)
+      if ((this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eLAYER2) ||
+          (this->mc_MessageId.e_ComProtocol == C_OscCanProtocol::eJ1939))
       {
          if (this->mc_DataOscSignal.e_MultiplexerType == C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL)
          {
@@ -2045,6 +2089,12 @@ void C_SdBueSignalPropertiesWidget::m_UpdateUiForChange(const E_Change oe_Change
       //Update UI via signal
       Q_EMIT (this->SigUpdateMlv(this->mc_MessageId, this->mu32_SignalIndex));
       break;
+   case eCHA_J1939_SPN:
+      if (this->me_ComProtocol == C_OscCanProtocol::eJ1939)
+      {
+         this->mpc_Ui->pc_SpinBoxJ1939Spn->setValue(this->mc_DataOscSignal.u32_J1939SuspectParameterNumber);
+      }
+      break;
    default:
       break;
    }
@@ -2094,6 +2144,7 @@ void C_SdBueSignalPropertiesWidget::m_UpdateErrorForChange(const C_SdBueSignalPr
    case eCHA_FACTOR:
    case eCHA_OFFSET:
    case eCHA_MLV:
+   case eCHA_J1939_SPN:
       //No check necessary
       break;
    default:
@@ -2133,6 +2184,9 @@ void C_SdBueSignalPropertiesWidget::m_SendSignalForChange(const C_SdBueSignalPro
       break;
    case eCHA_MUX_VALUE:
       Q_EMIT (this->SigRecheckError(this->mc_MessageId));
+      break;
+   case eCHA_J1939_SPN:
+      Q_EMIT (this->SigNameChanged(this->mc_MessageId));
       break;
    case eCHA_INIT:
    case eCHA_UNIT:
@@ -2210,6 +2264,10 @@ void C_SdBueSignalPropertiesWidget::m_ConnectAll(void) const
    connect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
                                                             int32_t)>(&C_OgeSpxNumber::valueChanged), this,
            &C_SdBueSignalPropertiesWidget::m_HandleStartBitChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   connect(this->mpc_Ui->pc_SpinBoxJ1939Spn, static_cast<void (QSpinBox::*)(
+                                                            int32_t)>(&QSpinBox::valueChanged), this,
+           &C_SdBueSignalPropertiesWidget::m_HandleJ1939SpnChange);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2268,4 +2326,8 @@ void C_SdBueSignalPropertiesWidget::m_DisconnectAll(void) const
    disconnect(this->mpc_Ui->pc_SpinBoxStartBit, static_cast<void (QSpinBox::*)(
                                                                int32_t)>(&C_OgeSpxNumber::valueChanged), this,
               &C_SdBueSignalPropertiesWidget::m_HandleStartBitChange);
+   //lint -e{929} Cast required to avoid ambiguous signal of qt interface
+   disconnect(this->mpc_Ui->pc_SpinBoxJ1939Spn, static_cast<void (QSpinBox::*)(
+                                                               int32_t)>(&QSpinBox::valueChanged), this,
+              &C_SdBueSignalPropertiesWidget::m_HandleJ1939SpnChange);
 }

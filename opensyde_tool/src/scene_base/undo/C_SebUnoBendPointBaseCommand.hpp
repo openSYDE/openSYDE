@@ -31,7 +31,7 @@ public:
    C_SebUnoBendPointBaseCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
                                 const QString & orc_Text, const QPointF & orc_ScenePosition,
                                 QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SebUnoBendPointBaseCommand(void);
+   ~C_SebUnoBendPointBaseCommand(void) override;
    void undo(void) override = 0;
    void redo(void) override = 0;
 

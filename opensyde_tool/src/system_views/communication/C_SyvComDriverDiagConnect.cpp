@@ -167,7 +167,7 @@ void C_SyvComDriverDiagConnect::m_RunWaitingStep(void)
    // Is a new connect already possible
    if ((this->mu32_DisconnectTime + 5100U) > TglGetTickCount())
    {
-      QThread::usleep((this->mu32_DisconnectTime + 5100U) - TglGetTickCount());
+      QThread::usleep(static_cast<uint32_t>((this->mu32_DisconnectTime + 5100U) - TglGetTickCount()));
    }
    while ((this->mu32_DisconnectTime + 5100U) > TglGetTickCount())
    {

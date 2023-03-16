@@ -13,11 +13,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
 
-#ifdef __BORLANDC__ //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
-
 #include <limits.h>
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -48,10 +43,10 @@ using namespace stw::tgl;
 
 C_Can::C_Can(const uint8_t ou8_CommChannel) :
    C_CanDispatcher(ou8_CommChannel),
-   mc_DLLName(""),
-   mpc_CAN(NULL),
+   mc_DllName(""),
+   mpc_Can(NULL),
    mq_DLLOpened(false),
-   mu32_RXID(CAN_RX_ID_INVALID)
+   mu32_RxId(CAN_RX_ID_INVALID)
 {
 }
 
@@ -59,10 +54,10 @@ C_Can::C_Can(const uint8_t ou8_CommChannel) :
 
 C_Can::C_Can(void) :
    C_CanDispatcher(),
-   mc_DLLName(""),
-   mpc_CAN(NULL),
+   mc_DllName(""),
+   mpc_Can(NULL),
    mq_DLLOpened(false),
-   mu32_RXID(CAN_RX_ID_INVALID)
+   mu32_RxId(CAN_RX_ID_INVALID)
 {
 }
 
@@ -82,32 +77,32 @@ C_Can::~C_Can(void)
 
    try
    {
-      delete mpc_CAN;
+      delete mpc_Can;
    }
    catch (...)
    {
    }
-   mpc_CAN = NULL;
+   mpc_Can = NULL;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 int32_t C_Can::CAN_DLL_Info(STW_CAN_DLL_INFO & orc_Info) const
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == false)
+   if (mpc_Can->mq_ExtFunctionsAvailable == false)
    {
-      return mpc_CAN->CAN_DLL_Info(orc_Info);
+      return mpc_Can->CAN_DLL_Info(orc_Info);
    }
-   return mpc_CAN->CANext_DLL_Info(mu8_CommChannel, orc_Info);
+   return mpc_Can->CANext_DLL_Info(mu8_CommChannel, orc_Info);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,23 +123,23 @@ int32_t C_Can::CAN_Exit(void)
 {
    int32_t s32_Return;
 
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
    mu8_CANOpened = 0U;
-   if (mpc_CAN->mq_ExtFunctionsAvailable == false)
+   if (mpc_Can->mq_ExtFunctionsAvailable == false)
    {
-      s32_Return = mpc_CAN->CAN_Exit();
+      s32_Return = mpc_Can->CAN_Exit();
    }
    else
    {
-      s32_Return = mpc_CAN->CANext_Exit(mu8_CommChannel);
+      s32_Return = mpc_Can->CANext_Exit(mu8_CommChannel);
    }
 
    return s32_Return;
@@ -167,21 +162,21 @@ int32_t C_Can::CAN_Exit(void)
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_Can::CAN_Reset(void)
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == false)
+   if (mpc_Can->mq_ExtFunctionsAvailable == false)
    {
-      return mpc_CAN->CAN_Reset();
+      return mpc_Can->CAN_Reset();
    }
-   (void)mpc_CAN->CANext_Exit(mu8_CommChannel);
-   return mpc_CAN->CANext_Init(mu8_CommChannel);
+   (void)mpc_Can->CANext_Exit(mu8_CommChannel);
+   return mpc_Can->CANext_Init(mu8_CommChannel);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -203,36 +198,36 @@ int32_t C_Can::CAN_Init(void)
 {
    int32_t s32_Return;
 
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
 
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == false)
+   if (mpc_Can->mq_ExtFunctionsAvailable == false)
    {
-      if (mu32_RXID == CAN_RX_ID_INVALID)
+      if (mu32_RxId == CAN_RX_ID_INVALID)
       {
-         s32_Return = mpc_CAN->CAN_Init();
+         s32_Return = mpc_Can->CAN_Init();
       }
       else
       {
-         s32_Return = mpc_CAN->CAN_Init_One_ID(0, mu32_RXID);
+         s32_Return = mpc_Can->CAN_Init_One_ID(0, mu32_RxId);
       }
    }
    else
    {
-      if (mu32_RXID == CAN_RX_ID_INVALID)
+      if (mu32_RxId == CAN_RX_ID_INVALID)
       {
-         s32_Return = mpc_CAN->CANext_Init(mu8_CommChannel);
+         s32_Return = mpc_Can->CANext_Init(mu8_CommChannel);
       }
       else
       {
-         s32_Return = mpc_CAN->CANext_Init_One_ID(mu8_CommChannel, 0, mu32_RXID);
+         s32_Return = mpc_Can->CANext_Init_One_ID(mu8_CommChannel, 0, mu32_RxId);
       }
    }
    if (s32_Return == C_NO_ERR)
@@ -263,35 +258,35 @@ int32_t C_Can::CAN_Init(const int32_t os32_BitrateKBitS)
 {
    int32_t s32_Return;
 
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == false)
+   if (mpc_Can->mq_ExtFunctionsAvailable == false)
    {
-      if (mu32_RXID == CAN_RX_ID_INVALID)
+      if (mu32_RxId == CAN_RX_ID_INVALID)
       {
-         s32_Return = mpc_CAN->CAN_Bitrate(os32_BitrateKBitS);
+         s32_Return = mpc_Can->CAN_Bitrate(os32_BitrateKBitS);
       }
       else
       {
-         s32_Return = mpc_CAN->CAN_Init_One_ID(os32_BitrateKBitS, mu32_RXID);
+         s32_Return = mpc_Can->CAN_Init_One_ID(os32_BitrateKBitS, mu32_RxId);
       }
    }
    else
    {
-      if (mu32_RXID == CAN_RX_ID_INVALID)
+      if (mu32_RxId == CAN_RX_ID_INVALID)
       {
-         s32_Return = mpc_CAN->CANext_Bitrate(mu8_CommChannel, os32_BitrateKBitS);
+         s32_Return = mpc_Can->CANext_Bitrate(mu8_CommChannel, os32_BitrateKBitS);
       }
       else
       {
-         s32_Return = mpc_CAN->CANext_Init_One_ID(mu8_CommChannel, os32_BitrateKBitS, mu32_RXID);
+         s32_Return = mpc_Can->CANext_Init_One_ID(mu8_CommChannel, os32_BitrateKBitS, mu32_RxId);
       }
    }
    if (s32_Return == C_NO_ERR)
@@ -321,20 +316,20 @@ int32_t C_Can::CAN_Init(const int32_t os32_BitrateKBitS)
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_Can::CAN_InteractiveSetup(void) const
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == true)
+   if (mpc_Can->mq_ExtFunctionsAvailable == true)
    {
-      return mpc_CAN->CANext_InterfaceSetup(mu8_CommChannel);
+      return mpc_Can->CANext_InterfaceSetup(mu8_CommChannel);
    }
-   return mpc_CAN->CAN_InterfaceSetup(NULL);
+   return mpc_Can->CAN_InterfaceSetup(NULL);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -344,14 +339,14 @@ int32_t C_Can::m_SendMsgToDLL(const T_STWCAN_Msg_TX & orc_Message) const
    //assume: pre-conditions already checked
    int32_t s32_Return;
 
-   if (mpc_CAN == NULL)
+   if (mpc_Can == NULL)
    {
       return C_CONFIG; //will not happen in RL; defensive measure to pacify static code analysis
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == true)
+   if (mpc_Can->mq_ExtFunctionsAvailable == true)
    {
-      s32_Return = mpc_CAN->CANext_Send_Msg(mu8_CommChannel, orc_Message);
+      s32_Return = mpc_Can->CANext_Send_Msg(mu8_CommChannel, orc_Message);
    }
    else
    {
@@ -361,11 +356,11 @@ int32_t C_Can::m_SendMsgToDLL(const T_STWCAN_Msg_TX & orc_Message) const
          C_CanDll::CANMSGTX_to_STWCANEXTMSG(t_Msg, orc_Message);
          if (orc_Message.u8_RTR == 0U)
          {
-            s32_Return = mpc_CAN->CAN_Send_extMsg(t_Msg);
+            s32_Return = mpc_Can->CAN_Send_extMsg(t_Msg);
          }
          else
          {
-            s32_Return = mpc_CAN->CAN_Send_extRTR(t_Msg);
+            s32_Return = mpc_Can->CAN_Send_extRTR(t_Msg);
          }
       }
       else
@@ -374,11 +369,11 @@ int32_t C_Can::m_SendMsgToDLL(const T_STWCAN_Msg_TX & orc_Message) const
          C_CanDll::CANMSGTX_to_STWCANMSG(t_Msg, orc_Message);
          if (orc_Message.u8_RTR == 0U)
          {
-            s32_Return = mpc_CAN->CAN_Send_Msg(t_Msg);
+            s32_Return = mpc_Can->CAN_Send_Msg(t_Msg);
          }
          else
          {
-            s32_Return = mpc_CAN->CAN_Send_RTR(t_Msg);
+            s32_Return = mpc_Can->CAN_Send_RTR(t_Msg);
          }
       }
    }
@@ -392,21 +387,21 @@ int32_t C_Can::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
    //assume: pre-conditions already checked
    int32_t s32_Return;
 
-   if (mpc_CAN == NULL)
+   if (mpc_Can == NULL)
    {
       return C_CONFIG; //will not happen in RL; defensive measure to pacify static code analysis
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == true)
+   if (mpc_Can->mq_ExtFunctionsAvailable == true)
    {
-      s32_Return = mpc_CAN->CANext_Read_Msg(mu8_CommChannel, orc_Message);
+      s32_Return = mpc_Can->CANext_Read_Msg(mu8_CommChannel, orc_Message);
    }
    else
    {
       if (mq_XTDAvailable == true)
       {
          STW_CAN_EXTMSG t_Msg;
-         s32_Return = mpc_CAN->CAN_Read_extMsg(t_Msg);
+         s32_Return = mpc_Can->CAN_Read_extMsg(t_Msg);
          if (s32_Return == C_NO_ERR)
          {
             C_CanDll::STWCANEXTMSG_to_CANMSGRX(orc_Message, t_Msg);
@@ -415,7 +410,7 @@ int32_t C_Can::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
       else
       {
          STW_CAN_MSG t_Msg;
-         s32_Return = mpc_CAN->CAN_Read_Msg(t_Msg);
+         s32_Return = mpc_Can->CAN_Read_Msg(t_Msg);
          if (s32_Return == 0)
          {
             C_CanDll::STWCANMSG_to_CANMSGRX(orc_Message, t_Msg);
@@ -451,11 +446,11 @@ int32_t C_Can::m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_Can::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
@@ -479,11 +474,11 @@ int32_t C_Can::CAN_Send_Msg(const T_STWCAN_Msg_TX & orc_Message)
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_Can::m_CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
@@ -493,16 +488,16 @@ int32_t C_Can::m_CAN_Read_Msg(T_STWCAN_Msg_RX & orc_Message)
 
 //----------------------------------------------------------------------------------------------------------------------
 
-int32_t C_Can::CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMS, T_STWCAN_Msg_RX & orc_Message) const
+int32_t C_Can::CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMs, T_STWCAN_Msg_RX & orc_Message) const
 {
    int32_t s32_Return;
    uint32_t u32_StartTime;
 
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
@@ -513,7 +508,7 @@ int32_t C_Can::CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMS, T_STWCAN_
    {
       s32_Return = this->m_ReadMsgFromDLL(orc_Message);
    }
-   while ((s32_Return != C_NO_ERR) && ((TglGetTickCount() - u32_StartTime) < ou32_MaxWaitTimeMS));
+   while ((s32_Return != C_NO_ERR) && ((TglGetTickCount() - u32_StartTime) < ou32_MaxWaitTimeMs));
 
    return s32_Return;
 }
@@ -537,16 +532,16 @@ int32_t C_Can::CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMS, T_STWCAN_
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_Can::CAN_Get_System_Time(uint64_t & oru64_SystemTimeUs) const
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if (mpc_CAN->mq_ExtFunctionsAvailable == true)
+   if (mpc_Can->mq_ExtFunctionsAvailable == true)
    {
-      return mpc_CAN->CANext_Get_System_Time(oru64_SystemTimeUs);
+      return mpc_Can->CANext_Get_System_Time(oru64_SystemTimeUs);
    }
    oru64_SystemTimeUs = TglGetTickCountUs(); //best we can do: we provide the timestamps ourself anyway
-                                              // as long as there are no "ext" functions
+                                             // as long as there are no "ext" functions
    return C_NO_ERR;
 }
 
@@ -560,16 +555,16 @@ int32_t C_Can::CAN_Get_Supported_Bitrates(C_SclString & orc_Unit, C_SclDynamicAr
    int32_t s32_NumBitrates;
    int32_t s32_Loop;
 
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if (mpc_CAN->mq_BitrateInformationFunctionsAvailable == false)
+   if (mpc_Can->mq_BitrateInformationFunctionsAvailable == false)
    {
       return C_CONFIG;
    }
 
-   s32_Return = mpc_CAN->CANext_Get_Num_Supported_Bitrates(oru32_MultiplicationFactor);
+   s32_Return = mpc_Can->CANext_Get_Num_Supported_Bitrates(oru32_MultiplicationFactor);
    if (s32_Return < C_NO_ERR)
    {
       return s32_Return;
@@ -598,7 +593,7 @@ int32_t C_Can::CAN_Get_Supported_Bitrates(C_SclString & orc_Unit, C_SclDynamicAr
 
    for (s32_Loop = 0; s32_Loop < s32_NumBitrates; s32_Loop++)
    {
-      s32_Return = mpc_CAN->CANext_Get_Supported_Bitrate(static_cast<uint16_t>(s32_Loop), u32_Bitrate);
+      s32_Return = mpc_Can->CANext_Get_Supported_Bitrate(static_cast<uint16_t>(s32_Loop), u32_Bitrate);
       if (s32_Return != C_NO_ERR)
       {
          return s32_Return;
@@ -612,20 +607,20 @@ int32_t C_Can::CAN_Get_Supported_Bitrates(C_SclString & orc_Unit, C_SclDynamicAr
 
 int32_t C_Can::CAN_Status(T_STWCAN_Status & orc_Status) const
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   if ((mu8_CommChannel > 0U) && (mpc_CAN->mq_ExtFunctionsAvailable == false))
+   if ((mu8_CommChannel > 0U) && (mpc_Can->mq_ExtFunctionsAvailable == false))
    {
       return C_CONFIG;
    }
 
-   if (mpc_CAN->mq_ExtFunctionsAvailable == false)
+   if (mpc_Can->mq_ExtFunctionsAvailable == false)
    {
-      return mpc_CAN->CAN_Status(orc_Status);
+      return mpc_Can->CAN_Status(orc_Status);
    }
-   return mpc_CAN->CANext_Status(mu8_CommChannel, orc_Status);
+   return mpc_Can->CANext_Status(mu8_CommChannel, orc_Status);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -640,8 +635,8 @@ int32_t C_Can::DLL_Close(void)
          (void)this->CAN_Exit();
       }
       mq_DLLOpened = false;
-      delete mpc_CAN;
-      mpc_CAN = NULL;
+      delete mpc_Can;
+      mpc_Can = NULL;
 
       return 0;
    }
@@ -662,18 +657,18 @@ int32_t C_Can::DLL_Open(void)
 
    try
    {
-      mpc_CAN = new C_CanDll(mc_DLLName.c_str());
+      mpc_Can = new C_CanDll(mc_DllName.c_str());
    }
    catch (...)
    {
-      delete mpc_CAN;
-      mpc_CAN = NULL;
+      delete mpc_Can;
+      mpc_Can = NULL;
       return CAN_COMP_ERR_DLL_INIT; //could not init DLL
    }
-   if (mpc_CAN->mpv_DLL == NULL)
+   if (mpc_Can->mpv_DLL == NULL)
    {
-      delete mpc_CAN;
-      mpc_CAN = NULL;
+      delete mpc_Can;
+      mpc_Can = NULL;
       return CAN_COMP_ERR_DLL_FORMAT; //DLL not in STW CAN-DLL format
    }
 
@@ -695,7 +690,7 @@ int32_t C_Can::DLL_Open(void)
 
 int32_t C_Can::DLL_Open(const C_SclString & orc_FileName)
 {
-   mc_DLLName = orc_FileName;
+   mc_DllName = orc_FileName;
    return DLL_Open();
 }
 
@@ -705,11 +700,11 @@ int32_t C_Can::CANTAPI_Connect(const uint8_t * const opu8_Number, const uint32_t
 {
    int32_t s32_Return;
 
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   s32_Return = mpc_CAN->CANTAPI_Connect(opu8_Number, ou32_TimeOut);
+   s32_Return = mpc_Can->CANTAPI_Connect(opu8_Number, ou32_TimeOut);
    if (s32_Return != C_NO_ERR)
    {
       return s32_Return;
@@ -722,84 +717,84 @@ int32_t C_Can::CANTAPI_Connect(const uint8_t * const opu8_Number, const uint32_t
 
 int32_t C_Can::CANTAPI_Disconnect(const uint32_t ou32_TimeOut)
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
    mu8_CANOpened = 0U;
-   return mpc_CAN->CANTAPI_Disconnect(ou32_TimeOut);
+   return mpc_Can->CANTAPI_Disconnect(ou32_TimeOut);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 int32_t C_Can::SER_Get_TX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize) const
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   return mpc_CAN->SER_Get_TX_Buf_Count(oru32_NumBytes, oru32_MaxBufSize);
+   return mpc_Can->SER_Get_TX_Buf_Count(oru32_NumBytes, oru32_MaxBufSize);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 int32_t C_Can::SER_Send_Bytes(const uint8_t * const opu8_Data, const uint32_t ou32_NumBytes)
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   return mpc_CAN->SER_Send_Bytes(opu8_Data, ou32_NumBytes);
+   return mpc_Can->SER_Send_Bytes(opu8_Data, ou32_NumBytes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 int32_t C_Can::SER_Get_RX_Buf_Count(uint32_t & oru32_NumBytes, uint32_t & oru32_MaxBufSize) const
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   return mpc_CAN->SER_Get_RX_Buf_Count(oru32_NumBytes, oru32_MaxBufSize);
+   return mpc_Can->SER_Get_RX_Buf_Count(oru32_NumBytes, oru32_MaxBufSize);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 int32_t C_Can::SER_Read_Bytes(uint8_t * const opu8_Data, uint32_t & oru32_NumBytes)
 {
-   if ((mq_DLLOpened == false) || (mpc_CAN == NULL))
+   if ((mq_DLLOpened == false) || (mpc_Can == NULL))
    {
       return CAN_COMP_ERR_DLL_NOT_OPENED;
    }
-   return mpc_CAN->SER_Read_Bytes(opu8_Data, oru32_NumBytes);
+   return mpc_Can->SER_Read_Bytes(opu8_Data, oru32_NumBytes);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void C_Can::SetDLLName(const C_SclString & orc_DLLName)
 {
-   mc_DLLName = orc_DLLName;
+   mc_DllName = orc_DLLName;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 C_SclString C_Can::GetDLLName(void) const
 {
-   return mc_DLLName;
+   return mc_DllName;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 void C_Can::SetLimitRXID(const uint32_t ou32_LimitRXID)
 {
-   mu32_RXID = ou32_LimitRXID;
+   mu32_RxId = ou32_LimitRXID;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 
 uint32_t C_Can::GetLimitRXID(void) const
 {
-   return mu32_RXID;
+   return mu32_RxId;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

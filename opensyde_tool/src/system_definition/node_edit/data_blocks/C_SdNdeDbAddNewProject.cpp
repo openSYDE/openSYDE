@@ -69,7 +69,7 @@ C_SdNdeDbAddNewProject::C_SdNdeDbAddNewProject(const uint32_t ou32_NodeIndex,
                                                stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_SdNdeDbAddNewProject),
-   ms32_TSPReadResult(-1),
+   ms32_TspReadResult(-1),
    mu32_NodeIndex(ou32_NodeIndex),
    mrc_ParentDialog(orc_Parent)
 {
@@ -355,12 +355,12 @@ void C_SdNdeDbAddNewProject::m_OkClicked(void)
    {
       bool q_Continue = false;
       bool q_ValidTsp = false;
-      if (this->ms32_TSPReadResult != C_NO_ERR)
+      if (this->ms32_TspReadResult != C_NO_ERR)
       {
          QString c_Details;
          C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
          c_Message.SetHeading(C_GtGetText::h_GetText("Import TSP"));
-         switch (this->ms32_TSPReadResult)
+         switch (this->ms32_TspReadResult)
          {
          case C_RANGE:
             c_Details = C_GtGetText::h_GetText("Specified openSYDE Target Support Package does not exist.");
@@ -659,11 +659,11 @@ void C_SdNdeDbAddNewProject::m_SetCreateInPath(const QString & orc_New)
 //----------------------------------------------------------------------------------------------------------------------
 void C_SdNdeDbAddNewProject::m_OnLoadTsp(void)
 {
-   this->ms32_TSPReadResult = C_OscTargetSupportPackageFiler::h_Load(
+   this->ms32_TspReadResult = C_OscTargetSupportPackageFiler::h_Load(
       this->mc_Package,
       C_PuiUtil::h_GetAbsolutePathFromProject(this->mpc_Ui->pc_LineEditTSP->GetPath()).toStdString().c_str());
 
-   if (this->ms32_TSPReadResult == C_NO_ERR)
+   if (this->ms32_TspReadResult == C_NO_ERR)
    {
       QString c_Text = "<html><body>";
       m_AddTopSection(c_Text);
@@ -718,7 +718,7 @@ void C_SdNdeDbAddNewProject::m_AddTemplateSection(QString & orc_Content) const
    for (uint32_t u32_ItTemplate = 0UL; u32_ItTemplate < this->mc_Package.c_Applications.size(); ++u32_ItTemplate)
    {
       const C_OscTspApplication & rc_Template = this->mc_Package.c_Applications[u32_ItTemplate];
-      orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("Data Block %1")).arg(u32_ItTemplate + 1UL) +
+      orc_Content += "<h4>" + static_cast<QString>(C_GtGetText::h_GetText("Data Block %1")).arg(u32_ItTemplate + 1) +
                      "</h4>";
       orc_Content += "<table>";
       orc_Content += "<tr>";

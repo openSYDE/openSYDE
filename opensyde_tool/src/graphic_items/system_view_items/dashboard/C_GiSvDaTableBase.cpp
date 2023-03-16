@@ -303,7 +303,7 @@ void C_GiSvDaTableBase::EditElementProperties(void)
                                              c_DisplayName);
 
                //Resize
-               c_New->SetSize(QSize(800, 500));
+               c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithoutDesignAndPreview());
 
                if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
                {
@@ -364,6 +364,9 @@ void C_GiSvDaTableBase::EditModeActiveChanged(const bool oq_Active)
       {
          // Nothing to do
       }
+
+      this->mpc_TableWidget->SetCursorHandlingActive((this->mq_EditModeActive == false) ||
+                                                     (this->mq_EditContentModeEnabled == true));
    }
 }
 
@@ -378,13 +381,15 @@ bool C_GiSvDaTableBase::EnableEditContent(void)
 {
    const bool q_Return = C_GiSvDaRectBaseGroup::EnableEditContent();
 
-   if (q_Return == true)
+   tgl_assert(this->mpc_TableWidget != NULL);
+   if (this->mpc_TableWidget != NULL)
    {
-      tgl_assert(this->mpc_TableWidget != NULL);
-      if (this->mpc_TableWidget != NULL)
+      if (q_Return == true)
       {
          this->mpc_TableWidget->SetSelectionAvailable(true, true);
       }
+      this->mpc_TableWidget->SetCursorHandlingActive((this->mq_EditModeActive == false) ||
+                                                     (this->mq_EditContentModeEnabled == true));
    }
    return q_Return;
 }
@@ -404,6 +409,9 @@ void C_GiSvDaTableBase::DisableEditContent(void)
       // In case of a still visible tool tip, it will no disappear due to the not forwarded events and an own scene
       // independent handling, it must be hided manually
       this->mpc_TableWidget->HideToolTip();
+
+      this->mpc_TableWidget->SetCursorHandlingActive((this->mq_EditModeActive == false) ||
+                                                     (this->mq_EditContentModeEnabled == true));
    }
 }
 
@@ -670,7 +678,7 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
       {
          C_OscCanMessageIdentificationIndices c_MessageId;
          uint32_t u32_SignalIndex;
-         if ((pc_View->GetPcData().GetConnected() == true) &&
+         if ((pc_View->GetOscPcData().GetConnected() == true) &&
              (C_PuiSdUtil::h_ConvertIndex(orc_DataPoolElementId, c_MessageId, u32_SignalIndex) == C_NO_ERR))
          {
             const C_OscNode * const pc_Node =
@@ -681,7 +689,7 @@ bool C_GiSvDaTableBase::GetViewActive(const C_PuiSvDbNodeDataPoolListElementId &
                   pc_Node->c_Properties.c_ComInterfaces[c_MessageId.u32_InterfaceIndex];
                if (rc_Interface.GetBusConnected() == true)
                {
-                  if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
+                  if (rc_Interface.u32_BusIndex == pc_View->GetOscPcData().GetBusIndex())
                   {
                      //Active
                      q_Retval = true;
@@ -880,7 +888,7 @@ void C_GiSvDaTableBase::m_AddNewDataElement(void)
                                                                                     false, true, true, true, false);
 
       //Resize
-      c_New->SetSize(QSize(800, 800));
+      c_New->SetSize(C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter());
 
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {

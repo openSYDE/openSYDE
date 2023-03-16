@@ -82,7 +82,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
    mpe_ComProtocolType(ope_ComProtocolType),
    mu32_NodeIndex(oru32_NodeIndex),
    ms32_DataPoolIndex(os32_DataPoolIndex),
-   mq_DatapoolAutoNvMStartAddress(false)
+   mq_DatapoolAutoNvmStartAddress(false)
 {
    bool q_IsShared;
 
@@ -188,7 +188,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
          tgl_assert(pc_Node != NULL);
          if (pc_Node != NULL)
          {
-            this->mq_DatapoolAutoNvMStartAddress = pc_Node->q_DatapoolAutoNvmStartAddress;
+            this->mq_DatapoolAutoNvmStartAddress = pc_Node->q_DatapoolAutoNvmStartAddress;
          }
       }
       else
@@ -566,7 +566,7 @@ void C_SdNdeDpProperties::m_OkClicked(void)
          this->mpc_OscDataPool->c_Comment = this->mpc_Ui->pc_CommentText->toPlainText().toStdString().c_str();
          this->mpc_OscDataPool->q_IsSafety = this->mpc_Ui->pc_CheckBoxSafety->isChecked();
          this->mpc_OscDataPool->u32_NvmSize = static_cast<uint32_t>(this->mpc_Ui->pc_SpinBoxSize->value());
-         if (this->mq_DatapoolAutoNvMStartAddress == false)
+         if (this->mq_DatapoolAutoNvmStartAddress == false)
          {
             // Update only in manual mode
             this->mpc_OscDataPool->u32_NvmStartAddress =
@@ -654,7 +654,7 @@ void C_SdNdeDpProperties::m_ApplyType(const bool oq_SharedDatapool)
       {
          q_DatapoolWithNvm = true;
 
-         this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setEnabled(!this->mq_DatapoolAutoNvMStartAddress);
+         this->mpc_Ui->pc_SpinBoxDatapoolStartAddress->setEnabled(!this->mq_DatapoolAutoNvmStartAddress);
 
          this->mpc_Ui->pc_LabelSafety->setVisible(false);
          this->mpc_Ui->pc_LabelComProt->setVisible(false);
@@ -1005,6 +1005,10 @@ void C_SdNdeDpProperties::m_InitComboBoxProtocols(const bool oq_NewDatapool,
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::
                                                                                          eCAN_OPEN));
 
+   // TODO BAY: Activate again when J1939 will be enabled
+   //this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::
+   //                                                                                      eJ1939));
+
    this->mpc_Ui->pc_ComboBoxProtocol->setCurrentText(C_PuiSdUtil::h_ConvertProtocolTypeToString(oe_ComProtocolType));
 
    if (oq_NewDatapool == false)
@@ -1042,6 +1046,10 @@ C_OscCanProtocol::E_Type C_SdNdeDpProperties::m_GetSelectedProtocol(void) const
    else if (c_ActualProtocol == C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::eCAN_OPEN))
    {
       e_Retval = C_OscCanProtocol::eCAN_OPEN;
+   }
+   else if (c_ActualProtocol == C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::eJ1939))
+   {
+      e_Retval = C_OscCanProtocol::eJ1939;
    }
    else
    {

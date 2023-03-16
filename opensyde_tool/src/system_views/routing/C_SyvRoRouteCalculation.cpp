@@ -49,7 +49,7 @@ C_SyvRoRouteCalculation::C_SyvRoRouteCalculation(const uint32_t ou32_ViewIndex, 
    const stw::opensyde_core::C_OscSystemDefinition & rc_SystemDefintion =
       C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst();
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(ou32_ViewIndex);
-   const C_PuiSvPc & rc_Pc = pc_View->GetPcData();
+   const stw::opensyde_core::C_OscViewPc & rc_Pc = pc_View->GetOscPcData();
 
    this->mq_PcAvailable = rc_Pc.GetConnected();
 

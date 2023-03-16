@@ -42,7 +42,7 @@ class C_SdNdeDpSelectorWidget :
 
 public:
    explicit C_SdNdeDpSelectorWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeDpSelectorWidget();
+   ~C_SdNdeDpSelectorWidget() override;
 
    void InitStaticNames(void) const;
    void InitWidget(const QString & orc_Title, const QString & orc_TooltipTitle, const QString & orc_TooltipContent,

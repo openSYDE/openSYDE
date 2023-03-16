@@ -643,7 +643,7 @@ void C_GiSvNodeSyvUpdate::m_InitIcons(void)
    const QRectF c_Rect = this->m_GetBoundary()->boundingRect();
    const int32_t s32_BORDER_SIZE = 9;
    const int32_t s32_BORDER_SIZE_ICON_BOTTOM = 15;
-   const int32_t s32_IconOffset = std::max(1L, s32_IconSize / 4L);
+   const int32_t s32_IconOffset = std::max(1, s32_IconSize / 4);
    int32_t s32_PosHorizontal;
    int32_t s32_PosVertical;
    //Helper Variable to avoid pc lint warnings

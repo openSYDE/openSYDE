@@ -68,7 +68,6 @@ C_PuiProject * C_PuiProject::mhpc_Singleton = NULL;
                no write access to file)
    C_RANGE    Path is empty
    C_NOACT    Could not create project directory
-   C_COM      Bus sorting failed
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiProject::Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)
@@ -636,7 +635,6 @@ uint32_t C_PuiProject::m_CalcHashProject(void) const
                no write access to file)
    C_RANGE    Path is empty
    C_NOACT    Could not create project directory
-   C_COM      Bus sorting failed
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiProject::m_Save(const bool oq_ForceSaveAll, const bool oq_UseDeprecatedFileFormatV2)

@@ -170,30 +170,27 @@ C_PuiSvDbProgressBar::E_Alignment C_SyvDaPeProgressBar::GetAlignment(void) const
 {
    C_PuiSvDbProgressBar::E_Alignment e_Retval;
 
-   switch (this->mpc_Ui->pc_ComboBoxType->currentIndex())
+   if (this->mpc_Ui->pc_ComboBoxType->currentIndex() == C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE1)
    {
-   case C_SyvDaPeProgressBar::mhs32_INDEX_STYLE_TYPE1:
-      switch (this->mpc_Ui->pc_ComboBoxAlignment->currentIndex())
+      if (this->mpc_Ui->pc_ComboBoxAlignment->currentIndex() == C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_BOTTOM)
       {
-      case C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_BOTTOM:
          e_Retval = C_PuiSvDbProgressBar::eBOTTOM;
-         break;
-      default:
-         e_Retval = C_PuiSvDbProgressBar::eTOP;
-         break;
       }
-      break;
-   default:
-      switch (this->mpc_Ui->pc_ComboBoxAlignment->currentIndex())
+      else
       {
-      case C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_LEFT:
-         e_Retval = C_PuiSvDbProgressBar::eLEFT;
-         break;
-      default:
-         e_Retval = C_PuiSvDbProgressBar::eRIGHT;
-         break;
+         e_Retval = C_PuiSvDbProgressBar::eTOP;
       }
-      break;
+   }
+   else
+   {
+      if (this->mpc_Ui->pc_ComboBoxAlignment->currentIndex() == C_SyvDaPeProgressBar::mhs32_INDEX_ALIGNMENT_LEFT)
+      {
+         e_Retval = C_PuiSvDbProgressBar::eLEFT;
+      }
+      else
+      {
+         e_Retval = C_PuiSvDbProgressBar::eRIGHT;
+      }
    }
 
    return e_Retval;

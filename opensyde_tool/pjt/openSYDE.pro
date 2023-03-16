@@ -50,9 +50,11 @@ SOURCES += ../src/main.cpp \
     ../src/project_operations/C_PopPasswordDialogWidget.cpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.cpp \
     ../src/system_definition/C_SdTopologyWidget.cpp \
+    ../src/system_definition/bus_edit/C_SdBueMessageSelectorTreeDelegate.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.cpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.cpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.cpp \
@@ -608,7 +610,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeList.cpp \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeWidget.cpp \
     ../src/system_views/communication/C_SyvComDriverUtil.cpp \
-    ../src/project_gui/system_views/C_PuiSvNodeUpdate.cpp \
     ../src/system_views/system_update/C_SyvUpSequences.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64Factor.cpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64FactorTable.cpp \
@@ -771,7 +772,6 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddListWidget.cpp \
     ../src/project_gui/system_definition/C_PuiSdSharedDatapools.cpp \
     ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.cpp \
-    ../src/project_gui/system_views/C_PuiSvNodeUpdateParamInfo.cpp \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.cpp \
     ../src/system_views/system_update/C_SyvUpInformationWidget.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.cpp \
@@ -928,9 +928,11 @@ HEADERS  += \
     ../src/project_operations/C_PopPasswordDialogWidget.hpp \
     ../src/project_operations/C_PopServiceProjSettingsModel.hpp \
     ../src/system_definition/C_SdTopologyWidget.hpp \
+    ../src/system_definition/bus_edit/C_SdBueMessageSelectorTreeDelegate.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.hpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.hpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.hpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.hpp \
@@ -1488,7 +1490,6 @@ HEADERS  += \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeList.hpp \
     ../src/system_views/device_configuration/C_SyvDcConnectedNodeWidget.hpp \
     ../src/system_views/communication/C_SyvComDriverUtil.hpp \
-    ../src/project_gui/system_views/C_PuiSvNodeUpdate.hpp \
     ../src/system_views/system_update/C_SyvUpSequences.hpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64Factor.hpp \
     ../src/opensyde_gui_elements/spin_box/C_OgeSpxInt64FactorTable.hpp \
@@ -1661,7 +1662,6 @@ HEADERS  += \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpSelectorAddListWidget.hpp \
     ../src/project_gui/system_definition/C_PuiSdSharedDatapools.hpp \
     ../src/project_gui/system_views/C_PuiSvHandlerFilerV1.hpp \
-    ../src/project_gui/system_views/C_PuiSvNodeUpdateParamInfo.hpp \
     ../src/system_views/system_update/C_SyvUpSummaryWidgetSmall.hpp \
     ../src/system_views/system_update/C_SyvUpInformationWidget.hpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSystemCommissioningEdit.hpp \
@@ -1773,6 +1773,7 @@ FORMS    += \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
     ../src/system_definition/C_SdTopologyWidget.ui \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.ui \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.ui \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoAddDeviceDialog.ui \
@@ -1969,6 +1970,7 @@ INCLUDEPATH += ../src \
                ../src/system_definition/node_edit/stw_flashloader_options \
                ../src/system_definition/bus_edit \
                ../src/system_definition/bus_edit/canopen \
+               ../src/system_definition/bus_edit/j1939 \
                ../src/system_definition/bus_edit/undo \
                ../src/system_definition/bus_edit/message_layout_viewer \
                ../src/system_views \

@@ -10,7 +10,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "C_SyvUpPacListNodeItemWidget.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -33,18 +33,18 @@ public:
    void ViewFileInfo(void) override;
    bool IsViewFileInfoPossible(void) const override;
 
-   void SetPemStates(const stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                     const stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger);
-   void GetPemStates(stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateSecurity & ore_StateSecurity,
-                     stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateDebugger & ore_StateDebugger) const;
+   void SetPemStates(const stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                     const stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger);
+   void GetPemStates(stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity & ore_StateSecurity,
+                     stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger & ore_StateDebugger) const;
 
 protected:
    void m_LoadFileInformation(bool & orq_FileExists, bool & orq_FlashwareWarning, bool & orq_TriggerRemove) override;
    QString m_CreateToolTipTitle(void) const override;
 
 private:
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateSecurity me_StateSecurity;
-   stw::opensyde_gui_logic::C_PuiSvNodeUpdate::E_StateDebugger me_StateDebugger;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateSecurity me_StateSecurity;
+   stw::opensyde_core::C_OscViewNodeUpdate::E_StateDebugger me_StateDebugger;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

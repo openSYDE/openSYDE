@@ -567,7 +567,6 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
    {
       std::set<uint8_t> c_Map = pc_CanOpenDeviceInfo->c_EdsFileContent.GetAllAvailableFactorySettingsSubIndices();
       std::set<uint8_t>::const_iterator c_ItResult;
-      int32_t s32_Index = 0;
 
       this->mpc_Ui->pc_SpinBoxCanOpenId->setValue(static_cast<int32_t>(pc_CanOpenDeviceInfo->u8_NodeIdValue));
       this->mpc_Ui->pc_CheckBoxSameAsOpensyde->setChecked(pc_CanOpenDeviceInfo->q_UseOpenSydeNodeId);
@@ -612,6 +611,7 @@ void C_SdNdeCoDeviceConfigWidget::m_LoadFromData(void)
       // factory settings supported?
       if (!c_Map.empty())
       {
+         int32_t s32_Index = 0;
          //factory support enabled
          this->mpc_Ui->pc_CheckBoxFactorySettings->setEnabled(true);
          this->mpc_Ui->pc_CheckBoxFactorySettings->setChecked(pc_CanOpenDeviceInfo->q_FactorySettingsActive);

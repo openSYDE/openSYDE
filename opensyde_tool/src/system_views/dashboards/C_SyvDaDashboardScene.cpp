@@ -180,6 +180,61 @@ bool C_SyvDaDashboardScene::IsSelectionRelevantForProxyWidgetInteraction(void) c
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Returns the necessary cursor type when hovered dependent of the cursor position
+
+   \param[in]       orc_ScenePos     Scene position of cursor
+   \param[out]      ore_Cursor       Detected necessary cursor
+
+   \retval   true   Override cursor is necessary
+   \retval   false  Override cursor is not necessary
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SyvDaDashboardScene::IsOverrideCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const
+{
+   bool q_Return = false;
+
+   if (this->mq_EditMode == true)
+   {
+      QList<QGraphicsItem *>::const_iterator c_ItItem;
+      const QList<QGraphicsItem *> & rc_Items = this->items();
+      float64_t f64_HighestZeOrderUnderCursor = 0.0;
+      bool q_AtLeastOneFound = false;
+
+      // Reset cursor to default
+      ore_Cursor = Qt::SizeAllCursor;
+
+      // search a item which lies under the cursor
+      for (c_ItItem = rc_Items.begin(); c_ItItem != rc_Items.end(); ++c_ItItem)
+      {
+         C_GiSvDaRectBaseGroup * const pc_Item = dynamic_cast<C_GiSvDaRectBaseGroup *>(*c_ItItem);
+
+         if ((pc_Item != NULL) &&
+             (pc_Item->isUnderMouse() == true))
+         {
+            Qt::CursorShape e_TempCursor;
+            q_Return = pc_Item->IsOverrideCursorNecessary(orc_ScenePos, e_TempCursor);
+
+            if (q_Return == true)
+            {
+               // Get the necessary cursor of the highest element with the z order to have the cursor which
+               // does match to real caused function when clicked
+               if ((q_AtLeastOneFound == false) ||
+                   (pc_Item->zValue() > f64_HighestZeOrderUnderCursor))
+               {
+                  // First item found or an item above the previous item in the z order
+                  f64_HighestZeOrderUnderCursor = pc_Item->zValue();
+                  ore_Cursor = e_TempCursor;
+                  q_AtLeastOneFound = true;
+               }
+            }
+         }
+      }
+   }
+
+   return q_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets the state of the edit mode
 
    \param[in]  oq_Active   Flag for setting the edit mode

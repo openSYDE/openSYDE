@@ -95,6 +95,11 @@
          <string>CANopen</string>
         </attribute>
        </widget>
+       <widget class="QWidget" name="pc_Tab5">
+        <attribute name="title">
+         <string>J1939</string>
+        </attribute>
+       </widget>
       </widget>
      </item>
      <item>

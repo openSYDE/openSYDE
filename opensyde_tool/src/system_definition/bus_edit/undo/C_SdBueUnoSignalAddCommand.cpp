@@ -104,8 +104,15 @@ void C_SdBueUnoSignalAddCommand::SetInitialData(const std::vector<C_OscCanSignal
    {
       this->mc_UiSignal[u32_ItStep].u8_ColorIndex = 0U;
 
-      // Adapt do safety protocol restrictions
-      C_SdUtil::h_AdaptSignalToProtocolType(this->mc_Signal[u32_ItStep], orc_ProtocolType[u32_ItStep], NULL);
+      tgl_assert(this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size());
+      if (this->mc_Signal[u32_ItStep].u32_ComDataElementIndex < this->mc_OscSignalCommon.size())
+      {
+         // Adapt do safety protocol restrictions
+         C_SdUtil::h_AdaptSignalToProtocolType(
+            this->mc_Signal[u32_ItStep],
+            this->mc_OscSignalCommon[this->mc_Signal[u32_ItStep].u32_ComDataElementIndex],
+            orc_ProtocolType[u32_ItStep], NULL);
+      }
    }
    tgl_assert(this->m_CheckSignalsSortedAscending());
 }

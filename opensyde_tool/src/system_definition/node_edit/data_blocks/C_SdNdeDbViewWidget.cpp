@@ -275,7 +275,7 @@ void C_SdNdeDbViewWidget::AddFromTsp(void)
       }
       pc_Dialog->HandleCodeGenerationConfig();
       // last step, import halc definition from TSP
-      AddHalcDefFromTSP(pc_Dialog);
+      AddHalcDefFromTsp(pc_Dialog);
       // Add warnings if any
       if (c_Details.isEmpty() == false)
       {
@@ -307,7 +307,7 @@ void C_SdNdeDbViewWidget::AddFromTsp(void)
    \param[in]  opc_Dialog  TSP Import dialog widget
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_Dialog)
+void C_SdNdeDbViewWidget::AddHalcDefFromTsp(C_SdNdeDbAddNewProject * const opc_Dialog)
 {
    bool q_IsClear = false;
 
@@ -321,9 +321,9 @@ void C_SdNdeDbViewWidget::AddHalcDefFromTSP(C_SdNdeDbAddNewProject * const opc_D
       const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(this->mu32_NodeIndex);
       if (pc_Node != NULL)
       {
-         for (uint32_t u32_ItDP = 0UL; u32_ItDP < pc_Node->c_DataPools.size(); ++u32_ItDP)
+         for (uint32_t u32_ItDp = 0UL; u32_ItDp < pc_Node->c_DataPools.size(); ++u32_ItDp)
          {
-            const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDP];
+            const C_OscNodeDataPool & rc_Dp = pc_Node->c_DataPools[u32_ItDp];
             if (rc_Dp.e_Type != C_OscNodeDataPool::eHALC)
             {
                ++u32_NotHalcDpCount;

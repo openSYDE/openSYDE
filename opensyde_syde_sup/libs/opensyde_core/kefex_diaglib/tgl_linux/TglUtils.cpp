@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <err.h>
 #include <pwd.h>
+#include <climits>
 #include "stwtypes.hpp"
 #include "TglUtils.hpp"
 #include "C_SclString.hpp"
@@ -46,8 +47,8 @@ using namespace stw::scl;
    \param[in]     os32_Line      Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func,
-                                               const int32_t os32_Line)
+void stw::tgl::TglReportAssertion(const char_t * const opcn_Module, const char_t * const opcn_Func,
+                                  const int32_t os32_Line)
 {
    C_SclString c_Text;
    c_Text = static_cast<C_SclString>("Extremely nasty error\n (assertion in module ") + opcn_Module + ", function " +
@@ -66,11 +67,11 @@ void TGL_PACKAGE stw::tgl::TglReportAssertion(const char_t * const opcn_Module, 
    \param[in]     os32_Line              Line number where the problem turned up
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo,
-                                                     const char_t * const opcn_Module, const char_t * const opcn_Func,
-                                                     const int32_t os32_Line)
+void stw::tgl::TglReportAssertionDetail(const char_t * const opcn_DetailInfo, const char_t * const opcn_Module, 
+                                        const char_t * const opcn_Func, const int32_t os32_Line)
 {
    C_SclString c_Text;
+
    c_Text = static_cast<C_SclString>(opcn_DetailInfo)
                                      + "\nfunction  " + opcn_Func
                                      + "\nassertion in module  " + opcn_Module
@@ -96,7 +97,7 @@ void TGL_PACKAGE stw::tgl::TglReportAssertionDetail(const char_t * const opcn_De
    false     error -> oc_UserName not valid
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool TGL_PACKAGE stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
+bool stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 {
    struct passwd *pt_passwd;
    bool q_Return = false;
@@ -115,13 +116,41 @@ bool TGL_PACKAGE stw::tgl::TglGetSystemUserName(C_SclString & orc_UserName)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Poll system message queue
+/*! \brief   get system machine name
+
+   Reports the name of the system
+
+   \param[out]    orc_MachineName     name of system
+
+   \return
+   true      system name detected and placed in orc_MachineName  \n
+   false     error -> orc_MachineName not valid
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool stw::tgl::TglGetSystemMachineName(C_SclString & orc_MachineName)
+{
+   char_t acn_HostName[HOST_NAME_MAX + 1];
+   const int x_Result = gethostname(&acn_HostName[0], sizeof(acn_HostName));
+
+   if (x_Result == 0)
+   {
+      orc_MachineName = acn_HostName;
+   }
+   else
+   {
+      orc_MachineName = "?\?\?\?\?";
+   }
+   return (x_Result == 0) ? true : false;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Poll system message queue
 
    Polls the system's message queue and posts detected messages for handling.
    This function can be used to proceed processing system messages while actively waiting for an event.
 */
 //----------------------------------------------------------------------------------------------------------------------
-void TGL_PACKAGE stw::tgl::TglHandleSystemMessages(void)
+void stw::tgl::TglHandleSystemMessages(void)
 {
 /*
    MSG t_Msg;
@@ -136,7 +165,7 @@ void TGL_PACKAGE stw::tgl::TglHandleSystemMessages(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Set environment variable for calling process
+/*! \brief   Set environment variable for calling process
 
    Sets an environment variable to a fixed value.
 
@@ -148,7 +177,7 @@ void TGL_PACKAGE stw::tgl::TglHandleSystemMessages(void)
    -1  could not set variable
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t TGL_PACKAGE stw::tgl::TglSetEnvironmentVariable(const C_SclString & orc_Name, const C_SclString & orc_Value)
+int32_t stw::tgl::TglSetEnvironmentVariable(const C_SclString & orc_Name, const C_SclString & orc_Value)
 {
    int32_t s32_Return = -1;
    char acn_String[1024];

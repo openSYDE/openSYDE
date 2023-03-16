@@ -1108,61 +1108,23 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(
       {
          const C_PuiSvDbNodeDataPoolListElementId & rc_ElementId = c_ItItem.key();
          auto && rc_Value = this->mc_DataPoolElementValid[c_ItItem.value()];
-         uint16_t u16_UpdateRate = 0U;
          // Update the valid flag
          rc_Value = rc_ElementId.GetIsValid();
 
          if (rc_ElementId.GetIsValid() == true)
          {
-            int32_t s32_Return;
-
             if (this->mq_ReadItem == true)
             {
-               if (rc_ElementId.GetType() == C_PuiSvDbNodeDataPoolListElementId::eDATAPOOL_ELEMENT)
-               {
-                  // Update the timeout configuration
-                  C_PuiSvReadDataConfiguration c_ReadConfig;
-                  s32_Return = pc_View->GetReadRailAssignment(rc_ElementId, c_ReadConfig);
-
-                  if (s32_Return == C_NO_ERR)
-                  {
-                     s32_Return = pc_View->GetUpdateRate(c_ReadConfig.u8_RailIndex, u16_UpdateRate);
-                  }
-               }
-               else
-               {
-                  // TODO: Get timeout time from CAN message config
-                  s32_Return = C_NO_ERR;
-               }
-
-               if (s32_Return != C_NO_ERR)
-               {
-                  const QString c_ElementDetail = static_cast<QString>(
-                     "Problem with Element %1. Indexes: Node %2; Datapool %3; List %4; Element %5")
-                                                  .arg(C_PuiSdUtil::h_GetNamespace(rc_ElementId).toStdString().c_str())
-                                                  .arg(rc_ElementId.u32_NodeIndex)
-                                                  .arg(rc_ElementId.u32_DataPoolIndex)
-                                                  .arg(rc_ElementId.u32_ListIndex)
-                                                  .arg(rc_ElementId.u32_ElementIndex);
-                  tgl_assertdetail(s32_Return == C_NO_ERR, c_ElementDetail.toStdString().c_str());
-               }
-
-               if ((s32_Return == C_NO_ERR) &&
-                   (c_ItItem.value() < this->mc_DataPoolElementTimeoutsMs.size()))
+               if (c_ItItem.value() < this->mc_DataPoolElementTimeoutsMs.size())
                {
                   //Ten steps with 0.5 seconds each
                   const uint32_t u32_TIMEOUT_MS = 5000U;
                   this->mc_DataPoolElementTimeoutsMs[c_ItItem.value()] = u32_TIMEOUT_MS;
                }
             }
-            else
-            {
-               s32_Return = C_NO_ERR;
-            }
 
             // Update the scaling configuration and initialize and check the formatter configuration
-            if ((s32_Return == C_NO_ERR) &&
-                (c_ItItem.value() < this->mc_UsedConfig.size()))
+            if (c_ItItem.value() < this->mc_UsedConfig.size())
             {
                QMap<C_PuiSvDbNodeDataPoolListElementId, C_DpElementConfig>::const_iterator c_ItItemConfig;
                c_ItItemConfig = this->mc_MappingDpElementToConfig.find(c_ItItem.key());
@@ -1224,7 +1186,7 @@ void C_PuiSvDbDataElementHandler::m_UpdateDataPoolElementTimeoutAndValidFlag(
             }
 
             // Update the minimum type configuration
-            if (((s32_Return == C_NO_ERR) && (c_ItItem.value() < this->mc_MinimumType.size())) &&
+            if ((c_ItItem.value() < this->mc_MinimumType.size()) &&
                 (c_ItItem.value() < this->mc_UsedConfig.size()))
             {
                const C_OscNodeDataPoolListElement * const pc_OscContent =
@@ -1432,7 +1394,7 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) cons
          {
             C_OscCanMessageIdentificationIndices c_MessageId;
             uint32_t u32_SignalIndex;
-            if ((pc_View->GetPcData().GetConnected() == true) &&
+            if ((pc_View->GetOscPcData().GetConnected() == true) &&
                 (C_PuiSdUtil::h_ConvertIndex(c_ElementId, c_MessageId, u32_SignalIndex) == C_NO_ERR))
             {
                const C_OscNode * const pc_Node =
@@ -1443,7 +1405,7 @@ bool C_PuiSvDbDataElementHandler::m_CheckHasAnyRequiredBusesConnected(void) cons
                      pc_Node->c_Properties.c_ComInterfaces[c_MessageId.u32_InterfaceIndex];
                   if (rc_Interface.GetBusConnected() == true)
                   {
-                     if (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex())
+                     if (rc_Interface.u32_BusIndex == pc_View->GetOscPcData().GetBusIndex())
                      {
                         //Active
                         q_AtLeastOneValidElement = true;
@@ -1516,7 +1478,7 @@ bool C_PuiSvDbDataElementHandler::m_CheckNodeActive(const uint32_t ou32_NodeInde
    {
       if (ou32_NodeIndex < c_ActiveNodes.size())
       {
-         if (c_ActiveNodes[ou32_NodeIndex] == true)
+         if (static_cast<bool>(c_ActiveNodes[ou32_NodeIndex]) == true)
          {
             q_Retval = true;
          }
@@ -1679,39 +1641,35 @@ void C_PuiSvDbDataElementHandler::m_GetErrorDescriptionForManualOperation(const 
    case C_WARN:
       if (this->mq_ReadItem == true)
       {
+         ors32_TextHeight = 250;
+
          switch (ou8_Nrc)
          {
          case 0x13:
             orc_Details = C_GtGetText::h_GetText("Incorrect length of request.");
-            ors32_TextHeight = 250;
+
             break;
          case 0x31:
             orc_Details = C_GtGetText::h_GetText("Datapool element specified by data identifier is not available.");
-            ors32_TextHeight = 250;
             break;
          case 0x22:
             orc_Details = C_GtGetText::h_GetText("Access to Datapool element blocked by application.");
-            ors32_TextHeight = 250;
             break;
          case 0x33:
             orc_Details = C_GtGetText::h_GetText("Required security level was not unlocked.");
-            ors32_TextHeight = 250;
             break;
          case 0x14:
             orc_Details = C_GtGetText::h_GetText(
                "The total length of the response message exceeds the available buffer size.");
-            ors32_TextHeight = 250;
             break;
          case 0x7F:
             orc_Details = C_GtGetText::h_GetText(
                "The requested service is not available in the currently active session.");
-            ors32_TextHeight = 250;
             break;
          default:
             orc_Details =
                static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_Nrc,
                                                                                                      16));
-            ors32_TextHeight = 250;
             break;
          }
       }
@@ -1758,7 +1716,6 @@ void C_PuiSvDbDataElementHandler::m_GetErrorDescriptionForManualOperation(const 
       orc_Description =
          static_cast<QString>(C_GtGetText::h_GetText("Operation failed with error response (%1).")).arg(orc_Details);
       orc_Details = "";
-      ors32_TextHeight = 230;
       break;
    default:
       orc_Description = C_GtGetText::h_GetText("Operation failure, cause unknown.");

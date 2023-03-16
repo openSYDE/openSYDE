@@ -317,22 +317,25 @@ int32_t C_OscHalcDefFiler::h_SaveData(const C_OscHalcDefBase & orc_IoData, C_Osc
    //NVM config
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild("nvm-config") == "nvm-config");
    orc_XmlParser.SetAttributeBool("active", orc_IoData.q_NvmBasedConfig);
-   tgl_assert(orc_XmlParser.CreateAndSelectNodeChild(
-                 "datapools-start-address-offset") == "datapools-start-address-offset");
-   for (uint32_t u32_It = 0UL; u32_It < orc_IoData.c_NvmNonSafeAddressOffset.size(); ++u32_It)
+   if (orc_IoData.q_NvmBasedConfig)
    {
-      const stw::scl::C_SclString c_AttributeName = "address-offset-datapool-" + stw::scl::C_SclString::IntToStr(
-         u32_It + 1U) + "-non-safe";
-      orc_XmlParser.SetAttributeUint32(c_AttributeName, orc_IoData.c_NvmNonSafeAddressOffset[u32_It]);
+      tgl_assert(orc_XmlParser.CreateAndSelectNodeChild(
+                    "datapools-start-address-offset") == "datapools-start-address-offset");
+      for (uint32_t u32_It = 0UL; u32_It < orc_IoData.c_NvmNonSafeAddressOffset.size(); ++u32_It)
+      {
+         const stw::scl::C_SclString c_AttributeName = "address-offset-datapool-" + stw::scl::C_SclString::IntToStr(
+            u32_It + 1U) + "-non-safe";
+         orc_XmlParser.SetAttributeUint32(c_AttributeName, orc_IoData.c_NvmNonSafeAddressOffset[u32_It]);
+      }
+      for (uint32_t u32_It = 0UL; u32_It < orc_IoData.c_NvmSafeAddressOffset.size(); ++u32_It)
+      {
+         const stw::scl::C_SclString c_AttributeName = "address-offset-datapool-" + stw::scl::C_SclString::IntToStr(
+            u32_It + 1U) + "-safe";
+         orc_XmlParser.SetAttributeUint32(c_AttributeName, orc_IoData.c_NvmSafeAddressOffset[u32_It]);
+      }
+      //Return
+      tgl_assert(orc_XmlParser.SelectNodeParent() == "nvm-config");
    }
-   for (uint32_t u32_It = 0UL; u32_It < orc_IoData.c_NvmSafeAddressOffset.size(); ++u32_It)
-   {
-      const stw::scl::C_SclString c_AttributeName = "address-offset-datapool-" + stw::scl::C_SclString::IntToStr(
-         u32_It + 1U) + "-safe";
-      orc_XmlParser.SetAttributeUint32(c_AttributeName, orc_IoData.c_NvmSafeAddressOffset[u32_It]);
-   }
-   //Return
-   tgl_assert(orc_XmlParser.SelectNodeParent() == "nvm-config");
    tgl_assert(orc_XmlParser.CreateAndSelectNodeChild(
                  "lists-reserved-size") == "lists-reserved-size");
    orc_XmlParser.SetAttributeUint32("parameters-list-size", orc_IoData.u32_NvmReservedListSizeParameters);

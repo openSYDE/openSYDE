@@ -159,6 +159,10 @@ private:
    uint32_t m_GetDefaultTimeout(void) const;
    uint32_t m_GetCoPdoSyncTxMethodCycleEquivalent(void) const;
 
+   // J1939 specific
+   void m_OnEditJ1939PgPropertiesClicked(void);
+   void m_UpdateJ1939PgInfo(void);
+
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
 

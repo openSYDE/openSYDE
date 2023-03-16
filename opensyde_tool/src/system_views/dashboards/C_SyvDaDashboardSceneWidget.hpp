@@ -38,7 +38,7 @@ class C_SyvDaDashboardSceneWidget :
 public:
    explicit C_SyvDaDashboardSceneWidget(const uint32_t ou32_ViewIndex, const uint32_t ou32_DashboardIndex,
                                         QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvDaDashboardSceneWidget(void);
+   ~C_SyvDaDashboardSceneWidget(void) override;
 
    void SetDashboardIndex(const uint32_t ou32_Value) override;
 

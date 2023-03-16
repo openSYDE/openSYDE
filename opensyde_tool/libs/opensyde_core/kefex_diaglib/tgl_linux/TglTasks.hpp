@@ -16,14 +16,6 @@
 #include "stwtypes.hpp"
 #include "C_SclDynamicArray.hpp"
 
-#ifndef TGL_PACKAGE
-#ifdef __BORLANDC__
-#define TGL_PACKAGE __declspec(package)
-#else
-#define TGL_PACKAGE
-#endif
-#endif
-
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
 {
@@ -33,7 +25,7 @@ namespace tgl
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Implements a handler for critical sections
-class TGL_PACKAGE C_TglCriticalSection
+class C_TglCriticalSection
 {
 protected:
    pthread_mutex_t mt_mutex; ///< synchronization object

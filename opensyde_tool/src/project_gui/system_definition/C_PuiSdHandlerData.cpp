@@ -224,7 +224,7 @@ int32_t C_PuiSdHandlerData::LoadFromFile(const stw::scl::C_SclString & orc_Path,
    \return
    C_NO_ERR   data saved
    C_RD_WR    problems accessing file system (e.g. could not erase pre-existing file before saving)
-   C_COM      Bus message sorting failed
+   C_RD_WR    could not write to file (e.g. missing write permissions; missing folder)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSdHandlerData::SaveToFile(const stw::scl::C_SclString & orc_Path, const bool oq_UseDeprecatedFileFormatV2)
@@ -233,114 +233,90 @@ int32_t C_PuiSdHandlerData::SaveToFile(const stw::scl::C_SclString & orc_Path, c
 
    const uint16_t u16_TimerId = osc_write_log_performance_start();
 
-   //Sort first
-   tgl_assert(this->mc_UiNodes.size() == this->mc_CoreDefinition.c_Nodes.size());
-   if (this->mc_UiNodes.size() == this->mc_CoreDefinition.c_Nodes.size())
+   if (TglFileExists(orc_Path) == true)
    {
-      C_OscSystemDefinition c_SortedOscDefinition = this->mc_CoreDefinition;
-      std::vector<C_PuiSdNode> c_SortedUiNodes = this->mc_UiNodes;
-      for (uint32_t u32_ItNode = 0; (u32_ItNode < c_SortedUiNodes.size()) && (s32_Return == C_NO_ERR); ++u32_ItNode)
+      //erase it:
+      int32_t s32_ReturnRemove;
+      s32_ReturnRemove = std::remove(orc_Path.c_str());
+      if (s32_ReturnRemove != 0)
       {
-         s32_Return = C_PuiSdHandlerData::mh_SortMessagesByName(c_SortedOscDefinition.c_Nodes[u32_ItNode],
-                                                                c_SortedUiNodes[u32_ItNode]);
+         osc_write_log_error("Saving System Definition",
+                             "Could not erase pre-existing file \"" + orc_Path + "\".");
+         s32_Return = C_RD_WR;
       }
-      //Save sorted structure
-      if (s32_Return == C_NO_ERR)
+   }
+   if (s32_Return == C_NO_ERR)
+   {
+      if (oq_UseDeprecatedFileFormatV2)
       {
-         if (TglFileExists(orc_Path) == true)
+         C_OscXmlParser c_XmlParser;
+         C_OscSystemDefinitionFilerV2::h_SaveSystemDefinition(this->mc_CoreDefinition, c_XmlParser);
+         //Reuse same XML parser for deprecated file format
+         tgl_assert(c_XmlParser.SelectRoot() == "opensyde-system-definition");
+         tgl_assert(c_XmlParser.SelectNodeChild("nodes") == "nodes");
+
+         C_PuiSdHandlerFilerV2::h_SaveNodes(this->mc_UiNodes, c_XmlParser);
+         tgl_assert(c_XmlParser.SelectNodeParent() == "opensyde-system-definition"); //back up
+
+         //Bus
+         tgl_assert(c_XmlParser.SelectNodeChild("buses") == "buses");
+         C_PuiSdHandlerFilerV2::h_SaveBuses(this->mc_UiBuses, c_XmlParser);
+         tgl_assert(c_XmlParser.SelectNodeParent() == "opensyde-system-definition"); //back up
+
+         //GUI items
+         c_XmlParser.CreateAndSelectNodeChild("gui-only");
+
+         //Bus text elements
+         c_XmlParser.CreateAndSelectNodeChild("bus-text-elements");
+         C_PuiSdHandlerFilerV2::h_SaveBusTextElements(this->c_BusTextElements, c_XmlParser);
+         tgl_assert(c_XmlParser.SelectNodeParent() == "gui-only"); //back up
+
+         //Base elements
+         C_PuiBsElementsFiler::h_SaveBaseElements(this->c_Elements, c_XmlParser);
+
+         s32_Return = c_XmlParser.SaveToFile(orc_Path);
+         if (s32_Return != C_NO_ERR)
          {
-            //erase it:
-            int32_t s32_ReturnRemove;
-            s32_ReturnRemove = std::remove(orc_Path.c_str());
-            if (s32_ReturnRemove != 0)
-            {
-               osc_write_log_error("Saving System Definition",
-                                   "Could not erase pre-existing file \"" + orc_Path + "\".");
-               s32_Return = C_RD_WR;
-            }
+            osc_write_log_error("Saving System Definition", "Could not write to file \"" + orc_Path + "\".");
+            s32_Return = C_RD_WR;
          }
+      }
+      else
+      {
+         s32_Return = C_OscSystemDefinitionFiler::h_SaveSystemDefinitionFile(this->mc_CoreDefinition, orc_Path);
          if (s32_Return == C_NO_ERR)
          {
-            if (oq_UseDeprecatedFileFormatV2)
+            QString c_FilePath = C_PuiSdHandlerFiler::h_GetSystemDefinitionUiFilePath(orc_Path.c_str());
+            //New files for UI
+            s32_Return = C_PuiSdHandlerFiler::h_SaveSystemDefinitionUiFile(c_FilePath, this->mc_CoreDefinition,
+                                                                           this->mc_UiNodes, this->mc_UiBuses,
+                                                                           this->c_BusTextElements,
+                                                                           this->c_Elements);
+
+            // Saving shared Datapool configuration
+            if (s32_Return == C_NO_ERR)
             {
-               C_OscXmlParser c_XmlParser;
-               C_OscSystemDefinitionFilerV2::h_SaveSystemDefinition(c_SortedOscDefinition, c_XmlParser);
-               //Reuse same XML parser for deprecated file format
-               tgl_assert(c_XmlParser.SelectRoot() == "opensyde-system-definition");
-               tgl_assert(c_XmlParser.SelectNodeChild("nodes") == "nodes");
+               c_FilePath = C_PuiSdHandlerFiler::h_GetSharedDatapoolUiFilePath(orc_Path.c_str());
+               s32_Return = C_PuiSdHandlerFiler::h_SaveSharedDatapoolsFile(c_FilePath, this->mc_SharedDatapools);
 
-               C_PuiSdHandlerFilerV2::h_SaveNodes(c_SortedUiNodes, c_XmlParser);
-               tgl_assert(c_XmlParser.SelectNodeParent() == "opensyde-system-definition"); //back up
-
-               //Bus
-               tgl_assert(c_XmlParser.SelectNodeChild("buses") == "buses");
-               C_PuiSdHandlerFilerV2::h_SaveBuses(this->mc_UiBuses, c_XmlParser);
-               tgl_assert(c_XmlParser.SelectNodeParent() == "opensyde-system-definition"); //back up
-
-               //GUI items
-               c_XmlParser.CreateAndSelectNodeChild("gui-only");
-
-               //Bus text elements
-               c_XmlParser.CreateAndSelectNodeChild("bus-text-elements");
-               C_PuiSdHandlerFilerV2::h_SaveBusTextElements(this->c_BusTextElements, c_XmlParser);
-               tgl_assert(c_XmlParser.SelectNodeParent() == "gui-only"); //back up
-
-               //Base elements
-               C_PuiBsElementsFiler::h_SaveBaseElements(this->c_Elements, c_XmlParser);
-
-               s32_Return = c_XmlParser.SaveToFile(orc_Path);
                if (s32_Return != C_NO_ERR)
                {
-                  osc_write_log_error("Saving System Definition", "Could not write to file \"" + orc_Path + "\".");
+                  osc_write_log_error("Saving shared Datapool configuration UI",
+                                      "Could not write to file \"" + orc_Path + "\".");
                   s32_Return = C_RD_WR;
                }
             }
             else
             {
-               s32_Return = C_OscSystemDefinitionFiler::h_SaveSystemDefinitionFile(c_SortedOscDefinition, orc_Path);
-               if (s32_Return == C_NO_ERR)
-               {
-                  QString c_FilePath = C_PuiSdHandlerFiler::h_GetSystemDefinitionUiFilePath(orc_Path.c_str());
-                  //New files for UI
-                  s32_Return = C_PuiSdHandlerFiler::h_SaveSystemDefinitionUiFile(c_FilePath, c_SortedOscDefinition,
-                                                                                 c_SortedUiNodes, this->mc_UiBuses,
-                                                                                 this->c_BusTextElements,
-                                                                                 this->c_Elements);
-
-                  // Saving shared Datapool configuration
-                  if (s32_Return == C_NO_ERR)
-                  {
-                     c_FilePath = C_PuiSdHandlerFiler::h_GetSharedDatapoolUiFilePath(orc_Path.c_str());
-                     s32_Return = C_PuiSdHandlerFiler::h_SaveSharedDatapoolsFile(c_FilePath, this->mc_SharedDatapools);
-
-                     if (s32_Return != C_NO_ERR)
-                     {
-                        osc_write_log_error("Saving shared Datapool configuration UI",
-                                            "Could not write to file \"" + orc_Path + "\".");
-                        s32_Return = C_RD_WR;
-                     }
-                  }
-                  else
-                  {
-                     osc_write_log_error("Saving System Definition UI",
-                                         "Could not write to file \"" + orc_Path + "\".");
-                     s32_Return = C_RD_WR;
-                  }
-               }
-               //Only update hash in non deprecated mode
-               //calculate the hash value and save it for comparing
-               this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
+               osc_write_log_error("Saving System Definition UI",
+                                   "Could not write to file \"" + orc_Path + "\".");
+               s32_Return = C_RD_WR;
             }
          }
+         //Only update hash in non deprecated mode
+         //calculate the hash value and save it for comparing
+         this->mu32_CalculatedHashSystemDefinition = this->CalcHashSystemDefinition();
       }
-      else
-      {
-         s32_Return = C_COM;
-      }
-   }
-   else
-   {
-      s32_Return = C_COM;
    }
 
    osc_write_log_performance_stop(u16_TimerId, "Save system definition");
@@ -467,6 +443,7 @@ C_SdTopologyDataSnapshot C_PuiSdHandlerData::GetSnapshot(void) const
 //----------------------------------------------------------------------------------------------------------------------
 C_OscSystemDefinition & C_PuiSdHandlerData::GetOscSystemDefinition(void)
 {
+   //lint -e{1536} we expose a private member for different usage in core context (public access required)
    return this->mc_CoreDefinition;
 }
 

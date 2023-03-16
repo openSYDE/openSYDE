@@ -37,6 +37,12 @@ public:
       eENABLED,
       eNAME,
       eCOMMENT,
+      eJ1939_PGN,
+      eJ1939_PRIORITY,
+      eJ1939_SOURCE_ADDRESS,
+      eJ1939_DESTINATION_ADDRESS,
+      eJ1939_FORMAT,
+      eJ1939_EDP_AND_DP,
       eCAN_OPEN_INDEX,
       eEXTENDED,
       eCAN_ID,
@@ -73,6 +79,12 @@ private:
    public:
       QString c_Name;
       QString c_Comment;
+      QVariant c_J1939Pgn;
+      QVariant c_J1939Priority;
+      QVariant c_J1939SourceAddress;
+      QVariant c_J1939DestinationAddress;
+      QVariant c_J1939Format;
+      QVariant c_J1939EdpAndDp;
       QVariant c_CoIndex;
       QVariant c_CoIndexEditRole;
       int32_t s32_Enabled;
@@ -120,6 +132,9 @@ private:
    QVariant m_GetMessageIcon(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId) const;
 
    void m_FillMsgInfo(void);
+   void m_FillJ1939MsgInfo(C_MsgTableData & orc_MessageTableData,
+                           const stw::opensyde_core::C_OscCanMessage & orc_MessageData);
+   QString m_GetCycleTimeHeaderName(void) const;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

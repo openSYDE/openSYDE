@@ -149,30 +149,27 @@ C_PuiSvDbSlider::E_Type C_SyvDaPeSlider::GetType(void) const
 {
    C_PuiSvDbSlider::E_Type e_Retval;
 
-   switch (this->mpc_Ui->pc_ComboBoxTypeColor->currentIndex())
+   if (this->mpc_Ui->pc_ComboBoxTypeColor->currentIndex() == C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2)
    {
-   case C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2:
-      switch (this->mpc_Ui->pc_ComboBoxTypeHandle->currentIndex())
+      if (this->mpc_Ui->pc_ComboBoxTypeHandle->currentIndex() == C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2)
       {
-      case C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2:
          e_Retval = C_PuiSvDbSlider::eTYPE_BIG_COLOR_2;
-         break;
-      default:
-         e_Retval = C_PuiSvDbSlider::eTYPE_SMALL_COLOR_2;
-         break;
       }
-      break;
-   default:
-      switch (this->mpc_Ui->pc_ComboBoxTypeHandle->currentIndex())
+      else
       {
-      case C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2:
-         e_Retval = C_PuiSvDbSlider::eTYPE_BIG_COLOR_1;
-         break;
-      default:
-         e_Retval = C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1;
-         break;
+         e_Retval = C_PuiSvDbSlider::eTYPE_SMALL_COLOR_2;
       }
-      break;
+   }
+   else
+   {
+      if (this->mpc_Ui->pc_ComboBoxTypeHandle->currentIndex() == C_SyvDaPeSlider::mhs32_INDEX_STYLE_TYPE2)
+      {
+         e_Retval = C_PuiSvDbSlider::eTYPE_BIG_COLOR_1;
+      }
+      else
+      {
+         e_Retval = C_PuiSvDbSlider::eTYPE_SMALL_COLOR_1;
+      }
    }
 
    return e_Retval;

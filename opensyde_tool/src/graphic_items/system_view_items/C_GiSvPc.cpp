@@ -250,10 +250,10 @@ bool C_GiSvPc::OpenDialog(void) const
       const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
       bool q_OpenDialog = false;
 
-      if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
+      if ((pc_View != NULL) && (pc_View->GetOscPcData().GetConnected() == true))
       {
-         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(
-            pc_View->GetPcData().GetBusIndex());
+         const C_OscSystemBus * const pc_Bus =
+            C_PuiSdHandler::h_GetInstance()->GetOscBus(pc_View->GetOscPcData().GetBusIndex());
 
          if (pc_Bus != NULL)
          {
@@ -267,8 +267,7 @@ bool C_GiSvPc::OpenDialog(void) const
 
       if ((q_OpenDialog == true) && (pc_View != NULL))
       {
-         const C_PuiSvPc c_PcData = pc_View->GetPcData();
-         const uint32_t u32_BusIndex = c_PcData.GetBusIndex();
+         const uint32_t u32_BusIndex = pc_View->GetOscPcData().GetBusIndex();
 
          //Find connected interface of target node to found bus index
          const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(u32_BusIndex);
@@ -327,7 +326,7 @@ void C_GiSvPc::LoadData(void)
 
    if (pc_View != NULL)
    {
-      C_PuiSvPc c_PcData = pc_View->GetPcData();
+      C_PuiSvPc c_PcData = pc_View->GetPuiPcData();
       C_GiCustomFunctions::h_AdaptMouseRangePos(c_PcData.c_UiPosition);
       this->LoadBasicData(c_PcData);
       //Overwrite z order
@@ -392,7 +391,7 @@ void C_GiSvPc::GenerateHint()
    if (pc_View != NULL)
    {
       QString c_ToolTipContent;
-      const C_PuiSvPc c_PcData = pc_View->GetPcData();
+      const C_PuiSvPc c_PcData = pc_View->GetPuiPcData();
 
       // content
       c_ToolTipContent += C_GtGetText::h_GetText("CAN Interface: ");
@@ -479,18 +478,19 @@ bool C_GiSvPc::m_OpenCanDllDialog(void) const
 
    if (pc_View != NULL)
    {
-      const C_PuiSvPc c_PcData = pc_View->GetPcData();
+      const C_OscViewPc & rc_OscPcData = pc_View->GetOscPcData();
+      const C_PuiSvPc & rc_PcData = pc_View->GetPuiPcData();
       QGraphicsView * const pc_GraphicsView = this->scene()->views().at(0);
       const QPointer<C_OgePopUpDialog> c_DllDialog = new C_OgePopUpDialog(pc_GraphicsView, pc_GraphicsView);
       C_SyvSeDllConfigurationDialog * const pc_DllWidget = new C_SyvSeDllConfigurationDialog(*c_DllDialog);
 
       // Initialize the data
-      pc_DllWidget->SetDllType(c_PcData.GetCanDllType());
-      pc_DllWidget->SetCustomDllPath(c_PcData.GetCustomCanDllPath());
+      pc_DllWidget->SetDllType(rc_PcData.GetCanDllType());
+      pc_DllWidget->SetCustomDllPath(rc_PcData.GetCustomCanDllPath());
       // Bitrate
-      if (c_PcData.GetConnected() == true)
+      if (rc_OscPcData.GetConnected() == true)
       {
-         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(c_PcData.GetBusIndex());
+         const C_OscSystemBus * const pc_Bus = C_PuiSdHandler::h_GetInstance()->GetOscBus(rc_OscPcData.GetBusIndex());
 
          if (pc_Bus != NULL)
          {

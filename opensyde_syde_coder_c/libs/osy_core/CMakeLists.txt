@@ -492,8 +492,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/ip_dispatcher/dispatcher
       ${CMAKE_CURRENT_SOURCE_DIR}/data_dealer
       ${CMAKE_CURRENT_SOURCE_DIR}/security
-      ${CMAKE_CURRENT_SOURCE_DIR}/libtomcrypt/src/headers
-      ${CMAKE_CURRENT_SOURCE_DIR}/libtomcrypt/libtommath
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/routing
       ${CMAKE_CURRENT_SOURCE_DIR}/protocol_drivers/communication
@@ -505,8 +503,6 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_stwflash
       ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/cmonprotocol
    )
-
-   add_subdirectory(libtomcrypt)
 endif()
 
 # windows target drivers: CAN and Ethernet dispatchers

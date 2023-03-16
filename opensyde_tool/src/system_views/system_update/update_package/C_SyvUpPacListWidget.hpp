@@ -40,7 +40,7 @@ class C_SyvUpPacListWidget :
 
 public:
    C_SyvUpPacListWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvUpPacListWidget();
+   ~C_SyvUpPacListWidget() override;
 
    void SetViewIndex(const uint32_t ou32_ViewIndex);
 

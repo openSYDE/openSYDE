@@ -20,7 +20,6 @@
 #include "C_OgePopUpDialog.hpp"
 #include "C_SyvDaItPaArWidget.hpp"
 #include "C_SyvDaItPaTreeView.hpp"
-#include "C_SyvDaItTableHeaderView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -54,11 +53,11 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
    mq_IgnoreChanges(false)
 {
    //Header
-   QHeaderView * const pc_Tmp = new C_SyvDaItTableHeaderView(Qt::Horizontal, this);
+   this->mpc_TableHeaderView = new C_SyvDaItTableHeaderView(Qt::Horizontal, this);
 
-   this->setHeader(pc_Tmp);
+   this->setHeader(this->mpc_TableHeaderView);
    //Make sure to install event filter to have handling for mouse move events
-   pc_Tmp->installEventFilter(this);
+   this->mpc_TableHeaderView->installEventFilter(this);
 
    this->C_SyvDaItPaTreeView::setModel(&this->mc_Model);
    this->setItemDelegate(&mc_Delegate);
@@ -92,6 +91,8 @@ C_SyvDaItPaTreeView::C_SyvDaItPaTreeView(QWidget * const opc_Parent) :
            &C_SyvDaItPaTreeView::m_HandleLinkClicked);
 
    //Register changes
+   connect(this->verticalScrollBar(), &QScrollBar::valueChanged, this,
+           &C_SyvDaItPaTreeView::m_OnVerticalScrollBarChange);
    connect(this->header(), &QHeaderView::sectionMoved, this, &C_SyvDaItPaTreeView::m_HandleChange);
    connect(this->header(), &QHeaderView::sectionResized, this, &C_SyvDaItPaTreeView::m_HandleChange);
    connect(this, &C_SyvDaItPaTreeView::expanded, this, &C_SyvDaItPaTreeView::m_HandleChange);
@@ -229,6 +230,20 @@ void C_SyvDaItPaTreeView::SetDark(const bool oq_Value)
 void C_SyvDaItPaTreeView::SetEditMode(const bool oq_EditMode)
 {
    this->mc_Model.SetEditMode(oq_EditMode);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the cursor handling active
+
+   If the cursor handling is active the SplitHCursor cursor will be set when necessary by setOverrideCursor
+   and restored when not
+
+   \param[in]       oq_Active     Flag if cursor handling is active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::SetCursorHandlingActive(const bool oq_Active)
+{
+   this->mpc_TableHeaderView->SetCursorHandlingActive(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -754,6 +769,28 @@ void C_SyvDaItPaTreeView::mouseDoubleClickEvent(QMouseEvent * const opc_Event)
    {
       C_OgeTreeViewToolTipBase::mouseDoubleClickEvent(opc_Event);
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  On vertical scroll bar change
+
+   \param[in]  os32_NewScrollBarValue  New scroll bar value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItPaTreeView::m_OnVerticalScrollBarChange(const int32_t os32_NewScrollBarValue)
+{
+   static int32_t hs32_PrevScrollBarValue = 0;
+
+   if (this->viewport()->children().size() >= 1)
+   {
+      const int32_t s32_ScrollBarValueDiff = os32_NewScrollBarValue - hs32_PrevScrollBarValue;
+      QWidget * const pc_EditorWidget = dynamic_cast<QWidget *>(this->viewport()->children().at(0));
+
+      const QPoint c_PosDifference(0, s32_ScrollBarValueDiff * C_SyvDaItPaTreeDelegate::h_GetTableItemHeight());
+      pc_EditorWidget->setGeometry(QRect(pc_EditorWidget->pos() - c_PosDifference, pc_EditorWidget->size()));
+   }
+   //Update last known slider position
+   hs32_PrevScrollBarValue = os32_NewScrollBarValue;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

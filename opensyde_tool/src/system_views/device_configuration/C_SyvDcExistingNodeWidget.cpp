@@ -199,7 +199,7 @@ void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConf
 {
    const C_PuiSvData * const pc_View = C_PuiSvHandler::h_GetInstance()->GetView(this->mu32_ViewIndex);
 
-   if ((pc_View != NULL) && (pc_View->GetPcData().GetConnected() == true))
+   if ((pc_View != NULL) && (pc_View->GetOscPcData().GetConnected() == true))
    {
       C_SyvDcDeviceConfiguation c_Config;
       C_OscProtocolSerialNumber c_SerialNumber;
@@ -209,7 +209,7 @@ void C_SyvDcExistingNodeWidget::AppendDeviceConfig(std::vector<C_SyvDcDeviceConf
       this->mpc_Ui->pc_WidgetSerialNumber->GetContent(c_SerialNumber, &c_SubNodeIdsToOldNodeIds);
       c_Config.c_SerialNumber = c_SerialNumber;
 
-      const uint32_t u32_ConnectedBusIndex = pc_View->GetPcData().GetBusIndex();
+      const uint32_t u32_ConnectedBusIndex = pc_View->GetOscPcData().GetBusIndex();
       std::vector<uint32_t> c_AllRelevantNodeIndexes;
       uint32_t u32_NodeCounter;
 
@@ -598,7 +598,7 @@ int32_t C_SyvDcExistingNodeWidget::m_Init(void)
    int32_t s32_Return = C_NO_ERR;
 
    if (((pc_Node != NULL) && (pc_Node->pc_DeviceDefinition != NULL) && (pc_View != NULL)) &&
-       (pc_View->GetPcData().GetConnected() == true))
+       (pc_View->GetOscPcData().GetConnected() == true))
    {
       QString c_Ids;
       const QString c_BaseName = C_PuiSdUtil::h_GetNodeBaseNameOrName(this->mu32_NodeIndex);
@@ -612,7 +612,7 @@ int32_t C_SyvDcExistingNodeWidget::m_Init(void)
          {
             const C_OscNodeComInterfaceSettings & rc_Interface = pc_Node->c_Properties.c_ComInterfaces[u32_ItInt];
             if ((rc_Interface.GetBusConnected() == true) &&
-                (rc_Interface.u32_BusIndex == pc_View->GetPcData().GetBusIndex()))
+                (rc_Interface.u32_BusIndex == pc_View->GetOscPcData().GetBusIndex()))
             {
                if (c_Ids.compare("") == 0)
                {

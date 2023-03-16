@@ -22,7 +22,6 @@
 #include "C_OgeWiUtil.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_SyvDaItTaView.hpp"
-#include "C_SyvDaItTableHeaderView.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui;
@@ -76,7 +75,8 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    this->setFrameShape(QAbstractItemView::Shape::NoFrame);
    this->setEditTriggers(EditTrigger::NoEditTriggers);
    //Consider all elements for resize
-   this->setHorizontalHeader(new C_SyvDaItTableHeaderView(Qt::Horizontal));
+   this->mpc_TableHeaderView = new C_SyvDaItTableHeaderView(Qt::Horizontal);
+   this->setHorizontalHeader(this->mpc_TableHeaderView);
    this->horizontalHeader()->setStretchLastSection(false);
    this->horizontalHeader()->setFixedHeight(27);
    this->horizontalHeader()->setMinimumSectionSize(4);
@@ -99,6 +99,8 @@ C_SyvDaItTaView::C_SyvDaItTaView(C_PuiSvDbDataElementHandler * const opc_Data, Q
    Clean up.
 */
 //----------------------------------------------------------------------------------------------------------------------
+//lint -e{1540}  no memory leak because of the parent of mpc_TableHeaderView assigned by setHorizontalHeader and the Qt
+// memory management
 C_SyvDaItTaView::~C_SyvDaItTaView(void)
 {
 }
@@ -326,6 +328,20 @@ void C_SyvDaItTaView::SetDisplayStyle(const C_PuiSvDbWidgetBase::E_Style oe_Styl
       tgl_assert(false);
       break;
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets the cursor handling active
+
+   If the cursor handling is active the SplitHCursor cursor will be set when necessary by setOverrideCursor
+   and restored when not
+
+   \param[in]       oq_Active     Flag if cursor handling is active
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaItTaView::SetCursorHandlingActive(const bool oq_Active)
+{
+   this->mpc_TableHeaderView->SetCursorHandlingActive(oq_Active);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

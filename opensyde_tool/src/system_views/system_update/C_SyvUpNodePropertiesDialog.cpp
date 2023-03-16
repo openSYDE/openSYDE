@@ -462,10 +462,9 @@ void C_SyvUpNodePropertiesDialog::mh_GetApplicationDataForNode(const C_GiSvSubNo
    tgl_assert(pc_FileInfo != NULL);
    if (pc_FileInfo != NULL)
    {
-      orc_FileProjectName = pc_FileInfo->acn_ProjectName;
-      orc_FileVersion = pc_FileInfo->acn_ProjectVersion;
-      orc_FileBuildDate = static_cast<QString>(pc_FileInfo->acn_Date) + " " +
-                          pc_FileInfo->acn_Time;
+      orc_FileProjectName = pc_FileInfo->GetProjectName().c_str();
+      orc_FileVersion = pc_FileInfo->GetProjectVersion().c_str();
+      orc_FileBuildDate = (pc_FileInfo->GetDate() + " " + pc_FileInfo->GetTime()).c_str();
    }
 
    orc_ApplicationName = rc_Application.c_Name.c_str();
@@ -607,24 +606,20 @@ void C_SyvUpNodePropertiesDialog::mh_ExtractStwDeviceInformation(const C_GiSvSub
    const C_SyvUpDeviceInfo c_DeviceInfo = orc_NodeInfo.GetDeviceInfo();
 
    for (int32_t s32_ItDeviceInfoBlock = 0;
-        s32_ItDeviceInfoBlock <
-        c_DeviceInfo.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks.
-        GetLength();
+        s32_ItDeviceInfoBlock < c_DeviceInfo.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks.GetLength();
         ++s32_ItDeviceInfoBlock)
    {
       const C_XFLECUInformation & rc_StwDeviceInfo =
-         c_DeviceInfo.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks[
-            s32_ItDeviceInfoBlock];
+         c_DeviceInfo.pc_StwDevice->c_BasicInformation.c_DeviceInfoBlocks[s32_ItDeviceInfoBlock];
       //Search for name match
-      if (orc_FileProjectName.compare(rc_StwDeviceInfo.acn_ProjectName) == 0)
+      if (orc_FileProjectName.compare(rc_StwDeviceInfo.GetProjectName().Trim().c_str()) == 0)
       {
          //Signal found
          orq_MissingStatus = false;
          //Apply
-         orc_DeviceProjectName = rc_StwDeviceInfo.acn_ProjectName;
-         orc_DeviceFileVersion = rc_StwDeviceInfo.acn_ProjectVersion;
-         orc_DeviceBuildDate = static_cast<QString>(rc_StwDeviceInfo.acn_Date) + " " +
-                               rc_StwDeviceInfo.acn_Time;
+         orc_DeviceProjectName = rc_StwDeviceInfo.GetProjectName().c_str();
+         orc_DeviceFileVersion = rc_StwDeviceInfo.GetProjectVersion().c_str();
+         orc_DeviceBuildDate = (rc_StwDeviceInfo.GetDate() + " " + rc_StwDeviceInfo.GetTime()).c_str();
          //Highlighting
          orq_MatchStatus = C_SyvUpNodePropertiesDialog::mh_HandleHighlighting(orc_FileProjectName,
                                                                               orc_DeviceProjectName,
@@ -673,7 +668,7 @@ void C_SyvUpNodePropertiesDialog::mh_ExtractOpenSydeDeviceInformation(const C_Gi
       const C_OscProtocolDriverOsy::C_FlashBlockInfo & rc_OsyDeviceInfo =
          c_DeviceInfo.pc_OpenSydeDevice->c_Applications[u32_ItOsyApplication];
       //Search for name match
-      if (orc_FileProjectName.compare(rc_OsyDeviceInfo.c_ApplicationName.c_str()) == 0)
+      if (orc_FileProjectName.trimmed().compare(rc_OsyDeviceInfo.c_ApplicationName.Trim().c_str()) == 0)
       {
          //Signal found
          orq_MissingStatus = false;
@@ -725,17 +720,17 @@ bool C_SyvUpNodePropertiesDialog::mh_HandleHighlighting(const QString & orc_File
 {
    bool q_Match = true;
 
-   if (orc_FileProjectName != orc_DeviceProjectName)
+   if (orc_FileProjectName.trimmed() != orc_DeviceProjectName.trimmed())
    {
       orc_DeviceProjectName = "<b>" + orc_DeviceProjectName + "</b>";
       q_Match = false;
    }
-   if (orc_FileVersion != orc_DeviceFileVersion)
+   if (orc_FileVersion.trimmed() != orc_DeviceFileVersion.trimmed())
    {
       orc_DeviceFileVersion = "<b>" + orc_DeviceFileVersion + "</b>";
       q_Match = false;
    }
-   if (orc_FileBuildDate != orc_DeviceBuildDate)
+   if (orc_FileBuildDate.trimmed() != orc_DeviceBuildDate.trimmed())
    {
       orc_DeviceBuildDate = "<b>" + orc_DeviceBuildDate + "</b>";
       q_Match = false;

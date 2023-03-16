@@ -2199,10 +2199,10 @@ void C_SdNdeDpSelectorListWidget::m_RearrangeItems(void)
       const int32_t s32_Row = s32_ItDp / this->ms32_ItemsPerRow;
       const int32_t s32_Column = s32_ItDp % this->ms32_ItemsPerRow;
       const int32_t s32_PosHorizontal = s32_Column * ms32_ItemWidth;
-      const int32_t s32_PosY = (s32_Row % this->ms32_RowsPerViewPage) * ms32_ItemHeight;
+      const int32_t s32_PosVertical = (s32_Row % this->ms32_RowsPerViewPage) * ms32_ItemHeight;
       const bool q_RowVisible = ((s32_Row >= s32_FirstVisibleRow) && (s32_Row <= s32_LastVisibleRow)) ? true : false;
 
-      this->mc_DpItems.at(s32_ItDp)->setGeometry(QRect(QPoint(s32_PosHorizontal, s32_PosY),
+      this->mc_DpItems.at(s32_ItDp)->setGeometry(QRect(QPoint(s32_PosHorizontal, s32_PosVertical),
                                                        this->mc_DpItems.at(s32_ItDp)->size()));
       this->mc_DpItems.at(s32_ItDp)->setVisible(q_RowVisible);
    }

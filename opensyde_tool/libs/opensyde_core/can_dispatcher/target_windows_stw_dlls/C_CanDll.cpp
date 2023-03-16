@@ -20,11 +20,6 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
 
-#ifdef __BORLANDC__ //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
-
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "C_CanDll.hpp"
@@ -48,14 +43,14 @@ static const uint32_t mu32_XTD_ID = 0x80000000UL; // MSB flag for 29Bit ID
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //lint -esym(1565,"stw::can::C_CAN_DLL::mt_Lock") //properly initialized by constructor
-C_CanDll::C_CanDll(const char_t * const opcn_DLLPath)
+C_CanDll::C_CanDll(const char_t * const opcn_DllPath)
 {
    mpv_DLL = NULL; // DLL-Handle
    m_ClearFunctionPointers();
 
    InitializeCriticalSection(&mt_Lock);
 
-   (void)m_Init(opcn_DLLPath);
+   (void)m_Init(opcn_DllPath);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -68,9 +63,9 @@ C_CanDll::~C_CanDll()
 
 //----------------------------------------------------------------------------------------------------------------------
 
-int32_t C_CanDll::m_Init(const char_t * const opcn_DLLPath)
+int32_t C_CanDll::m_Init(const char_t * const opcn_DllPath)
 {
-   mpv_DLL = LoadLibraryA(opcn_DLLPath);
+   mpv_DLL = LoadLibraryA(opcn_DllPath);
    if (mpv_DLL != NULL) //load DLL
    {
       //Using intermediate casts to "void (*)(void)" is a workaround for a GCC >= 8.1(?) compiler warning regarding

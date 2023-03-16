@@ -864,6 +864,7 @@ C_SclString C_OscNodeFilerV2::h_CommunicationProtocolToString(const C_OscCanProt
       c_Retval = "can open safety";
       break;
    case C_OscCanProtocol::eCAN_OPEN:
+   case C_OscCanProtocol::eJ1939:
    default:
       c_Retval = "invalid";
       break;

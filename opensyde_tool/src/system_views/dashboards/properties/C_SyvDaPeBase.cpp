@@ -194,6 +194,8 @@ C_SyvDaPeBase::C_SyvDaPeBase(C_OgePopUpDialog & orc_Parent, const uint32_t ou32_
    connect(this->mpc_Ui->pc_ComboBoxTheme,
            static_cast<void (QComboBox::*)(int32_t)>(&C_OgeCbxText::currentIndexChanged),
            this, &C_SyvDaPeBase::SigRefresh);
+   connect(this->mpc_Ui->pc_LineEditFormatterString,  &QLineEdit::textChanged, this,
+           &C_SyvDaPeBase::m_CheckFormatterString);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -387,7 +389,7 @@ C_SyvDaDashboardScene * C_SyvDaPeBase::GetPreviewScene(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SyvDaPeBase::h_GetSceneViewSize(void)
 {
-   return QSize(259, 146);
+   return QSize(259, 160);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -555,6 +557,49 @@ QString C_SyvDaPeBase::GetDisplayName(void) const
    }
 
    return c_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get popup size with display formatter
+ *
+ *  Provides the size for a popup for widget properties that
+ *  contains the display formatter
+ *
+ *  \return
+ *   QSize
+*/
+QSize C_SyvDaPeBase::h_GetPopupSizeWithDisplayFormatter(void)
+{
+   return QSize(800, 920);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get popup size with NO display formatter
+ *
+ *   Provides the size for a popup for widget properties that
+ *   does not contain the display formatter
+ *
+ *   \return
+ *    QSize
+*/
+QSize C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter(void)
+{
+   return QSize(800, 800);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Get popup size with NO design and preview panes
+ *
+ *   Provides the size for a popup for widget properties that does not contain
+ *   the design and preview panes but may contain the display formatter
+ *   e.g. Table widget - Edit Properites Dialog (C_GiSvDaTableBase::EditElementProperties)
+ *
+ *   \return
+ *    QSize
+*/
+QSize C_SyvDaPeBase::h_GetPopupSizeWithoutDesignAndPreview()
+{
+   return QSize(800, 500);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1016,6 +1061,83 @@ void C_SyvDaPeBase::m_OnFormatterActiveChange(void) const
    const bool q_Active = this->mpc_Ui->pc_CheckBoxFormatterActive->isChecked();
 
    this->mpc_Ui->pc_LineEditFormatterString->setEnabled(q_Active);
+
+   // if display formatter active and contains some text, apply "red style" to text and display red tooltip
+   if (q_Active && (!mpc_Ui->pc_LineEditFormatterString->text().isEmpty()))
+   {
+      m_CheckFormatterString();
+   }
+   else
+   {
+      C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditFormatterString, "Valid",
+                                             true);
+      this->mpc_Ui->pc_LineEditFormatterString->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                      C_GtGetText::h_GetText(""),
+                                                                      stw::opensyde_gui::C_NagToolTip::eDEFAULT);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check the formatter string
+
+   Checks if the printf string has a valid and compatible format.
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SyvDaPeBase::m_CheckFormatterString(void) const
+{
+   const C_PuiSvDbDataElementDisplayFormatter c_FormatterConfig = this->GetFormatterInformation();
+
+   // Check formatter first
+   if ((c_FormatterConfig.q_IsActive == true) &&
+       (this->mc_DataElement.GetIsValid() == true))
+   {
+      const C_PuiSvDbDataElementScaling c_Scaling = this->GetScalingInformation();
+      const C_OscNodeDataPoolListElement * const pc_Element =
+         C_PuiSdHandler::h_GetInstance()->GetOscDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                    this->mc_DataElement.u32_DataPoolIndex,
+                                                                    this->mc_DataElement.u32_ListIndex,
+                                                                    this->mc_DataElement.u32_ElementIndex);
+      const C_PuiSdNodeDataPoolListElement * const pc_UiElement =
+         C_PuiSdHandler::h_GetInstance()->GetUiDataPoolListElement(this->mc_DataElement.u32_NodeIndex,
+                                                                   this->mc_DataElement.u32_DataPoolIndex,
+                                                                   this->mc_DataElement.u32_ListIndex,
+                                                                   this->mc_DataElement.u32_ElementIndex);
+
+      tgl_assert(pc_UiElement != NULL);
+      tgl_assert(pc_Element != NULL);
+
+      // Check if the format is valid and compatible. If not, font color is changed to red and a tool tip is
+      // displayed to indicate the error
+      if ((pc_UiElement != NULL) &&
+          (pc_Element != NULL))
+      {
+         const bool q_FormatterCompatible = c_FormatterConfig.IsFormatterCompatible(
+            C_PuiSvDbDataElementDisplayFormatter::h_GetTypeCategory(pc_Element->c_MinValue,
+                                                                    c_Scaling,
+                                                                    pc_UiElement->q_InterpretAsString));
+
+         //set text property
+         C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_LineEditFormatterString, "Valid",
+                                                q_FormatterCompatible);
+         if (!q_FormatterCompatible)
+         {
+            const QString c_Heading = C_GtGetText::h_GetText("Formatter String");
+            QString c_Content;
+
+            c_Content += C_GtGetText::h_GetText("- invalid or not compatible format\n");
+
+            this->mpc_Ui->pc_LineEditFormatterString->SetToolTipInformation(c_Heading, c_Content,
+                                                                            stw::opensyde_gui::C_NagToolTip::eERROR);
+         }
+         else
+         {
+            this->mpc_Ui->pc_LineEditFormatterString->SetToolTipInformation(C_GtGetText::h_GetText(""),
+                                                                            C_GtGetText::h_GetText(""),
+                                                                            stw::opensyde_gui::C_NagToolTip::eDEFAULT);
+         }
+      }
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1034,6 +1156,7 @@ void C_SyvDaPeBase::m_InitNoDataElement(void) const
    m_OnUseDefaultScalingChange();
 
    //Formatter
+   this->mpc_Ui->pc_CheckBoxFormatterActive->setEnabled(false);
    this->mpc_Ui->pc_CheckBoxFormatterActive->setChecked(false);
    this->mpc_Ui->pc_LineEditFormatterString->setText("");
    this->m_OnFormatterActiveChange();
@@ -1103,6 +1226,7 @@ void C_SyvDaPeBase::m_InitDataElement(const C_PuiSvDbNodeDataPoolListElementId &
       {
          this->mpc_Ui->pc_PushButtonUpdateModeConfigure->setEnabled(true);
       }
+      this->mpc_Ui->pc_CheckBoxFormatterActive->setEnabled(true);
    }
    else
    {

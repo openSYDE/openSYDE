@@ -49,7 +49,7 @@ using namespace stw::opensyde_gui_logic;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_PuiSvData::C_PuiSvData(void) :
-   mc_Name("NewView"),
+   C_OscViewData(),
    mu16_UpdateRateFast(100U),
    mu16_UpdateRateMedium(500U),
    mu16_UpdateRateSlow(1000U),
@@ -64,16 +64,6 @@ C_PuiSvData::C_PuiSvData(void) :
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   destructor
-
-   clean up ...
-*/
-//----------------------------------------------------------------------------------------------------------------------
-C_PuiSvData::~C_PuiSvData(void)
-{
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Calculates the hash value over all data
 
    The hash value is a 32 bit CRC value.
@@ -83,7 +73,6 @@ C_PuiSvData::~C_PuiSvData(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::CalcHash(uint32_t & oru32_HashValue) const
 {
-   stw::scl::C_SclChecksums::CalcCRC32(this->mc_Name.toStdString().c_str(), this->mc_Name.length(), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->mu32_DeviceConfigSelectedBitRate,
                                        sizeof(this->mu32_DeviceConfigSelectedBitRate), oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->me_DeviceConfigMode, sizeof(this->me_DeviceConfigMode), oru32_HashValue);
@@ -92,12 +81,7 @@ void C_PuiSvData::CalcHash(uint32_t & oru32_HashValue) const
    stw::scl::C_SclChecksums::CalcCRC32(&this->mu16_UpdateRateMedium, sizeof(this->mu16_UpdateRateMedium),
                                        oru32_HashValue);
    stw::scl::C_SclChecksums::CalcCRC32(&this->mu16_UpdateRateSlow, sizeof(this->mu16_UpdateRateSlow), oru32_HashValue);
-   this->mc_PcData.CalcHash(oru32_HashValue);
-   for (uint32_t u32_ItUpdate = 0; u32_ItUpdate < this->mc_NodeUpdateInformation.size(); ++u32_ItUpdate)
-   {
-      const C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[u32_ItUpdate];
-      rc_Update.CalcHash(oru32_HashValue);
-   }
+   this->mc_PuiPcData.CalcHash(oru32_HashValue);
    for (uint32_t u32_ItNode = 0; u32_ItNode < this->mc_NodeActiveFlags.size(); ++u32_ItNode)
    {
       const bool q_Data = static_cast<bool>(this->mc_NodeActiveFlags[u32_ItNode]);
@@ -114,30 +98,8 @@ void C_PuiSvData::CalcHash(uint32_t & oru32_HashValue) const
       c_It.key().CalcHash(oru32_HashValue);
       c_It.value().CalcHash(oru32_HashValue);
    }
-}
 
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Calculates the hash value over setup data
-
-   The hash value is a 32 bit CRC value.
-
-   \return
-   Hash value
-*/
-//----------------------------------------------------------------------------------------------------------------------
-uint32_t C_PuiSvData::CalcUpdateHash(void) const
-{
-   uint32_t u32_Retval = 0;
-
-   stw::scl::C_SclChecksums::CalcCRC32(this->mc_Name.toStdString().c_str(), this->mc_Name.length(), u32_Retval);
-   this->mc_PcData.CalcHash(u32_Retval);
-   for (uint32_t u32_ItNode = 0; u32_ItNode < this->mc_NodeActiveFlags.size(); ++u32_ItNode)
-   {
-      const bool q_Data = static_cast<bool>(this->mc_NodeActiveFlags[u32_ItNode]);
-      stw::scl::C_SclChecksums::CalcCRC32(&q_Data, sizeof(q_Data), u32_Retval);
-   }
-
-   return u32_Retval;
+   C_OscViewData::CalcHash(oru32_HashValue);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -239,9 +201,9 @@ void C_PuiSvData::SetServiceModeDashboardActive(const bool oq_NewValue)
    Current PC data
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvPc & C_PuiSvData::GetPcData(void) const
+const C_PuiSvPc & C_PuiSvData::GetPuiPcData(void) const
 {
-   return this->mc_PcData;
+   return this->mc_PuiPcData;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -250,36 +212,9 @@ const C_PuiSvPc & C_PuiSvData::GetPcData(void) const
    \param[in]  orc_Value   New PC data
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::SetPcData(const C_PuiSvPc & orc_Value)
+void C_PuiSvData::SetPuiPcData(const C_PuiSvPc & orc_Value)
 {
-   this->mc_PcData = orc_Value;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Get node active
-
-   \param[in]  ou32_NodeIndex    Node index
-
-   \return
-   Status if node is active
-*/
-//----------------------------------------------------------------------------------------------------------------------
-bool C_PuiSvData::GetNodeActive(const uint32_t ou32_NodeIndex) const
-{
-   bool q_Retval = false;
-
-   if (ou32_NodeIndex < this->mc_NodeActiveFlags.size())
-   {
-      if (this->mc_NodeActiveFlags[ou32_NodeIndex] == 0U)
-      {
-         q_Retval = false;
-      }
-      else
-      {
-         q_Retval = true;
-      }
-   }
-   return q_Retval;
+   this->mc_PuiPcData = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -309,390 +244,6 @@ bool C_PuiSvData::GetNodeStatusDisplayedAsActive(const uint32_t ou32_NodeIndex) 
       }
    }
    return q_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node active flags
-
-   \return
-   Current node active flags
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const std::vector<uint8_t> & C_PuiSvData::GetNodeActiveFlags(void) const
-{
-   return this->mc_NodeActiveFlags;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node active flags
-
-   \param[in]  orc_Value   New node active flags
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::SetNodeActiveFlags(const std::vector<uint8_t> & orc_Value)
-{
-   this->mc_NodeActiveFlags = orc_Value;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node update information
-
-   \return
-   Current node update information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const std::vector<C_PuiSvNodeUpdate> & C_PuiSvData::GetAllNodeUpdateInformation(void) const
-{
-   return this->mc_NodeUpdateInformation;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information
-
-   \param[in]  orc_NodeUpdateInformation  New node update information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::SetNodeUpdateInformation(const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation)
-{
-   this->mc_NodeUpdateInformation = orc_NodeUpdateInformation;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get node update information
-
-   \param[in]  ou32_NodeIndex    Node index
-
-   \return
-   NULL Update information not found
-   Else Valid update information
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvNodeUpdate * C_PuiSvData::GetNodeUpdateInformation(const uint32_t ou32_NodeIndex) const
-{
-   const C_PuiSvNodeUpdate * pc_Retval = NULL;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      pc_Retval = &this->mc_NodeUpdateInformation[ou32_NodeIndex];
-   }
-   return pc_Retval;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information
-
-   \param[in]  ou32_NodeIndex             Node index
-   \param[in]  orc_NodeUpdateInformation  New node update information
-
-   \return
-   C_NO_ERR    No error
-   C_RANGE     Node index invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformation(const uint32_t ou32_NodeIndex,
-                                              const C_PuiSvNodeUpdate & orc_NodeUpdateInformation)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      this->mc_NodeUpdateInformation[ou32_NodeIndex] = orc_NodeUpdateInformation;
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information path
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_Index        Index to access
-   \param[in]  orc_Value         New path
-   \param[in]  oe_Type           Selector for structure
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationPath(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                  const QString & orc_Value,
-                                                  const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.SetPath(ou32_Index, orc_Value, oe_Type);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information parameter set information
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_Index        Index to access
-   \param[in]  orc_Value         New path
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationParamInfo(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                       const C_PuiSvNodeUpdateParamInfo & orc_Value)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.SetParamInfo(ou32_Index, orc_Value);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information PEM file path
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  orc_Value         New path
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationPemFilePath(const uint32_t ou32_NodeIndex, const QString & orc_Value)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.SetPemFilePath(orc_Value);
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information skip flag
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_Index        Index to access
-   \param[in]  oq_SkipFile       New skip flag
-   \param[in]  oe_Type           Selector for structure
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfPath(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                              const bool oq_SkipFile,
-                                                              const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.SetSkipUpdateOfPath(ou32_Index, oq_SkipFile, oe_Type);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information parameter set skip flag
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_Index        Index to access
-   \param[in]  oq_SkipFile       New skip flag
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfParamInfo(const uint32_t ou32_NodeIndex,
-                                                                   const uint32_t ou32_Index, const bool oq_SkipFile)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.SetSkipUpdateOfParamInfo(ou32_Index, oq_SkipFile);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information PEM file skip flag
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  oq_SkipFile       New skip flag
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32_t ou32_NodeIndex, const bool oq_SkipFile)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.SetSkipUpdateOfPemFile(oq_SkipFile);
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information states
-
-   \param[in]      ou32_NodeIndex    Node index
-   \param[in]      oe_StateSecurity  Security state of node
-   \param[in]      oe_StateDebugger  Debugger state of node
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationStates(const uint32_t ou32_NodeIndex,
-                                                    const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                    const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.SetStates(oe_StateSecurity, oe_StateDebugger);
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set node update information parameter set information
-
-   \param[in]  ou32_NodeIndex       Node index
-   \param[in]  ou32_Index           Index to access
-   \param[in]  orc_FilePath         New path
-   \param[in]  ou32_LastKnownCrc    Last known CRC for this file
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::SetNodeUpdateInformationParamInfoContent(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                              const QString & orc_FilePath,
-                                                              const uint32_t ou32_LastKnownCrc)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.SetParamInfoContent(ou32_Index, orc_FilePath, ou32_LastKnownCrc);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add node update information path
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  orc_Value         New path
-   \param[in]  oe_Type           Selector for structure
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::AddNodeUpdateInformationPath(const uint32_t ou32_NodeIndex, const QString & orc_Value,
-                                                  const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.AddPath(orc_Value, oe_Type);
-
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Add node update information for a parameter set
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  orc_Value         New path
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::AddNodeUpdateInformationParamInfo(const uint32_t ou32_NodeIndex,
-                                                       const C_PuiSvNodeUpdateParamInfo & orc_Value)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.AddParamInfo(orc_Value);
-
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Get name
-
-   \return
-   Current name
-*/
-//----------------------------------------------------------------------------------------------------------------------
-const QString & C_PuiSvData::GetName(void) const
-{
-   return this->mc_Name;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set name
-
-   \param[in]  orc_Value   New name
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::SetName(const QString & orc_Value)
-{
-   this->mc_Name = orc_Value;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1386,7 +937,7 @@ void C_PuiSvData::OnSyncNodeAdded(const uint32_t ou32_Index)
       {
          uint32_t u32_NodeUpdateCounter;
          uint32_t u32_Position = 0U;
-         C_PuiSvNodeUpdate c_NodeUpdate;
+         C_OscViewNodeUpdate c_NodeUpdate;
 
          // Search the highest node update position and add the new node to the end
          for (u32_NodeUpdateCounter = 0U; u32_NodeUpdateCounter < this->mc_NodeUpdateInformation.size();
@@ -1656,28 +1207,6 @@ void C_PuiSvData::OnSyncNodeAboutToBeDeleted(const uint32_t ou32_Index)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sync view bus index to added bus index
-
-   \param[in]  ou32_Index  Added bus index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::OnSyncBusAdded(const uint32_t ou32_Index)
-{
-   this->mc_PcData.OnSyncBusAdded(ou32_Index);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sync view bus index to deleted bus index
-
-   \param[in]  ou32_Index  Deleted bus index
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::OnSyncBusDeleted(const uint32_t ou32_Index)
-{
-   this->mc_PcData.OnSyncBusDeleted(ou32_Index);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Adapt to system definition change
 
    \param[in]  ou32_NodeIndex       Node index
@@ -1790,8 +1319,18 @@ void C_PuiSvData::OnSyncNodeApplicationAdded(const uint32_t ou32_NodeIndex, cons
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
-      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationAdded(ou32_NodeIndex, ou32_ApplicationIndex);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_App =
+         C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, ou32_ApplicationIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+
+      tgl_assert(pc_App != NULL);
+      tgl_assert(pc_Node != NULL);
+      if ((pc_App != NULL) && (pc_Node != NULL))
+      {
+         C_OscViewNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+         rc_Update.OnSyncNodeApplicationAdded(ou32_ApplicationIndex, pc_App->e_Type, pc_App->c_ResultPaths.size(),
+                                              pc_Node->c_Applications);
+      }
    }
 }
 
@@ -1808,8 +1347,20 @@ void C_PuiSvData::OnSyncNodeApplicationMoved(const uint32_t ou32_NodeIndex, cons
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
-      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationMoved(ou32_NodeIndex, ou32_ApplicationSourceIndex, ou32_ApplicationTargetIndex);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_AppSource =
+         C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, ou32_ApplicationSourceIndex);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_AppTarget =
+         C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, ou32_ApplicationTargetIndex);
+
+      tgl_assert(pc_AppSource != NULL);
+      tgl_assert(pc_AppTarget != NULL);
+
+      if ((pc_AppSource != NULL) && (pc_AppTarget != NULL))
+      {
+         C_OscViewNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+         rc_Update.OnSyncNodeApplicationMoved(ou32_ApplicationSourceIndex, ou32_ApplicationTargetIndex,
+                                              pc_AppSource->e_Type, pc_AppTarget->e_Type);
+      }
    }
 }
 
@@ -1825,8 +1376,16 @@ void C_PuiSvData::OnSyncNodeApplicationAboutToBeDeleted(const uint32_t ou32_Node
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
-      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationAboutToBeDeleted(ou32_NodeIndex, ou32_ApplicationIndex);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_App =
+         C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, ou32_ApplicationIndex);
+
+      tgl_assert(pc_App != NULL);
+      if (pc_App != NULL)
+      {
+         C_OscViewNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+         rc_Update.OnSyncNodeApplicationAboutToBeDeleted(ou32_ApplicationIndex, pc_App->e_Type,
+                                                         pc_App->c_ResultPaths.size());
+      }
    }
 }
 
@@ -1842,8 +1401,17 @@ void C_PuiSvData::OnSyncNodeApplicationAboutToBeChangedFromParamSetHalc(const ui
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
-      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationAboutToBeChangedFromParamSetHalc(ou32_NodeIndex, ou32_ApplicationIndex);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_App =
+         C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, ou32_ApplicationIndex);
+
+      // Application still exists. Deletion will be done after this function
+      tgl_assert(pc_App != NULL);
+      if (pc_App != NULL)
+      {
+         C_OscViewNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+         rc_Update.OnSyncNodeApplicationAboutToBeChangedFromParamSetHalc(ou32_ApplicationIndex, pc_App->e_Type,
+                                                                         pc_App->c_ResultPaths.size());
+      }
    }
 }
 
@@ -1859,8 +1427,20 @@ void C_PuiSvData::OnSyncNodeApplicationChangedToParamSetHalc(const uint32_t ou32
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
-      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationChangedToParamSetHalc(ou32_NodeIndex, ou32_ApplicationIndex);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_App =
+         C_PuiSdHandler::h_GetInstance()->GetApplication(ou32_NodeIndex, ou32_ApplicationIndex);
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_NodeIndex);
+
+      // Application still exists. Deletion will be done after this function
+      tgl_assert(pc_App != NULL);
+      tgl_assert(pc_Node != NULL);
+      if ((pc_App != NULL) && (pc_Node != NULL))
+      {
+         C_OscViewNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+         rc_Update.OnSyncNodeApplicationChangedToParamSetHalc(ou32_ApplicationIndex, pc_App->e_Type,
+                                                              pc_App->c_ResultPaths.size(),
+                                                              pc_Node->c_Applications);
+      }
    }
 }
 
@@ -1879,9 +1459,16 @@ void C_PuiSvData::OnSyncNodeApplicationResultPathSizeChanged(const uint32_t ou32
 {
    if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
    {
-      C_PuiSvNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_Update.OnSyncNodeApplicationResultPathSizeChanged(ou32_NodeIndex, ou32_ApplicationIndex, ou32_OldSize,
-                                                           ou32_NewSize);
+      const stw::opensyde_core::C_OscNodeApplication * const pc_App = C_PuiSdHandler::h_GetInstance()->GetApplication(
+         ou32_NodeIndex,
+         ou32_ApplicationIndex);
+
+      tgl_assert(pc_App != NULL);
+      if (pc_App != NULL)
+      {
+         C_OscViewNodeUpdate & rc_Update = this->mc_NodeUpdateInformation[ou32_NodeIndex];
+         rc_Update.OnSyncNodeApplicationResultPathSizeChanged(pc_App->e_Type, ou32_OldSize, ou32_NewSize);
+      }
    }
 }
 
@@ -2343,7 +1930,7 @@ void C_PuiSvData::SetNodeCheckedState(const uint32_t ou32_NodeIndex, const uint8
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPcBox(const C_PuiBsBox & orc_Box)
 {
-   this->mc_PcData.SetBox(orc_Box);
+   this->mc_PuiPcData.SetBox(orc_Box);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2354,19 +1941,7 @@ void C_PuiSvData::SetPcBox(const C_PuiBsBox & orc_Box)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPcConnection(const C_PuiBsLineBase & orc_Line)
 {
-   this->mc_PcData.SetConnectionData(orc_Line);
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Set connected state of pc in view
-
-   \param[in]  oq_Connected   Flag if pc is connected
-   \param[in]  ou32_BusIndex  Bus index PC is connected to
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void C_PuiSvData::SetPcConnected(const bool oq_Connected, const uint32_t ou32_BusIndex)
-{
-   this->mc_PcData.SetConnected(oq_Connected, ou32_BusIndex);
+   this->mc_PuiPcData.SetConnectionData(orc_Line);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2377,7 +1952,7 @@ void C_PuiSvData::SetPcConnected(const bool oq_Connected, const uint32_t ou32_Bu
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPcCanDllType(const C_PuiSvPc::E_CanDllType oe_DllType)
 {
-   this->mc_PcData.SetCanDllType(oe_DllType);
+   this->mc_PuiPcData.SetCanDllType(oe_DllType);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2388,7 +1963,7 @@ void C_PuiSvData::SetPcCanDllType(const C_PuiSvPc::E_CanDllType oe_DllType)
 //----------------------------------------------------------------------------------------------------------------------
 void C_PuiSvData::SetPcCanDllPath(const QString & orc_DllPath)
 {
-   this->mc_PcData.SetCustomCanDllPath(orc_DllPath);
+   this->mc_PuiPcData.SetCustomCanDllPath(orc_DllPath);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -2948,132 +2523,6 @@ int32_t C_PuiSvData::RemoveReadRailItem(const C_OscNodeDataPoolListElementId & o
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove node update information path
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_Index        Index to remove
-   \param[in]  oe_Type           Selector for structure
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::RemoveNodeUpdateInformationPath(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index,
-                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.RemovePath(ou32_Index, oe_Type);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove node update information parameter set information
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  ou32_Index        Index to remove
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::RemoveNodeUpdateInformationParamInfo(const uint32_t ou32_NodeIndex, const uint32_t ou32_Index)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      s32_Return = rc_UpdateInformation.RemoveParamInfo(ou32_Index);
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Remove node update information PEM file path
-
-   \param[in]  ou32_NodeIndex    Node index
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::RemoveNodeUpdateInformationPemFilePath(const uint32_t ou32_NodeIndex)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.RemovePemFilePath();
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clear all node update information paths as appropriate for the type
-
-   \param[in]  ou32_NodeIndex    Node index
-   \param[in]  oe_Type           Selector for structure
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::ClearNodeUpdateInformationAsAppropriate(const uint32_t ou32_NodeIndex,
-                                                             const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.ClearPathsAsAppropriate(oe_Type);
-
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Clear all node update information parameter set paths for this node
-
-   \param[in]  ou32_NodeIndex    Node index
-
-   \return
-   C_NO_ERR Operation success
-   C_RANGE  Operation failure: parameter invalid
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_PuiSvData::ClearNodeUpdateInformationParamPaths(const uint32_t ou32_NodeIndex)
-{
-   int32_t s32_Return = C_RANGE;
-
-   if (ou32_NodeIndex < this->mc_NodeUpdateInformation.size())
-   {
-      C_PuiSvNodeUpdate & rc_UpdateInformation = this->mc_NodeUpdateInformation[ou32_NodeIndex];
-      rc_UpdateInformation.ClearParamPaths();
-
-      s32_Return = C_NO_ERR;
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Delete dashboard from view
 
    \param[in]  ou32_DashboardIndex  Dashboard index
@@ -3403,11 +2852,11 @@ void C_PuiSvData::InitFromSystemDefinition(void)
          const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_ItInfo);
          if (pc_Node != NULL)
          {
-            std::vector<QString> c_ApplPaths;
-            std::vector<C_PuiSvNodeUpdateParamInfo> c_ParamInfos;
+            std::vector<stw::scl::C_SclString> c_ApplPaths;
+            std::vector<C_OscViewNodeUpdateParamInfo> c_ParamInfos;
             std::vector<bool> c_ApplSkipFlags;
             std::vector<bool> c_ParamSetSkipFlags;
-            C_PuiSvNodeUpdate c_Info;
+            C_OscViewNodeUpdate c_Info;
             c_Info.u32_NodeUpdatePosition = u32_ItInfo;
             //Sync applications
             c_ApplPaths.reserve(pc_Node->c_Applications.size());
@@ -3418,29 +2867,28 @@ void C_PuiSvData::InitFromSystemDefinition(void)
                {
                   // Only in case of a HALC NVM Datapool the size 1 is possible
                   tgl_assert(rc_Application.c_ResultPaths.size() == 1);
-                  c_ApplPaths.push_back(
-                     C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                        rc_Application.c_ProjectPath.c_str(),
-                        rc_Application.c_ResultPaths[0U].c_str()));
+                  c_ApplPaths.emplace_back(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
+                                              rc_Application.c_ProjectPath.c_str(),
+                                              rc_Application.c_ResultPaths[0U].c_str()).toStdString().c_str());
                }
                else
                {
                   uint32_t u32_PathCounter;
                   for (u32_PathCounter = 0; u32_PathCounter < rc_Application.c_ResultPaths.size(); ++u32_PathCounter)
                   {
-                     C_PuiSvNodeUpdateParamInfo c_ParamInfo;
+                     C_OscViewNodeUpdateParamInfo c_ParamInfo;
                      // Adaption necessary if a check of the default PSI File will be added
-                     c_ParamInfo.SetContent(C_PuiUtil::h_MakeIndependentOfDbProjectPath(
-                                               rc_Application.c_ProjectPath.c_str(),
-                                               rc_Application.c_ResultPaths[u32_PathCounter].c_str()),
-                                            0U);
+                     c_ParamInfo.SetContent(
+                        C_PuiUtil::h_MakeIndependentOfDbProjectPath(
+                           rc_Application.c_ProjectPath.c_str(),
+                           rc_Application.c_ResultPaths[u32_PathCounter].c_str()).toStdString().c_str(), 0U);
                      c_ParamInfos.push_back(c_ParamInfo);
                   }
                }
             }
             c_ApplSkipFlags.resize(c_ApplPaths.size(), false);
-            c_Info.SetPaths(c_ApplPaths, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
-            c_Info.SetSkipUpdateOfPathsFlags(c_ApplSkipFlags, C_PuiSvNodeUpdate::eFTP_DATA_BLOCK);
+            c_Info.SetPaths(c_ApplPaths, C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
+            c_Info.SetSkipUpdateOfPathsFlags(c_ApplSkipFlags, C_OscViewNodeUpdate::eFTP_DATA_BLOCK);
 
             if (c_ParamInfos.size() > 0)
             {
@@ -3458,7 +2906,7 @@ void C_PuiSvData::InitFromSystemDefinition(void)
    {
       uint32_t u32_Counter;
 
-      this->mc_PcData.SetConnected(true, 0);
+      this->SetPcConnected(true, 0);
 
       for (u32_Counter = 0U; u32_Counter < this->mc_NodeActiveFlags.size(); ++u32_Counter)
       {
@@ -3467,7 +2915,7 @@ void C_PuiSvData::InitFromSystemDefinition(void)
    }
    else
    {
-      this->mc_PcData.SetConnected(false, 0);
+      this->SetPcConnected(false, 0);
    }
 }
 

@@ -417,7 +417,7 @@ int32_t C_PuiSvHandler::SetViewName(const uint32_t ou32_Index, const QString & o
    if (ou32_Index < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_Index];
-      rc_View.SetName(orc_Name);
+      rc_View.SetName(orc_Name.toStdString().c_str());
    }
    else
    {
@@ -1168,7 +1168,7 @@ int32_t C_PuiSvHandler::SetViewReadRailAssignment(const uint32_t ou32_ViewIndex,
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::SetNodeUpdateInformation(const uint32_t ou32_ViewIndex,
-                                                 const std::vector<C_PuiSvNodeUpdate> & orc_NodeUpdateInformation)
+                                                 const std::vector<C_OscViewNodeUpdate> & orc_NodeUpdateInformation)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -1197,7 +1197,7 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformation(const uint32_t ou32_ViewIndex,
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::SetNodeUpdateInformation(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                                 const C_PuiSvNodeUpdate & orc_NodeUpdateInformation)
+                                                 const C_OscViewNodeUpdate & orc_NodeUpdateInformation)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -1229,14 +1229,15 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformation(const uint32_t ou32_ViewIndex, 
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::SetNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                      const uint32_t ou32_Index, const QString & orc_Value,
-                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+                                                     const C_OscViewNodeUpdate::E_GenericFileType oe_Type)
 {
    int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      s32_Retval = rc_View.SetNodeUpdateInformationPath(ou32_NodeIndex, ou32_Index, orc_Value, oe_Type);
+      s32_Retval = rc_View.SetNodeUpdateInformationPath(ou32_NodeIndex, ou32_Index,
+                                                        orc_Value.toStdString().c_str(), oe_Type);
    }
    else
    {
@@ -1260,7 +1261,7 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationPath(const uint32_t ou32_ViewInd
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::SetNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                           const uint32_t ou32_Index,
-                                                          const C_PuiSvNodeUpdateParamInfo & orc_Value)
+                                                          const C_OscViewNodeUpdateParamInfo & orc_Value)
 {
    int32_t s32_Retval;
 
@@ -1296,7 +1297,7 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationPemFilePath(const uint32_t ou32_
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      s32_Retval = rc_View.SetNodeUpdateInformationPemFilePath(ou32_NodeIndex, orc_Value);
+      s32_Retval = rc_View.SetNodeUpdateInformationPemFilePath(ou32_NodeIndex, orc_Value.toStdString().c_str());
    }
    else
    {
@@ -1322,7 +1323,7 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationPemFilePath(const uint32_t ou32_
 int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPath(const uint32_t ou32_ViewIndex,
                                                                  const uint32_t ou32_NodeIndex,
                                                                  const uint32_t ou32_Index, const bool oq_SkipFile,
-                                                                 const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+                                                                 const C_OscViewNodeUpdate::E_GenericFileType oe_Type)
 {
    int32_t s32_Retval;
 
@@ -1413,8 +1414,8 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationSkipUpdateOfPemFile(const uint32
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::SetNodeUpdateInformationStates(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                                       const C_PuiSvNodeUpdate::E_StateSecurity oe_StateSecurity,
-                                                       const C_PuiSvNodeUpdate::E_StateDebugger oe_StateDebugger)
+                                                       const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                       const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger)
 {
    int32_t s32_Retval;
 
@@ -1455,8 +1456,9 @@ int32_t C_PuiSvHandler::SetNodeUpdateInformationParamInfoContent(const uint32_t 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      s32_Retval = rc_View.SetNodeUpdateInformationParamInfoContent(ou32_NodeIndex, ou32_Index, orc_FilePath,
-                                                                    ou32_LastKnownCrc);
+      s32_Retval =
+         rc_View.SetNodeUpdateInformationParamInfoContent(ou32_NodeIndex, ou32_Index,
+                                                          orc_FilePath.toStdString().c_str(), ou32_LastKnownCrc);
    }
    else
    {
@@ -1533,7 +1535,8 @@ int32_t C_PuiSvHandler::InsertView(const uint32_t ou32_Index, const C_PuiSvData 
       }
       if (oq_AutoAdaptName == true)
       {
-         c_TmpView.SetName(C_Uti::h_GetUniqueNameQt(this->m_GetExistingViewNames(), c_TmpView.GetName()));
+         c_TmpView.SetName(C_Uti::h_GetUniqueNameQt(this->m_GetExistingViewNames(),
+                                                    c_TmpView.GetName().c_str()).toStdString().c_str());
       }
       this->mc_Views.insert(this->mc_Views.begin() + ou32_Index, c_TmpView);
    }
@@ -1590,14 +1593,14 @@ int32_t C_PuiSvHandler::AddViewReadRailItem(const uint32_t ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::AddNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                      const QString & orc_Value,
-                                                     const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+                                                     const C_OscViewNodeUpdate::E_GenericFileType oe_Type)
 {
    int32_t s32_Retval;
 
    if (ou32_ViewIndex < this->mc_Views.size())
    {
       C_PuiSvData & rc_View = this->mc_Views[ou32_ViewIndex];
-      s32_Retval = rc_View.AddNodeUpdateInformationPath(ou32_NodeIndex, orc_Value, oe_Type);
+      s32_Retval = rc_View.AddNodeUpdateInformationPath(ou32_NodeIndex, orc_Value.toStdString().c_str(), oe_Type);
    }
    else
    {
@@ -1619,7 +1622,7 @@ int32_t C_PuiSvHandler::AddNodeUpdateInformationPath(const uint32_t ou32_ViewInd
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::AddNodeUpdateInformationParamInfo(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
-                                                          const C_PuiSvNodeUpdateParamInfo & orc_Value)
+                                                          const C_OscViewNodeUpdateParamInfo & orc_Value)
 {
    int32_t s32_Retval;
 
@@ -2067,7 +2070,7 @@ int32_t C_PuiSvHandler::RemoveViewReadRailItem(const uint32_t ou32_ViewIndex,
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::RemoveNodeUpdateInformationPath(const uint32_t ou32_ViewIndex, const uint32_t ou32_NodeIndex,
                                                         const uint32_t ou32_Index,
-                                                        const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+                                                        const C_OscViewNodeUpdate::E_GenericFileType oe_Type)
 {
    int32_t s32_Retval;
 
@@ -2154,7 +2157,7 @@ int32_t C_PuiSvHandler::RemoveNodeUpdateInformationPemFilePath(const uint32_t ou
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_PuiSvHandler::ClearNodeUpdateInformationAsAppropriate(const uint32_t ou32_ViewIndex,
                                                                 const uint32_t ou32_NodeIndex,
-                                                                const C_PuiSvNodeUpdate::E_GenericFileType oe_Type)
+                                                                const C_OscViewNodeUpdate::E_GenericFileType oe_Type)
 {
    int32_t s32_Retval;
 
@@ -2575,14 +2578,14 @@ int32_t C_PuiSvHandler::CheckViewError(const uint32_t ou32_Index, bool * const o
             if (u32_ItView != ou32_Index)
             {
                const C_PuiSvData & rc_CurData = this->mc_Views[u32_ItView];
-               if (rc_CurData.GetName().compare(rc_CheckedData.GetName()) == 0)
+               if (rc_CurData.GetName().AnsiCompare(rc_CheckedData.GetName()) == 0)
                {
                   c_Details.q_NameInvalid = true;
                }
             }
          }
          //Check PC connected
-         c_Details.q_PcNotConnected = !rc_CheckedData.GetPcData().GetConnected();
+         c_Details.q_PcNotConnected = !rc_CheckedData.GetOscPcData().GetConnected();
          //Check all routing details
          tgl_assert(this->m_CheckRouting(ou32_Index, c_NodeActiveFlags, c_SetupWarningMessage, c_ErrorMessages,
                                          c_NodesWithDashboardRoutingError,
@@ -2685,16 +2688,16 @@ int32_t C_PuiSvHandler::CheckViewReconnectNecessary(const uint32_t ou32_ViewInde
       // includes hash and is necessary for node indices update, which should be done before loading any view
       this->CheckViewError(ou32_ViewIndex, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
       //Check if bus exists
-      if (rc_View.GetPcData().GetConnected() == true)
+      if (rc_View.GetOscPcData().GetConnected() == true)
       {
-         if (rc_View.GetPcData().GetBusIndex() >= C_PuiSdHandler::h_GetInstance()->GetOscBusesSize())
+         if (rc_View.GetOscPcData().GetBusIndex() >= C_PuiSdHandler::h_GetInstance()->GetOscBusesSize())
          {
             orq_ReconnectNecessary = true;
          }
          else
          {
             //Check if bus enabled
-            if (this->CheckBusDisabled(ou32_ViewIndex, rc_View.GetPcData().GetBusIndex()) == true)
+            if (this->CheckBusDisabled(ou32_ViewIndex, rc_View.GetOscPcData().GetBusIndex()) == true)
             {
                orq_ReconnectNecessary = true;
             }
@@ -2985,7 +2988,7 @@ int32_t C_PuiSvHandler::CalcViewRoutingCrcIndex(const uint32_t ou32_ViewIndex, c
                   //Init
                   oru32_Crc = 0xFFFFFFFFUL;
 
-                  if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetPcData().GetBusIndex(),
+                  if (C_PuiSdHandler::h_GetInstance()->MapBusIndexToName(pc_View->GetOscPcData().GetBusIndex(),
                                                                          c_Name) == C_NO_ERR)
                   {
                      stw::scl::C_SclChecksums::CalcCRC32(c_Name.toStdString().c_str(), c_Name.length(), oru32_Crc);
@@ -4616,7 +4619,7 @@ std::map<stw::scl::C_SclString, bool> C_PuiSvHandler::m_GetExistingViewNames(voi
    for (uint32_t u32_ItView = 0; u32_ItView < this->mc_Views.size(); ++u32_ItView)
    {
       const C_PuiSvData & rc_Data = this->mc_Views[u32_ItView];
-      c_Retval[rc_Data.GetName().toStdString().c_str()] = true;
+      c_Retval[rc_Data.GetName()] = true;
    }
    return c_Retval;
 }

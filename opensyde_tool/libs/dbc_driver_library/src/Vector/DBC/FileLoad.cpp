@@ -2159,7 +2159,13 @@ Status File::load(Network & network, const char * filename)
 
             /* Value Tables (VAL_TABLE) */
             if (name == "VAL_TABLE_") {
-                readValueTable(network, line);
+                // 2023-02-23 STW: after discussion with colleagues we disable the following code line.
+                //                 Reason is a known stack overflow problem with the std::regex function.
+                //                 Same issue was found in /* Value Descriptions (VAL) for Signals (SG) */ parsing.
+                //                 Due to we don't use VAL_TABLE data yet, there is no benefit to add the same fix we did
+                //                 for VAL parsing.
+
+                //readValueTable(network, line);
             } else
 
             /* Messages (BO) */

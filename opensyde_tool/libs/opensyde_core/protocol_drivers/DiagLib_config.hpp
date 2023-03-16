@@ -16,14 +16,6 @@
 #include "C_OscUtils.hpp"
 
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-//if the diaglib shall become part of a bigger library a keyword to export classes and functions might be required
-#ifdef __BORLANDC__
-//for VisLib: export from Borland C++ Builder packages
-#define STW_DIAGLIB_EXPORT __declspec(package)
-#else
-//else leave this blank
-#define STW_DIAGLIB_EXPORT
-#endif
 
 //Define which dynamicarray type to use for KEFEX variable lists.
 //We use the Ansi-C++ DynamicArray

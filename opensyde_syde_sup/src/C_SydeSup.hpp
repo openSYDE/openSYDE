@@ -19,6 +19,7 @@
 #include "C_OscIpDispatcher.hpp"
 #include "C_OscSecurityPemDatabase.hpp"
 #include "C_OscSuSequences.hpp"
+#include "C_OscViewData.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -31,6 +32,12 @@ class C_SydeSup
 public:
    C_SydeSup(void);
    virtual ~C_SydeSup(void);
+
+   enum E_OperationMode
+   {
+      eMODE_UPDATE,
+      eMODE_CREATEPACKAGE
+   };
 
    enum E_Result
    {
@@ -76,12 +83,19 @@ public:
       eERR_THREAD_UPDATE_IN_PROGRESS   = 70,
       eERR_THREAD_UPDATE_INIT_FAILED   = 71,
 
+      eERR_CREATE_PROJ_LOAD_FAILED     = 80,
+      eERR_CREATE_VIEW_NOT_FOUND       = 81,
+      eERR_CREATE_ZIP_RD_RW            = 82,
+      eERR_CREATE_ZIP_CONFIG           = 83,
+
       eOK                              = 0,
       eERR_UNKNOWN                     = 100
    };
 
    E_Result ParseCommandLine(const int32_t os32_Argc, char_t * const * const oppcn_Argv);
+   E_Result SelectModeAndStart(void);
    E_Result Update(void);
+   E_Result CreatePackage(void);
    static void h_WriteLog(const stw::scl::C_SclString & orc_Activity, const stw::scl::C_SclString & orc_Text,
                           const bool & orq_IsError = false, const bool & orq_Quiet = false);
 
@@ -97,36 +111,59 @@ protected:
    stw::opensyde_core::C_OscIpDispatcher * mpc_EthDispatcher;
    bool mq_Quiet;
    bool mq_OnlyNecessaryFiles;
+   E_OperationMode me_OperationMode;
+   stw::scl::C_SclString mc_OperationMode;
    stw::scl::C_SclString mc_SupFilePath;
    stw::scl::C_SclString mc_CanDriver;
    stw::scl::C_SclString mc_LogPath;
    stw::scl::C_SclString mc_LogFile;
    stw::scl::C_SclString mc_UnzipPath;
    stw::scl::C_SclString mc_CertFolderPath;
+   stw::scl::C_SclString mc_OsyProjectPath;
+   stw::scl::C_SclString mc_ViewName;
+   stw::scl::C_SclString mc_DeviceDefPath;
 
    C_SydeSup::E_Result m_InitOptionalParameters(void);
 
 private:
+   // Update system with service update package
    virtual void m_CloseCan(void) = 0;
    virtual E_Result m_OpenCan(const stw::scl::C_SclString & orc_CanDriver, const uint64_t ou64_BitrateBps) = 0;
    virtual E_Result m_OpenEthernet(void) = 0;
-   virtual stw::scl::C_SclString m_GetApplicationVersion(const stw::scl::C_SclString & orc_ApplicationFileName) const = 0;
+   virtual stw::scl::C_SclString m_GetApplicationVersion(const stw::scl::C_SclString & orc_ApplicationFileName) const =
+      0;
    virtual stw::scl::C_SclString m_GetDefaultLogLocation(void) const = 0;
    virtual stw::scl::C_SclString m_GetCanInterfaceUsageExample(void) const = 0;
 
    void m_PrintVersion(const stw::scl::C_SclString & orc_Version, const stw::scl::C_SclString & orc_BinaryHash,
                        const bool oq_Detailed) const;
    void m_PrintInformation(const bool oq_Detailed) const;
+   void m_InitLogging(void);
    stw::scl::C_SclString m_GetLogFileLocation(void) const;
    void m_PrintStringFromError(const C_SydeSup::E_Result & ore_Result) const;
    void m_Conclude(C_SupSuSequences & orc_Sequence, const bool & orq_ResetSystem);
    int32_t m_UpdateSystem(C_SupSuSequences & orc_Sequence,
-                                    const stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition,
-                                    std::vector<uint32_t> & orc_NodesUpdateOrder,
-                                    const std::vector<uint8_t> & orc_ActiveNodes,
-                                    std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite) const;
+                          const stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition,
+                          std::vector<uint32_t> & orc_NodesUpdateOrder, const std::vector<uint8_t> & orc_ActiveNodes,
+                          std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite) const;
    std::vector<uint8_t> m_GetActiveNodeTypes(const stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition,
-                                                     const std::vector<uint8_t> & orc_ActiveNodes) const;
+                                             const std::vector<uint8_t> & orc_ActiveNodes) const;
+
+   // Creation of service update package
+   E_Result m_FindView(const std::vector<stw::opensyde_core::C_OscViewData> & orc_Views,
+                       stw::opensyde_core::C_OscViewData & orc_View);
+   void m_GetUpdatePackage(const stw::opensyde_core::C_OscViewData & orc_View,
+                           const stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition,
+                           std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite) const;
+   void m_GetDataBlocksToWrite(const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdate,
+                               const stw::opensyde_core::C_OscNode & orc_Node,
+                               stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const;
+   void m_GetFileBasedFilesToWrite(const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdate,
+                                   const stw::opensyde_core::C_OscNode & orc_Node,
+                                   stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const;
+   void m_GetParamSetsToWrite(const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdate,
+                              const stw::opensyde_core::C_OscNode & orc_Node,
+                              stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const;
 
    // Security PEM database
    stw::opensyde_core::C_OscSecurityPemDatabase mc_PemDatabase;

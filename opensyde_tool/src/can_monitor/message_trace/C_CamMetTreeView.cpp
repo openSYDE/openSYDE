@@ -64,6 +64,8 @@ const int32_t C_CamMetTreeView::mhs32_COL_WIDTH_CAN_COUNTER = 97;
    \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
+//PC-Lint suppressions: No problem with having the mutex stored as member instead of a static member
+//lint -save -e2751
 C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
    C_OgeTreeViewToolTipBase(opc_Parent),
    C_SyvComMessageMonitor(),
@@ -939,6 +941,7 @@ void C_CamMetTreeView::m_UpdateUi(const std::list<C_CamMetTreeLoggerData> & orc_
       this->style()->polish(this);
    }
    this->mc_MutexUpdate.unlock();
+   //lint -restore
 }
 
 //----------------------------------------------------------------------------------------------------------------------

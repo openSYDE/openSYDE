@@ -74,7 +74,7 @@ C_SyvUpPacParamSetFileAddPopUp::C_SyvUpPacParamSetFileAddPopUp(
 /*! \brief   Default destructor
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SyvUpPacParamSetFileAddPopUp::~C_SyvUpPacParamSetFileAddPopUp(void)
+C_SyvUpPacParamSetFileAddPopUp::~C_SyvUpPacParamSetFileAddPopUp(void) noexcept
 {
    delete this->mpc_Ui;
 }
@@ -113,7 +113,7 @@ int32_t C_SyvUpPacParamSetFileAddPopUp::ReadFile(void)
    Read file info (check file read function return value for validity)
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvNodeUpdateParamInfo & C_SyvUpPacParamSetFileAddPopUp::GetParamInfo(void) const
+const C_OscViewNodeUpdateParamInfo & C_SyvUpPacParamSetFileAddPopUp::GetParamInfo(void) const
 {
    return this->mc_FileInfo.GetParamInfo();
 }

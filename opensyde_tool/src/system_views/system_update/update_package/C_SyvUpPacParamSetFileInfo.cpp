@@ -78,7 +78,7 @@ int32_t C_SyvUpPacParamSetFileInfo::ReadFile(void)
    if (s32_Retval == C_NO_ERR)
    {
       this->mc_InterpretedFileInfo = c_FileHandler.GetInterpretedData();
-      this->mc_ParamInfo.SetContent(this->mc_StoragePath, u16_FileCrc);
+      this->mc_ParamInfo.SetContent(this->mc_StoragePath.toStdString().c_str(), u16_FileCrc);
       this->mc_ComparisonResults.clear();
       m_Comparison(q_OptionlContentMissing);
       m_ConvertToHtmlString(q_OptionlContentMissing);
@@ -94,7 +94,7 @@ int32_t C_SyvUpPacParamSetFileInfo::ReadFile(void)
    Read file info (check file read function return value for validity)
 */
 //----------------------------------------------------------------------------------------------------------------------
-const C_PuiSvNodeUpdateParamInfo & C_SyvUpPacParamSetFileInfo::GetParamInfo(void) const
+const C_OscViewNodeUpdateParamInfo & C_SyvUpPacParamSetFileInfo::GetParamInfo(void) const
 {
    return this->mc_ParamInfo;
 }

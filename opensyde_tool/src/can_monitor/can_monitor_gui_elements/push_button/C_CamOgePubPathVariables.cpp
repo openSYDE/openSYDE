@@ -17,11 +17,13 @@
 #include "cam_constants.hpp"
 #include "C_GtGetText.hpp"
 #include "C_CamOgePubPathVariables.hpp"
+#include "C_OscUtils.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::opensyde_gui_elements;
 using namespace stw::opensyde_gui_logic;
 using namespace stw::opensyde_gui;
+using namespace stw::opensyde_core;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
 
@@ -111,7 +113,7 @@ void C_CamOgePubPathVariables::m_CanMonitorProjTriggered(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamOgePubPathVariables::m_UserNameTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_USER_NAME));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_USER_NAME.c_str()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -122,5 +124,5 @@ void C_CamOgePubPathVariables::m_UserNameTriggered(void)
 //----------------------------------------------------------------------------------------------------------------------
 void C_CamOgePubPathVariables::m_ComputerNameTriggered(void)
 {
-   Q_EMIT (this->SigVariableSelected(mc_PATH_VARIABLE_COMPUTER_NAME));
+   Q_EMIT (this->SigVariableSelected(C_OscUtils::hc_PATH_VARIABLE_COMPUTER_NAME.c_str()));
 }

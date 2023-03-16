@@ -203,6 +203,10 @@ void C_SdBueMessageSelectorWidget::UpdateButtonText(void) const
       {
          c_Text = static_cast<QString>(C_GtGetText::h_GetText("PDO Messages (%1)"));
       }
+      else if (this->me_ProtocolType == C_OscCanProtocol::eJ1939)
+      {
+         c_Text = static_cast<QString>(C_GtGetText::h_GetText("PG Messages (%1)"));
+      }
       else
       {
          c_Text = static_cast<QString>(C_GtGetText::h_GetText("Messages (%1)"));
@@ -477,40 +481,32 @@ void C_SdBueMessageSelectorWidget::RecheckProtocolError(void) const
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PbTreeWidgetRoot, "Valid", q_Valid);
 
    // Update the tooltip
+   QString c_ToolTipHeading;
+   QString c_ToolTipText;
    if (this->me_ProtocolType == C_OscCanProtocol::eCAN_OPEN)
    {
-      const QString c_Text = C_GtGetText::h_GetText("Show overview of all PDO messages / mapped signals");
-
-      if (q_Valid == true)
-      {
-         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
-            C_GtGetText::h_GetText("PDO Messages"),
-            c_Text);
-      }
-      else
-      {
-         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
-            C_GtGetText::h_GetText("PDO Messages"),
-            c_Text + c_ErrorText,
-            C_NagToolTip::eERROR);
-      }
+      c_ToolTipHeading = C_GtGetText::h_GetText("PDO Messages");
+      c_ToolTipText = C_GtGetText::h_GetText("Show overview of all PDO messages / mapped signals");
+   }
+   else if (this->me_ProtocolType == C_OscCanProtocol::eJ1939)
+   {
+      c_ToolTipHeading = C_GtGetText::h_GetText("PG Messages");
+      c_ToolTipText = C_GtGetText::h_GetText("Show overview of all PG messages / mapped SP signals");
    }
    else
    {
-      const QString c_Text = C_GtGetText::h_GetText("Show overview of all messages / mapped signals");
+      c_ToolTipHeading = C_GtGetText::h_GetText("Messages");
+      c_ToolTipText = C_GtGetText::h_GetText("Show overview of all messages / mapped signals");
+   }
 
-      if (q_Valid == true)
-      {
-         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(C_GtGetText::h_GetText("Messages"),
-                                                                  c_Text);
-      }
-      else
-      {
-         this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(
-            C_GtGetText::h_GetText("Messages"),
-            c_Text + c_ErrorText,
-            C_NagToolTip::eERROR);
-      }
+   if (q_Valid == true)
+   {
+      this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(c_ToolTipHeading, c_ToolTipText);
+   }
+   else
+   {
+      this->mpc_Ui->pc_PbTreeWidgetRoot->SetToolTipInformation(c_ToolTipHeading, c_ToolTipText + c_ErrorText,
+                                                               C_NagToolTip::eERROR);
    }
 }
 

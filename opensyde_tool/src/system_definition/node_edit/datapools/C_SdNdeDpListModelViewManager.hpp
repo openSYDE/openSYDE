@@ -44,7 +44,7 @@ class C_SdNdeDpListModelViewManager :
 public:
    //Avoid call
    C_SdNdeDpListModelViewManager(QObject * const opc_Parent = NULL);
-   virtual ~C_SdNdeDpListModelViewManager(void);
+   ~C_SdNdeDpListModelViewManager(void) override;
    void Clear(void);
 
    stw::opensyde_gui::C_SdNdeDpListDataSetView * GetDataSetView(const uint32_t & oru32_NodeIndex,

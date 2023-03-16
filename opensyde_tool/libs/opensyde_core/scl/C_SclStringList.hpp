@@ -35,20 +35,11 @@ namespace stw
 {
 namespace scl
 {
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
-
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Container class for lists of strings
-class SCL_PACKAGE C_SclStringList
+class C_SclStringList
 {
 private:
 public:

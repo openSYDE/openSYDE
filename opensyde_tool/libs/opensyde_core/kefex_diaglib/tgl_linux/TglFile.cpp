@@ -155,7 +155,7 @@ int32_t stw::tgl::TglFileSize(const C_SclString & orc_FileName)
    false      directory does not exist
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool TGL_PACKAGE stw::tgl::TglDirectoryExists(const C_SclString & orc_Path)
+bool stw::tgl::TglDirectoryExists(const C_SclString & orc_Path)
 {
    int32_t s32_Ret;
    struct stat t_Status;
@@ -206,8 +206,8 @@ bool stw::tgl::TglFileExists(const C_SclString & orc_FileName)
    C_NOACT      no files found
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t TGL_PACKAGE stw::tgl::TglFileFind(const C_SclString & orc_SearchPattern,
-                                          C_SclDynamicArray<C_TglFileSearchRecord> & orc_FoundFiles)
+int32_t stw::tgl::TglFileFind(const C_SclString & orc_SearchPattern,
+                              C_SclDynamicArray<C_TglFileSearchRecord> & orc_FoundFiles)
 {
    int32_t s32_Error = C_CONFIG;
    DIR * pc_Dir;
@@ -250,7 +250,7 @@ int32_t TGL_PACKAGE stw::tgl::TglFileFind(const C_SclString & orc_SearchPattern,
    path with delimiter
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglFileIncludeTrailingDelimiter(const C_SclString & orc_Path)
+C_SclString stw::tgl::TglFileIncludeTrailingDelimiter(const C_SclString & orc_Path)
 {
    if (orc_Path.Length() == 0)
    {
@@ -276,7 +276,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglFileIncludeTrailingDelimiter(const C_SclStr
    extension (includes the ".")
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglExtractFileExtension(const C_SclString & orc_Path)
+C_SclString stw::tgl::TglExtractFileExtension(const C_SclString & orc_Path)
 {
    uint32_t u32_Pos;
    C_SclString c_Extension = "";
@@ -303,8 +303,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglExtractFileExtension(const C_SclString & or
    new file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglChangeFileExtension(const C_SclString & orc_Path,
-                                                          const C_SclString & orc_Extension)
+C_SclString stw::tgl::TglChangeFileExtension(const C_SclString & orc_Path, const C_SclString & orc_Extension)
 {
    uint32_t u32_Pos;
    C_SclString c_NewPath = orc_Path;
@@ -325,7 +324,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglChangeFileExtension(const C_SclString & orc
    \return  full path including "/binary" (including extension if any); empty string on error
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglGetExePath(void)
+C_SclString stw::tgl::TglGetExePath(void)
 {
     int32_t s32_Return;
     char_t acn_Arg[20];
@@ -360,7 +359,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglGetExePath(void)
       }
       else
       {
-         // The buffer was probably to small, try a further iteration with an increased buffer size:
+         // The buffer was probably too small, try a further iteration with an increased buffer size:
          // sn_Return is bigger or equal to sn_BuffSize. This is an indicator for a truncated part of the path
       }
     }
@@ -387,7 +386,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglGetExePath(void)
    file path   (including final "\" or ":")
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglExtractFilePath(const C_SclString & orc_Path)
+C_SclString stw::tgl::TglExtractFilePath(const C_SclString & orc_Path)
 {
    uint32_t u32_Return;
    C_SclString c_Path = ".";
@@ -412,7 +411,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglExtractFilePath(const C_SclString & orc_Pat
    file name
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglExtractFileName(const C_SclString & orc_Path)
+C_SclString stw::tgl::TglExtractFileName(const C_SclString & orc_Path)
 {
    uint32_t u32_Return;
    C_SclString c_FileName;
@@ -442,8 +441,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglExtractFileName(const C_SclString & orc_Pat
    Absolute path; empty string on error
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString TGL_PACKAGE stw::tgl::TglExpandFileName(const C_SclString & orc_RelativePath,
-                                                     const C_SclString & orc_BasePath)
+C_SclString stw::tgl::TglExpandFileName(const C_SclString & orc_RelativePath, const C_SclString & orc_BasePath)
 {
    char_t * pcn_Path;
    C_SclString c_RelPath = orc_BasePath + "/" + orc_RelativePath;
@@ -460,7 +458,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglExpandFileName(const C_SclString & orc_Rela
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief  Create single directory
+/*! \brief   Create single directory
 
    Create a directory.
    Does not support creating directories recursively.
@@ -472,7 +470,7 @@ C_SclString TGL_PACKAGE stw::tgl::TglExpandFileName(const C_SclString & orc_Rela
    -1    could not create directory
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t TGL_PACKAGE stw::tgl::TglCreateDirectory(const C_SclString & orc_Directory)
+int32_t stw::tgl::TglCreateDirectory(const C_SclString & orc_Directory)
 {
    int32_t s32_Ret;
    int32_t s32_Result = -1;
@@ -540,8 +538,7 @@ static int m_RemoveFile(const char * opcn_Pathname, const struct stat * opt_Stat
    -1    could not remove directory
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t TGL_PACKAGE stw::tgl::TglRemoveDirectory(const C_SclString & orc_Directory,
-                                                  const bool oq_ContentOnly)
+int32_t stw::tgl::TglRemoveDirectory(const C_SclString & orc_Directory, const bool oq_ContentOnly)
 {
    int32_t s32_Ret = -1;
    bool q_DirExists;
@@ -562,3 +559,29 @@ int32_t TGL_PACKAGE stw::tgl::TglRemoveDirectory(const C_SclString & orc_Directo
    return s32_Ret;
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Check whether specified path is a relative path
+
+   For Linux:
+   An absolute path starts with "/".
+
+   \param[in]   orc_Path             Path to check
+
+   \return
+   true   path is a relative path (or empty)
+   false  path is an absolute path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool stw::tgl::TglIsRelativePath(const C_SclString & orc_Path) 
+{
+   bool q_IsAbsolute = false;
+
+   if (orc_Path.Length() >= 1U)
+   {
+      if (orc_Path[1] == '/')
+      {
+         q_IsAbsolute = true;
+      }
+   }
+   return !q_IsAbsolute;
+}

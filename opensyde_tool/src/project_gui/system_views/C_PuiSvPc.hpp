@@ -40,11 +40,8 @@ public:
 
    void CalcHash(uint32_t & oru32_HashValue) const override;
 
-   bool GetConnected(void) const;
-   uint32_t GetBusIndex(void) const;
    const C_PuiBsLineBase & GetConnectionData(void) const;
    void SetConnectionData(const C_PuiBsLineBase & orc_Value);
-   void SetConnected(const bool oq_Connected, const uint32_t ou32_BusIndex, const bool & orq_ForceSimpleSet = false);
    E_CanDllType GetCanDllType(void) const;
    QString GetCanDll(void) const;
    QString GetCustomCanDllPath(void) const;
@@ -55,15 +52,7 @@ public:
    //Specific setter
    void SetBox(const C_PuiBsBox & orc_Box);
 
-   //Sync to system definition
-   void OnSyncBusAdded(const uint32_t ou32_Index);
-   void OnSyncBusDeleted(const uint32_t ou32_Index);
-   bool CheckIndirectDisconnection(void) const;
-
 private:
-   bool mq_Connected;      ///< Flag if there is a valid bus connected to this PC
-   uint32_t mu32_BusIndex; ///< Target bus index this PC connects to
-   ///< Only valid if bus flag q_IsBusConnected is true
    C_PuiBsLineBase mc_ConnectionData; ///< Relevant connection UI data
    E_CanDllType me_CanDllType;        ///< Type of CAN DLL
    QString mc_CustomCanDllPath;       ///< Path to the custom CAN DLL

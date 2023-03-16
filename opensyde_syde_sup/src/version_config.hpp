@@ -6,15 +6,15 @@
    Contains the version information to be used e.g. from resources.rc or from .cpp files.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef VERSION_CONFIG_HPP
-#define VERSION_CONFIG_HPP
+#ifndef VERSION_CONFIG_H
+#define VERSION_CONFIG_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 #define PROJECT_VERSION_MAJOR 1
-#define PROJECT_VERSION_MINOR 10
-#define PROJECT_VERSION_RELEASE 1
+#define PROJECT_VERSION_MINOR 11
+#define PROJECT_VERSION_RELEASE 2
 #define PROJECT_VERSION_BUILD 0
 
-#endif
+#endif // VERSION_CONFIG_H

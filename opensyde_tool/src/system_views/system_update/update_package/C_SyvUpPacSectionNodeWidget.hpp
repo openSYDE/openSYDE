@@ -20,7 +20,7 @@
 #include "C_SyvUpDeviceInfo.hpp"
 
 #include "C_OscSuSequences.hpp"
-#include "C_PuiSvNodeUpdate.hpp"
+#include "C_OscViewNodeUpdate.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 
@@ -92,7 +92,7 @@ protected:
    void resizeEvent(QResizeEvent * const opc_Event) override;
 
    virtual void m_InitSpecificItem(const stw::opensyde_core::C_OscNode & orc_Node,
-                                   const stw::opensyde_gui_logic::C_PuiSvNodeUpdate & orc_UpdateInfo) = 0;
+                                   const stw::opensyde_core::C_OscViewNodeUpdate & orc_UpdateInfo) = 0;
    virtual void m_InitStaticNames(void) = 0;
    virtual void m_UpdateTitle(void);
    virtual uint32_t m_AdaptParamSetNumber(const uint32_t ou32_Number);
@@ -105,7 +105,7 @@ protected:
 
    void m_AdaptParamSetFile(const QString & orc_File, C_SyvUpPacListNodeItemWidget * const opc_App);
    int32_t m_GetParamsetFileInfo(const QString & orc_File,
-                                 stw::opensyde_gui_logic::C_PuiSvNodeUpdateParamInfo & orc_ParamFileInfo);
+                                 stw::opensyde_core::C_OscViewNodeUpdateParamInfo & orc_ParamFileInfo);
 
    void mousePressEvent(QMouseEvent * const opc_Event) override;
 
@@ -141,6 +141,7 @@ private:
    void m_UpdateNumbers(void);
    void m_ButtonAddNewFile(void);
    void m_RestartMovie(void);
+   void m_UpdateLabelNoFiles(void);
 
    static void mh_FillDoFlashWithPemStates(const C_SyvUpPacListNodeItemWidget * const opc_App,
                                            stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_DoFlash);

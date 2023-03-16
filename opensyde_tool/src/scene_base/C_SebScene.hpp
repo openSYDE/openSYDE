@@ -63,6 +63,7 @@ public:
 
    virtual bool IsMousePosRelevantForProxyWidgetInteraction(const QPointF & orc_ScenePos);
    virtual bool IsSelectionRelevantForProxyWidgetInteraction(void) const;
+   virtual bool IsOverrideCursorNecessary(const QPointF & orc_ScenePos, Qt::CursorShape & ore_Cursor) const;
 
    virtual void UpdateTransform(const QTransform & orc_Transform);
 
