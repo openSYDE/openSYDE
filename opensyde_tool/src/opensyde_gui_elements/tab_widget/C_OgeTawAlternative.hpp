@@ -31,7 +31,7 @@ class C_OgeTawAlternative :
 
 public:
    C_OgeTawAlternative(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTawAlternative(void);
+   ~C_OgeTawAlternative(void) override;
 
 private:
    //Avoid call

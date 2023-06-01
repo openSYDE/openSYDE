@@ -258,6 +258,18 @@ C_SclString C_SydeSupWindows::m_GetDefaultLogLocation(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default example for unzip location (user's temporary folder of operating system)
+
+   \return
+   Example unzip location
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_SydeSupWindows::m_GetUnzipLocationDefaultExample(void) const
+{
+   return "%TEMP%";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Get CAN interface command line flag "-i" usage example
 
    \return

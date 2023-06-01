@@ -78,7 +78,9 @@ C_CamMosDatabaseBusSelectionPopup::C_CamMosDatabaseBusSelectionPopup(
 
    //lint -e{1938} //we don't create global objects of this class; no race conditions can occur
    this->mpc_Ui->pc_LabelDatabaseValue->setText(C_Uti::h_MinimizePath(orc_Database.c_Name,
-                                                                      mc_STYLE_GUIDE_FONT_REGULAR_12, 750, 4));
+                                                                      C_Uti::h_GetFontPixel(
+                                                                         mc_STYLE_GUIDE_FONT_REGULAR_12),
+                                                                      this->mpc_Ui->pc_LabelDatabaseValue->width(), 4));
 
    this->mpc_Ui->pc_LabelDatabaseValue->SetToolTipInformation("", C_CamUti::h_GetAbsPathFromProj(orc_Database.c_Name));
 

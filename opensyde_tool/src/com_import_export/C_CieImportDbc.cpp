@@ -61,11 +61,11 @@ C_SclString C_CieImportDbc::mhc_ErrorMessage = "";    // empty string
 
    The caller is responsible to provided valid pointers for the function parameters.
 
-   \param[in]  orc_File               path and name of .dbc file
-   \param[out] orc_Definition         communication stack definition filled with data read from .dbc file
-   \param[out] orc_WarningMessages    list of global warnings e.g. why some messages could not be imported
-   \param[out] orc_ErrorMessage       error message with reason for failed import
-   \param[in]  oq_AddUnmappedMessages Optional flag to include unmapped messages in the output
+   \param[in]   orc_File                  path and name of .dbc file
+   \param[out]  orc_Definition            communication stack definition filled with data read from .dbc file
+   \param[out]  orc_WarningMessages       list of global warnings e.g. why some messages could not be imported
+   \param[out]  orc_ErrorMessage          error message with reason for failed import
+   \param[in]   oq_AddUnmappedMessages    Optional flag to include unmapped messages in the output
 
    \return
    C_NO_ERR    required data from file successfully stored in orc_Definition
@@ -112,26 +112,26 @@ int32_t C_CieImportDbc::h_ImportNetwork(const C_SclString & orc_File,
       // assign node definitions with messages
       // there is also a check if each message was assigned
       std::set<std::string> c_MessageAssignment;
-      for (const auto c_DbcMessage : c_DbcNetwork.messages)
+      for (const auto & rc_DbcMessage : c_DbcNetwork.messages)
       {
-         c_MessageAssignment.insert(c_DbcMessage.second.name);
+         c_MessageAssignment.insert(rc_DbcMessage.second.name);
       }
       orc_Definition.c_Nodes.resize(c_DbcNetwork.nodes.size());
-      for (const auto c_DbcNode : c_DbcNetwork.nodes)
+      for (const auto & rc_DbcNode : c_DbcNetwork.nodes)
       {
          C_CieConverter::C_CieNode & rc_Node = orc_Definition.c_Nodes[u32_Nodes];
-         mh_GetNode(c_DbcNode.second, rc_Node);
+         mh_GetNode(rc_DbcNode.second, rc_Node);
          osc_write_log_info("DBC file import", "Reading messages with signals for node \"" +
                             rc_Node.c_Properties.c_Name + "\" ...");
 
-         for (const auto c_DbcMessage : c_DbcNetwork.messages)
+         for (const auto & rc_DbcMessage : c_DbcNetwork.messages)
          {
-            const int32_t s32_Tmp = mh_GetMessage(c_DbcMessage.second, rc_Node);
+            const int32_t s32_Tmp = mh_GetMessage(c_DbcNetwork, rc_DbcMessage.second, rc_Node);
             // check if message is assigned to a node
             if (s32_Tmp != C_CONFIG)
             {
                // message is assigned to a node, then we erase this message from temporary message assignment set
-               const std::set<std::string>::const_iterator c_Iter = c_MessageAssignment.find(c_DbcMessage.second.name);
+               const std::set<std::string>::const_iterator c_Iter = c_MessageAssignment.find(rc_DbcMessage.second.name);
                if (c_Iter != c_MessageAssignment.end())
                {
                   c_MessageAssignment.erase(c_Iter);
@@ -164,7 +164,8 @@ int32_t C_CieImportDbc::h_ImportNetwork(const C_SclString & orc_File,
                if (c_DbcMessage != c_DbcNetwork.messages.end())
                {
                   //Add found valid message to unmapped messages
-                  if (mh_ConvertAndAddMessage(c_DbcMessage->second, orc_Definition.c_UnmappedMessages) != C_NO_ERR)
+                  if (mh_ConvertAndAddMessage(c_DbcNetwork, c_DbcMessage->second,
+                                              orc_Definition.c_UnmappedMessages) != C_NO_ERR)
                   {
                      s32_Return = C_WARN;
                   }
@@ -186,7 +187,10 @@ int32_t C_CieImportDbc::h_ImportNetwork(const C_SclString & orc_File,
       }
    }
 
-   osc_write_log_info("DBC file import", "DBC network successfully imported.");
+   if ((s32_Return == C_NO_ERR) || (s32_Return == C_WARN))
+   {
+      osc_write_log_info("DBC file import", "DBC network successfully imported.");
+   }
 
    orc_WarningMessages = mhc_WarningMessages; // set warning messages for caller
    orc_ErrorMessage = mhc_ErrorMessage;       // set error message for caller
@@ -197,8 +201,8 @@ int32_t C_CieImportDbc::h_ImportNetwork(const C_SclString & orc_File,
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Read data from .dbc file
 
-   \param[in]  orc_File        path and name of .dbc file
-   \param[out] orc_Network     data read from .dbc file
+   \param[in]   orc_File      path and name of .dbc file
+   \param[out]  orc_Network   data read from .dbc file
 
    \return
    C_NO_ERR    all data successfully read from file
@@ -224,14 +228,23 @@ int32_t C_CieImportDbc::mh_ReadFile(const C_SclString & orc_File, Vector::DBC::N
    else
    {
       // load database file
-      Vector::DBC::File c_File;
       bool q_ReadError = false;
 
       //try/catch the load function due to the dbc library may throw exceptions when reading files with not supported
       // content
       try
       {
-         if (c_File.load(orc_Network, orc_File.c_str()) != Vector::DBC::Status::Ok)
+         std::ifstream c_InputFile(orc_File.c_str());
+         if (c_InputFile.is_open())
+         {
+            c_InputFile >> orc_Network;
+            c_InputFile.close();
+            if (orc_Network.successfullyParsed == false)
+            {
+               q_ReadError = true;
+            }
+         }
+         else
          {
             q_ReadError = true;
          }
@@ -270,8 +283,9 @@ void C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConv
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get message definition
 
-   \param[in]      orc_DbcMessage        message definition from DBC file
-   \param[in, out] orc_Node              target node definitions
+   \param[in]       orc_DbcNetwork  Dbc network
+   \param[in]       orc_DbcMessage  message definition from DBC file
+   \param[in, out]  orc_Node        target node definitions
 
    \return
    C_NO_ERR    all data successfully retrieved
@@ -279,7 +293,8 @@ void C_CieImportDbc::mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConv
    C_CONFIG    node does not contain this message
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage, C_CieConverter::C_CieNode & orc_Node)
+int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Network & orc_DbcNetwork,
+                                      const Vector::DBC::Message & orc_DbcMessage, C_CieConverter::C_CieNode & orc_Node)
 {
    int32_t s32_Return = C_NO_ERR;
    bool q_IsTxMessage = false;
@@ -295,9 +310,9 @@ int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessag
    }
    else if (orc_DbcMessage.transmitters.empty() == false)
    {
-      for (const auto c_DbcTransmitter : orc_DbcMessage.transmitters)
+      for (const auto & rc_DbcTransmitter : orc_DbcMessage.transmitters)
       {
-         if (orc_Node.c_Properties.c_Name.AnsiCompare(c_DbcTransmitter.c_str()) == 0)
+         if (orc_Node.c_Properties.c_Name.AnsiCompare(rc_DbcTransmitter.c_str()) == 0)
          {
             q_IsTxMessage = true;
             break;
@@ -310,11 +325,11 @@ int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessag
    }
 
    // check on receiver nodes
-   for (auto c_DbcSignal : orc_DbcMessage.signals)
+   for (const auto & rc_DbcSignal : orc_DbcMessage.signals)
    {
-      for (const auto c_DbcReceiver : c_DbcSignal.second.receivers)
+      for (const auto & rc_DbcReceiver : rc_DbcSignal.second.receivers)
       {
-         if (orc_Node.c_Properties.c_Name.AnsiCompare(c_DbcReceiver.c_str()) == 0)
+         if (orc_Node.c_Properties.c_Name.AnsiCompare(rc_DbcReceiver.c_str()) == 0)
          {
             // node found
             q_IsRxMessage = true;
@@ -332,7 +347,7 @@ int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessag
    if (q_IsTxMessage == true)
    {
       // add message if valid
-      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_TxMessages) != C_NO_ERR)
+      if (mh_ConvertAndAddMessage(orc_DbcNetwork, orc_DbcMessage, orc_Node.c_TxMessages) != C_NO_ERR)
       {
          s32_Return = C_WARN;
       }
@@ -340,7 +355,7 @@ int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessag
    else if (q_IsRxMessage == true)
    {
       // add message if valid
-      if (mh_ConvertAndAddMessage(orc_DbcMessage, orc_Node.c_RxMessages) != C_NO_ERR)
+      if (mh_ConvertAndAddMessage(orc_DbcNetwork, orc_DbcMessage, orc_Node.c_RxMessages) != C_NO_ERR)
       {
          s32_Return = C_WARN;
       }
@@ -357,15 +372,17 @@ int32_t C_CieImportDbc::mh_GetMessage(const Vector::DBC::Message & orc_DbcMessag
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Parse and convert message
 
-   \param[in]     orc_DbcMessage       Message to convert
-   \param[in,out] orc_Message          Converted message
+   \param[in]      orc_DbcNetwork   Dbc network
+   \param[in]      orc_DbcMessage   Message to convert
+   \param[in,out]  orc_Message      Converted message
 
    \retval   C_NO_ERR   No error occurred
    \retval   C_WARN     Could not find at least one thing
    \retval   C_CONFIG   Message ID invalid
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
+int32_t C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Network & orc_DbcNetwork,
+                                          const Vector::DBC::Message & orc_DbcMessage,
                                           C_CieConverter::C_CieNodeMessage & orc_Message)
 {
    int32_t s32_Return = C_NO_ERR;
@@ -398,17 +415,17 @@ int32_t C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMe
                          "Importing signals for CAN message \"" + orc_Message.c_CanMessage.c_Name + "\" ...");
 
       // get all signal definitions for this message
-      for (const auto c_DbcSignal : orc_DbcMessage.signals)
+      for (const auto & rc_DbcSignal : orc_DbcMessage.signals)
       {
          // If a multiplexer signal exists the message is a multiplexed message
-         if (mh_GetSignal(c_DbcSignal.second, q_MessageAdapted, orc_Message) != C_NO_ERR)
+         if (mh_GetSignal(orc_DbcNetwork, rc_DbcSignal.second, q_MessageAdapted, orc_Message) != C_NO_ERR)
          {
             s32_Return = C_WARN;
          }
       }
 
       // get transmission definitions
-      mh_GetTransmission(orc_DbcMessage, orc_Message);
+      mh_GetTransmission(orc_DbcNetwork, orc_DbcMessage, orc_Message);
 
       if (q_MessageAdapted == true)
       {
@@ -434,20 +451,22 @@ int32_t C_CieImportDbc::mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMe
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Add valid messages to list of import messages.
 
+   \param[in]      orc_DbcNetwork   Dbc network
    \param[in]      orc_DbcMessage   DBC message to convert
-   \param[in,out]  rc_Messages      Messages where imported message should be added if valid
+   \param[in,out]  orc_Messages     Messages where imported message should be added if valid
 
    \retval   C_NO_ERR   No error occurred
    \retval   C_WARN     Could not find at least one thing
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_CieImportDbc::mh_ConvertAndAddMessage(const Vector::DBC::Message & orc_DbcMessage,
+int32_t C_CieImportDbc::mh_ConvertAndAddMessage(const Vector::DBC::Network & orc_DbcNetwork,
+                                                const Vector::DBC::Message & orc_DbcMessage,
                                                 std::vector<C_CieConverter::C_CieNodeMessage> & orc_Messages)
 {
    int32_t s32_Return = C_WARN;
 
    C_CieConverter::C_CieNodeMessage c_Message;
-   const int32_t s32_RetPrepMessage = C_CieImportDbc::mh_PrepareMessage(orc_DbcMessage, c_Message);
+   const int32_t s32_RetPrepMessage = C_CieImportDbc::mh_PrepareMessage(orc_DbcNetwork, orc_DbcMessage, c_Message);
 
    // Add message if not invalid
    if ((s32_RetPrepMessage == C_NO_ERR) || (s32_RetPrepMessage == C_WARN))
@@ -467,40 +486,43 @@ int32_t C_CieImportDbc::mh_ConvertAndAddMessage(const Vector::DBC::Message & orc
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief    Get signal definition
 
-   \param[in]      orc_DbcSignal                signal definition from DBC file
-   \param[in,out]  orq_SignalAdapted            flag if signal was adapted, will not be reset to false
-   \param[out]     orc_Message                  target message definitions
+   \param[in]      orc_DbcNetwork      Dbc network
+   \param[in]      orc_DbcSignal       signal definition from DBC file
+   \param[in,out]  orq_SignalAdapted   flag if signal was adapted, will not be reset to false
+   \param[out]     orc_Message         target message definitions
 
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and warning reported
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_SignalAdapted,
+int32_t C_CieImportDbc::mh_GetSignal(const Vector::DBC::Network & orc_DbcNetwork,
+                                     const Vector::DBC::Signal & orc_DbcSignal, bool & orq_SignalAdapted,
                                      C_CieConverter::C_CieNodeMessage & orc_Message)
 {
    int32_t s32_Return = C_NO_ERR;
 
-   std::map<uint32_t, std::string>::const_iterator c_ItValueDescr;
+   std::map<int64_t, std::string>::const_iterator c_ItValueDescr;
    C_CieConverter::C_CieCanSignal c_Signal;
    bool q_MultiplexerSignal = false;
 
    // Handle multiplexing information
-   if (orc_DbcSignal.multiplexorSwitch == true)
+   switch (orc_DbcSignal.multiplexor)
    {
+   case Vector::DBC::Signal::Multiplexor::MultiplexorSwitch:
       c_Signal.e_MultiplexerType = C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL;
       c_Signal.u16_MultiplexValue = 0; // default
       q_MultiplexerSignal = true;
-   }
-   else if (orc_DbcSignal.multiplexedSignal == true)
-   {
+      break;
+   case Vector::DBC::Signal::Multiplexor::MultiplexedSignal:
       c_Signal.e_MultiplexerType = C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL;
       c_Signal.u16_MultiplexValue = static_cast<uint16_t>(orc_DbcSignal.multiplexerSwitchValue);
-   }
-   else
-   {
+      break;
+   case Vector::DBC::Signal::Multiplexor::NoMultiplexor:
+   default:
       c_Signal.e_MultiplexerType = C_OscCanSignal::eMUX_DEFAULT;
       c_Signal.u16_MultiplexValue = 0; // default
+      break;
    }
 
    c_Signal.u16_ComBitStart = static_cast<uint16_t>(orc_DbcSignal.startBit);
@@ -554,8 +576,8 @@ int32_t C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, 
         c_ItValueDescr != orc_DbcSignal.valueDescriptions.end();
         ++c_ItValueDescr)
    {
-      c_Signal.c_ValueDescription.emplace(std::pair<uint32_t, C_SclString>(
-                                             static_cast<uint32_t>(c_ItValueDescr->first),
+      c_Signal.c_ValueDescription.emplace(std::pair<int64_t, C_SclString>(
+                                             c_ItValueDescr->first,
                                              c_ItValueDescr->second.c_str()));
    }
 
@@ -582,7 +604,9 @@ int32_t C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, 
       c_Signal.c_Element.c_Unit = "";
    }
 
-   if (mh_GetSignalValues(orc_DbcSignal, q_MultiplexerSignal, orq_SignalAdapted,
+   C_CieImportDbc::mh_GetSignalSpnInfo(orc_DbcNetwork, orc_DbcSignal, c_Signal);
+
+   if (mh_GetSignalValues(orc_DbcNetwork, orc_DbcSignal, q_MultiplexerSignal, orq_SignalAdapted,
                           c_Signal.c_Element, orc_Message.c_Warnings) != C_NO_ERR)
    {
       s32_Return = C_WARN;
@@ -596,9 +620,62 @@ int32_t C_CieImportDbc::mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, 
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get signal spn info
+
+   \param[in]      orc_DbcNetwork   Dbc network
+   \param[in]      orc_DbcSignal    Dbc signal
+   \param[in,out]  orc_Signal       Signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieImportDbc::mh_GetSignalSpnInfo(const Vector::DBC::Network & orc_DbcNetwork,
+                                         const Vector::DBC::Signal & orc_DbcSignal,
+                                         C_CieConverter::C_CieCanSignal & orc_Signal)
+{
+   std::map<std::string, Vector::DBC::Attribute>::const_iterator c_IterSpn;
+   c_IterSpn = orc_DbcSignal.attributeValues.find("SPN");
+   if (c_IterSpn != orc_DbcSignal.attributeValues.end())
+   {
+      const std::map<std::string,
+                     Vector::DBC::AttributeDefinition>::const_iterator c_IterSpnType =
+         orc_DbcNetwork.attributeDefinitions.find("SPN");
+      if (c_IterSpnType != orc_DbcNetwork.attributeDefinitions.end())
+      {
+         if (c_IterSpnType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Int)
+         {
+            orc_Signal.u32_J1939Spn = static_cast<uint32_t>(c_IterSpn->second.integerValue);
+         }
+         else if (c_IterSpnType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Float)
+         {
+            orc_Signal.u32_J1939Spn = static_cast<uint32_t>(c_IterSpn->second.floatValue);
+         }
+         else if (c_IterSpnType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Hex)
+         {
+            orc_Signal.u32_J1939Spn = static_cast<uint32_t>(c_IterSpn->second.hexValue);
+         }
+         else if (c_IterSpnType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Enum)
+         {
+            orc_Signal.u32_J1939Spn = static_cast<uint32_t>(c_IterSpn->second.enumValue);
+         }
+         else
+         {
+            orc_Signal.u32_J1939Spn = 0UL;
+         }
+      }
+      else
+      {
+         orc_Signal.u32_J1939Spn = 0UL;
+      }
+   }
+   else
+   {
+      orc_Signal.u32_J1939Spn = 0UL;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Verify if all signal values are inside of the signal value range, if not: remove
 
-   \param[in,out] orc_DbcSignal Signal for which to clean up the value tables
+   \param[in,out]  orc_DbcSignal    Signal for which to clean up the value tables
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportDbc::mh_VerifySignalValueTable(C_CieConverter::C_CieCanSignal & orc_DbcSignal)
@@ -609,7 +686,7 @@ void C_CieImportDbc::mh_VerifySignalValueTable(C_CieConverter::C_CieCanSignal & 
          (orc_DbcSignal.u16_ComBitLength == 64U) ?
          std::numeric_limits<uint64_t>::max() : ((static_cast<uint64_t>(1ULL) << orc_DbcSignal.u16_ComBitLength) -
                                                  1ULL);
-      for (std::map<uint32_t, stw::scl::C_SclString>::const_iterator c_ItValueDescr =
+      for (std::map<int64_t, stw::scl::C_SclString>::const_iterator c_ItValueDescr =
               orc_DbcSignal.c_ValueDescription.begin();
            c_ItValueDescr != orc_DbcSignal.c_ValueDescription.end();)
       {
@@ -639,18 +716,20 @@ void C_CieImportDbc::mh_VerifySignalValueTable(C_CieConverter::C_CieCanSignal & 
 
    Set minimum and maximum values for a signal.
 
-   \param[in]      orc_DbcSignal         signal definition from DBC file
-   \param[in]      oq_MultiplexerSignal  flag if signal is multiplexer signal
-   \param[in,out]  orq_SignalAdapted     flag if signal was adapted, will not be reset to false
-   \param[out]     orc_Element           element for CAN message signals
-   \param[out]     orc_WarningMessages   list of warnings for each message
+   \param[in]      orc_DbcNetwork         Dbc network
+   \param[in]      orc_DbcSignal          signal definition from DBC file
+   \param[in]      oq_MultiplexerSignal   flag if signal is multiplexer signal
+   \param[in,out]  orq_SignalAdapted      flag if signal was adapted, will not be reset to false
+   \param[out]     orc_Element            element for CAN message signals
+   \param[out]     orc_WarningMessages    list of warnings for each message
 
    \return
    C_NO_ERR    all data successfully retrieved
    C_WARN      unknown parameter found -> default value set and error reported
 */
 //----------------------------------------------------------------------------------------------------------------------
-int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal, const bool oq_MultiplexerSignal,
+int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Network & orc_DbcNetwork,
+                                           const Vector::DBC::Signal & orc_DbcSignal, const bool oq_MultiplexerSignal,
                                            bool & orq_SignalAdapted, C_CieConverter::C_CieDataPoolElement & orc_Element,
                                            C_SclStringList & orc_WarningMessages)
 {
@@ -713,16 +792,16 @@ int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSi
       }
 
       // 0.0 equals auto/default (correct value is set below)
-      if (C_OscUtils::h_IsFloat64NearlyEqual(c_DbcSignal.maximumPhysicalValue, 0.0) == false)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(c_DbcSignal.maximum, 0.0) == false)
       {
-         c_DbcSignal.maximumPhysicalValue = 0.0;
+         c_DbcSignal.maximum = 0.0;
          orq_SignalAdapted = true;
       }
 
       // 0.0 equals auto/default (correct value is set below)
-      if (C_OscUtils::h_IsFloat64NearlyEqual(c_DbcSignal.minimumPhysicalValue, 0.0) == false)
+      if (C_OscUtils::h_IsFloat64NearlyEqual(c_DbcSignal.minimum, 0.0) == false)
       {
-         c_DbcSignal.minimumPhysicalValue = 0.0;
+         c_DbcSignal.minimum = 0.0;
          orq_SignalAdapted = true;
       }
    }
@@ -784,10 +863,10 @@ int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSi
       // set values if valid bit size otherwise default (0) value
       if (c_DbcSignal.bitSize <= 64U)
       {
-         f64_MinValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.minimumPhysicalValue);
-         f64_MaxValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.maximumPhysicalValue);
-         f64_MinValuePhy = c_DbcSignal.minimumPhysicalValue;
-         f64_MaxValuePhy = c_DbcSignal.maximumPhysicalValue;
+         f64_MinValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.minimum);
+         f64_MaxValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.maximum);
+         f64_MinValuePhy = c_DbcSignal.minimum;
+         f64_MaxValuePhy = c_DbcSignal.maximum;
       }
       else
       {
@@ -805,18 +884,18 @@ int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSi
    else if (c_DbcSignal.extendedValueType == Vector::DBC::Signal::ExtendedValueType::Float)
    {
       e_CurrentType = C_OscNodeDataPoolContent::eFLOAT32;
-      f64_MinValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.minimumPhysicalValue);
-      f64_MaxValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.maximumPhysicalValue);
-      f64_MinValuePhy = c_DbcSignal.minimumPhysicalValue;
-      f64_MaxValuePhy = c_DbcSignal.maximumPhysicalValue;
+      f64_MinValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.minimum);
+      f64_MaxValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.maximum);
+      f64_MinValuePhy = c_DbcSignal.minimum;
+      f64_MaxValuePhy = c_DbcSignal.maximum;
    }
    else if (c_DbcSignal.extendedValueType == Vector::DBC::Signal::ExtendedValueType::Double)
    {
       e_CurrentType = C_OscNodeDataPoolContent::eFLOAT64;
-      f64_MinValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.minimumPhysicalValue);
-      f64_MaxValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.maximumPhysicalValue);
-      f64_MinValuePhy = c_DbcSignal.minimumPhysicalValue;
-      f64_MaxValuePhy = c_DbcSignal.maximumPhysicalValue;
+      f64_MinValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.minimum);
+      f64_MaxValue = c_DbcSignal.physicalToRawValue(c_DbcSignal.maximum);
+      f64_MinValuePhy = c_DbcSignal.minimum;
+      f64_MaxValuePhy = c_DbcSignal.maximum;
    }
    else
    {
@@ -873,117 +952,134 @@ int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSi
    c_Iter = c_DbcSignal.attributeValues.find("GenSigStartValue");
    if (c_Iter != c_DbcSignal.attributeValues.end())
    {
-      // initial value available
       const Vector::DBC::Attribute c_StartValue = c_Iter->second;
-      // check type of initial value, is already raw value
-      if (c_StartValue.valueType == Vector::DBC::AttributeValueType::Int)
+      const std::map<std::string,
+                     Vector::DBC::AttributeDefinition>::const_iterator c_IterType =
+         orc_DbcNetwork.attributeDefinitions.find(
+            c_StartValue.name);
+      if (c_IterType != orc_DbcNetwork.attributeDefinitions.end())
       {
-         f64_InitialValue = static_cast<float64_t>(c_StartValue.integerValue);
-      }
-      else if (c_StartValue.valueType == Vector::DBC::AttributeValueType::Float)
-      {
-         f64_InitialValue = c_StartValue.floatValue;
-      }
-      else if (c_StartValue.valueType == Vector::DBC::AttributeValueType::Hex) // has the same representation as int
-      {
-         f64_InitialValue = static_cast<float64_t>(c_StartValue.hexValue);
-      }
-      else if (c_StartValue.valueType == Vector::DBC::AttributeValueType::Enum)
-      {
-         f64_InitialValue = static_cast<float64_t>(c_StartValue.enumValue);
-      }
-      else
-      {
-         const float64_t f64_DefaultPhy = (f64_DEFAULT * c_DbcSignal.factor) + c_DbcSignal.offset;
-         const C_SclString c_Message = "Signal \"" + c_String +
-                                       "\": Type for initial value unknown. Initial value set to default value \"" +
-                                       QString::number(f64_DefaultPhy).toStdString().c_str() + "\".";
-         osc_write_log_warning("DBC file import", c_Message);
-         orc_WarningMessages.Append(c_Message);
-         f64_InitialValue = f64_DEFAULT;
-         s32_Return = C_WARN;
-      }
-
-      if ((oq_MultiplexerSignal == true) &&
-          (C_OscUtils::h_IsFloat64NearlyEqual(f64_InitialValue, 0.0) == false))
-      {
-         // Multiplexer signal restrictions
-         f64_InitialValue = 0.0;
-         orq_SignalAdapted = true;
-      }
-
-      f64_InitialValuePhy = (f64_InitialValue * c_DbcSignal.factor) + c_DbcSignal.offset;
-
-      // check if raw value of DBC signal are in range for data type
-      if (mh_CheckRange(f64_InitialValue, e_CurrentType) != C_NO_ERR)
-      {
-         const C_SclString c_Message = "Signal \"" + c_String +
-                                       "\": violation of datatype range in DBC file for initial raw value \"" +
-                                       QString::number(f64_InitialValue).toStdString().c_str() +
-                                       "\". Correct datatype with \"Start Bit\" and \"Length\"" \
-                                       " has to be set manually.";
-         osc_write_log_warning("DBC file import", c_Message);
-         orc_WarningMessages.Append(c_Message);
-         s32_Return = C_WARN;
-      }
-      // set available initial value
-      C_OscNodeDataPoolContentUtil::h_SetValueInContent(f64_InitialValue, c_InitialValue);
-      // set value in range, leave initial value if in range
-      C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_ValueChangedTo;
-      const int32_t s32_Tmp =
-         C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_Element.c_MinValue,
-                                                               orc_Element.c_MaxValue,
-                                                               c_InitialValue,
-                                                               e_ValueChangedTo,
-                                                               C_OscNodeDataPoolContentUtil::eLEAVE_VALUE);
-      if (s32_Tmp == C_RANGE)
-      {
-         // min and max values are interchanged
-         // rare case with no practical scenario yet
-         // do not know how to handle this better than leave all values as they are
-         // and display warning to user
-         const C_SclString c_Message = "Signal \"" + c_String + "\": Minimum raw value \"" +
-                                       QString::number(f64_MinValue).toStdString().c_str() +
-                                       "\" and maximum raw value \"" +
-                                       QString::number(f64_MaxValue).toStdString().c_str() +
-                                       "\" are interchanged. This is not supported. Values left as they are.";
-         osc_write_log_warning("DBC file import", c_Message);
-         orc_WarningMessages.Append(c_Message);
-         s32_Return = C_WARN;
-      }
-      else
-      {
-         if (e_ValueChangedTo != C_OscNodeDataPoolContentUtil::eNO_CHANGE)
+         // initial value available
+         // check type of initial value, is already raw value
+         if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Int)
          {
-            // value was out of range, take closer min or max value
-            C_SclString c_PlaceholderMinMax;
-            s32_Return = C_WARN;
-            if (e_ValueChangedTo == C_OscNodeDataPoolContentUtil::eMIN)
-            {
-               c_PlaceholderMinMax = "minimum";
-               f64_InitialValue = f64_MinValue; // set value for later datatype range check
-            }
-            else if (e_ValueChangedTo == C_OscNodeDataPoolContentUtil::eMAX)
-            {
-               c_PlaceholderMinMax = "maximum";
-               f64_InitialValue = f64_MaxValue; // set value for later datatype range check
-            }
-            else
-            {
-               //nothing more to do
-            }
-
-            const C_SclString c_Message = "Signal \"" + c_String + "\": Initial value \"" +
-                                          QString::number(f64_InitialValuePhy).toStdString().c_str() +
-                                          "\" is not between minimum \"" +
-                                          QString::number(f64_MinValuePhy).toStdString().c_str() +
-                                          "\" and maximum \"" +
-                                          QString::number(f64_MaxValuePhy).toStdString().c_str() +
-                                          "\" value. Initial value set to " +
-                                          c_PlaceholderMinMax + " value.";
+            f64_InitialValue = static_cast<float64_t>(c_StartValue.integerValue);
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Float)
+         {
+            f64_InitialValue = c_StartValue.floatValue;
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Hex) // has the same
+                                                                                                   // representation
+         // as int
+         {
+            f64_InitialValue = static_cast<float64_t>(c_StartValue.hexValue);
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Enum)
+         {
+            f64_InitialValue = static_cast<float64_t>(c_StartValue.enumValue);
+         }
+         else
+         {
+            const float64_t f64_DefaultPhy = (f64_DEFAULT * c_DbcSignal.factor) + c_DbcSignal.offset;
+            const C_SclString c_Message = "Signal \"" + c_String +
+                                          "\": Type for initial value unknown. Initial value set to default value \"" +
+                                          QString::number(f64_DefaultPhy).toStdString().c_str() + "\".";
             osc_write_log_warning("DBC file import", c_Message);
             orc_WarningMessages.Append(c_Message);
+            f64_InitialValue = f64_DEFAULT;
+            s32_Return = C_WARN;
          }
+
+         if ((oq_MultiplexerSignal == true) &&
+             (C_OscUtils::h_IsFloat64NearlyEqual(f64_InitialValue, 0.0) == false))
+         {
+            // Multiplexer signal restrictions
+            f64_InitialValue = 0.0;
+            orq_SignalAdapted = true;
+         }
+
+         f64_InitialValuePhy = (f64_InitialValue * c_DbcSignal.factor) + c_DbcSignal.offset;
+
+         // check if raw value of DBC signal are in range for data type
+         if (mh_CheckRange(f64_InitialValue, e_CurrentType) != C_NO_ERR)
+         {
+            const C_SclString c_Message = "Signal \"" + c_String +
+                                          "\": violation of datatype range in DBC file for initial raw value \"" +
+                                          QString::number(f64_InitialValue).toStdString().c_str() +
+                                          "\". Correct datatype with \"Start Bit\" and \"Length\"" \
+                                          " has to be set manually.";
+            osc_write_log_warning("DBC file import", c_Message);
+            orc_WarningMessages.Append(c_Message);
+            s32_Return = C_WARN;
+         }
+         // set available initial value
+         C_OscNodeDataPoolContentUtil::h_SetValueInContent(f64_InitialValue, c_InitialValue);
+         // set value in range, leave initial value if in range
+         C_OscNodeDataPoolContentUtil::E_ValueChangedTo e_ValueChangedTo;
+         const int32_t s32_Tmp =
+            C_OscNodeDataPoolContentUtil::h_SetValueInMinMaxRange(orc_Element.c_MinValue,
+                                                                  orc_Element.c_MaxValue,
+                                                                  c_InitialValue,
+                                                                  e_ValueChangedTo,
+                                                                  C_OscNodeDataPoolContentUtil::eLEAVE_VALUE);
+         if (s32_Tmp == C_RANGE)
+         {
+            // min and max values are interchanged
+            // rare case with no practical scenario yet
+            // do not know how to handle this better than leave all values as they are
+            // and display warning to user
+            const C_SclString c_Message = "Signal \"" + c_String + "\": Minimum raw value \"" +
+                                          QString::number(f64_MinValue).toStdString().c_str() +
+                                          "\" and maximum raw value \"" +
+                                          QString::number(f64_MaxValue).toStdString().c_str() +
+                                          "\" are interchanged. This is not supported. Values left as they are.";
+            osc_write_log_warning("DBC file import", c_Message);
+            orc_WarningMessages.Append(c_Message);
+            s32_Return = C_WARN;
+         }
+         else
+         {
+            if (e_ValueChangedTo != C_OscNodeDataPoolContentUtil::eNO_CHANGE)
+            {
+               // value was out of range, take closer min or max value
+               C_SclString c_PlaceholderMinMax;
+               s32_Return = C_WARN;
+               if (e_ValueChangedTo == C_OscNodeDataPoolContentUtil::eMIN)
+               {
+                  c_PlaceholderMinMax = "minimum";
+                  f64_InitialValue = f64_MinValue; // set value for later datatype range check
+               }
+               else if (e_ValueChangedTo == C_OscNodeDataPoolContentUtil::eMAX)
+               {
+                  c_PlaceholderMinMax = "maximum";
+                  f64_InitialValue = f64_MaxValue; // set value for later datatype range check
+               }
+               else
+               {
+                  //nothing more to do
+               }
+
+               const C_SclString c_Message = "Signal \"" + c_String + "\": Initial value \"" +
+                                             QString::number(f64_InitialValuePhy).toStdString().c_str() +
+                                             "\" is not between minimum \"" +
+                                             QString::number(f64_MinValuePhy).toStdString().c_str() +
+                                             "\" and maximum \"" +
+                                             QString::number(f64_MaxValuePhy).toStdString().c_str() +
+                                             "\" value. Initial value set to " +
+                                             c_PlaceholderMinMax + " value.";
+               osc_write_log_warning("DBC file import", c_Message);
+               orc_WarningMessages.Append(c_Message);
+            }
+         }
+      }
+      else
+      {
+         const C_SclString c_Message = "Signal \"" + c_String +
+                                       "\": Type not found.";
+         osc_write_log_warning("DBC file import", c_Message);
+         orc_WarningMessages.Append(c_Message);
+         s32_Return = C_WARN;
       }
    }
    else
@@ -1117,7 +1213,7 @@ int32_t C_CieImportDbc::mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSi
    Search all attribute definitions for the prepared strings and set according
    attribute definition.
 
-   \param[in]  orc_DbcNetwork                network definition from DBC file
+   \param[in]  orc_DbcNetwork    network definition from DBC file
 
    \return
    C_NO_ERR    attribute definitions found
@@ -1129,12 +1225,7 @@ int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & 
    int32_t s32_Return = C_NO_ERR;
 
    // search Send Type
-   const auto c_DbcAttributeDefinition = find_if(
-      orc_DbcNetwork.attributeDefinitions.begin(), orc_DbcNetwork.attributeDefinitions.end(), [] (auto & orc_Definition)
-   {
-      return mhc_SEND_TYPE.AnsiCompare(orc_Definition.first.c_str()) == 0;
-   }
-      );
+   const auto c_DbcAttributeDefinition = orc_DbcNetwork.attributeDefinitions.find(mhc_SEND_TYPE.c_str());
 
    // attribute found?
    if (c_DbcAttributeDefinition != orc_DbcNetwork.attributeDefinitions.end())
@@ -1149,12 +1240,7 @@ int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & 
    }
 
    // search default send type
-   const auto c_DbcAttributeDefaults = find_if(
-      orc_DbcNetwork.attributeDefaults.begin(), orc_DbcNetwork.attributeDefaults.end(), [] (auto & orc_Default)
-   {
-      return mhc_SEND_TYPE.AnsiCompare(orc_Default.first.c_str()) == 0;
-   }
-      );
+   const auto c_DbcAttributeDefaults = orc_DbcNetwork.attributeDefaults.find(mhc_SEND_TYPE.c_str());
 
    // attribute found?
    if (c_DbcAttributeDefaults != orc_DbcNetwork.attributeDefaults.end())
@@ -1172,42 +1258,78 @@ int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & 
    }
 
    // search default initial value
-   const auto c_DbcAttributeDefaultsInit = find_if(
-      orc_DbcNetwork.attributeDefaults.begin(), orc_DbcNetwork.attributeDefaults.end(), [] (auto & orc_Default)
-   {
-      return mhc_INITIAL_VALUE.AnsiCompare(orc_Default.first.c_str()) == 0;
-   }
-      );
+   const auto c_DbcAttributeDefaultsInit = orc_DbcNetwork.attributeDefaults.find(mhc_INITIAL_VALUE.c_str());
 
    // attribute found?
    mhq_DefaultValueDefined = false;
    if (c_DbcAttributeDefaultsInit != orc_DbcNetwork.attributeDefaults.end())
    {
-      const C_SclString c_DefaultInitialValue = (c_DbcAttributeDefaultsInit->second).stringValue.c_str();
-      // try to convert to DBC standard raw float value
-      try
+      const std::map<std::string,
+                     Vector::DBC::AttributeDefinition>::const_iterator c_IterType =
+         orc_DbcNetwork.attributeDefinitions.find(
+            c_DbcAttributeDefaultsInit->second.name);
+      if (c_IterType != orc_DbcNetwork.attributeDefinitions.end())
       {
-         mhf32_DefaultInitialValue = static_cast<float32_t>(c_DefaultInitialValue.ToDouble());
-         mhq_DefaultValueDefined = true;
-      }
-      catch (...)
-      {
-         // could be of type enum
-         if ((c_DbcAttributeDefaultsInit->second).valueType == Vector::DBC::AttributeValueType::Enum)
+         if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Int)
+         {
+            mhf32_DefaultInitialValue = static_cast<float32_t>((c_DbcAttributeDefaultsInit->second).integerValue);
+            mhq_DefaultValueDefined = true;
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Hex)
+         {
+            mhf32_DefaultInitialValue = static_cast<float32_t>((c_DbcAttributeDefaultsInit->second).hexValue);
+            mhq_DefaultValueDefined = true;
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Float)
+         {
+            mhf32_DefaultInitialValue = static_cast<float32_t>((c_DbcAttributeDefaultsInit->second).floatValue);
+            mhq_DefaultValueDefined = true;
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Enum)
          {
             mhf32_DefaultInitialValue = static_cast<float32_t>((c_DbcAttributeDefaultsInit->second).enumValue);
             mhq_DefaultValueDefined = true;
+         }
+         else if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::String)
+         {
+            const C_SclString c_DefaultInitialValue = (c_DbcAttributeDefaultsInit->second).stringValue.c_str();
+            // try to convert to DBC standard raw float value
+            try
+            {
+               mhf32_DefaultInitialValue = static_cast<float32_t>(c_DefaultInitialValue.ToDouble());
+               mhq_DefaultValueDefined = true;
+            }
+            catch (...)
+            {
+               // strange, print a warning to user
+               s32_Return = C_WARN;
+               mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
+                                          "\" could not be interpreted. Default value set to \"0\".");
+               osc_write_log_warning("DBC file import",
+                                     "Default initial value for signals \"" + c_DefaultInitialValue +
+                                     "\" could not be interpreted. Default value set to \"0\".");
+            }
          }
          else
          {
             // strange, print a warning to user
             s32_Return = C_WARN;
-            mhc_WarningMessages.Append("Default initial value for signals \"" + c_DefaultInitialValue +
-                                       "\" could not be interpreted. Default value set to \"0\".");
+            mhc_WarningMessages.Append("Default type value for signals \"" + mhc_SEND_TYPE +
+                                       "\". Default value set to \"0\".");
             osc_write_log_warning("DBC file import",
-                                  "Default initial value for signals \"" + c_DefaultInitialValue +
-                                  "\" could not be interpreted. Default value set to \"0\".");
+                                  "Default type value for signals \"" + mhc_SEND_TYPE +
+                                  "\". Default value set to \"0\".");
          }
+      }
+      else
+      {
+         // strange, print a warning to user
+         s32_Return = C_WARN;
+         mhc_WarningMessages.Append("Default definition for signals \"" + c_DbcAttributeDefaultsInit->second.name +
+                                    "\" could not be found. Default value set to \"0\".");
+         osc_write_log_warning("DBC file import",
+                               "Default definition for signals \"" + c_DbcAttributeDefaultsInit->second.name +
+                               "\" could not be found. Default value set to \"0\".");
       }
    }
    // default attribute found?
@@ -1229,11 +1351,13 @@ int32_t C_CieImportDbc::mh_GetAttributeDefinitions(const Vector::DBC::Network & 
          is missing. Thus the default value is used. (Option: don't accept default
          values but set the parameters for each message explicitly)
 
-   \param[in]  orc_DbcMessage        message definition from DBC file
-   \param[out] orc_Message           target message definitions
+   \param[in]   orc_DbcNetwork   Dbc network
+   \param[in]   orc_DbcMessage   message definition from DBC file
+   \param[out]  orc_Message      target message definitions
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
+void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Network & orc_DbcNetwork,
+                                        const Vector::DBC::Message & orc_DbcMessage,
                                         C_CieConverter::C_CieNodeMessage & orc_Message)
 {
    C_SclString c_MessageType;
@@ -1243,15 +1367,22 @@ void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMess
    orc_Message.c_CanMessage.u32_CycleTimeMs = 100U;
 
    // search for attribute cycle time (cycle time also means cyclic transmission method)
-   for (const auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
+   for (const auto & rc_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
-      if (mhc_CYCLE_TIME.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
+      if (mhc_CYCLE_TIME.AnsiCompare(rc_DbcAttributeValue.first.c_str()) == 0)
       {
-         if (c_DbcAttributeValue.second.valueType == Vector::DBC::AttributeValueType::Int)
+         const std::map<std::string,
+                        Vector::DBC::AttributeDefinition>::const_iterator c_IterType =
+            orc_DbcNetwork.attributeDefinitions.find(rc_DbcAttributeValue.first);
+         if (c_IterType != orc_DbcNetwork.attributeDefinitions.end())
          {
-            orc_Message.c_CanMessage.u32_CycleTimeMs = c_DbcAttributeValue.second.integerValue;
-            q_CycleTimeFound = true;
-            break;
+            if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Int)
+            {
+               orc_Message.c_CanMessage.u32_CycleTimeMs =
+                  static_cast<uint32_t>(rc_DbcAttributeValue.second.integerValue);
+               q_CycleTimeFound = true;
+               break;
+            }
          }
       }
    }
@@ -1269,45 +1400,53 @@ void C_CieImportDbc::mh_GetTransmission(const Vector::DBC::Message & orc_DbcMess
 
    // search for attribute send type (keyword 'cyclic' shall always indicate openSYDE method eTX_METHOD_CYCLIC,
    // otherwise it shall be of type eTX_METHOD_ON_EVENT)
-   for (const auto c_DbcAttributeValue : orc_DbcMessage.attributeValues)
+   for (const auto & rc_DbcAttributeValue : orc_DbcMessage.attributeValues)
    {
       // check for message send type
-      if (mhc_SEND_TYPE.AnsiCompare(c_DbcAttributeValue.first.c_str()) == 0)
+      if (mhc_SEND_TYPE.AnsiCompare(rc_DbcAttributeValue.first.c_str()) == 0)
       {
-         // attribute send type found -> overwrite default value
-         // there must be an enum! if not, then take default value
-         if (c_DbcAttributeValue.second.valueType == Vector::DBC::AttributeValueType::Enum)
+         const std::map<std::string,
+                        Vector::DBC::AttributeDefinition>::const_iterator c_IterType =
+            orc_DbcNetwork.attributeDefinitions.find(rc_DbcAttributeValue.first);
+         if (c_IterType != orc_DbcNetwork.attributeDefinitions.end())
          {
-            const uint32_t u32_Type = c_DbcAttributeValue.second.enumValue;
-            c_MessageType = mhc_AttributeSendType.enumValues[u32_Type].c_str();
-            const C_SclString c_Tmp = c_MessageType.LowerCase();
-            if (c_Tmp != "")
+            // attribute send type found -> overwrite default value
+            // there must be an enum! if not, then take default value
+            if (c_IterType->second.valueType.type == Vector::DBC::AttributeValueType::Type::Enum)
             {
-               if (c_Tmp.Pos("cyclic") > 0)
+               const uint32_t u32_Type = static_cast<uint32_t>(rc_DbcAttributeValue.second.enumValue);
+               c_MessageType = mhc_AttributeSendType.valueType.enumValues[u32_Type].c_str();
+               const C_SclString c_Tmp = c_MessageType.LowerCase();
+               if (c_Tmp != "")
                {
-                  orc_Message.c_CanMessage.e_TxMethod = C_OscCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC;
-                  // only display warning if it does not match exactly (case-insensitive)
-                  if (c_Tmp != "cyclic")
+                  if (c_Tmp.Pos("cyclic") > 0)
                   {
-                     const C_SclString c_Message = "Message type \"" + c_MessageType + "\" interpreted as \"Cyclic\".";
+                     orc_Message.c_CanMessage.e_TxMethod = C_OscCanMessage::E_TxMethodType::eTX_METHOD_CYCLIC;
+                     // only display warning if it does not match exactly (case-insensitive)
+                     if (c_Tmp != "cyclic")
+                     {
+                        const C_SclString c_Message = "Message type \"" + c_MessageType +
+                                                      "\" interpreted as \"Cyclic\".";
 
-                     osc_write_log_warning("DBC file import", c_Message);
-                     orc_Message.c_Warnings.Append(c_Message);
+                        osc_write_log_warning("DBC file import", c_Message);
+                        orc_Message.c_Warnings.Append(c_Message);
+                     }
                   }
-               }
-               else
-               {
-                  // all other messages send types shall be interpreted as "OnEvent"
-                  orc_Message.c_CanMessage.e_TxMethod = C_OscCanMessage::E_TxMethodType::eTX_METHOD_ON_EVENT;
-                  // only display warning if it does not match exactly (case-insensitive)
-                  if (c_Tmp != "onevent")
+                  else
                   {
-                     const C_SclString c_Message = "Message type \"" + c_MessageType + "\" interpreted as \"OnEvent\".";
-                     osc_write_log_warning("DBC file import", c_Message);
-                     orc_Message.c_Warnings.Append(c_Message);
+                     // all other messages send types shall be interpreted as "OnEvent"
+                     orc_Message.c_CanMessage.e_TxMethod = C_OscCanMessage::E_TxMethodType::eTX_METHOD_ON_EVENT;
+                     // only display warning if it does not match exactly (case-insensitive)
+                     if (c_Tmp != "onevent")
+                     {
+                        const C_SclString c_Message = "Message type \"" + c_MessageType +
+                                                      "\" interpreted as \"OnEvent\".";
+                        osc_write_log_warning("DBC file import", c_Message);
+                        orc_Message.c_Warnings.Append(c_Message);
+                     }
                   }
+                  break;
                }
-               break;
             }
          }
       }

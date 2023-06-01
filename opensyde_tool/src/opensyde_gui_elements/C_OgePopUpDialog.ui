@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>314</width>
-    <height>221</height>
+    <height>230</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <property name="leftMargin">
     <number>25</number>
    </property>
@@ -63,8 +63,11 @@
           <number>0</number>
          </property>
          <item row="0" column="0">
-          <layout class="QVBoxLayout" name="pc_VerticalLayout">
+          <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="0,1">
            <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -177,14 +180,52 @@
              </layout>
             </widget>
            </item>
+           <item>
+            <widget class="stw::opensyde_gui_elements::C_OgeTransparentScrollArea" name="scrollArea">
+             <property name="focusPolicy">
+              <enum>Qt::ClickFocus</enum>
+             </property>
+             <property name="widgetResizable">
+              <bool>true</bool>
+             </property>
+             <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidgetContents">
+              <property name="geometry">
+               <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>254</width>
+                <height>68</height>
+               </rect>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <layout class="QVBoxLayout" name="pc_VerticalLayoutPopUps"/>
+               </item>
+              </layout>
+             </widget>
+            </widget>
+           </item>
           </layout>
          </item>
         </layout>
        </widget>
       </item>
      </layout>
-     <zorder>pc_GroupBoxTitle</zorder>
-     <zorder>pc_TopWidget</zorder>
     </widget>
    </item>
   </layout>
@@ -216,6 +257,18 @@
    <class>stw::opensyde_gui_elements::C_OgeFraBorder</class>
    <extends>QFrame</extends>
    <header>C_OgeFraBorder.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
+   <extends>QWidget</extends>
+   <header>C_OgeWiOnlyBackground.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeTransparentScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>C_OgeTransparentScrollArea.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

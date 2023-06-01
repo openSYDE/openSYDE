@@ -134,6 +134,10 @@ bool C_GiBiBoundary::OpenStyleDialog(const bool oq_DarkMode)
    C_GiSyBaseWidget * const pc_Dialog = new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Boundary"), oq_DarkMode);
    C_GiSyBoundaryWidget * const pc_SettingsWidget = new C_GiSyBoundaryWidget(*pc_Dialog);
 
+   const QSize c_SIZE(880, 506);
+
+   c_New->SetSize(c_SIZE);
+
    pc_SettingsWidget->SetBorderColor(this->GetBorderColor());
    pc_SettingsWidget->SetBackgroundColor(this->GetBackgroundColor());
    pc_SettingsWidget->SetBorderWidth(this->GetBorderWidth());

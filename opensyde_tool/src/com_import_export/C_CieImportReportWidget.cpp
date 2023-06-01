@@ -68,14 +68,15 @@ const QString C_CieImportReportWidget::hc_HTML_TABLE_DATA_START =
    \param[in]      orc_SkippedImportDataAssigned   Skipped import data assigned
    \param[in]      opc_NodeNameReplacement         Node name replacement
    \param[in]      oq_IsCanOpen                    Is CANopen
+   \param[in]      oq_UniqueAddRequested           Flag to add messages unique
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, const QString & orc_FilePath,
                                                  const uint32_t ou32_BusIndex,
                                                  const C_OscCanProtocol::E_Type oe_ProtocolType,
                                                  const std::vector<C_CieImportDataAssignment> & orc_ImportDataAssigned,
-                                                 const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned, const stw::scl::C_SclString * const opc_NodeNameReplacement,
-                                                 const bool oq_IsCanOpen) :
+                                                 const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned, const stw::scl::C_SclString * const opc_NodeNameReplacement, const bool oq_IsCanOpen,
+                                                 const bool oq_UniqueAddRequested) :
    QWidget(&orc_Parent),
    mpc_Ui(new Ui::C_CieImportReportWidget),
    mrc_ParentDialog(orc_Parent),
@@ -84,7 +85,8 @@ C_CieImportReportWidget::C_CieImportReportWidget(C_OgePopUpDialog & orc_Parent, 
    me_ProtocolType(oe_ProtocolType),
    mc_ImportedAssignedData(orc_ImportDataAssigned),
    mc_SkippedImportedAssignedData(orc_SkippedImportDataAssigned),
-   mpc_NodeNameReplacement(opc_NodeNameReplacement)
+   mpc_NodeNameReplacement(opc_NodeNameReplacement),
+   mq_UniqueAddRequested(oq_UniqueAddRequested)
 {
    const QFileInfo c_FileInfo(orc_FilePath);
 
@@ -414,7 +416,7 @@ void C_CieImportReportWidget::m_OkClicked(void)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Slot of Ok button click
+/*! \brief   Slot of Cancel button click
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportReportWidget::m_CancelClicked(void)
@@ -703,49 +705,56 @@ int32_t C_CieImportReportWidget::m_GetMessageOverrideInfo(C_OscCanMessage & orc_
 
    // reset
    orc_MessageOverrideInfo = std::make_pair(-1, -1);
-
-   const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_OsyNodeIndex);
-
-   if (pc_Node != NULL)
+   if (this->mq_UniqueAddRequested == false)
    {
-      if ((orc_Suffix == "EDS") || (orc_Suffix == "DCF"))
-      {
-         orc_ImportMessageToFind.c_Name = C_CieUtil::h_GetMessageName(*pc_Node, oq_Tx, ou32_MessageIndex,
-                                                                      this->me_ProtocolType,
-                                                                      this->mpc_NodeNameReplacement).toStdString().c_str();
-      }
+      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(ou32_OsyNodeIndex);
 
-      //Only check other protocol matches
-      if (this->me_ProtocolType != C_OscCanProtocol::eCAN_OPEN)
+      if (pc_Node != NULL)
       {
-         std::vector<const C_OscCanProtocol *> c_Protocols = pc_Node->GetCanProtocolsConst(this->me_ProtocolType);
-         std::vector<const C_OscCanProtocol *>::const_iterator c_ProtocolIt;
-
-         // Iterate Protocols (resp. Datapools)
-         for (c_ProtocolIt = c_Protocols.begin(); c_ProtocolIt != c_Protocols.end(); ++c_ProtocolIt)
+         if ((orc_Suffix == "EDS") || (orc_Suffix == "DCF"))
          {
-            const C_OscCanProtocol * const pc_Protocol = *c_ProtocolIt;
-            if (pc_Protocol != NULL)
-            {
-               if (ou32_OsyInterfaceIndex < pc_Protocol->c_ComMessages.size())
-               {
-                  const C_OscCanMessageContainer & rc_MessageContainer =
-                     pc_Protocol->c_ComMessages[ou32_OsyInterfaceIndex];
-                  const std::vector<C_OscCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_Tx);
+            orc_ImportMessageToFind.c_Name = C_CieUtil::h_GetMessageName(*pc_Node, oq_Tx, ou32_MessageIndex,
+                                                                         this->me_ProtocolType,
+                                                                         this->mpc_NodeNameReplacement).toStdString().
+                                             c_str();
+         }
 
-                  // Check all existing messages for a match (CAN Id and Name)
-                  for (uint32_t u32_MessageIt = 0; u32_MessageIt < rc_Messages.size(); u32_MessageIt++)
+         //Only check other protocol matches
+         if (this->me_ProtocolType != C_OscCanProtocol::eCAN_OPEN)
+         {
+            std::vector<const C_OscCanProtocol *> c_Protocols = pc_Node->GetCanProtocolsConst(this->me_ProtocolType);
+            std::vector<const C_OscCanProtocol *>::const_iterator c_ProtocolIt;
+
+            // Iterate Protocols (resp. Datapools)
+            for (c_ProtocolIt = c_Protocols.begin(); c_ProtocolIt != c_Protocols.end(); ++c_ProtocolIt)
+            {
+               const C_OscCanProtocol * const pc_Protocol = *c_ProtocolIt;
+               if (pc_Protocol != NULL)
+               {
+                  if (ou32_OsyInterfaceIndex < pc_Protocol->c_ComMessages.size())
                   {
-                     const C_OscCanMessage & rc_ExistingMessage = rc_Messages[u32_MessageIt];
-                     if (((rc_ExistingMessage.u32_CanId == orc_ImportMessageToFind.u32_CanId) &&
-                          (rc_ExistingMessage.q_IsExtended == orc_ImportMessageToFind.q_IsExtended)) &&
-                         (rc_ExistingMessage.c_Name == orc_ImportMessageToFind.c_Name))
+                     const C_OscCanMessageContainer & rc_MessageContainer =
+                        pc_Protocol->c_ComMessages[ou32_OsyInterfaceIndex];
+                     const std::vector<C_OscCanMessage> & rc_Messages = rc_MessageContainer.GetMessagesConst(oq_Tx);
+
+                     // Check all existing messages for a match (CAN Id and Name)
+                     for (uint32_t u32_MessageIt = 0; u32_MessageIt < rc_Messages.size(); u32_MessageIt++)
                      {
-                        orc_MessageOverrideInfo =
-                           std::make_pair(static_cast<int32_t>(pc_Protocol->u32_DataPoolIndex),
-                                          static_cast<int32_t>(u32_MessageIt));
-                        break; // no further search necessary if found
+                        const C_OscCanMessage & rc_ExistingMessage = rc_Messages[u32_MessageIt];
+                        if (((rc_ExistingMessage.u32_CanId == orc_ImportMessageToFind.u32_CanId) &&
+                             (rc_ExistingMessage.q_IsExtended == orc_ImportMessageToFind.q_IsExtended)) &&
+                            (rc_ExistingMessage.c_Name == orc_ImportMessageToFind.c_Name))
+                        {
+                           orc_MessageOverrideInfo =
+                              std::make_pair(static_cast<int32_t>(pc_Protocol->u32_DataPoolIndex),
+                                             static_cast<int32_t>(u32_MessageIt));
+                           break; // no further search necessary if found
+                        }
                      }
+                  }
+                  else
+                  {
+                     s32_Retval = C_CONFIG;
                   }
                }
                else
@@ -753,16 +762,12 @@ int32_t C_CieImportReportWidget::m_GetMessageOverrideInfo(C_OscCanMessage & orc_
                   s32_Retval = C_CONFIG;
                }
             }
-            else
-            {
-               s32_Retval = C_CONFIG;
-            }
          }
       }
-   }
-   else
-   {
-      s32_Retval = C_CONFIG;
+      else
+      {
+         s32_Retval = C_CONFIG;
+      }
    }
 
    return s32_Retval;
@@ -825,7 +830,7 @@ void C_CieImportReportWidget::mh_GetTableWithMessageEntries(int32_t & ors32_Retv
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieImportReportWidget::m_InsertMessages(void) const
 {
-   C_CieUtil::h_InsertMessages(this->mc_ImportedAssignedData, this->me_ProtocolType);
+   C_CieUtil::h_InsertMessages(this->mc_ImportedAssignedData, this->me_ProtocolType, this->mq_UniqueAddRequested);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -941,7 +946,7 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32_t ou32_Index, c
    QString c_Tmp;
 
    //Index
-   c_Retval += C_CieImportReportWidget::hc_HTML_TABLE_DATA_START + QString::number(ou32_Index + 1UL) +
+   c_Retval += C_CieImportReportWidget::hc_HTML_TABLE_DATA_START + QString::number(ou32_Index + 1U) +
                c_TableEntryEnd;
    //Message name
    if ((orc_Suffix.toUpper() == "EDS") || (orc_Suffix.toUpper() == "DCF"))
@@ -967,7 +972,7 @@ QString C_CieImportReportWidget::mh_GetMessageEntry(const uint32_t ou32_Index, c
    else
    {
       c_Retval += C_CieImportReportWidget::hc_HTML_TABLE_DATA_START + static_cast<QString>("%1 (0x%2)").arg(
-         orc_CurMessage.c_Name.c_str()).arg(orc_CurMessage.u32_CanId, 0, 16) + c_TableEntryEnd;
+         orc_CurMessage.c_Name.c_str(), QString::number(orc_CurMessage.u32_CanId, 16).toUpper()) + c_TableEntryEnd;
    }
 
    //Signals

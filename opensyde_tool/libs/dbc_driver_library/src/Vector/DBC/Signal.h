@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -25,6 +25,7 @@
 
 #include <cstdint>
 #include <map>
+#include <ostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -43,78 +44,90 @@ namespace DBC {
 /**
  * Signal (SG)
  */
-class VECTOR_DBC_EXPORT Signal
-{
-public:
-    Signal();
-
+struct VECTOR_DBC_EXPORT Signal {
     /** Name */
-    std::string name;
+    std::string name {};
 
-    /** Multiplexed Signal (m) */
-    bool multiplexedSignal; // m
+    /** Multiplexor */
+    enum class Multiplexor : char {
+        /** No Multiplexor */
+        NoMultiplexor = 0,
+
+        /** Multiplexed Signal */
+        MultiplexedSignal = 'm',
+
+        /** MultiplexorSwitch */
+        MultiplexorSwitch = 'M'
+    };
+
+    /** @copydoc Multiplexor */
+    Multiplexor multiplexor { Multiplexor::NoMultiplexor };
 
     /** Multiplexer Switch Value */
-    unsigned int multiplexerSwitchValue;
-
-    /** Multiplexor Switch (M) */
-    bool multiplexorSwitch; // M
+    uint32_t multiplexerSwitchValue {};
 
     /** Start Bit */
-    unsigned int startBit;
+    uint32_t startBit {};
 
     /** Bit Size */
-    unsigned int bitSize;
+    uint32_t bitSize {};
 
     /** Byte Order */
-    ByteOrder byteOrder;
+    ByteOrder byteOrder { ByteOrder::BigEndian };
 
     /** Value Type */
-    ValueType valueType;
+    ValueType valueType { ValueType::Unsigned };
 
     /** Factor */
-    double factor;
+    double factor {};
 
     /** Offset */
-    double offset;
+    double offset {};
 
     /** Minimun Physical Value (or 0 if auto calculated) */
-    double minimumPhysicalValue;
+    double minimum {};
 
     /** Maximum Physical Value (or 0 if auto calculated) */
-    double maximumPhysicalValue;
+    double maximum {};
 
     /** Unit */
-    std::string unit;
+    std::string unit {};
 
     /** Receivers */
-    std::set<std::string> receivers;
+    std::set<std::string> receivers {};
 
     /** Signal Extended Value Type (SIG_VALTYPE, obsolete) */
     enum class ExtendedValueType : char {
-        Undefined = ' ',
+        /** Undefined */
+        Undefined = 0,
+
+        /** Integer */
         Integer = '0',
+
+        /** Float */
         Float = '1',
+
+        /** Double */
         Double = '2'
     };
 
     /** Signal Extended Value Type (SIG_VALTYPE, obsolete) */
-    ExtendedValueType extendedValueType;
+    ExtendedValueType extendedValueType { ExtendedValueType::Undefined };
 
     /** Value Descriptions (VAL) */
-    ValueDescriptions valueDescriptions;
+    ValueDescriptions valueDescriptions {};
 
     /** Signal Type Refs (SGTYPE, obsolete) */
-    std::string type;
+    std::string type {};
 
     /** Comment (CM) */
-    std::string comment;
+    std::string comment {};
 
     /** Attribute Values (BA) */
-    std::map<std::string, Attribute> attributeValues;
+    std::map<std::string, Attribute> attributeValues {};
 
     /** Extended Multiplexors (SG_MUL_VAL) */
-    std::map<std::string, ExtendedMultiplexor> extendedMultiplexors;
+    std::map<std::string, ExtendedMultiplexor> extendedMultiplexors {};
 
     /**
      * @brief Convert from Raw to Physical Value
@@ -123,7 +136,7 @@ public:
      *
      * Converts a value from raw to physical representation.
      */
-    double rawToPhysicalValue(double rawValue);
+    double rawToPhysicalValue(double rawValue) const;
 
     /**
      * @brief Convert from Physical to Raw Value
@@ -132,7 +145,7 @@ public:
      *
      * Converts a value from physical to raw representation.
      */
-    double physicalToRawValue(double physicalValue);
+    double physicalToRawValue(double physicalValue) const;
 
     /**
      * @brief Get minimum Physical Value
@@ -140,7 +153,7 @@ public:
      *
      * Based on size, valueType and extendedValueType this calculates the minimum raw value.
      */
-    double minimumRawValue();
+    double minimumRawValue() const;
 
     /**
      * @brief Get maximum Raw Value
@@ -148,7 +161,7 @@ public:
      *
      * Based on size, valueType and extendedValueType this calculates the maximum raw value.
      */
-    double maximumRawValue();
+    double maximumRawValue() const;
 
     /**
      * @brief Decodes/Extracts a signal from the message data
@@ -159,7 +172,7 @@ public:
      *
      * @note Multiplexors are not taken into account.
      */
-    uint64_t decode(std::vector<uint8_t> & data);
+    uint64_t decode(std::vector<uint8_t> & data) const;
 
     /**
      * @brief Encodes a signal into the message data
@@ -170,8 +183,10 @@ public:
      *
      * @note Multiplexors are not taken into account.
      */
-    void encode(std::vector<uint8_t> & data, uint64_t rawValue);
+    void encode(std::vector<uint8_t> & data, uint64_t rawValue) const;
 };
+
+std::ostream & operator<<(std::ostream & os, const Signal & signal);
 
 }
 }

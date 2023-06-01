@@ -143,7 +143,7 @@
         <x>0</x>
         <y>0</y>
         <width>400</width>
-        <height>243</height>
+        <height>241</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_6">
@@ -274,8 +274,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>394</width>
-            <height>278</height>
+            <width>396</width>
+            <height>279</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -327,8 +327,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>394</width>
-            <height>278</height>
+            <width>396</width>
+            <height>279</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -384,8 +384,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>394</width>
-            <height>278</height>
+            <width>396</width>
+            <height>279</height>
            </rect>
           </property>
           <property name="autoFillBackground">
@@ -460,6 +460,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeSmoothScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>C_OgeSmoothScrollArea.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
    <extends>QWidget</extends>
    <header>C_OgeWiOnlyBackground.hpp</header>
@@ -480,12 +486,6 @@
    <class>stw::opensyde_gui_elements::C_OgeLabToolboxHeadingGroup</class>
    <extends>QLabel</extends>
    <header>C_OgeLabToolboxHeadingGroup.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeSmoothScrollArea</class>
-   <extends>QScrollArea</extends>
-   <header>C_OgeSmoothScrollArea.hpp</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeLabToolBarNoSearchResult</class>

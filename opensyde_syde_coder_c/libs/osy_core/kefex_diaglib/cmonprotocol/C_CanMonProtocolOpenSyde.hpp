@@ -8,22 +8,14 @@
    \copyright   Copyright 2017 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONPROTOCOLOPENSYDEH
-#define CCMONPROTOCOLOPENSYDEH
+#ifndef CCMONPROTOCOLOPENSYDEHPP
+#define CCMONPROTOCOLOPENSYDEHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
 #include "C_SclString.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -34,7 +26,7 @@ namespace cmon_protocol
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///Interpretation of openSYDE protocol
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolOpenSyde :
+class C_CanMonProtocolOpenSyde :
    public C_CanMonProtocolBase
 {
 protected:

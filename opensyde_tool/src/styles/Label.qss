@@ -48,7 +48,8 @@ padding: 5px;
 }
 
 /* --------------------------------------------------------------------- */
-stw--opensyde_gui_elements--C_OgeLabGenericBubble
+stw--opensyde_gui_elements--C_OgeLabGenericBubble,
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Padding="1"]
 {
 margin-top: 1px;
 padding-left: 2px;

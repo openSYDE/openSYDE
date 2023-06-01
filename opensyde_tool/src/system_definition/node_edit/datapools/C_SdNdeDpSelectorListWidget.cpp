@@ -21,7 +21,6 @@
 #include "C_GtGetText.hpp"
 #include "C_OgePopUpDialog.hpp"
 #include "C_SdNdeDpProperties.hpp"
-#include "C_SdNdeDpSelectorAddWidget.hpp"
 #include "C_PuiSdHandler.hpp"
 #include "C_SdClipBoardHelper.hpp"
 #include "C_Uti.hpp"
@@ -31,6 +30,8 @@
 #include "TglUtils.hpp"
 #include "C_PuiSdSharedDatapools.hpp"
 #include "C_OscLoggingHandler.hpp"
+#include "C_SdNdeDpImportRamView.hpp"
+#include "C_SdNdeDpImportRamViewReport.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -491,32 +492,105 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
       {
          C_OscNodeDataPool c_NewDatapool;
          C_PuiSdNodeDataPool c_UiDataPool;
-         bool q_SharedDatapoolSelected = false;
+         C_SdNdeDpSelectorAddWidget::E_SelectionResult e_SelectionDialogResult =
+            C_SdNdeDpSelectorAddWidget::eSTANDALONE;
          C_OscNodeDataPoolId c_SharedDatapoolId;
-         bool q_ShareNewDatapool = false;
+         QString c_RamViewProjectPath;
+         bool q_ContinueFromSelection = false;
 
          // the type must be initialized
          c_NewDatapool.c_Name = C_PuiSdHandler::h_GetInstance()->GetUniqueDataPoolName(this->mu32_NodeIndex,
                                                                                        c_NewDatapool.c_Name);
          c_NewDatapool.e_Type = this->me_DataPoolType;
 
-         // ask for sharing if possible
-         // (only if the Datapool is DIAG or NVM Datapool - no sharing between COMM and HAL Datapools)
+         // ask for sharing or RAMView import if possible
+         // (only if it is a DIAG or NVM Datapool - no sharing between and no import of COMM and HAL Datapools)
          if ((this->me_DataPoolType == C_OscNodeDataPool::eDIAG) ||
              (this->me_DataPoolType == C_OscNodeDataPool::eNVM))
          {
-            q_ShareNewDatapool =
-               this->m_OpenShareDataPoolDialog(c_NewDatapool, q_SharedDatapoolSelected, c_SharedDatapoolId);
+            q_ContinueFromSelection =
+               this->m_OpenDataPoolSelectDialog(c_NewDatapool, e_SelectionDialogResult, c_SharedDatapoolId,
+                                                c_RamViewProjectPath);
+         }
+
+         if ((q_ContinueFromSelection == true) &&
+             (e_SelectionDialogResult == C_SdNdeDpSelectorAddWidget::eRAMVIEWIMPORT))
+         {
+            stw::scl::C_SclStringList c_ImportInfo;
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            const int32_t s32_ImportResult = C_SdNdeDpImportRamView::h_ImportDataPoolFromRamViewDefProject(
+               c_RamViewProjectPath.toStdString().c_str(), c_NewDatapool, c_UiDataPool, c_ImportInfo);
+            QApplication::restoreOverrideCursor();
+
+            if (s32_ImportResult == C_NO_ERR)
+            {
+               // check if we found at least one list for the specified Datapool type
+               // we do not need to check if the list has any element, because we assume it is a valid RAMView project
+               if (c_NewDatapool.c_Lists.empty() == true)
+               {
+                  // show error message box and stop continuing
+                  const QString c_RamOrEeprom = (c_NewDatapool.e_Type == C_OscNodeDataPool::eNVM) ? "EEPROM" : "RAM";
+                  C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+
+                  c_Message.SetHeading(C_GtGetText::h_GetText("RAMView Import"));
+                  c_Message.SetDescription(C_GtGetText::h_GetText("No lists of type ") + c_RamOrEeprom +
+                                           C_GtGetText::h_GetText(" found. A ") +
+                                           C_PuiSdUtil::h_ConvertDataPoolTypeToString(c_NewDatapool.e_Type) +
+                                           C_GtGetText::h_GetText(" Datapool cannot be created without a list."));
+                  c_Message.SetDetails(
+                     C_GtGetText::h_GetText("RAMView project \"") + c_RamViewProjectPath +
+                     C_GtGetText::h_GetText("\" does not contain any list of type ") + c_RamOrEeprom + ".");
+                  c_Message.Execute();
+
+                  q_ContinueFromSelection = false;
+               }
+               else
+               {
+                  // show report
+                  const QPointer<C_OgePopUpDialog> c_PopUpDialogReport = new C_OgePopUpDialog(this, this);
+                  C_SdNdeDpImportRamViewReport * const pc_ReportDialogWidget =
+                     new C_SdNdeDpImportRamViewReport(*c_PopUpDialogReport, c_RamViewProjectPath,
+                                                      c_NewDatapool, c_ImportInfo);
+                  Q_UNUSED(pc_ReportDialogWidget)
+                  c_PopUpDialogReport->SetSize(mc_POPUP_REPORT_SIZE);
+
+                  if (c_PopUpDialogReport->exec() != static_cast<int32_t>(QDialog::Accepted))
+                  {
+                     q_ContinueFromSelection = false;
+                  }
+                  if (c_PopUpDialogReport != NULL)
+                  {
+                     c_PopUpDialogReport->HideOverlay();
+                     c_PopUpDialogReport->deleteLater();
+                  }
+               } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+            }
+            else
+            {
+               // show error message box and stop continuing
+               C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::eERROR);
+               c_Message.SetHeading(C_GtGetText::h_GetText("RAMView Import Failed"));
+               c_Message.SetDescription(C_GtGetText::h_GetText("Error occured loading RAMView project file."));
+               c_Message.SetDetails(
+                  C_GtGetText::h_GetText("Could not load \"") + c_RamViewProjectPath + "\".<br>" +
+                  static_cast<QString>(C_GtGetText::h_GetText("For details see ")) +
+                  C_Uti::h_GetLink(C_GtGetText::h_GetText("log file."), mc_STYLESHEET_GUIDE_COLOR_LINK,
+                                   C_OscLoggingHandler::h_GetCompleteLogFileLocation().c_str()));
+               C_OscLoggingHandler::h_Flush(); // update log file
+               c_Message.Execute();
+
+               q_ContinueFromSelection = false;
+            }
          }
 
          if ((this->me_DataPoolType == C_OscNodeDataPool::eCOM) ||
              (this->me_DataPoolType == C_OscNodeDataPool::eHALC) ||
              (this->me_DataPoolType == C_OscNodeDataPool::eHALC_NVM) ||
-             (q_ShareNewDatapool == true))
+             (q_ContinueFromSelection == true))
          {
             const C_OscNodeDataPoolId * opc_SharedDatapoolId = NULL;
 
-            if (q_SharedDatapoolSelected == true)
+            if (e_SelectionDialogResult == C_SdNdeDpSelectorAddWidget::eSHARED)
             {
                // Datapool should be shared. Synchronize the Datapool before opening the properties dialog
                C_OscNodeDataPool c_SharedDatapool;
@@ -568,11 +642,10 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
             // Open the Datapool properties dialog for the new Datapool
             if (this->m_OpenDataPoolDialog(c_NewDatapool, c_UiDataPool, opc_SharedDatapoolId,
                                            pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].
-                                           q_ProgrammingSupport,
-                                           -1) == true)
+                                           q_ProgrammingSupport, -1) == true)
             {
-               // Initialize the Datapool only when not shared
-               if (q_SharedDatapoolSelected == false)
+               // Initialize the Datapool only when stand alone
+               if (e_SelectionDialogResult == C_SdNdeDpSelectorAddWidget::eSTANDALONE)
                {
                   //Initialize (after type is certain)
                   for (uint32_t u32_ItList = 0; u32_ItList < c_NewDatapool.c_Lists.size(); ++u32_ItList)
@@ -583,17 +656,14 @@ void C_SdNdeDpSelectorListWidget::AddNewDatapool(void)
                         C_PuiSdHandler::h_InitDataElement(c_NewDatapool.e_Type, c_NewDatapool.q_IsSafety,
                                                           rc_List.c_Elements[u32_ItElement]);
                      }
-
-                     // Safety property of eHALC_NVM is not changeable, no handling necessary
-                     if ((c_NewDatapool.e_Type == C_OscNodeDataPool::eNVM) && (c_NewDatapool.q_IsSafety == true))
-                     {
-                        rc_List.q_NvmCrcActive = true;
-                     }
+                     // CRC update for safety NVM Datapools is already done in Datapool properties dialog close
                   }
                }
 
                //Add step
-               this->m_AddNewDataPool(c_NewDatapool, c_UiDataPool, -1, false, !q_SharedDatapoolSelected,
+               const bool q_AllowDataAdaptation = (e_SelectionDialogResult == C_SdNdeDpSelectorAddWidget::eSTANDALONE);
+               const bool q_SharedDatapoolSelected = (e_SelectionDialogResult == C_SdNdeDpSelectorAddWidget::eSHARED);
+               this->m_AddNewDataPool(c_NewDatapool, c_UiDataPool, -1, false, q_AllowDataAdaptation,
                                       q_SharedDatapoolSelected, &c_SharedDatapoolId);
                Q_EMIT (this->SigDataPoolChanged());
                //Check
@@ -1103,6 +1173,14 @@ void C_SdNdeDpSelectorListWidget::keyPressEvent(QKeyEvent * const opc_Event)
          }
       }
    }
+   else //shortcut for HAL datapools "Edit Properties" (Key_F2)
+   {
+      if (opc_Event->key() == static_cast<int32_t>(Qt::Key_F2))
+      {
+         this->m_Edit(true);
+         q_CallOrig = false;
+      }
+   }
 
    if (q_CallOrig == true)
    {
@@ -1201,86 +1279,49 @@ void C_SdNdeDpSelectorListWidget::m_UpdateNumbers(void) const
 //}
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Opens the add datapool dialog for configuring the shared datapool configuration
+/*! \brief   Opens the add Datapool selection dialog
 
-   Checking if it is necessary to open the dialog first. If no other Datapools exist, sharing is not possible
+   Opens the add Datapool dialog where the user can select if to add a standalone Datapool, import a Datapool from
+   a RAMView project or add a shared Datapool incl. configuration.
 
-   \param[in,out] orc_OscDataPool             Reference to the actual core datapool object
-   \param[out]    orq_SharedDatapoolSelected  Flag if datapool was selected. Only if true oru32_SharedNodeIndex and
-                                              oru32_SharedDatapoolIndex are valid
-   \param[out]    orc_SharedDatapoolId        Datapool ID of selected shared datapool partner to the new datapool
+   \param[in,out] orc_OscDataPool         Reference to the actual core datapool object
+   \param[out]    ore_DialogResult        Flag for stand-alone vs shared vs. RAMView imported Datapool
+                                          Following parameters are only valid in particular result cases
+   \param[out]    orc_SharedDatapoolId    Datapool ID of selected shared datapool partner to the new datapool
+   \param[out]    orc_RamViewFilePath     RAMView project file path (*.def)
 
    \return
-   User accepted dialog or dialog was not necessary
+   User accepted dialog
    User aborted dialog
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool C_SdNdeDpSelectorListWidget::m_OpenShareDataPoolDialog(C_OscNodeDataPool & orc_OscDataPool,
-                                                            bool & orq_SharedDatapoolSelected,
-                                                            C_OscNodeDataPoolId & orc_SharedDatapoolId)
+bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolSelectDialog(C_OscNodeDataPool & orc_OscDataPool,
+                                                             C_SdNdeDpSelectorAddWidget::E_SelectionResult & ore_DialogResult, C_OscNodeDataPoolId & orc_SharedDatapoolId,
+                                                             QString & orc_RamViewFilePath)
 {
    bool q_Return = false;
-   bool q_DatapoolFound = false;
-   uint32_t u32_NodeIndex;
 
-   // Search for Datapools of the same type
-   for (u32_NodeIndex = 0U; u32_NodeIndex < C_PuiSdHandler::h_GetInstance()->GetOscNodesSize(); ++u32_NodeIndex)
-   {
-      const C_OscNode * const pc_Node = C_PuiSdHandler::h_GetInstance()->GetOscNodeConst(u32_NodeIndex);
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
+   C_SdNdeDpSelectorAddWidget * const pc_Dialog = new C_SdNdeDpSelectorAddWidget(*c_New,
+                                                                                 this->mu32_NodeIndex,
+                                                                                 orc_OscDataPool);
 
-      if (pc_Node != NULL)
-      {
-         uint32_t u32_DpCounter;
+   const QSize c_SIZE(620, 520);
 
-         for (u32_DpCounter = 0U; u32_DpCounter < pc_Node->c_DataPools.size(); ++u32_DpCounter)
-         {
-            if (pc_Node->c_DataPools[u32_DpCounter].e_Type == this->me_DataPoolType)
-            {
-               // At least one Datapool of the same type exists
-               q_DatapoolFound = true;
-               break;
-            }
-         }
-      }
+   c_New->SetSize(c_SIZE);
+   Q_UNUSED(pc_Dialog)
 
-      if (q_DatapoolFound == true)
-      {
-         break;
-      }
-   }
-
-   if (q_DatapoolFound == true)
-   {
-      // At least one Datapool of the same type exists, show the dialog
-      const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
-      C_SdNdeDpSelectorAddWidget * const pc_Dialog = new C_SdNdeDpSelectorAddWidget(*c_New,
-                                                                                    this->mu32_NodeIndex,
-                                                                                    orc_OscDataPool);
-
-      Q_UNUSED(pc_Dialog)
-
-      if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
-      {
-         q_Return = true;
-         orq_SharedDatapoolSelected =
-            pc_Dialog->GetSelectedSharedDatapool(orc_SharedDatapoolId);
-      }
-      else
-      {
-         orq_SharedDatapoolSelected = false;
-      }
-
-      c_New->HideOverlay();
-      c_New->deleteLater();
-   } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
-   else
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       q_Return = true;
-      orq_SharedDatapoolSelected = false;
+      ore_DialogResult = pc_Dialog->GetDialogResult(orc_SharedDatapoolId, orc_RamViewFilePath);
    }
 
+   c_New->HideOverlay();
+   c_New->deleteLater();
+
    return q_Return;
-}
+} //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Opens the Datapool properties dialog
@@ -1311,6 +1352,51 @@ bool C_SdNdeDpSelectorListWidget::m_OpenDataPoolDialog(C_OscNodeDataPool & orc_O
       new C_SdNdeDpProperties(*c_New, &orc_OscDataPool, &orc_UiDataPool, &this->me_ProtocolType,
                               os32_DataPoolIndex, this->mu32_NodeIndex, oq_SelectName, oq_NodeProgrammingSupport,
                               opc_SharedDatapoolId);
+
+   if (orc_OscDataPool.e_Type == C_OscNodeDataPool::eDIAG)
+   {
+      if (!pc_Dialog->GetIsDatapoolShared())
+      {
+         const QSize c_SIZE(892, 800);
+
+         c_New->SetSize(c_SIZE);
+      }
+      else
+      {
+         const QSize c_SIZE(892, 908);
+
+         c_New->SetSize(c_SIZE);
+      }
+   }
+   else if (orc_OscDataPool.e_Type == C_OscNodeDataPool::eNVM)
+   {
+      if (!pc_Dialog->GetIsDatapoolShared())
+      {
+         const QSize c_SIZE(892, 932);
+         c_New->SetSize(c_SIZE);
+      }
+      else
+      {
+         const QSize c_SIZE(892, 1040);
+         c_New->SetSize(c_SIZE);
+      }
+   }
+   else if (orc_OscDataPool.e_Type == C_OscNodeDataPool::eCOM)
+   {
+      const QSize c_SIZE(892, 843);
+
+      c_New->SetSize(c_SIZE);
+   }
+   else if (orc_OscDataPool.e_Type == C_OscNodeDataPool::eHALC)
+   {
+      const QSize c_SIZE(892, 800);
+      c_New->SetSize(c_SIZE);
+   }
+   else //C_OscNodeDataPool::eHALC_NVM
+   {
+      const QSize c_SIZE(892, 889);
+      c_New->SetSize(c_SIZE);
+   }
 
    Q_UNUSED(pc_Dialog)
 
@@ -1571,12 +1657,14 @@ void C_SdNdeDpSelectorListWidget::m_SetupContextMenu(void)
                                                           static_cast<int32_t>(Qt::CTRL) +
                                                           static_cast<int32_t>(Qt::Key_Plus));
 
+   this->mpc_EditAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                                              "Edit Properties"), this,
+                                                           &C_SdNdeDpSelectorListWidget::m_Edit,
+                                                           static_cast<int32_t>(Qt::Key_F2));
+
    this->mpc_EditContentAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
                                                                      "Edit Content"), this,
                                                                   &C_SdNdeDpSelectorListWidget::m_EditContent);
-   this->mpc_EditAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
-                                                              "Edit Properties"), this,
-                                                           &C_SdNdeDpSelectorListWidget::m_Edit);
 
    this->mpc_EditActionSeparator = this->mpc_ContextMenu->addSeparator();
 
@@ -1665,16 +1753,6 @@ void C_SdNdeDpSelectorListWidget::m_Edit(const bool oq_SelectName)
                                            q_ProgrammingSupport, s32_DpIndex,
                                            oq_SelectName) == true)
             {
-               // Update crc active if safety
-               // Safety property of eHALC_NVM is not changeable, no handling necessary
-               if ((c_OscDatapool.e_Type == C_OscNodeDataPool::eNVM) && (c_OscDatapool.q_IsSafety == true))
-               {
-                  for (uint32_t u32_ItList = 0; u32_ItList < c_OscDatapool.c_Lists.size(); ++u32_ItList)
-                  {
-                     C_OscNodeDataPoolList & rc_List = c_OscDatapool.c_Lists[u32_ItList];
-                     rc_List.q_NvmCrcActive = true;
-                  }
-               }
                // save the changes
                if (C_PuiSdHandler::h_GetInstance()->SetDataPool(this->mu32_NodeIndex, s32_DpIndex,
                                                                 c_OscDatapool, c_UiDataPool, true,

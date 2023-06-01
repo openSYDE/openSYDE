@@ -1174,9 +1174,9 @@ void C_SyvComMessageMonitor::mh_InterpretDbcFileCanSignal(C_OscComMessageLoggerD
       // Check if a value description matches to the current value
       try
       {
-         const uint32_t u32_Value = static_cast<uint32_t>(c_Signal.c_RawValueDec.ToInt64());
-         const std::map<uint32_t, stw::scl::C_SclString>::const_iterator c_ItDescription =
-            orc_DbcSignal.c_ValueDescription.find(u32_Value);
+         const int64_t s64_Value = c_Signal.c_RawValueDec.ToInt64();
+         const std::map<int64_t, stw::scl::C_SclString>::const_iterator c_ItDescription =
+            orc_DbcSignal.c_ValueDescription.find(s64_Value);
 
          if (c_ItDescription != orc_DbcSignal.c_ValueDescription.end())
          {

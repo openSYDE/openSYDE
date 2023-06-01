@@ -25,6 +25,7 @@
 #include "C_OscNodeDataPoolId.hpp"
 #include "C_OscCanProtocol.hpp"
 #include "C_PuiSdNodeDataPool.hpp"
+#include "C_SdNdeDpSelectorAddWidget.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -99,9 +100,10 @@ private:
    C_SdNdeDpSelectorListWidget(const C_SdNdeDpSelectorListWidget &);
    C_SdNdeDpSelectorListWidget & operator =(const C_SdNdeDpSelectorListWidget &) &;
 
-   bool m_OpenShareDataPoolDialog(stw::opensyde_core::C_OscNodeDataPool & orc_OscDataPool,
-                                  bool & orq_SharedDatapoolSelected,
-                                  stw::opensyde_core::C_OscNodeDataPoolId & orc_SharedDatapoolId);
+   bool m_OpenDataPoolSelectDialog(stw::opensyde_core::C_OscNodeDataPool & orc_OscDataPool,
+                                   C_SdNdeDpSelectorAddWidget::E_SelectionResult & ore_DialogResult,
+                                   stw::opensyde_core::C_OscNodeDataPoolId & orc_SharedDatapoolId,
+                                   QString & orc_RamViewFilePath);
    bool m_OpenDataPoolDialog(stw::opensyde_core::C_OscNodeDataPool & orc_OscDataPool,
                              stw::opensyde_gui_logic::C_PuiSdNodeDataPool & orc_UiDataPool,
                              const stw::opensyde_core::C_OscNodeDataPoolId * const opc_SharedDatapoolId,

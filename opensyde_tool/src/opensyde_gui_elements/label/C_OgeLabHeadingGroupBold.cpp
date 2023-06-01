@@ -42,6 +42,6 @@ using namespace stw::opensyde_gui_elements;
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeLabHeadingGroupBold::C_OgeLabHeadingGroupBold(QWidget * const opc_Parent) :
-   C_OgeLabToolTipBase(opc_Parent)
+   C_OgeLabContextMenuBase(opc_Parent)
 {
 }

@@ -155,6 +155,74 @@ C_CamProFilterData C_CamMosFilterPopup::GetFilterData(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Filtering the duplicates from QList's (QList<int32_t> oc_CanMsgId,  const QList<uint8_t> oc_CanMsgXtd)
+ *  Set function for calling C_CamMosFilterPopup::m_OnAddFilterItemFromContextmenu()
+
+   \param[in]       oc_CanMsgId     List of selected message CanId's
+   \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterPopup::SetAddFilterItem(const QList<int32_t> oc_CanMsgId,  const QList<uint8_t> oc_CanMsgXtd)
+{
+   bool q_IsLastItemInList = false;
+   int32_t s32_XtdCounter = 0;
+
+   QList<int32_t> oc_FilteredCanMsgIdList;
+   QList<uint8_t> oc_FilteredCanMsgXtdList;
+
+   for (QList<int32_t>::const_iterator c_It = oc_CanMsgId.begin(); c_It != oc_CanMsgId.end(); ++c_It)
+   {
+      if (!oc_FilteredCanMsgIdList.contains(*c_It))
+      {
+         oc_FilteredCanMsgIdList.append(*c_It);
+         oc_FilteredCanMsgXtdList.append(oc_CanMsgXtd.at(s32_XtdCounter));
+      }
+      else
+      {
+         if (oc_FilteredCanMsgIdList.indexOf(*c_It) >= 0)
+         {
+            bool q_HasFoundCurrentIndexWithDifferentXtd = false;
+            bool q_HasFoundCurrentIndexWithSameXtd = false;
+            for (int32_t s32_It = 0; s32_It < oc_FilteredCanMsgIdList.size(); s32_It++)
+            {
+               if ((oc_CanMsgId.at(c_It - oc_CanMsgId.begin()) == oc_FilteredCanMsgIdList.at(s32_It)) &&
+                   (oc_CanMsgXtd.at(c_It - oc_CanMsgId.begin()) != oc_FilteredCanMsgXtdList.at(s32_It)))
+               {
+                  q_HasFoundCurrentIndexWithDifferentXtd = true;
+               }
+               if ((oc_CanMsgId.at(c_It - oc_CanMsgId.begin()) == oc_FilteredCanMsgIdList.at(s32_It)) &&
+                   (oc_CanMsgXtd.at(c_It - oc_CanMsgId.begin()) == oc_FilteredCanMsgXtdList.at(s32_It)))
+               {
+                  q_HasFoundCurrentIndexWithSameXtd = true;
+               }
+            }
+            if (((q_HasFoundCurrentIndexWithSameXtd == false) && (q_HasFoundCurrentIndexWithDifferentXtd == false)) ||
+                ((q_HasFoundCurrentIndexWithDifferentXtd == true) && (q_HasFoundCurrentIndexWithSameXtd == false)))
+            {
+               oc_FilteredCanMsgIdList.append(*c_It);
+               oc_FilteredCanMsgXtdList.append(oc_CanMsgXtd.at(s32_XtdCounter));
+            }
+         }
+      }
+      s32_XtdCounter++;
+   }
+
+   for (int32_t s32_It = 0; s32_It < oc_FilteredCanMsgIdList.size(); s32_It++)
+   {
+      if (s32_It == ((oc_FilteredCanMsgIdList.size()) - 1))
+      {
+         q_IsLastItemInList = true;
+      }
+      C_CamMosFilterPopup::m_OnAddFilterItemFromContextmenu(oc_FilteredCanMsgIdList.at(
+                                                               s32_It), oc_FilteredCanMsgXtdList.at(
+                                                               s32_It), q_IsLastItemInList);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Overwritten key press event slot
 
    Here: Handle specific enter key cases
@@ -320,10 +388,8 @@ void C_CamMosFilterPopup::m_InitStaticGuiElements(void) const
                                                                                        eDETAILS), 288);
    this->mpc_Ui->pc_TableView->setColumnWidth(C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::
                                                                                        eREMOVE), 60);
-   //stretch last section
-   this->mpc_Ui->pc_TableView->horizontalHeader()->setStretchLastSection(true);
 
-   //set header resize mode (stretch)
+   //set header resize mode (stretch "details" section)
    this->mpc_Ui->pc_TableView->horizontalHeader()->setSectionResizeMode(C_CamMosFilterTableModel::h_EnumToColumn(
                                                                            C_CamMosFilterTableModel::eENABLED),
                                                                         QHeaderView::Fixed);
@@ -335,7 +401,7 @@ void C_CamMosFilterPopup::m_InitStaticGuiElements(void) const
                                                                         QHeaderView::Fixed);
    this->mpc_Ui->pc_TableView->horizontalHeader()->setSectionResizeMode(C_CamMosFilterTableModel::h_EnumToColumn(
                                                                            C_CamMosFilterTableModel::eDETAILS),
-                                                                        QHeaderView::Fixed);
+                                                                        QHeaderView::Stretch);
    this->mpc_Ui->pc_TableView->horizontalHeader()->setSectionResizeMode(C_CamMosFilterTableModel::h_EnumToColumn(
                                                                            C_CamMosFilterTableModel::eREMOVE),
                                                                         QHeaderView::Fixed);
@@ -568,6 +634,51 @@ void C_CamMosFilterPopup::m_OnAddFilterItem(void) const
 
    // show or hide table and settings
    this->m_ShowNoFilter(false);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Copied from existing function C_CamMosFilterPopup::m_OnAddFilterItem with modifications
+ *  Updates Filter with selected messages (Hex value) CanId in "pc_LeCanIdStart" and "pc_LeCanIdEnd" Labels
+ *  also updating the checkbox "pc_CheckBoxExtended" based on u8_CanMsgXTD value
+ *
+   \param[in]       os32_CanMsgId           Selected message CanId
+   \param[in]       ou8_CanMsgXtd           Selected CanMessage has extended format
+   \param[in]    oq_IsLastItemInList       Is current item is last item from selected list
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+
+void C_CamMosFilterPopup::m_OnAddFilterItemFromContextmenu(const int32_t os32_CanMsgId, const uint8_t ou8_CanMsgXtd,
+                                                           const bool oq_IsLastItemInList)
+{
+   std::vector<uint32_t> c_IndexVector;
+   uint32_t u32_NewIndex;
+
+   // add new row in model
+   c_IndexVector.push_back(static_cast<uint32_t>(this->mpc_TableModel->rowCount()));
+   u32_NewIndex = this->mpc_TableModel->AddNewItem(c_IndexVector);
+
+   const QModelIndex c_Index = this->mpc_TableModel->index(
+      u32_NewIndex, C_CamMosFilterTableModel::h_EnumToColumn(C_CamMosFilterTableModel::eTYPE));
+
+   //Changing filter settings type to "CAN ID" for selected row
+   this->mpc_TableModel->setData(c_Index, 1, static_cast<int32_t>(Qt::DisplayRole));
+
+   this->mpc_TableModel->SetFilterItemIds(u32_NewIndex, static_cast<uint32_t>(os32_CanMsgId),
+                                          static_cast<uint32_t>(os32_CanMsgId), static_cast<bool>(ou8_CanMsgXtd));
+
+   if (oq_IsLastItemInList == true)
+   {
+      this->mpc_Ui->pc_TableView->clearSelection();
+      this->mpc_Ui->pc_TableView->selectRow(u32_NewIndex);
+      this->m_UpdateTitleFilterItemCount();
+      this->m_ShowNoFilter(false);
+
+      const QList<C_CamProFilterItemData> c_Data = this->mpc_TableModel->GetFilterItemsData();
+      this->m_UpdateSettingsSection(c_Data[u32_NewIndex]);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

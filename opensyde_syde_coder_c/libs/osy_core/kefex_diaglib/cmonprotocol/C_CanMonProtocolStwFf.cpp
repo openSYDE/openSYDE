@@ -11,11 +11,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -65,6 +61,7 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
    bool q_IsRequest;
    uint8_t u8_NodeId;
    int32_t s32_Start;
+
    if ((orc_Msg.u32_ID < 0x480U) || (orc_Msg.u32_ID > 0x5C4U))
    {
       return "";
@@ -82,7 +79,7 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
    }
    if (orc_Msg.u8_DLC < 2U)
    {
-      c_Text+=" !!WRONG_DLC!!";
+      c_Text += " !!WRONG_DLC!!";
       return c_Text;
    }
    switch (orc_Msg.au8_Data[0] & 0x0FU)
@@ -146,7 +143,7 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
       {
          if (orc_Msg.u8_DLC < 5U)
          {
-            c_Text+=" !!WRONG_DLC!!";
+            c_Text += " !!WRONG_DLC!!";
             return c_Text;
          }
          c_Text += (" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16_t)orc_Msg.au8_Data[3]) << 8U)));
@@ -156,7 +153,7 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
       {
          if (orc_Msg.u8_DLC < 3U)
          {
-            c_Text+=" !!WRONG_DLC!!";
+            c_Text += " !!WRONG_DLC!!";
             return c_Text;
          }
          s32_Start = 2;
@@ -189,9 +186,9 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
             c_Text += " !!WRONG_DLC!!";
             return c_Text;
          }
-         c_Text+=(" Ver:" + m_GetValueDecHex(orc_Msg.au8_Data[3] + (((uint16_t)orc_Msg.au8_Data[4]) << 8U))+
-                     " BSmax:"+m_GetByteAsStringFormat(orc_Msg.au8_Data[5]) +
-                     " STmin:"+m_GetByteAsStringFormat(orc_Msg.au8_Data[6]));
+         c_Text += (" Ver:" + m_GetValueDecHex(orc_Msg.au8_Data[3] + (((uint16_t)orc_Msg.au8_Data[4]) << 8U)) +
+                    " BSmax:" + m_GetByteAsStringFormat(orc_Msg.au8_Data[5]) +
+                    " STmin:" + m_GetByteAsStringFormat(orc_Msg.au8_Data[6]));
          break;
       default:
          c_Text += " DATA:";
@@ -210,24 +207,24 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
       {
          if (orc_Msg.u8_DLC < 6U)
          {
-            c_Text+=" !!WRONG_DLC!!";
+            c_Text += " !!WRONG_DLC!!";
             return c_Text;
          }
-         c_Text+=(" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16_t)orc_Msg.au8_Data[3]) << 8U)) +
-                                            (((uint32_t)orc_Msg.au8_Data[4]) << 16U) +
-                                            (((uint32_t)orc_Msg.au8_Data[5]) << 24U));
+         c_Text += (" SIZE:" + m_GetValueDecHex(orc_Msg.au8_Data[2] + (((uint16_t)orc_Msg.au8_Data[3]) << 8U)) +
+                    (((uint32_t)orc_Msg.au8_Data[4]) << 16U) +
+                    (((uint32_t)orc_Msg.au8_Data[5]) << 24U));
          s32_Start = 6;
       }
       else
       {
          if (orc_Msg.u8_DLC < 3U)
          {
-            c_Text+=" !!WRONG_DLC!!";
+            c_Text += " !!WRONG_DLC!!";
             return c_Text;
          }
          s32_Start = 2;
       }
-      c_Text+=" DATA:";
+      c_Text += " DATA:";
       for (; s32_Start < 8; s32_Start++)
       {
          c_Text += " " + m_GetByteAsStringFormat(orc_Msg.au8_Data[s32_Start]);
@@ -246,14 +243,14 @@ C_SclString C_CanMonProtocolStwFf::MessageToString(const T_STWCAN_Msg_RX & orc_M
    case FF_SERVICE_ERROR:
       if (orc_Msg.u8_DLC < 6U)
       {
-         c_Text+=" !!WRONG_DLC!!";
+         c_Text += " !!WRONG_DLC!!";
       }
       else
       {
          c_Text += (" ERROR: " + m_GetValueDecHex(orc_Msg.au8_Data[2] +
-                                               (((uint16_t)orc_Msg.au8_Data[3]) << 8U)) +
-                                               (((uint32_t)orc_Msg.au8_Data[4]) << 16U) +
-                                               (((uint32_t)orc_Msg.au8_Data[5]) << 24U));
+                                                  (((uint16_t)orc_Msg.au8_Data[3]) << 8U)) +
+                    (((uint32_t)orc_Msg.au8_Data[4]) << 16U) +
+                    (((uint32_t)orc_Msg.au8_Data[5]) << 24U));
       }
       break;
    default:
@@ -276,4 +273,3 @@ C_SclString C_CanMonProtocolStwFf::GetProtocolName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

@@ -14,6 +14,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include <QWidget>
 #include <QTimer>
+#include <QMouseEvent>
 
 #include "stwtypes.hpp"
 
@@ -82,12 +83,16 @@ public:
    //lint -save -e1736
 
    void SetCanBitrate(const int32_t os32_Value);
+   void AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+   void CanFilterMsgDropped(void);
 
 Q_SIGNALS:
    void SigStartLogging(void);
    void SigPauseLogging(void);
    void SigContinueLogging(void);
    void SigStopLogging(void);
+   void SigEmitAddFilterToParentWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+   void SigSendCanMsgDroppedToChildrenWidget(void);
 
    // Values of os32_Result:
    // C_NO_ERR    required data from file successfully stored in orc_Definition and DBC file added to interpretation

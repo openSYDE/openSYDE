@@ -41,7 +41,7 @@ class C_SyvHandlerWidget :
 
 public:
    explicit C_SyvHandlerWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SyvHandlerWidget(void);
+   ~C_SyvHandlerWidget(void) override;
 
    void UserInputFunc(const uint32_t ou32_FuncNumber) override;
    void SetSubMode(const int32_t os32_SubMode, const uint32_t ou32_Index, const uint32_t ou32_Flag) override;

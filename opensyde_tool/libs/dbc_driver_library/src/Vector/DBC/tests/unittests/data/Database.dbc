@@ -34,7 +34,7 @@ NS_ :
 BS_:
 
 BU_: Node_1 Node_2
-VAL_TABLE_ Value_Table 0 "Description for the value '0x0'" 1 "Description for the value '0x1'" ;
+VAL_TABLE_ Value_Table 0 "Description for the value '0x0'" 1 " Description for the value '0x1'" ;
 
 
 BO_ 0 Multiplexed_Message: 8 Vector__XXX
@@ -57,8 +57,8 @@ BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
  SG_ Signal_8_Motorola_Signed : 0|8@0- (1,0) [0|0] "" Vector__XXX
  SG_ Signal_8_Motorola_Unsigned : 0|8@0+ (1,0) [0|0] "" Vector__XXX
 
-BO_TX_BU_ 1 : Node_1 Node_2;
-BO_TX_BU_ 2147483649 : Node_1 Node_2;
+BO_TX_BU_ 1 : Node_1,Node_2;
+BO_TX_BU_ 2147483649 : Node_1,Node_2;
 
 
 EV_ Variable_Data_Read: 0 [0|0] "" 0 2 DUMMY_NODE_VECTOR1 Vector__XXX;
@@ -224,7 +224,6 @@ BA_REL_ "AttrDef_Node_MappedRxSignal_Enum" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSi
 BA_REL_ "AttrDef_Node_MappedRxSignal_Floa" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 2;
 BA_REL_ "AttrDef_Node_MappedRxSignal_Hex" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 2;
 BA_REL_ "AttrDef_Node_MappedRxSignal_Int" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig 1;
-BA_REL_ "AttrDef_Node_MappedRxSignal_Int" BU_SG_REL_ Node_1 SG_ 2147483649 Signal_8 1;
 BA_REL_ "AttrDef_Node_MappedRxSignal_Str" BU_SG_REL_ Node_1 SG_ 1 Signal_8_VtSig "Changed";
 BA_REL_ "AttrDef_Node_TxMessage_Enum" BU_BO_REL_ Node_1 1 2;
 BA_REL_ "AttrDef_Node_TxMessage_Float" BU_BO_REL_ Node_1 1 2;

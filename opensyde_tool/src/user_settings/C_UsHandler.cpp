@@ -647,6 +647,30 @@ QString C_UsHandler::GetLastKnownServiceProjectPath() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known RAMView project import file path
+
+   \return
+   Last known RAMView project import file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownRamViewProjectPath() const
+{
+   return this->mc_LastKnownRamViewProjectPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get last known J1939 catalog import file path
+
+   \return
+   Last known J1939 catalog import file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+QString C_UsHandler::GetLastKnownJ1939CatalogPath() const
+{
+   return this->mc_LastKnownJ1939CatalogPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get last known import path
 
    \return
@@ -1249,6 +1273,28 @@ void C_UsHandler::SetLastKnownHalcExportPath(const QString & orc_NewPath)
 void C_UsHandler::SetLastKnownServiceProjectPath(const QString & orc_NewPath)
 {
    this->mc_LastKnownServiceProjectPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known service project file path
+
+   \param[in]  orc_NewPath    service project file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownRamViewProjectPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownRamViewProjectPath = orc_NewPath;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set last known J1939 catalog file path
+
+   \param[in]  orc_NewPath    J1939 catalog file path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_UsHandler::SetLastKnownJ1939CatalogPath(const QString & orc_NewPath)
+{
+   this->mc_LastKnownJ1939CatalogPath = orc_NewPath;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

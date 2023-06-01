@@ -344,7 +344,8 @@ bool C_GiSvSubNodeData::CheckUpdateDisabledState(void) const
                         pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
                      if (pc_UpdateInfo != NULL)
                      {
-                        if ((pc_UpdateInfo->GetParamInfos().size() == 0UL) &&
+                        if (((pc_UpdateInfo->GetParamInfos().size() == 0UL) &&
+                             (pc_UpdateInfo->GetPemFilePath().IsEmpty() == true)) &&
                             (pc_UpdateInfo->GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED).size() == 0UL))
                         {
                            //No file associated
@@ -419,7 +420,8 @@ bool C_GiSvSubNodeData::CheckAlwaysUpdate(void) const
        (pc_Node->u32_SubDeviceIndex < pc_Node->pc_DeviceDefinition->c_SubDevices.size()))
    {
       const C_OscViewNodeUpdate * const pc_UpdateInformation = pc_View->GetNodeUpdateInformation(this->mu32_NodeIndex);
-      if (((pc_UpdateInformation->GetParamInfos().size() == 0UL) &&
+      if ((((pc_UpdateInformation->GetParamInfos().size() == 0UL) &&
+            (pc_UpdateInformation->GetPemFilePath().IsEmpty() == true)) &&
            (pc_UpdateInformation->GetPaths(C_OscViewNodeUpdate::eFTP_FILE_BASED).size() == 0UL)) &&
           (pc_Node->pc_DeviceDefinition->c_SubDevices[pc_Node->u32_SubDeviceIndex].q_FlashloaderOpenSydeIsFileBased ==
            false))

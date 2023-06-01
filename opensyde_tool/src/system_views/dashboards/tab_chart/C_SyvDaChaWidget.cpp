@@ -345,15 +345,14 @@ void C_SyvDaChaWidget::RegisterDataPoolElementCyclicError(
       QString c_Info;
       QString c_AdditionalInfo;
 
-      switch (ou8_ErrorCode)
+      if (ou8_ErrorCode == 0x22U)
       {
-      case 0x22:
          c_AdditionalInfo = C_GtGetText::h_GetText("Access to element value failed (e.g. blocked by application)");
-         break;
-      default:
+      }
+      else
+      {
          c_AdditionalInfo =
             static_cast<QString>(C_GtGetText::h_GetText("Unknown NRC: 0x%1")).arg(QString::number(ou8_ErrorCode, 16));
-         break;
       }
       c_Info =
          static_cast<QString>(C_GtGetText::h_GetText("Cyclic service failed with error: %1")).arg(c_AdditionalInfo);

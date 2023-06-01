@@ -43,7 +43,7 @@ public:
       const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
    static void h_InsertMessages(
       const std::vector<stw::opensyde_gui::C_CieImportDataAssignment> & orc_ImportDataAssignment,
-      const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType);
+      const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType, const bool oq_UniqueAddRequested);
    static int32_t h_GetDeviceInfo(const uint32_t ou32_DeviceNodeIndex, const uint32_t ou32_DeviceNodeInterfaceIndex,
                                   const uint32_t ou32_ManagerNodeIndex, const uint8_t ou8_ManagerNodeInterfaceNumber,
                                   const QString & orc_EdsPath,
@@ -58,7 +58,6 @@ public:
                                    const stw::scl::C_SclString * const opc_NodeNameReplacement);
 
 private:
-   static const QSize mhc_SIZE_REPORT;
    static int32_t mh_ImportDbcFile(const uint32_t ou32_BusIndex,
                                    const stw::opensyde_core::C_OscCanProtocol::E_Type oe_ProtocolType,
                                    const QString & orc_FullFilePath, QWidget * const opc_Parent,
@@ -82,7 +81,7 @@ private:
                                     std::vector<stw::opensyde_gui_logic::C_PuiSdNodeCanMessage> & orc_UiMessageData, const
                                     std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalData, const
                                     std::vector<stw::opensyde_gui_logic::C_PuiSdNodeDataPoolListElement> & orc_UiSignalData, const
-                                    std::vector<std::pair<int32_t, int32_t> > & orc_MessageOverrideIndices);
+                                    std::vector<std::pair<int32_t, int32_t> > & orc_MessageOverrideIndices, const bool oq_UniqueAddRequested);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

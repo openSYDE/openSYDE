@@ -15,6 +15,11 @@
 #include <QPainter>
 #include <QGraphicsColorizeEffect>
 #include <QGraphicsDropShadowEffect>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QScreen>
+#include <QWindow>
+#include <QDebug>
 
 #include "stwtypes.hpp"
 #include "C_HeHandler.hpp"
@@ -146,10 +151,11 @@ void C_OgePopUpDialog::SetWidget(QWidget * const opc_Widget)
       this->mc_WidgetClassName = opc_Widget->metaObject()->className();
 
       opc_Widget->setParent(this);
-      this->mpc_Ui->pc_VerticalLayout->addWidget(opc_Widget);
+      this->mpc_Ui->pc_VerticalLayoutPopUps->addWidget(opc_Widget);
       s32_Index = this->mpc_Ui->pc_VerticalLayout->indexOf(opc_Widget);
       this->mpc_Ui->pc_VerticalLayout->setStretch(s32_Index, 1);
       opc_Widget->setAutoFillBackground(true);
+      this->mpc_Ui->pc_ScrollAreaWidgetContents->SetBackgroundColor(11);
    }
 }
 
@@ -244,7 +250,32 @@ void C_OgePopUpDialog::HandleMouseMoveEvent(const QMouseEvent * const opc_Event)
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgePopUpDialog::SetSize(const QSize & orc_Size)
 {
-   this->resize(orc_Size);
+   const QSize c_Size = QApplication::screens()[C_OgePopUpDialog::ApplicationRunningScreen()] -> size();
+   const int32_t s32_ScreenWidth = c_Size.width();
+   const int32_t s32_ScreenHeight = c_Size.height();
+
+   if ((orc_Size.width() >= s32_ScreenWidth) || (orc_Size.height() >= s32_ScreenHeight))
+   {
+      if (orc_Size.height() >= s32_ScreenHeight)
+      {
+         if (orc_Size.width() >= s32_ScreenWidth)
+         {
+            this->resize(s32_ScreenWidth, s32_ScreenHeight);
+         }
+         else
+         {
+            this->resize(orc_Size.width(), s32_ScreenHeight);
+         }
+      }
+      else
+      {
+         this->resize(s32_ScreenWidth, orc_Size.height());
+      }
+   }
+   else
+   {
+      this->resize(orc_Size);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -309,6 +340,22 @@ void C_OgePopUpDialog::HideOverlay(void) const
 void C_OgePopUpDialog::SetNotifyAndBlockClose(const bool oq_NotifyAndBlockClose)
 {
    this->mq_NotifyAndBlockClose = oq_NotifyAndBlockClose;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call is to get the main widget screen index
+
+   We are getting screen index using QApplication::activeWindow() function
+
+   \return
+   Returning integer value (screen index)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+int32_t C_OgePopUpDialog::ApplicationRunningScreen() const
+{
+   const QDesktopWidget c_Widget;
+
+   return c_Widget.screenNumber(QApplication::activeWindow());
 }
 
 //----------------------------------------------------------------------------------------------------------------------

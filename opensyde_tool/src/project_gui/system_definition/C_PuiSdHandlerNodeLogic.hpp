@@ -353,6 +353,17 @@ private:
                                         C_PuiSdHandlerNodeLogicNvmArea & orc_AreaToMerge);
    void m_SetOscNodeIds(const uint32_t ou32_NodeIndex, const std::vector<uint8_t> & orc_NodeIds);
    void m_SetOscNodeId(const uint32_t ou32_NodeIndex, const uint32_t ou32_InterfaceIndex, const uint8_t ou8_NodeId);
+   void m_SetDataPoolListSharedSync(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                    const uint32_t & oru32_DataPoolListIndex,
+                                    const stw::opensyde_core::C_OscNodeDataPoolList & orc_OscContent,
+                                    const C_PuiSdNodeDataPoolList & orc_UiContent);
+   void m_SetDataPoolListNvmCrcSharedSync(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                          const uint32_t & oru32_DataPoolListIndex, const bool oq_Value);
+   void m_SetDataPoolListElementSharedSync(const uint32_t & oru32_NodeIndex, const uint32_t & oru32_DataPoolIndex,
+                                           const uint32_t & oru32_DataPoolListIndex,
+                                           const uint32_t & oru32_DataPoolListElementIndex,
+                                           const stw::opensyde_core::C_OscNodeDataPoolListElement & orc_OscContent,
+                                           const C_PuiSdNodeDataPoolListElement & orc_UiContent);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

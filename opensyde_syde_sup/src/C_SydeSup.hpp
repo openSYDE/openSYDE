@@ -133,6 +133,7 @@ private:
    virtual stw::scl::C_SclString m_GetApplicationVersion(const stw::scl::C_SclString & orc_ApplicationFileName) const =
       0;
    virtual stw::scl::C_SclString m_GetDefaultLogLocation(void) const = 0;
+   virtual stw::scl::C_SclString m_GetUnzipLocationDefaultExample(void) const = 0;
    virtual stw::scl::C_SclString m_GetCanInterfaceUsageExample(void) const = 0;
 
    void m_PrintVersion(const stw::scl::C_SclString & orc_Version, const stw::scl::C_SclString & orc_BinaryHash,
@@ -148,22 +149,6 @@ private:
                           std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite) const;
    std::vector<uint8_t> m_GetActiveNodeTypes(const stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition,
                                              const std::vector<uint8_t> & orc_ActiveNodes) const;
-
-   // Creation of service update package
-   E_Result m_FindView(const std::vector<stw::opensyde_core::C_OscViewData> & orc_Views,
-                       stw::opensyde_core::C_OscViewData & orc_View);
-   void m_GetUpdatePackage(const stw::opensyde_core::C_OscViewData & orc_View,
-                           const stw::opensyde_core::C_OscSystemDefinition & orc_SystemDefinition,
-                           std::vector<stw::opensyde_core::C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite) const;
-   void m_GetDataBlocksToWrite(const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdate,
-                               const stw::opensyde_core::C_OscNode & orc_Node,
-                               stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const;
-   void m_GetFileBasedFilesToWrite(const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdate,
-                                   const stw::opensyde_core::C_OscNode & orc_Node,
-                                   stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const;
-   void m_GetParamSetsToWrite(const stw::opensyde_core::C_OscViewNodeUpdate & orc_NodeUpdate,
-                              const stw::opensyde_core::C_OscNode & orc_Node,
-                              stw::opensyde_core::C_OscSuSequences::C_DoFlash & orc_ApplicationToWrite) const;
 
    // Security PEM database
    stw::opensyde_core::C_OscSecurityPemDatabase mc_PemDatabase;

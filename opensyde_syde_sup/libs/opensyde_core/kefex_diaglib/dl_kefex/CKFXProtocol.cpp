@@ -115,7 +115,7 @@ void C_KFXProtocol::m_ProtocolSend(const bool oq_OK, const T_STWCAN_Msg_TX & orc
       C_SclString c_Text;
       C_SclString c_Help;
       C_SclString c_Time;
-      sint32 i;
+      int32_t i;
 
       c_Time = C_CMONProtocols::FormatTimeStamp(TGL_GetTickCountUS(), false);
       if (u8_CreateCommProtocol == 1U)
@@ -153,7 +153,7 @@ void C_KFXProtocol::m_ProtocolReceive(const T_STWCAN_Msg_RX & orc_Msg)
       C_SclString c_Text;
       C_SclString c_Help;
       C_SclString c_Time;
-      sint32 i;
+      int32_t i;
       c_Time = C_CMONProtocols::FormatTimeStamp(TGL_GetTickCountUS(), false);
       if (u8_CreateCommProtocol == 1U)
       {
@@ -708,14 +708,14 @@ int32_t C_KFXProtocol::SendWriteEepromSslEndRequest(const uint16_t ou16_NumReque
 //--------------------------------------------------------------
 //   .PARAMETERS
 //    Bezeichner                        Bedeutung
-//    uint32  dwAbsoluteValue    Absolute numeric hysteresis value
-//    uint8 *pbBase             Resulting value base (cf. spec)
-//    uint8 *pbValue            Resulting value (cf. spec)
+//    uint32_t  dwAbsoluteValue    Absolute numeric hysteresis value
+//    uint8_t *pbBase             Resulting value base (cf. spec)
+//    uint8_t *pbValue            Resulting value (cf. spec)
 //    bool qForce              true -> do not automatically adapt value base
 //                                     in this case the submitted *pbBase will be used
 //--------------------------------------------------------------
 //   .RETURNVALUE
-//   sint32   C_NO_ERR  no errors
+//   int32_t   C_NO_ERR  no errors
 //            C_RANGE   dwAbsoluteValue out of range
 //**************************************************************.FE*
 int32_t C_KFXProtocol::m_CalcHysteresis(const uint32_t ou32_AbsoluteValue, uint8_t * const opu8_Base,
@@ -770,13 +770,13 @@ int32_t C_KFXProtocol::m_CalcHysteresis(const uint32_t ou32_AbsoluteValue, uint8
 //--------------------------------------------------------------
 //   .PARAMETERS
 //    Bezeichner                        Bedeutung
-//    uint16  ou16_VariableIndex     Index of requested variable
-//    uint16  ou16_MaxWaitTime       Maximum wait time
-//    uint32  ou32_UpperHysteresis
-//    uint32  ou32_LowerHysteresis
+//    uint16_t  ou16_VariableIndex     Index of requested variable
+//    uint16_t  ou16_MaxWaitTime       Maximum wait time
+//    uint32_t  ou32_UpperHysteresis
+//    uint32_t  ou32_LowerHysteresis
 //--------------------------------------------------------------
 //   .RETURNVALUE
-//   sint32   C_NO_ERR  no errors
+//   int32_t   C_NO_ERR  no errors
 //            C_WARN    upper and lower hysteresis require different value bases
 //                      but have been forced to use the one of the greater number
 //**************************************************************.FE*
@@ -1495,7 +1495,7 @@ void C_KFXProtocol::InstallECUResetHandler(const PR_KFXProtECUResetCallBack opr_
 //--------------------------------------------------------------
 
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
-void C_KFXProtocol::SetKEFEXVariableInfo(const C_KFXVariableLists * const opt_KFXLists, const uint16 ou16_ListOffset)
+void C_KFXProtocol::SetKEFEXVariableInfo(const C_KFXVariableLists * const opt_KFXLists, const uint16_t ou16_ListOffset)
 {
    (void)mc_Protocol.KFXSetVariableInfo(opt_KFXLists, ou16_ListOffset);
 }

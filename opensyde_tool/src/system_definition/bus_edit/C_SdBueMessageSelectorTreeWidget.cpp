@@ -39,6 +39,10 @@
 #include "C_SdBueMessageSelectorTreeWidget.hpp"
 #include "C_OgePopUpDialog.hpp"
 #include "C_SdBueCoAddSignalsDialog.hpp"
+#include "C_SdBueJ1939AddMessagesFromCatalogDialog.hpp"
+#include "C_CieImportDataAssignment.hpp"
+#include "C_CieDataPoolListAdapter.hpp"
+#include "C_CieImportReportWidget.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -323,6 +327,120 @@ void C_SdBueMessageSelectorTreeWidget::AddMessage(void)
       }
    }
 }
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Action add message from catalog (J1939 specific)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorTreeWidget::AddMessageFromCatalog(void)
+{
+   const QPointer<C_OgePopUpDialog> c_PopUpCatalog = new C_OgePopUpDialog(this, this);
+
+   C_SdBueJ1939AddMessagesFromCatalogDialog * const pc_AddMessageFromCatalogDialog =
+      new C_SdBueJ1939AddMessagesFromCatalogDialog(*c_PopUpCatalog);
+
+   //Resize
+   c_PopUpCatalog->SetSize(QSize(800, 900));
+
+   Q_UNUSED(pc_AddMessageFromCatalogDialog)
+
+   if (c_PopUpCatalog->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      // Assign all imported messages to one node as Tx messages
+      C_CieConverter::C_CieNode c_NodeForCatalogMessages;
+      c_NodeForCatalogMessages.c_TxMessages =  pc_AddMessageFromCatalogDialog->GetMessagesImportedFromCatalog();
+
+      if (c_NodeForCatalogMessages.c_TxMessages.size() > 0)
+      {
+         // Fetch nodes and interfaces of the current bus
+         std::vector<QString> c_NodeNames;
+         std::vector<uint32_t> c_NodeIndexes;
+         std::vector<uint32_t> c_InterfaceIndexes;
+
+         C_PuiSdHandler::h_GetInstance()->GetOscSystemDefinitionConst().GetNodeIndexesOfBus(this->mu32_BusIndex,
+                                                                                            c_NodeIndexes,
+                                                                                            c_InterfaceIndexes);
+         tgl_assert(C_SdUtil::h_GetNames(c_NodeIndexes, c_InterfaceIndexes, c_NodeNames, false) ==
+                    stw::errors::C_NO_ERR);
+
+         // Assign the imported messages to the first active node on the current bus
+         std::vector<C_CieImportDataAssignment> c_NodeAssignments;
+         C_CieImportDataAssignment c_NodeAssignmentConverted;
+         c_NodeAssignmentConverted.c_ImportData = C_CieDataPoolListAdapter::h_GetStructureFromDbcFileImport(
+            c_NodeForCatalogMessages);
+
+         // Find an active node to which the messages imported from the catalog will be added
+         if (c_NodeIndexes.size() == c_InterfaceIndexes.size())
+         {
+            bool q_NodeFound = false;
+            for (uint32_t u32_ItNode = 0; u32_ItNode < c_NodeIndexes.size(); ++u32_ItNode)
+            {
+               std::vector<const C_OscCanMessageContainer *> c_MessageContainers =
+                  C_PuiSdHandler::h_GetInstance()->GetCanProtocolMessageContainers(c_NodeIndexes[u32_ItNode],
+                                                                                   this->me_ProtocolType,
+                                                                                   c_InterfaceIndexes[u32_ItNode]);
+               uint32_t u32_Counter;
+               for (u32_Counter = 0U; u32_Counter < c_MessageContainers.size(); ++u32_Counter)
+               {
+                  const C_OscCanMessageContainer * const pc_MessageContainer = c_MessageContainers[u32_Counter];
+                  if (pc_MessageContainer->q_IsComProtocolUsedByInterface == true)
+                  {
+                     c_NodeAssignmentConverted.u32_OsyNodeIndex = c_NodeIndexes[u32_ItNode];
+                     c_NodeAssignmentConverted.u32_OsyInterfaceIndex = c_InterfaceIndexes[u32_ItNode];
+                     q_NodeFound = true;
+                     break;
+                  }
+               }
+
+               if (q_NodeFound == true)
+               {
+                  break;
+               }
+            }
+         }
+
+         c_NodeAssignments.push_back(c_NodeAssignmentConverted);
+
+         const std::vector<C_CieImportDataAssignment> c_SkippedImportDataAssigned;
+
+         // Create message report for user
+         const QPointer<C_OgePopUpDialog> c_PopUpDialogReportDialog =
+            new C_OgePopUpDialog(this, this);
+         C_CieImportReportWidget * const pc_DialogImportReport =
+            new C_CieImportReportWidget(*c_PopUpDialogReportDialog,
+                                        pc_AddMessageFromCatalogDialog->GetCatalogFilePath(), this->mu32_BusIndex,
+                                        C_OscCanProtocol::eJ1939, c_NodeAssignments, c_SkippedImportDataAssigned,
+                                        NULL, false, true);
+
+         Q_UNUSED(pc_DialogImportReport)
+
+         //Hide previous overlay before showing the next one
+         c_PopUpCatalog->HideOverlay();
+
+         // resize
+         c_PopUpDialogReportDialog->SetSize(mc_POPUP_REPORT_SIZE);
+
+         // display message report
+         if (c_PopUpDialogReportDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
+         {
+            Q_EMIT (this->SigReload());
+            Q_EMIT (this->SigErrorChanged());
+         }
+
+         if (c_PopUpDialogReportDialog != NULL)
+         {
+            c_PopUpDialogReportDialog->HideOverlay();
+            c_PopUpDialogReportDialog->deleteLater();
+         }
+      } //lint !e429  //no memory leak because of the parent of pc_Dialog and the Qt memory management
+   }
+
+   if (c_PopUpCatalog != NULL)
+   {
+      c_PopUpCatalog->HideOverlay();
+      c_PopUpCatalog->deleteLater();
+   }
+} //lint !e429  //no memory leak because of the parent of pc_AddMessageFromCatalogDialog and the Qt memory management
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Action add signal
@@ -651,7 +769,7 @@ void C_SdBueMessageSelectorTreeWidget::Copy(void)
                                                                                     c_Messages[u32_ItVec],
                                                                                     c_OscSignalCommons[u32_ItVec],
                                                                                     c_UiSignalCommons[u32_ItVec],
-                                                                                    c_UiSignals[u32_ItVec]) ==
+                                                                                    c_UiSignals[u32_ItVec], true) ==
                              C_NO_ERR);
 
                   //Get owner data

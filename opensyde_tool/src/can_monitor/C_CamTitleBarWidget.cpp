@@ -357,7 +357,8 @@ void C_CamTitleBarWidget::m_ShowAbout(void)
    new C_NagAboutDialog(*c_New, "openSYDE CAN Monitor", ":/images/CAN_Monitor_logo.png", 20);
 
    //Resize
-   c_New->SetSize(QSize(650, 350));
+   const QSize c_SIZE(650, 538);
+   c_New->SetSize(c_SIZE);
 
    c_New->exec();
 

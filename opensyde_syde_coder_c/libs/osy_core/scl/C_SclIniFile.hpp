@@ -50,14 +50,6 @@ namespace stw
 namespace scl
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
 
 //unfortunately we need to mark throwing constructors and destructors specially in C++11
 #ifndef SCL_WILL_THROW
@@ -75,7 +67,7 @@ namespace scl
 ///This structure stores the definition of a key.
 /// A key is a named identifier that is associated with a value. It may or may not have a comment.
 /// All comments must PRECEDE the key on the line in the config file.
-class SCL_PACKAGE C_SclIniKey
+class C_SclIniKey
 {
 public:
    C_SclString c_Key;     ///< key (text before the "=")
@@ -87,7 +79,7 @@ public:
 ///This structure stores the definition of a section.
 /// A section contains any number of keys, and may or may not have a comment.
 /// Like keys, all comments must precede the section.
-class SCL_PACKAGE C_SclIniSection
+class C_SclIniSection
 {
 public:
    C_SclString c_Name;                    ///< name (text within "[""]")
@@ -97,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 ///INI file handling
-class SCL_PACKAGE C_SclIniFile
+class C_SclIniFile
 {
 private:
    // Utility Methods

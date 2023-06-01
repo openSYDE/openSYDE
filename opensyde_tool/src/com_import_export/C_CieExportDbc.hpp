@@ -60,10 +60,11 @@ private:
                                 Vector::DBC::Message & orc_DbcMessage);
    static int32_t mh_SetSignalValues(const C_CieConverter::C_CieDataPoolElement & orc_Element,
                                      Vector::DBC::Signal & orc_DbcSignal);
+   static void mh_SetSignalSpnValue(const C_CieConverter::C_CieCanSignal & orc_Signal,
+                                    Vector::DBC::Signal & orc_DbcSignal);
    static int32_t mh_SetTransmission(const C_CieConverter::C_CieNodeMessage & orc_Message,
                                      Vector::DBC::Message & orc_DbcMessage);
-   static int32_t mh_CheckDbcFileStatus(const Vector::DBC::Status & ore_Status);
-   static void mh_SetNewSymbols(std::list<std::string> & orc_NewSymbols);
+   static void mh_SetNewSymbols(std::vector<std::string> & orc_NewSymbols);
    static void mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::Attribute> & orc_AttributeDefaults);
    static void mh_SetAttributeDefinitions(std::map<std::string,
                                                    Vector::DBC::AttributeDefinition> & orc_AttributeDefinitions);

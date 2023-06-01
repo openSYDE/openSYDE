@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <Vector/DBC/config.h>
+#include <string>
 
 /* GCC */
 #ifdef __GNUC__
@@ -54,3 +54,6 @@
 #pragma warning (disable: 4482)
 
 #endif
+
+/** Windows endline (also on Linux) */
+extern const std::string endl;

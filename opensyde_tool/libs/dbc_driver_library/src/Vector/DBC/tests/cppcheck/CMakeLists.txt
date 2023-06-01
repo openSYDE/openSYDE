@@ -1,13 +1,23 @@
 get_target_property(sources ${PROJECT_NAME} SOURCES)
 
-add_custom_target(cppcheck ALL
-    ${CPPCHECK_EXECUTABLE}
-    --enable=all
-    --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/suppressions.txt
-    --xml --xml-version=2
-    ${sources}
-    -I "${PROJECT_BINARY_DIR}/src/Vector/DBC"
-    > cppcheck-out.txt 2> cppcheck-err.xml)
+add_custom_target(cppcheck_${PROJECT_NAME} ALL
+    COMMAND
+        ${CPPCHECK_EXECUTABLE}
+        --enable=all
+        -I "${PROJECT_BINARY_DIR}/src/Vector_DBC"
+        --output-file=cppcheck-err.xml
+        --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/suppressions.txt
+        --xml
+        --xml-version=2
+        ${sources}
+        > cppcheck-out.txt
+    DEPENDS
+        ${sources}
+    BYPRODUCTS
+        cppcheck-out.txt
+        cppcheck-err.xml
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/suppressions.txt)
 
 install(
     FILES

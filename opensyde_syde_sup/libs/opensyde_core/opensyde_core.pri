@@ -51,6 +51,7 @@ HEADERS += \
     $${PWD}/C_OscBinaryHash.hpp \
     $${PWD}/C_OscChecksummedIniFile.hpp \
     $${PWD}/C_OscUtils.hpp \
+    $${PWD}/DiagLib_config.hpp \
     $${PWD}/kefex_diaglib/dl_string_resources/C_SclResourceStrings.hpp \
     $${PWD}/kefex_diaglib/dl_string_resources/DLStrings.hpp \
     $${PWD}/kefex_diaglib/stwcompid/stwcompid.h \
@@ -107,10 +108,25 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_imports) {
    message("opensyde_core_skip_imports not detected ... dragging in package")
 
    SOURCES += \
-    $${PWD}/imports/C_OscImportEdsDcf.cpp
+      $${PWD}/imports/C_OscImportEdsDcf.cpp \
+      $${PWD}/imports/C_OscImportRamView.cpp \
+      $${PWD}//kefex_diaglib/dl_kefex/CKFXDATFile.cpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXDEFProject.cpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXProjectOptions.cpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableBase.cpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableListBase.cpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableLists.cpp
 
    HEADERS += \
-    $${PWD}/imports/C_OscImportEdsDcf.hpp
+      $${PWD}/imports/C_OscImportEdsDcf.hpp \
+      $${PWD}/imports/C_OscImportRamView.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableLists.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXDATFile.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXDEFProject.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXProjectOptions.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableBase.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableListBase.hpp \
+      $${PWD}/kefex_diaglib/dl_kefex/CKFXVariableLists.hpp
 }
 
 # optional: file generation
@@ -508,8 +524,7 @@ contains(opensyde_core_skip_modules, opensyde_core_skip_protocol_drivers) {
               $${PWD}/protocol_drivers/system_update/C_OscSuSequences.hpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuSequencesNodeStates.hpp \
               $${PWD}/protocol_drivers/system_update/C_OscSuServiceUpdatePackage.hpp \
-              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.hpp \
-              $${PWD}/protocol_drivers/DiagLib_config.hpp
+              $${PWD}/protocol_drivers/system_update/C_OsyHexFile.hpp
 }
 
 # optional: protocol logging

@@ -1090,7 +1090,7 @@ void C_SdHandlerWidget::m_RtfExport(void)
          C_RtfExportWidget * const pc_DialogExportReport = new C_RtfExportWidget(*c_PopUpDialog);
 
          // resize
-         const QSize c_SIZE_IMPORT_REPORT(890, 410);
+         const QSize c_SIZE_IMPORT_REPORT(890, 434);
 
          c_PopUpDialog->SetSize(c_SIZE_IMPORT_REPORT);
 

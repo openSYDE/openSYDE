@@ -1124,11 +1124,12 @@ const
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Copy can message with all related data structures
 
-   \param[in]   orc_MessageId          Message identification indices
-   \param[out]  orc_Message            Message data
-   \param[out]  orc_OscSignalCommons   Signals data (osc common)
-   \param[out]  orc_UiSignalCommons    Signals data (ui common)
-   \param[out]  orc_UiSignals          Signals data (ui)
+   \param[in]   orc_MessageId                   Message identification indices
+   \param[out]  orc_Message                     Message data
+   \param[out]  orc_OscSignalCommons            Signals data (osc common)
+   \param[out]  orc_UiSignalCommons             Signals data (ui common)
+   \param[out]  orc_UiSignals                   Signals data (ui)
+   \param[in]   oq_ChangeSignalIndicesToOutput  Change signal indices to output
 
    \return
    C_NO_ERR Operation success
@@ -1139,7 +1140,8 @@ int32_t C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OscCanMessageIdent
                                                       C_OscCanMessage & orc_Message,
                                                       std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
                                                       std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
-                                                      std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals) const
+                                                      std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
+                                                      const bool oq_ChangeSignalIndicesToOutput) const
 {
    int32_t s32_Retval = C_NO_ERR;
    const C_OscCanMessage * const pc_Message = this->GetCanMessage(orc_MessageId);
@@ -1166,14 +1168,18 @@ int32_t C_PuiSdHandlerBusLogic::GetCanMessageComplete(const C_OscCanMessageIdent
       orc_UiSignalCommons.reserve(pc_Message->c_Signals.size());
       for (uint32_t u32_ItSignal = 0; u32_ItSignal < pc_Message->c_Signals.size(); ++u32_ItSignal)
       {
-         const C_OscCanSignal & rc_Message = pc_Message->c_Signals[u32_ItSignal];
-         if (rc_Message.u32_ComDataElementIndex < pc_OscList->c_Elements.size())
+         C_OscCanSignal & rc_Signal = orc_Message.c_Signals[u32_ItSignal];
+         if (rc_Signal.u32_ComDataElementIndex < pc_OscList->c_Elements.size())
          {
-            orc_OscSignalCommons.push_back(pc_OscList->c_Elements[rc_Message.u32_ComDataElementIndex]);
+            orc_OscSignalCommons.push_back(pc_OscList->c_Elements[rc_Signal.u32_ComDataElementIndex]);
          }
-         if (rc_Message.u32_ComDataElementIndex < pc_UiList->c_DataPoolListElements.size())
+         if (rc_Signal.u32_ComDataElementIndex < pc_UiList->c_DataPoolListElements.size())
          {
-            orc_UiSignalCommons.push_back(pc_UiList->c_DataPoolListElements[rc_Message.u32_ComDataElementIndex]);
+            orc_UiSignalCommons.push_back(pc_UiList->c_DataPoolListElements[rc_Signal.u32_ComDataElementIndex]);
+         }
+         if (oq_ChangeSignalIndicesToOutput)
+         {
+            rc_Signal.u32_ComDataElementIndex = u32_ItSignal;
          }
       }
    }

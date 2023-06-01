@@ -16,8 +16,8 @@
    \copyright   Copyright 2009 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef C_SCLResourceStringsHPP
-#define C_SCLResourceStringsHPP
+#ifndef C_SCLRESOURCESTRINGSHPP
+#define C_SCLRESOURCESTRINGSHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
@@ -31,27 +31,19 @@ namespace stw
 namespace scl
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 ///resource string with index
-class SCL_PACKAGE C_SclResourceString
+class C_SclResourceString
 {
 public:
    uint16_t u16_Index;
    C_SclString c_Text;
 };
 
-///handler for ressource style strings
-class SCL_PACKAGE C_SCLResourceStrings
+///handler for resource style strings
+class C_SCLResourceStrings
 {
 private:
    C_SclDynamicArray<C_SclResourceString> mac_Strings;
@@ -68,7 +60,7 @@ public:
    void AddString(const uint16_t ou16_Index, const C_SclString & orc_Text);
    void Clear(void);
 
-   //will implicitely call SortByIndex
+   //will implicitly call SortByIndex
    void SetStringTable(const C_SclResourceString * const opc_Strings, const uint16_t ou16_NumStrings);
 
    void SortByIndex(void);

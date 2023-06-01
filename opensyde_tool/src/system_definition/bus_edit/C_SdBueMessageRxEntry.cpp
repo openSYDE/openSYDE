@@ -140,6 +140,8 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32_t o
                                  const std::vector<QString> & orc_DatapoolNames, const bool oq_NodeLayer,
                                  const bool oq_ReadOnly)
 {
+   const uint32_t u32_NumEntries = orc_DatapoolIndexes.size();
+
    tgl_assert(orc_DatapoolIndexes.size() > 0);
    tgl_assert(orc_DatapoolIndexes.size() == orc_ReceiveTimeoutValues.size());
    tgl_assert(orc_DatapoolIndexes.size() == orc_ReceiveTimeoutModes.size());
@@ -219,6 +221,8 @@ void C_SdBueMessageRxEntry::Init(const QString & orc_EntryName, const uint32_t o
          this->mc_Entries.push_back(pc_Entry);
       } //lint !e429 //cleanup handled by Qt engine
    }
+
+   this->m_HandleWidgetSize(u32_NumEntries);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -964,4 +968,26 @@ void C_SdBueMessageRxEntry::m_UpdateTimeoutLink(void) const
    }
 
    this->mpc_Ui->pc_LabelTimeoutLink->setEnabled(!this->mq_TimeoutConfigurationReadOnly);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle widget size
+
+   \param[in]  ou32_NumEntries   Num entries
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageRxEntry::m_HandleWidgetSize(const uint32_t ou32_NumEntries)
+{
+   uint32_t u32_NewHeight;
+
+   if (ou32_NumEntries == 1)
+   {
+      u32_NewHeight = 28;
+   }
+   else
+   {
+      u32_NewHeight = 30 + (28 * ou32_NumEntries);
+   }
+   this->setMinimumHeight(u32_NewHeight);
+   this->setMaximumHeight(u32_NewHeight);
 }

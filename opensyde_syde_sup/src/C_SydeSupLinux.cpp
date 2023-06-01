@@ -345,7 +345,19 @@ C_SclString C_SydeSupLinux::m_GetApplicationVersion(const C_SclString & orc_Appl
 //----------------------------------------------------------------------------------------------------------------------
 C_SclString C_SydeSupLinux::m_GetDefaultLogLocation(void) const
 {
-   return "/var/log";
+    return "/var/log";
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get default example for unzip location (user's temporary folder of operating system)
+
+   \return
+   Example unzip location
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_SydeSupLinux::m_GetUnzipLocationDefaultExample(void) const
+{
+    return "/tmp";
 }
 
 //----------------------------------------------------------------------------------------------------------------------

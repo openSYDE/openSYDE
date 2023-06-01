@@ -1,5 +1,5 @@
-#ifndef CCMONProtocolTargetH
-#define CCMONProtocolTargetH
+#ifndef CCMONPROTOCOLTARGETHPP
+#define CCMONPROTOCOLTARGETHPP
 
 //target specific definitions for CCMONProtocol class
 //what we need:

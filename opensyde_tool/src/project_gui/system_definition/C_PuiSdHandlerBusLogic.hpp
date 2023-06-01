@@ -96,7 +96,8 @@ public:
                                  stw::opensyde_core::C_OscCanMessage & orc_Message,
                                  std::vector<stw::opensyde_core::C_OscNodeDataPoolListElement> & orc_OscSignalCommons,
                                  std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalCommons,
-                                 std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals) const;
+                                 std::vector<C_PuiSdNodeCanSignal> & orc_UiSignals,
+                                 const bool oq_ChangeSignalIndicesToOutput = false) const;
    const stw::opensyde_core::C_OscNodeDataPoolList * GetOscCanDataPoolList(const uint32_t & oru32_NodeIndex,
                                                                            const stw::opensyde_core::C_OscCanProtocol::E_Type & ore_ComType, const uint32_t & oru32_InterfaceIndex, const uint32_t ou32_DatapoolIndex,
                                                                            const bool & orq_MessageIsTx) const;

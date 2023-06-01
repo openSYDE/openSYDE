@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -24,12 +24,13 @@
 namespace Vector {
 namespace DBC {
 
-BitTiming::BitTiming() :
-    baudrate(0),
-    btr1(0),
-    btr2(0)
-{
-    /* nothing to do here */
+std::ostream & operator<<(std::ostream & os, const BitTiming & bitTiming) {
+    os << "BS_:";
+    if (bitTiming.baudrate || bitTiming.btr1 || bitTiming.btr2)
+        os << ' ' << bitTiming.baudrate << ':' << bitTiming.btr1 << ':' << bitTiming.btr2;
+    os << endl;
+
+    return os;
 }
 
 }

@@ -20,6 +20,7 @@
 #include "C_CamOgeWiSectionHeader.hpp"
 #include "C_GtGetText.hpp"
 #include "C_OscSystemBus.hpp"
+#include "C_CamMainWindow.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -94,6 +95,12 @@ C_CamMetWidget::C_CamMetWidget(QWidget * const opc_Parent) :
    // Status bar update
    connect(&this->mc_StatusBarTimer, &QTimer::timeout, this, &C_CamMetWidget::m_StatusBarTimer);
    this->mc_StatusBarTimer.start(500);
+
+   connect(this->mpc_Ui->pc_TraceView, &C_CamMetTreeView::SigEmitAddFilterToParentWidget, this,
+           &C_CamMetWidget::AddFilterData);
+
+   connect(this, &C_CamMetWidget::SigSendCanMsgDroppedToChildrenWidget, this->mpc_Ui->pc_TraceView,
+           &C_CamMetTreeView::CanFilterMsgDropped);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -445,4 +452,33 @@ void C_CamMetWidget::m_DatabaseTimer(void)
 void C_CamMetWidget::SetCanBitrate(const int32_t os32_Value)
 {
    ms32_CanBitrate = os32_Value;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from  constructor. Used to send the received QList of selected messages
+ *   Can Id's  and IsCanMsgExtended to parent widget
+ *
+   \param[in]       oc_CanMsgId     List of selected message CanId's
+   \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
+
+   \return
+   Emit an signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetWidget::AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd)
+{
+   Q_EMIT C_CamMetWidget::SigEmitAddFilterToParentWidget(oc_CanMsgId, oc_CanMsgXtd);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from parent widget constructor. Used to pass CanMsgDropped Information
+ *  to child widget
+
+   \return
+   Emit a signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetWidget::CanFilterMsgDropped()
+{
+   Q_EMIT C_CamMetWidget::SigSendCanMsgDroppedToChildrenWidget();
 }

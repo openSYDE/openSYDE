@@ -304,7 +304,7 @@ std::map<C_SdBueMessageTableModel::E_Columns, uint32_t> C_SdBueMessageTableView:
    c_ColumnWidths[C_SdBueMessageTableModel::eJ1939_EDP_AND_DP] = 55;
    c_ColumnWidths[C_SdBueMessageTableModel::eCAN_OPEN_INDEX] = 54;
    c_ColumnWidths[C_SdBueMessageTableModel::eEXTENDED] = 71;
-   c_ColumnWidths[C_SdBueMessageTableModel::eCAN_ID] = 72;
+   c_ColumnWidths[C_SdBueMessageTableModel::eCAN_ID] = 84;
    c_ColumnWidths[C_SdBueMessageTableModel::eCOB_ID] = 228;
    c_ColumnWidths[C_SdBueMessageTableModel::eDLC] = 44;
    c_ColumnWidths[C_SdBueMessageTableModel::eTX_METHOD] = 90;

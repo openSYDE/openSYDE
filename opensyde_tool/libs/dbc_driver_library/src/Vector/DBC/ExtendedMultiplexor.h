@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -23,6 +23,7 @@
 
 #include <Vector/DBC/platform.h>
 
+#include <cstdint>
 #include <set>
 #include <string>
 #include <utility>
@@ -35,19 +36,15 @@ namespace DBC {
 /**
  * Extended Multiplexor (SG_MUL_VAL)
  */
-class VECTOR_DBC_EXPORT ExtendedMultiplexor
-{
-public:
-    ExtendedMultiplexor();
-
+struct VECTOR_DBC_EXPORT ExtendedMultiplexor {
     /** Switch Name */
-    std::string switchName;
+    std::string switchName {};
 
     /** Value Range */
-    using ValueRange = std::pair<unsigned int, unsigned int>;
+    using ValueRange = std::pair<uint32_t, uint32_t>;
 
     /** Value Range */
-    std::set<ValueRange> valueRanges;
+    std::set<ValueRange> valueRanges {};
 };
 
 }

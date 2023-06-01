@@ -34,7 +34,7 @@ class C_SdBueSignalTableView :
 
 public:
    C_SdBueSignalTableView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdBueSignalTableView(void);
+   ~C_SdBueSignalTableView(void) override;
 
    void LoadUserSettings(const std::vector<int32_t> & orc_Values);
    void SaveUserSettings(std::vector<int32_t> & orc_Values) const;

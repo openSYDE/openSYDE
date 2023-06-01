@@ -12,18 +12,12 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
-#ifdef __BORLANDC__ //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
-
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
 #include "C_CanBase.hpp"
 #include "C_SclDynamicArray.hpp"
 
 //----------------------------------------------------------------------------------------------------------------------
-
 
 using namespace stw::errors;
 using namespace stw::can;

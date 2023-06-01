@@ -44,14 +44,6 @@ namespace stw
 namespace scl
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
 
 //mark functions as deprecated if possible
 #if (!defined(SCL_DEPRECATED_PRE)) && (!defined(SCL_DEPRECATED_POST))
@@ -78,7 +70,7 @@ namespace scl
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///String wrapper class
-class SCL_PACKAGE C_SclString
+class C_SclString
 {
 private:
    void m_ThrowIfOutOfRange(const int32_t os32_Index) const;
@@ -249,13 +241,13 @@ template <typename T> C_SclString C_SclString::IntToHex(const T orc_Value, const
 
 //----------------------------------------------------------------------------------------------------------------------
 
-extern bool SCL_PACKAGE operator == (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
-extern bool SCL_PACKAGE operator != (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
-extern bool SCL_PACKAGE operator < (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
-extern bool SCL_PACKAGE operator > (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
-extern bool SCL_PACKAGE operator <= (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
-extern bool SCL_PACKAGE operator >= (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
-extern C_SclString SCL_PACKAGE operator + (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern bool operator == (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern bool operator != (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern bool operator < (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern bool operator > (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern bool operator <= (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern bool operator >= (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
+extern C_SclString operator + (const C_SclString & orc_Par1, const C_SclString & orc_Par2);
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */
 }

@@ -41,7 +41,7 @@ class C_SdHandlerWidget :
 
 public:
    explicit C_SdHandlerWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdHandlerWidget();
+   ~C_SdHandlerWidget() override;
 
    void SetParentHook(QWidget * const opc_Parent) override;
    void UserInputFunc(const uint32_t ou32_FuncNumber) override;

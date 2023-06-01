@@ -32,7 +32,7 @@ class C_SdNdeCoOverviewTableView :
 
 public:
    C_SdNdeCoOverviewTableView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdNdeCoOverviewTableView(void);
+   ~C_SdNdeCoOverviewTableView(void) override;
 
    void LoadUserSettings(void);
    void SaveUserSettings(void) const;

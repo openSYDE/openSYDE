@@ -7,7 +7,9 @@ It's optimized towards fast access on loaded data, not on load performance or sa
 
 Minimum requirements:
 
-* gcc (>=4.9) or boost::regex (>=1.48)
+* compiler with C++14 support (gcc, clang, msvc)
+* flex
+* bison (>=3.3)
 
 Building under Linux works as usual:
 
@@ -75,8 +77,6 @@ The following files are products of installation and building:
 
 * Templates/Functions for protocols (ARINC664, CANoe, CANopen, CAN_FD, CAPL, Ethernet, Interaction Layer, Network Management, ISO11783, J1587, J1939, MOST, NMEA)
 * Comparation of two DBCs
-* Some OPTIONS can be auto detected, e.g. OPTION_USE_CPP11_REGEX or OPTION_USE_CPP11_ENUM_CLASS. Results should be placed in config.h.
-* cmake target for code beautifier: Astyle or Uncrustify (add_custom_command)?
 
 # Missing test coverage
 

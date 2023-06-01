@@ -55,6 +55,7 @@ set(OPENSYDE_CORE_COMMON_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscBinaryHash.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscChecksummedIniFile.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscUtils.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/DiagLib_config.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_string_resources/C_SclResourceStrings.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_string_resources/DLStrings.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/stwcompid/stwcompid.h
@@ -122,6 +123,23 @@ else()
    set(OPENSYDE_CORE_IMPORTS_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportEdsDcf.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportEdsDcf.hpp
+
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportRamView.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportRamView.hpp
+      #classes from legacy DiagLib are required to load KEFEX RAMView projects:
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableLists.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDATFile.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDATFile.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDEFProject.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDEFProject.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXProjectOptions.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXProjectOptions.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableListBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableListBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableLists.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableLists.hpp
    )
 endif()
 

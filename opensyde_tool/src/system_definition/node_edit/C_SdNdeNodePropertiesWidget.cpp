@@ -1630,10 +1630,12 @@ void C_SdNdeNodePropertiesWidget::m_IpAddressClick(const uint32_t ou32_Row)
       const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->parentWidget(), this->parentWidget());
       C_SdNdeIpAddressConfigurationWidget * const pc_Dialog =
          new C_SdNdeIpAddressConfigurationWidget(*c_New, this->mu32_NodeIndex, ou32_Row);
+      const QSize c_SIZE(600, 416);
+
       Q_UNUSED(pc_Dialog)
 
       //Resize
-      c_New->SetSize(QSize(600, 300));
+      c_New->SetSize(c_SIZE);
 
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {

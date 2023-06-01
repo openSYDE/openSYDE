@@ -200,6 +200,16 @@ C_CamMainWindow::C_CamMainWindow(QWidget * const opc_Parent) :
    connect(this->mpc_Ui->pc_GeneratorWidget, &C_CamGenWidget::SigRemoveAllCyclicMessages, this,
            &C_CamMainWindow::m_RemoveAllCyclicMessages);
 
+   connect(this->mpc_Ui->pc_TraceWidget, &C_CamMetWidget::SigEmitAddFilterToParentWidget, this,
+           &C_CamMainWindow::m_AddFilterData);
+   connect(this, &C_CamMainWindow::SigEmitAddFilterToChildWidget, this->mpc_Ui->pc_SettingsWidget,
+           &C_CamMosWidget::AddFilterData);
+
+   connect(this->mpc_Ui->pc_SettingsWidget, &C_CamMosWidget::SigSendCanMsgDroppedToParentWidget, this,
+           &C_CamMainWindow::CanFilterMsgDropped);
+   connect(this, &C_CamMainWindow::SigSendCanMsgDroppedToChildrenWidget, this->mpc_Ui->pc_TraceWidget,
+           &C_CamMetWidget::CanFilterMsgDropped);
+
    this->m_LoadUserSettings();
 }
 
@@ -234,6 +244,34 @@ C_CamMainWindow::~C_CamMainWindow()
    }
 
    delete this->mpc_Ui;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from child widget constructor. Used to pass CanMsgDropped Information to child widget
+
+   \return
+   Emit a signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMainWindow::CanFilterMsgDropped()
+{
+   Q_EMIT SigSendCanMsgDroppedToChildrenWidget();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from constructor. Received QList of selected messages
+ *   Can Id's  and IsCanMsgExtended data from child widget
+
+   \param[in]       oc_CanMsgId     List of selected message CanId's
+   \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
+
+   \return
+   Emit an signal which will be caught in constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMainWindow::m_AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd)
+{
+   Q_EMIT C_CamMainWindow::SigEmitAddFilterToChildWidget(oc_CanMsgId, oc_CanMsgXtd);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

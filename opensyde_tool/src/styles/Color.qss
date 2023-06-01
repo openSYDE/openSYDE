@@ -17,7 +17,9 @@ stw--opensyde_gui--C_NagViewList,
 stw--opensyde_gui--C_NagViewList::item,
 stw--opensyde_gui--C_SyvDaItPaTreeView,
 stw--opensyde_gui--C_SyvDaItPaWidgetNew,
+stw--opensyde_gui_elements--C_OgeTebLabel,
 stw--opensyde_gui--C_SdBueCoAddSignalsView,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView,
 stw--opensyde_gui_elements--C_OgeGbxNavigationSectionSelected,
 stw--opensyde_gui_elements--C_OgePubNavigation[Active="false"],
 stw--opensyde_gui_elements--C_OgeGbxNavigationTab,
@@ -191,10 +193,13 @@ stw--opensyde_gui_elements--C_OgePubIconChart:checked[Style="OPENSYDE_DARK"][Bac
 stw--opensyde_gui--C_SdNdeCoAddDeviceDialog,
 stw--opensyde_gui--C_SdBueCoAddSignalsDialog,
 stw--opensyde_gui--C_SdNdeCoDeviceUpdateEdsDialog,
-stw--opensyde_gui--C_SdBueJ1939PgPropertiesDialog
+stw--opensyde_gui--C_SdBueJ1939PgPropertiesDialog,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogDialog,
+stw--opensyde_gui--C_SdNdeDpImportRamViewReport
 {
 background-color: transparent;
 }
+
 
 /* border-color */
 stw--opensyde_gui--C_SyvDaItDashboardLabelWidget[Type="TRANSPARENT"],
@@ -383,7 +388,8 @@ stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item:selected:!hover,
 stw--opensyde_gui_elements--C_OgeChxTiny::indicator:enabled:!checked[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement:hover[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgeLeProperties[Background="0"],
-stw--opensyde_gui_elements--C_OgePubOpen[Background="0"]:!hover:!open:!pressed
+stw--opensyde_gui_elements--C_OgePubOpen[Background="0"]:!hover:!open:!pressed,
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Background="0"]
 {
 background-color: rgb(255, 255, 255);
 }
@@ -449,7 +455,8 @@ stw--opensyde_gui_elements--C_OgeCbxMultiSelectTableHalc QListView::item,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView,
 stw--opensyde_gui--C_SdNdeHalcConfigImportView::item,
 stw--opensyde_gui_elements--C_OgeTreeViewCheckable,
-stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item
+stw--opensyde_gui_elements--C_OgeTreeViewCheckable::item,
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="1"]
 {
 color: rgb(19, 19, 45);
 }
@@ -614,6 +621,7 @@ stw--opensyde_gui_elements--C_OgeTedDbComment,
 stw--opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw--opensyde_gui_elements--C_OgeLabDescriptionMessage,
 stw--opensyde_gui_elements--C_OgeLabGroupItemValue,
+stw--opensyde_gui_elements--C_OgeLabHeadingGroupBold,
 stw--opensyde_gui_elements--C_OgeCbxFontProperties,
 stw--opensyde_gui_elements--C_OgeCbxFontProperties QListView,
 stw--opensyde_gui_elements--C_OgeLabHeadingMessage,
@@ -625,7 +633,8 @@ stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style=
 stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"],
 stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"],
 stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"],
-stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"]
+stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"],
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu
 {
 selection-color: rgb(42, 42, 91);
 }
@@ -674,7 +683,10 @@ stw--opensyde_gui_elements--C_OgePubHalcPanel,
 stw--opensyde_gui--C_SdNdeHalcChannelTreeView::item:selected,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
-stw--opensyde_gui_elements--C_OgeRabProperties[CheckedColor="4"]:checked
+stw--opensyde_gui_elements--C_OgeRabProperties[CheckedColor="4"]:checked,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView::section,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView::item::selected,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView::item
 {
 color: rgb(57, 57, 109);
 }
@@ -790,7 +802,8 @@ stw--opensyde_gui_elements--C_OgeLabDashboardDefaultNonScaling[Style="OPENSYDE_2
 stw--opensyde_gui_elements--C_OgeLabDashboardProgressBarMaximum[Style="OPENSYDE_2_BRIGHT"],
 stw--opensyde_gui_elements--C_OgeLabNodePropComIfTable[COMIF_TableCell_Hyperlink="true"]:enabled,
 stw--opensyde_gui_elements--C_OgeLabGenericNoPaddingNoMargins[Foreground="6"],
-stw--opensyde_gui_elements--C_OgePubTextOnly
+stw--opensyde_gui_elements--C_OgePubTextOnly,
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Foreground="6"]
 {
 color: rgb(86, 86, 104);
 }
@@ -878,6 +891,7 @@ stw--opensyde_gui_elements--C_OgeLabGroupItem[HasColor8="true"],
 stw--opensyde_gui_elements--C_OgeChxProperties,
 stw--opensyde_gui_elements--C_OgeRabProperties,
 stw--opensyde_gui_elements--C_OgeLabGroupSubItem,
+stw--opensyde_gui_elements--C_OgeTebLabel,
 stw--opensyde_gui_elements--C_OgeTedTable,
 stw--opensyde_gui_elements--C_OgeChxDefaultSmall:unchecked,
 stw--opensyde_gui_elements--C_OgeLabStateInfo,
@@ -967,7 +981,9 @@ background-color: rgb(155, 155, 170);
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView,
 stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView,
-stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section
+stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView::section
 {
 border-color: rgb(155, 155, 170);
 }
@@ -1069,9 +1085,10 @@ stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground:checked[CheckedBac
 stw--opensyde_gui_elements--C_OgePubHalcPanel:enabled:hover:pressed,
 stw--opensyde_gui_elements--C_OgePubAddChartDataElement:hover:pressed[Style="OPENSYDE_BRIGHT"],
 stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"],
-stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"]
+stw--opensyde_gui_elements--C_OgePubIconChart:hover:pressed[Style="OPENSYDE_BRIGHT"][BackgroundChecked="false"],
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView::item::selected
 {
-background-color: rgb(206, 206, 217);
+     background-color: rgb(206, 206, 217);
 }
 
 /* border-color */
@@ -1293,7 +1310,9 @@ stw--opensyde_gui--C_SdNdeHalcConfigTreeView QHeaderView::section,
 stw--opensyde_gui--C_SdBueCoAddSignalsView QHeaderView::section,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:disabled,
 stw--opensyde_gui--C_SdBueMessageSelectorTreeWidget::indicator:enabled:!checked,
-stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Hovered="11"]:hover
+stw--opensyde_gui_elements--C_OgePubGenericTextWithBackground[Hovered="11"]:hover,
+stw--opensyde_gui--C_SdBueJ1939AddMessagesFromCatalogTableView QHeaderView::section,
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu[Background="11"]
 {
 background-color: rgb(237, 237, 242);
 }
@@ -1669,6 +1688,7 @@ stw--opensyde_gui_elements--C_OgeTedDbComment,
 stw--opensyde_gui_elements--C_OgeLabListHeaderHeading,
 stw--opensyde_gui_elements--C_OgeLabDescriptionMessage,
 stw--opensyde_gui_elements--C_OgeLabGroupItemValue,
+stw--opensyde_gui_elements--C_OgeLabHeadingGroupBold,
 stw--opensyde_gui_elements--C_OgeCbxFontProperties,
 stw--opensyde_gui_elements--C_OgeCbxFontProperties QListView,
 stw--opensyde_gui_elements--C_OgeLabHeadingMessage,
@@ -1680,7 +1700,8 @@ stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style=
 stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_DARK"],
 stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="OPENSYDE_2_DARK"],
 stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="FLAT_DARK"],
-stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"]
+stw--opensyde_gui_elements--C_OgeWiDashboardSpinBoxGroup QAbstractSpinBox[Style="SKEUOMORPH_DARK"],
+stw--opensyde_gui_elements--C_OgeLabGenericWithContextMenu
 {
 selection-background-color: rgb(195, 186, 221);
 }

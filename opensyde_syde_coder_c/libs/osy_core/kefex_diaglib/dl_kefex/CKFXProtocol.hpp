@@ -1,5 +1,5 @@
-#ifndef CKFXPROTOCOLH
-#define CKFXPROTOCOLH
+#ifndef CKFXPROTOCOLHPP
+#define CKFXPROTOCOLHPP
 
 #include <cstdio>
 
@@ -11,7 +11,7 @@
 #ifndef DIAGLIB_KEFEX_PROTOCOL_NO_LOGGING
 #include "C_CanMonProtocol.hpp" //for protocolling HLP to text file
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
-#include "CKFXVariableLists.h" //for protocolling HLP to text file
+#include "CKFXVariableLists.hpp" //for protocolling HLP to text file
 #endif
 #endif
 
@@ -75,7 +75,6 @@ public:
 //----------------------------------------------------------------------------------------------------------------------
 
 //function prototypes
-//do not use __closure to stay independent of Borland C++
 typedef void (* PR_KFXProtECUResetCallBack)(void * const opv_InstancePointer);
 typedef void (* PR_KFXProtNewCyclicTransmissionReceived)(void * const opv_Instance, const uint32_t ou32_Index,
                                                          const int64_t os64_Value, const uint32_t ou32_TimeStamp,
@@ -84,7 +83,7 @@ typedef void (* PR_KFXProtNewCyclicTransmissionReceived)(void * const opv_Instan
 //---------------------------------------------------------------------------
 
 ///KEFEX communication protocol driver
-class STW_DIAGLIB_EXPORT C_KFXProtocol
+class C_KFXProtocol
 {
 private:
    C_KFXProtocol(const C_KFXProtocol & orc_Source);               ///< not implemented -> prevent copying

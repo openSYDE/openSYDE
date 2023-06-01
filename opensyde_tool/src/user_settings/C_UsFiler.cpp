@@ -1094,6 +1094,13 @@ void C_UsFiler::mh_SaveProjectDependentSection(const C_UsHandler & orc_UserSetti
       //Service Project Path
       orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_service_project_path",
                           orc_UserSettings.GetLastKnownServiceProjectPath().toStdString().c_str());
+      //RAMView Project Import Path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_ramview_project_path",
+                          orc_UserSettings.GetLastKnownRamViewProjectPath().toStdString().c_str());
+
+      // J1939 Catalog Path
+      orc_Ini.WriteString(orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_j1939_catalog_path",
+                          orc_UserSettings.GetLastKnownJ1939CatalogPath().toStdString().c_str());
 
       // Last tab index in system definition
       orc_Ini.WriteInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value",
@@ -2193,6 +2200,16 @@ void C_UsFiler::mh_LoadProjectDependentSection(C_UsHandler & orc_UserSettings, C
       orc_UserSettings.SetLastKnownServiceProjectPath(
          orc_Ini.ReadString(
             orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_service_project_path", "").c_str());
+
+      //RAMView Project Import Path
+      orc_UserSettings.SetLastKnownRamViewProjectPath(
+         orc_Ini.ReadString(
+            orc_ActiveProject.toStdString().c_str(), "ProjSd_last_known_ramview_project_path", "").c_str());
+
+      // J1939 Catalog Path
+      orc_UserSettings.SetLastKnownJ1939CatalogPath(orc_Ini.ReadString(
+                                                       orc_ActiveProject.toStdString().c_str(),
+                                                       "ProjSd_last_known_j1939_catalog_path", "").c_str());
 
       // Last tab index in system definition
       s32_Value = orc_Ini.ReadInteger(orc_ActiveProject.toStdString().c_str(), "ProjSdNodeEditTabIndex_value", 0);

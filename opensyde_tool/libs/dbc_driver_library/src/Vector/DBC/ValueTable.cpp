@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -24,11 +24,15 @@
 namespace Vector {
 namespace DBC {
 
-ValueTable::ValueTable() :
-    name(),
-    valueDescriptions()
-{
-    /* nothing to do here */
+std::ostream & operator<<(std::ostream & os, const ValueTable & valueTable) {
+    os << "VAL_TABLE_ " << valueTable.name;
+    for (const auto & valueDescription : valueTable.valueDescriptions) {
+        os << " " << valueDescription.first;
+        os << " \"" << valueDescription.second << "\"";
+    }
+    os << " ;" << endl;
+
+    return os;
 }
 
 }

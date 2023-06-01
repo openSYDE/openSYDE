@@ -570,7 +570,9 @@ QString C_SyvDaPeBase::GetDisplayName(void) const
 */
 QSize C_SyvDaPeBase::h_GetPopupSizeWithDisplayFormatter(void)
 {
-   return QSize(800, 920);
+   const QSize c_SIZE(800, 967);
+
+   return c_SIZE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -584,7 +586,9 @@ QSize C_SyvDaPeBase::h_GetPopupSizeWithDisplayFormatter(void)
 */
 QSize C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter(void)
 {
-   return QSize(800, 800);
+   const QSize c_SIZE(800, 800);
+
+   return c_SIZE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -599,7 +603,9 @@ QSize C_SyvDaPeBase::h_GetPopupSizeWithoutDisplayFormatter(void)
 */
 QSize C_SyvDaPeBase::h_GetPopupSizeWithoutDesignAndPreview()
 {
-   return QSize(800, 500);
+   const QSize c_SIZE(800, 723);
+
+   return c_SIZE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------

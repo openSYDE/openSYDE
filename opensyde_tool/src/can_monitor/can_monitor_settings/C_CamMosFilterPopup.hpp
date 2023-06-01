@@ -43,6 +43,7 @@ public:
    ~C_CamMosFilterPopup(void) override;
 
    stw::opensyde_gui_logic::C_CamProFilterData GetFilterData(void) const;
+   void SetAddFilterItem(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -65,6 +66,8 @@ private:
    void m_OnCancel(void) const;
    void m_OnOk(void);
    void m_OnAddFilterItem(void) const;
+   void m_OnAddFilterItemFromContextmenu(const int32_t os32_CanMsgId, const uint8_t ou8_CanMsgXtd,
+                                         const bool oq_IsLastItemInList);
    void m_OnIndexClicked(const QModelIndex & orc_NewIndex) const;
    void m_OnDeleteKeyPressed(void) const;
    void m_OnRowChanged(const QModelIndex & orc_NewIndex, const QModelIndex & orc_PrevIndex) const;

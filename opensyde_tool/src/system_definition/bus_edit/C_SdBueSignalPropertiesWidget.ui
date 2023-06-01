@@ -244,7 +244,7 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="stw::opensyde_gui_elements::C_OgeLabGenericBubble" name="pc_LabelObjectDictValue">
+                  <widget class="stw::opensyde_gui_elements::C_OgeLabGenericWithContextMenu" name="pc_LabelObjectDictValue">
                    <property name="maximumSize">
                     <size>
                      <width>130</width>
@@ -1173,21 +1173,6 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
-   <extends>QComboBox</extends>
-   <header>C_OgeCbxText.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeFraSeparator</class>
    <extends>QFrame</extends>
    <header>C_OgeFraSeparator.hpp</header>
@@ -1199,19 +1184,9 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeLabHeadingGroupBold.hpp</header>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeTedPropertiesComment</class>
-   <extends>QTextEdit</extends>
-   <header>C_OgeTedPropertiesComment.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLeProperties.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLePropertiesName</class>
-   <extends>QLineEdit</extends>
-   <header>C_OgeLePropertiesName.hpp</header>
+   <class>stw::opensyde_gui_elements::C_OgeCbxText</class>
+   <extends>QComboBox</extends>
+   <header>C_OgeCbxText.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeSpxNumber</class>
@@ -1219,9 +1194,34 @@ p, li { white-space: pre-wrap; }
    <header>C_OgeSpxNumber.hpp</header>
   </customwidget>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeTedPropertiesComment</class>
+   <extends>QTextEdit</extends>
+   <header>C_OgeTedPropertiesComment.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLePropertiesName</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLePropertiesName.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGenericNoPaddingNoMargins.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeChxProperties</class>
    <extends>QCheckBox</extends>
    <header>C_OgeChxProperties.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLeProperties</class>
+   <extends>QLineEdit</extends>
+   <header>C_OgeLeProperties.hpp</header>
   </customwidget>
   <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeSpxDoubleProperties</class>
@@ -1240,9 +1240,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGenericBubble</class>
+   <class>stw::opensyde_gui_elements::C_OgeLabGenericWithContextMenu</class>
    <extends>QLabel</extends>
-   <header>C_OgeLabGenericBubble.hpp</header>
+   <header>C_OgeLabGenericWithContextMenu.hpp</header>
   </customwidget>
  </customwidgets>
  <tabstops>

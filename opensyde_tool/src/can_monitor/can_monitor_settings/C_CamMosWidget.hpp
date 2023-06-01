@@ -56,6 +56,8 @@ public:
    void ClearConfiguration(void) const;
 
    void ExpandSettings(const bool oq_Expand) const;
+   void AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+   void CanFilterMsgDropped(void);
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -77,6 +79,8 @@ Q_SIGNALS:
    void SigRemoveAllLogFiles(void);
    void SigCanDllConfigured(void);
    void SigNotifyMissingDataBase(const QString & orc_Path);
+   void SigEmitAddFilterToChildWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+   void SigSendCanMsgDroppedToParentWidget(void);
 
 protected:
    void moveEvent(QMoveEvent * const opc_Event) override;

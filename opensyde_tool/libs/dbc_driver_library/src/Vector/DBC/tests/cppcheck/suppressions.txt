@@ -1,0 +1,7 @@
+noExplicitConstructor:// A stack with random access from its top
+syntaxError:*/src/Vector/DBC/Parser.output
+redundantAssignment:*/src/Vector/DBC/Scanner.cpp
+unusedStructMember:*/src/Vector/DBC/Scanner.cpp
+unusedFunction:*/src/Vector/DBC/Scanner.cpp
+ConfigurationNotChecked
+missingInclude

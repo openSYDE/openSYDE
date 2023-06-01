@@ -890,7 +890,7 @@ int32_t C_SyvUpScene::m_StartProgressAnimationBusses(const C_SyvRoRouteCalculati
                  rc_Interface.u32_BusIndex))
             {
                const C_PuiSdNodeConnection * const pc_UiConnectionData =
-                  C_PuiSdHandler::h_GetInstance()->GetUiConnection(ou32_NodeIndex, u32_ItInterface,
+                  C_PuiSdHandler::h_GetInstance()->GetUiConnection(ou32_NodeIndex, rc_Interface.u8_InterfaceNumber,
                                                                    rc_Interface.e_InterfaceType);
                if (pc_UiConnectionData != NULL)
                {

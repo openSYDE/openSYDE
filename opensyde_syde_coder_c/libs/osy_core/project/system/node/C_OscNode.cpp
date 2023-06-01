@@ -2250,6 +2250,11 @@ void C_OscNode::m_GetAllMessages(const uint32_t ou32_InterfaceIndex,
    m_AppendAllProtocolMessages(ou32_InterfaceIndex, C_OscCanProtocol::eCAN_OPEN, orc_Messages,
                                ope_SkipComProtocol, opu32_SkipInterfaceIndex, opq_SkipMessageIsTxFlag,
                                opu32_SkipMessageIndex);
+
+   //J1939
+   m_AppendAllProtocolMessages(ou32_InterfaceIndex, C_OscCanProtocol::eJ1939, orc_Messages,
+                               ope_SkipComProtocol, opu32_SkipInterfaceIndex, opq_SkipMessageIsTxFlag,
+                               opu32_SkipMessageIndex);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

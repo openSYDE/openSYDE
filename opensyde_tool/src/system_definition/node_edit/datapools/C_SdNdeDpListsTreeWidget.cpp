@@ -902,14 +902,10 @@ void C_SdNdeDpListsTreeWidget::keyPressEvent(QKeyEvent * const opc_Event)
         (opc_Event->modifiers().testFlag(Qt::ControlModifier) == true)) &&
        (opc_Event->modifiers().testFlag(Qt::AltModifier) == true))
    {
-      switch (opc_Event->key())
+      if (static_cast<Qt::Key>(opc_Event->key()) == Qt::Key_O)
       {
-      case Qt::Key_O:
          //Undo redo command view
          this->mc_UndoManager.ToggleCommandDisplay();
-         break;
-      default:
-         break;
       }
    }
    //Standard commands

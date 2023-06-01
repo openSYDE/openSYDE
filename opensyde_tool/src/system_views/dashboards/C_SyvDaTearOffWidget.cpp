@@ -485,6 +485,9 @@ void C_SyvDaTearOffWidget::m_OnEditProperties(C_OgeWiDashboardTab * const opc_So
       C_SyvDaDashboardTabProperties * const pc_Dialog =
          new C_SyvDaDashboardTabProperties(*c_New, "Dashboard Tab", u32_DashboardIndex, mpc_Dashboard->GetViewIndex());
 
+      const QSize c_SIZE(892, 646);
+      c_New->SetSize(c_SIZE);
+
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
          const uint32_t u32_ViewIndex = this->mpc_Dashboard->GetViewIndex();

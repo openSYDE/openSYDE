@@ -484,6 +484,10 @@ bool C_GiSvPc::m_OpenCanDllDialog(void) const
       const QPointer<C_OgePopUpDialog> c_DllDialog = new C_OgePopUpDialog(pc_GraphicsView, pc_GraphicsView);
       C_SyvSeDllConfigurationDialog * const pc_DllWidget = new C_SyvSeDllConfigurationDialog(*c_DllDialog);
 
+      // Resize
+      const QSize c_SIZE(700, 490);
+      c_DllDialog->SetSize(c_SIZE);
+
       // Initialize the data
       pc_DllWidget->SetDllType(rc_PcData.GetCanDllType());
       pc_DllWidget->SetCustomDllPath(rc_PcData.GetCustomCanDllPath());
@@ -497,9 +501,6 @@ bool C_GiSvPc::m_OpenCanDllDialog(void) const
             pc_DllWidget->SetBitrate(pc_Bus->u64_BitRate);
          }
       }
-
-      // Resize
-      c_DllDialog->SetSize(QSize(700, 450));
 
       if (c_DllDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
       {

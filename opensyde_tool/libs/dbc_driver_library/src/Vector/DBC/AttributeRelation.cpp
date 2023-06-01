@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -24,65 +24,57 @@
 namespace Vector {
 namespace DBC {
 
-AttributeRelation::AttributeRelation() :
-    Attribute(),
-    relationType(AttributeRelation::RelationType::ControlUnitEnvironmentVariable),
-    nodeName(),
-    messageId(0),
-    signalName()
-{
-    /* nothing to do here */
-}
+bool operator<(const AttributeRelation & lhs, const AttributeRelation & rhs) {
+    bool retval = false;
 
-bool AttributeRelation::operator < (const AttributeRelation & rhs) const
-{
     /* compare name */
-    if (name == rhs.name) {
+    if (lhs.name == rhs.name) {
 
         /* compare relationType */
-        if (relationType == rhs.relationType) {
+        if (lhs.objectType == rhs.objectType) {
 
             /* relationType based optimizations */
-            switch(relationType) {
-            case RelationType::ControlUnitEnvironmentVariable:
+            switch (lhs.objectType) {
+            case AttributeObjectType::Network:
+            case AttributeObjectType::Node:
+            case AttributeObjectType::Message:
+            case AttributeObjectType::Signal:
+            case AttributeObjectType::EnvironmentVariable:
+                /* not handled here */
+                break;
+            case AttributeObjectType::ControlUnitEnvironmentVariable:
                 /* only compare nodeName, environmentVariableName */
-                if (nodeName == rhs.nodeName) {
-                    return environmentVariableName < rhs.environmentVariableName;
-                } else {
-                    return nodeName < rhs.nodeName;
-                }
+                if (lhs.nodeName == rhs.nodeName)
+                    retval = lhs.environmentVariableName < rhs.environmentVariableName;
+                else
+                    retval = lhs.nodeName < rhs.nodeName;
                 break;
 
-            case RelationType::NodeTxMessage:
+            case AttributeObjectType::NodeTxMessage:
                 /* only compare nodeName, messageId */
-                if (nodeName == rhs.nodeName) {
-                    return messageId < rhs.messageId;
-                } else {
-                    return nodeName < rhs.nodeName;
-                }
+                if (lhs.nodeName == rhs.nodeName)
+                    retval = lhs.messageId < rhs.messageId;
+                else
+                    retval = lhs.nodeName < rhs.nodeName;
                 break;
 
-            case RelationType::NodeMappedRxSignal:
+            case AttributeObjectType::NodeMappedRxSignal:
                 /* only compare nodeName, messageId, signalName */
-                if (nodeName == rhs.nodeName) {
-                    if (messageId == rhs.messageId) {
-                        return signalName < rhs.signalName;
-                    } else {
-                        return messageId < rhs.messageId;
-                    }
-                } else {
-                    return nodeName < rhs.nodeName;
-                }
+                if (lhs.nodeName == rhs.nodeName) {
+                    if (lhs.messageId == rhs.messageId)
+                        retval = lhs.signalName < rhs.signalName;
+                    else
+                        retval = lhs.messageId < rhs.messageId;
+                } else
+                    retval = lhs.nodeName < rhs.nodeName;
                 break;
             }
-        } else {
-            return relationType < rhs.relationType;
-        }
-    } else {
-        return name < rhs.name;
-    }
+        } else
+            retval = lhs.objectType < rhs.objectType;
+    } else
+        retval = lhs.name < rhs.name;
 
-    return false;
+    return retval;
 }
 
 }

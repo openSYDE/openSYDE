@@ -156,17 +156,16 @@ int32_t C_SdNdeHalcConfigImportDialog::PrepareDialog(QString & orc_ErrorDetails)
 
             if (s32_Return != C_NO_ERR)
             {
-               switch (s32_Return)
+               if (s32_Return == C_NOACT)
                {
-               case C_NOACT:
                   orc_ErrorDetails = C_GtGetText::h_GetText("Imported Hardware configuration does not have any elements "
                                                             "which does match to the current configuration. "
                                                             "Nothing to import.");
-                  break;
-               default:
+               }
+               else
+               {
                   orc_ErrorDetails =
                      static_cast<QString>(C_GtGetText::h_GetText("Unknown error: %1")).arg(C_Uti::h_StwError(s32_Return));
-                  break;
                }
             }
 

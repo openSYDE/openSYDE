@@ -560,12 +560,12 @@ uint64_t C_OscXmlParserBase::GetAttributeUint64(const C_SclString & orc_Name, co
    uint64_t u64_Value = ou64_Default;
    C_SclString c_Text;
 
-   //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
    c_Text = this->GetAttributeString(orc_Name);
    if (c_Text != "")
    {
       if ((c_Text.Length() >= 2) && ((c_Text[1] == '0') && (c_Text[2] == 'x')))
       {
+         //do not use XMLElement::Query function: it can not handle hexadecimal values with "0x"
          std::istringstream c_Stream(c_Text.SubString(3UL, c_Text.Length() - 2UL).c_str());
          c_Stream >> std::hex >> u64_Value;
          if (c_Stream.fail() == true)
@@ -575,9 +575,10 @@ uint64_t C_OscXmlParserBase::GetAttributeUint64(const C_SclString & orc_Name, co
       }
       else
       {
-         std::istringstream c_Stream(c_Text.c_str());
-         c_Stream >> u64_Value;
-         if (c_Stream.fail() == true)
+         //Use Query function. Using istringstream with an decimal string caused issues with
+         // max uint64 value and MSVC. No issues found with hex string. See #83022.
+         const tinyxml2::XMLError e_Error = mpc_CurrentNode->QueryUnsigned64Attribute(orc_Name.c_str(), &u64_Value);
+         if (e_Error != tinyxml2::XML_SUCCESS)
          {
             u64_Value = ou64_Default;
          }

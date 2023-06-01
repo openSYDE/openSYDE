@@ -2926,30 +2926,24 @@ int32_t C_PuiSdHandlerNodeLogic::SetDataPoolList(const uint32_t & oru32_NodeInde
             {
                rc_UiDataPool.c_DataPoolLists[oru32_DataPoolListIndex] = orc_UiContent;
                rc_OscDataPool.c_Lists[oru32_DataPoolListIndex] = orc_OscContent;
+               // Adapt required fields
+               if (rc_OscDataPool.q_IsSafety)
+               {
+                  C_OscNodeDataPoolList & rc_List = rc_OscDataPool.c_Lists[oru32_DataPoolListIndex];
+                  rc_List.q_NvmCrcActive = true;
+                  for (uint32_t u32_ItEl = 0UL; u32_ItEl < rc_List.c_Elements.size(); ++u32_ItEl)
+                  {
+                     rc_List.c_Elements[u32_ItEl].e_Access = C_OscNodeDataPoolListElement::eACCESS_RO;
+                  }
+               }
                //Update addresses
                rc_OscDataPool.RecalculateAddress();
 
                // Handle shared Datapools
                if (oq_HandleSharedDatapools == true)
                {
-                  std::vector<C_OscNodeDataPoolId> c_SharedDatapools;
-
-                  if (this->mc_SharedDatapools.IsSharedAndGetDatapoolGroup(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                           c_SharedDatapools) == true)
-                  {
-                     uint32_t u32_SharedDpCounter;
-
-                     // Synchronize with the shared Datapools
-                     for (u32_SharedDpCounter = 0U; u32_SharedDpCounter < c_SharedDatapools.size();
-                          ++u32_SharedDpCounter)
-                     {
-                        const C_OscNodeDataPoolId & rc_DpId = c_SharedDatapools[u32_SharedDpCounter];
-                        // No error expected. The Datapools must have the same conditions
-                        tgl_assert(this->SetDataPoolList(rc_DpId.u32_NodeIndex, rc_DpId.u32_DataPoolIndex,
-                                                         oru32_DataPoolListIndex, orc_OscContent, orc_UiContent,
-                                                         false) == C_NO_ERR);
-                     }
-                  }
+                  this->m_SetDataPoolListSharedSync(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
+                                                    orc_OscContent, orc_UiContent);
                }
             }
             else
@@ -3269,31 +3263,23 @@ int32_t C_PuiSdHandlerNodeLogic::SetDataPoolListNvmCrc(const uint32_t & oru32_No
          if (oru32_DataPoolListIndex < rc_OscDataPool.c_Lists.size())
          {
             C_OscNodeDataPoolList & rc_OscList = rc_OscDataPool.c_Lists[oru32_DataPoolListIndex];
-            rc_OscList.q_NvmCrcActive = oq_Value;
+            //Adapt required fields
+            if (rc_OscDataPool.q_IsSafety)
+            {
+               rc_OscList.q_NvmCrcActive = true;
+            }
+            else
+            {
+               rc_OscList.q_NvmCrcActive = oq_Value;
+            }
             //Update addresses
             rc_OscDataPool.RecalculateAddress();
 
             // Handle shared Datapools
             if (oq_HandleSharedDatapools == true)
             {
-               std::vector<C_OscNodeDataPoolId> c_SharedDatapools;
-
-               if (this->mc_SharedDatapools.IsSharedAndGetDatapoolGroup(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                        c_SharedDatapools) == true)
-               {
-                  uint32_t u32_SharedDpCounter;
-
-                  // Synchronize with the shared Datapools
-                  for (u32_SharedDpCounter = 0U; u32_SharedDpCounter < c_SharedDatapools.size();
-                       ++u32_SharedDpCounter)
-                  {
-                     const C_OscNodeDataPoolId & rc_DpId = c_SharedDatapools[u32_SharedDpCounter];
-                     // No error expected. The Datapools must have the same conditions
-                     tgl_assert(this->SetDataPoolListNvmCrc(rc_DpId.u32_NodeIndex, rc_DpId.u32_DataPoolIndex,
-                                                            oru32_DataPoolListIndex, oq_Value,
-                                                            false) == C_NO_ERR);
-                  }
-               }
+               this->m_SetDataPoolListNvmCrcSharedSync(oru32_NodeIndex, oru32_DataPoolIndex, oru32_DataPoolListIndex,
+                                                       oq_Value);
             }
          }
          else
@@ -4512,54 +4498,44 @@ int32_t C_PuiSdHandlerNodeLogic::SetDataPoolListElement(const uint32_t & oru32_N
             if (oru32_DataPoolListElementIndex < rc_UiList.c_DataPoolListElements.size())
             {
                C_OscNodeDataPoolListElement & rc_OscDataElement = rc_OscList.c_Elements[oru32_DataPoolListElementIndex];
-               if ((rc_OscDataElement.GetType() != orc_OscContent.GetType()) ||
-                   ((rc_OscDataElement.GetArray() != orc_OscContent.GetArray()) ||
+               C_OscNodeDataPoolListElement c_NewValuesContent = orc_OscContent;
+               //Adapt required fields
+               if (rc_OscDataPool.q_IsSafety)
+               {
+                  c_NewValuesContent.e_Access = C_OscNodeDataPoolListElement::eACCESS_RO;
+               }
+               if ((rc_OscDataElement.GetType() != c_NewValuesContent.GetType()) ||
+                   ((rc_OscDataElement.GetArray() != c_NewValuesContent.GetArray()) ||
                     (rc_OscDataElement.GetArraySize() !=
-                     orc_OscContent.GetArraySize())))
+                     c_NewValuesContent.GetArraySize())))
                {
                   Q_EMIT this->SigSyncNodeDataPoolListElementChanged(oru32_NodeIndex, oru32_DataPoolIndex,
                                                                      oru32_DataPoolListIndex,
                                                                      oru32_DataPoolListElementIndex,
-                                                                     orc_OscContent.GetType(),
-                                                                     orc_OscContent.GetArray(),
-                                                                     orc_OscContent.GetArraySize(),
+                                                                     c_NewValuesContent.GetType(),
+                                                                     c_NewValuesContent.GetArray(),
+                                                                     c_NewValuesContent.GetArraySize(),
                                                                      orc_UiContent.q_InterpretAsString);
                }
-               if (rc_OscDataElement.e_Access != orc_OscContent.e_Access)
+               if (rc_OscDataElement.e_Access != c_NewValuesContent.e_Access)
                {
                   Q_EMIT this->SigSyncNodeDataPoolListElementAccessChanged(oru32_NodeIndex, oru32_DataPoolIndex,
                                                                            oru32_DataPoolListIndex,
                                                                            oru32_DataPoolListElementIndex,
-                                                                           orc_OscContent.e_Access);
+                                                                           c_NewValuesContent.e_Access);
                }
                rc_UiList.c_DataPoolListElements[oru32_DataPoolListElementIndex] = orc_UiContent;
-               rc_OscDataElement = orc_OscContent;
+               rc_OscDataElement = c_NewValuesContent;
                //Update addresses
                rc_OscDataPool.RecalculateAddress();
 
                // Handle shared Datapools
                if (oq_HandleSharedDatapools == true)
                {
-                  std::vector<C_OscNodeDataPoolId> c_SharedDatapools;
-
-                  if (this->mc_SharedDatapools.IsSharedAndGetDatapoolGroup(oru32_NodeIndex, oru32_DataPoolIndex,
-                                                                           c_SharedDatapools) == true)
-                  {
-                     uint32_t u32_SharedDpCounter;
-
-                     // Synchronize with the shared Datapools
-                     for (u32_SharedDpCounter = 0U; u32_SharedDpCounter < c_SharedDatapools.size();
-                          ++u32_SharedDpCounter)
-                     {
-                        const C_OscNodeDataPoolId & rc_DpId = c_SharedDatapools[u32_SharedDpCounter];
-                        // No error expected. The Datapools must have the same conditions
-                        tgl_assert(this->SetDataPoolListElement(rc_DpId.u32_NodeIndex, rc_DpId.u32_DataPoolIndex,
-                                                                oru32_DataPoolListIndex,
-                                                                oru32_DataPoolListElementIndex, orc_OscContent,
-                                                                orc_UiContent,
-                                                                false) == C_NO_ERR);
-                     }
-                  }
+                  this->m_SetDataPoolListElementSharedSync(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                           oru32_DataPoolListIndex, oru32_DataPoolListElementIndex,
+                                                           c_NewValuesContent,
+                                                           orc_UiContent);
                }
             }
             else
@@ -6409,6 +6385,163 @@ void C_PuiSdHandlerNodeLogic::m_SetOscNodeId(const uint32_t ou32_NodeIndex, cons
          C_OscNodeComInterfaceSettings & rc_Interface = rc_OscNode.c_Properties.c_ComInterfaces[ou32_InterfaceIndex];
          rc_Interface.u8_NodeId = ou8_NodeId;
          m_SyncOsyNodeIdChange(ou32_NodeIndex, ou32_InterfaceIndex, ou8_NodeId);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data pool list, shared datapools sync operation only
+
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  orc_OscContent             OSC data pool list content
+   \param[in]  orc_UiContent              UI data pool list content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::m_SetDataPoolListSharedSync(const uint32_t & oru32_NodeIndex,
+                                                          const uint32_t & oru32_DataPoolIndex,
+                                                          const uint32_t & oru32_DataPoolListIndex,
+                                                          const C_OscNodeDataPoolList & orc_OscContent,
+                                                          const C_PuiSdNodeDataPoolList & orc_UiContent)
+{
+   std::vector<C_OscNodeDataPoolId> c_SharedDatapools;
+
+   if (this->mc_SharedDatapools.IsSharedAndGetDatapoolGroup(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                            c_SharedDatapools) == true)
+   {
+      const C_OscNodeDataPool * const pc_DatapoolOrg = this->GetOscDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
+      if (pc_DatapoolOrg != NULL)
+      {
+         uint32_t u32_SharedDpCounter;
+
+         // Synchronize with the shared Datapools
+         for (u32_SharedDpCounter = 0U; u32_SharedDpCounter < c_SharedDatapools.size();
+              ++u32_SharedDpCounter)
+         {
+            const C_OscNodeDataPoolId & rc_DpId = c_SharedDatapools[u32_SharedDpCounter];
+            const C_OscNodeDataPool * const pc_Datapool = this->GetOscDataPool(rc_DpId.u32_NodeIndex,
+                                                                               rc_DpId.u32_DataPoolIndex);
+            const C_OscNodeDataPoolList * const pc_List = this->GetOscDataPoolList(rc_DpId.u32_NodeIndex,
+                                                                                   rc_DpId.u32_DataPoolIndex,
+                                                                                   oru32_DataPoolListIndex);
+            tgl_assert((pc_Datapool != NULL) && (pc_List != NULL));
+            if ((pc_Datapool != NULL) && (pc_List != NULL))
+            {
+               C_OscNodeDataPoolList c_NewValue = orc_OscContent;
+               //Keep original values
+               if ((!pc_Datapool->q_IsSafety) && (pc_DatapoolOrg->q_IsSafety))
+               {
+                  c_NewValue.q_NvmCrcActive = pc_List->q_NvmCrcActive;
+                  tgl_assert(pc_List->c_Elements.size() == c_NewValue.c_Elements.size());
+                  if (pc_List->c_Elements.size() == c_NewValue.c_Elements.size())
+                  {
+                     for (uint32_t u32_ItEl = 0UL; u32_ItEl < pc_List->c_Elements.size(); ++u32_ItEl)
+                     {
+                        c_NewValue.c_Elements[u32_ItEl].e_Access = pc_List->c_Elements[u32_ItEl].e_Access;
+                     }
+                  }
+               }
+               // No error expected. The Datapools must have the same conditions
+               tgl_assert(this->SetDataPoolList(rc_DpId.u32_NodeIndex, rc_DpId.u32_DataPoolIndex,
+                                                oru32_DataPoolListIndex, c_NewValue, orc_UiContent,
+                                                false) == C_NO_ERR);
+            }
+         }
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data pool list nvm crc flag, shared datapools sync operation only
+
+   \param[in]  oru32_NodeIndex            Node index
+   \param[in]  oru32_DataPoolIndex        Data pool index
+   \param[in]  oru32_DataPoolListIndex    Data pool list index
+   \param[in]  oq_Value                   New value
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::m_SetDataPoolListNvmCrcSharedSync(const uint32_t & oru32_NodeIndex,
+                                                                const uint32_t & oru32_DataPoolIndex,
+                                                                const uint32_t & oru32_DataPoolListIndex,
+                                                                const bool oq_Value)
+{
+   std::vector<C_OscNodeDataPoolId> c_SharedDatapools;
+
+   if (this->mc_SharedDatapools.IsSharedAndGetDatapoolGroup(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                            c_SharedDatapools) == true)
+   {
+      uint32_t u32_SharedDpCounter;
+
+      // Synchronize with the shared Datapools
+      for (u32_SharedDpCounter = 0U; u32_SharedDpCounter < c_SharedDatapools.size();
+           ++u32_SharedDpCounter)
+      {
+         const C_OscNodeDataPoolId & rc_DpId = c_SharedDatapools[u32_SharedDpCounter];
+         // No error expected. The Datapools must have the same conditions
+         tgl_assert(this->SetDataPoolListNvmCrc(rc_DpId.u32_NodeIndex, rc_DpId.u32_DataPoolIndex,
+                                                oru32_DataPoolListIndex, oq_Value,
+                                                false) == C_NO_ERR);
+      }
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Set data pool list element, shared datapools sync operation only
+
+   \param[in]  oru32_NodeIndex                  Node index
+   \param[in]  oru32_DataPoolIndex              Data pool index
+   \param[in]  oru32_DataPoolListIndex          Data pool list index
+   \param[in]  oru32_DataPoolListElementIndex   Data pool list element index
+   \param[in]  orc_OscContent                   OSC data pool list element content
+   \param[in]  orc_UiContent                    UI data pool list element content
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_PuiSdHandlerNodeLogic::m_SetDataPoolListElementSharedSync(const uint32_t & oru32_NodeIndex,
+                                                                 const uint32_t & oru32_DataPoolIndex,
+                                                                 const uint32_t & oru32_DataPoolListIndex,
+                                                                 const uint32_t & oru32_DataPoolListElementIndex,
+                                                                 const C_OscNodeDataPoolListElement & orc_OscContent,
+                                                                 const C_PuiSdNodeDataPoolListElement & orc_UiContent)
+{
+   std::vector<C_OscNodeDataPoolId> c_SharedDatapools;
+
+   if (this->mc_SharedDatapools.IsSharedAndGetDatapoolGroup(oru32_NodeIndex, oru32_DataPoolIndex,
+                                                            c_SharedDatapools) == true)
+   {
+      const C_OscNodeDataPool * const pc_DatapoolOrg = this->GetOscDataPool(oru32_NodeIndex, oru32_DataPoolIndex);
+      if (pc_DatapoolOrg != NULL)
+      {
+         uint32_t u32_SharedDpCounter;
+
+         // Synchronize with the shared Datapools
+         for (u32_SharedDpCounter = 0U; u32_SharedDpCounter < c_SharedDatapools.size();
+              ++u32_SharedDpCounter)
+         {
+            const C_OscNodeDataPoolId & rc_DpId = c_SharedDatapools[u32_SharedDpCounter];
+            const C_OscNodeDataPool * const pc_Datapool = this->GetOscDataPool(rc_DpId.u32_NodeIndex,
+                                                                               rc_DpId.u32_DataPoolIndex);
+            const C_OscNodeDataPoolListElement * const pc_Element = this->GetOscDataPoolListElement(
+               rc_DpId.u32_NodeIndex,
+               rc_DpId.u32_DataPoolIndex, oru32_DataPoolListIndex,
+               oru32_DataPoolListElementIndex);
+            tgl_assert((pc_Datapool != NULL) && (pc_Element != NULL));
+            if ((pc_Datapool != NULL) && (pc_Element != NULL))
+            {
+               C_OscNodeDataPoolListElement c_NewElement = orc_OscContent;
+               //Keep original values
+               if ((!pc_Datapool->q_IsSafety) && (pc_DatapoolOrg->q_IsSafety))
+               {
+                  c_NewElement.e_Access = pc_Element->e_Access;
+               }
+               // No error expected. The Datapools must have the same conditions
+               tgl_assert(this->SetDataPoolListElement(rc_DpId.u32_NodeIndex, rc_DpId.u32_DataPoolIndex,
+                                                       oru32_DataPoolListIndex,
+                                                       oru32_DataPoolListElementIndex, c_NewElement,
+                                                       orc_UiContent,
+                                                       false) == C_NO_ERR);
+            }
+         }
       }
    }
 }

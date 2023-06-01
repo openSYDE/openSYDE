@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -23,9 +23,10 @@
 
 #include <Vector/DBC/platform.h>
 
+#include <cstdint>
 #include <string>
 
-#include <Vector/DBC/AttributeValueType.h>
+#include <Vector/DBC/AttributeObjectType.h>
 
 #include <Vector/DBC/vector_dbc_export.h>
 
@@ -33,39 +34,39 @@ namespace Vector {
 namespace DBC {
 
 /**
- * Attribute Value (BA) and
+ * Attribute Value (BA)
+ *
  * Attribute Default (BA_DEF_DEF) and
  * Attribute Default Value on Relation (BA_DEF_DEF_REL)
  */
-class VECTOR_DBC_EXPORT Attribute
-{
-public:
-    Attribute();
-
+struct VECTOR_DBC_EXPORT Attribute {
     /** Name */
-    std::string name;
+    std::string name {};
 
     /** Value Type */
-    AttributeValueType valueType;
+    AttributeObjectType objectType { AttributeObjectType::Network };
 
     union {
         /** Integer Value of type AttributeValueType::Int */
-        int integerValue;
+        // 2023-03-15 STW: Replace int32 by int64 to allow compatibility with int64 DBC files
+        int64_t integerValue {};
 
         /** Hex Value of type AttributeValueType::Hex */
-        int hexValue;
+        // 2023-03-15 STW: Replace int32 by int64 to allow compatibility with int64 DBC files
+        int64_t hexValue;
 
         /** Float Value of type AttributeValueType::Float */
         double floatValue;
 
-        /** Enum Value of type AttributeValueType::Enum (used only for BA enums) */
-        int enumValue;
-
         // std::string doesn't work in a union, so it's below
+
+        /** Enum Value of type AttributeValueType::Enum (used only for BA enums) */
+        // 2023-03-15 STW: Replace int32 by int64 to allow compatibility with int64 DBC files
+        int64_t enumValue;
     };
 
     /** String Value of type AttributeValueType::String (used only for BA_DEF_DEF enums) */
-    std::string stringValue;
+    std::string stringValue {};
 };
 
 }

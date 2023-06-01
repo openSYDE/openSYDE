@@ -9,10 +9,6 @@
 */
 //----------------------------------------------------------------------------------------------------------------------
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -21,7 +17,6 @@
 #include "C_SclString.hpp"
 
 //---------------------------------------------------------------------------
-
 
 using namespace stw::errors;
 using namespace stw::cmon_protocol;
@@ -114,9 +109,9 @@ uint16_t C_CanMonProtocolBase::mh_BytesToWordHighLow(const uint8_t oau8_Bytes[2]
 uint32_t C_CanMonProtocolBase::mh_BytesToDwordLowHigh(const uint8_t oau8_Bytes[4])
 {
    return static_cast<uint32_t>(oau8_Bytes[0] +
-                              ((static_cast<uint32_t>(oau8_Bytes[1])) << 8U) +
-                              ((static_cast<uint32_t>(oau8_Bytes[2])) << 16U) +
-                              ((static_cast<uint32_t>(oau8_Bytes[3])) << 24U));
+                                ((static_cast<uint32_t>(oau8_Bytes[1])) << 8U) +
+                                ((static_cast<uint32_t>(oau8_Bytes[2])) << 16U) +
+                                ((static_cast<uint32_t>(oau8_Bytes[3])) << 24U));
 }
 
 //-----------------------------------------------------------------------------
@@ -132,9 +127,9 @@ uint32_t C_CanMonProtocolBase::mh_BytesToDwordLowHigh(const uint8_t oau8_Bytes[4
 uint32_t C_CanMonProtocolBase::mh_BytesToDwordHighLow(const uint8_t oau8_Bytes[4])
 {
    return static_cast<uint32_t>(oau8_Bytes[3] +
-                              ((static_cast<uint32_t>(oau8_Bytes[2])) << 8U) +
-                              ((static_cast<uint32_t>(oau8_Bytes[1])) << 16U) +
-                              ((static_cast<uint32_t>(oau8_Bytes[0])) << 24U));
+                                ((static_cast<uint32_t>(oau8_Bytes[2])) << 8U) +
+                                ((static_cast<uint32_t>(oau8_Bytes[1])) << 16U) +
+                                ((static_cast<uint32_t>(oau8_Bytes[0])) << 24U));
 }
 
 //-----------------------------------------------------------------------------
@@ -254,13 +249,13 @@ C_CanMonProtocolBase::~C_CanMonProtocolBase(void)
 
 //---------------------------------------------------------------------------
 
-C_CMONProtocolKEFEX_IVA::C_CMONProtocolKEFEX_IVA(void) :
+C_CanMonProtocolKefexIva::C_CanMonProtocolKefexIva(void) :
    C_CanMonProtocolBase()
 {
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
-   mpc_KFXLists = NULL;
+   mpc_KfxLists = NULL;
 #endif
-   mu16_KFXListOffset = 0;
+   mu16_KfxListOffset = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -269,43 +264,43 @@ C_CMONProtocolKEFEX_IVA::C_CMONProtocolKEFEX_IVA(void) :
 void C_CMONProtocolKEFEX_IVA::SetVariableInfo(const stw::diag_lib::C_KFXVariableLists * const opc_Lists,
                                               const uint16 ou16_ListOffset)
 {
-   mpc_KFXLists       = opc_Lists;
-   mu16_KFXListOffset = ou16_ListOffset;
+   mpc_KfxLists       = opc_Lists;
+   mu16_KfxListOffset = ou16_ListOffset;
 }
 #endif
 
 //---------------------------------------------------------------------------
 
-C_SclString C_CMONProtocolKEFEX_IVA::m_KFXTextAndIndexToString(const char_t * const opcn_Text,
-                                                               const uint16_t ou16_Index) const
+C_SclString C_CanMonProtocolKefexIva::m_KfxTextAndIndexToString(const char_t * const opcn_Text,
+                                                                const uint16_t ou16_Index) const
 {
-   return (static_cast<C_SclString>(opcn_Text) + " " + m_KFXIndexToString(ou16_Index));
+   return (static_cast<C_SclString>(opcn_Text) + " " + m_KfxIndexToString(ou16_Index));
 }
 
 //---------------------------------------------------------------------------
 
-C_SclString C_CMONProtocolKEFEX_IVA::m_KFXIndexToString(const uint16_t ou16_Index, const bool oq_IsKEFEXVarIndex) const
+C_SclString C_CanMonProtocolKefexIva::m_KfxIndexToString(const uint16_t ou16_Index, const bool oq_IsKefexVarIndex) const
 {
    C_SclString c_Help = "";
 
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
    uint16 u16_List;
    uint16 u16_Variable;
-   if (oq_IsKEFEXVarIndex == true)
+   if (oq_IsKefexVarIndex == true)
    {
-      if (mpc_KFXLists != NULL)
+      if (mpc_KfxLists != NULL)
       {
          stw::diag_lib::C_KFXVariableLists::UnpackIndex(ou16_Index, &u16_List, &u16_Variable);
-         u16_List -= mu16_KFXListOffset;
-         if (mpc_KFXLists->VariableExists(u16_List, u16_Variable) == true)
+         u16_List -= mu16_KfxListOffset;
+         if (mpc_KfxLists->VariableExists(u16_List, u16_Variable) == true)
          {
-            c_Help = "VAR " + mpc_KFXLists->operator [](u16_List).c_ListName + "." +
-                     mpc_KFXLists->operator [](u16_List).VariableList[u16_Variable].c_Name;
+            c_Help = "VAR " + mpc_KfxLists->operator [](u16_List).c_ListName + "." +
+                     mpc_KfxLists->operator [](u16_List).VariableList[u16_Variable].c_Name;
          }
       }
    }
 #else
-   (void)oq_IsKEFEXVarIndex;
+   (void)oq_IsKefexVarIndex;
 #endif
 
    if (c_Help == "")

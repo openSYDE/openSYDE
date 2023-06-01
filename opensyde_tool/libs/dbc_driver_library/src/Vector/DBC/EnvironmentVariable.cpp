@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -24,22 +24,69 @@
 namespace Vector {
 namespace DBC {
 
-EnvironmentVariable::EnvironmentVariable() :
-    name(),
-    type(EnvironmentVariable::Type::Integer),
-    minimum(0.0),
-    maximum(0.0),
-    unit(),
-    initialValue(0.0),
-    id(0),
-    accessType(EnvironmentVariable::AccessType::Unrestricted),
-    accessNodes(),
-    valueDescriptions(),
-    dataSize(0),
-    comment(),
-    attributeValues()
-{
-    /* nothing to do here */
+std::ostream & operator<<(std::ostream & os, const EnvironmentVariable & environmentVariable) {
+    os << "EV_ " << environmentVariable.name << ": ";
+
+    /* Type */
+    switch (environmentVariable.type) {
+    case EnvironmentVariable::Type::Integer:
+    // [[fallthrough]]
+    case EnvironmentVariable::Type::String:
+    // [[fallthrough]]
+    case EnvironmentVariable::Type::Data:
+        os << '0';
+        break;
+    case EnvironmentVariable::Type::Float:
+        os << '1';
+        break;
+    }
+
+    /* Minimum, Maximum */
+    os << " [";
+    os << environmentVariable.minimum;
+    os << '|';
+    os << environmentVariable.maximum;
+    os << ']';
+
+    /* Unit */
+    os << " \"";
+    os << environmentVariable.unit;
+    os << "\" ";
+
+    /* Initial Value */
+    os << environmentVariable.initialValue;
+    os << ' ';
+
+    /* ID */
+    os << environmentVariable.id;
+
+    /* Access Type */
+    os << " DUMMY_NODE_VECTOR";
+    os << std::hex;
+    if (environmentVariable.type == EnvironmentVariable::Type::String)
+        os << (static_cast<uint16_t>(environmentVariable.accessType) | 0x8000);
+    else
+        os << static_cast<uint16_t>(environmentVariable.accessType);
+    os << std::dec;
+    os << ' ';
+
+    /* Access Nodes */
+    if (environmentVariable.accessNodes.empty())
+        os << "Vector__XXX";
+    else {
+        os << ' ';
+        bool first = true;
+        for (const auto & accessNode : environmentVariable.accessNodes) {
+            if (first)
+                first = false;
+            else
+                os << ',';
+            os << accessNode;
+        }
+    }
+    os << ";" << endl;
+
+    return os;
 }
 
 }

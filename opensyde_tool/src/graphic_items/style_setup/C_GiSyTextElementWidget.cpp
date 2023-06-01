@@ -250,7 +250,9 @@ void C_GiSyTextElementWidget::m_FontColorClicked(void)
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, c_Color);
 
    //Resize
-   c_Popup->SetSize(QSize(412, 620));
+   const QSize c_SIZE(462, 670);
+
+   c_Popup->SetSize(c_SIZE);
 
    if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
    {

@@ -28,7 +28,6 @@
 #include "C_OscCanSignal.hpp"
 #include "C_OscNodeDataPoolContent.hpp"
 #include "TglFile.hpp"
-#include "DBC/Status.h"
 #include "TglUtils.hpp"
 #include "C_SdNdeDpContentUtil.hpp"
 #include "C_OscLoggingHandler.hpp"
@@ -72,10 +71,10 @@ C_CieExportDbc::C_ExportStatistic C_CieExportDbc::mhc_ExportStatistic; // for pu
    * CIE data structure must be correctly converted from openSYDE structures
      by C_CieDataPoolListAdapter::h_ConvertToDBCImportMessage
 
-   \param[in]     orc_File              output DBC file (full file path required)
-   \param[in]     orc_Definition        content for DBC file
-   \param[out]    orc_WarningMessages   warning messages after export
-   \param[out]    orc_ErrorMessage      error message after export
+   \param[in]   orc_File               output DBC file (full file path required)
+   \param[in]   orc_Definition         content for DBC file
+   \param[out]  orc_WarningMessages    warning messages after export
+   \param[out]  orc_ErrorMessage       error message after export
 
    \return
    C_NO_ERR        successful export to DBC file
@@ -97,7 +96,6 @@ int32_t C_CieExportDbc::h_ExportNetwork(const stw::scl::C_SclString & orc_File,
    C_SclString c_Message;
 
    Vector::DBC::Network c_DbcNetwork;
-   Vector::DBC::File c_File;
 
    mhc_WarningMessages.Clear(); // clear old warning messages for this export
    mhc_ErrorMessage = "";       // clear old error message for this export
@@ -121,11 +119,15 @@ int32_t C_CieExportDbc::h_ExportNetwork(const stw::scl::C_SclString & orc_File,
       // set network information (bus name is network name)
       const std::string c_DbName = "DBName";
       Vector::DBC::Attribute c_DbNameAttribute;
+      Vector::DBC::AttributeDefinition c_DbNameAttributeType;
       c_DbNameAttribute.name = "DBName";
       c_DbNameAttribute.stringValue = mh_EscapeCriticalSymbols(orc_Definition.c_Bus.c_Name).c_str();
-      c_DbNameAttribute.valueType = Vector::DBC::AttributeValueType::String;
+      c_DbNameAttributeType.name = "DBName";
+      c_DbNameAttributeType.valueType.type = Vector::DBC::AttributeValueType::Type::String;
       c_DbcNetwork.attributeValues.emplace(std::pair<std::string, Vector::DBC::Attribute>(
                                               c_DbName, c_DbNameAttribute));
+      c_DbcNetwork.attributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
+                                                   c_DbName, c_DbNameAttributeType));
       c_DbcNetwork.comment = mh_EscapeCriticalSymbols(orc_Definition.c_Bus.c_Comment).c_str();
 
       c_Message = "Filling up general network information, symbols and attributes for network \"" +
@@ -155,19 +157,23 @@ int32_t C_CieExportDbc::h_ExportNetwork(const stw::scl::C_SclString & orc_File,
    // save DBC export to file
    if ((s32_Return == C_NO_ERR) || (s32_Return == C_WARN))
    {
-      c_Message = "Saving network to file ...";
-      osc_write_log_info("DBC file export", c_Message);
-      const Vector::DBC::Status e_Status = c_File.save(c_DbcNetwork, orc_File.c_str());
+      std::ofstream c_File(orc_File.c_str());
 
-      const int32_t s32_Tmp = mh_CheckDbcFileStatus(e_Status);
-
-      if (s32_Tmp != C_NO_ERR)
+      if (c_File.is_open())
       {
-         s32_Return = s32_Tmp; // C_WARN or worse
-      }
+         c_Message = "Saving network to file ...";
+         osc_write_log_info("DBC file export", c_Message);
+         c_File << c_DbcNetwork;
 
-      // set status flag of this export
-      mhq_ValidDbcExport = true;
+         // set status flag of this export
+         mhq_ValidDbcExport = true;
+      }
+      else
+      {
+         orc_ErrorMessage = "Path \"" + orc_File + "\" could not be opened.";
+         osc_write_log_warning("DBC file export", orc_ErrorMessage);
+         s32_Return = C_BUSY;
+      }
    }
 
    orc_WarningMessages = mhc_WarningMessages; // set warning messages for caller
@@ -404,9 +410,9 @@ int32_t C_CieExportDbc::mh_SetMessages(const std::vector<C_CieConverter::C_CieNo
    Assumptions:
    * there is no consistency check for signals (must be secured by openSYDE GUI)
 
-   \param[in]     orc_CieSignals      input CAN signals structure to export
-   \param[in]     orc_RxMessages      input CAN node structure to get signal receivers
-   \param[out]    orc_DbcMessage      DBC message with signal data structure with receivers for DBC file export
+   \param[in]   orc_CieSignals   input CAN signals structure to export
+   \param[in]   orc_CieNodes     input node data structure to export
+   \param[out]  orc_DbcMessage   DBC message with signal data structure with receivers for DBC file export
 
    \return
    C_NO_ERR    all messages and signals successfully set
@@ -439,24 +445,23 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
       switch (c_CieSignal.e_MultiplexerType)
       {
       case C_OscCanSignal::eMUX_DEFAULT:
-         c_DbcSignal.multiplexedSignal = false;
-         c_DbcSignal.multiplexorSwitch = false;
+         c_DbcSignal.multiplexor = Vector::DBC::Signal::Multiplexor::NoMultiplexor;
          c_DbcSignal.multiplexerSwitchValue = 0;
          break;
       case C_OscCanSignal::eMUX_MULTIPLEXER_SIGNAL:
-         c_DbcSignal.multiplexedSignal = false;
-         c_DbcSignal.multiplexorSwitch = true;
+         c_DbcSignal.multiplexor = Vector::DBC::Signal::Multiplexor::MultiplexorSwitch;
          c_DbcSignal.multiplexerSwitchValue = 0;
          break;
       case C_OscCanSignal::eMUX_MULTIPLEXED_SIGNAL:
-         c_DbcSignal.multiplexedSignal = true;
-         c_DbcSignal.multiplexorSwitch = false;
+         c_DbcSignal.multiplexor = Vector::DBC::Signal::Multiplexor::MultiplexedSignal;
          c_DbcSignal.multiplexerSwitchValue = c_CieSignal.u16_MultiplexValue;
          break;
       default:
          tgl_assert(false);
          break;
       }
+
+      C_CieExportDbc::mh_SetSignalSpnValue(c_CieSignal, c_DbcSignal);
 
       // set signal values
       C_CieConverter::C_CieDataPoolElement & rc_Element = c_CieSignal.c_Element;
@@ -505,8 +510,8 @@ int32_t C_CieExportDbc::mh_SetSignals(const std::vector<C_CieConverter::C_CieCan
    Assumptions:
    * there is no consistency check for signal values (must be secured by openSYDE GUI)
 
-   \param[in]     orc_Element    input signal data structure to export
-   \param[out]    orc_DbcSignal  values of a signal for DBC file export
+   \param[in]   orc_Element      input signal data structure to export
+   \param[out]  orc_DbcSignal    values of a signal for DBC file export
 
    \return
    C_NO_ERR    all messages and signals successfully set
@@ -526,10 +531,10 @@ int32_t C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CieDataPoolEl
    orc_DbcSignal.unit = orc_Element.c_Unit.c_str();
    float64_t f64_MinVal;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_MinValue, f64_MinVal, 0UL); // raw value
-   orc_DbcSignal.minimumPhysicalValue = orc_DbcSignal.rawToPhysicalValue(f64_MinVal);  // phy value
+   orc_DbcSignal.minimum = orc_DbcSignal.rawToPhysicalValue(f64_MinVal);               // phy value
    float64_t f64_MaxVal;
    C_SdNdeDpContentUtil::h_GetValueAsFloat64(orc_Element.c_MaxValue, f64_MaxVal, 0UL); // raw value
-   orc_DbcSignal.maximumPhysicalValue = orc_DbcSignal.rawToPhysicalValue(f64_MaxVal);  // phy value
+   orc_DbcSignal.maximum = orc_DbcSignal.rawToPhysicalValue(f64_MaxVal);               // phy value
 
    // set value type
    // the types of the min, max and init values must be the same!
@@ -615,12 +620,32 @@ int32_t C_CieExportDbc::mh_SetSignalValues(const C_CieConverter::C_CieDataPoolEl
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set signal spn value
+
+   \param[in]      orc_Signal       Signal
+   \param[in,out]  orc_DbcSignal    Dbc signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CieExportDbc::mh_SetSignalSpnValue(const C_CieConverter::C_CieCanSignal & orc_Signal,
+                                          Vector::DBC::Signal & orc_DbcSignal)
+{
+   // set spn
+   Vector::DBC::Attribute c_SpnAttribute;
+   c_SpnAttribute.name = "SPN";
+   c_SpnAttribute.integerValue = orc_Signal.u32_J1939Spn;
+   orc_DbcSignal.attributeValues.emplace(std::pair<std::string,
+                                                   Vector::DBC::Attribute>(c_SpnAttribute.
+                                                                           name,
+                                                                           c_SpnAttribute));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Function sets transmission type for message.
 
    Hint: openSYDE only has the two transmission types 'Cyclic' and 'OnEvent'.
 
-   \param[in]     orc_Message      input message data structure for message type
-   \param[out]    orc_DbcMessage   output message data structure for DBC file export
+   \param[in]   orc_Message      input message data structure for message type
+   \param[out]  orc_DbcMessage   output message data structure for DBC file export
 
    \return
    C_NO_ERR    transmission type of message successfully set
@@ -682,207 +707,12 @@ int32_t C_CieExportDbc::mh_SetTransmission(const C_CieConverter::C_CieNodeMessag
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Interprets status of Vector DBC library.
-
-   If any warning or error, then global warning list or error string is filled.
-
-   \param[in]     ore_Status     status of Vector DBC library
-
-   \return
-   C_NO_ERR        no error
-   C_UNKNOWN_ERR   general error, no more details
-   C_BUSY          error on writing to file
-   C_WARN          see global warning list
-*/
-//----------------------------------------------------------------------------------------------------------------------
-int32_t C_CieExportDbc::mh_CheckDbcFileStatus(const Vector::DBC::Status & ore_Status)
-{
-   int32_t s32_Return;
-
-   osc_write_log_info("DBC file export", "Interpreting status of Vector DBC file...");
-
-   if (ore_Status == Vector::DBC::Status::Ok)
-   {
-      s32_Return = C_NO_ERR;
-      osc_write_log_info("DBC file export", "Status of Vector DBC file OK.");
-   }
-   else if (ore_Status == Vector::DBC::Status::Error)
-   {
-      s32_Return = C_UNKNOWN_ERR;
-      mhc_ErrorMessage = "Status error message of DBC file export: \"General Error\".";
-      osc_write_log_error("DBC file export", mhc_ErrorMessage);
-   }
-   else if (ore_Status == Vector::DBC::Status::FileOpenError)
-   {
-      s32_Return = C_BUSY;
-      mhc_ErrorMessage = "Status error message of DBC file export: \"Error on file open\".";
-      osc_write_log_error("DBC file export", mhc_ErrorMessage);
-   }
-   else
-   {
-      // warnings
-      s32_Return = C_WARN;
-
-      C_SclString c_Message = "Status warning message(s) of DBC file export: ";
-      mhc_WarningMessages.Append(c_Message);
-      osc_write_log_warning("DBC file export", c_Message);
-
-      if (ore_Status == Vector::DBC::Status::Warning)
-      {
-         c_Message = "\"General warning\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::Unknown)
-      {
-         c_Message = "\"Unknown entry in database file\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::Unsupported)
-      {
-         c_Message = "\"Unsupported entry in database file\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedVersion)
-      {
-         c_Message = "\"Incorrect format of Version (VERSION)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedBitTiming)
-      {
-         c_Message = "\"Incorrect format of Bit Timing (BS)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedValueTable)
-      {
-         c_Message = "\"Incorrect format of Value Table (VAL_TABLE)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedSignal)
-      {
-         c_Message = "\"Incorrect format of Signal (SG)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedMessage)
-      {
-         c_Message = "\"Incorrect format of Message (BO)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedMessageTransmitter)
-      {
-         c_Message = "\"Incorrect format of Message Transmitter (BO_TX_BU)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedEnvironmentVariable)
-      {
-         c_Message = "\"Incorrect format of Environment Variable (EV)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedEnvironmentVariableData)
-      {
-         c_Message = "\"Incorrect format of Environment Variable Data (ENVVAR_DATA)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedSignalType)
-      {
-         c_Message = "\"Incorrect format of Signal Type (SGTYPE)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedComment)
-      {
-         c_Message = "\"Incorrect format of Comment (CM)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedAttributeDefinition)
-      {
-         c_Message = "\"Incorrect format of Attribute Definition (BA_DEF)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedAttributeDefinitionRelation)
-      {
-         c_Message = "\"Incorrect format of Attribute Definition at Relation (BA_DEF_REL)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedAttributeDefault)
-      {
-         c_Message = "\"Incorrect format of Attribute Default (BA_DEF_DEF)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedAttributeDefaultRelation)
-      {
-         c_Message = "\"Incorrect format of Attribute Default at Relation (BA_DEF_DEF_REL)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedAttributeValue)
-      {
-         c_Message = "\"Incorrect format of Attribute Value (BA)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedAttributeRelationValue)
-      {
-         c_Message = "\"Incorrect format of Attribute Value at Relation (BA_REF)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedValueDescription)
-      {
-         c_Message = "\"Incorrect format of Value Description (VAL)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedSignalGroup)
-      {
-         c_Message = "\"Incorrect format of Signal Group (SIG_GROUP)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedSignalExtendedValueType)
-      {
-         c_Message = "\"Incorrect format of Signal Extended Value Type (SIG_VALTYPE)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::MalformedExtendedMultiplexor)
-      {
-         c_Message = "\"Incorrect format of Extended Multiplexer (SG_MUL_VAL)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-      if (ore_Status == Vector::DBC::Status::SignalWithoutMessage)
-      {
-         c_Message = "\"Signal (SG) followed a line, which was not a Message (BO) or Signal (SG)\".";
-         mhc_WarningMessages.Append(c_Message);
-         osc_write_log_warning("DBC file export", c_Message);
-      }
-   }
-
-   return s32_Return;
-}
-
-//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fills up the obligatory new symbol entries of a DBC file.
 
-   \param[in,out] orc_NewSymbols   symbol list to fill with standard entries
+   \param[in,out]  orc_NewSymbols   symbol list to fill with standard entries
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieExportDbc::mh_SetNewSymbols(std::list<std::string> & orc_NewSymbols)
+void C_CieExportDbc::mh_SetNewSymbols(std::vector<std::string> & orc_NewSymbols)
 {
    orc_NewSymbols.emplace_back("NS_DESC_");
    orc_NewSymbols.emplace_back("CM_");
@@ -917,7 +747,7 @@ void C_CieExportDbc::mh_SetNewSymbols(std::list<std::string> & orc_NewSymbols)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fills up the obligatory attribute default map.
 
-   \param[in,out] orc_AttributeDefaults   attribute default map to fill with standard values
+   \param[in,out]  orc_AttributeDefaults  attribute default map to fill with standard values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::Attribute> & orc_AttributeDefaults)
@@ -927,7 +757,6 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
 
    Vector::DBC::Attribute c_BusTypeAttribute;
    c_BusTypeAttribute.name = c_BusTypeName;
-   c_BusTypeAttribute.valueType = Vector::DBC::AttributeValueType::String;
    c_BusTypeAttribute.stringValue = "";
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_BusTypeName, c_BusTypeAttribute));
 
@@ -935,7 +764,6 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    const std::string c_DbName = "DBName";
    Vector::DBC::Attribute c_DbNameAttribute;
    c_DbNameAttribute.name = c_DbName;
-   c_DbNameAttribute.valueType = Vector::DBC::AttributeValueType::String;
    c_DbNameAttribute.stringValue = "";
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_DbName, c_DbNameAttribute));
 
@@ -943,7 +771,6 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    const std::string c_MsgCycleTimeName = "GenMsgCycleTime";
    Vector::DBC::Attribute c_MsgCycleTimeAttribute;
    c_MsgCycleTimeAttribute.name = c_MsgCycleTimeName;
-   c_MsgCycleTimeAttribute.valueType = Vector::DBC::AttributeValueType::Int;
    c_MsgCycleTimeAttribute.integerValue = 0;
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_MsgCycleTimeName,
                                                                                 c_MsgCycleTimeAttribute));
@@ -952,7 +779,6 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    const std::string c_MsgSendTypeName = "GenMsgSendType";
    Vector::DBC::Attribute c_MsgSendTypeAttribute;
    c_MsgSendTypeAttribute.name = c_MsgSendTypeName;
-   c_MsgSendTypeAttribute.valueType = Vector::DBC::AttributeValueType::Enum;
    c_MsgSendTypeAttribute.stringValue = "NoMsgSendType";
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_MsgSendTypeName,
                                                                                 c_MsgSendTypeAttribute));
@@ -961,7 +787,6 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    const std::string c_SigInactiveName = "GenSigInactiveValue";
    Vector::DBC::Attribute c_SigInactiveAttribute;
    c_SigInactiveAttribute.name = c_SigInactiveName;
-   c_SigInactiveAttribute.valueType = Vector::DBC::AttributeValueType::Int;
    c_SigInactiveAttribute.integerValue = 0;
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_SigInactiveName,
                                                                                 c_SigInactiveAttribute));
@@ -970,7 +795,6 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    const std::string c_SigSendTypeName = "GenSigSendType";
    Vector::DBC::Attribute c_SigSendTypeAttribute;
    c_SigSendTypeAttribute.name = c_SigSendTypeName;
-   c_SigSendTypeAttribute.valueType = Vector::DBC::AttributeValueType::Enum;
    c_SigSendTypeAttribute.stringValue = "Cyclic";
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_SigSendTypeName,
                                                                                 c_SigSendTypeAttribute));
@@ -982,15 +806,22 @@ void C_CieExportDbc::mh_SetAttributeDefaults(std::map<std::string, Vector::DBC::
    const std::string c_NmStationName = "NmStationAddress";
    Vector::DBC::Attribute c_NmStationAttribute;
    c_NmStationAttribute.name = c_NmStationName;
-   c_NmStationAttribute.valueType = Vector::DBC::AttributeValueType::Hex;
    c_NmStationAttribute.hexValue = 0;
    orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(c_NmStationName, c_NmStationAttribute));
+
+   // set spn
+   std::string c_SpnName = "SPN";
+   Vector::DBC::Attribute c_SpnAttribute;
+   c_SpnAttribute.name = c_SpnName;
+   c_SpnAttribute.integerValue = 0;
+   orc_AttributeDefaults.emplace(std::pair<std::string, Vector::DBC::Attribute>(
+                                    c_SpnName, c_SpnAttribute));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Fills up the obligatory attribute definition map.
 
-   \param[in,out] orc_AttributeDefinitions   attribute definition map to fill with standard values
+   \param[in,out]  orc_AttributeDefinitions  attribute definition map to fill with standard values
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
@@ -1000,8 +831,8 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
    std::string c_BusTypeName = "BusType";
    Vector::DBC::AttributeDefinition c_BusTypeAttributeDef;
    c_BusTypeAttributeDef.name = c_BusTypeName;
-   c_BusTypeAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Network;
-   c_BusTypeAttributeDef.valueType = Vector::DBC::AttributeValueType::String;
+   c_BusTypeAttributeDef.objectType = Vector::DBC::AttributeObjectType::Network;
+   c_BusTypeAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::String;
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_BusTypeName, c_BusTypeAttributeDef));
 
@@ -1009,27 +840,27 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
    std::string c_DbName = "DBName";
    Vector::DBC::AttributeDefinition c_DbNameAttributeDef;
    c_DbNameAttributeDef.name = c_DbName;
-   c_DbNameAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Network;
-   c_DbNameAttributeDef.valueType = Vector::DBC::AttributeValueType::String;
-   c_DbNameAttributeDef.enumValues.emplace_back("");
+   c_DbNameAttributeDef.objectType = Vector::DBC::AttributeObjectType::Network;
+   c_DbNameAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::String;
+   c_DbNameAttributeDef.valueType.enumValues.emplace_back("");
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_DbName, c_DbNameAttributeDef));
 
    // set global attribute definition for cycle time (default)
    Vector::DBC::AttributeDefinition c_CycleTimeAttributeDef;
    c_CycleTimeAttributeDef.name = mhc_MSG_CYCLE_TIME;
-   c_CycleTimeAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Message;
-   c_CycleTimeAttributeDef.valueType = Vector::DBC::AttributeValueType::Int;
+   c_CycleTimeAttributeDef.objectType = Vector::DBC::AttributeObjectType::Message;
+   c_CycleTimeAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::Int;
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_CycleTimeAttributeDef.name, c_CycleTimeAttributeDef));
 
    // set global attribute definitions for openSYDE message send types 'Cyclic' and 'OnEvent'
    Vector::DBC::AttributeDefinition c_MsgSendTypeAttributeDef;
    c_MsgSendTypeAttributeDef.name = mhc_MSG_SEND_TYPE;
-   c_MsgSendTypeAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Message;
-   c_MsgSendTypeAttributeDef.valueType = Vector::DBC::AttributeValueType::Enum;
-   c_MsgSendTypeAttributeDef.enumValues.emplace_back("Cyclic");
-   c_MsgSendTypeAttributeDef.enumValues.emplace_back("OnEvent");
+   c_MsgSendTypeAttributeDef.objectType = Vector::DBC::AttributeObjectType::Message;
+   c_MsgSendTypeAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::Enum;
+   c_MsgSendTypeAttributeDef.valueType.enumValues.emplace_back("Cyclic");
+   c_MsgSendTypeAttributeDef.valueType.enumValues.emplace_back("OnEvent");
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_MsgSendTypeAttributeDef.name, c_MsgSendTypeAttributeDef));
 
@@ -1037,8 +868,8 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
    std::string c_SigInactiveValueName = "GenSigInactiveValue";
    Vector::DBC::AttributeDefinition c_SigInactiveValueAttributeDef;
    c_SigInactiveValueAttributeDef.name = c_SigInactiveValueName;
-   c_SigInactiveValueAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Signal;
-   c_SigInactiveValueAttributeDef.valueType = Vector::DBC::AttributeValueType::Int;
+   c_SigInactiveValueAttributeDef.objectType = Vector::DBC::AttributeObjectType::Signal;
+   c_SigInactiveValueAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::Int;
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_SigInactiveValueName, c_SigInactiveValueAttributeDef));
 
@@ -1046,10 +877,10 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
    std::string c_SigSendTypeName = "GenSigSendType";
    Vector::DBC::AttributeDefinition c_SigSendTypeAttributeDef;
    c_SigSendTypeAttributeDef.name = c_SigSendTypeName;
-   c_SigSendTypeAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Signal;
-   c_SigSendTypeAttributeDef.valueType = Vector::DBC::AttributeValueType::Enum;
+   c_SigSendTypeAttributeDef.objectType = Vector::DBC::AttributeObjectType::Signal;
+   c_SigSendTypeAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::Enum;
 
-   c_SigSendTypeAttributeDef.enumValues.emplace_back("NoSigSendType");
+   c_SigSendTypeAttributeDef.valueType.enumValues.emplace_back("NoSigSendType");
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_SigSendTypeName, c_SigSendTypeAttributeDef));
 
@@ -1060,8 +891,8 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
    std::string c_NmStationName = "NmStationAddress";
    Vector::DBC::AttributeDefinition c_NmStationAttributeDef;
    c_NmStationAttributeDef.name = c_NmStationName;
-   c_NmStationAttributeDef.objectType = Vector::DBC::AttributeDefinition::ObjectType::Node;
-   c_NmStationAttributeDef.valueType = Vector::DBC::AttributeValueType::Hex;
+   c_NmStationAttributeDef.objectType = Vector::DBC::AttributeObjectType::Node;
+   c_NmStationAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::Hex;
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_NmStationName, c_NmStationAttributeDef));
 
@@ -1069,12 +900,27 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
    std::string c_SigInitialValueName = mhc_SIG_INITIAL_VALUE.c_str();
    Vector::DBC::AttributeDefinition c_SigInitialValueAttribute;
    c_SigInitialValueAttribute.name = c_SigInitialValueName;
-   c_SigInitialValueAttribute.objectType = Vector::DBC::AttributeDefinition::ObjectType::Signal;
-   c_SigInitialValueAttribute.valueType = Vector::DBC::AttributeValueType::Int; // I am not sure, but setting this to
-                                                                                // integer because we have raw values
-                                                                                // here
+   c_SigInitialValueAttribute.objectType = Vector::DBC::AttributeObjectType::Signal;
+   c_SigInitialValueAttribute.valueType.type = Vector::DBC::AttributeValueType::Type::Int; // I am not sure, but setting
+                                                                                           // this
+                                                                                           // to
+                                                                                           // integer because we have
+                                                                                           // raw
+                                                                                           // values
+                                                                                           // here
    orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
                                        c_SigInitialValueName, c_SigInitialValueAttribute));
+
+   // set spn
+   std::string c_SpnName = "SPN";
+   Vector::DBC::AttributeDefinition c_SpnAttributeDef;
+   c_SpnAttributeDef.name = c_SpnName;
+   c_SpnAttributeDef.objectType = Vector::DBC::AttributeObjectType::Signal;
+   c_SpnAttributeDef.valueType.type = Vector::DBC::AttributeValueType::Type::Int;
+   c_SpnAttributeDef.valueType.integerValue.minimum = 0;
+   c_SpnAttributeDef.valueType.integerValue.maximum = 524287;
+   orc_AttributeDefinitions.emplace(std::pair<std::string, Vector::DBC::AttributeDefinition>(
+                                       c_SpnName, c_SpnAttributeDef));
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1093,7 +939,7 @@ void C_CieExportDbc::mh_SetAttributeDefinitions(std::map<std::string,
 
    As a result the length of the string might change.
 
-   \param[in]     orc_String         Original string
+   \param[in]  orc_String  Original string
 
    \return
    Niceified string

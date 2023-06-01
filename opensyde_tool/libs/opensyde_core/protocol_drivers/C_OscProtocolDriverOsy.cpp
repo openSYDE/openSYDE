@@ -412,7 +412,7 @@ int32_t C_OscProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8_t o
    // snatch away the response we want to get.
    mc_LockReception.Acquire();
 
-   while (((stw::tgl::TglGetTickCount() - mu32_TimeoutPollingMs) < u32_StartTime) && (q_Finished == false))
+   while ((stw::tgl::TglGetTickCount() < (u32_StartTime + mu32_TimeoutPollingMs)) && (q_Finished == false))
    {
       //trigger handling of Rx and Tx communication
       s32_Return = this->m_Cycle(true, ou8_ExpectedServiceId, &orc_Service);
@@ -1507,8 +1507,8 @@ int32_t C_OscProtocolDriverOsy::OsyWriteApplicationSoftwareFingerprint(const uin
    c_Data.resize(7U + static_cast<size_t>(c_UserName.Length()));
    (void)std::memcpy(&c_Data[0], &orau8_Date[0], 3U);
    (void)std::memcpy(&c_Data[3], &orau8_Time[0], 3U);
-   c_Data[6] = static_cast<uint8_t>(orc_UserName.Length());
-   (void)std::memcpy(&c_Data[7], orc_UserName.c_str(), orc_UserName.Length());
+   c_Data[6] = static_cast<uint8_t>(c_UserName.Length());
+   (void)std::memcpy(&c_Data[7], c_UserName.c_str(), c_UserName.Length());
 
    s32_Return = m_WriteDataByIdentifier(mhu16_OSY_DI_APPLICATION_SOFTWARE_FINGERPRINT, c_Data, u8_NrErrorCode);
    if (opu8_NrCode != NULL)

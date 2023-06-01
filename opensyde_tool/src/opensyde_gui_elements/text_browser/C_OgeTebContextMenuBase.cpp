@@ -42,17 +42,27 @@ using namespace stw::opensyde_gui_logic;
 
    Set up GUI with all elements.
 
-   \param[in,out] opc_Parent Optional pointer to parent
+   \param[in,out]  opc_Parent    Optional pointer to parent
 */
 //----------------------------------------------------------------------------------------------------------------------
 C_OgeTebContextMenuBase::C_OgeTebContextMenuBase(QWidget * const opc_Parent) :
    QTextBrowser(opc_Parent),
-   mpc_ContextMenu(NULL)
+   mpc_ContextMenu(NULL),
+   mq_LinkOnly(false)
 {
    m_InitContextMenu();
 
    this->setOpenLinks(false); // do not open link in text browser but open file
    connect(this, &QTextBrowser::anchorClicked, this, &C_OgeTebContextMenuBase::m_LinkClicked);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set link only
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OgeTebContextMenuBase::SetLinkOnly()
+{
+   this->mq_LinkOnly = true;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -73,6 +83,8 @@ void C_OgeTebContextMenuBase::m_InitContextMenu(void)
 
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Setup context menu entries
+
+   \param[in]  orc_Pos  Pos
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
@@ -81,10 +93,13 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
    this->mpc_ContextMenu->clear();
 
    // add the actions
-   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy"),
-                                    this,
-                                    &C_OgeTebContextMenuBase::copy,
-                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
+   if (this->mq_LinkOnly == false)
+   {
+      this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy"),
+                                       this,
+                                       &C_OgeTebContextMenuBase::copy,
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_C));
+   }
 
    this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Copy Link Location"),
                                     this,
@@ -92,10 +107,13 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
 
    this->mpc_ContextMenu->addSeparator();
 
-   this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select All"),
-                                    this,
-                                    &C_OgeTebContextMenuBase::selectAll,
-                                    static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
+   if (this->mq_LinkOnly == false)
+   {
+      this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Select All"),
+                                       this,
+                                       &C_OgeTebContextMenuBase::selectAll,
+                                       static_cast<int32_t>(Qt::CTRL) + static_cast<int32_t>(Qt::Key_A));
+   }
 
    // store link text for copying
    mc_LinkText = this->anchorAt(orc_Pos);
@@ -107,7 +125,8 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
    }
 
    // disable "Copy" if selection is empty
-   if ((this->textCursor().selectedText() == "") && (this->mpc_ContextMenu->actions().length() >= 1))
+   if (((this->textCursor().selectedText() == "") && (this->mpc_ContextMenu->actions().length() >= 1)) &&
+       (this->mq_LinkOnly == false))
    {
       this->mpc_ContextMenu->actions().at(0)->setEnabled(false);
    }
@@ -116,16 +135,29 @@ void C_OgeTebContextMenuBase::m_SetupContextMenu(const QPoint & orc_Pos)
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Show custom context menu
 
-   \param[in] orc_Pos Local context menu position
+   \param[in]  orc_Pos  Local context menu position
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_OgeTebContextMenuBase::m_OnCustomContextMenuRequested(const QPoint & orc_Pos)
 {
-   m_SetupContextMenu(orc_Pos);
-   QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
-   c_PosGlobal = c_PosGlobal + QPoint(8, 5); // little coordination correction of popup needed
+   bool q_Open = true;
 
-   this->mpc_ContextMenu->popup(c_PosGlobal);
+   if (this->mq_LinkOnly)
+   {
+      if (this->anchorAt(orc_Pos) == "")
+      {
+         q_Open = false;
+      }
+   }
+
+   if (q_Open)
+   {
+      m_SetupContextMenu(orc_Pos);
+      QPoint c_PosGlobal = this->mapToGlobal(orc_Pos);
+      c_PosGlobal = c_PosGlobal + QPoint(8, 5); // little coordination correction of popup needed
+
+      this->mpc_ContextMenu->popup(c_PosGlobal);
+   }
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -94,11 +94,11 @@ bool C_OscUtils::h_CheckValidCeName(const stw::scl::C_SclString & orc_Name, cons
             cn_Char = orc_Name.c_str()[u32_Index];
             // is alphanumeric and no underscore true or a number true -> invalid name
 
-            //If the value of the character is not representable as unsigned char the the behavior of isalnum is
+            //If the value of the character is not representable as unsigned char the behavior of isalnum is
             // undefined. So be as defensive as possible:
             if ((static_cast<int8_t>(cn_Char) < 0) ||
                 (((std::isalnum(cn_Char) == 0) &&
-                  (cn_Char != '_')) || (std::isdigit(orc_Name.c_str()[0]) == 1))) //ANSI compliant check
+                  (cn_Char != '_')) || (std::isdigit(orc_Name.c_str()[0]) != 0))) //ANSI compliant check
             {
                q_IsValid = false;
                break;
@@ -119,7 +119,7 @@ bool C_OscUtils::h_CheckValidCeName(const stw::scl::C_SclString & orc_Name, cons
             // undefined. So be as defensive as possible:
             if ((static_cast<int8_t>(cn_Char) < 0) ||
                 ((std::isalnum(cn_Char) == 0) &&
-                 ((cn_Char != '_') || (std::isdigit(orc_Name.c_str()[0]) == 1)))) //ANSI compliant check
+                 ((cn_Char != '_') || (std::isdigit(orc_Name.c_str()[0]) != 0)))) //ANSI compliant check
             {
                q_IsValid = false;
                break;

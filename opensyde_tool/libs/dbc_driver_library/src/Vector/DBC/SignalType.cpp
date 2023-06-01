@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -24,20 +24,16 @@
 namespace Vector {
 namespace DBC {
 
-SignalType::SignalType() :
-    name(),
-    size(0),
-    byteOrder(ByteOrder::BigEndian),
-    valueType(ValueType::Unsigned),
-    factor(0.0),
-    offset(0.0),
-    minimum(0.0),
-    maximum(0.0),
-    unit(),
-    defaultValue(0.0),
-    valueTable()
-{
-    /* nothing to do here */
+std::ostream & operator<<(std::ostream & os, const SignalType & signalType) {
+    os << "SGTYPE_ " << signalType.name;
+    os << " : " << signalType.size;
+    os << '@' << char(signalType.byteOrder);
+    os << ' ' << char(signalType.valueType);
+    os << ' ' << signalType.defaultValue;
+    os << ", " << signalType.valueTable;
+    os << ';' << endl;
+
+    return os;
 }
 
 }

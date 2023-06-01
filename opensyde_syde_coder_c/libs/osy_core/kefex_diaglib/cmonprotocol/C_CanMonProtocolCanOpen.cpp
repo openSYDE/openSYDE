@@ -1,8 +1,4 @@
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include "C_CanMonProtocolTarget.hpp"
 
@@ -10,7 +6,6 @@
 #include "C_CanMonProtocolCanOpen.hpp"
 
 //---------------------------------------------------------------------------
-
 
 using namespace stw::cmon_protocol;
 using namespace stw::scl;
@@ -99,6 +94,7 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
    uint8_t u16_SubIndex;
    uint32_t u32_Size;
    int32_t j;
+
    c_Text = "";
 
    if ((orc_Msg.u32_ID >= GUARD_AREA_LOW) && (orc_Msg.u32_ID < GUARD_AREA_HIGH)) //Nodeguarding / Heartbeat / Bootup
@@ -106,8 +102,8 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
       if ((orc_Msg.u8_DLC >= 1U) && (orc_Msg.u8_RTR == 0U))
       {
          c_Text = "HB/Guard " +
-              m_GetByteAsStringFormat(static_cast<uint8_t>(orc_Msg.u32_ID - (GUARD_AREA_LOW - 1))) + " : TGL:"
-              + C_SclString::IntToStr(orc_Msg.au8_Data[0] >> 7) + " : ST:";
+                  m_GetByteAsStringFormat(static_cast<uint8_t>(orc_Msg.u32_ID - (GUARD_AREA_LOW - 1))) + " : TGL:" +
+                  C_SclString::IntToStr(orc_Msg.au8_Data[0] >> 7) + " : ST:";
          switch (orc_Msg.au8_Data[0] & 0x7FU)
          {
          case 0:
@@ -145,19 +141,19 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
       }
       switch (orc_Msg.au8_Data[0])
       {
-      case CS_START_NODE          :
+      case CS_START_NODE:
          c_Text = c_Help + "START NODE";
          break;
-      case CS_STOP_NODE           :
+      case CS_STOP_NODE:
          c_Text = c_Help + "STOP NODE";
          break;
       case CS_ENTER_PREOPERATIONAL:
          c_Text = c_Help + "ENTER PREOPERATIONAL";
          break;
-      case CS_RESET_NODE          :
+      case CS_RESET_NODE:
          c_Text = c_Help + "RESET NODE";
          break;
-      case CS_RESET_COMM          :
+      case CS_RESET_COMM:
          c_Text = c_Help + "RESET COMMUNICATION";
          break;
       default:
@@ -283,186 +279,186 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
    {
       if (orc_Msg.u32_ID < CLIENT_BASE_ID)
       {
-         c_Help = "SDO SERVER " + m_GetByteAsStringFormat(static_cast<uint8_t>(orc_Msg.u32_ID - SERVER_BASE_ID))+": ";
+         c_Help = "SDO SERVER " + m_GetByteAsStringFormat(static_cast<uint8_t>(orc_Msg.u32_ID - SERVER_BASE_ID)) + ": ";
          switch (orc_Msg.au8_Data[0] & 0xE0U)
          {
-            case SCS_INIT_UPLOAD     :
-               u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
-               u16_SubIndex = orc_Msg.au8_Data[3];
-               if ((orc_Msg.au8_Data[0] & 0x02U) == 0x02U)
+         case SCS_INIT_UPLOAD:
+            u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+            u16_SubIndex = orc_Msg.au8_Data[3];
+            if ((orc_Msg.au8_Data[0] & 0x02U) == 0x02U)
+            {
+               //expedited
+               c_Help = c_Help + "INIT UPLOAD EXP RES ";
+               (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
+               if ((orc_Msg.au8_Data[0] & 0x01U) == 0x01U) //size is indicated
                {
-                  //expedited
-                  c_Help = c_Help + "INIT UPLOAD EXP RES ";
-                  (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
-                  if ((orc_Msg.au8_Data[0] & 0x01U) == 0x01U) //size is indicated
-                  {
-                     u32_Size = 4 - ((orc_Msg.au8_Data[0] & 0x0CU) >> 2);
-                     c_Help2 += ("Size:" + m_GetByteAsStringFormat(static_cast<uint8_t>(u32_Size)) + " ");
-                  }
-                  else
-                  {
-                     u32_Size = 4;
-                     c_Help2 += ("Size:?\?\? ");
-                  }
-                  c_Help2 += "DB: ";
-                  for (j = 0; j < static_cast<int32_t>(u32_Size); j++)
-                  {
-                     c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 4]) +" ");
-                  }
-                  c_Text = c_Help + c_Help2;
-               }
-               else
-               {
-                  //segmented
-                  c_Help = c_Help + "INIT UPLOAD SEG RES ";
-                  (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
-                  u32_Size =  mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]);
-                  c_Help2 += ("Size: " + m_GetValueDecHex(u32_Size));
-                  c_Text = c_Help + c_Help2;
-               }
-               break;
-            case SCS_SEGMENT_UPLOAD  :
-               c_Help = c_Help + "UPLOAD SEG RES ";
-               c_Help2 = "";
-               if ((orc_Msg.au8_Data[0] & 0x0EU) != 0U) //size specified ?
-               {
-                  u32_Size = 7 - ((orc_Msg.au8_Data[0] & 0x0EU) >> 1);
+                  u32_Size = 4 - ((orc_Msg.au8_Data[0] & 0x0CU) >> 2);
                   c_Help2 += ("Size:" + m_GetByteAsStringFormat(static_cast<uint8_t>(u32_Size)) + " ");
                }
                else
                {
-                  u32_Size = 7;
-                  c_Help2 += ("Size:?\?\?");
+                  u32_Size = 4;
+                  c_Help2 += ("Size:?\?\? ");
                }
+               c_Help2 += "DB: ";
                for (j = 0; j < static_cast<int32_t>(u32_Size); j++)
-               {
-                  c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 1]) +" ");
-               }
-               c_Text = c_Help + c_Help2;
-               break;
-            case SCS_INIT_DOWNLOAD   :
-               c_Help = c_Help + "INIT DOWNLOAD RES ";
-               u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
-               u16_SubIndex = orc_Msg.au8_Data[3];
-               (void)c_Help2.PrintFormatted("%X,%02X", u16_Index, u16_SubIndex);
-               c_Text = c_Help + c_Help2;
-               break;
-            case SCS_SEGMENT_DOWNLOAD:
-               c_Help = c_Help + "DOWNLOAD SEG RES ";
-               c_Text = c_Help;
-               break;
-            case ABORT_DOMAIN        :
-               c_Help = c_Help + "ABORT ";
-               u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
-               u16_SubIndex = orc_Msg.au8_Data[3];
-               (void)c_Help2.PrintFormatted("%X,%02X  Reason:", u16_Index, u16_SubIndex);
-               for (j = 0; j < 4; j++)
                {
                   c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 4]) + " ");
                }
                c_Text = c_Help + c_Help2;
+            }
+            else
+            {
+               //segmented
+               c_Help = c_Help + "INIT UPLOAD SEG RES ";
+               (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
+               u32_Size =  mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]);
+               c_Help2 += ("Size: " + m_GetValueDecHex(u32_Size));
+               c_Text = c_Help + c_Help2;
+            }
+            break;
+         case SCS_SEGMENT_UPLOAD:
+            c_Help = c_Help + "UPLOAD SEG RES ";
+            c_Help2 = "";
+            if ((orc_Msg.au8_Data[0] & 0x0EU) != 0U) //size specified ?
+            {
+               u32_Size = 7 - ((orc_Msg.au8_Data[0] & 0x0EU) >> 1);
+               c_Help2 += ("Size:" + m_GetByteAsStringFormat(static_cast<uint8_t>(u32_Size)) + " ");
+            }
+            else
+            {
+               u32_Size = 7;
+               c_Help2 += ("Size:?\?\?");
+            }
+            for (j = 0; j < static_cast<int32_t>(u32_Size); j++)
+            {
+               c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 1]) + " ");
+            }
+            c_Text = c_Help + c_Help2;
+            break;
+         case SCS_INIT_DOWNLOAD:
+            c_Help = c_Help + "INIT DOWNLOAD RES ";
+            u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+            u16_SubIndex = orc_Msg.au8_Data[3];
+            (void)c_Help2.PrintFormatted("%X,%02X", u16_Index, u16_SubIndex);
+            c_Text = c_Help + c_Help2;
+            break;
+         case SCS_SEGMENT_DOWNLOAD:
+            c_Help = c_Help + "DOWNLOAD SEG RES ";
+            c_Text = c_Help;
+            break;
+         case ABORT_DOMAIN:
+            c_Help = c_Help + "ABORT ";
+            u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
+            u16_SubIndex = orc_Msg.au8_Data[3];
+            (void)c_Help2.PrintFormatted("%X,%02X  Reason:", u16_Index, u16_SubIndex);
+            for (j = 0; j < 4; j++)
+            {
+               c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 4]) + " ");
+            }
+            c_Text = c_Help + c_Help2;
 
-               //add real error codes:
-               c_Help2 = "";
-               switch (mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]))
-               {
-               case SDO_ERROR_TOGGLE_BIT_NOT_ALTERNATED:
-                  c_Help2 = "(toggle bit not alternated)";
-                  break;
-               case SDO_ERROR_TIMEOUT                  :
-                  c_Help2 = "(SDO timed out)";
-                  break;
-               case SDO_ERROR_INVALID_COMMAND_SPCIFIER :
-                  c_Help2 = "(command specifier invalid)";
-                  break;
-               case SDO_ERROR_INVALID_BLOCK_SIZE       :
-                  c_Help2 = "(invalid block size)";
-                  break;
-               case SDO_ERROR_INVALID_SEQUENCE_NUMBER  :
-                  c_Help2 = "(invalid sequence number)";
-                  break;
-               case SDO_ERROR_CRC_ERROR                :
-                  c_Help2 = "(CRC error)";
-                  break;
-               case SDO_ERROR_OUT_OF_MEMORY            :
-                  c_Help2 = "(out of memory)";
-                  break;
-               case SDO_ERROR_UNSUPPORTED_ACCESS       :
-                  c_Help2 = "(unsupported access)";
-                  break;
-               case SDO_ERROR_READING_A_WO_OBJECT      :
-                  c_Help2 = "(reading a WO object)";
-                  break;
-               case SDO_ERROR_WRITING_AN_RO_OBJECT     :
-                  c_Help2 = "(writing an RO object)";
-                  break;
-               case SDO_ERROR_OBJECT_DOES_NOT_EXIST    :
-                  c_Help2 = "(object does not exist)";
-                  break;
-               case SDO_ERROR_OBJECT_CANNOT_BE_MAPPED  :
-                  c_Help2 = "(object cannot be mapped)";
-                  break;
-               case SDO_ERROR_MAPPING_OVERFLOW         :
-                  c_Help2 = "(mapping overflow)";
-                  break;
-               case SDO_ERROR_PARAMETER_INCOMPATIBLE   :
-                  c_Help2 = "(parameter incompatible)";
-                  break;
-               case SDO_ERROR_INTERNAL_INCOMPATIBILITY :
-                  c_Help2 = "(internal incompatibility)";
-                  break;
-               case SDO_ERROR_HARDWARE_ERROR           :
-                  c_Help2 = "(hardware error)";
-                  break;
-               case SDO_ERROR_LENGTH_DOES_NOT_MATCH    :
-                  c_Help2 = "(data length does not match)";
-                  break;
-               case SDO_ERROR_LENGTH_TOO_HIGH          :
-                  c_Help2 = "(data length too high)";
-                  break;
-               case SDO_ERROR_LENGTH_TOO_LOW           :
-                  c_Help2 = "(data length too low)";
-                  break;
-               case SDO_ERROR_SUBINDEX_DOES_NOT_EXIST  :
-                  c_Help2 = "(subindex does not exist)";
-                  break;
-               case SDO_ERROR_VALUE_RANGE_EXCEEDED     :
-                  c_Help2 = "(value range exceeded)";
-                  break;
-               case SDO_ERROR_VALUE_TOO_HIGH           :
-                  c_Help2 = "(value too high)";
-                  break;
-               case SDO_ERROR_VALUE_TOO_LOW            :
-                  c_Help2 = "(value too low)";
-                  break;
-               case SDO_ERROR_MAX_VALUE_LT_MIN_VALUE   :
-                  c_Help2 = "(min is greater than max)";
-                  break;
-               case SDO_ERROR_GENERAL_ERROR            :
-                  c_Help2 = "(general error)";
-                  break;
-               case SDO_ERROR_APPLICATION_STORAGE      :
-                  c_Help2 = "(application storage)";
-                  break;
-               case SDO_ERROR_LOCAL_CONTROL            :
-                  c_Help2 = "(local control)";
-                  break;
-               case SDO_ERROR_DEVICE_STATE             :
-                  c_Help2 = "(present device state)";
-                  break;
-               case SDO_ERROR_DYNAMIC_OD_ERROR         :
-                  c_Help2 = "(dynamic OD error)";
-                  break;
-               default:
-                  break;
-               }
-               if (c_Help2 != "")
-               {
-                  c_Text = c_Text + " "+c_Help2;
-               }
+            //add real error codes:
+            c_Help2 = "";
+            switch (mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]))
+            {
+            case SDO_ERROR_TOGGLE_BIT_NOT_ALTERNATED:
+               c_Help2 = "(toggle bit not alternated)";
+               break;
+            case SDO_ERROR_TIMEOUT:
+               c_Help2 = "(SDO timed out)";
+               break;
+            case SDO_ERROR_INVALID_COMMAND_SPCIFIER:
+               c_Help2 = "(command specifier invalid)";
+               break;
+            case SDO_ERROR_INVALID_BLOCK_SIZE:
+               c_Help2 = "(invalid block size)";
+               break;
+            case SDO_ERROR_INVALID_SEQUENCE_NUMBER:
+               c_Help2 = "(invalid sequence number)";
+               break;
+            case SDO_ERROR_CRC_ERROR:
+               c_Help2 = "(CRC error)";
+               break;
+            case SDO_ERROR_OUT_OF_MEMORY:
+               c_Help2 = "(out of memory)";
+               break;
+            case SDO_ERROR_UNSUPPORTED_ACCESS:
+               c_Help2 = "(unsupported access)";
+               break;
+            case SDO_ERROR_READING_A_WO_OBJECT:
+               c_Help2 = "(reading a WO object)";
+               break;
+            case SDO_ERROR_WRITING_AN_RO_OBJECT:
+               c_Help2 = "(writing an RO object)";
+               break;
+            case SDO_ERROR_OBJECT_DOES_NOT_EXIST:
+               c_Help2 = "(object does not exist)";
+               break;
+            case SDO_ERROR_OBJECT_CANNOT_BE_MAPPED:
+               c_Help2 = "(object cannot be mapped)";
+               break;
+            case SDO_ERROR_MAPPING_OVERFLOW:
+               c_Help2 = "(mapping overflow)";
+               break;
+            case SDO_ERROR_PARAMETER_INCOMPATIBLE:
+               c_Help2 = "(parameter incompatible)";
+               break;
+            case SDO_ERROR_INTERNAL_INCOMPATIBILITY:
+               c_Help2 = "(internal incompatibility)";
+               break;
+            case SDO_ERROR_HARDWARE_ERROR:
+               c_Help2 = "(hardware error)";
+               break;
+            case SDO_ERROR_LENGTH_DOES_NOT_MATCH:
+               c_Help2 = "(data length does not match)";
+               break;
+            case SDO_ERROR_LENGTH_TOO_HIGH:
+               c_Help2 = "(data length too high)";
+               break;
+            case SDO_ERROR_LENGTH_TOO_LOW:
+               c_Help2 = "(data length too low)";
+               break;
+            case SDO_ERROR_SUBINDEX_DOES_NOT_EXIST:
+               c_Help2 = "(subindex does not exist)";
+               break;
+            case SDO_ERROR_VALUE_RANGE_EXCEEDED:
+               c_Help2 = "(value range exceeded)";
+               break;
+            case SDO_ERROR_VALUE_TOO_HIGH:
+               c_Help2 = "(value too high)";
+               break;
+            case SDO_ERROR_VALUE_TOO_LOW:
+               c_Help2 = "(value too low)";
+               break;
+            case SDO_ERROR_MAX_VALUE_LT_MIN_VALUE:
+               c_Help2 = "(min is greater than max)";
+               break;
+            case SDO_ERROR_GENERAL_ERROR:
+               c_Help2 = "(general error)";
+               break;
+            case SDO_ERROR_APPLICATION_STORAGE:
+               c_Help2 = "(application storage)";
+               break;
+            case SDO_ERROR_LOCAL_CONTROL:
+               c_Help2 = "(local control)";
+               break;
+            case SDO_ERROR_DEVICE_STATE:
+               c_Help2 = "(present device state)";
+               break;
+            case SDO_ERROR_DYNAMIC_OD_ERROR:
+               c_Help2 = "(dynamic OD error)";
                break;
             default:
                break;
+            }
+            if (c_Help2 != "")
+            {
+               c_Text = c_Text + " " + c_Help2;
+            }
+            break;
+         default:
+            break;
          }
       }
       else
@@ -470,17 +466,17 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
          c_Help = "SDO CLIENT " + m_GetByteAsStringFormat(static_cast<uint8_t>(orc_Msg.u32_ID - CLIENT_BASE_ID)) + ": ";
          switch (orc_Msg.au8_Data[0] & 0xE0U)
          {
-         case CCS_INIT_UPLOAD     :
+         case CCS_INIT_UPLOAD:
             c_Help = c_Help + "INIT UPLOAD REQ ";
             u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
             u16_SubIndex = orc_Msg.au8_Data[3];
             (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
             c_Text = c_Help + c_Help2;
             break;
-         case CCS_SEGMENT_UPLOAD  :
+         case CCS_SEGMENT_UPLOAD:
             c_Text = c_Help + "UPLOAD SEG REQ ";
             break;
-         case CCS_INIT_DOWNLOAD   :
+         case CCS_INIT_DOWNLOAD:
             u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
             u16_SubIndex = orc_Msg.au8_Data[3];
             (void)c_Help2.PrintFormatted("%X,%02X  ", u16_Index, u16_SubIndex);
@@ -500,7 +496,7 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
                }
                for (j = 0; j < static_cast<int32_t>(u32_Size); j++)
                {
-                  c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 4] ) + " ");
+                  c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 4]) + " ");
                }
                c_Text = c_Help + c_Help2;
             }
@@ -528,11 +524,11 @@ C_SclString C_CanMonProtocolCanOpen::MessageToString(const T_STWCAN_Msg_RX & orc
             }
             for (j = 0; j < static_cast<int32_t>(u32_Size); j++)
             {
-               c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 1] ) + " ");
+               c_Help2 += (m_GetByteAsStringFormat(orc_Msg.au8_Data[j + 1]) + " ");
             }
             c_Text = c_Help + c_Help2;
             break;
-         case ABORT_DOMAIN        :
+         case ABORT_DOMAIN:
             c_Help = c_Help + "ABORT ";
             u16_Index = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]);
             u16_SubIndex = orc_Msg.au8_Data[3];
@@ -565,4 +561,3 @@ C_SclString C_CanMonProtocolCanOpen::GetProtocolName(void) const
 }
 
 //---------------------------------------------------------------------------
-

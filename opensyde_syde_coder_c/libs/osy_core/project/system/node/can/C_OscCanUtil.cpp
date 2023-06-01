@@ -32,6 +32,25 @@ using namespace stw::opensyde_core;
 /* -- Implementation ------------------------------------------------------------------------------------------------ */
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sets a new PGN and updates all depending elements
+
+   \param[in]  ou32_Pgn     New PGN
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscCanUtilJ1939PgInfo::SetPgn(const uint32_t ou32_Pgn)
+{
+   this->u32_Pgn = ou32_Pgn;
+
+   // Extract the PGN
+   this->u8_PduSpecific = static_cast<uint8_t>(this->u32_Pgn & 0x000000FFU);
+   this->u8_PduFormat = static_cast<uint8_t>((this->u32_Pgn & 0x0000FF00U) >> 8U);
+   this->u8_Dp = static_cast<uint8_t>((this->u32_Pgn & 0x00010000U) >> 16U);
+   this->u8_Edp = static_cast<uint8_t>((this->u32_Pgn & 0x00020000U) >> 17U);
+
+   this->q_HasDestinationAddress = (this->u8_PduFormat <= 0xEFU);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default constructor
 */
 //----------------------------------------------------------------------------------------------------------------------
@@ -179,18 +198,20 @@ void C_OscCanUtil::h_GetSignalValue(const uint8_t (&orau8_CanDb)[8], const C_Osc
 
    if (u16_LengthBitOffset != 0U)
    {
-      const uint16_t u16_IndexLastByte = u16_LengthByte - 1U;
+      // Last byte of real signal depending of the signal length with the signed bit included
+      const uint16_t u16_IndexLastSignalByte = u16_LengthByte - 1U;
       // Irrelevant bits could be still set 'above' the MSB
-      orc_DataPoolData[u16_IndexLastByte] &= static_cast<uint8_t>(~static_cast<uint8_t>(0xFFU << u16_LengthBitOffset));
+      orc_DataPoolData[u16_IndexLastSignalByte] &=
+         static_cast<uint8_t>(~static_cast<uint8_t>(0xFFU << u16_LengthBitOffset));
       // Handle a signed value at the end
       if ((oe_ContentType == C_OscNodeDataPoolContent::eSINT8) ||
           (oe_ContentType == C_OscNodeDataPoolContent::eSINT16) ||
           (oe_ContentType == C_OscNodeDataPoolContent::eSINT32) ||
           (oe_ContentType == C_OscNodeDataPoolContent::eSINT64))
       {
-         // The byte of the signal in the Datapool data which has the bit for the signed value
+         // The byte of the signal in the Datapool data
          // It is not always the same as the byte length of the signal
-         const uint16_t u16_SignedBitByte =
+         const uint16_t u16_IndexLastDataTypeByte =
             static_cast<uint16_t>(C_OscNodeDataPoolContentUtil::h_GetDataTypeSizeInByte(oe_ContentType) - 1UL);
          // The signed bit mask for the signal based on the concrete size of the signal
          const uint8_t u8_SignedBitMask = static_cast<uint8_t>(0x01UL << (u16_LengthBitOffset - 1UL));
@@ -198,13 +219,26 @@ void C_OscCanUtil::h_GetSignalValue(const uint8_t (&orau8_CanDb)[8], const C_Osc
          // Check the type and its length and where the signed bit of the native type has to be
 
          // Check if it is a negative value
-         if ((orc_DataPoolData[u16_IndexLastByte] & u8_SignedBitMask) == u8_SignedBitMask)
+         if ((orc_DataPoolData[u16_IndexLastSignalByte] & u8_SignedBitMask) == u8_SignedBitMask)
          {
-            // Remove the signed bit of the signal based on the length of the message payload signal size
-            orc_DataPoolData[u16_IndexLastByte] ^= u8_SignedBitMask;
+            uint16_t u16_NotUsedByteCounter;
+            uint16_t u16_BitCounter;
+            // The signed bit must be moved to MSB position and all "new" bits must be set to 1
+            // Therefore the signed bit must not be moved explicit, all bits above (MSB side) the
+            // previous signed bit must be set to 1
+            for (u16_BitCounter = u16_LengthBitOffset; u16_BitCounter < 8U; ++u16_BitCounter)
+            {
+               orc_DataPoolData[u16_IndexLastSignalByte] |= static_cast<uint8_t>(0x01UL << u16_BitCounter);
+            }
 
-            // Add it on last signal bit position of the native type
-            orc_DataPoolData[u16_SignedBitByte] |= 0x80U;
+            // In case of the signed bit is not in the last byte (can happen in eSINT32 or eSINT64)
+            // The bytes on the MSB side of the signed bit, which are not used, must be filled with 0xFF
+            for (u16_NotUsedByteCounter = (u16_IndexLastSignalByte + 1UL);
+                 u16_NotUsedByteCounter <= u16_IndexLastDataTypeByte;
+                 ++u16_NotUsedByteCounter)
+            {
+               orc_DataPoolData[u16_NotUsedByteCounter] = 0xFFU;
+            }
          }
       }
    }
@@ -399,4 +433,61 @@ void C_OscCanUtil::h_SetSignalValue(uint8_t (&orau8_CanDb)[8], const C_OscCanSig
          }
       }
    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the J1939 PG information from a CAN ID
+
+   No error check or plausibility check here
+
+   \param[in]       ou32_CanId     CAN identifier to extract J1939 PG information
+   \param[out]      orc_PgInfo     Extracted PG information
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscCanUtil::h_GetJ1939PgInfoFromCanId(const uint32_t ou32_CanId, C_OscCanUtilJ1939PgInfo & orc_PgInfo)
+{
+   orc_PgInfo.u8_SourceAddress = static_cast<uint8_t>(ou32_CanId & 0x000000FFU);
+   orc_PgInfo.SetPgn((ou32_CanId & 0x03FFFF00U) >> 8U);
+   orc_PgInfo.u8_Priority = static_cast<uint8_t>((ou32_CanId & 0x1C000000U) >> 26U);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Gets the CAN ID from a J1939 PG information
+
+   No error check or plausibility check here
+
+   \param[in]       orc_PgInfo     PG information for converting to CAN ID
+   \param[out]      oru32_CanId    Generated CAN ID
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscCanUtil::h_GetCanIdFromJ1939PgInfo(const C_OscCanUtilJ1939PgInfo & orc_PgInfo, uint32_t & oru32_CanId)
+{
+   oru32_CanId = static_cast<uint32_t>(orc_PgInfo.u8_SourceAddress);
+   oru32_CanId |= ((orc_PgInfo.u32_Pgn << 8U) & 0x03FFFF00U);
+   oru32_CanId |= ((static_cast<uint32_t>(orc_PgInfo.u8_Priority) << 26U) & 0x1C000000U);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Returns the PGN value for display purpose
+ *
+   Returns the modified PGN where the destination address is interpreted as 0x00
+
+   \param[in]       ou32_Pgn     PGN value to be modified
+
+   \return
+   The modified PGN
+*/
+//----------------------------------------------------------------------------------------------------------------------
+uint32_t C_OscCanUtil::h_GetVisiblePgn(const uint32_t ou32_Pgn)
+{
+   const uint8_t u8_PduFormat = static_cast<uint8_t>((ou32_Pgn & 0x0000FF00U) >> 8U);
+   const bool q_HasDestinationAddress = (u8_PduFormat <= 0xEFU);
+
+   uint32_t u32_VisiblePgn = ou32_Pgn;
+
+   if (q_HasDestinationAddress == true) // PDU Format 1 (Point-to-Point)
+   {
+      u32_VisiblePgn = u32_VisiblePgn & 0x03FF00U;
+   }
+   return u32_VisiblePgn;
 }

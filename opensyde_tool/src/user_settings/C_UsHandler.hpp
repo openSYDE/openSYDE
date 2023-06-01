@@ -92,6 +92,8 @@ public:
    QString GetLastKnownHalcImportPath(void) const;
    QString GetLastKnownHalcExportPath(void) const;
    QString GetLastKnownServiceProjectPath(void) const;
+   QString GetLastKnownRamViewProjectPath(void) const;
+   QString GetLastKnownJ1939CatalogPath(void) const;
    C_UsNode GetProjSdNode(const QString & orc_NodeName) const;
    C_UsCommunication GetProjSdBus(const QString & orc_BusName) const;
    C_UsSystemView GetProjSvSetupView(const QString & orc_ViewName) const;
@@ -148,6 +150,8 @@ public:
    void SetLastKnownHalcImportPath(const QString & orc_NewPath);
    void SetLastKnownHalcExportPath(const QString & orc_NewPath);
    void SetLastKnownServiceProjectPath(const QString & orc_NewPath);
+   void SetLastKnownRamViewProjectPath(const QString & orc_NewPath);
+   void SetLastKnownJ1939CatalogPath(const QString & orc_NewPath);
    void SetProjSdNodeSelectedDatapoolName(const QString & orc_NodeName, const QString & orc_DatapoolName);
    void SetProjSdNodeSelectedProtocol(const QString & orc_NodeName,
                                       const stw::opensyde_core::C_OscCanProtocol::E_Type oe_Protocol);
@@ -300,6 +304,8 @@ private:
    QString mc_LastKnownHalcImportPath;                   ///< History of last known HALC import file path
    QString mc_LastKnownHalcExportPath;                   ///< History of last known HALC export file path
    QString mc_LastKnownServiceProjectPath;               ///< History of last known service project path
+   QString mc_LastKnownRamViewProjectPath;               ///< History of last known RAMView project import path
+   QString mc_LastKnownJ1939CatalogPath;                 ///< History of last known J1939 catalog import path
    QMap<QString, C_UsSystemView> mc_ProjSvSetupView;     ///< History of last known view user settings
    QMap<QString, C_UsNode> mc_ProjSdNode;                ///< History of last known node user settings
    QMap<QString, C_UsCommunication> mc_ProjSdBus;        ///< History of last known bus user settings

@@ -49,7 +49,6 @@ using namespace stw::opensyde_gui_elements;
 using namespace stw::scl;
 
 /* -- Module Global Constants --------------------------------------------------------------------------------------- */
-const QSize C_CieUtil::mhc_SIZE_REPORT(1210, 790);
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
@@ -255,7 +254,7 @@ int32_t C_CieUtil::h_ExportFile(const stw::opensyde_gui_logic::C_CieConverter::C
                pc_DialogExportReport->SetMessageData(c_NodeMapping, c_ExportStatistic, c_Warnings);
 
                // resize
-               c_PopUpDialogReportDialog->SetSize(mhc_SIZE_REPORT);
+               c_PopUpDialogReportDialog->SetSize(mc_POPUP_REPORT_SIZE);
 
                // display message report
                if (c_PopUpDialogReportDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
@@ -302,26 +301,19 @@ int32_t C_CieUtil::h_ExportFile(const stw::opensyde_gui_logic::C_CieConverter::C
    \param[in,out]  orc_Comment   Comment
 */
 //----------------------------------------------------------------------------------------------------------------------
-void C_CieUtil::h_AdaptName(stw::scl::C_SclString & orc_Name, stw::scl::C_SclString & orc_Comment)
+void C_CieUtil::h_AdaptName(C_SclString & orc_Name, C_SclString & orc_Comment)
 {
-   stw::scl::C_SclString c_NewName;
-   //Remove spaces
-   for (uint32_t u32_ItOldName = 0; u32_ItOldName < orc_Name.Length(); ++u32_ItOldName)
+   C_SclString c_NewName = orc_Name;
+
+   //eliminate all spaces:
+   c_NewName.ReplaceAll(" ", "");
+
+   //cut string:
+   if (c_NewName.Length() > ms32_C_ITEM_MAX_CHAR_COUNT)
    {
-      if (orc_Name[static_cast<int32_t>(u32_ItOldName + 1UL)] == ' ')
-      {
-         //Skip
-      }
-      else
-      {
-         c_NewName += orc_Name[static_cast<int32_t>(u32_ItOldName + 1UL)];
-         //Cut string
-         if (c_NewName.Length() >= ms32_C_ITEM_MAX_CHAR_COUNT)
-         {
-            break;
-         }
-      }
+      c_NewName.Delete(ms32_C_ITEM_MAX_CHAR_COUNT + 1, c_NewName.Length());
    }
+
    if (orc_Name == c_NewName)
    {
       //No change
@@ -361,10 +353,11 @@ void C_CieUtil::h_AdaptImportMessages(std::vector<C_CieImportDataAssignment> & o
 
    \param[in]  orc_ImportDataAssignment   Import data assignment
    \param[in]  oe_ProtocolType            Protocol type
+   \param[in]  oq_UniqueAddRequested      Flag to add messages unique
 */
 //----------------------------------------------------------------------------------------------------------------------
 void C_CieUtil::h_InsertMessages(const std::vector<C_CieImportDataAssignment> & orc_ImportDataAssignment,
-                                 const C_OscCanProtocol::E_Type oe_ProtocolType)
+                                 const C_OscCanProtocol::E_Type oe_ProtocolType, const bool oq_UniqueAddRequested)
 {
    //Each imported node
    for (uint32_t u32_ItNodes = 0; u32_ItNodes < orc_ImportDataAssignment.size(); u32_ItNodes++)
@@ -382,7 +375,7 @@ void C_CieUtil::h_InsertMessages(const std::vector<C_CieImportDataAssignment> & 
                                                 rc_CurData.c_ImportData.c_Ui.c_UiTxMessageData,
                                                 rc_CurData.c_ImportData.c_Core.c_OscTxSignalData,
                                                 rc_CurData.c_ImportData.c_Ui.c_UiTxSignalData,
-                                                rc_CurData.c_TxMessageOverrideIndices);
+                                                rc_CurData.c_TxMessageOverrideIndices, oq_UniqueAddRequested);
 
          tgl_assert(s32_Retval == C_NO_ERR);
          if (s32_Retval == C_NO_ERR)
@@ -395,7 +388,7 @@ void C_CieUtil::h_InsertMessages(const std::vector<C_CieImportDataAssignment> & 
                                            rc_CurData.c_ImportData.c_Ui.c_UiRxMessageData,
                                            rc_CurData.c_ImportData.c_Core.c_OscRxSignalData,
                                            rc_CurData.c_ImportData.c_Ui.c_UiRxSignalData,
-                                           rc_CurData.c_RxMessageOverrideIndices);
+                                           rc_CurData.c_RxMessageOverrideIndices, oq_UniqueAddRequested);
             tgl_assert(s32_Retval == C_NO_ERR);
          }
       }
@@ -535,7 +528,7 @@ void C_CieUtil::h_ReportEdsImportError(QWidget * const opc_ParentWidget, const i
       break;
    case C_NOACT:
       c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                       "EDS file import failed.\nNode ID %1 is invalid.")).arg(
+                                                       "EDS file import failed. Node ID %1 is invalid.")).arg(
                                   ou8_NodeId));
       c_Message.SetDetails(C_GtGetText::h_GetText("CANopen standard only supports node IDs in the range "
                                                   "of 1 to 127.\nThe node ID can be changed in node "
@@ -749,7 +742,7 @@ int32_t C_CieUtil::mh_ImportDbcFile(const uint32_t ou32_BusIndex, const C_OscCan
             c_PopUpDialogNodeAssignment->HideOverlay();
 
             // resize
-            c_PopUpDialogReportDialog->SetSize(mhc_SIZE_REPORT);
+            c_PopUpDialogReportDialog->SetSize(mc_POPUP_REPORT_SIZE);
 
             // display message report
             if (c_PopUpDialogReportDialog->exec() == static_cast<int32_t>(QDialog::Accepted))
@@ -891,7 +884,7 @@ int32_t C_CieUtil::mh_ImportDcfEdsFile(const uint32_t ou32_BusIndex, const C_Osc
                   Q_UNUSED(pc_Dialog)
 
                   //Resize
-                  c_New->SetSize(mhc_SIZE_REPORT);
+                  c_New->SetSize(mc_POPUP_REPORT_SIZE);
 
                   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
                   {
@@ -933,7 +926,7 @@ int32_t C_CieUtil::mh_ImportDcfEdsFile(const uint32_t ou32_BusIndex, const C_Osc
                   break;
                case C_NOACT:
                   c_Message.SetDescription(static_cast<QString>(C_GtGetText::h_GetText(
-                                                                   "EDS file import failed.\nNode ID %1 is invalid.")).arg(
+                                                                   "EDS file import failed. Node ID %1 is invalid.")).arg(
                                               rc_CurInterface.u8_NodeId));
                   c_Message.SetDetails(C_GtGetText::h_GetText("CANopen standard only supports node IDs in the range "
                                                               "of 1 to 127.\nThe node ID can be changed in node "
@@ -1081,6 +1074,7 @@ void C_CieUtil::mh_AdaptMessagesToProtocolType(std::vector<C_CieImportDataAssign
    \param[in]  orc_OscSignalData                Imported core signal data
    \param[in]  orc_UiSignalData                 Imported UI signal data
    \param[in]  orc_MessageOverrideIndices       Indices indicating if message will get replaced or will be added
+   \param[in]  oq_UniqueAddRequested            Flag to add messages unique
 
    \return
    C_NO_ERR Operation success
@@ -1095,7 +1089,8 @@ int32_t C_CieUtil::mh_InsertMessages(const uint32_t ou32_NodeIndex, const C_OscC
                                      const std::vector<C_OscNodeDataPoolListElement> & orc_OscSignalData,
                                      const std::vector<C_PuiSdNodeDataPoolListElement> & orc_UiSignalData,
                                      const std::vector< std::pair<int32_t,
-                                                                  int32_t> > & orc_MessageOverrideIndices)
+                                                                  int32_t> > & orc_MessageOverrideIndices,
+                                     const bool oq_UniqueAddRequested)
 {
    int32_t s32_Retval = C_NO_ERR;
 
@@ -1154,7 +1149,7 @@ int32_t C_CieUtil::mh_InsertMessages(const uint32_t ou32_NodeIndex, const C_OscC
                                                                ou32_DatapoolIndexForNewContent, oq_MessagesAreTx,
                                                                rc_CurMessage,
                                                                c_CurOscSignalCommons, c_CurUiSignalCommons,
-                                                               rc_UiMessage, false) != C_NO_ERR)
+                                                               rc_UiMessage, oq_UniqueAddRequested) != C_NO_ERR)
             {
                s32_Retval = C_RANGE;
             }
@@ -1231,7 +1226,7 @@ int32_t C_CieUtil::mh_InsertMessages(const uint32_t ou32_NodeIndex, const C_OscC
                                                                               c_CurOscSignalCommons,
                                                                               c_CurUiSignalCommons,
                                                                               rc_UiMessage,
-                                                                              false) != C_NO_ERR)
+                                                                              oq_UniqueAddRequested) != C_NO_ERR)
                         {
                            s32_Retval = C_RANGE;
                         }

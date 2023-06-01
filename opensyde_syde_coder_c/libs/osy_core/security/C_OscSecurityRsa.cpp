@@ -70,7 +70,9 @@ int32_t C_OscSecurityRsa::h_SignSignature(const std::vector<uint8_t> & orc_Priva
    orc_EncryptedMessage.resize(C_OscSecurityRsa::mhu32_DEFAULT_BUFFER_SIZE);
 
    //Get private key information from PKCS#8 dump:
-   PKCS8_PRIV_KEY_INFO * const pc_Key = d2i_PKCS8_PRIV_KEY_INFO(NULL, &pu8_Data, orc_PrivateKey.size());
+   PKCS8_PRIV_KEY_INFO * const pc_Key = d2i_PKCS8_PRIV_KEY_INFO(
+      NULL, &pu8_Data,
+      static_cast<long>(orc_PrivateKey.size())); //lint !e970 //using type to match library interface
    if (pc_Key != NULL)
    {
       //Convert PKCS#8 key to EVP_PKEY:
@@ -88,7 +90,8 @@ int32_t C_OscSecurityRsa::h_SignSignature(const std::vector<uint8_t> & orc_Priva
          {
             //Perform the actual encryption:
             const int x_ResultEncrypt = RSA_private_encrypt( //lint !e970 !e8080 //using type to match library interface
-               orc_Message.size(), &orc_Message[0], &orc_EncryptedMessage[0], pc_Rsa,
+               static_cast<int>(orc_Message.size()),         //lint !e970 //using type to match library interface
+               &orc_Message[0], &orc_EncryptedMessage[0], pc_Rsa,
                RSA_PKCS1_PADDING);
             RSA_free(pc_Rsa);
 
@@ -135,7 +138,9 @@ int32_t C_OscSecurityRsa::h_VerifySignature(const std::vector<uint8_t> & orc_Pub
    orq_Valid = false;
 
    //Extract X509 data from binary key data:
-   X509 * const pc_X509Data = d2i_X509(NULL, &pu8_Data, orc_PublicKey.size());
+   X509 * const pc_X509Data = d2i_X509(
+      NULL, &pu8_Data,
+      static_cast<long>(orc_PublicKey.size())); //lint !e970 //using type to match library interface
    if (pc_X509Data != NULL)
    {
       //Get key in EVP_PKEY format:
@@ -155,8 +160,10 @@ int32_t C_OscSecurityRsa::h_VerifySignature(const std::vector<uint8_t> & orc_Pub
             c_DecryptedMessage.resize(C_OscSecurityRsa::mhu32_DEFAULT_BUFFER_SIZE);
 
             //Perform the actual decryption:
-            const int x_DecryptResult = RSA_public_decrypt( //lint !e970 !e8080  //using type to match library interface
-               orc_EncryptedMessage.size(), &orc_EncryptedMessage[0], &c_DecryptedMessage[0], pc_Rsa,
+            const int x_DecryptResult = //lint !e970 !e8080  //using type to match library interface
+                                        RSA_public_decrypt(
+               static_cast<int>(orc_EncryptedMessage.size()), //lint !e970 //using type to match library interface
+               &orc_EncryptedMessage[0], &c_DecryptedMessage[0], pc_Rsa,
                RSA_PKCS1_PADDING);
             RSA_free(pc_Rsa);
 

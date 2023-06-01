@@ -83,19 +83,18 @@ QWidget * C_SdNdeComIfSettingsTableDelegate::createEditor(QWidget * const opc_Pa
 
    if (orc_Index.isValid() == true)
    {
-      switch (orc_Index.column())
+      if (static_cast<E_Columns>(orc_Index.column()) == E_Columns::eNODEID)
       {
-      case C_SdNdeComIfSettingsTableDelegate::E_Columns::eNODEID:
          pc_SpinBox = new C_OgeSpxTableComIf(opc_Parent);
          pc_SpinBox->SetMaximumCustom(u8_Maximum);
          connect(pc_SpinBox, static_cast<void (QSpinBox::*)(int32_t)>(&QSpinBox::valueChanged), this,
                  &C_SdNdeComIfSettingsTableDelegate::m_CheckValue);
          pc_Retval = pc_SpinBox;
          Q_EMIT this->SigEdit(orc_Index);
-         break;
-      default:
+      }
+      else
+      {
          pc_Retval = QStyledItemDelegate::createEditor(opc_Parent, orc_Option, orc_Index);
-         break;
       }
    }
 
@@ -117,18 +116,17 @@ void C_SdNdeComIfSettingsTableDelegate::setEditorData(QWidget * const opc_Editor
    {
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
 
-      switch (orc_Index.column())
+      if (static_cast<E_Columns>(orc_Index.column()) == E_Columns::eNODEID)
       {
-      case C_SdNdeComIfSettingsTableDelegate::E_Columns::eNODEID:
          if (pc_SpinBoxInt != NULL)
          {
             //pc_SpinBoxInt->setAlignment(Qt::AlignCenter);
             pc_SpinBoxInt->setValue(orc_Index.data().toInt());
          }
-         break;
-      default:
+      }
+      else
+      {
          QStyledItemDelegate::setEditorData(opc_Editor, orc_Index);
-         break;
       }
    }
 }
@@ -150,17 +148,16 @@ void C_SdNdeComIfSettingsTableDelegate::setModelData(QWidget * const opc_Editor,
    {
       QSpinBox * const pc_SpinBoxInt = dynamic_cast<QSpinBox * const>(opc_Editor);
 
-      switch (orc_Index.column())
+      if (static_cast<E_Columns>(orc_Index.column()) == E_Columns::eNODEID)
       {
-      case C_SdNdeComIfSettingsTableDelegate::E_Columns::eNODEID:
          if (pc_SpinBoxInt != NULL)
          {
             opc_Model->setData(orc_Index, pc_SpinBoxInt->value());
          }
-         break;
-      default:
+      }
+      else
+      {
          QStyledItemDelegate::setModelData(opc_Editor, opc_Model, orc_Index);
-         break;
       }
    }
 }

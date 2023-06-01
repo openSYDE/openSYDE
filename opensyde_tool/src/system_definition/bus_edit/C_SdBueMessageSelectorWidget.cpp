@@ -74,11 +74,20 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
    InitStaticNames();
 
    //Add button
-   this->mpc_Ui->pc_PbAddMessage->setIconSize(QSize(13, 13));
+
+   const QSize c_SIZE(13, 13);
+   this->mpc_Ui->pc_PbAddMessage->setIconSize(c_SIZE);
    this->mpc_Ui->pc_PbAddMessage->SetCustomIcon("://images/IconAddEnabled.svg", "://images/IconAddDisabled.svg");
 
    //Deactivate debug string
    this->mpc_Ui->pc_GroupBoxNoMessages->setTitle("");
+
+   this->mpc_Ui->pc_PbAddMessageFromCatalog->setIconSize(c_SIZE);
+   this->mpc_Ui->pc_PbAddMessageFromCatalog->SetCustomIcon("://images/IconAddEnabled.svg",
+                                                           "://images/IconAddDisabled.svg");
+   this->mpc_Ui->pc_GroupBoxNoMessagesFromCatalog->setTitle("");
+
+   this->mpc_Ui->pc_PbAddMessageFromCatalog->setVisible(true);
 
    stw::opensyde_gui_logic::C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_FramSperatorUp,
                                                                    "HasColor7Background",
@@ -112,6 +121,8 @@ C_SdBueMessageSelectorWidget::C_SdBueMessageSelectorWidget(QWidget * const opc_P
            &C_SdBueMessageSelectorWidget::SigSelectName);
    connect(this->mpc_Ui->pc_PbAddMessage, &QPushButton::clicked, this,
            &C_SdBueMessageSelectorWidget::m_AddMessageButtonClicked);
+   connect(this->mpc_Ui->pc_PbAddMessageFromCatalog, &QPushButton::clicked, this,
+           &C_SdBueMessageSelectorWidget::m_AddMessageFromCatalogButtonClicked);
    //Handle zero message case
    connect(this->mpc_Ui->pc_MessageTreeWidget, &C_SdBueMessageSelectorTreeWidget::SigZeroMessages,
            this->mpc_Ui->pc_PbTreeWidgetRoot, &C_OgePubTreeWidgetRoot::click);
@@ -183,6 +194,15 @@ void C_SdBueMessageSelectorWidget::SetProtocolType(const stw::opensyde_core::C_O
    else
    {
       this->mpc_Ui->pc_PbAddMessage->setEnabled(true);
+   }
+
+   if (this->me_ProtocolType == C_OscCanProtocol::eJ1939)
+   {
+      this->mpc_Ui->pc_PbAddMessageFromCatalog->setVisible(true);
+   }
+   else
+   {
+      this->mpc_Ui->pc_PbAddMessageFromCatalog->setVisible(false);
    }
 }
 
@@ -257,11 +277,13 @@ void C_SdBueMessageSelectorWidget::InitFromData(void) const
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)
    {
       this->mpc_Ui->pc_GroupBoxNoMessages->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxNoMessagesFromCatalog->setVisible(false);
       this->mpc_Ui->pc_MessageTreeWidget->setVisible(true);
    }
    else
    {
       this->mpc_Ui->pc_GroupBoxNoMessages->setVisible(true);
+      this->mpc_Ui->pc_GroupBoxNoMessagesFromCatalog->setVisible(true);
       this->mpc_Ui->pc_MessageTreeWidget->setVisible(false);
    }
 }
@@ -833,6 +855,12 @@ void C_SdBueMessageSelectorWidget::m_SetupContextMenu(void)
                                                                  static_cast<int32_t>(Qt::CTRL) +
                                                                  static_cast<int32_t>(Qt::Key_Plus));
 
+   this->mpc_AddMessageFromCatalogAction =
+      this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText(
+                                          "Add new Message from Catalog"),
+                                       this->mpc_Ui->pc_MessageTreeWidget,
+                                       &C_SdBueMessageSelectorTreeWidget::AddMessageFromCatalog);
+
    this->mpc_AddSignalAction = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add new Signal"),
                                                                 this->mpc_Ui->pc_MessageTreeWidget,
                                                                 &C_SdBueMessageSelectorTreeWidget::AddSignal);
@@ -901,6 +929,7 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
          bool q_ShowContextMenu = true;
          const bool q_ProtCoActive = (this->me_ProtocolType == C_OscCanProtocol::eCAN_OPEN);
          const bool q_ReadOnly = this->mpc_Ui->pc_MessageTreeWidget->IsSelectedMessageContentReadOnly();
+         const bool q_J1939Active = (this->me_ProtocolType == C_OscCanProtocol::eJ1939);
 
          if (s32_Level == 1) // Message level
          {
@@ -922,10 +951,14 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
             this->mpc_CutAction->setEnabled(!q_ProtCoActive);
             this->mpc_PasteAction->setEnabled(!q_ProtCoActive);
             this->mpc_DeleteAction->setEnabled(!q_ProtCoActive);
+
+            this->mpc_AddMessageFromCatalogAction->setVisible(q_J1939Active);
+            this->mpc_AddMessageFromCatalogAction->setEnabled(q_J1939Active);
          }
          else if (s32_Level == 2) // Signal level
          {
             this->mpc_AddMessageAction->setVisible(false);
+            this->mpc_AddMessageFromCatalogAction->setVisible(false);
             this->mpc_AddSignalAction->setVisible(false);
             this->mpc_AddSignalActionWithKey->setVisible(true);
 
@@ -964,6 +997,9 @@ void C_SdBueMessageSelectorWidget::m_OnCustomContextMenuRequested(const QPoint &
             this->mpc_PasteAction->setEnabled(!q_ProtCoActive);
 
             this->m_MessagesButtonClicked();
+
+            this->mpc_AddMessageFromCatalogAction->setVisible(q_J1939Active);
+            this->mpc_AddMessageFromCatalogAction->setEnabled(q_J1939Active);
          }
          else
          {
@@ -1013,11 +1049,34 @@ void C_SdBueMessageSelectorWidget::m_OnMessageCountChanged(void)
    if (this->mpc_Ui->pc_MessageTreeWidget->topLevelItemCount() > 0)
    {
       this->mpc_Ui->pc_GroupBoxNoMessages->setVisible(false);
+      this->mpc_Ui->pc_GroupBoxNoMessagesFromCatalog->setVisible(false);
       this->mpc_Ui->pc_MessageTreeWidget->setVisible(true);
    }
    else
    {
       this->mpc_Ui->pc_GroupBoxNoMessages->setVisible(true);
+      this->mpc_Ui->pc_GroupBoxNoMessagesFromCatalog->setVisible(true);
       this->mpc_Ui->pc_MessageTreeWidget->setVisible(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Adding context menu feature (Add new Message from catalog) as a button to click
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageSelectorWidget::m_AddMessageFromCatalogButtonClicked() const
+{
+   if (this->mpc_Ui->pc_MessageTreeWidget->CheckIfAnyNodeConnected() == true)
+   {
+      this->mpc_Ui->pc_MessageTreeWidget->AddMessageFromCatalog();
+   }
+   else
+   {
+      C_OgeWiCustomMessage c_MessageBox(this->parentWidget());
+      c_MessageBox.SetHeading(C_GtGetText::h_GetText("Message add from catalog"));
+      c_MessageBox.SetDescription(C_GtGetText::h_GetText("Cannot add new Message from catalog. Select an active node."));
+      c_MessageBox.SetCustomMinHeight(180, 180);
+      c_MessageBox.Execute();
    }
 }

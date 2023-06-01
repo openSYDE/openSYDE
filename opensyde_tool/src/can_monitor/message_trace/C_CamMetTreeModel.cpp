@@ -1562,6 +1562,32 @@ uint32_t C_CamMetTreeModel::TranslateTreeRowsToSignalIndex(const int32_t os32_Me
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Drag functionality using flags set from base classes
+
+   \param[in]       orc_Index     Index of selected row
+
+   \return
+   retun QT::ItemFlags
+
+   \retval   return OR operation of Qt::ItemIsDragEnabled and QAbstractItemModel::flags(index)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+Qt::ItemFlags C_CamMetTreeModel::flags(const QModelIndex & orc_Index) const
+{
+   Qt::ItemFlags c_ItemFlagsResult;
+   if (!orc_Index.isValid())
+   {
+      c_ItemFlagsResult = Qt::NoItemFlags;
+   }
+   else
+   {
+      c_ItemFlagsResult = Qt::ItemIsDragEnabled | QAbstractItemModel::flags(orc_Index);
+   }
+
+   return c_ItemFlagsResult;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Reserves new size by the necessary vectors and sets the configured buffer size as used value
 */
 //----------------------------------------------------------------------------------------------------------------------

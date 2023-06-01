@@ -35,7 +35,7 @@ class C_OgeTreeViewCheckable :
 
 public:
    C_OgeTreeViewCheckable(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTreeViewCheckable(void);
+   ~C_OgeTreeViewCheckable(void) override;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

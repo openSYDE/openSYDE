@@ -148,8 +148,8 @@ void C_SdNdeCoDeviceUpdateEdsDialog::DoApplyData(void) const
                                                                             this->
                                                                             mu8_ManagerInterfaceId,
                                                                             this->mc_DeviceNodeId) == C_NO_ERR);
-   C_CieUtil::h_InsertMessages(c_NewNodeAssignmentVector, C_OscCanProtocol::eCAN_OPEN);
-   C_CieUtil::h_InsertMessages(c_AdaptedNodeAssignmentVector, C_OscCanProtocol::eCAN_OPEN);
+   C_CieUtil::h_InsertMessages(c_NewNodeAssignmentVector, C_OscCanProtocol::eCAN_OPEN, false);
+   C_CieUtil::h_InsertMessages(c_AdaptedNodeAssignmentVector, C_OscCanProtocol::eCAN_OPEN, false);
 }
 
 //----------------------------------------------------------------------------------------------------------------------

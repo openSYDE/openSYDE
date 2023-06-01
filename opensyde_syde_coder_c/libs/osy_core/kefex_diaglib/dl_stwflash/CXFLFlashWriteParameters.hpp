@@ -8,8 +8,8 @@
    \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CXFLFLASHWRITEPARAMETERSH
-#define CXFLFLASHWRITEPARAMETERSH
+#ifndef CXFLFLASHWRITEPARAMETERSHPP
+#define CXFLFLASHWRITEPARAMETERSHPP
 
 #include "stwtypes.hpp"
 #include "C_SclString.hpp"
@@ -103,7 +103,7 @@ enum E_XFLDevTypeCheckMatchIDFailReaction
 };
 
 //----------------------------------------------------------------------------------------------------------------------
-///Parameters for perfoming flash write procedure
+///Parameters for performing flash write procedure
 class C_XFLFlashWriteParameters
 {
 public:
@@ -143,7 +143,7 @@ public:
    bool q_VerboseMode; ///< true -> report some more details about progress ...
 
    bool q_XFLExchange;                   ///< false -> regular download; true -> send XFL_EXCHANGE request
-   uint8_t u8_IgnoreInvalidHexfileError; ///< behaviour on erroneous hexfile  \n
+   uint8_t u8_IgnoreInvalidHexfileError; ///< behavior on erroneous hexfile  \n
    ///< 0 -> always fail  \n
    ///< 1 -> always ignore \n
    ///< 2 -> fail; on overlap ask user

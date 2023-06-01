@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -23,7 +23,7 @@
 
 #include <Vector/DBC/platform.h>
 
-#include <map>
+#include <cstdint>
 #include <string>
 
 #include <Vector/DBC/Attribute.h>
@@ -36,40 +36,27 @@ namespace DBC {
 /**
  * Attribute Value on Relation (BA_REL)
  */
-class VECTOR_DBC_EXPORT AttributeRelation : public Attribute {
-public:
-    AttributeRelation();
-
-    /** Relation Type */
-    enum class RelationType {
-        ControlUnitEnvironmentVariable, /**< Control Unit - Env. Variable */
-        NodeTxMessage, /**< Node - Tx Message */
-        NodeMappedRxSignal /**< Node - Mapped Rx Signal */
-    };
-
-    /** Relation Type */
-    RelationType relationType;
-
+struct VECTOR_DBC_EXPORT AttributeRelation : Attribute {
     /** Node Name */
-    std::string nodeName;
+    std::string nodeName {};
 
     /** Environment Variable Name */
-    std::string environmentVariableName;
+    std::string environmentVariableName {};
 
     /** Message Identifier */
-    unsigned int messageId;
+    uint32_t messageId {};
 
     /** Signal Name */
-    std::string signalName;
-
-    /**
-     * Compare Operator
-     *
-     * @param[in] rhs Right Hand Side of operation
-     * @return comparison result
-     */
-    bool operator < (const AttributeRelation & rhs) const;
+    std::string signalName {};
 };
+
+/**
+ * Compare Operator
+ *
+ * @param[in] rhs Right Hand Side of operation
+ * @return comparison result
+ */
+bool operator<(const AttributeRelation & lhs, const AttributeRelation & rhs);
 
 }
 }

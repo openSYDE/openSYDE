@@ -13,10 +13,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <cstring>
 #include "stwtypes.hpp"
@@ -32,7 +28,7 @@ using namespace stw::diag_lib;
 //magic for device info block in hex file
 const char_t stw::diag_lib::XFL_DEVICE_INFO_MAGIC_V1[XFL_DEVICE_INFO_MAGIC_LENGTH_V1 + 1U] = "Lx_?z2.";
 const char_t stw::diag_lib::XFL_DEVICE_INFO_MAGIC_V2[XFL_DEVICE_INFO_MAGIC_LENGTH_V2] = "Lx_?zg."; /// \0 already
-                                                                                                  // included
+                                                                                                   // included
 
 const uint8_t C_XFLECUInformation::hau8_LENGTHS_DEVICE_ID[3]       =
 {

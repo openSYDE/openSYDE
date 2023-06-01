@@ -49,6 +49,8 @@ public:
    ~C_SdNdeDpProperties(void) override;
 
    void InitStaticNames(void);
+   bool GetIsDatapoolShared() const;
+   void SetIsDatapoolShared(const bool o_IsShared);
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -88,6 +90,7 @@ private:
    void m_BreakSharedRelation(void);
    bool m_IsRelatedAppValid(const int32_t os32_RelatedDataBlockIndex) const;
    int32_t m_GetCurrentDataBlockIndex(void) const;
+   bool mq_IsDatapoolShared;
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

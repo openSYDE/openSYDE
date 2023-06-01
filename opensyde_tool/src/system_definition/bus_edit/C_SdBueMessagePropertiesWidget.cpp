@@ -104,43 +104,34 @@ C_SdBueMessagePropertiesWidget::C_SdBueMessagePropertiesWidget(QWidget * const o
    this->mpc_Ui->pc_FrameJ1939PgInfo->SetBackgroundColor(12);
    this->mpc_Ui->pc_FrameJ1939PgInfo->SetBorderColor(10);
 
-   this->mpc_Ui->pc_LabelJ1939Pgn->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939Pgn->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939Pgn->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939Priority->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939Priority->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939Priority->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939SourceAddr->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939SourceAddr->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939SourceAddr->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939DestAddr->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939DestAddr->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939DestAddr->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939Format->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939Format->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939Format->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939EdpDp->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939EdpDp->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939EdpDp->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939PgnValue->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939PgnValue->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939PgnValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939PriorityValue->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939PriorityValue->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939PriorityValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939SourceAddrValue->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939SourceAddrValue->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939SourceAddrValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939DestAddrValue->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939DestAddrValue->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939DestAddrValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939FormatValue->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939FormatValue->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939FormatValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
-   this->mpc_Ui->pc_LabelJ1939EdpDpValue->SetFontPixel(13);
    this->mpc_Ui->pc_LabelJ1939EdpDpValue->SetForegroundColor(6);
    this->mpc_Ui->pc_LabelJ1939EdpDpValue->setTextInteractionFlags(Qt::TextSelectableByMouse);
    C_OgeWiUtil::h_ApplyStylesheetProperty(this->mpc_Ui->pc_PushButtonJ1939OpenDialog, "WithLeftBorder", true);
+
+   this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(-1);
+   this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
 
    InitStaticNames();
 
@@ -2621,7 +2612,9 @@ void C_SdBueMessagePropertiesWidget::m_OnEditJ1939PgPropertiesClicked(void)
       this->mpc_Ui->pc_SpinBoxId->value(), *c_PopUp, this->mpc_Ui->pc_LineEditName->text());
 
    //Resize
-   c_PopUp->SetSize(QSize(600, 430));
+   const QSize c_SIZE(600, 456);
+
+   c_PopUp->SetSize(c_SIZE);
 
    Q_UNUSED(pc_AddDialog)
 

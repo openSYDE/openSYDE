@@ -441,7 +441,8 @@ void C_SyvDaItPaWidgetNew::ButtonAddClicked(void)
                                                                                     false, true, false, true, true);
 
       //Resize
-      c_New->SetSize(QSize(800, 800));
+      const QSize c_SIZE(800, 800);
+      c_New->SetSize(c_SIZE);
 
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {
@@ -989,7 +990,6 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OscNodeDataPoolLis
 
             if (s32_Result == C_NO_ERR)
             {
-               const QSize c_SIZE_IMPORT_REPORT(1210, 790);
                const C_OscParamSetInterpretedData & rc_Data = c_ParamSetHandler.GetInterpretedData();
                std::vector<stw::opensyde_core::C_OscNodeDataPoolListElementId> c_FloatRangeCheckInvalidValueIds;
                std::vector<QString> c_FloatRangeCheckInvalidValues;
@@ -1005,7 +1005,7 @@ void C_SyvDaItPaWidgetNew::m_LoadElements(const std::vector<C_OscNodeDataPoolLis
                Q_UNUSED(pc_Dialog)
 
                //Resize
-               c_New->SetSize(c_SIZE_IMPORT_REPORT);
+               c_New->SetSize(mc_POPUP_REPORT_SIZE);
 
                pc_Dialog->GetFloatRangeCheckResults(c_FloatRangeCheckInvalidValueIds, c_FloatRangeCheckInvalidValues,
                                                     c_FloatRangeCheckNewValues);

@@ -31,7 +31,7 @@ public:
    C_SebUnoMoveSubLineCommand(QGraphicsScene * const opc_Scene, const std::vector<uint64_t> & orc_Ids,
                               const int32_t & ors32_SubLineId, const QPointF & orc_PositionDifference,
                               QUndoCommand * const opc_Parent = NULL);
-   virtual ~C_SebUnoMoveSubLineCommand();
+   ~C_SebUnoMoveSubLineCommand() override;
    void undo(void) override;
    void redo(void) override;
 

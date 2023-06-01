@@ -22,6 +22,7 @@ RC_FILE = ../src/can_monitor/cam_resources.rc
 opensyde_core_skip_modules += opensyde_core_skip_zipping
 opensyde_core_skip_modules += opensyde_core_skip_code_generation
 opensyde_core_skip_modules += opensyde_core_skip_protocol_drivers
+opensyde_core_skip_modules += opensyde_core_skip_imports
 include(../libs/opensyde_core/opensyde_core.pri)
 
 SOURCES += \
@@ -31,25 +32,23 @@ SOURCES += \
     ../src/system_views/communication/C_SyvComMessageLoggerFileBlf.cpp \
     ../src/system_views/communication/C_SyvComDriverThread.cpp \
     ../src/com_import_export/C_CieImportDbc.cpp \
+    ../src/com_import_export/C_CieConverter.cpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.cpp\
     ../src/can_monitor/cam_main.cpp \
     ../src/project_operations/C_PopErrorHandling.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/Attribute.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeDefinition.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeRelation.cpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/AttributeValueType.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/BitTiming.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/EnvironmentVariable.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/ExtendedMultiplexor.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/File.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/FileLoad.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/FileSave.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Message.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Network.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/Node.cpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/Parser.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Signal.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalGroup.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalType.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueTable.cpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/platform.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.cpp \
     ../src/opensyde_gui_elements/widget/C_OgeWiError.cpp \
     ../src/opensyde_gui_elements/C_OgePopUpDialog.cpp \
@@ -234,6 +233,29 @@ SOURCES += \
     ../src/can_monitor/data_base/C_CamDbOsyListId.cpp \
     ../src/can_monitor/data_base/C_CamDbDbcUnmappedMessageId.cpp
 
+#using our standard compiler warning switches we will get some (non-critical) warnings in Scanner.cpp
+#we do not want to modify that library (as it is auto generated)
+#so we want to suppress those warnings
+#to do that we define an additional compiler named "dbc_scanner" and assign Scanner.cpp to be built with that compiler
+#see https://stackoverflow.com/questions/27683777/how-to-specify-compiler-flag-to-a-single-source-file-with-qmake
+# for more information
+win32-g++ {
+   SOURCES_DBC_SCANNER = ../libs/dbc_driver_library/src/Vector/DBC/Scanner.cpp  #define sources to be built with additional compiler
+   dbc_scanner.name = dbc_scanner
+   dbc_scanner.input = SOURCES_DBC_SCANNER              #assign sources
+   dbc_scanner.dependency_type = TYPE_C
+   dbc_scanner.variable_out = OBJECTS
+   dbc_scanner.output = ${QMAKE_VAR_OBJECTS_DIR}${QMAKE_FILE_IN_BASE}$${first(QMAKE_EXT_OBJ)}
+   #invoke C compiler (as it's a C file)
+   dbc_scanner.commands = $${QMAKE_CC} $(CFLAGS) $(INCPATH) -w -c ${QMAKE_FILE_IN} -o ${QMAKE_FILE_OUT}
+   QMAKE_EXTRA_COMPILERS += dbc_scanner
+}
+
+#for MSVC: simply add the file to the standard compiler:
+win32-msvc* {
+SOURCES += ../libs/dbc_driver_library/src/Vector/DBC/Scanner.cpp
+}
+
 PRECOMPILED_HEADER = ../src/precompiled_headers/can_monitor/precomp_headers.hpp
 
 HEADERS  += \
@@ -242,30 +264,33 @@ HEADERS  += \
     ../src/system_views/communication/C_SyvComMessageMonitor.hpp \
     ../src/system_views/communication/C_SyvComMessageLoggerFileBlf.hpp \
     ../src/system_views/communication/C_SyvComDriverThread.hpp \
+    ../libs/flexlexer/FlexLexer.h \
+    ../libs/dbc_driver_library/src/Vector/DBC.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Attribute.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeDefinition.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/AttributeObjectType.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeRelation.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeValueType.h \
     ../libs/dbc_driver_library/src/Vector/DBC/BitTiming.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ByteOrder.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/config.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/Doxygen.h \
     ../libs/dbc_driver_library/src/Vector/DBC/EnvironmentVariable.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ExtendedMultiplexor.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/File.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Message.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Network.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Node.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/platform.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/Parser.hpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/Scanner.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Signal.h \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalGroup.h \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalType.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/Status.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueDescriptions.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueTable.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueType.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/location.hh \
+    ../libs/dbc_driver_library/src/Vector/DBC/platform.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/position.hh \
+    ../libs/dbc_driver_library/src/Vector/DBC/stack.hh \
     ../libs/dbc_driver_library/src/Vector/DBC/vector_dbc_export.h \
-    ../libs/dbc_driver_library/src/Vector/DBC.h \
     ../src/com_import_export/C_CieImportDbc.hpp \
     ../src/com_import_export/C_CieConverter.hpp \
     ../src/system_definition/node_edit/datapools/C_SdNdeDpContentUtil.hpp \
@@ -653,6 +678,7 @@ INCLUDEPATH += ../src \
                ../src/util \
                ../src/precompiled_headers/can_monitor \
                ../libs/gettext \
+               ../libs/flexlexer \
                ../libs/dbc_driver_library/src \
                ../libs/dbc_driver_library/src/Vector \
                ../libs/blf_driver_library

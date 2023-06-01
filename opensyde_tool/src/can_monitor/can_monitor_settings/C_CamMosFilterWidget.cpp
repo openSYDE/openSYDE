@@ -13,6 +13,7 @@
 #include "precomp_headers.hpp"
 
 #include <QListWidgetItem>
+#include <QMimeData>
 
 #include "C_CamMosFilterWidget.hpp"
 #include "ui_C_CamMosFilterWidget.h"
@@ -65,6 +66,8 @@ C_CamMosFilterWidget::C_CamMosFilterWidget(QWidget * const opc_Parent) :
    // load configuration
    connect(C_CamProHandler::h_GetInstance(), &C_CamProHandler::SigNewConfiguration,
            this, &C_CamMosFilterWidget::m_LoadConfig);
+
+   this->setAcceptDrops(true);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -128,6 +131,97 @@ void C_CamMosFilterWidget::Clear(void)
 
    // clear list of filter widgets
    mc_Entries.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Set function for calling m_OnAddFilterFromContextmenu
+
+   \param[in]       oc_CanMsgId     List of selected message CanId's
+   \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterWidget::SetAddFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd)
+{
+   C_CamMosFilterWidget::m_OnAddFilterFromContextmenu(oc_CanMsgId, oc_CanMsgXtd);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overridden drag enter event slot
+
+   Here accepts (MimeData Format) qabstractitemmodeldatalist item from C_CamMetTreeView class
+
+   \param[in,out]  opc_Event  Event identification and information
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterWidget::dragEnterEvent(QDragEnterEvent * const opc_Event)
+{
+   const QMimeData * const pc_MimeData = opc_Event->mimeData();
+
+   if (pc_MimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
+   {
+      opc_Event->setAccepted(true);
+   }
+   else
+   {
+      opc_Event->setAccepted(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overridden drag move event slot
+
+   Here accepts (MimeData Format) qabstractitemmodeldatalist item from C_CamMetTreeView class
+
+   \param[in,out]  opc_Event  Event identification and information
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterWidget::dragMoveEvent(QDragMoveEvent * const opc_Event)
+{
+   const QMimeData * const pc_MimeData = opc_Event->mimeData();
+
+   if (pc_MimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
+   {
+      opc_Event->setAccepted(true);
+   }
+   else
+   {
+      opc_Event->setAccepted(false);
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Overridden drop event slot
+
+   Here accepts (MimeData Format) qabstractitemmodeldatalist item from C_CamMetTreeView class
+
+   \param[in,out]  opc_Event  Event identification and information
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterWidget::dropEvent(QDropEvent * const opc_Event)
+{
+   const QMimeData * const pc_MimeData = opc_Event->mimeData();
+
+   if (pc_MimeData->hasFormat("application/x-qabstractitemmodeldatalist"))
+   {
+      opc_Event->setAccepted(true);
+   }
+   else
+   {
+      opc_Event->setAccepted(false);
+   }
+   Q_EMIT C_CamMosFilterWidget::SigSendCanFilterMsgDroppedToParentWidget();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -295,6 +389,88 @@ void C_CamMosFilterWidget::m_OnAddClicked()
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
                                                                  this->mpc_Ui->pc_ScrollAreaContents);
    C_CamMosFilterPopup * const pc_Dialog = new C_CamMosFilterPopup(c_FilterData, *c_New);
+
+   Q_UNUSED(pc_Dialog)
+
+   //Resize
+   c_New->SetSize(QSize(700, 820));
+
+   // Update settings on accept
+   if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
+   {
+      QList<C_CamProFilterItemData> c_TempItems;
+      c_FilterData = pc_Dialog->GetFilterData();
+      // c_FilterData.q_Enabled is not set from dialog but we want the default anyway
+
+      // add in data handling
+      C_CamProHandler::h_GetInstance()->AddFilter(c_FilterData);
+
+      // add new widget
+      this->m_AddFilterWidget(c_FilterData);
+
+      // if receive filters are disabled ask user for enabling
+      if (C_CamProHandler::h_GetInstance()->GetFilterWidgetEnabled() == false)
+      {
+         C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eQUESTION);
+         c_Message.SetHeading(C_GtGetText::h_GetText("Receive Filter Disabled"));
+         c_Message.SetDescription(C_GtGetText::h_GetText("Filters are not applied as long as receive filter setting is "
+                                                         "disabled. Do you want to enable it now?"));
+         c_Message.SetOkButtonText("Enable");
+         c_Message.SetNoButtonText("Keep Disabled");
+         if (c_Message.Execute() == C_OgeWiCustomMessage::eOK)
+         {
+            C_CamProHandler::h_GetInstance()->SetFilterWidgetEnabled(true);
+            this->mpc_Ui->pc_WiHeader->SetToggleState(true);
+            // this also emits toggled signal, so filter items get enabled automatically
+         }
+      }
+      else
+      {
+         // enable new filter items if filter widget is already enabled
+         c_TempItems = c_FilterData.c_FilterItems;
+         this->m_GetActiveFilterItems(c_TempItems);
+
+         Q_EMIT (this->SigAddFilterItems(c_TempItems));
+
+         // inform about new number of filters
+         Q_EMIT (this->SigFilterNumberChanged(this->m_CountActiveFilterPackages()));
+      }
+   }
+
+   if (c_New != NULL)
+   {
+      c_New->HideOverlay();
+   }
+} //lint !e429  no memory leak because of the parent of pc_Dialog and the Qt memory management
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Calling an existing function (C_CamMosFilterWidget::m_OnAddClicked()) with modificatios
+ *  Sending QList of selected messages Can Id's  and IsCanMsgExtended to child widget "C_CamMosFilterPopup"
+ *
+   \param[in]       oc_CanMsgId     List of selected message CanId's
+   \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosFilterWidget::m_OnAddFilterFromContextmenu(const QList<int32_t> oc_CanMsgId,
+                                                        const QList<uint8_t> oc_CanMsgXtd)
+{
+   // Create unique name
+   std::map<stw::scl::C_SclString, bool> c_Names;
+   std::vector<C_CamProFilterData> c_Filters = C_CamProHandler::h_GetInstance()->GetFilters();
+   const QString c_ProposedName = "NewFilter";
+   C_CamProFilterData c_FilterData;
+
+   for (uint32_t u32_ItFilter = 0UL; u32_ItFilter < c_Filters.size(); ++u32_ItFilter)
+   {
+      c_Names[c_Filters[u32_ItFilter].c_Name.toStdString().c_str()] = true;
+   }
+   c_FilterData.c_Name = C_Uti::h_GetUniqueNameQt(c_Names, c_ProposedName);
+
+   // Pop up dialog (use scroll area widget as parent to make sure scroll bars are styled correctly)
+   const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this->mpc_Ui->pc_ScrollAreaContents,
+                                                                 this->mpc_Ui->pc_ScrollAreaContents);
+   C_CamMosFilterPopup * const pc_Dialog = new C_CamMosFilterPopup(c_FilterData, *c_New);
+   pc_Dialog->SetAddFilterItem(oc_CanMsgId, oc_CanMsgXtd);
 
    Q_UNUSED(pc_Dialog)
 

@@ -32,8 +32,11 @@ class C_OgeTebContextMenuBase :
 public:
    C_OgeTebContextMenuBase(QWidget * const opc_Parent = NULL);
 
+   void SetLinkOnly(void);
+
 private:
    stw::opensyde_gui_elements::C_OgeContextMenu * mpc_ContextMenu;
+   bool mq_LinkOnly;
    QString mc_LinkText;
    void m_InitContextMenu(void);
    void m_SetupContextMenu(const QPoint & orc_Pos);

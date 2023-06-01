@@ -1,5 +1,5 @@
-#ifndef CKFXCommH
-#define CKFXCommH
+#ifndef CKFXCOMMHPP
+#define CKFXCOMMHPP
 
 #include "stwtypes.hpp"
 #include "CKFXCommConfiguration.hpp"
@@ -75,7 +75,7 @@ typedef void (* PR_KFXCommECUResetCallBack)(void * const opv_Instance);
 //----------------------------------------------------------------------------------------------------------------------
 
 ///base class for "KEFEX-like" protocols
-class STW_DIAGLIB_EXPORT C_KFXCommunicationBase
+class C_KFXCommunicationBase
 {
 private:
    C_KFXCommunicationBase(const C_KFXCommunicationBase & orc_Source);               //not implemented -> prevent copying

@@ -82,6 +82,8 @@ private:
    bool mq_ModeSingleNode;
    bool mq_ExclusiveMode;
 
+   void m_HandleWidgetSize(const uint32_t ou32_ContentSize, const uint32_t ou32_NumEntries);
+
    //Avoid call
    C_SdBueMessageRxList(const C_SdBueMessageRxList &);
    C_SdBueMessageRxList & operator =(const C_SdBueMessageRxList &) &;

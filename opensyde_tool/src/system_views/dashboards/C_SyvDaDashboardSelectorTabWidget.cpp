@@ -817,6 +817,10 @@ void C_SyvDaDashboardSelectorTabWidget::m_OnAddClicked(void)
                                                                                        this->mu32_ViewIndex,
                                                                                        true);
 
+   const QSize c_SIZE(892, 646);
+
+   c_New->SetSize(c_SIZE);
+
    Q_UNUSED(pc_Dialog)
 
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
@@ -1460,6 +1464,9 @@ bool C_SyvDaDashboardSelectorTabWidget::m_EditTab(const uint32_t & oru32_DataInd
                                                                                        this->mu32_ViewIndex);
 
    Q_UNUSED(pc_Dialog)
+
+   const QSize c_SIZE(892, 646);
+   c_New->SetSize(c_SIZE);
 
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {

@@ -36,16 +36,15 @@ const int measurements = 10000;
  * - Number of messages in database (random in range 1..1000)
  * - Measured lookup time (nanoseconds)
  */
-void performance_test_1()
-{
+void performance_test_1() {
     Vector::DBC::Network network;
 
     /* multiple measurement loops */
-    for (int i = 0; i < measurements; ++i) {
+    for (auto i = 0; i < measurements; ++i) {
         unsigned int messageCount = (rand() % 1000) + 1;
 
         /* setup the database with random number of messages */
-        for (unsigned int id = 0; id < messageCount; ++id) {
+        for (auto id = 0; id < messageCount; ++id) {
             Vector::DBC::Message & message = network.messages[id];
             message.id = id;
             message.name = "message_" + std::to_string(id);
@@ -62,7 +61,7 @@ void performance_test_1()
         assert(message.name == "message_" + std::to_string(id));
 
         /* print result */
-        std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1);
+        std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
         std::cout << messageCount << "\t" << ns.count() << std::endl;
     }
 }
@@ -74,16 +73,15 @@ void performance_test_1()
  * - Number of signals in message (random in range 1..8)
  * - Measured lookup time (nanoseconds)
  */
-void performance_test_2()
-{
+void performance_test_2() {
     Vector::DBC::Message message;
 
     /* multiple measurement loops */
-    for (int i = 0; i < measurements; ++i) {
+    for (auto i = 0; i < measurements; ++i) {
         unsigned int signalCount = (rand() % 8) + 1;
 
         /* setup the message with random number of signals */
-        for (unsigned int nr = 0; nr < signalCount; ++nr) {
+        for (auto nr = 0; nr < signalCount; ++nr) {
             std::string signalName = "signal_" + std::to_string(nr);
             Vector::DBC::Signal & signal = message.signals[signalName];
             signal.name = signalName;
@@ -93,13 +91,13 @@ void performance_test_2()
 
         /* and look it up */
         auto t1 = std::chrono::high_resolution_clock::now();
-        for (auto signal : message.signals) {
-            std::string & signalName = signal.second.name;
-        }
+        for (const auto & signal : message.signals)
+           // 2023-03-07 STW: Fix compile error
+            const std::string & signalName = signal.second.name;
         auto t2 = std::chrono::high_resolution_clock::now();
 
         /* print result */
-        std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1);
+        std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
         std::cout << signalCount << "\t" << ns.count() << std::endl;
     }
 }
@@ -111,15 +109,14 @@ void performance_test_2()
  * - Bit size of signal (random in range 1..64)
  * - Measured decode time (nanoseconds)
  */
-void performance_test_3(Vector::DBC::ByteOrder byteOrder, Vector::DBC::ValueType valueType)
-{
+void performance_test_3(Vector::DBC::ByteOrder byteOrder, Vector::DBC::ValueType valueType) {
     /* multiple measurement loops */
-    for (int i = 0; i < measurements; ++i) {
+    for (auto i = 0; i < measurements; ++i) {
         unsigned int bitSize = (rand() % 64) + 1;
 
         /* setup 8 byte random data */
         std::vector<uint8_t> data;
-        for (int b = 0; b < 8; ++b)
+        for (auto b = 0; b < 8; ++b)
             data.push_back(rand() % 0x100);
 
         /* setup signal */
@@ -135,13 +132,12 @@ void performance_test_3(Vector::DBC::ByteOrder byteOrder, Vector::DBC::ValueType
         auto t2 = std::chrono::high_resolution_clock::now();
 
         /* print result */
-        std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2-t1);
+        std::chrono::nanoseconds ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t2 - t1);
         std::cout << bitSize << "\t" << ns.count() << std::endl;
     }
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char ** argv) {
     /* safety check */
     if (argc != 2) {
         std::cout << "Syntax: performance_test <test id>" << std::endl;
@@ -153,20 +149,15 @@ int main(int argc, char **argv)
 
     if (id == "1")
         performance_test_1();
-    else
-    if (id == "2")
+    else if (id == "2")
         performance_test_2();
-    else
-    if (id == "3ls")
+    else if (id == "3ls")
         performance_test_3(Vector::DBC::ByteOrder::LittleEndian, Vector::DBC::ValueType::Signed);
-    else
-    if (id == "3lu")
+    else if (id == "3lu")
         performance_test_3(Vector::DBC::ByteOrder::LittleEndian, Vector::DBC::ValueType::Unsigned);
-    else
-    if (id == "3bs")
+    else if (id == "3bs")
         performance_test_3(Vector::DBC::ByteOrder::BigEndian, Vector::DBC::ValueType::Signed);
-    else
-    if (id == "3bu")
+    else if (id == "3bu")
         performance_test_3(Vector::DBC::ByteOrder::BigEndian, Vector::DBC::ValueType::Unsigned);
 
     return 0;

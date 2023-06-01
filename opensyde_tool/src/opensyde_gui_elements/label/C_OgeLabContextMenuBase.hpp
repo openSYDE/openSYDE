@@ -12,8 +12,8 @@
 #define C_OGELABCONTEXTMENUBASE_H
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include <QLabel>
 #include "C_OgeContextMenu.hpp"
+#include "C_OgeLabToolTipBase.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -25,7 +25,7 @@ namespace opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeLabContextMenuBase :
-   public QLabel
+   public C_OgeLabToolTipBase
 {
    Q_OBJECT
 

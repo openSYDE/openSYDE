@@ -12,11 +12,12 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
-#include "stwerrors.hpp"
+#include "C_SdUtil.hpp"
 #include "TglUtils.hpp"
-#include "C_SdBueUnoMessageAddDeleteBaseCommand.hpp"
-#include "C_PuiSdHandler.hpp"
 #include "constants.hpp"
+#include "stwerrors.hpp"
+#include "C_PuiSdHandler.hpp"
+#include "C_SdBueUnoMessageAddDeleteBaseCommand.hpp"
 
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::errors;
@@ -75,37 +76,12 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
    {
       for (uint32_t u32_ItStep = 0UL; u32_ItStep < this->mc_UniqueId.size(); ++u32_ItStep)
       {
+         C_PuiSdNodeCanMessage c_UiMessage;
+         c_UiMessage.c_Signals = this->mc_UiSignals[u32_ItStep];
          //Adapt default values for protocol
-         if (this->mc_LastMessageId[u32_ItStep].e_ComProtocol == C_OscCanProtocol::eECES)
-         {
-            //Tx method
-            this->mc_Message[u32_ItStep].e_TxMethod = C_OscCanMessage::eTX_METHOD_CYCLIC;
-         }
-         else if (this->mc_LastMessageId[u32_ItStep].e_ComProtocol == C_OscCanProtocol::eCAN_OPEN_SAFETY)
-         {
-            //Message id
-            this->mc_Message[u32_ItStep].q_IsExtended = false;
-            if ((this->mc_Message[u32_ItStep].u32_CanId % 2U) == 0U)
-            {
-               this->mc_Message[u32_ItStep].u32_CanId = this->mc_Message[u32_ItStep].u32_CanId - 1U;
-            }
-            if (this->mc_Message[u32_ItStep].u32_CanId < mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN)
-            {
-               this->mc_Message[u32_ItStep].u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MIN;
-            }
-            if (this->mc_Message[u32_ItStep].u32_CanId > mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX)
-            {
-               this->mc_Message[u32_ItStep].u32_CanId = mu32_PROTOCOL_ECOS_MESSAGE_ID_MAX;
-            }
-            //Tx method
-            this->mc_Message[u32_ItStep].e_TxMethod = C_OscCanMessage::eTX_METHOD_CYCLIC;
-            //Dlc
-            this->mc_Message[u32_ItStep].u16_Dlc = 8U;
-         }
-         else
-         {
-            //Layer 2 -> all
-         }
+         C_SdUtil::h_AdaptMessageToProtocolType(this->mc_Message[u32_ItStep], &c_UiMessage,
+                                                this->mc_OscSignalCommons[u32_ItStep],
+                                                this->mc_LastMessageId[u32_ItStep].e_ComProtocol, NULL);
          //Cycle time
          if (this->mc_Message[u32_ItStep].u32_CycleTimeMs == 0U)
          {
@@ -119,7 +95,7 @@ void C_SdBueUnoMessageAddDeleteBaseCommand::m_Add(void)
                                                                 this->mc_Message[u32_ItStep],
                                                                 this->mc_OscSignalCommons[u32_ItStep],
                                                                 this->mc_UiSignalCommons[u32_ItStep],
-                                                                this->mc_UiSignals[u32_ItStep],
+                                                                c_UiMessage.c_Signals,
                                                                 this->mc_LastMessageId[u32_ItStep].u32_MessageIndex) ==
                     C_NO_ERR);
          for (uint32_t u32_ItMessage = 0U; u32_ItMessage < this->mc_MatchingIds[u32_ItStep].size(); ++u32_ItMessage)

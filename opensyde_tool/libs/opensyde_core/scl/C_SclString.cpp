@@ -11,12 +11,6 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
-
 #include <cstdio>  //for printf
 #include <cctype>  //for tolower / toupper
 #include <cstdlib> //for strtol
@@ -292,7 +286,7 @@ C_SclString & C_SclString::operator +=(const C_SclString & orc_Source)
    new combined string
 */
 //----------------------------------------------------------------------------------------------------------------------
-C_SclString SCL_PACKAGE stw::scl::operator +(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+C_SclString stw::scl::operator +(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    std::string c_Temp;
    (void)c_Temp.assign(orc_Par1.c_str());
@@ -313,7 +307,7 @@ C_SclString SCL_PACKAGE stw::scl::operator +(const C_SclString & orc_Par1, const
    false   -> strings are not identical
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool SCL_PACKAGE stw::scl::operator ==(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+bool stw::scl::operator ==(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    return ((orc_Par1.AsStdString()->compare(orc_Par2.c_str())) == 0) ? true : false;
 }
@@ -331,7 +325,7 @@ bool SCL_PACKAGE stw::scl::operator ==(const C_SclString & orc_Par1, const C_Scl
    false    -> both strings are identical
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool SCL_PACKAGE stw::scl::operator !=(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+bool stw::scl::operator !=(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    return (orc_Par1 == orc_Par2) ? false : true;
 }
@@ -350,7 +344,7 @@ bool SCL_PACKAGE stw::scl::operator !=(const C_SclString & orc_Par1, const C_Scl
    false    -> orc_Par1 >= orc_Par2
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool SCL_PACKAGE stw::scl::operator <(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+bool stw::scl::operator <(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    return (orc_Par1.AsStdString()->compare(orc_Par2.c_str()) < 0) ? true : false;
 }
@@ -369,7 +363,7 @@ bool SCL_PACKAGE stw::scl::operator <(const C_SclString & orc_Par1, const C_SclS
    false    -> orc_Par1 <= orc_Par2
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool SCL_PACKAGE stw::scl::operator >(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+bool stw::scl::operator >(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    return (orc_Par1.AsStdString()->compare(orc_Par2.c_str()) > 0) ? true : false;
 }
@@ -388,7 +382,7 @@ bool SCL_PACKAGE stw::scl::operator >(const C_SclString & orc_Par1, const C_SclS
    false    -> orc_Par1 >  orc_Par2
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool SCL_PACKAGE stw::scl::operator <=(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+bool stw::scl::operator <=(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    return (orc_Par1 > orc_Par2) ? false : true;
 }
@@ -407,7 +401,7 @@ bool SCL_PACKAGE stw::scl::operator <=(const C_SclString & orc_Par1, const C_Scl
    false    -> orc_Par1 <  orc_Par2
 */
 //----------------------------------------------------------------------------------------------------------------------
-bool SCL_PACKAGE stw::scl::operator >=(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
+bool stw::scl::operator >=(const C_SclString & orc_Par1, const C_SclString & orc_Par2)
 {
    return (orc_Par1 < orc_Par2) ? false : true;
 }

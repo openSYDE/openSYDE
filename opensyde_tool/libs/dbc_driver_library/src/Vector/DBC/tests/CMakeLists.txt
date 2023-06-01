@@ -6,7 +6,7 @@ if(OPTION_RUN_CPPCHECK)
     add_subdirectory(cppcheck)
 endif()
 
-if(OPTION_RUN_TESTS)
+if(OPTION_BUILD_TESTS)
     add_subdirectory(unittests)
 endif()
 

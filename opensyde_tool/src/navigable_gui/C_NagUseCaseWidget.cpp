@@ -210,6 +210,10 @@ void C_NagUseCaseWidget::SaveAs(void)
 {
    const QPointer<stw::opensyde_gui_elements::C_OgePopUpDialog> c_New =
       new stw::opensyde_gui_elements::C_OgePopUpDialog(this, this);
+   const QSize c_SIZE(906, 415);
+
+   c_New->SetSize(c_SIZE);
+
    C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
 
    // open save-as dialog
@@ -236,7 +240,7 @@ void C_NagUseCaseWidget::OpenColorPicker(void)
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
 
    //Resize
-   c_Popup->SetSize(QSize(412, 620));
+   c_Popup->SetSize(QSize(462, 670));
 
    // open color picker dialog
    if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))

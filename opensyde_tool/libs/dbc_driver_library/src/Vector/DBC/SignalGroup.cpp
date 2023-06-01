@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -24,14 +24,22 @@
 namespace Vector {
 namespace DBC {
 
-SignalGroup::SignalGroup() :
-    messageId(0),
-    name(),
-    repetitions(1),
-    signals()
-{
-    /* nothing to do here */
+std::ostream & operator<<(std::ostream & os, const SignalGroup & signalGroup) {
+    os << "SIG_GROUP_ " << signalGroup.messageId << ' ' << signalGroup.name;
+    os << ' ' << signalGroup.repetitions;
+    bool first = true;
+    for (const auto & signal : signalGroup.signals) {
+        if (first)
+            first = false;
+        else
+            os << ',';
+        os << signal;
+    }
+    os << ';' << endl;
+
+    return os;
 }
+
 
 }
 }

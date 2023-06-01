@@ -697,8 +697,11 @@ void C_TblTreDataElementModel::m_InitBusSignal(const uint32_t ou32_ViewIndex,  c
                break;
             }
             //Protocols
-            pc_BusItem->ReserveChildrenSpace(3UL);
-            for (uint8_t u8_ItProtocol = 0U; u8_ItProtocol < 4U; ++u8_ItProtocol)
+            pc_BusItem->ReserveChildrenSpace(static_cast<uint32_t>(C_OscCanProtocol::hc_ALL_PROTOCOLS.size()));
+
+            for (uint8_t u8_ItProtocol = 0U;
+                 u8_ItProtocol < static_cast<uint8_t>(C_OscCanProtocol::hc_ALL_PROTOCOLS.size());
+                 ++u8_ItProtocol)
             {
                bool q_ProtocolValid;
                C_PuiSdNodeCanMessageSyncManager * const pc_SyncManager = new C_PuiSdNodeCanMessageSyncManager();

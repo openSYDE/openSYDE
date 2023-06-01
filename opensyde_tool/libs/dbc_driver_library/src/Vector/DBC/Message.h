@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -23,7 +23,9 @@
 
 #include <Vector/DBC/platform.h>
 
+#include <cstdint>
 #include <map>
+#include <ostream>
 #include <set>
 #include <string>
 
@@ -39,38 +41,36 @@ namespace DBC {
 /**
  * Message (BO)
  */
-class VECTOR_DBC_EXPORT Message
-{
-public:
-    Message();
-
+struct VECTOR_DBC_EXPORT Message {
     /** Identifier (with bit 31 set this is extended CAN frame) */
-    unsigned int id;
+    uint32_t id {};
 
     /** Name */
-    std::string name;
+    std::string name {};
 
     /** Size */
-    unsigned int size;
+    uint32_t size {};
 
     /** Transmitter (empty string if the number of send nodes is zero or more than one) */
-    std::string transmitter;
+    std::string transmitter {};
 
     /** Signals (SG) */
-    std::map<std::string, Signal> signals;
+    std::map<std::string, Signal> signals {};
 
     /** Message Transmitters (BO_TX_BU) */
-    std::set<std::string> transmitters;
+    std::set<std::string> transmitters {};
 
     /** Signal Groups (SIG_GROUP) */
-    std::map<std::string, SignalGroup> signalGroups;
+    std::map<std::string, SignalGroup> signalGroups {};
 
     /** Comment (CM) */
-    std::string comment;
+    std::string comment {};
 
     /** Attribute Values (BA) */
-    std::map<std::string, Attribute> attributeValues;
+    std::map<std::string, Attribute> attributeValues {};
 };
+
+std::ostream & operator<<(std::ostream & os, const Message & message);
 
 }
 }

@@ -41,6 +41,11 @@ stw::scl::C_SCLResourceStrings C_OscUtils::mhc_ResourceStrings;
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 /* -- Global Variables ---------------------------------------------------------------------------------------------- */
+const stw::scl::C_SclString C_OscUtils::hc_PATH_VARIABLE_OPENSYDE_BIN = "%{OPENSYDE_BINARY}";
+const stw::scl::C_SclString C_OscUtils::hc_PATH_VARIABLE_OPENSYDE_PROJ = "%{OPENSYDE_PROJECT}";
+const stw::scl::C_SclString C_OscUtils::hc_PATH_VARIABLE_DATABLOCK_PROJ = "%{PROJECT_DIR}";
+const stw::scl::C_SclString C_OscUtils::hc_PATH_VARIABLE_USER_NAME = "%{USER_NAME}";
+const stw::scl::C_SclString C_OscUtils::hc_PATH_VARIABLE_COMPUTER_NAME = "%{COMPUTER_NAME}";
 
 /* -- Module Global Variables --------------------------------------------------------------------------------------- */
 
@@ -88,8 +93,12 @@ bool C_OscUtils::h_CheckValidCeName(const stw::scl::C_SclString & orc_Name, cons
             // first char of name
             cn_Char = orc_Name.c_str()[u32_Index];
             // is alphanumeric and no underscore true or a number true -> invalid name
-            if (((std::isalnum(cn_Char) == 0) &&
-                 (cn_Char != '_')) || (std::isdigit(orc_Name.c_str()[0]) == 1)) //ANSI compliant check
+
+            //If the value of the character is not representable as unsigned char the behavior of isalnum is
+            // undefined. So be as defensive as possible:
+            if ((static_cast<int8_t>(cn_Char) < 0) ||
+                (((std::isalnum(cn_Char) == 0) &&
+                  (cn_Char != '_')) || (std::isdigit(orc_Name.c_str()[0]) != 0))) //ANSI compliant check
             {
                q_IsValid = false;
                break;
@@ -103,9 +112,14 @@ bool C_OscUtils::h_CheckValidCeName(const stw::scl::C_SclString & orc_Name, cons
          {
             // fist char of name
             cn_Char = orc_Name.c_str()[u32_Index];
+
             // is alphanumeric true or no underscore and a number true -> invalid name
-            if ((std::isalnum(cn_Char) == 0) &&
-                ((cn_Char != '_') || (std::isdigit(orc_Name.c_str()[0]) == 1))) //ANSI compliant check
+
+            //If the value of the character is not representable as unsigned char the the behavior of isalnum is
+            // undefined. So be as defensive as possible:
+            if ((static_cast<int8_t>(cn_Char) < 0) ||
+                ((std::isalnum(cn_Char) == 0) &&
+                 ((cn_Char != '_') || (std::isdigit(orc_Name.c_str()[0]) != 0)))) //ANSI compliant check
             {
                q_IsValid = false;
                break;
@@ -269,13 +283,17 @@ C_SclString C_OscUtils::h_NiceifyStringForFileName(const C_SclString & orc_Strin
       for (uint32_t u32_Index = 0U; u32_Index < orc_String.Length(); u32_Index++)
       {
          const char_t cn_Character = orc_String.c_str()[u32_Index];
-         if ((std::isalnum(cn_Character) == 0) &&
-             (cn_Character != '_') && (cn_Character != '-') && (cn_Character != '(') && (cn_Character != ')') &&
-             (cn_Character != '{') && (cn_Character != '}') && (cn_Character != '$') && (cn_Character != '.') &&
-             (cn_Character != ' ') && (cn_Character != '%') && (cn_Character != '&') && (cn_Character != '!') &&
-             (cn_Character != '#') && (cn_Character != '+') && (cn_Character != ',') && (cn_Character != ';') &&
-             (cn_Character != '=') && (cn_Character != '@') && (cn_Character != '[') && (cn_Character != ']') &&
-             (cn_Character != '^') && (cn_Character != '\'') && (cn_Character != '~'))
+
+         //If the value of the character is not representable as unsigned char the the behavior of isalnum is
+         // undefined. So be as defensive as possible:
+         if ((static_cast<int8_t>(cn_Character) < 0)  ||
+             ((std::isalnum(cn_Character) == 0) &&
+              (cn_Character != '_') && (cn_Character != '-') && (cn_Character != '(') && (cn_Character != ')') &&
+              (cn_Character != '{') && (cn_Character != '}') && (cn_Character != '$') && (cn_Character != '.') &&
+              (cn_Character != ' ') && (cn_Character != '%') && (cn_Character != '&') && (cn_Character != '!') &&
+              (cn_Character != '#') && (cn_Character != '+') && (cn_Character != ',') && (cn_Character != ';') &&
+              (cn_Character != '=') && (cn_Character != '@') && (cn_Character != '[') && (cn_Character != ']') &&
+              (cn_Character != '^') && (cn_Character != '\'') && (cn_Character != '~')))
          {
             c_Result += C_SclString::IntToStr(cn_Character);
          }
@@ -326,7 +344,10 @@ C_SclString C_OscUtils::h_NiceifyStringForCeComment(const C_SclString & orc_Stri
       const char_t cn_Character = c_Result[u32_Index];
       const uint32_t u32_NextIndex = u32_Index + 1U;
 
-      if ((std::isprint(cn_Character) == 0) || (cn_Character == '@') || (cn_Character == '`'))
+      //If the value of the character is not representable as unsigned char the the behavior of isprint is undefined.
+      //So be as defensive as possible:
+      if ((static_cast<int8_t>(cn_Character) < 0) || (std::isprint(cn_Character) == 0) ||
+          (cn_Character == '@') || (cn_Character == '`'))
       {
          c_Result[u32_Index] = '_';
       }
@@ -754,4 +775,195 @@ int32_t C_OscUtils::h_CopyFile(const C_SclString & orc_SourceFile, const C_SclSt
    }
 
    return s32_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Get rid of Data Block project path.
+
+   If the path contains mc_PATH_VARIABLE_DATABLOCK_PROJ we replace this with the project path,
+   but do not resolve any other placeholder variable.
+   If the path is relative it is meant as relative to the Data Block project path,
+   so we concatenate these paths.
+
+   This might result in invalid paths if the placeholder variable is not in front of string
+   but an absolute path (which would be a misconfiguration).
+
+   \param[in]  orc_DbProjectPath     path for resolving data block project variable and concatenation
+   \param[in]  orc_OsydeProjectPath  path to opened openSYDE project without file name
+                                      (for resolving hc_PATH_VARIABLE_OPENSYDE_PROJ references)
+   \param[in]  orc_Path              path that probably contains variables
+
+   \return
+   Path without Data Block project path dependencies (might still contain placeholder variables or be relative)
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscUtils::h_MakeIndependentOfDbProjectPath(const C_SclString & orc_DbProjectPath,
+                                                         const C_SclString & orc_OsydeProjectPath,
+                                                         const C_SclString & orc_Path)
+{
+   C_SclString c_Return = orc_Path;
+
+   const uint32_t u32_Pos = c_Return.Pos(hc_PATH_VARIABLE_DATABLOCK_PROJ);
+
+   if (u32_Pos != 0U)
+   {
+      c_Return.ReplaceAll(hc_PATH_VARIABLE_DATABLOCK_PROJ, orc_DbProjectPath);
+
+      // remove all double slashes but the first (network paths)
+      if (c_Return.Pos("//") == 1)
+      {
+         c_Return = '/' + c_Return;
+      }
+      c_Return.ReplaceAll("//", "/");
+   }
+   else
+   {
+      // concatenate if placeholder-resolved path would be relative
+      const C_SclString c_ResolvedPath = C_OscUtils::h_ResolvePlaceholderVariables(orc_Path, orc_OsydeProjectPath);
+
+      if (TglIsRelativePath(c_ResolvedPath) == true)
+      {
+         //relative path
+         c_Return = C_OscUtils::h_ConcatPathIfNecessary(orc_DbProjectPath, c_Return);
+      }
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if path contains placeholder variables (e.g. %{OPENSYDE_PROJECT}) and resolve them.
+
+   \param[in]  orc_Path              path that probably contains variables
+   \param[in]  orc_OsydeProjectPath  path to opened openSYDE project without file name
+                                      (for resolving hc_PATH_VARIABLE_OPENSYDE_PROJ references)
+   \param[in]  orc_DbProjectPath     path for resolving data block project variable (special case),
+                                     which might contain placeholder variables itself
+
+   \return
+   Resolved path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscUtils::h_ResolvePlaceholderVariables(const C_SclString & orc_Path,
+                                                      const C_SclString & orc_OsydeProjectPath,
+                                                      const C_SclString & orc_DbProjectPath)
+{
+   C_SclString c_Return = orc_Path;
+
+   // first check for indicator %
+   uint32_t u32_Pos = c_Return.Pos("%");
+
+   if (u32_Pos != 0U)
+   {
+      // replace general path variables
+      c_Return = C_OscUtils::h_ResolveProjIndependentPlaceholderVariables(c_Return);
+
+      // resolve project-specific variables
+      c_Return.ReplaceAll(hc_PATH_VARIABLE_OPENSYDE_PROJ, orc_OsydeProjectPath);
+
+      u32_Pos = c_Return.Pos(hc_PATH_VARIABLE_DATABLOCK_PROJ);
+      if (u32_Pos != 0U)
+      {
+         const C_SclString c_PathWithResolvedPlaceholders =
+            C_OscUtils::h_ResolvePlaceholderVariables(orc_DbProjectPath, "");
+         c_Return.ReplaceAll(hc_PATH_VARIABLE_DATABLOCK_PROJ, c_PathWithResolvedPlaceholders);
+         // occurrences of orc_DbProjectPath in itself get replaced with ""
+      }
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Check if path contains project independent variables (e.g. %{OPENSYDE_BINARY}) and resolve them.
+
+   Do not call this function for replacing every path variable!
+   This functionality can be found in a utility class that knows project stuff.
+
+   \param[in]  orc_Path    path that probably contains variables
+
+   \return
+   Resolved path
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscUtils::h_ResolveProjIndependentPlaceholderVariables(const C_SclString & orc_Path)
+{
+   C_SclString c_Return = orc_Path;
+   C_SclString c_Replacement;
+
+   uint32_t u32_Pos = c_Return.Pos(hc_PATH_VARIABLE_OPENSYDE_BIN);
+
+   if (u32_Pos != 0U)
+   {
+      c_Replacement = TglExtractFilePath(TglGetExePath());
+      c_Return.ReplaceAll(hc_PATH_VARIABLE_OPENSYDE_BIN, c_Replacement);
+   }
+
+   u32_Pos = c_Return.Pos(hc_PATH_VARIABLE_USER_NAME);
+   if (u32_Pos != 0U)
+   {
+      tgl_assert(TglGetSystemUserName(c_Replacement) == true);
+      c_Return.ReplaceAll(hc_PATH_VARIABLE_USER_NAME, c_Replacement);
+   }
+
+   u32_Pos = c_Return.Pos(hc_PATH_VARIABLE_COMPUTER_NAME);
+   if (u32_Pos != 0U)
+   {
+      tgl_assert(TglGetSystemMachineName(c_Replacement) == true);
+      c_Return.ReplaceAll(hc_PATH_VARIABLE_COMPUTER_NAME, c_Replacement);
+   }
+
+   return c_Return;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Utility function to convert relative path to absolute path if necessary
+
+   Warning: assuming orc_BaseDir is not an empty string and no file.
+
+   \param[in]  orc_BaseDir                   Base path if relative and could itself be relative
+   \param[in]  orc_RelativeOrAbsolutePath    Path which might be relative or absolute (and could be empty)
+
+   \return
+   Absolute file path if input fulfills assumptions
+*/
+//----------------------------------------------------------------------------------------------------------------------
+C_SclString C_OscUtils::h_ConcatPathIfNecessary(const C_SclString & orc_BaseDir,
+                                                const C_SclString & orc_RelativeOrAbsolutePath)
+{
+   C_SclString c_Retval;
+
+   const C_SclString c_Path = TglExtractFilePath(orc_RelativeOrAbsolutePath);
+
+   bool q_IsRelativePath = TglIsRelativePath(c_Path);
+
+   //special scenario: if the path starts with "\\" or "//" is is a UNC network path
+   //for our purpose we consider it an absolute path (concatting would have weird results)
+   if ((orc_RelativeOrAbsolutePath.Length() >= 2U) &&
+       (((orc_RelativeOrAbsolutePath[1] == '/') && (orc_RelativeOrAbsolutePath[2] == '/')) ||
+        ((orc_RelativeOrAbsolutePath[1] == '\\') && (orc_RelativeOrAbsolutePath[2] == '\\'))))
+   {
+      q_IsRelativePath = false;
+   }
+
+   if ((orc_BaseDir != "") && (q_IsRelativePath == true))
+   {
+      c_Retval = orc_BaseDir + "/" + orc_RelativeOrAbsolutePath;
+
+      //replace all "\" by "/":
+      c_Retval.ReplaceAll("\\", "/");
+   }
+   else
+   {
+      c_Retval = orc_RelativeOrAbsolutePath;
+   }
+
+   // remove all double slashes but the first (network paths)
+   if (c_Retval.Pos("//") == 1U)
+   {
+      c_Retval = '/' + c_Retval;
+   }
+   c_Retval.ReplaceAll("//", "/");
+
+   return c_Retval;
 }

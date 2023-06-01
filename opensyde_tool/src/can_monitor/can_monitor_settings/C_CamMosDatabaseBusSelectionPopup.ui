@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>404</width>
+    <width>726</width>
     <height>308</height>
    </rect>
   </property>
@@ -189,6 +189,18 @@
         </item>
         <item row="0" column="2" colspan="3">
          <widget class="stw::opensyde_gui_elements::C_OgeLabGenericNoPaddingNoMargins" name="pc_LabelDatabaseValue">
+          <property name="minimumSize">
+           <size>
+            <width>470</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>470</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="text">
            <string>Database Value</string>
           </property>

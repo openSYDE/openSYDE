@@ -8,8 +8,8 @@
    \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CXFLFLASHWRITEH
-#define CXFLFLASHWRITEH
+#ifndef CXFLFLASHWRITEHPP
+#define CXFLFLASHWRITEHPP
 
 #include "stwtypes.hpp"
 #include "CXFLProtocol.hpp"
@@ -50,7 +50,7 @@ enum E_XFLUserInteractionReason
 
 //----------------------------------------------------------------------------------------------------------------------
 ///Class for performing the actual write flash procedure
-class STW_DIAGLIB_EXPORT C_XFLFlashWrite :
+class C_XFLFlashWrite :
    public C_XFLActions
 {
 private:

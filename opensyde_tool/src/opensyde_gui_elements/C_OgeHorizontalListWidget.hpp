@@ -33,7 +33,7 @@ class C_OgeHorizontalListWidget :
 
 public:
    C_OgeHorizontalListWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeHorizontalListWidget();
+   ~C_OgeHorizontalListWidget() override;
 
    int32_t GetCountLines(void) const;
    int32_t GetActualLine(void) const;

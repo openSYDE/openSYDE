@@ -34,7 +34,7 @@ class C_PopPasswordDialogWidget :
 
 public:
    explicit C_PopPasswordDialogWidget(QWidget * const opc_Parent = NULL);
-   virtual ~C_PopPasswordDialogWidget(void);
+   ~C_PopPasswordDialogWidget(void) override;
 
    void HandleMousePressEvent(const QMouseEvent * const opc_Event);
    void HandleMouseReleaseEvent(const QMouseEvent * const opc_Event);

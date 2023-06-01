@@ -44,6 +44,12 @@ public:
    void PrepareForExpanded(const bool oq_Expand) const;
 
    void Clear(void);
+   void SetAddFilter(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+
+protected:
+   void dragEnterEvent(QDragEnterEvent * const opc_Event) override;
+   void dragMoveEvent(QDragMoveEvent * const opc_Event) override;
+   void dropEvent(QDropEvent * const opc_Event) override;
 
    //The signals keyword is necessary for Qt signal slot functionality
    //lint -save -e1736
@@ -54,6 +60,7 @@ Q_SIGNALS:
    void SigRemoveFilterItems(const QList<stw::opensyde_gui_logic::C_CamProFilterItemData> & orc_FilterItems);
    void SigRemoveAllFilters(void);
    void SigHide(void);
+   void SigSendCanFilterMsgDroppedToParentWidget(void);
 
 private:
    Ui::C_CamMosFilterWidget * mpc_Ui;
@@ -68,6 +75,7 @@ private:
    void m_RemoveFilterWidget(C_CamMosFilterItemWidget * const opc_ItemWidget) const;
    void m_EnableFilters(const bool & orq_Enabled);
    void m_OnAddClicked(void);
+   void m_OnAddFilterFromContextmenu(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
    void m_AddFilterWidget(const stw::opensyde_gui_logic::C_CamProFilterData & orc_FilterData);
    void m_RemoveFilter(C_CamMosFilterItemWidget * const opc_ItemWidget);
    void m_ActivateFilter(const C_CamMosFilterItemWidget * const opc_ItemWidget, const bool & orq_Enable);

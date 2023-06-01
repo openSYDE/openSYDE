@@ -26,7 +26,6 @@
 /* -- Used Namespaces ----------------------------------------------------------------------------------------------- */
 using namespace stw::scl;
 using namespace stw::tgl;
-
 using namespace stw::errors;
 using namespace stw::opensyde_core;
 

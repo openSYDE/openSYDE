@@ -30,7 +30,7 @@ class C_OgeCbxTable :
 
 public:
    C_OgeCbxTable(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeCbxTable(void);
+   ~C_OgeCbxTable(void) override;
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_Event) override;

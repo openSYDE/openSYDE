@@ -249,6 +249,7 @@ void C_CieDataPoolListAdapter::mh_FillUpCoreStructureByDbcValues(
          c_CanSignal.u32_ComDataElementIndex = u32_SignalIndex;
          c_CanSignal.e_MultiplexerType = c_CanMessageSignalsIter->e_MultiplexerType;
          c_CanSignal.u16_MultiplexValue = c_CanMessageSignalsIter->u16_MultiplexValue;
+         c_CanSignal.u32_J1939SuspectParameterNumber = c_CanMessageSignalsIter->u32_J1939Spn;
          u32_SignalIndex++;
          // store signal in CAN message structure
          c_CanMessage.c_Signals.push_back(c_CanSignal);
@@ -513,6 +514,7 @@ int32_t C_CieDataPoolListAdapter::h_ConvertToDbcImportMessage(const uint32_t ou3
          c_CurrentCieSignal.e_ComByteOrder = rc_CurrentOscCanSignal.e_ComByteOrder;
          c_CurrentCieSignal.e_MultiplexerType = rc_CurrentOscCanSignal.e_MultiplexerType;
          c_CurrentCieSignal.u16_MultiplexValue = rc_CurrentOscCanSignal.u16_MultiplexValue;
+         c_CurrentCieSignal.u32_J1939Spn = rc_CurrentOscCanSignal.u32_J1939SuspectParameterNumber;
 
          // fill up data pool list elements of signal
          const C_OscNodeDataPoolListElement * const pc_OscElement = C_PuiSdHandler::h_GetInstance()->

@@ -69,12 +69,13 @@ public:
    class C_CieCanSignal
    {
    public:
+      uint32_t u32_J1939Spn;                                              ///< j1939 SPN
       stw::opensyde_core::C_OscCanSignal::E_ByteOrderType e_ComByteOrder; ///< Communication value byte order
       uint16_t u16_ComBitLength;                                          ///< Communication value bit length
       uint16_t u16_ComBitStart;                                           ///< Communication value bit start
       // position
-      C_CieDataPoolElement c_Element;                               ///< Communication data pool element
-      std::map<uint32_t, stw::scl::C_SclString> c_ValueDescription; ///< Optional communication value
+      C_CieDataPoolElement c_Element;                              ///< Communication data pool element
+      std::map<int64_t, stw::scl::C_SclString> c_ValueDescription; ///< Optional communication value
       // descriptions
       stw::opensyde_core::C_OscCanSignal::E_MultiplexerType e_MultiplexerType; ///< Signal multiplexer type
       uint16_t u16_MultiplexValue;                                             ///< Only used if eMULTIPLEXED_SIGNAL
@@ -100,6 +101,9 @@ public:
    class C_CieNodeMessage
    {
    public:
+      bool operator <(const C_CieNodeMessage & orc_Cmp) const;
+      bool operator ==(const C_CieNodeMessage & orc_Cmp) const;
+
       C_CieCanMessage c_CanMessage;         ///< Transmitted message type
       stw::scl::C_SclStringList c_Warnings; ///< Appropriate warnings: if empty, there is no warning
    };

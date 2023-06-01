@@ -13,10 +13,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__          //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"

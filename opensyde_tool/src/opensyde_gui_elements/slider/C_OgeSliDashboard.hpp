@@ -32,7 +32,7 @@ class C_OgeSliDashboard :
 
 public:
    C_OgeSliDashboard(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeSliDashboard(void);
+   ~C_OgeSliDashboard(void) override;
 
    void SetCurrentStyle(const stw::opensyde_gui_logic::C_PuiSvDbSlider::E_Style oe_Style, const bool oq_IsDark);
    void SetDisplayStyle(const stw::opensyde_gui_logic::C_PuiSvDbSlider::E_Type oe_Type);

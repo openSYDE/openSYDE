@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -21,67 +21,24 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 #include <Vector/DBC/Signal.h>
 
 namespace Vector {
 namespace DBC {
 
-Signal::Signal() :
-    name(),
-
-    /* multiplexer indicator */
-    multiplexedSignal(false),
-    multiplexerSwitchValue(0),
-    multiplexorSwitch(false),
-
-    /* position */
-    startBit(0),
-    bitSize(0),
-    byteOrder(ByteOrder::BigEndian),
-    valueType(ValueType::Unsigned),
-
-    /* raw/physical conversion */
-    factor(0.0),
-    offset(0.0),
-    minimumPhysicalValue(0.0),
-    maximumPhysicalValue(0.0),
-
-    /* unit */
-    unit(),
-
-    /* receivers */
-    receivers(),
-
-    /* value type and description */
-    extendedValueType(Signal::ExtendedValueType::Undefined),
-    valueDescriptions(),
-    type(),
-
-    /* comments and attributes */
-    comment(),
-    attributeValues(),
-
-    /* extended multiplexors */
-    extendedMultiplexors()
-{
-    /* nothing to do here */
-}
-
-double Signal::rawToPhysicalValue(double rawValue)
-{
+double Signal::rawToPhysicalValue(double rawValue) const {
     /* physicalValue = rawValue * factor + offset */
     return rawValue * factor + offset;
 }
 
-double Signal::physicalToRawValue(double physicalValue)
-{
+double Signal::physicalToRawValue(double physicalValue) const {
     /* rawValue = (physicalValue - offset) / factor */
     return (physicalValue - offset) / factor;
 }
 
-double Signal::minimumRawValue()
-{
+double Signal::minimumRawValue() const {
     /* calculate minimum raw value */
     double minimumRawValue = 0.0;
     switch (extendedValueType) {
@@ -89,24 +46,22 @@ double Signal::minimumRawValue()
     case ExtendedValueType::Integer:
         if (valueType == ValueType::Signed) {
             minimumRawValue = -(2 << (bitSize - 2)); // bitSize-- because shift instead of pow
-        } else {
+        } else
             minimumRawValue = 0.0;
-        }
         break;
 
     case ExtendedValueType::Float:
-        minimumRawValue = 3.4e-38;
+        minimumRawValue = std::numeric_limits<float>::min();
         break;
 
     case ExtendedValueType::Double:
-        minimumRawValue = 1.7e-308;
+        minimumRawValue = std::numeric_limits<double>::min();
         break;
     }
     return minimumRawValue;
 }
 
-double Signal::maximumRawValue()
-{
+double Signal::maximumRawValue() const {
     /* calculate maximum raw value */
     double maximumRawValue = 0.0;
     switch (extendedValueType) {
@@ -120,22 +75,20 @@ double Signal::maximumRawValue()
         break;
 
     case ExtendedValueType::Float:
-        maximumRawValue = 3.4e38;
+        maximumRawValue = std::numeric_limits<float>::max();
         break;
 
     case ExtendedValueType::Double:
-        maximumRawValue = 1.7e308;
+        maximumRawValue = std::numeric_limits<double>::max();
         break;
     }
     return maximumRawValue;
 }
 
-uint64_t Signal::decode(std::vector<uint8_t> & data)
-{
+uint64_t Signal::decode(std::vector<uint8_t> & data) const {
     /* safety check */
-    if (bitSize == 0) {
+    if (bitSize == 0)
         return 0;
-    }
 
     /* copy bits */
     uint64_t retVal = 0;
@@ -143,29 +96,26 @@ uint64_t Signal::decode(std::vector<uint8_t> & data)
         /* start with MSB */
         unsigned int srcBit = startBit;
         unsigned int dstBit = bitSize - 1;
-        for (unsigned int i = 0; i < bitSize; ++i) {
+        for (uint32_t i = 0; i < bitSize; ++i) {
             /* copy bit */
-            if (data[srcBit / 8] & (1 << (srcBit % 8))) {
+            if (data[srcBit / 8] & (1 << (srcBit % 8)))
                 retVal |= (1ULL << dstBit);
-            }
 
             /* calculate next position */
-            if ((srcBit % 8) == 0) {
+            if ((srcBit % 8) == 0)
                 srcBit += 15;
-            } else {
+            else
                 --srcBit;
-            }
             --dstBit;
         }
     } else {
         /* start with LSB */
         unsigned int srcBit = startBit;
         unsigned int dstBit = 0;
-        for (unsigned int i = 0; i < bitSize; ++i) {
+        for (uint32_t i = 0; i < bitSize; ++i) {
             /* copy bit */
-            if (data[srcBit / 8] & (1 << (srcBit % 8))) {
+            if (data[srcBit / 8] & (1 << (srcBit % 8)))
                 retVal |= (1ULL << dstBit);
-            }
 
             /* calculate next position */
             ++srcBit;
@@ -176,60 +126,103 @@ uint64_t Signal::decode(std::vector<uint8_t> & data)
     /* if signed, then fill all bits above MSB with 1 */
     if (valueType == ValueType::Signed) {
         if (retVal & (1 << (bitSize - 1))) {
-            for (unsigned int i = bitSize; i < 8 * sizeof(retVal); ++i) {
+            for (auto i = bitSize; i < 64; ++i)
                 retVal |= (1ULL << i);
-            }
         }
     }
 
     return retVal;
 }
 
-void Signal::encode(std::vector<uint8_t> & data, uint64_t rawValue)
-{
+void Signal::encode(std::vector<uint8_t> & data, uint64_t rawValue) const {
     /* safety check */
-    if (bitSize == 0) {
+    if (bitSize == 0)
         return;
-    }
 
     /* copy bits */
     if (byteOrder == ByteOrder::BigEndian) {
         /* start with MSB */
         unsigned int srcBit = startBit;
         unsigned int dstBit = bitSize - 1;
-        for (unsigned int i = 0; i < bitSize; ++i) {
+        for (uint32_t i = 0; i < bitSize; ++i) {
             /* copy bit */
-            if (rawValue & (1ULL << dstBit)) {
+            if (rawValue & (1ULL << dstBit))
                 data[srcBit / 8] |= (1 << (srcBit % 8));
-            } else {
+            else
                 data[srcBit / 8] &= ~(1 << (srcBit % 8));
-            }
 
             /* calculate next position */
-            if ((srcBit % 8) == 0) {
+            if ((srcBit % 8) == 0)
                 srcBit += 15;
-            } else {
+            else
                 --srcBit;
-            }
             --dstBit;
         }
     } else {
         /* start with LSB */
         unsigned int srcBit = startBit;
         unsigned int dstBit = 0;
-        for (unsigned int i = 0; i < bitSize; ++i) {
+        for (uint32_t i = 0; i < bitSize; ++i) {
             /* copy bit */
-            if (rawValue & (1ULL << dstBit)) {
+            if (rawValue & (1ULL << dstBit))
                 data[srcBit / 8] |= (1 << (srcBit % 8));
-            } else {
+            else
                 data[srcBit / 8] &= ~(1 << (srcBit % 8));
-            }
 
             /* calculate next position */
             ++srcBit;
             ++dstBit;
         }
     }
+}
+
+std::ostream & operator<<(std::ostream & os, const Signal & signal) {
+    /* Name */
+    os << " SG_ " << signal.name << ' ';
+
+    /* Multiplexed Signal, Multiplexor Switch/Signal */
+    switch (signal.multiplexor) {
+    case Signal::Multiplexor::NoMultiplexor:
+        os << ' ';
+        break;
+    case Signal::Multiplexor::MultiplexedSignal:
+        os << 'm' << signal.multiplexerSwitchValue;
+        break;
+    case Signal::Multiplexor::MultiplexorSwitch:
+        os << 'M';
+        break;
+    }
+    os << ": ";
+
+    /* Start Bit, Size, Byte Order, Value Type */
+    os << signal.startBit << '|' << signal.bitSize << '@' << char(signal.byteOrder) << char(signal.valueType);
+
+    /* Factor, Offset */
+    os << " (" << signal.factor << ',' << signal.offset << ')';
+
+    /* Minimum, Maximum */
+    os << " [" << signal.minimum << '|' << signal.maximum << ']';
+
+    /* Unit */
+    os << " \"" << signal.unit << "\" ";
+
+    /* Receivers */
+    if (signal.receivers.empty())
+        os << "Vector__XXX";
+    else {
+        // 2023-03-22 STW: Add comma for receiver list to fix import errors after export
+        os << " ";
+        for (std::set<std::string>::const_iterator receiver = signal.receivers.begin();
+             receiver != signal.receivers.end(); ++receiver)
+        {
+            if(receiver != signal.receivers.begin())
+                os << ",";
+            os << *receiver;
+        }
+    }
+    os << endl;
+
+    return os;
 }
 
 }

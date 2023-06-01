@@ -28,6 +28,8 @@ QCustomPlot           GPL 3                     libraries\qcustomplot-2.0.1     
 Vector::BLF Module    GPL 3                     libraries\vector_blf-1.0.0                               https://bitbucket.org/tobylorenz/vector_blf
 OpenSSL               Apache V2.0               libaries\openssl-3.0.0                                   https://www.openssl.org/source/license.html
 Vector::DBC Module    GPL 3                     opensyde_tool\libs\dbc_driver_library                    https://bitbucket.org/tobylorenz/vector_dbc
+Bison                 GPL 3                     opensyde_tool\libs\dbc_driver_library                    https://www.gnu.org/software/bison/
+Flex                  BSD modified              opensyde_tool\libs\dbc_driver_library                    https://github.com/westes/flex/blob/v2.6.4/COPYING
 TinyXML-2             zlib license              opensyde_tool\libs\opensyde_core\xml_parser\tinyxml2     http://leethomason.github.io/tinyxml2/
 MinGW Runtime         MIT Style                 <no sources provided>                                    http://www.mingw.org/license
 Miniz                 MIT                       opensyde_tool\libs\opensyde_core\miniz                   https://github.com/richgel999/miniz

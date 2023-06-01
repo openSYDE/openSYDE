@@ -115,6 +115,22 @@ void C_SdBueJ1939PgPropertiesDialog::InitStaticNames(void) const
    this->mpc_Ui->pc_PushButtonOk->setText(C_GtGetText::h_GetText("OK"));
    this->mpc_Ui->pc_PushButtonCancel->setText(C_GtGetText::h_GetText("Cancel"));
    this->mpc_Ui->pc_LabelDestinationAddressBroadcast->setText(C_GtGetText::h_GetText("All"));
+
+   // Set tool tip info
+   this->mpc_Ui->pc_LabelPgn->SetToolTipInformation(C_GtGetText::h_GetText("PGN"),
+                                                    C_GtGetText::h_GetText(
+                                                       "J1939 Parameter Group Number"));
+   this->mpc_Ui->pc_LabelPriority->SetToolTipInformation(C_GtGetText::h_GetText("Priority"),
+                                                         C_GtGetText::h_GetText(
+                                                            "The priority for this message"));
+   this->mpc_Ui->pc_LabelSourceAddress->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                 "Source Address"),
+                                                              C_GtGetText::h_GetText(
+                                                                 "Address of source node"));
+   this->mpc_Ui->pc_LabelDestinationAddress->SetToolTipInformation(C_GtGetText::h_GetText(
+                                                                      "Destination Address"),
+                                                                   C_GtGetText::h_GetText(
+                                                                      "Address of target node"));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

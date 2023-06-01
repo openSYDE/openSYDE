@@ -13,7 +13,7 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 
-#include "C_OgeLabToolTipBase.hpp"
+#include "C_OgeLabContextMenuBase.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -25,7 +25,7 @@ namespace opensyde_gui_elements
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 class C_OgeLabHeadingGroupBold :
-   public C_OgeLabToolTipBase
+   public C_OgeLabContextMenuBase
 {
    Q_OBJECT
 

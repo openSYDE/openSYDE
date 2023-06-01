@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -23,6 +23,7 @@
 
 #include <Vector/DBC/platform.h>
 
+#include <ostream>
 #include <string>
 
 #include <Vector/DBC/ValueDescriptions.h>
@@ -35,17 +36,15 @@ namespace DBC {
 /**
  * Value Table (VAL_TABLE)
  */
-class VECTOR_DBC_EXPORT ValueTable
-{
-public:
-    ValueTable();
-
+struct VECTOR_DBC_EXPORT ValueTable {
     /** Name */
-    std::string name;
+    std::string name {};
 
     /** Value Descriptions */
-    ValueDescriptions valueDescriptions;
+    ValueDescriptions valueDescriptions {};
 };
+
+std::ostream & operator<<(std::ostream & os, const ValueTable & valueTable);
 
 }
 }

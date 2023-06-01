@@ -8,8 +8,8 @@
    \copyright   Copyright 1999 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CXFLPROTOCOLH
-#define CXFLPROTOCOLH
+#ifndef CXFLPROTOCOLHPP
+#define CXFLPROTOCOLHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -237,7 +237,7 @@ public:
 
 //----------------------------------------------------------------------------------------------------------------------
 /// STW Flashloader protocol driver
-class STW_DIAGLIB_EXPORT C_XFLProtocol :
+class C_XFLProtocol :
    virtual public C_DLReportEvents
 {
 protected:

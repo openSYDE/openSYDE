@@ -9,8 +9,8 @@
    \copyright   Copyright 2002 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCANH
-#define CCANH
+#ifndef CCANHPP
+#define CCANHPP
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "stwtypes.hpp"
@@ -25,25 +25,17 @@ namespace stw
 namespace can
 {
 /* -- Defines ------------------------------------------------------------------------------------------------------- */
-#ifndef STWCAN_PACKAGE
-#ifdef __BORLANDC__
-//maybe we want this module to be put into a VCL package ...
-#define STWCAN_PACKAGE __declspec(package)
-#else
-#define STWCAN_PACKAGE
-#endif
-#endif
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 ///high level interface to STW CANDLLs
-class STWCAN_PACKAGE C_Can :
+class C_Can :
    public C_CanDispatcher
 {
 private:
-   stw::scl::C_SclString mc_DLLName;
-   C_CanDll * mpc_CAN;
+   stw::scl::C_SclString mc_DllName;
+   C_CanDll * mpc_Can;
    bool mq_DLLOpened;
-   uint32_t mu32_RXID;
+   uint32_t mu32_RxId;
 
    int32_t m_ReadMsgFromDLL(T_STWCAN_Msg_RX & orc_Message) const;
    int32_t m_SendMsgToDLL(const T_STWCAN_Msg_TX & orc_Message) const;
@@ -80,7 +72,7 @@ public:
    int32_t DLL_Open(const stw::scl::C_SclString & orc_FileName);
    int32_t DLL_Close(void);
 
-   int32_t CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMS, T_STWCAN_Msg_RX & orc_Message) const;
+   int32_t CAN_Read_Msg_Timeout(const uint32_t ou32_MaxWaitTimeMs, T_STWCAN_Msg_RX & orc_Message) const;
 
    int32_t CAN_InteractiveSetup(void) const;
 

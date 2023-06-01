@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -32,8 +32,11 @@ namespace DBC {
  * Value Type
  */
 enum class ValueType : char {
-    Unsigned = '+', /**< Unsigned */
-    Signed = '-' /**< Signed */
+    /** Unsigned */
+    Unsigned = '+',
+
+    /** Signed */
+    Signed = '-'
 };
 
 }

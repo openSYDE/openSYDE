@@ -72,6 +72,17 @@ C_CieDcfEdsImportNodeSelectWidget::C_CieDcfEdsImportNodeSelectWidget(
    mrc_ParentDialog.SetSubTitle(static_cast<QFileInfo>(orc_FilePath).completeSuffix().toUpper() +
                                 C_GtGetText::h_GetText(" File"));
 
+   if (static_cast<QFileInfo>(orc_FilePath).completeSuffix().toUpper() == "DCF")
+   {
+      const QSize c_SIZE(717, 375);
+      mrc_ParentDialog.SetSize(c_SIZE);
+   }
+   else
+   {
+      const QSize c_SIZE(720, 375);
+      mrc_ParentDialog.SetSize(c_SIZE);
+   }
+
    this->m_FillUpComboBox(ou32_BusIndex);
 
    //Connects

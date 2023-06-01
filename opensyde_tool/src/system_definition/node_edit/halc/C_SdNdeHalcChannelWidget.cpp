@@ -76,7 +76,7 @@ C_SdNdeHalcChannelWidget::C_SdNdeHalcChannelWidget(QWidget * const opc_Parent) :
    this->mpc_Ui->pc_LabChannelTitle->SetFontPixel(13);
    this->mpc_Ui->pc_LabChannelCurrent->SetBackgroundColor(11);
    this->mpc_Ui->pc_LabChannelCurrent->SetForegroundColor(1);
-   this->mpc_Ui->pc_LabChannelCurrent->SetFontPixel(13);
+   this->mpc_Ui->pc_LabChannelCurrent->SetMarginsPadding(1);
    this->mpc_Ui->pc_LabViewDatapools->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
    this->mpc_Ui->pc_LabViewDatapools->setOpenExternalLinks(false);
    this->mpc_Ui->pc_LabViewDatapools->setFocusPolicy(Qt::NoFocus);

@@ -30,6 +30,7 @@ SOURCES += ../src/main.cpp \
     ../libs/opensyde_core/aes/AES.cpp \
     ../libs/opensyde_core/C_OscZipData.cpp \
     ../libs/opensyde_core/C_OscZipFile.cpp \
+    ../src/com_import_export/C_CieConverter.cpp \
     ../src/com_import_export/C_CieImportDataAssignment.cpp \
     ../src/com_import_export/C_CieImportedMessageVectorData.cpp \
     ../src/graphic_items/system_view_items/C_GiSvNodeData.cpp \
@@ -38,7 +39,9 @@ SOURCES += ../src/main.cpp \
     ../src/navigable_gui/C_NagTopTreeDelegate.cpp \
     ../src/navigable_gui/C_NagTopTreeModel.cpp \
     ../src/navigable_gui/C_NagTopTreeView.cpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabGenericWithContextMenu.cpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.cpp \
+    ../src/opensyde_gui_elements/text_browser/C_OgeTebLabel.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.cpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.cpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.cpp \
@@ -54,6 +57,9 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.cpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.cpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogDialog.cpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableModel.cpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableView.cpp \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.cpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.cpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.cpp \
@@ -75,6 +81,7 @@ SOURCES += ../src/main.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewTableView.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableModel.cpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableView.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamViewReport.cpp \
     ../src/system_views/C_SyvHandlerWidget.cpp \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.cpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfig.cpp \
@@ -691,22 +698,19 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/label/C_OgeLabContextMenuBase.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubSvgIconOnly.cpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedToolTipContent.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/Attribute.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeDefinition.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeRelation.cpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/AttributeValueType.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/BitTiming.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/EnvironmentVariable.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/ExtendedMultiplexor.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/File.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/FileLoad.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/FileSave.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Message.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Network.cpp \
-    ../libs/dbc_driver_library/src/Vector/DBC/Node.cpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/Parser.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/Signal.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalGroup.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalType.cpp \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueTable.cpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/platform.cpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebContextMenuBase.cpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebReport.cpp \
     ../src/opensyde_gui_elements/group_box/C_OgeGbxToolTipBase.cpp \
@@ -875,7 +879,8 @@ SOURCES += ../src/main.cpp \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.cpp \
     ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBaseCheckable.cpp \
     ../src/opensyde_gui_elements/C_OgeTreeViewCheckable.cpp \
-    ../src/table_base/tree_base/C_TblTreeModelCheckable.cpp
+    ../src/table_base/tree_base/C_TblTreeModelCheckable.cpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamView.cpp
 
 #using our standard compiler warning switches we will get some (non-critical) warnings in miniz.c
 #we do not want to modify that library (as it is not maintained by us)
@@ -895,9 +900,28 @@ win32-g++ {
    QMAKE_EXTRA_COMPILERS += miniz
 }
 
+#using our standard compiler warning switches we will get some (non-critical) warnings in Scanner.cpp
+#we do not want to modify that library (as it is auto generated)
+#so we want to suppress those warnings
+#to do that we define an additional compiler named "dbc_scanner" and assign Scanner.cpp to be built with that compiler
+#see https://stackoverflow.com/questions/27683777/how-to-specify-compiler-flag-to-a-single-source-file-with-qmake
+# for more information
+win32-g++ {
+   SOURCES_DBC_SCANNER = ../libs/dbc_driver_library/src/Vector/DBC/Scanner.cpp  #define sources to be built with additional compiler
+   dbc_scanner.name = dbc_scanner
+   dbc_scanner.input = SOURCES_DBC_SCANNER              #assign sources
+   dbc_scanner.dependency_type = TYPE_C
+   dbc_scanner.variable_out = OBJECTS
+   dbc_scanner.output = ${QMAKE_VAR_OBJECTS_DIR}${QMAKE_FILE_IN_BASE}$${first(QMAKE_EXT_OBJ)}
+   #invoke C compiler (as it's a C file)
+   dbc_scanner.commands = $${QMAKE_CC} $(CFLAGS) $(INCPATH) -w -c ${QMAKE_FILE_IN} -o ${QMAKE_FILE_OUT}
+   QMAKE_EXTRA_COMPILERS += dbc_scanner
+}
+
 #for MSVC: simply add the file to the standard compiler:
 win32-msvc* {
    SOURCES += ../result/miniz/miniz.c
+   SOURCES += ../libs/dbc_driver_library/src/Vector/DBC/Scanner.cpp
 }
 
 PRECOMPILED_HEADER = ../src/precompiled_headers/gui/precomp_headers.hpp
@@ -916,7 +940,9 @@ HEADERS  += \
     ../src/navigable_gui/C_NagTopTreeDelegate.hpp \
     ../src/navigable_gui/C_NagTopTreeModel.hpp \
     ../src/navigable_gui/C_NagTopTreeView.hpp \
+    ../src/opensyde_gui_elements/label/C_OgeLabGenericWithContextMenu.hpp \
     ../src/opensyde_gui_elements/line_edit/C_OgeLeIpAddress.hpp \
+    ../src/opensyde_gui_elements/text_browser/C_OgeTebLabel.hpp \
     ../src/opensyde_gui_elements/text_edit/C_OgeTedDbComment.hpp \
     ../src/project_gui/system_definition/C_PuiSdHandlerCanOpenLogic.hpp \
     ../src/project_gui/system_definition/node/C_PuiSdNodeInterfaceAutomaticProperties.hpp \
@@ -932,6 +958,9 @@ HEADERS  += \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsModel.hpp \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsView.hpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogDialog.hpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableModel.hpp \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogTableView.hpp \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.hpp \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.hpp \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.hpp \
@@ -953,6 +982,7 @@ HEADERS  += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewTableView.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableModel.hpp \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoTableView.hpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamViewReport.hpp \
     ../src/system_views/C_SyvHandlerWidget.hpp \
     ../src/system_views/system_update/C_SyvUpUpdateWidget.hpp \
     ../src/system_views/system_update/update_package/C_SyvUpPacConfig.hpp \
@@ -1539,30 +1569,33 @@ HEADERS  += \
     ../src/system_definition/node_edit/C_SdNdeProgrammingOptions.hpp \
     ../src/com_import_export/C_CieConverter.hpp \
     ../src/com_import_export/C_CieImportDbc.hpp \
+    ../libs/flexlexer/FlexLexer.h \
+    ../libs/dbc_driver_library/src/Vector/DBC.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Attribute.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeDefinition.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/AttributeObjectType.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeRelation.h \
     ../libs/dbc_driver_library/src/Vector/DBC/AttributeValueType.h \
     ../libs/dbc_driver_library/src/Vector/DBC/BitTiming.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ByteOrder.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/config.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/Doxygen.h \
     ../libs/dbc_driver_library/src/Vector/DBC/EnvironmentVariable.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ExtendedMultiplexor.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/File.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Message.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Network.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Node.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/platform.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/Parser.hpp \
+    ../libs/dbc_driver_library/src/Vector/DBC/Scanner.h \
     ../libs/dbc_driver_library/src/Vector/DBC/Signal.h \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalGroup.h \
     ../libs/dbc_driver_library/src/Vector/DBC/SignalType.h \
-    ../libs/dbc_driver_library/src/Vector/DBC/Status.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueDescriptions.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueTable.h \
     ../libs/dbc_driver_library/src/Vector/DBC/ValueType.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/location.hh \
+    ../libs/dbc_driver_library/src/Vector/DBC/platform.h \
+    ../libs/dbc_driver_library/src/Vector/DBC/position.hh \
+    ../libs/dbc_driver_library/src/Vector/DBC/stack.hh \
     ../libs/dbc_driver_library/src/Vector/DBC/vector_dbc_export.h \
-    ../libs/dbc_driver_library/src/Vector/DBC.h \
     ../src/opensyde_gui_elements/widget/C_OgeWiCustomMessage.hpp \
     ../src/opensyde_gui_elements/label/C_OgeLabHeadingMessage.hpp \
     ../src/opensyde_gui_elements/text_browser/C_OgeTebMessageDetails.hpp \
@@ -1765,7 +1798,8 @@ HEADERS  += \
     ../src/opensyde_gui_elements/push_button/C_OgePubIconChart.hpp \
     ../src/opensyde_gui_elements/C_OgeTreeViewToolTipBaseCheckable.hpp \
     ../src/opensyde_gui_elements/C_OgeTreeViewCheckable.hpp \
-    ../src/table_base/tree_base/C_TblTreeModelCheckable.hpp
+    ../src/table_base/tree_base/C_TblTreeModelCheckable.hpp \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamView.hpp
 
 FORMS    += \
     ../src/navigable_gui/C_NagServiceModeInfo.ui \
@@ -1773,6 +1807,7 @@ FORMS    += \
     ../src/project_operations/C_PopPasswordDialogWidget.ui \
     ../src/system_definition/C_SdTopologyWidget.ui \
     ../src/system_definition/bus_edit/canopen/C_SdBueCoAddSignalsDialog.ui \
+    ../src/system_definition/bus_edit/j1939/C_SdBueJ1939AddMessagesFromCatalogDialog.ui \
     ../src/system_definition/bus_edit/j1939/C_SdBueJ1939PgPropertiesDialog.ui \
     ../src/system_definition/node_edit/C_SdNdeLeIpAddressWidget.ui \
     ../src/system_definition/node_edit/C_SdNdeNodePropertiesTabContentWidget.ui \
@@ -1786,6 +1821,7 @@ FORMS    += \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoManagerIntfWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoOverviewWidget.ui \
     ../src/system_definition/node_edit/canopen_manager/C_SdNdeCoPdoWidget.ui \
+    ../src/system_definition/node_edit/datapools/C_SdNdeDpImportRamViewReport.ui \
     ../src/system_views/C_SyvHandlerWidget.ui \
     ../src/opensyde_gui_elements/C_OgePopUpDialog.ui \
     ../src/opensyde_gui_elements/widget/C_OgeWiHover.ui \
@@ -2015,6 +2051,7 @@ INCLUDEPATH += ../src \
                ../libs/opensyde_core/aes \
                ../libs/opensyde_core/miniz \
                ../libs/gettext \
+               ../libs/flexlexer \
                ../libs/dbc_driver_library/src/ \
                ../libs/dbc_driver_library/src/Vector \
                ../libs/dbc_driver_library/src/Vector/DBC \

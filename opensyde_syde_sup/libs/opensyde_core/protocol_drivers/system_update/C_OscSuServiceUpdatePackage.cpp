@@ -96,6 +96,8 @@ stw::scl::C_SclString C_OscSuServiceUpdatePackage::mhc_ErrorMessage;        // d
        * service update package file ("service_update_package.syde_supdef")
 
    Function is temporarily creating a folder to save files for zip archive.
+   If the optional parameter orc_TemporaryDirectory is empty, this temporary folder is
+   created next to package path. Else it is created as subfolder of the provided temporary directory.
    In any case it is tried to delete the temporary folder at the end of this function.
    The temporary folder has the extension ".syde_sup_tmp" and must not exist already.
 
@@ -114,6 +116,8 @@ stw::scl::C_SclString C_OscSuServiceUpdatePackage::mhc_ErrorMessage;        // d
    \param[in]  oq_SaveInCompatibilityFormat Flag to export in compatibility format (V2)
    \param[in]  oq_SaveAsFile                True: content of System Update Package is saved in .syde_sup format
                                             False: content of System Update Package is saved to a directory
+   \param[in]  orc_TemporaryDirectory       Optional parameter for temporary directory. If empty, temporary directory
+                                            is created next to package path.
 
    \return
    C_NO_ERR    success
@@ -142,8 +146,8 @@ int32_t C_OscSuServiceUpdatePackage::h_CreatePackage(const C_SclString & orc_Pac
                                                      const uint32_t ou32_ActiveBusIndex,
                                                      const vector<uint8_t> & orc_ActiveNodes,
                                                      const vector<uint32_t> & orc_NodesUpdateOrder,
-                                                     const vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite, C_SclStringList & orc_WarningMessages, C_SclString & orc_ErrorMessage, const bool oq_SaveInCompatibilityFormat,
-                                                     const bool oq_SaveAsFile)
+                                                     const vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite, C_SclStringList & orc_WarningMessages, C_SclString & orc_ErrorMessage, const bool oq_SaveInCompatibilityFormat, const bool oq_SaveAsFile,
+                                                     const C_SclString & orc_TemporaryDirectory)
 {
    int32_t s32_Return;
 
@@ -183,19 +187,32 @@ int32_t C_OscSuServiceUpdatePackage::h_CreatePackage(const C_SclString & orc_Pac
       if (oq_SaveAsFile)
       {
          // path for temporary folder to create contents
-         c_PackagePathTmp = orc_PackagePath.SubString(1, orc_PackagePath.Pos(mc_PACKAGE_EXT) - 1) +
+         if (orc_TemporaryDirectory.IsEmpty() == true)
+         {
+            c_PackagePathTmp = orc_PackagePath;
+         }
+         else
+         {
+            // use sub folder named like package
+            c_PackagePathTmp = TglFileIncludeTrailingDelimiter(orc_TemporaryDirectory) +
+                               TglExtractFileName(orc_PackagePath);
+            // TglExpandFileName() in the linux tgl only works for existing paths, but our path does not yet exist,
+            // so we need to expand the path manually
+         }
+         c_PackagePathTmp = c_PackagePathTmp.SubString(1, c_PackagePathTmp.Pos(mc_PACKAGE_EXT) - 1) +
                             mc_PACKAGE_EXT_TMP;
-         // add trailing path delimiter to temporary folder if not present
-         c_PackagePathTmp = TglFileIncludeTrailingDelimiter(c_PackagePathTmp);
       }
       else
       {
          // if we want to save the Update Package as a directory, we just use the temp folder, don't rename and delete
          // it. Obviously the zipping does not happen either (see below).
          c_PackagePathTmp = orc_PackagePath.SubString(1, orc_PackagePath.Pos(mc_PACKAGE_EXT) - 1);
-         // add trailing path delimiter to temporary folder if not present
-         c_PackagePathTmp = TglFileIncludeTrailingDelimiter(c_PackagePathTmp);
       }
+
+      // add trailing path delimiter to temporary folder if not present
+      c_PackagePathTmp = TglFileIncludeTrailingDelimiter(c_PackagePathTmp);
+
+      osc_write_log_info("Creating Update Package", "Temporary folder path: " + c_PackagePathTmp);
 
       // create folders and copy applications to them
       s32_Return = C_OscSuSequences::h_CreateTemporaryFolder(orc_SystemDefinition.c_Nodes, orc_ActiveNodes,

@@ -192,6 +192,9 @@ const uint32_t mu32_TOOL_TIP_MAXIMUM_ITEMS = 3;
 //Message box default size
 const int32_t ms32_MESSAGE_BOX_DEFAULT_WIDTH = 600;
 
+//Report popup size
+const QSize mc_POPUP_REPORT_SIZE(1210, 790);
+
 //Icon Size
 const QSize mc_ICON_SIZE_24 = QSize(24, 24);
 const QSize mc_ICON_SIZE_20 = QSize(20, 20);

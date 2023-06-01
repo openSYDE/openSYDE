@@ -1578,7 +1578,7 @@ QVariant C_CamGenSigTableModel::m_HandleColPhysicalInterpreted(const uint32_t ou
          }
          //Handle allowed combo box values
          c_Strings.reserve(pc_DbcSignal->c_ValueDescription.size());
-         for (std::map<uint32_t, stw::scl::C_SclString>::const_iterator c_It =
+         for (std::map<int64_t, stw::scl::C_SclString>::const_iterator c_It =
                  pc_DbcSignal->c_ValueDescription.begin();
               c_It != pc_DbcSignal->c_ValueDescription.end(); ++c_It)
          {

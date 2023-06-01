@@ -76,6 +76,7 @@ C_KFXCommunicationBase::C_KFXCommunicationBase(void)
 
 C_KFXCommunicationBase::~C_KFXCommunicationBase()
 {
+   mpr_ECUResetCallBack = NULL;
    mpv_ECUResetInstance = NULL;
 }
 

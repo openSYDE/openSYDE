@@ -33,7 +33,7 @@ class C_OgeTableWidgetComIf :
 
 public:
    C_OgeTableWidgetComIf(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTableWidgetComIf(void);
+   ~C_OgeTableWidgetComIf(void) override;
 
    void SetToolTipAt(const uint32_t ou32_Row, const uint32_t ou32_Col, const QString & orc_Heading,
                      const QString & orc_Content,

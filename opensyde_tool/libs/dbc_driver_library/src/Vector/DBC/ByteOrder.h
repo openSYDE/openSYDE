@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -32,10 +32,17 @@ namespace DBC {
  * Byte Order Type
  */
 enum class ByteOrder : char {
-    Motorola = '0', /** < Motorola / Big Endian */
-    BigEndian = '0', /**< Bit Endian / Motorola */
-    Intel = '1', /**< Intel / Little Endian */
-    LittleEndian = '1' /**< Little Endian / Intel */
+    /** Motorola / Big Endian */
+    Motorola = '0',
+
+    /** Bit Endian / Motorola */
+    BigEndian = '0',
+
+    /** Intel / Little Endian */
+    Intel = '1',
+
+    /** Little Endian / Intel */
+    LittleEndian = '1'
 };
 
 }

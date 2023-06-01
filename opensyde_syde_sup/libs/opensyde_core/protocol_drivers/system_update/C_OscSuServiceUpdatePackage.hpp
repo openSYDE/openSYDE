@@ -44,7 +44,7 @@ public:
                                   const std::vector<C_OscSuSequences::C_DoFlash> & orc_ApplicationsToWrite,
                                   stw::scl::C_SclStringList & orc_WarningMessages,
                                   stw::scl::C_SclString & orc_ErrorMessage, const bool oq_SaveInCompatibilityFormat,
-                                  const bool oq_SaveAsFile);
+                                  const bool oq_SaveAsFile, const stw::scl::C_SclString & orc_TemporaryDirectory = "");
 
    static int32_t h_ProcessPackage(const stw::scl::C_SclString & orc_PackagePath,
                                    const stw::scl::C_SclString & orc_TargetUnzipPath,

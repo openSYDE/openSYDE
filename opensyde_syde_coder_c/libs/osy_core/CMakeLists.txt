@@ -55,6 +55,7 @@ set(OPENSYDE_CORE_COMMON_SOURCES
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscBinaryHash.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscChecksummedIniFile.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/C_OscUtils.hpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/DiagLib_config.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_string_resources/C_SclResourceStrings.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_string_resources/DLStrings.hpp
    ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/stwcompid/stwcompid.h
@@ -122,6 +123,23 @@ else()
    set(OPENSYDE_CORE_IMPORTS_SOURCES
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportEdsDcf.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportEdsDcf.hpp
+
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportRamView.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscImportRamView.hpp
+      #classes from legacy DiagLib are required to load KEFEX RAMView projects:
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableLists.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDATFile.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDATFile.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDEFProject.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXDEFProject.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXProjectOptions.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXProjectOptions.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableListBase.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableListBase.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableLists.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/kefex_diaglib/dl_kefex/CKFXVariableLists.hpp
    )
 endif()
 
@@ -244,6 +262,11 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeStwFlashloaderSettings.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeCommFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/C_OscNodeDataPoolId.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdateParamInfo.cpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewFiler.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenObjectDictionary.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsInfoBlock.cpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsDeviceInfoBlock.cpp
@@ -328,6 +351,11 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerDeviceInfo.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerInfo.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open/C_OscCanOpenManagerFiler.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewData.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewPc.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdate.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewNodeUpdateParamInfo.hpp
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view/C_OscViewFiler.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenObjectDictionary.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsInfoBlock.hpp
       ${CMAKE_CURRENT_SOURCE_DIR}/imports/C_OscCanOpenEdsDeviceInfoBlock.hpp
@@ -348,6 +376,7 @@ else()
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can
       ${CMAKE_CURRENT_SOURCE_DIR}/project/system/node/can/can_open
+      ${CMAKE_CURRENT_SOURCE_DIR}/project/view
    )
 endif()
 

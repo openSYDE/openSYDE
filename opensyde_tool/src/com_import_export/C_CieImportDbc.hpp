@@ -44,19 +44,27 @@ private:
 
    static int32_t mh_ReadFile(const stw::scl::C_SclString & orc_File, Vector::DBC::Network & orc_Network);
    static void mh_GetNode(const Vector::DBC::Node & orc_DbcNode, C_CieConverter::C_CieNode & orc_Node);
-   static int32_t mh_GetMessage(const Vector::DBC::Message & orc_DbcMessage, C_CieConverter::C_CieNode & orc_Node);
-   static int32_t mh_PrepareMessage(const Vector::DBC::Message & orc_DbcMessage,
+   static int32_t mh_GetMessage(const Vector::DBC::Network & orc_DbcNetwork,
+                                const Vector::DBC::Message & orc_DbcMessage, C_CieConverter::C_CieNode & orc_Node);
+   static int32_t mh_PrepareMessage(const Vector::DBC::Network & orc_DbcNetwork,
+                                    const Vector::DBC::Message & orc_DbcMessage,
                                     C_CieConverter::C_CieNodeMessage & orc_Message);
-   static int32_t mh_ConvertAndAddMessage(const Vector::DBC::Message & orc_DbcMessage,
+   static int32_t mh_ConvertAndAddMessage(const Vector::DBC::Network & orc_DbcNetwork,
+                                          const Vector::DBC::Message & orc_DbcMessage,
                                           std::vector<C_CieConverter::C_CieNodeMessage> & orc_Messages);
-   static int32_t mh_GetSignal(const Vector::DBC::Signal & orc_DbcSignal, bool & orq_SignalAdapted,
-                               C_CieConverter::C_CieNodeMessage & orc_Message);
+   static int32_t mh_GetSignal(const Vector::DBC::Network & orc_DbcNetwork, const Vector::DBC::Signal & orc_DbcSignal,
+                               bool & orq_SignalAdapted, C_CieConverter::C_CieNodeMessage & orc_Message);
+   static void mh_GetSignalSpnInfo(const Vector::DBC::Network & orc_DbcNetwork,
+                                   const Vector::DBC::Signal & orc_DbcSignal,
+                                   C_CieConverter::C_CieCanSignal & orc_Signal);
    static void mh_VerifySignalValueTable(C_CieConverter::C_CieCanSignal & orc_DbcSignal);
-   static int32_t mh_GetSignalValues(const Vector::DBC::Signal & orc_DbcSignal, const bool oq_MultiplexerSignal,
+   static int32_t mh_GetSignalValues(const Vector::DBC::Network & orc_DbcNetwork,
+                                     const Vector::DBC::Signal & orc_DbcSignal, const bool oq_MultiplexerSignal,
                                      bool & orq_SignalAdapted, C_CieConverter::C_CieDataPoolElement & orc_Element,
                                      stw::scl::C_SclStringList & orc_WarningMessages);
    static int32_t mh_GetAttributeDefinitions(const Vector::DBC::Network & orc_DbcNetwork);
-   static void mh_GetTransmission(const Vector::DBC::Message & orc_DbcMessage,
+   static void mh_GetTransmission(const Vector::DBC::Network & orc_DbcNetwork,
+                                  const Vector::DBC::Message & orc_DbcMessage,
                                   C_CieConverter::C_CieNodeMessage & orc_Message);
    static int32_t mh_CheckRange(const float64_t of64_Value,
                                 const stw::opensyde_core::C_OscNodeDataPoolContent::E_Type oe_Datatype);

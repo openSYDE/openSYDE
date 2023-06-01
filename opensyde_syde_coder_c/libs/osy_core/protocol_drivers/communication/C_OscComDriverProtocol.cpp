@@ -17,6 +17,7 @@
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp"
 
+#include <limits>
 #include <iostream>
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -69,6 +70,8 @@ C_OscComDriverProtocol::C_OscComDriverProtocol(void) :
    mu32_ActiveBusIndex(0U),
    mpc_SecurityPemDb(NULL)
 {
+   //Check if client and server use same float standard, see #84517 for more details
+   tgl_assert(std::numeric_limits<float32_t>::is_iec559);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1438,6 +1441,10 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(const uint32_t ou32_Acti
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Sets a node into a security level
 
+   If the first request fails with the error hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED, the node is not ready for
+   the security access request. The reason is to avoid brute force attacks. Waiting for one second before try again
+   in this case.
+
    \param[in]     opc_ExistingProtocol  Protocol to use for communication
    \param[in]     ou8_SecurityLevel     level of requested security
    \param[out]    opu8_NrCode           if != NULL: negative response code
@@ -1468,9 +1475,30 @@ int32_t C_OscComDriverProtocol::m_SetNodeSecurityAccess(C_OscProtocolDriverOsy *
          bool q_SecureMode;
          uint64_t u64_Seed;
          uint8_t ou8_SecurityAlgorithm;
+         uint8_t u8_NrErrorCode = 0U;
 
          s32_Return = opc_ExistingProtocol->OsySecurityAccessRequestSeed(ou8_SecurityLevel, q_SecureMode, u64_Seed,
-                                                                         ou8_SecurityAlgorithm, opu8_NrCode);
+                                                                         ou8_SecurityAlgorithm, &u8_NrErrorCode);
+
+         if (opu8_NrCode != NULL)
+         {
+            (*opu8_NrCode) = u8_NrErrorCode;
+         }
+
+         if ((s32_Return == C_WARN) &&
+             (u8_NrErrorCode == C_OscProtocolDriverOsy::hu8_NR_CODE_REQUIRED_TIME_DELAY_NOT_EXPIRED))
+         {
+            // Special case: The server must wait for a second to allow a request after a reset.
+            // In some scenarios the normal waiting times after resets are not enough (this times are not calculated for
+            // this security scenario), so wait in this case for another second and try again
+            osc_write_log_warning("Security Access", "The node was not ready for the Security Access request. Trying"
+                                  " after waiting for another second again.");
+
+            stw::tgl::TglSleep(1000);
+
+            s32_Return = opc_ExistingProtocol->OsySecurityAccessRequestSeed(ou8_SecurityLevel, q_SecureMode, u64_Seed,
+                                                                            ou8_SecurityAlgorithm, opu8_NrCode);
+         }
 
          if (s32_Return == C_NO_ERR)
          {

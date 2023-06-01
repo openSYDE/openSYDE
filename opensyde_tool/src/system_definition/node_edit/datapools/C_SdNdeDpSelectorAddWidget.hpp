@@ -40,6 +40,13 @@ class C_SdNdeDpSelectorAddWidget :
    Q_OBJECT
 
 public:
+   enum E_SelectionResult ///< Flag for result of selection result of dialog
+   {
+      eSTANDALONE = 0, ///< Stand alone Datapool
+      eSHARED,         ///< Shared Datapool
+      eRAMVIEWIMPORT   ///< Datapool imported from a RAMView project
+   };
+
    explicit C_SdNdeDpSelectorAddWidget(stw::opensyde_gui_elements::C_OgePopUpDialog & orc_Parent,
                                        const uint32_t ou32_NodeIndex,
                                        stw::opensyde_core::C_OscNodeDataPool & orc_OscDataPool);
@@ -47,7 +54,8 @@ public:
 
    void InitStaticNames(void) const;
 
-   bool GetSelectedSharedDatapool(stw::opensyde_core::C_OscNodeDataPoolId & orc_SharedDatapoolId) const;
+   E_SelectionResult GetDialogResult(stw::opensyde_core::C_OscNodeDataPoolId & orc_SharedDatapoolId,
+                                     QString & orc_RamViewFilePath) const;
 
 protected:
    void keyPressEvent(QKeyEvent * const opc_KeyEvent) override;
@@ -60,6 +68,7 @@ private:
    const uint32_t mu32_NodeIndex;
    //lint -e{1725} Only problematic if copy or assignment is allowed
    stw::opensyde_core::C_OscNodeDataPool & mrc_OscDataPool;
+   QString mc_RamViewFilePath;
 
    std::map<QString, stw::opensyde_core::C_OscNodeDataPoolId> mc_AvailableDatapools;
 
@@ -68,10 +77,11 @@ private:
    void m_OkClicked(void);
    void m_CancelClicked(void);
 
-   void m_OnStandAloneChange(void) const;
-   void m_OnSharedChanged(void) const;
-
+   void m_DisableSharedSection(void) const;
+   void m_EnableSharedSection(void) const;
    void m_OnSharedDataPoolChanged(void) const;
+
+   void m_GetSelectedSharedDatapool(stw::opensyde_core::C_OscNodeDataPoolId & orc_SharedDatapoolId) const;
 
    //Avoid call
    C_SdNdeDpSelectorAddWidget(const C_SdNdeDpSelectorAddWidget &);

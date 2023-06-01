@@ -1309,7 +1309,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfCanInterface(const C_OscNodeComInterfaceSe
                   static_cast<QString>(C_GtGetText::h_GetText("CAN-Bitrate: ")) +
                   QString::number(ou32_Bitrate / 1000U) +
                   static_cast<QString>(" kbit/s ") + "</td>";
-      orc_Text += "<td width=\"20%\">" +
+      orc_Text += "<td width=\"60%\">" +
                   this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETCANBITRATE, orc_ServerIdOnConfiguredBus,
                                                      orc_IntfSetting.e_InterfaceType,
                                                      orc_IntfSetting.u8_InterfaceNumber) + "</td>";
@@ -1354,7 +1354,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfEthInterface(const C_OscNodeComInterfaceSe
       orc_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("IP: ")) + c_IpAddress +
                   static_cast<QString>(C_GtGetText::h_GetText(" (Sub-Net: ")) + c_NetMask +
                   static_cast<QString>(C_GtGetText::h_GetText(", default gateway: ")) + c_DefaultGateway + ")</td>";
-      orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETIPADDRESS,
+      orc_Text += "<td width=\"60%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETIPADDRESS,
                                                                             orc_ServerIdOnConfiguredBus,
                                                                             orc_IntfSetting.e_InterfaceType,
                                                                             orc_IntfSetting.u8_InterfaceNumber) +
@@ -1426,7 +1426,7 @@ void C_SyvDcWidget::m_ShowConfigInfoOfInterface(const C_OscNodeComInterfaceSetti
       orc_Text += "<tr>";
       orc_Text += "<td width=\"40%\">" + static_cast<QString>(C_GtGetText::h_GetText("Node ID: ")) +
                   QString::number(static_cast<uint32_t>(orc_ServerIdOnConfiguredBus.u8_NodeIdentifier)) + "</td>";
-      orc_Text += "<td width=\"20%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETNODEID,
+      orc_Text += "<td width=\"60%\">" + this->m_GetStateStringOfServerStep(C_SyvDcSequences::hu32_SETNODEID,
                                                                             orc_ServerIdOnConfiguredBus,
                                                                             orc_IntfSetting.e_InterfaceType,
                                                                             orc_IntfSetting.u8_InterfaceNumber) +
@@ -1845,11 +1845,11 @@ void C_SyvDcWidget::m_ShowReadInfo(const int32_t os32_ActualResult)
                       "</td>";
             if (rc_Info.q_DeviceNameValid == true)
             {
-               c_Text += "<td width=\"20%\">" + static_cast<QString>(C_GtGetText::h_GetText("OK")) + "</td>";
+               c_Text += "<td width=\"60%\">" + static_cast<QString>(C_GtGetText::h_GetText("OK")) + "</td>";
             }
             else
             {
-               c_Text += "<td width=\"20%\">" + static_cast<QString>(C_GtGetText::h_GetText("NA")) + "</td>";
+               c_Text += "<td width=\"60%\">" + static_cast<QString>(C_GtGetText::h_GetText("NA")) + "</td>";
             }
             c_Text += "</tr>";
             c_Text += "</table>";
@@ -2047,7 +2047,7 @@ QString C_SyvDcWidget::m_GetStateStringOfServerStep(const uint32_t ou32_Step,
                                                     const uint8_t ou8_InterfaceNumber)
 {
    // Default text if no concrete state is available
-   QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (prev. failure)"));
+   QString c_Text = static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (error occurred during process)"));
 
    QMap<stw::opensyde_core::C_OscProtocolDriverOsyNode,
         std::vector<C_ServerConfStepResult> >::const_iterator c_ItServer;

@@ -12,11 +12,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -60,9 +56,9 @@ C_SclString C_CanMonProtocolL2::MessageToString(const T_STWCAN_Msg_RX & orc_Msg)
    int32_t j;
    uint8_t u8_Len;
 
-   cn_XTD = (orc_Msg.u8_XTD == 1U) ? 'x':' ';
-   cn_RTR = (orc_Msg.u8_RTR == 1U) ? 'r':' '; //note: displaying RTR correctly will only work if comm driver supplies
-                                           // that information
+   cn_XTD = (orc_Msg.u8_XTD == 1U) ? 'x' : ' ';
+   cn_RTR = (orc_Msg.u8_RTR == 1U) ? 'r' : ' '; //note: displaying RTR correctly will only work if comm driver supplies
+                                                // that information
    u8_Len = (orc_Msg.u8_DLC > 8U) ? static_cast<uint8_t>(8U) : orc_Msg.u8_DLC;
 
    if (mq_Decimal == false)
@@ -103,4 +99,3 @@ C_SclString C_CanMonProtocolL2::GetProtocolName(void) const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-

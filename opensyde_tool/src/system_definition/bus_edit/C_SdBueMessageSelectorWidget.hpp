@@ -111,6 +111,7 @@ private:
    bool mq_MessagesActive;
    stw::opensyde_core::C_OscCanProtocol::E_Type me_ProtocolType;
    QAction * mpc_AddMessageAction;
+   QAction * mpc_AddMessageFromCatalogAction;
    QAction * mpc_AddSignalAction;
    QAction * mpc_AddSignalActionWithKey;
    QAction * mpc_ExpandAllAction;
@@ -130,6 +131,7 @@ private:
    void m_OnCustomContextMenuRequested(const QPoint & orc_Pos);
    void m_OnSignalCountOfMessageChanged(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId);
    void m_OnMessageCountChanged(void);
+   void m_AddMessageFromCatalogButtonClicked(void) const;
 };
 }
 }

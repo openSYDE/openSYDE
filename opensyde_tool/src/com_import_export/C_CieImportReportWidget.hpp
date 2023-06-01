@@ -48,7 +48,7 @@ public:
                                     const std::vector<C_CieImportDataAssignment > & orc_ImportDataAssigned,
                                     const std::vector<C_CieImportDataAssignment> & orc_SkippedImportDataAssigned,
                                     const stw::scl::C_SclString * const opc_NodeNameReplacement,
-                                    const bool oq_IsCanOpen = false);
+                                    const bool oq_IsCanOpen = false, const bool oq_UniqueAddRequested = false);
    ~C_CieImportReportWidget(void) override;
 
    void InitStaticNames(void) const;
@@ -78,6 +78,7 @@ private:
    std::vector<C_CieImportDataAssignment> mc_ImportedAssignedData;
    std::vector<C_CieImportDataAssignment> mc_SkippedImportedAssignedData;
    const stw::scl::C_SclString * const mpc_NodeNameReplacement;
+   const bool mq_UniqueAddRequested;
 
    void m_OkClicked(void);
    void m_CancelClicked(void);

@@ -52,6 +52,7 @@ public:
    void InitFromData(void);
    void Add(void);
    void AddMessage(void);
+   void AddMessageFromCatalog(void);
    void AddSignal(void);
    void AddSignalWithStartBit(const stw::opensyde_core::C_OscCanMessageIdentificationIndices & orc_MessageId,
                               const uint16_t ou16_StartBit, const bool oq_MultiplexedSignal,

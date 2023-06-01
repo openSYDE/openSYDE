@@ -11,10 +11,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include "DiagLib_config.hpp" //diaglib configuration
 
@@ -1029,10 +1025,11 @@ int32_t C_XFLFlashWrite::m_SetUserDefinedSectors(const C_SclString & orc_Sectors
    Set application checksum to "0" to signal that programming was started, but not finished.
    For finger-print sequence cf. the STW flashloader specification.
 
-   \param[in]    orc_FingerPrintIndexes  flags signalling which finger print services are available
+   \param[in]    orc_FingerPrintIndexes  flags signaling which finger print services are available
 
    \return
-   C_NO_ERR    checksum calculated
+   C_NO_ERR    finger print information written
+   -1          could not write finger print information (parts may have been written)
 */
 //----------------------------------------------------------------------------------------------------------------------
 int32_t C_XFLFlashWrite::m_WriteStartFingerPrint(const C_XFLFingerPrintSupportedIndexes & orc_FingerPrintIndexes)

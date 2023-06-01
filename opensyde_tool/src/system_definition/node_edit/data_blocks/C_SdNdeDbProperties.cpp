@@ -220,7 +220,9 @@ C_SdNdeDbProperties::~C_SdNdeDbProperties(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 {
-   return QSize(800, 500);
+   const QSize c_SIZE(1152, 761);
+
+   return c_SIZE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -232,7 +234,9 @@ QSize C_SdNdeDbProperties::h_GetBinaryWindowSize(void)
 //----------------------------------------------------------------------------------------------------------------------
 QSize C_SdNdeDbProperties::h_GetDefaultWindowSize(void)
 {
-   return QSize(1200, 900);
+   const QSize c_SIZE(1200, 942);
+
+   return c_SIZE;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1212,6 +1216,15 @@ void C_SdNdeDbProperties::m_SetVisibilityOfContentWidgets(const C_OscNodeApplica
 void C_SdNdeDbProperties::m_OnFileGenerationChanged(const int32_t os32_State)
 {
    // reset
+   if (this->me_Type == C_OscNodeApplication::ePROGRAMMABLE_APPLICATION)
+   {
+      mrc_ParentDialog.SetSize(C_SdNdeDbProperties::h_GetBinaryWindowSize());
+   }
+   else
+   {
+      mrc_ParentDialog.SetSize(C_SdNdeDbProperties::h_GetDefaultWindowSize());
+   }
+
    this->me_Type = C_OscNodeApplication::eBINARY;
 
    if (static_cast<Qt::CheckState>(os32_State) == Qt::Checked)

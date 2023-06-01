@@ -42,6 +42,7 @@ class C_CamMainWindow :
 public:
    explicit C_CamMainWindow(QWidget * const opc_Parent = NULL);
    ~C_CamMainWindow(void) override;
+   void CanFilterMsgDropped(void);
 
 protected:
    void closeEvent(QCloseEvent * const opc_Event) override;
@@ -115,6 +116,11 @@ private:
    void m_CheckMessagesForLoadedDatabase(const QString & orc_DatabasePath);
    void m_CheckForLastDatabaseLoaded(const QString & orc_DatabasePath);
    void m_DisplayCheckMessagesDialog(const QString & orc_DatabasePath, const std::vector<uint32_t> & orc_Indices);
+   void m_AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+
+Q_SIGNALS:
+   void SigEmitAddFilterToChildWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
+   void SigSendCanMsgDroppedToChildrenWidget(void);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

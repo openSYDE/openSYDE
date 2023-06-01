@@ -95,6 +95,8 @@ public:
    uint32_t TranslateTreeRowsToSignalIndex(const int32_t os32_MessageIndex, const int32_t os32_SignalIndex,
                                            const int32_t os32_SignalIndexL2 = -1) const;
 
+   Qt::ItemFlags flags(const QModelIndex & orc_Index) const override;
+
 private:
    bool mq_DisplayTree;
    bool mq_UniqueMessageMode;

@@ -140,8 +140,15 @@ C_CamMetTreeView::C_CamMetTreeView(QWidget * const opc_Parent) :
    connect(
       C_CamProHandler::h_GetInstance(), &C_CamProHandler::SigNewConfiguration, this,
       &C_CamMetTreeView::m_RestoreUserSettings);
-}
 
+   connect(this, &C_CamMetTreeView::SigEmitAddFilter, this, &C_CamMetTreeView::m_AddFilter);
+
+   this->setDropIndicatorShown(true);
+   this->setDragEnabled(true);
+   this->setDragDropMode(QAbstractItemView::DragDrop);
+   this->setDefaultDropAction(Qt::MoveAction);
+   this->setSelectionMode(QAbstractItemView::ExtendedSelection);
+}
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Default destructor
 
@@ -484,6 +491,19 @@ std::vector<int32_t> C_CamMetTreeView::GetCurrentColumnWidths() const
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from parent widget constructor. Throwing Filter popup on dragged item
+ *  by calling the function "m_AddFilter"
+
+   \return
+   void
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::CanFilterMsgDropped()
+{
+   C_CamMetTreeView::m_AddFilter();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Overwritten show event slot
 
    Here: move scroll bar buttons, start delayed timer
@@ -749,6 +769,9 @@ void C_CamMetTreeView::m_SetupContextMenu(void)
                                                               "Copy as Text"), this, &C_CamMetTreeView::m_CopySelection,
                                                            static_cast<int32_t>(Qt::CTRL) +
                                                            static_cast<int32_t>(Qt::Key_C));
+
+   this->mpc_AddFilter = this->mpc_ContextMenu->addAction(C_GtGetText::h_GetText("Add to Receive Filter"),
+                                                          this, &C_CamMetTreeView::m_OnAddFilterClicked);
 
    this->mpc_ContextMenu->addSeparator();
 
@@ -1050,6 +1073,61 @@ void C_CamMetTreeView::m_CollapseAll(void)
    this->updateGeometry();
 }
 
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  For adding Filter data from context menu and by drag and drop action, getting the selected row index
+ *  complete data. Sending QList of selected messages Can Id's  and IsCanMsgExtended to parent widget for further process
+ *  Here the SelectedRowIndexs = (number of selected rows X number of columns in a row) so we filtering
+ *  extact number of rows selected by using (SelectedRowIndexs.size() % columns in a row)
+
+   \return
+   Emit signal, which will be caught in parent widget (C_CamMetWidget) constructor
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::m_AddFilter()
+{
+   if (this->selectionModel()->hasSelection())
+   {
+      QList<int32_t>  c_SelectedRowIndexs;
+      QList<int32_t>  c_SelectedRowListMessagesCanId;
+      QList<uint8_t>  c_SelectedRowListMessagesXtd;
+      const QModelIndexList c_Indices = this->selectedIndexes();
+      for (QModelIndexList::const_iterator c_It = c_Indices.begin(); c_It != c_Indices.end(); ++c_It)
+      {
+         const QModelIndex & rc_Index = *c_It;
+         const int32_t s32_Row = this->mc_SortProxyModel.mapToSource(rc_Index).row();
+         c_SelectedRowIndexs << s32_Row;
+         if (((c_SelectedRowIndexs.size() % 7) == 1) || (c_SelectedRowIndexs.size() == 1))
+         {
+            if (this->mc_Model.GetMessageData(s32_Row)->c_CanMsg.u8_XTD == 0)
+            {
+               c_SelectedRowListMessagesCanId << this->mc_Model.GetMessageData(s32_Row)->c_CanIdDec.ToInt();
+            }
+            else
+            {
+               c_SelectedRowListMessagesCanId << this->mc_Model.GetMessageData(s32_Row)->c_CanMsg.u32_ID;
+            }
+            c_SelectedRowListMessagesXtd << this->mc_Model.GetMessageData(s32_Row)->c_CanMsg.u8_XTD;
+         }
+      }
+
+      Q_EMIT C_CamMetTreeView::SigEmitAddFilterToParentWidget(c_SelectedRowListMessagesCanId,
+                                                              c_SelectedRowListMessagesXtd);
+      this->clearSelection();
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call on context menu "Add filter" action click. Emit an signal which can be used in connect
+ *  mechanism from constructor
+
+   \return
+   Emit an signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMetTreeView::m_OnAddFilterClicked()
+{
+   Q_EMIT C_CamMetTreeView::SigEmitAddFilter();
+}
 //----------------------------------------------------------------------------------------------------------------------
 /*! \brief  Expand all messages and update geometry
 */

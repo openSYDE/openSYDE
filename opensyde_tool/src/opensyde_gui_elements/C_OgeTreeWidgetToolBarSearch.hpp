@@ -34,7 +34,7 @@ class C_OgeTreeWidgetToolBarSearch :
 
 public:
    C_OgeTreeWidgetToolBarSearch(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTreeWidgetToolBarSearch();
+   ~C_OgeTreeWidgetToolBarSearch() override;
 
    virtual bool Search(const QString & orc_SearchString) = 0;
    virtual void ClearResult(void) = 0;

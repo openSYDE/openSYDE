@@ -412,7 +412,7 @@ int32_t C_OscProtocolDriverOsy::m_PollForSpecificServiceResponse(const uint8_t o
    // snatch away the response we want to get.
    mc_LockReception.Acquire();
 
-   while (((stw::tgl::TglGetTickCount() - mu32_TimeoutPollingMs) < u32_StartTime) && (q_Finished == false))
+   while ((stw::tgl::TglGetTickCount() < (u32_StartTime + mu32_TimeoutPollingMs)) && (q_Finished == false))
    {
       //trigger handling of Rx and Tx communication
       s32_Return = this->m_Cycle(true, ou8_ExpectedServiceId, &orc_Service);

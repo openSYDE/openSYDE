@@ -136,6 +136,10 @@ C_CamMosWidget::C_CamMosWidget(QWidget * const opc_Parent) :
            this, &C_CamMosWidget::SigRemoveAllLogFiles);
    connect(this->mpc_Ui->pc_WiDllConfig, &C_CamMosDllWidget::SigCanDllConfigured,
            this, &C_CamMosWidget::SigCanDllConfigured);
+   connect(this, &C_CamMosWidget::SigEmitAddFilterToChildWidget, this->mpc_Ui->pc_WiFilter,
+           &C_CamMosFilterWidget::SetAddFilter);
+   connect(this->mpc_Ui->pc_WiFilter, &C_CamMosFilterWidget::SigSendCanFilterMsgDroppedToParentWidget, this,
+           &C_CamMosWidget::CanFilterMsgDropped);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -289,6 +293,34 @@ void C_CamMosWidget::ExpandSettings(const bool oq_Expand) const
 {
    this->mpc_Ui->pc_WiTitle->SetOpen(oq_Expand);
    // this toggles the ">>" button and therefore emits a signal; on this signal we connect and adapt the GUI
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from parent widget constructor. Used to receive and pass the
+ *  QList of selected messages Can Id's  and IsCanMsgExtended data to child widget
+
+   \param[in]       oc_CanMsgId     List of selected message CanId's
+   \param[in]       oc_CanMsgXtd     List of selected CanMessage has extended format
+
+   \return
+   Emit a signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::AddFilterData(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd)
+{
+   Q_EMIT C_CamMosWidget::SigEmitAddFilterToChildWidget(oc_CanMsgId, oc_CanMsgXtd);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Function call of connect mechanism from child widget constructor. Used to pass CanMsgDropped Information to parent widget
+
+   \return
+   Emit a signal
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_CamMosWidget::CanFilterMsgDropped()
+{
+   Q_EMIT C_CamMosWidget::SigSendCanMsgDroppedToParentWidget();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

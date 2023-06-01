@@ -81,9 +81,6 @@ C_SdBueComIfDescriptionWidget::C_SdBueComIfDescriptionWidget(QWidget * const opc
    // init static names
    this->InitStaticNames();
 
-   // TODO BAY: Activate again when J1939 will be enabled
-   this->mpc_Ui->pc_ProtocolTabWidget->setTabVisible(4, false);
-
    //Set undo manager
    this->mpc_Ui->pc_MessageSelectorWidget->SetUndoManager(&this->mc_UndoManager);
 

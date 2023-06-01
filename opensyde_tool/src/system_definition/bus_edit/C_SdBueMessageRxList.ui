@@ -34,7 +34,19 @@
      <property name="title">
       <string>GroupBox</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1">
+     <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <spacer name="verticalSpacer_3">
         <property name="orientation">
@@ -85,19 +97,6 @@
         </item>
        </layout>
       </item>
-      <item>
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>67</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
      </layout>
     </widget>
    </item>
@@ -106,7 +105,7 @@
      <property name="title">
       <string>GroupBox</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -123,51 +122,11 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="stw::opensyde_gui_elements::C_OgeTransparentScrollArea" name="pc_ScrollArea">
-        <property name="widgetResizable">
-         <bool>true</bool>
+       <layout class="QVBoxLayout" name="pc_VerticalLayout" stretch="">
+        <property name="spacing">
+         <number>10</number>
         </property>
-        <widget class="stw::opensyde_gui_elements::C_OgeWiOnlyBackground" name="pc_ScrollAreaWidget">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>0</y>
-           <width>396</width>
-           <height>130</height>
-          </rect>
-         </property>
-         <layout class="QVBoxLayout" name="pc_VerticalLayout">
-          <property name="spacing">
-           <number>10</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <spacer name="verticalSpacer">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>40</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </widget>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -176,27 +135,15 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
+   <extends>QLabel</extends>
+   <header>C_OgeLabGroupItem.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>stw::opensyde_gui_elements::C_OgeGbxTransparent</class>
    <extends>QGroupBox</extends>
    <header>C_OgeGbxTransparent.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeWiOnlyBackground</class>
-   <extends>QWidget</extends>
-   <header>C_OgeWiOnlyBackground.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeTransparentScrollArea</class>
-   <extends>QScrollArea</extends>
-   <header>C_OgeTransparentScrollArea.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>stw::opensyde_gui_elements::C_OgeLabGroupItem</class>
-   <extends>QLabel</extends>
-   <header>C_OgeLabGroupItem.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

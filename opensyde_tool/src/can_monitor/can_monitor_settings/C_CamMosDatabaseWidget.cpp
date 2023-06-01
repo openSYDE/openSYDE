@@ -157,7 +157,8 @@ void C_CamMosDatabaseWidget::OnLoadFinishedOsySysDef(const int32_t os32_Result,
                                                      *c_New);
 
             //Resize
-            c_New->SetSize(QSize(700, 400));
+            const QSize c_SIZE(700, 412);
+            c_New->SetSize(c_SIZE);
 
             // Execute
             if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))

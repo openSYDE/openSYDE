@@ -1522,7 +1522,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetTableLineForBrowser(const QString & o
    c_Text += "<table width=\"100%\" style =\" margin-left:" + QString::number(s32_UsedMargin) + "px\">";
    c_Text += "<tr>";
    c_Text += "<td width=\"" + QString::number(s32_UsedWidthCol1) + "%\">" + orc_FirstRow + "</td>";
-   c_Text += "<td width=\"20%\">" + orc_SecondRow + "</td>";
+   c_Text += "<td width=\"40%\">" + orc_SecondRow + "</td>";
    c_Text += "</tr>";
    c_Text += "</table>";
 
@@ -1545,7 +1545,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodeStateString(const E_Osc
    const QString c_Failed = static_cast<QString>(C_GtGetText::h_GetText("Failed"));
    const QString c_Skipped = static_cast<QString>(C_GtGetText::h_GetText("Skipped"));
    const QString c_SkippedPrevErr =
-      static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (prev. failure)"));
+      static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (error occurred during process)"));
 
    switch (oe_State)
    {
@@ -1586,7 +1586,7 @@ QString C_SyvUpNodePropertiesDialog::mh_GetSuSequenceNodeFileLoadStateString(
    const QString c_Ok = static_cast<QString>(C_GtGetText::h_GetText("Ok"));
    const QString c_Failed = static_cast<QString>(C_GtGetText::h_GetText("Failed"));
    const QString c_SkippedPrevErr =
-      static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (prev. failure)"));
+      static_cast<QString>(C_GtGetText::h_GetText("<b>Skipped</b> (error occurred during process)"));
 
    if ((oe_StateExists == eSUSEQ_STATE_NO_ERR) &&
        (oe_StateLoadedd == eSUSEQ_STATE_NO_ERR))

@@ -18,6 +18,9 @@
 #include <QTreeView>
 #include <QAction>
 #include <QSortFilterProxyModel>
+#include <QMimeData>
+#include <QList>
+#include <QMouseEvent>
 
 #include "C_CamMetTreeModel.hpp"
 #include "C_CamMetTreeDelegate.hpp"
@@ -27,6 +30,8 @@
 #include "C_CamMetTreeLoggerData.hpp"
 #include "C_OgeTreeViewToolTipBase.hpp"
 #include "C_OgeContextMenu.hpp"
+#include "C_CamMosFilterWidget.hpp"
+#include "C_CamMetWidget.hpp"
 
 /* -- Namespace ----------------------------------------------------------------------------------------------------- */
 namespace stw
@@ -68,6 +73,7 @@ public:
    void SaveUserSettings(void) const;
    void SetCurrentColumnWidths(const std::vector<int32_t> & orc_ColumnWidths);
    std::vector<int32_t> GetCurrentColumnWidths(void) const;
+   void CanFilterMsgDropped(void);
 
 protected:
    void showEvent(QShowEvent * const opc_Event) override;
@@ -93,6 +99,7 @@ private:
    QAction * mpc_ActionCopy;
    QAction * mpc_ActionExpandAll;
    QAction * mpc_ActionCollapseAll;
+   QAction * mpc_AddFilter;
    bool mq_UniqueMessageMode;
    bool mq_IsRunning;
    const bool mq_AllowSorting;
@@ -111,6 +118,8 @@ private:
    void m_RestoreUserSettings(void);
    void m_ExpandAll(void);
    void m_CollapseAll(void);
+   void m_AddFilter();
+   void m_OnAddFilterClicked();
    void m_OnCollapse(const QModelIndex & orc_Index);
    std::vector<int32_t> m_GetCurrentColumnPositionIndices(void) const;
    void m_SetColumnPositionIndices(const std::vector<int32_t> & orc_NewColPositionIndices);
@@ -127,6 +136,10 @@ private:
    const static int32_t mhs32_COL_WIDTH_CAN_DLC;
    const static int32_t mhs32_COL_WIDTH_CAN_DATA;
    const static int32_t mhs32_COL_WIDTH_CAN_COUNTER;
+
+Q_SIGNALS:
+   void SigEmitAddFilter();
+   void SigEmitAddFilterToParentWidget(const QList<int32_t> oc_CanMsgId, const QList<uint8_t> oc_CanMsgXtd);
 };
 
 /* -- Extern Global Variables --------------------------------------------------------------------------------------- */

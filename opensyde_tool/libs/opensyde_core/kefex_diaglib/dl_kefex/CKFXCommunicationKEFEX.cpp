@@ -949,7 +949,7 @@ void C_KFXCommunicationKEFEX::ResetCommProtocol(void)
 
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
 void C_KFXCommunicationKEFEX::SetKEFEXVariableInfo(const C_KFXVariableLists * const opt_KFXLists,
-                                                   const uint16 ou16_ListOffset) const
+                                                   const uint16_t ou16_ListOffset) const
 {
    mpc_Protocol->SetKEFEXVariableInfo(opt_KFXLists, ou16_ListOffset);
 }

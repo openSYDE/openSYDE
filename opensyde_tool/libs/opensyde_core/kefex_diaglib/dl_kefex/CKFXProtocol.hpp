@@ -11,7 +11,7 @@
 #ifndef DIAGLIB_KEFEX_PROTOCOL_NO_LOGGING
 #include "C_CanMonProtocol.hpp" //for protocolling HLP to text file
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
-#include "CKFXVariableLists.h" //for protocolling HLP to text file
+#include "CKFXVariableLists.hpp" //for protocolling HLP to text file
 #endif
 #endif
 

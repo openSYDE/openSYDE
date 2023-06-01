@@ -788,7 +788,8 @@ void C_SdNdeCoConfigTreeView::m_OnAddDevice(void)
                                                                                    u8_InterfaceNumber);
 
       //Resize
-      c_PopUp->SetSize(QSize(1200, 745));
+      const QSize c_SIZE(1200, 829);
+      c_PopUp->SetSize(c_SIZE);
 
       Q_UNUSED(pc_AddDialog)
 
@@ -882,7 +883,7 @@ void C_SdNdeCoConfigTreeView::m_OnAddDeviceReport(const uint32_t ou32_SelectedNo
             Q_UNUSED(pc_Dialog)
 
             //Resize
-            c_New->SetSize(QSize(1210, 790));
+            c_New->SetSize(mc_POPUP_REPORT_SIZE);
 
             if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
             {

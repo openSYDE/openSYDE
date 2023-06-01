@@ -9,11 +9,7 @@
    \copyright   Copyright 2010 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
 #include "C_CanMonProtocolTarget.hpp"
 #include "stwtypes.hpp"
@@ -21,7 +17,6 @@
 #include "C_CanMonProtocolKefex.hpp"
 
 //---------------------------------------------------------------------------
-
 
 using namespace stw::errors;
 using namespace stw::cmon_protocol;
@@ -72,23 +67,23 @@ static const uint8_t mu8_KFX_PROTOCOL_SRR_CF                       = 0x43U;
 */
 //-----------------------------------------------------------------------------
 C_CanMonProtocolKefex::C_CanMonProtocolKefex(void) :
-   C_CMONProtocolKEFEX_IVA(),
-   mu16_KFXBaseID(0x600U)
+   C_CanMonProtocolKefexIva(),
+   mu16_KfxBaseID(0x600U)
 {
 }
 
 //---------------------------------------------------------------------------
 
-uint16_t C_CanMonProtocolKefex::GetBaseID(void) const
+uint16_t C_CanMonProtocolKefex::GetBaseId(void) const
 {
-   return mu16_KFXBaseID;
+   return mu16_KfxBaseID;
 }
 
 //---------------------------------------------------------------------------
 
-void C_CanMonProtocolKefex::SetBaseID(const uint16_t ou16_BaseID)
+void C_CanMonProtocolKefex::SetBaseId(const uint16_t ou16_BaseId)
 {
-   mu16_KFXBaseID = ou16_BaseID;
+   mu16_KfxBaseID = ou16_BaseId;
 }
 
 //-----------------------------------------------------------------------------
@@ -108,10 +103,11 @@ void C_CanMonProtocolKefex::SetBaseID(const uint16_t ou16_BaseID)
 int32_t C_CanMonProtocolKefex::SaveParamsToIni(C_SclIniFile & orc_IniFile, const C_SclString & orc_Section)
 {
    int32_t s32_Error = C_NO_ERR;
+
    try
    {
-      orc_IniFile.WriteInteger(orc_Section, "PP_KFX_BASE_ID",     this->mu16_KFXBaseID);
-      orc_IniFile.WriteInteger(orc_Section, "PP_KFX_LIST_OFFSET", this->mu16_KFXListOffset);
+      orc_IniFile.WriteInteger(orc_Section, "PP_KFX_BASE_ID",     this->mu16_KfxBaseID);
+      orc_IniFile.WriteInteger(orc_Section, "PP_KFX_LIST_OFFSET", this->mu16_KfxListOffset);
       //const t_RAMLists *m_ptKFXLists; No easy way to save this.
    }
    catch (...)
@@ -137,24 +133,24 @@ int32_t C_CanMonProtocolKefex::SaveParamsToIni(C_SclIniFile & orc_IniFile, const
 //-----------------------------------------------------------------------------
 int32_t C_CanMonProtocolKefex::LoadParamsFromIni(C_SclIniFile & orc_IniFile, const C_SclString & orc_Section)
 {
-   this->mu16_KFXBaseID     = static_cast<uint16_t>(orc_IniFile.ReadInteger(orc_Section, "PP_KFX_BASE_ID",
-                                                  this->mu16_KFXBaseID));
-   this->mu16_KFXListOffset = static_cast<uint16_t>(orc_IniFile.ReadInteger(orc_Section, "PP_KFX_LIST_OFFSET",
-                                                  this->mu16_KFXListOffset));
+   this->mu16_KfxBaseID     = static_cast<uint16_t>(orc_IniFile.ReadInteger(orc_Section, "PP_KFX_BASE_ID",
+                                                                            this->mu16_KfxBaseID));
+   this->mu16_KfxListOffset = static_cast<uint16_t>(orc_IniFile.ReadInteger(orc_Section, "PP_KFX_LIST_OFFSET",
+                                                                            this->mu16_KfxListOffset));
    //const t_RAMLists *m_ptKFXLists; No easy way to load this.
    return C_NO_ERR;
 }
 
 //---------------------------------------------------------------------------
 
-C_SclString C_CanMonProtocolKefex::m_KFXIndexAndErrorToString(const char_t * const opcn_Text, const uint16_t ou16_Index,
+C_SclString C_CanMonProtocolKefex::m_KfxIndexAndErrorToString(const char_t * const opcn_Text, const uint16_t ou16_Index,
                                                               const uint16_t ou16_Error,
-                                                              const bool oq_IsKEFEXVarIndex) const
+                                                              const bool oq_IsKefexVarIndex) const
 {
    C_SclString c_Help;
    C_SclString c_Help2;
 
-   c_Help = static_cast<C_SclString>(" ") + opcn_Text + "  " + m_KFXIndexToString(ou16_Index, oq_IsKEFEXVarIndex) +
+   c_Help = static_cast<C_SclString>(" ") + opcn_Text + "  " + m_KfxIndexToString(ou16_Index, oq_IsKefexVarIndex) +
             "  ERROR ";
 
    if (mq_Decimal == true)
@@ -170,10 +166,11 @@ C_SclString C_CanMonProtocolKefex::m_KFXIndexAndErrorToString(const char_t * con
 
 //---------------------------------------------------------------------------
 
-C_SclString C_CanMonProtocolKefex::m_KFXTextAndValueToString(const char_t * const opcn_Text,
-                                                           const uint32_t ou32_Value) const
+C_SclString C_CanMonProtocolKefex::m_KfxTextAndValueToString(const char_t * const opcn_Text,
+                                                             const uint32_t ou32_Value) const
 {
    C_SclString c_Help;
+
    if (mq_Decimal == true)
    {
       (void)c_Help.PrintFormatted("%s %d", opcn_Text, ou32_Value);
@@ -201,10 +198,11 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
    C_SclString c_Help;
    C_SclString c_Help2;
    C_SclString c_Help3;
+
    c_Text = "";
 
-   if ((orc_Msg.u32_ID >= static_cast<uint32_t>(mu16_KFXBaseID)) &&
-       (orc_Msg.u32_ID <= ((static_cast<uint32_t>(mu16_KFXBaseID)) + 0x1FFU)))
+   if ((orc_Msg.u32_ID >= static_cast<uint32_t>(mu16_KfxBaseID)) &&
+       (orc_Msg.u32_ID <= ((static_cast<uint32_t>(mu16_KfxBaseID)) + 0x1FFU)))
    {
       //it is a KFX protocol message !
       uint8_t u8_Sender;
@@ -233,7 +231,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
          else
          {
             u8_Receiver = orc_Msg.au8_Data[0];
-            c_Text = m_GetByteAsStringFormat(u8_Sender)+" -> "+m_GetByteAsStringFormat(u8_Receiver);
+            c_Text = m_GetByteAsStringFormat(u8_Sender) + " -> " + m_GetByteAsStringFormat(u8_Receiver);
             //which service ?
             switch (orc_Msg.au8_Data[1] & 0x7FU)
             {
@@ -244,7 +242,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndValueToString(" ServiceRead REQ  INDEX ",
+                  c_Help = m_KfxTextAndValueToString(" ServiceRead REQ  INDEX ",
                                                      mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                c_Text += c_Help;
@@ -256,11 +254,12 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndValueToString(" ServiceWrite REQ  INDEX ",
-                          static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]))) +
-                          "  VALUE "+ m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                  c_Help = m_KfxTextAndValueToString(" ServiceWrite REQ  INDEX ",
+                                                     static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])))
+                           +
+                           "  VALUE " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_SRR:
                if (orc_Msg.u8_DLC < 4U)
@@ -269,7 +268,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndIndexToString(" SRR REQ ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                  c_Help = m_KfxTextAndIndexToString(" SRR REQ ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                c_Text += c_Help;
                break;
@@ -283,16 +282,16 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[1] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = m_KFXIndexAndErrorToString("SRR SEG FC REQ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
+                     c_Help = m_KfxIndexAndErrorToString("SRR SEG FC REQ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]),
                                                          mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
                   }
                   else
                   {
                      c_Help = " SRR SEG FC REQ  " +
-                             m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                             "  BS "  + m_GetValueDecHex(orc_Msg.au8_Data[4]) +
-                             "  MI "  + m_GetValueDecHex(orc_Msg.au8_Data[5]) + "ms" +
-                             "  PAR " + m_GetValueDecHex(orc_Msg.au8_Data[6]);
+                              m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                              "  BS "  + m_GetValueDecHex(orc_Msg.au8_Data[4]) +
+                              "  MI "  + m_GetValueDecHex(orc_Msg.au8_Data[5]) + "ms" +
+                              "  PAR " + m_GetValueDecHex(orc_Msg.au8_Data[6]);
                   }
                }
                c_Text += c_Help;
@@ -308,7 +307,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   u16_Hysteresis = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]);
                   const uint16_t u16_HystBase  = static_cast<uint16_t>((u16_Hysteresis >> 14U) & 0x03U);
                   const uint16_t u16_UpperHyst = static_cast<uint16_t>((u16_Hysteresis >> 7U)  & 0x7FU);
-                  const uint16_t u16_LowerHyst = static_cast<uint16_t>( u16_Hysteresis         & 0x7FU);
+                  const uint16_t u16_LowerHyst = static_cast<uint16_t>(u16_Hysteresis         & 0x7FU);
                   float64_t f64_Help;
 
                   c_Help2 += " UHYST ";
@@ -351,9 +350,9 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   default:
                      break;
                   }
-                  c_Help = " ECRR REQ  " + m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]))+
-                          "  MAXTIME "  + m_GetValueDecHex(u16_Time) +
-                          "ms " + c_Help2;
+                  c_Help = " ECRR REQ  " + m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                           "  MAXTIME "  + m_GetValueDecHex(u16_Time) +
+                           "ms " + c_Help2;
                }
                c_Text += c_Help;
                break;
@@ -365,8 +364,8 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                else
                {
                   u16_Time = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
-                  c_Help = " TCRR REQ  " + m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]))+
-                          "  TIME "+ m_GetValueDecHex(u16_Time) + "ms";
+                  c_Help = " TCRR REQ  " + m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                           "  TIME " + m_GetValueDecHex(u16_Time) + "ms";
                }
                c_Text += c_Help;
                break;
@@ -379,8 +378,8 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                {
                   u16_Time = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]);
                   c_Help = " TCRR TS REQ  " +
-                          m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
-                          "  TIME " + m_GetValueDecHex(u16_Time) + "ms";
+                           m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])) +
+                           "  TIME " + m_GetValueDecHex(u16_Time) + "ms";
                }
                c_Text += c_Help;
                break;
@@ -391,7 +390,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndIndexToString(" AIR REQ  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                  c_Help = m_KfxTextAndIndexToString(" AIR REQ  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                c_Text += c_Help;
                break;
@@ -402,9 +401,9 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndIndexToString(" AIR HS REQ  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
+                  c_Help = m_KfxTextAndIndexToString(" AIR HS REQ  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_ABORT_ALL_RESPONSES:
                c_Text += " AAR REQ";
@@ -420,22 +419,24 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                else
                {
                   u32_Size = orc_Msg.au8_Data[4] +
-                      ((static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 8U)) +
-                      ((static_cast<uint32_t>(orc_Msg.au8_Data[6]) << 16U));
+                             ((static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 8U)) +
+                             ((static_cast<uint32_t>(orc_Msg.au8_Data[6]) << 16U));
                   if (mq_Decimal == true)
                   {
                      (void)c_Help.PrintFormatted(" IMM SEG FF REQ  %s NUM %d PAR %d",
-                         m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])).c_str(), u32_Size,
-                         orc_Msg.au8_Data[7]);
+                                                 m_KfxIndexToString(mh_BytesToWordLowHigh(
+                                                                       &orc_Msg.au8_Data[2])).c_str(), u32_Size,
+                                                 orc_Msg.au8_Data[7]);
                   }
                   else
                   {
                      (void)c_Help.PrintFormatted(" IMM SEG FF REQ  %s  NUM %X  PAR %X",
-                         m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])).c_str(), u32_Size,
-                         orc_Msg.au8_Data[7]);
+                                                 m_KfxIndexToString(mh_BytesToWordLowHigh(
+                                                                       &orc_Msg.au8_Data[2])).c_str(), u32_Size,
+                                                 orc_Msg.au8_Data[7]);
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_IWR_CF:
                if (orc_Msg.u8_DLC < 8U)
@@ -447,27 +448,27 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = " IMM SEG CF REQ  BLK " + m_GetValueDecHex(orc_Msg.au8_Data[2])+
-                             "  ERROR "+
-                             m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])));
+                     c_Help = " IMM SEG CF REQ  BLK " + m_GetValueDecHex(orc_Msg.au8_Data[2]) +
+                              "  ERROR " +
+                              m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])));
                   }
                   else
                   {
                      if (mq_Decimal == true)
                      {
                         (void)c_Help.PrintFormatted(" IMM SEG CF REQ  BLK %d  DATA [%d,%d,%d,%d,%d]",
-                            orc_Msg.au8_Data[2], orc_Msg.au8_Data[3], orc_Msg.au8_Data[4],
-                            orc_Msg.au8_Data[5], orc_Msg.au8_Data[6], orc_Msg.au8_Data[7]);
+                                                    orc_Msg.au8_Data[2], orc_Msg.au8_Data[3], orc_Msg.au8_Data[4],
+                                                    orc_Msg.au8_Data[5], orc_Msg.au8_Data[6], orc_Msg.au8_Data[7]);
                      }
                      else
                      {
                         (void)c_Help.PrintFormatted(" IMM SEG CF REQ  BLK %02X  DATA [%02X,%02X,%02X,%02X,%02X]",
-                            orc_Msg.au8_Data[2], orc_Msg.au8_Data[3], orc_Msg.au8_Data[4],
-                            orc_Msg.au8_Data[5], orc_Msg.au8_Data[6], orc_Msg.au8_Data[7]);
+                                                    orc_Msg.au8_Data[2], orc_Msg.au8_Data[3], orc_Msg.au8_Data[4],
+                                                    orc_Msg.au8_Data[5], orc_Msg.au8_Data[6], orc_Msg.au8_Data[7]);
                      }
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_IMMEDIATE_WRITE_HS:
                if (orc_Msg.u8_DLC < 8U)
@@ -476,10 +477,10 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = " IMM HS REQ  " + m_KFXIndexToString((mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])))+
-                          "  VALUE "+ m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
+                  c_Help = " IMM HS REQ  " + m_KfxIndexToString((mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]))) +
+                           "  VALUE " + m_GetValueDecHex(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[4]));
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_LOGON_HS:
                if (orc_Msg.u8_DLC < 8U)
@@ -489,19 +490,21 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                else
                {
                   c_Help = " LOGON HS REQ  CRC " +
-                          m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]))) +
-                          "  VER "+ m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]))) +
-                          "  NUM "+ m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6])));
+                           m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]))) +
+                           "  VER " + m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(
+                                                                                &orc_Msg.au8_Data[4]))) +
+                           "  NUM " + m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(
+                                                                                &orc_Msg.au8_Data[6])));
                }
                c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_LOGOFF_HS:
                c_Text += " LOGOFF HS REQ";
                break;
-            case mu8_KFX_PROTOCOL_READ_EEPROM: //no break
+            case mu8_KFX_PROTOCOL_READ_EEPROM:       //no break
             case mu8_KFX_PROTOCOL_READ_FLASH_EEPROM: //no break
-            case mu8_KFX_PROTOCOL_READ_SRAM: //no break
-            case mu8_KFX_PROTOCOL_READ_EPROM: //no break
+            case mu8_KFX_PROTOCOL_READ_SRAM:         //no break
+            case mu8_KFX_PROTOCOL_READ_EPROM:        //no break
                switch (orc_Msg.au8_Data[1] & 0x7FU)
                {
                case mu8_KFX_PROTOCOL_READ_EEPROM:
@@ -517,7 +520,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   c_Text += " READ EPROM REQ";
                   break;
                default:
-                  c_Text +=" READ ?\?\? REQ";
+                  c_Text += " READ ?\?\? REQ";
                   break;
                }
                if (orc_Msg.u8_DLC < 6U)
@@ -535,12 +538,12 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                      c_Text += " BYTE ";
                   }
                   u32_Address = orc_Msg.au8_Data[3] + ((static_cast<uint32_t>(orc_Msg.au8_Data[4])) << 8U) +
-                                                      ((static_cast<uint32_t>(orc_Msg.au8_Data[5])) << 16U);
+                                ((static_cast<uint32_t>(orc_Msg.au8_Data[5])) << 16U);
                   c_Help = " ADD: " + m_GetValueDecHex(u32_Address);
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
-            case mu8_KFX_PROTOCOL_WRITE_EEPROM_HS: //no break
+            case mu8_KFX_PROTOCOL_WRITE_EEPROM_HS:       //no break
             case mu8_KFX_PROTOCOL_WRITE_FLASH_EEPROM_HS: //no break
             case mu8_KFX_PROTOCOL_WRITE_SRAM_HS:
                switch (orc_Msg.au8_Data[1] & 0x7FU)
@@ -573,7 +576,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                      c_Text += " BYTE ";
                   }
                   u32_Address = orc_Msg.au8_Data[3] + ((static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 8U)) +
-                                                      ((static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 16U));
+                                ((static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 16U));
                   u16_Value = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]);
                   c_Help = " ADD: " + m_GetValueDecHex(u32_Address) + "  VAL:";
                   if (orc_Msg.au8_Data[2] == 0U)
@@ -594,7 +597,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndValueToString(" UPDATE TASK REQ  INDEX",
+                  c_Help = m_KfxTextAndValueToString(" UPDATE TASK REQ  INDEX",
                                                      mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                c_Text += c_Help;
@@ -606,7 +609,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndValueToString(" UPDATE TASK HS REQ  INDEX",
+                  c_Help = m_KfxTextAndValueToString(" UPDATE TASK HS REQ  INDEX",
                                                      mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2]));
                }
                c_Text += c_Help;
@@ -620,17 +623,17 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                {
                   if (orc_Msg.au8_Data[2] == 0x1U) //START
                   {
-                     c_Help = m_KFXTextAndValueToString(" WRITE EEPROM SSL REQ  START  NUM_SERVICES ",
-                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
-                                                         "  CRC " +
-                                                         m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                     c_Help = m_KfxTextAndValueToString(" WRITE EEPROM SSL REQ  START  NUM_SERVICES ",
+                                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+                              "  CRC " +
+                              m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
                   }
                   else if (orc_Msg.au8_Data[2] == 0x2U) //END
                   {
-                     c_Help = m_KFXTextAndValueToString(" WRITE EEPROM SSL REQ  END  NUM_SERVICES ",
-                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
-                                                         "  CRC " +
-                                                         m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                     c_Help = m_KfxTextAndValueToString(" WRITE EEPROM SSL REQ  END  NUM_SERVICES ",
+                                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+                              "  CRC " +
+                              m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
                   }
                   else
                   {
@@ -641,7 +644,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                c_Text += c_Help;
                break;
             default:
-               c_Text+= "?\?\?";
+               c_Text += "?\?\?";
                break;
             }
             if (c_Text != "")
@@ -653,38 +656,38 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
       else
       {
          //response
-         c_Text = m_GetByteAsStringFormat(u8_Sender)+" -> XXX";
+         c_Text = m_GetByteAsStringFormat(u8_Sender) + " -> XXX";
          if (orc_Msg.u8_DLC < 2U)
          {
             c_Text += " (*DLC Error*)";
          }
          else
          {
-            c_Text = m_GetByteAsStringFormat(u8_Sender)+" -> XXX";
+            c_Text = m_GetByteAsStringFormat(u8_Sender) + " -> XXX";
             //which service ?
             switch (orc_Msg.au8_Data[0] & 0x7FU)
             {
-            case mu8_KFX_PROTOCOL_SRR:  //no break
-            case mu8_KFX_PROTOCOL_ECRR: //no break
+            case mu8_KFX_PROTOCOL_SRR:          //no break
+            case mu8_KFX_PROTOCOL_ECRR:         //no break
             case mu8_KFX_PROTOCOL_SERVICE_READ: //no break
             case mu8_KFX_PROTOCOL_TCRR:
                switch (orc_Msg.au8_Data[0] & 0x7FU)
                {
-                  case mu8_KFX_PROTOCOL_SRR:
-                     c_Help3 = "SRR";
-                     break;
-                  case mu8_KFX_PROTOCOL_ECRR:
-                     c_Help3 = "ECRR";
-                     break;
-                  case mu8_KFX_PROTOCOL_TCRR:
-                     c_Help3 = "TCRR";
-                     break;
-                  case mu8_KFX_PROTOCOL_SERVICE_READ:
-                     c_Help3 = "ServiceRead";
-                     break;
-                  default:
-                     c_Help3 = "?\?\?";
-                     break;
+               case mu8_KFX_PROTOCOL_SRR:
+                  c_Help3 = "SRR";
+                  break;
+               case mu8_KFX_PROTOCOL_ECRR:
+                  c_Help3 = "ECRR";
+                  break;
+               case mu8_KFX_PROTOCOL_TCRR:
+                  c_Help3 = "TCRR";
+                  break;
+               case mu8_KFX_PROTOCOL_SERVICE_READ:
+                  c_Help3 = "ServiceRead";
+                  break;
+               default:
+                  c_Help3 = "?\?\?";
+                  break;
                }
                c_Help3 += " RES";
 
@@ -696,14 +699,15 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                else
                {
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
-                  {  //error
-                     c_Help = m_KFXIndexAndErrorToString(c_Help3.c_str(), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
-                                                                          mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                  {
+                     //error
+                     c_Help = m_KfxIndexAndErrorToString(c_Help3.c_str(), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
+                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                      c_Help2 = "";
                   }
                   else
                   {
-                     c_Help = " " + c_Help3 + "  " + m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
+                     c_Help = " " + c_Help3 + "  " + m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
                      if (mq_Decimal == true)
                      {
                         c_Help2 = "  VALUE: " + C_SclString::IntToStr(mh_BytesToDwordLowHigh(&orc_Msg.au8_Data[3]));
@@ -726,20 +730,20 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = m_KFXIndexAndErrorToString("SRR SEG FF RES", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
-                                                                           mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                     c_Help = m_KfxIndexAndErrorToString("SRR SEG FF RES", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
+                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                   else
                   {
-                     c_Help = " SRR SEG FF RES  " + m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]))+
-                             "  NUM " + m_GetValueDecHex(orc_Msg.au8_Data[3] +
-                                        (static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 8U) +
-                                        (static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 16U))+
-                             "  PAR " + m_GetValueDecHex(orc_Msg.au8_Data[6])+
-                             "  DATA [" + m_GetValueDecHex(orc_Msg.au8_Data[7]) + "]";
+                     c_Help = " SRR SEG FF RES  " + m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1])) +
+                              "  NUM " + m_GetValueDecHex(orc_Msg.au8_Data[3] +
+                                                          (static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 8U) +
+                                                          (static_cast<uint32_t>(orc_Msg.au8_Data[5]) << 16U)) +
+                              "  PAR " + m_GetValueDecHex(orc_Msg.au8_Data[6]) +
+                              "  DATA [" + m_GetValueDecHex(orc_Msg.au8_Data[7]) + "]";
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_SRR_CF:
                if (orc_Msg.u8_DLC < 8U)
@@ -752,25 +756,28 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   {
                      //error
                      c_Help = " SRR SEG CF RES  BLK " + m_GetValueDecHex(orc_Msg.au8_Data[1]) +
-                             "  ERROR " + m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])));
+                              "  ERROR " +
+                              m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])));
                   }
                   else
                   {
                      if (mq_Decimal == true)
                      {
                         (void)c_Help.PrintFormatted(" SRR SEG CF RES  BLK %d  DATA [%d,%d,%d,%d,%d,%d]",
-                           orc_Msg.au8_Data[1], orc_Msg.au8_Data[2],  orc_Msg.au8_Data[3],
-                           orc_Msg.au8_Data[4], orc_Msg.au8_Data[5],  orc_Msg.au8_Data[6], orc_Msg.au8_Data[7]);
+                                                    orc_Msg.au8_Data[1], orc_Msg.au8_Data[2],  orc_Msg.au8_Data[3],
+                                                    orc_Msg.au8_Data[4], orc_Msg.au8_Data[5],  orc_Msg.au8_Data[6],
+                                                    orc_Msg.au8_Data[7]);
                      }
                      else
                      {
                         (void)c_Help.PrintFormatted(" SRR SEG CF RES  BLK %02X  DATA [%02X,%02X,%02X,%02X,%02X,%02X]",
-                           orc_Msg.au8_Data[1], orc_Msg.au8_Data[2],  orc_Msg.au8_Data[3],
-                           orc_Msg.au8_Data[4], orc_Msg.au8_Data[5],  orc_Msg.au8_Data[6], orc_Msg.au8_Data[7]);
+                                                    orc_Msg.au8_Data[1], orc_Msg.au8_Data[2],  orc_Msg.au8_Data[3],
+                                                    orc_Msg.au8_Data[4], orc_Msg.au8_Data[5],  orc_Msg.au8_Data[6],
+                                                    orc_Msg.au8_Data[7]);
                      }
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_TCRR_TIMESTAMPED:
                if (orc_Msg.u8_DLC < 8U)
@@ -783,17 +790,17 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = m_KFXIndexAndErrorToString("TCRR TS RES", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
-                                                                        mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                     c_Help = m_KfxIndexAndErrorToString("TCRR TS RES", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
+                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                      c_Help2 = "";
                   }
                   else
                   {
-                     c_Help = m_KFXTextAndIndexToString(" TCRR TS RES  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
+                     c_Help = m_KfxTextAndIndexToString(" TCRR TS RES  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
                      c_Help2 = "  VALUE: " + m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3])) +
-                              "  TS: " + m_GetValueDecHex(orc_Msg.au8_Data[5] +
-                                 (static_cast<uint32_t>(orc_Msg.au8_Data[6]) << 8U) +
-                                 (static_cast<uint32_t>(orc_Msg.au8_Data[7]) << 16U)) + "ms";
+                               "  TS: " + m_GetValueDecHex(orc_Msg.au8_Data[5] +
+                                                           (static_cast<uint32_t>(orc_Msg.au8_Data[6]) << 8U) +
+                                                           (static_cast<uint32_t>(orc_Msg.au8_Data[7]) << 16U)) + "ms";
                   }
                }
                c_Text = c_Text + c_Help + c_Help2;
@@ -805,9 +812,9 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                }
                else
                {
-                  c_Help = m_KFXTextAndValueToString(" AIR HS  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
+                  c_Help = m_KfxTextAndValueToString(" AIR HS  ", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_ABORT_ALL_RESPONSES_HS:
                c_Text += " AAR HS RES";
@@ -823,18 +830,20 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = m_KFXIndexAndErrorToString(c_Help3.c_str(),
-                                 mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]),
-                                 false);
+                     c_Help = m_KfxIndexAndErrorToString(c_Help3.c_str(),
+                                                         mh_BytesToWordLowHigh(
+                                                            &orc_Msg.au8_Data[1]),
+                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]),
+                                                         false);
                   }
                   else
                   {
-                     c_Help = m_KFXTextAndValueToString((c_Help3 + "  INDEX").c_str(),
+                     c_Help = m_KfxTextAndValueToString((c_Help3 + "  INDEX").c_str(),
                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
                      c_Help += " OK";
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_IMMEDIATE_WRITE_HS:
                c_Help3 = " IMM RES";
@@ -847,16 +856,18 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = m_KFXIndexAndErrorToString(c_Help3.c_str(),
-                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                     c_Help = m_KfxIndexAndErrorToString(c_Help3.c_str(),
+                                                         mh_BytesToWordLowHigh(
+                                                            &orc_Msg.au8_Data[1]),
+                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                   else
                   {
-                     c_Help = m_KFXTextAndIndexToString(c_Help3.c_str(), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
+                     c_Help = m_KfxTextAndIndexToString(c_Help3.c_str(), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
                      c_Help += " OK";
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_IWR_FC:
                if (orc_Msg.u8_DLC < 5U)
@@ -866,20 +877,23 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                else
                {
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
-                  { //error
-                     c_Help = m_KFXIndexAndErrorToString("IMM SEG FC RES",
-                             mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]), mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                  {
+                     //error
+                     c_Help = m_KfxIndexAndErrorToString("IMM SEG FC RES",
+                                                         mh_BytesToWordLowHigh(
+                                                            &orc_Msg.au8_Data[1]),
+                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                   else
                   {
                      c_Help = " IMM SEG FC RES  " +
-                             m_KFXIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1])) +
-                             "  BS " + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
-                             "  MI " + m_GetValueDecHex(orc_Msg.au8_Data[4]) + "ms" +
-                             "  PAR " + m_GetValueDecHex(orc_Msg.au8_Data[5]);
+                              m_KfxIndexToString(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1])) +
+                              "  BS " + m_GetValueDecHex(orc_Msg.au8_Data[3]) +
+                              "  MI " + m_GetValueDecHex(orc_Msg.au8_Data[4]) + "ms" +
+                              "  PAR " + m_GetValueDecHex(orc_Msg.au8_Data[5]);
                   }
                }
-               c_Text+=c_Help;
+               c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_LOGON_HS:
                if (orc_Msg.u8_DLC < 5U)
@@ -891,7 +905,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   c_Text += " LOGON HS RES";
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
-                     c_Text += m_KFXTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                     c_Text += m_KfxTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                }
                break;
@@ -904,18 +918,19 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                {
                   c_Text += " LOGOFF HS RES";
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
-                  {  //error
-                     c_Text = m_KFXTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                  {
+                     //error
+                     c_Text = m_KfxTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                }
                break;
             case mu8_KFX_PROTOCOL_STARTUP_INDICATION:
-               c_Text+= " STARTUP";
+               c_Text += " STARTUP";
                break;
-            case mu8_KFX_PROTOCOL_READ_EEPROM: //no break
+            case mu8_KFX_PROTOCOL_READ_EEPROM:       //no break
             case mu8_KFX_PROTOCOL_READ_FLASH_EEPROM: //no break
-            case mu8_KFX_PROTOCOL_READ_SRAM: //no break
-            case mu8_KFX_PROTOCOL_READ_EPROM: //no break
+            case mu8_KFX_PROTOCOL_READ_SRAM:         //no break
+            case mu8_KFX_PROTOCOL_READ_EPROM:        //no break
                switch (orc_Msg.au8_Data[0] & 0x7FU)
                {
                case mu8_KFX_PROTOCOL_READ_EEPROM:
@@ -944,7 +959,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help += m_KFXTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                     c_Help += m_KfxTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                   else
                   {
@@ -957,8 +972,8 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                         c_Help += " BYTE ";
                      }
                      u32_Address = orc_Msg.au8_Data[2] +
-                           ((static_cast<uint32_t>(orc_Msg.au8_Data[3]) << 8U)) +
-                           ((static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 16U));
+                                   ((static_cast<uint32_t>(orc_Msg.au8_Data[3]) << 8U)) +
+                                   ((static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 16U));
                      u16_Value = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[5]);
                      c_Help += " ADD: " + m_GetValueDecHex(u32_Address) + "  VAL:";
                      if (orc_Msg.au8_Data[1] == 0U)
@@ -974,7 +989,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                c_Text += c_Help;
                break;
             case mu8_KFX_PROTOCOL_WRITE_FLASH_EEPROM_HS: //no break
-            case mu8_KFX_PROTOCOL_WRITE_EEPROM_HS: //no break
+            case mu8_KFX_PROTOCOL_WRITE_EEPROM_HS:       //no break
             case mu8_KFX_PROTOCOL_WRITE_SRAM_HS:
                switch (orc_Msg.au8_Data[0] & 0x7FU)
                {
@@ -998,8 +1013,9 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                else
                {
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
-                  { //error
-                     c_Help += m_KFXTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
+                  {
+                     //error
+                     c_Help += m_KfxTextAndValueToString("  ERROR", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]));
                   }
                   else
                   {
@@ -1012,8 +1028,8 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                         c_Help += " BYTE ";
                      }
                      u32_Address = orc_Msg.au8_Data[2] +
-                                ((static_cast<uint32_t>(orc_Msg.au8_Data[3]) << 8U)) +
-                                ((static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 16U));
+                                   ((static_cast<uint32_t>(orc_Msg.au8_Data[3]) << 8U)) +
+                                   ((static_cast<uint32_t>(orc_Msg.au8_Data[4]) << 16U));
                      u16_Value = mh_BytesToWordLowHigh(&orc_Msg.au8_Data[5]);
                      c_Help += " ADD: " + m_GetValueDecHex(u32_Address) + "  VAL:";
                      if (orc_Msg.au8_Data[1] == 0U)
@@ -1038,12 +1054,12 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                   if ((orc_Msg.au8_Data[0] & 0x80U) == 0x80U)
                   {
                      //error
-                     c_Help = m_KFXIndexAndErrorToString("UPDATE TASK RES", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
+                     c_Help = m_KfxIndexAndErrorToString("UPDATE TASK RES", mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]),
                                                          mh_BytesToWordLowHigh(&orc_Msg.au8_Data[3]), false);
                   }
                   else
                   {
-                     c_Help = m_KFXTextAndValueToString(" UPDATE TASK RES  INDEX",
+                     c_Help = m_KfxTextAndValueToString(" UPDATE TASK RES  INDEX",
                                                         mh_BytesToWordLowHigh(&orc_Msg.au8_Data[1]));
                      c_Help += " OK";
                   }
@@ -1072,7 +1088,7 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                      }
                      else
                      {
-                        c_Help = m_KFXTextAndValueToString(" WRITE EEPROM SSL RES  START  NUM_SERVICES ",
+                        c_Help = m_KfxTextAndValueToString(" WRITE EEPROM SSL RES  START  NUM_SERVICES ",
                                                            mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4]));
                      }
                   }
@@ -1082,14 +1098,13 @@ C_SclString C_CanMonProtocolKefex::MessageToString(const T_STWCAN_Msg_RX & orc_M
                      {
                         c_Help = " WRITE EEPROM SSL RES  END   ERROR " +
                                  m_GetValueDecHex(static_cast<uint32_t>(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[2])));
-
                      }
                      else
                      {
-                        c_Help = m_KFXTextAndValueToString(" WRITE EEPROM SSL RES  END  NUM_SERVICES ",
-                                                            mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
-                                                            "  CRC " +
-                                                            m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
+                        c_Help = m_KfxTextAndValueToString(" WRITE EEPROM SSL RES  END  NUM_SERVICES ",
+                                                           mh_BytesToWordLowHigh(&orc_Msg.au8_Data[4])) +
+                                 "  CRC " +
+                                 m_GetValueDecHex(mh_BytesToWordLowHigh(&orc_Msg.au8_Data[6]));
                      }
                   }
                   else
@@ -1124,4 +1139,3 @@ C_SclString C_CanMonProtocolKefex::GetProtocolName(void) const
 }
 
 //---------------------------------------------------------------------------
-

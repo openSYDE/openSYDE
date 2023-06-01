@@ -40,6 +40,7 @@ set(SYDESUP_LINUX_INCLUDE_DIRECTORIES
 set(SYDESUP_COMMON_SOURCES
    ${PROJECT_ROOT}/src/C_SydeSup.cpp
    ${PROJECT_ROOT}/src/C_SupSuSequences.cpp
+   ${PROJECT_ROOT}/src/C_SupCreatePackage.cpp
 )
 
 set(SYDESUP_WINDOWS_SOURCES

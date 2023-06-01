@@ -131,10 +131,10 @@ bool C_OscSuSequences::m_IsNodeActive(const uint32_t ou32_NodeIndex, const uint3
    The return value can be used to abort an ongoing sequence.
    However, not all calls to the function check the return value.
 
-   \param[in]     oe_Step           Step of node configuration
-   \param[in]     os32_Result       Result of service
-   \param[in]     ou8_Progress      Progress of sequence in percentage
-   \param[in]     orc_Information   Additional text information
+   \param[in]  oe_Step           Step of node configuration
+   \param[in]  os32_Result       Result of service
+   \param[in]  ou8_Progress      Progress of sequence in percentage
+   \param[in]  orc_Information   Additional text information
 
    \return
    Flag for aborting sequence
@@ -159,11 +159,11 @@ bool C_OscSuSequences::m_ReportProgress(const E_ProgressStep oe_Step, const int3
 
    For more details see description of the other m_ReportProgress() function
 
-   \param[in]     oe_Step           Step of node configuration
-   \param[in]     os32_Result       Result of service
-   \param[in]     orc_Server        Affected node
-   \param[in]     ou8_Progress      Progress of sequence in percentage (goes from 0..100 for each function)
-   \param[in]     orc_Information   Additional text information
+   \param[in]  oe_Step           Step of node configuration
+   \param[in]  os32_Result       Result of service
+   \param[in]  ou8_Progress      Progress of sequence in percentage (goes from 0..100 for each function)
+   \param[in]  orc_Server        Affected node
+   \param[in]  orc_Information   Additional text information
 
    \return
    Flag for aborting sequence
@@ -902,7 +902,6 @@ int32_t C_OscSuSequences::m_FlashNodeOpenSydeFile(const std::vector<C_SclString>
    (i.e. path information will be removed).
 
    \param[in]     orc_FileToFlash               File to write
-   \param[in]     ou32_SignatureAddress         address of signature block within hex file
    \param[in]     ou32_RequestDownloadTimeout   Maximum time in ms it can take to prepare one file on the target file
    \param[in]     ou32_TransferDataTimeout      Maximum time in ms it can take to write up to 4kB of data to the target
                                                  file
@@ -4170,6 +4169,53 @@ int32_t C_OscSuSequences::GetUpdateStates(std::vector<C_OscSuSequencesNodeUpdate
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Fill flash data structure with PEM states
+
+   \param[in]   oe_StateSecurity    Security state
+   \param[in]   oe_StateDebugger    Debugger state
+   \param[out]  orc_DoFlash         Flash data structure
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_OscSuSequences::h_FillDoFlashWithPemStates(const C_OscViewNodeUpdate::E_StateSecurity oe_StateSecurity,
+                                                  const C_OscViewNodeUpdate::E_StateDebugger oe_StateDebugger,
+                                                  C_OscSuSequences::C_DoFlash & orc_DoFlash)
+{
+   switch (oe_StateSecurity)
+   {
+   case C_OscViewNodeUpdate::eST_SEC_NO_CHANGE:
+      orc_DoFlash.q_SendSecurityEnabledState = false;
+      break;
+   case C_OscViewNodeUpdate::eST_SEC_ACTIVATE:
+      orc_DoFlash.q_SendSecurityEnabledState = true;
+      orc_DoFlash.q_SecurityEnabled = true;
+      break;
+   case C_OscViewNodeUpdate::eST_SEC_DEACTIVATE:
+      orc_DoFlash.q_SendSecurityEnabledState = true;
+      orc_DoFlash.q_SecurityEnabled = false;
+      break;
+   default:
+      break;
+   }
+
+   switch (oe_StateDebugger)
+   {
+   case C_OscViewNodeUpdate::eST_DEB_NO_CHANGE:
+      orc_DoFlash.q_SendDebuggerEnabledState = false;
+      break;
+   case C_OscViewNodeUpdate::eST_DEB_ACTIVATE:
+      orc_DoFlash.q_SendDebuggerEnabledState = true;
+      orc_DoFlash.q_DebuggerEnabled = true;
+      break;
+   case C_OscViewNodeUpdate::eST_DEB_DEACTIVATE:
+      orc_DoFlash.q_SendDebuggerEnabledState = true;
+      orc_DoFlash.q_DebuggerEnabled = false;
+      break;
+   default:
+      break;
+   }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Convert information read from openSYDE server node to string list
 
    Can be used by the application for a no-frills approach to get a textual representation of the information
@@ -4586,10 +4632,10 @@ void C_OscSuSequences::h_StwFlashloaderInformationToText(const C_XflDeviceInform
 //----------------------------------------------------------------------------------------------------------------------
 bool C_OscSuSequences::C_ApplicationProperties::operator ==(const C_ApplicationProperties & orc_Source) const
 {
-   return((this->c_Name == orc_Source.c_Name) &&
-          (this->c_Version == orc_Source.c_Version) &&
-          (this->c_BuildDate == orc_Source.c_BuildDate) &&
-          (this->c_BuildTime == orc_Source.c_BuildTime));
+   return((this->c_Name.Trim() == orc_Source.c_Name.Trim()) &&
+          (this->c_Version.Trim() == orc_Source.c_Version.Trim()) &&
+          (this->c_BuildDate.Trim() == orc_Source.c_BuildDate.Trim()) &&
+          (this->c_BuildTime.Trim() == orc_Source.c_BuildTime.Trim()));
 }
 
 //----------------------------------------------------------------------------------------------------------------------

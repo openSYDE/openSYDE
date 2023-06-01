@@ -31,7 +31,7 @@ class C_OgeTawToolTipBase :
 {
 public:
    C_OgeTawToolTipBase(QWidget * const opc_Parent = NULL);
-   virtual ~C_OgeTawToolTipBase(void);
+   ~C_OgeTawToolTipBase(void) override;
 
    void SetToolTipInformation(const uint32_t ou32_Index, const QString & orc_Heading, const QString & orc_Content);
 

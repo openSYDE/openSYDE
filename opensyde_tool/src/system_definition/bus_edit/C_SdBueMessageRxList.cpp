@@ -52,15 +52,11 @@ C_SdBueMessageRxList::C_SdBueMessageRxList(QWidget * const opc_Parent) :
 {
    mpc_Ui->setupUi(this);
 
-   this->mpc_Ui->pc_ScrollAreaWidget->SetBackgroundColor(-1);
-
    InitStaticNames();
 
    //Debug strings
    this->mpc_Ui->pc_GroupBoxEmpty->setTitle("");
    this->mpc_Ui->pc_GroupBoxNotEmpty->setTitle("");
-
-   this->mpc_Ui->pc_ScrollArea->DeactivateScrollbarResize();
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -116,6 +112,7 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
        (orc_EntryNames.size() == orc_EntryDatapoolNames.size()) &&
        (orc_EntryNames.size() == orc_DatapoolIndexes.size()))
    {
+      uint32_t u32_MinSize = 0UL;
       std::vector<uint32_t> c_NodeDatapoolIndexes;
       std::vector<QString> c_NodeDatapoolNames;
       std::vector<C_PuiSdNodeCanMessage::E_RxTimeoutMode> c_ReceiveTimeoutModes;
@@ -161,6 +158,8 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
             c_NodeDatapoolNames.clear();
             c_ReceiveTimeoutModes.clear();
             c_ReceiveTimeoutValues.clear();
+
+            u32_MinSize += static_cast<uint32_t>(pc_Entry->minimumHeight());
          } //lint !e429  //no memory leak because of the Qt memory management
       }
 
@@ -175,6 +174,8 @@ void C_SdBueMessageRxList::AddNodes(const std::vector<QString> & orc_EntryNames,
          this->mpc_Ui->pc_GroupBoxEmpty->setVisible(false);
          this->mpc_Ui->pc_GroupBoxNotEmpty->setVisible(true);
       }
+
+      this->m_HandleWidgetSize(u32_MinSize, orc_EntryNames.size());
    }
    else
    {
@@ -388,4 +389,28 @@ void C_SdBueMessageRxList::Clear(void)
       pc_Entry->deleteLater();
    }
    this->mc_Entries.clear();
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Handle widget size
+
+   \param[in]  ou32_ContentSize  Content size
+   \param[in]  ou32_NumEntries   Num entries
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdBueMessageRxList::m_HandleWidgetSize(const uint32_t ou32_ContentSize, const uint32_t ou32_NumEntries)
+{
+   uint32_t u32_MinSize;
+
+   if (ou32_NumEntries == 0UL)
+   {
+      u32_MinSize = 39UL;
+   }
+   else
+   {
+      u32_MinSize = ou32_ContentSize + (10UL * (ou32_NumEntries - 1UL));
+   }
+
+   this->setMinimumHeight(u32_MinSize);
+   this->setMaximumHeight(u32_MinSize);
 }

@@ -13,10 +13,6 @@
 
 /* -- Includes ------------------------------------------------------------------------------------------------------ */
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include <windows.h>
 #include "stwtypes.hpp"
@@ -83,12 +79,26 @@ void stw::tgl::TglDelayUs(const uint32_t ou32_NumberUs)
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief   Sleep for a number of milliseconds
+
+   Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
+   i.e.: no active, blocking waiting.
+
+   \param[in]    ou32_NumberMs    number of milliseconds to delay
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
+{
+   Sleep(ou32_NumberMs);
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Get system time in microseconds
 
    Return elapsed time since system start in micro-seconds as precise as possible.
 
    \return
-   System time in micro-seconds.
+   System time in microseconds.
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint64_t stw::tgl::TglGetTickCountUs(void)
@@ -119,7 +129,7 @@ uint64_t stw::tgl::TglGetTickCountUs(void)
    As we return an uint32 milliseconds value it will overflow after 49.7 days (just like the Win32 GetTickCount)
 
    \return
-   System time in milliseconds.
+   System time in milliseconds
 */
 //----------------------------------------------------------------------------------------------------------------------
 uint32_t stw::tgl::TglGetTickCount(void)
@@ -127,16 +137,3 @@ uint32_t stw::tgl::TglGetTickCount(void)
    return static_cast<uint32_t>(TglGetTickCountUs() / 1000U);
 }
 
-//----------------------------------------------------------------------------------------------------------------------
-/*! \brief   Sleep for a number of milliseconds
-
-   Delay for a number of milliseconds. Thread control shall meanwhile be passed on.
-   i.e.: no active, blocking waiting.
-
-   \param[in]    ou32_NumberMs    number of milliseconds to delay
-*/
-//----------------------------------------------------------------------------------------------------------------------
-void stw::tgl::TglSleep(const uint32_t ou32_NumberMs)
-{
-   Sleep(ou32_NumberMs);
-}

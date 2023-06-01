@@ -471,17 +471,13 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
           (q_CtrlModifier == true) &&
           (q_AltModifier == true))
       {
-         switch (opc_KeyEvent->key())
+         if (static_cast<Qt::Key>(opc_KeyEvent->key()) == Qt::Key_O)
          {
-         case Qt::Key_O:
             //Undo redo command view
             if (this->m_GetUndoManager() != NULL)
             {
                this->m_GetUndoManager()->ToggleCommandDisplay();
             }
-            break;
-         default:
-            break;
          }
       }
       //Debug commands end
@@ -491,32 +487,24 @@ void C_SebScene::keyPressEvent(QKeyEvent * const opc_KeyEvent)
       {
          if (q_ShiftModifier == true)
          {
-            switch (opc_KeyEvent->key())
+            if (static_cast<Qt::Key>(opc_KeyEvent->key()) == Qt::Key_Backspace)
             {
-            case Qt::Key_Backspace:
                if ((this->m_IsUndoAvailable() == true) && (this->m_GetUndoManager() != NULL))
                {
                   // redo
                   this->m_GetUndoManager()->DoRedo();
                }
-               break;
-            default:
-               break;
             }
          }
          else
          {
-            switch (opc_KeyEvent->key())
+            if (static_cast<Qt::Key>(opc_KeyEvent->key()) == Qt::Key_Backspace)
             {
-            case Qt::Key_Backspace:
                if ((this->m_IsUndoAvailable() == true) && (this->m_GetUndoManager() != NULL))
                {
                   // undo
                   this->m_GetUndoManager()->DoUndo();
                }
-               break;
-            default:
-               break;
             }
          }
       }

@@ -235,6 +235,7 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
                                        static_cast<uint32_t>(this->ms32_DataPoolIndex));
 
       q_IsShared = rc_SharedDatapools.IsSharedDatapool(c_DpId, &u32_SharedDatapoolGroup);
+      SetIsDatapoolShared(q_IsShared);
 
       if (q_IsShared == true)
       {
@@ -289,11 +290,13 @@ C_SdNdeDpProperties::C_SdNdeDpProperties(C_OgePopUpDialog & orc_Parent, C_OscNod
       this->mpc_Ui->pc_BushButtonBreakRelation->setEnabled(false);
 
       q_IsShared = true;
+      SetIsDatapoolShared(q_IsShared);
    }
    else
    {
       // New Datapool is not shared
       q_IsShared = false;
+      SetIsDatapoolShared(q_IsShared);
    }
 
    //apply datapool style
@@ -450,6 +453,36 @@ void C_SdNdeDpProperties::InitStaticNames(void)
    this->mpc_Ui->pc_ComboBoxScope->addItem("dummy");
    this->mpc_Ui->pc_ComboBoxScope->setItemText(mhs32_INDEX_PRIVATE, C_GtGetText::h_GetText("Private"));
    this->mpc_Ui->pc_ComboBoxScope->setItemText(mhs32_INDEX_PUBLIC, C_GtGetText::h_GetText("Public"));
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Getting bool variable whether Datapool is shared or not
+
+   \return
+   return type bool
+
+   \retval   Return value 1   True, In case of datapool shared
+   \retval   Return value 2   False, In case of datapool not shared
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_SdNdeDpProperties::GetIsDatapoolShared() const
+{
+   return mq_IsDatapoolShared;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Setting bool variable whether Datapool is shared or not
+
+   \param[in]       o_IsShared ... Getting the information of datapool shared or not from another class "C_SdNdeDpProperties"
+
+   \return
+   void
+
+*/
+//----------------------------------------------------------------------------------------------------------------------
+void C_SdNdeDpProperties::SetIsDatapoolShared(const bool o_IsShared)
+{
+   mq_IsDatapoolShared = o_IsShared;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -1004,10 +1037,8 @@ void C_SdNdeDpProperties::m_InitComboBoxProtocols(const bool oq_NewDatapool,
                                                                                          eCAN_OPEN_SAFETY));
    this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::
                                                                                          eCAN_OPEN));
-
-   // TODO BAY: Activate again when J1939 will be enabled
-   //this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::
-   //                                                                                      eJ1939));
+   this->mpc_Ui->pc_ComboBoxProtocol->addItem(C_PuiSdUtil::h_ConvertProtocolTypeToString(C_OscCanProtocol::
+                                                                                         eJ1939));
 
    this->mpc_Ui->pc_ComboBoxProtocol->setCurrentText(C_PuiSdUtil::h_ConvertProtocolTypeToString(oe_ComProtocolType));
 
@@ -1112,6 +1143,15 @@ void C_SdNdeDpProperties::m_HandleDataPoolSafetyAdaptation(void)
       for (uint32_t u32_ItList = 0; u32_ItList < this->mpc_OscDataPool->c_Lists.size(); ++u32_ItList)
       {
          C_OscNodeDataPoolList & rc_CurList = this->mpc_OscDataPool->c_Lists[u32_ItList];
+
+         // Update crc active if safety
+         // Safety property of eHALC_NVM is not changeable, no handling necessary
+         if (this->mpc_OscDataPool->e_Type == C_OscNodeDataPool::eNVM)
+         {
+            rc_CurList.q_NvmCrcActive = true;
+         }
+
+         // Set acces RO if safety
          for (uint32_t u32_ItElement = 0; u32_ItElement < rc_CurList.c_Elements.size(); ++u32_ItElement)
          {
             C_OscNodeDataPoolListElement & rc_CurElement = rc_CurList.c_Elements[u32_ItElement];
@@ -1152,8 +1192,17 @@ void C_SdNdeDpProperties::m_BreakSharedRelation(void)
          this->m_ApplyType(false);
          // The parent dialog must be resized to the minimum.This will cause an automatic adaption of the dialog
          // to the correct size
-         this->mpc_ParentDialog->setMinimumHeight(0);
-         this->mpc_ParentDialog->setMaximumHeight(0);
+         if (this->mpc_OscDataPool->e_Type == C_OscNodeDataPool::eDIAG)
+         {
+            const QSize c_SIZE(892, 800);
+            this->mpc_ParentDialog->SetSize(c_SIZE);
+         }
+         else //For C_OscNodeDataPool::eNVM
+         {
+            const QSize c_SIZE(892, 932);
+            this->mpc_ParentDialog->SetSize(c_SIZE);
+         }
+         // we can not change Qt constant but it is still better than using the hard coded magic number 16777215
       }
    }
 }

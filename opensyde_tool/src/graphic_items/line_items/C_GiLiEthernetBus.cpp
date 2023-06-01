@@ -96,6 +96,10 @@ bool C_GiLiEthernetBus::OpenStyleDialog(void)
    C_GiSyLineWidget * const pc_SettingsWidget =
       new C_GiSyLineWidget(C_GiSyLineWidget::E_Type::eETHERNET_BUS, *pc_Dialog);
 
+   const QSize c_SIZE(880, 506);
+
+   c_New->SetSize(c_SIZE);
+
    pc_SettingsWidget->SetLineColor(this->GetColor());
    pc_SettingsWidget->SetLineWidth(this->GetWidth());
    pc_SettingsWidget->SetInnerLineColor(this->GetMiddleLineColor());

@@ -2629,6 +2629,83 @@ bool C_OscNodeDataPoolContent::operator !=(const C_OscNodeDataPoolContent & orc_
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+/*! \brief  Compare content strict
+
+   \param[in]  orc_Cmp  Compared instance
+
+   \return
+   Flags
+
+   \retval   True    Equal to orc_Cmp
+   \retval   False   Not equal to orc_Cmp
+*/
+//----------------------------------------------------------------------------------------------------------------------
+bool C_OscNodeDataPoolContent::CompareContentStrict(const C_OscNodeDataPoolContent & orc_Cmp) const
+{
+   bool q_Retval = false;
+
+   if ((this->mq_Array == orc_Cmp.GetArray()) && (this->me_Type == orc_Cmp.GetType()))
+   {
+      if (this->mq_Array == false)
+      {
+         switch (this->me_Type)
+         {
+         case eUINT8:
+            q_Retval = (this->GetValueU8() == orc_Cmp.GetValueU8());
+            break;
+         case eUINT16:
+            q_Retval = (this->GetValueU16() == orc_Cmp.GetValueU16());
+            break;
+         case eUINT32:
+            q_Retval = (this->GetValueU32() == orc_Cmp.GetValueU32());
+            break;
+         case eUINT64:
+            q_Retval = (this->GetValueU64() == orc_Cmp.GetValueU64());
+            break;
+         case eSINT8:
+            q_Retval = (this->GetValueS8() == orc_Cmp.GetValueS8());
+            break;
+         case eSINT16:
+            q_Retval = (this->GetValueS16() == orc_Cmp.GetValueS16());
+            break;
+         case eSINT32:
+            q_Retval = (this->GetValueS32() == orc_Cmp.GetValueS32());
+            break;
+         case eSINT64:
+            q_Retval = (this->GetValueS64() == orc_Cmp.GetValueS64());
+            break;
+         //lint -e{777} Required float equal check
+         case eFLOAT32:
+            q_Retval = this->GetValueF32() == orc_Cmp.GetValueF32();
+            break;
+         //lint -e{777} Required float equal check
+         case eFLOAT64:
+            q_Retval = this->GetValueF64() == orc_Cmp.GetValueF64();
+            break;
+         default:
+            break;
+         }
+      }
+      else
+      {
+         if (this->GetArraySize() == orc_Cmp.GetArraySize())
+         {
+            q_Retval = true;
+            for (uint32_t u32_ItArray = 0; u32_ItArray < this->GetArraySize(); ++u32_ItArray)
+            {
+               if (this->m_CompareArrayNotEqual(orc_Cmp, u32_ItArray) == true)
+               {
+                  q_Retval = false;
+                  break;
+               }
+            }
+         }
+      }
+   }
+   return q_Retval;
+}
+
+//----------------------------------------------------------------------------------------------------------------------
 /*! \brief   Check if value at array index greater or equal to orc_Cmp
 
    \param[in]  orc_Cmp     Compared instance

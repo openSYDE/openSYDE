@@ -1,10 +1,6 @@
-#include "precomp_headers.hpp"  //pre-compiled headers
-#ifdef __BORLANDC__   //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
+#include "precomp_headers.hpp" //pre-compiled headers
 
-#include "DiagLib_config.hpp"  //diaglib configuration
+#include "DiagLib_config.hpp" //diaglib configuration
 
 #include "stwtypes.hpp"
 #include "stwerrors.hpp"
@@ -14,7 +10,6 @@
 #include "C_SclChecksums.hpp"
 
 //---------------------------------------------------------------------------
-
 
 using namespace stw::errors;
 using namespace stw::diag_lib;
@@ -35,9 +30,11 @@ static const uint8_t KFX_LOCK_Segmented_Write = 9U;
 
 //---------------------------------------------------------------------------
 
-C_KFXCommunicationKEFEX::C_KFXCommunicationKEFEX(const bool oq_SleepBetweenPolling) : C_KFXCommunicationBase()
+C_KFXCommunicationKEFEX::C_KFXCommunicationKEFEX(const bool oq_SleepBetweenPolling) :
+   C_KFXCommunicationBase()
 {
    uint8_t u8_Index;
+
    for (u8_Index = 0U; u8_Index < KFX_NUM_LOCKS; u8_Index++)
    {
       m_apcLocks[u8_Index] = new C_TglCriticalSection();
@@ -76,6 +73,7 @@ C_KFXCommunicationKEFEX::C_KFXCommunicationKEFEX(const bool oq_SleepBetweenPolli
 C_KFXCommunicationKEFEX::~C_KFXCommunicationKEFEX()
 {
    uint8_t u8_Index;
+
    for (u8_Index = 0U; u8_Index < KFX_NUM_LOCKS; u8_Index++)
    {
       delete m_apcLocks[u8_Index];
@@ -88,6 +86,7 @@ C_KFXCommunicationKEFEX::~C_KFXCommunicationKEFEX()
 void C_KFXCommunicationKEFEX::Cycle(void)
 {
    uint8_t u8_Index;
+
    //all incoming cyclic transmissions will be reported in callback in the background:
    //only do this if there is no other communication going on:
    for (u8_Index = 0U; u8_Index < KFX_NUM_LOCKS; u8_Index++)
@@ -144,7 +143,7 @@ void C_KFXCommunicationKEFEX::m_Unlock(const uint8_t ou8_Index)
 */
 //-----------------------------------------------------------------------------
 int32_t C_KFXCommunicationKEFEX::Logon(const uint64_t ou64_ProjectChecksum, const uint16_t ou16_DataVersion,
-                                      const uint16_t ou16_NumOfVars, const uint8_t ou8_ProjectIndex)
+                                       const uint16_t ou16_NumOfVars, const uint8_t ou8_ProjectIndex)
 {
    int32_t s32_Return;
    C_KFXProcotolResponse c_Service;
@@ -202,7 +201,7 @@ int32_t C_KFXCommunicationKEFEX::Logoff(const bool oq_WaitForHandshake)
                   //(will also trigger event handlers for incoming cyclic transmissions)
 
    s32_Return = mpc_Protocol->SendLogoffRequest();
-   if(s32_Return != C_NO_ERR)
+   if (s32_Return != C_NO_ERR)
    {
       return C_RD_WR;
    }
@@ -257,9 +256,9 @@ int32_t C_KFXCommunicationKEFEX::ReadService(const uint32_t ou32_Index, uint32_t
    }
 
    oru32_Value = static_cast<uint32_t>(c_Service.au8_Data[0]) +
-               ((static_cast<uint32_t>(c_Service.au8_Data[1])) << 8U) +
-               ((static_cast<uint32_t>(c_Service.au8_Data[2])) << 16U) +
-               ((static_cast<uint32_t>(c_Service.au8_Data[3])) << 24U);
+                 ((static_cast<uint32_t>(c_Service.au8_Data[1])) << 8U) +
+                 ((static_cast<uint32_t>(c_Service.au8_Data[2])) << 16U) +
+                 ((static_cast<uint32_t>(c_Service.au8_Data[3])) << 24U);
    return C_NO_ERR;
 }
 
@@ -300,7 +299,7 @@ int32_t C_KFXCommunicationKEFEX::WriteService(const uint32_t ou32_Index, const u
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::ReadEEPROM(const uint32_t ou32_Address, const uint32_t ou32_NumBytes,
-                                           uint8_t * const opu8_Data)
+                                            uint8_t * const opu8_Data)
 {
    int32_t s32_Return;
    uint32_t u32_Offset = 0U;
@@ -369,7 +368,7 @@ int32_t C_KFXCommunicationKEFEX::ReadEEPROM(const uint32_t ou32_Address, const u
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::WriteEEPROM(const uint32_t ou32_Address, const uint32_t ou32_NumBytes,
-                                            const uint8_t * const opu8_Data)
+                                             const uint8_t * const opu8_Data)
 {
    int32_t s32_Return;
    uint32_t u32_Offset = 0U;
@@ -448,7 +447,6 @@ int32_t C_KFXCommunicationKEFEX::WriteEEPROM(const uint32_t ou32_Address, const 
          u32_BytesLeft--;
       }
    }
-
 
    m_Unlock(KFX_LOCK_WriteEEP);
    return C_NO_ERR;
@@ -576,7 +574,7 @@ int32_t C_KFXCommunicationKEFEX::WriteEEPROMSSLEnd(void)
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::ReadNumericVariable(const uint32_t ou32_Index, const uint8_t ou8_NumBytes,
-                                                    int64_t & ors64_Value)
+                                                     int64_t & ors64_Value)
 {
    int32_t s32_Return;
    C_KFXProcotolResponse c_Service;
@@ -624,7 +622,7 @@ int32_t C_KFXCommunicationKEFEX::ReadNumericVariable(const uint32_t ou32_Index, 
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::WriteNumericVariable(const uint32_t ou32_Index, const uint8_t ou8_NumBytes,
-                                                     const int64_t os64_Value)
+                                                      const int64_t os64_Value)
 {
    int32_t s32_Return;
    C_KFXProcotolResponse c_Service;
@@ -671,7 +669,7 @@ int32_t C_KFXCommunicationKEFEX::WriteNumericVariable(const uint32_t ou32_Index,
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::ReadAggregateVariable(const uint32_t ou32_Index, const uint32_t ou32_NumBytes,
-                                                      uint8_t * const opu8_Data)
+                                                       uint8_t * const opu8_Data)
 {
    int32_t s32_Return;
 
@@ -697,7 +695,7 @@ int32_t C_KFXCommunicationKEFEX::ReadAggregateVariable(const uint32_t ou32_Index
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::WriteAggregateVariable(const uint32_t ou32_Index, const uint32_t ou32_NumBytes,
-                                                       const uint8_t * const opu8_Data)
+                                                        const uint8_t * const opu8_Data)
 {
    int32_t s32_Return;
 
@@ -754,9 +752,10 @@ int32_t C_KFXCommunicationKEFEX::SendChangeNotification(const uint32_t ou32_Inde
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::RequestTimeTriggeredTransmission(const uint32_t ou32_Index, const bool oq_TimeStamped,
-                                                                 const uint32_t ou32_Interval)
+                                                                  const uint32_t ou32_Interval)
 {
    int32_t s32_Return;
+
    tgl_assert(ou32_Index <= 0xFFFFU); //this protocol implementation can only handle a 16bit index
    s32_Return = mpc_Protocol->SendTCRRRequest(static_cast<uint16_t>(ou32_Index), oq_TimeStamped,
                                               static_cast<uint16_t>(ou32_Interval));
@@ -766,11 +765,12 @@ int32_t C_KFXCommunicationKEFEX::RequestTimeTriggeredTransmission(const uint32_t
 //---------------------------------------------------------------------------
 
 int32_t C_KFXCommunicationKEFEX::RequestChangeTriggeredTransmission(const uint32_t ou32_Index,
-                                                                   const uint32_t ou32_MaxTimeout,
-                                                                   const uint32_t ou32_UpperHysteresis,
-                                                                   const uint32_t ou32_LowerHysteresis)
+                                                                    const uint32_t ou32_MaxTimeout,
+                                                                    const uint32_t ou32_UpperHysteresis,
+                                                                    const uint32_t ou32_LowerHysteresis)
 {
    int32_t s32_Return;
+
    tgl_assert(ou32_Index <= 0xFFFFU); //this protocol implementation can only handle a 16bit index
    s32_Return = mpc_Protocol->SendECRRRequestAbsolute(static_cast<uint16_t>(ou32_Index),
                                                       static_cast<uint16_t>(ou32_MaxTimeout),
@@ -788,6 +788,7 @@ int32_t C_KFXCommunicationKEFEX::TerminateCyclicTransmission(const uint32_t ou32
 {
    int32_t s32_Return;
    C_KFXProcotolResponse c_Service;
+
    tgl_assert(ou32_Index <= 0xFFFFU); //this protocol implementation can only handle a 16bit index
 
    this->Cycle(); //clear all orphaned responses (will also trigger event handlers for incoming cyclic transmissions)
@@ -859,6 +860,7 @@ int32_t C_KFXCommunicationKEFEX::TerminateAllCyclicTransmissions(const bool oq_W
 int32_t C_KFXCommunicationKEFEX::LoadConfigFromINI(C_SclIniFile * const opc_File, const C_SclString & orc_Section)
 {
    int32_t s32_Return;
+
    s32_Return = C_KFXCommunicationBase::LoadConfigFromINI(opc_File, orc_Section);
    if (s32_Return != C_NO_ERR)
    {
@@ -873,6 +875,7 @@ int32_t C_KFXCommunicationKEFEX::LoadConfigFromINI(C_SclIniFile * const opc_File
 int32_t C_KFXCommunicationKEFEX::SetConfig(const C_KFXCommConfiguration * const opt_Config)
 {
    int32_t s32_Return;
+
    s32_Return = C_KFXCommunicationBase::SetConfig(opt_Config);
    if (s32_Return != C_NO_ERR)
    {
@@ -946,7 +949,7 @@ void C_KFXCommunicationKEFEX::ResetCommProtocol(void)
 
 #ifdef CMONPROTOCOL_ALLOW_RAMVIEW_PROJECT_MAPPING
 void C_KFXCommunicationKEFEX::SetKEFEXVariableInfo(const C_KFXVariableLists * const opt_KFXLists,
-                                                   const uint16 ou16_ListOffset) const
+                                                   const uint16_t ou16_ListOffset) const
 {
    mpc_Protocol->SetKEFEXVariableInfo(opt_KFXLists, ou16_ListOffset);
 }

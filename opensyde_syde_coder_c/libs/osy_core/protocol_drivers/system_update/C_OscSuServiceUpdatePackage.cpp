@@ -206,9 +206,9 @@ int32_t C_OscSuServiceUpdatePackage::h_CreatePackage(const C_SclString & orc_Pac
          // guarantee a correct behavior of h_CreateTemporaryFolder
          mhc_ErrorMessage = "Could not create temporary folder \"" +
                             c_PackagePathTmp + "\" with application files.";
-         if ((s32_Return == C_TIMEOUT) || (s32_Return == C_RD_WR))
+         if (c_ErrorPath.IsEmpty() == false)
          {
-            mhc_ErrorMessage += "\nIssue in path: \"" + c_ErrorPath + "\"";
+            mhc_ErrorMessage += " Issue in path: \"" + c_ErrorPath + "\"";
          }
          osc_write_log_error("Creating Update Package", mhc_ErrorMessage);
          s32_Return = C_RD_WR; // redefine because we only have a few error codes
@@ -772,7 +772,9 @@ int32_t C_OscSuServiceUpdatePackage::mh_CheckParamsToCreatePackage(const C_SclSt
    {
       const C_SclString c_TargetDir = TglExtractFilePath(orc_PackagePath);
 
-      if (TglDirectoryExists(c_TargetDir) == false)
+      // package name without path or './' leads to target directory "",
+      // which should not lead to error as it will result in creating package next to executable
+      if ((c_TargetDir.IsEmpty() == false) && (TglDirectoryExists(c_TargetDir) == false))
       {
          mhc_ErrorMessage = "Target directory \"" + c_TargetDir + "\" does not exist.";
          osc_write_log_error("Creating Update Package", mhc_ErrorMessage);

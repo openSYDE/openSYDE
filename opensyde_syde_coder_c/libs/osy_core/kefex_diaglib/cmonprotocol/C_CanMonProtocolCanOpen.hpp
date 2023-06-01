@@ -8,20 +8,12 @@
    \copyright   Copyright 2006 Sensor-Technik Wiedemann GmbH. All rights reserved.
 */
 //----------------------------------------------------------------------------------------------------------------------
-#ifndef CCMONProtocolCANOPENH
-#define CCMONProtocolCANOPENH
+#ifndef CCMONPROTOCOLCANOPENHPP
+#define CCMONPROTOCOLCANOPENHPP
 
 #include "stwtypes.hpp"
 #include "C_CanMonProtocolBase.hpp"
 #include "C_SclString.hpp"
-
-#ifndef CMONPROTOCOL_PACKAGE
-#ifdef __BORLANDC__
-#define CMONPROTOCOL_PACKAGE __declspec(package)
-#else
-#define CMONPROTOCOL_PACKAGE
-#endif
-#endif
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +24,7 @@ namespace cmon_protocol
 //----------------------------------------------------------------------------------------------------------------------
 
 ///CANopen protocol converter
-class CMONPROTOCOL_PACKAGE C_CanMonProtocolCanOpen :
+class C_CanMonProtocolCanOpen :
    public C_CanMonProtocolBase
 {
 public:

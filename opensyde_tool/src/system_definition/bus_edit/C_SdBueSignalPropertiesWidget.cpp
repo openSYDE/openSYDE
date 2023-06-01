@@ -86,8 +86,7 @@ C_SdBueSignalPropertiesWidget::C_SdBueSignalPropertiesWidget(QWidget * const opc
 
    this->mpc_Ui->pc_LabelObjectDictValue->SetBackgroundColor(11);
    this->mpc_Ui->pc_LabelObjectDictValue->SetForegroundColor(1);
-   this->mpc_Ui->pc_LabelObjectDictValue->SetFontPixel(13);
-
+   this->mpc_Ui->pc_LabelObjectDictValue->SetMarginsPadding(1);
    this->mpc_Ui->pc_ComboBoxType->view()->setTextElideMode(Qt::ElideRight);
 
    InitStaticNames();

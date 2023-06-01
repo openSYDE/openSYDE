@@ -169,6 +169,10 @@ bool C_GiBiTextElement::OpenStyleDialog(const bool oq_DarkMode)
       new C_GiSyBaseWidget(*c_New, C_GtGetText::h_GetText("Text Element"), oq_DarkMode);
    C_GiSyTextElementWidget * const pc_SettingsWidget = new C_GiSyTextElementWidget(*pc_Dialog);
 
+   const QSize c_SIZE(880, 506);
+
+   c_New->SetSize(c_SIZE);
+
    pc_SettingsWidget->SetFontColor(this->GetFontColor());
    pc_SettingsWidget->SetFontStyle(this->GetFontStyle());
 

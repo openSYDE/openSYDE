@@ -1395,11 +1395,9 @@ void C_SyvUpPacListWidget::m_AddFileAction(void)
       if (this->mpc_SelectedNode->IsFileBased() == false)
       {
          // No file based and a openSYDE device, only parameter set image and PEM files are possible to add
-         this->m_AddNewFile(C_GtGetText::h_GetText("openSYDE parameter set image or PEM file"),
-                            static_cast<QString>(C_GtGetText::h_GetText(
-                                                    "openSYDE parameter set image")) + " (*.syde_psi);;" +
-                            static_cast<QString>(C_GtGetText::h_GetText(
-                                                    "PEM file")) + " (*.pem)");
+         this->m_AddNewFile(C_GtGetText::h_GetText("Add openSYDE parameter set image or PEM file"),
+                            static_cast<QString>(C_GtGetText::h_GetText("Parameter set image/PEM file")) +
+                            " (*.syde_psi *.pem)");
       }
       else
       {
@@ -1444,8 +1442,25 @@ void C_SyvUpPacListWidget::m_AddNewFile(const QString & orc_DialogCaption, const
                const bool q_ParamsetFile = c_File.completeSuffix().toLower() == "syde_psi";
                const bool q_PemFile = c_File.completeSuffix().toLower() == "pem";
 
-               // add file
-               this->mpc_SelectedNode->AddNewFile(c_Files[s32_Pos], q_ParamsetFile, q_PemFile);
+               if ((this->mpc_SelectedNode->IsFileBased() == false) && (q_ParamsetFile == false) &&
+                   (q_PemFile == false))
+               {
+                  // Only PEM and PSI files are allowed in non-filebased-case
+                  const QString c_Details =
+                     static_cast<QString>(C_GtGetText::h_GetText("File path: %1")).arg(c_Files[s32_Pos]);
+                  C_OgeWiCustomMessage c_Message(this, C_OgeWiCustomMessage::E_Type::eERROR);
+                  c_Message.SetHeading(C_GtGetText::h_GetText("Update Package Configuration"));
+                  c_Message.SetDescription(C_GtGetText::h_GetText(
+                                              "Invalid file: only *.syde_psi and *.pem files are allowed."));
+                  c_Message.SetDetails(c_Details);
+                  c_Message.SetCustomMinHeight(180, 250);
+                  c_Message.Execute();
+               }
+               else
+               {
+                  // add file
+                  this->mpc_SelectedNode->AddNewFile(c_Files[s32_Pos], q_ParamsetFile, q_PemFile);
+               }
             }
 
             // remember last path

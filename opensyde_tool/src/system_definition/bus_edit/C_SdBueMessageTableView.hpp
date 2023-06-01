@@ -34,7 +34,7 @@ class C_SdBueMessageTableView :
 
 public:
    C_SdBueMessageTableView(QWidget * const opc_Parent = NULL);
-   virtual ~C_SdBueMessageTableView(void);
+   ~C_SdBueMessageTableView(void) override;
 
    void LoadUserSettings(const std::vector<int32_t> & orc_Values);
    void SaveUserSettings(std::vector<int32_t> & orc_Values) const;

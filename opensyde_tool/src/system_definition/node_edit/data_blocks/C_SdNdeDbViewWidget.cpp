@@ -233,7 +233,9 @@ void C_SdNdeDbViewWidget::AddFromTsp(void)
    //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
 
    //Resize
-   c_New->SetSize(QSize(800, 745));
+   const QSize c_SIZE(970, 745);
+
+   c_New->SetSize(c_SIZE);
 
    //init
    pc_Dialog->SetTspPath(C_UsHandler::h_GetInstance()->GetProjSdTopologyLastKnownTspPath());
@@ -566,7 +568,7 @@ void C_SdNdeDbViewWidget::m_ProgrammingOptions(void) const
       //connect(pc_New, &C_OgePopUpDialog::SigHelp, pc_SettingsWidget, &C_GiSyLineWidget::HandleHelp);
 
       //Resize
-      c_New->SetSize(QSize(810, 350));
+      c_New->SetSize(QSize(810, 573));
 
       if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
       {

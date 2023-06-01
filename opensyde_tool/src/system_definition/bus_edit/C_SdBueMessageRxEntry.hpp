@@ -120,6 +120,7 @@ private:
    void m_HandleInactiveStates(void) const;
    void m_UpdateAndAdaptRxTimeoutValue(void);
    void m_UpdateTimeoutLink(void) const;
+   void m_HandleWidgetSize(const uint32_t ou32_NumEntries);
 
    //Avoid call
    C_SdBueMessageRxEntry(const C_SdBueMessageRxEntry &);

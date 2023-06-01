@@ -36,7 +36,23 @@
     <widget class="stw::opensyde_gui::C_CamMetControlBarWidget" name="pc_ControlWidget" native="true"/>
    </item>
    <item>
-    <widget class="stw::opensyde_gui::C_CamMetTreeView" name="pc_TraceView"/>
+    <widget class="stw::opensyde_gui::C_CamMetTreeView" name="pc_TraceView">
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="dragEnabled">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropMode">
+      <enum>QAbstractItemView::DragDrop</enum>
+     </property>
+     <property name="defaultDropAction">
+      <enum>Qt::MoveAction</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="stw::opensyde_gui::C_CamMetStatusBarWidget" name="pc_StatusWidget" native="true"/>

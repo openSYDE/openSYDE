@@ -471,9 +471,9 @@ C_GiTextElementBus * C_SdTopologyScene::AddTextElementBus(const uint64_t * const
 
    s32_Index = static_cast<int32_t>(C_PuiSdHandler::h_GetInstance()->c_BusTextElements.size());
    //Get next free z value
-   orf64_BusZetValue = this->GetHighestUsedZetValueList(this->items()) + 1.0;
-   //Place text element over the bus
-   c_Data.f64_ZetOrder = orf64_BusZetValue + 1.0;
+   orf64_BusZetValue = this->GetHighestUsedZetValueList(this->items()) + 2.0;
+   //Place text element under the bus
+   c_Data.f64_ZetOrder = orf64_BusZetValue - 1.0;
    C_PuiSdHandler::h_GetInstance()->c_BusTextElements.push_back(c_Data);
 
    this->m_SyncIndex(C_PuiSdDataElement::eTEXT_ELEMENT_BUS, s32_Index, C_PuiSdDataElement::eADD);
@@ -2982,7 +2982,8 @@ void C_SdTopologyScene::m_ShowNewConnectionPopUp(const C_GiNode * const opc_Node
                                                                                      opc_Bus->GetIndex(),
                                                                                      s32_SpecialInterface);
       //Resize
-      c_Dialog->SetSize(QSize(800, 280));
+      const QSize c_SIZE(800, 364);
+      c_Dialog->SetSize(c_SIZE);
       if (pc_ComIfWidget->GetInteractionPossible() == true)
       {
          if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))
@@ -3071,7 +3072,7 @@ void C_SdTopologyScene::m_ShowNewNodeToNodeConnectionPopUp(const C_GiNode * cons
                                                                                                            opc_Node1->GetIndex(),
                                                                                                            opc_Node2->GetIndex());
       //Resize
-      c_Dialog->SetSize(QSize(800, 450));
+      c_Dialog->SetSize(QSize(800, 577));
       if (pc_ComIfWidget->GetInteractionPossible() == true)
       {
          if (c_Dialog->exec() == static_cast<int32_t>(QDialog::Accepted))

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013 Tobias Lorenz.
+ * Copyright (C) 2013-2019 Tobias Lorenz.
  * Contact: tobias.lorenz@gmx.net
  *
  * This file is part of Tobias Lorenz's Toolkit.
@@ -23,6 +23,8 @@
 
 #include <Vector/DBC/platform.h>
 
+#include <cstdint>
+#include <ostream>
 #include <string>
 
 #include <Vector/DBC/ByteOrder.h>
@@ -36,44 +38,42 @@ namespace DBC {
 /**
  * Signal Type (SGTYPE)
  */
-class VECTOR_DBC_EXPORT SignalType
-{
-public:
-    SignalType();
-
+struct VECTOR_DBC_EXPORT SignalType {
     /** Name */
-    std::string name;
+    std::string name {};
 
     /** Size */
-    unsigned int size;
+    uint32_t size {};
 
     /** Byte Order */
-    ByteOrder byteOrder;
+    ByteOrder byteOrder { ByteOrder::BigEndian };
 
     /** Value Type */
-    ValueType valueType;
+    ValueType valueType { ValueType::Unsigned };
 
     /** Factor */
-    double factor;
+    double factor {};
 
     /** Offset */
-    double offset;
+    double offset {};
 
-    /** Minimum */
-    double minimum;
+    /** Minimum Physical Value */
+    double minimum {};
 
-    /** Maximum */
-    double maximum;
+    /** Maximum Physical Value */
+    double maximum {};
 
     /** Unit */
-    std::string unit;
+    std::string unit {};
 
     /** Default Value */
-    double defaultValue;
+    double defaultValue {};
 
     /** Value Table */
-    std::string valueTable;
+    std::string valueTable {};
 };
+
+std::ostream & operator<<(std::ostream & os, const SignalType & signalType);
 
 }
 }

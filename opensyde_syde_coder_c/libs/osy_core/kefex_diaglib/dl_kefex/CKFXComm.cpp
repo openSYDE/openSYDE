@@ -1,8 +1,4 @@
 #include "precomp_headers.hpp" //pre-compiled headers
-#ifdef __BORLANDC__            //putting the pragmas in the config-header will not work
-#pragma hdrstop
-#pragma package(smart_init)
-#endif
 
 #include "DiagLib_config.hpp" //diaglib configuration
 
@@ -19,7 +15,6 @@ using namespace stw::scl;
 
 //---------------------------------------------------------------------------
 
-//place string here instead of header (else Borland precompiled headers will not work !)
 namespace stw
 {
 namespace diag_lib
@@ -81,6 +76,7 @@ C_KFXCommunicationBase::C_KFXCommunicationBase(void)
 
 C_KFXCommunicationBase::~C_KFXCommunicationBase()
 {
+   mpr_ECUResetCallBack = NULL;
    mpv_ECUResetInstance = NULL;
 }
 

@@ -26,29 +26,20 @@ namespace stw
 {
 namespace scl
 {
-//maybe this will be a part of a Borland library:
-#ifndef SCL_PACKAGE
-#ifdef __BORLANDC__
-#define SCL_PACKAGE __declspec(package)
-#else
-#define SCL_PACKAGE
-#endif
-#endif
-
 /* -- Global Constants ---------------------------------------------------------------------------------------------- */
 
 /* -- Types --------------------------------------------------------------------------------------------------------- */
 
 //suppress PC-Lint false positives (those do have side-effects):
-//lint -estring(1960,"stw::scl::SCLDynamicArray<<1>>::Delete(long)")
-//lint -estring(1960,"stw::scl::SCLDynamicArray<<1>>::IncLength(long)")
-//lint -estring(1960,"stw::scl::SCLDynamicArray<<1>>::Insert(long, const <1>&)")
-//lint -estring(1960,"stw::scl::SCLDynamicArray<<1>>::SetLength(long)")
+//lint -estring(1960,"stw::scl::C_SclDynamicArray<<1>>::Delete(long)")
+//lint -estring(1960,"stw::scl::C_SclDynamicArray<<1>>::IncLength(long)")
+//lint -estring(1960,"stw::scl::C_SclDynamicArray<<1>>::Insert(long, const <1>&)")
+//lint -estring(1960,"stw::scl::C_SclDynamicArray<<1>>::SetLength(long)")
 ///Template-based array with dynamic size
-template <class T> class SCL_PACKAGE C_SclDynamicArray
+template <class T> class C_SclDynamicArray
 {
 private:
-   std::vector<T> mc_Array; ///< actual container wrapped by SCLDynamicArray
+   std::vector<T> mc_Array; ///< actual container wrapped by this class
 
 public:
    C_SclDynamicArray(void);
@@ -256,7 +247,7 @@ template <class T> void C_SclDynamicArray<T>::Delete(const int32_t os32_Index)
 {
    if (os32_Index > this->GetHigh())
    {
-      throw "SCLDynamicArray::Delete at Invalid Position !";
+      throw "C_SclDynamicArray::Delete at Invalid Position !";
    }
    typename std::vector<T>::iterator c_Index = mc_Array.begin();
    c_Index += os32_Index;
@@ -281,7 +272,7 @@ template <class T> void C_SclDynamicArray<T>::Insert(const int32_t os32_Index, c
 {
    if (os32_Index > this->GetLength()) //allow appending ...
    {
-      throw "SCLDynamicArray::Insert at Invalid Position !";
+      throw "C_SclDynamicArray::Insert at Invalid Position !";
    }
    typename std::vector<T>::iterator c_Index = mc_Array.begin();
    c_Index += os32_Index;

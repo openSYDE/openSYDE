@@ -353,6 +353,10 @@ void C_NagMainWidget::OnSaveProjAs(void)
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_PopSaveAsDialogWidget * const pc_Dialog = new C_PopSaveAsDialogWidget(*c_New);
 
+   const QSize c_SIZE(906, 415);
+
+   c_New->SetSize(c_SIZE);
+
    if (c_New->exec() == static_cast<int32_t>(QDialog::Accepted))
    {
       UpdateRecentProjects();
@@ -374,6 +378,10 @@ void C_NagMainWidget::OnCreateServiceProj(void)
 {
    const QPointer<C_OgePopUpDialog> c_New = new C_OgePopUpDialog(this, this);
    C_PopCreateServiceProjDialogWidget * const pc_Dialog = new C_PopCreateServiceProjDialogWidget(*c_New);
+
+   const QSize c_SIZE(908, 784);
+
+   c_New->SetSize(c_SIZE);
 
    // get views for tree visualization of the project permissions
    std::vector<uint32_t> c_ViewIndices;
@@ -431,7 +439,7 @@ void C_NagMainWidget::OpenColorPicker(void)
    C_GiSyColorSelectWidget * const pc_ColorWidget = new C_GiSyColorSelectWidget(*c_Popup, mc_STYLE_GUIDE_COLOR_7);
 
    //Resize
-   c_Popup->SetSize(QSize(412, 620));
+   c_Popup->SetSize(QSize(462, 670));
 
    // open color picker dialog
    if (c_Popup->exec() == static_cast<int32_t>(QDialog::Accepted))
@@ -684,7 +692,7 @@ void C_NagMainWidget::m_AboutClicked()
                         C_GtGetText::h_GetText("QCustomPlot by Emanuel Eichhammer"));
 
    //Resize
-   c_New->SetSize(QSize(650, 350));
+   c_New->SetSize(QSize(650, 611));
 
    c_New->exec();
 

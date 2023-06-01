@@ -60,6 +60,7 @@ private:
    virtual E_Result m_OpenEthernet(void);
    virtual stw::scl::C_SclString m_GetApplicationVersion(const stw::scl::C_SclString & orc_ApplicationFileName) const;
    virtual stw::scl::C_SclString m_GetDefaultLogLocation(void) const;
+   virtual stw::scl::C_SclString m_GetUnzipLocationDefaultExample(void) const;
    virtual stw::scl::C_SclString m_GetCanInterfaceUsageExample(void) const;
 
    bool mq_CanDllLoaded;
